@@ -3288,8 +3288,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askEmbark(Unit unit, Unit carrier, Direction direction) {
         Client client = freeColClient.getClient();
         EmbarkMessage message = new EmbarkMessage(unit, carrier, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

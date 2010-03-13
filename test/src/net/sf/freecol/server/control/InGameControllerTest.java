@@ -50,6 +50,10 @@ import net.sf.freecol.util.test.MockMapGenerator;
 
 public class InGameControllerTest extends FreeColTestCase {
     TileType plains = spec().getTileType("model.tile.plains");
+    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
+    UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
+    UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
     UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
@@ -207,6 +211,63 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse(lake.isConnected());
         treasure.setLocation(lake);
         assertFalse(treasure.canCashInTreasureTrain());
+    }
+
+    public void testEmbark() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getCoastTestMap(plains);
+        server.setMapGenerator(new MockMapGenerator(map));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+        // we need to update the reference
+        map = game.getMap();
+
+        //Game game = getStandardGame();
+        //Map map = getTestMap();
+        //Tile tile = map.getTile(6, 8);
+        //game.setMap(map);
+
+        InGameController igc = (InGameController) server.getController();
+        Tile landTile = map.getTile(9, 9);
+        Tile seaTile = map.getTile(10, 9);
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Unit colonist = new Unit(game, landTile, dutch, colonistType, UnitState.ACTIVE);
+        Unit galleon = new Unit(game, seaTile, dutch, galleonType, UnitState.ACTIVE);
+        Unit caravel = new Unit(game, seaTile, dutch, caravelType, UnitState.ACTIVE);
+        caravel.getType().setSpaceTaken(2);
+        Unit wagon = new Unit(game, landTile, dutch, wagonTrainType, UnitState.ACTIVE);
+
+        // can not put ship on carrier
+        igc.embarkUnit(dutch, caravel, galleon);
+        assertTrue("caravel can not be put on galleon",
+                   caravel.getLocation() == seaTile);
+
+        // can not put wagon on galleon at its normal size
+        wagon.getType().setSpaceTaken(12);
+        igc.embarkUnit(dutch, wagon, galleon);
+        assertTrue("large wagon can not be put on galleon",
+                   wagon.getLocation() == landTile);
+
+        // but we can if it is made smaller
+        wagon.getType().setSpaceTaken(2);
+        igc.embarkUnit(dutch, wagon, galleon);
+        assertTrue("wagon should now fit on galleon",
+                   wagon.getLocation() == galleon);
+        assertEquals(UnitState.SENTRY, wagon.getState());
+
+        // can put colonist on carrier
+        igc.embarkUnit(dutch, colonist, caravel);
+        assertTrue("colonist should embark on caravel",
+                   colonist.getLocation() == caravel);
+        assertEquals(UnitState.SENTRY, colonist.getState());
     }
 
 }

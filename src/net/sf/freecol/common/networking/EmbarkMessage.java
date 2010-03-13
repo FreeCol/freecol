@@ -19,20 +19,17 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -97,6 +94,7 @@ public class EmbarkMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -140,38 +138,14 @@ public class EmbarkMessage extends Message {
             }
             if (carrier.getTile() != destinationTile) {
                 return Message.clientError("Carrier: " + carrierId
-                                           + " is not next to unit: " + unitId);
+                                           + " is not at destination tile: "
+                                           + destinationTile.toString());
             }
         }
 
-        // Embark
-        if (!server.getInGameController().embarkUnit(serverPlayer, unit, carrier)) {
-            if (unit.isNaval()) {
-                return Message.clientError("Naval unit " + unitId
-                                           + " can not embark.");
-            } else {
-                return Message.clientError("No space available for unit " + unitId
-                                           + " to embark.");
-            }
-        }
-
-
-        // Return the updated carrier and the source location.
-        // Splice in an animation if there was movement between tiles.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        if (sourceTile != null && destinationTile != null) {
-            Element animate = doc.createElement("animateMove");
-            reply.appendChild(animate);
-            animate.setAttribute("unit", unit.getId());
-            animate.setAttribute("oldTile", sourceTile.getId());
-            animate.setAttribute("newTile", destinationTile.getId());
-        }
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(carrier.toXMLElement(serverPlayer, doc));
-        update.appendChild(((FreeColGameObject) sourceLocation).toXMLElement(serverPlayer, doc));
-        return reply;
+        // Proceed to embark
+        return server.getInGameController()
+            .embarkUnit(serverPlayer, unit, carrier);
     }
 
     /**

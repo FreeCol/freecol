@@ -180,55 +180,6 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertTrue("Tile2 should be explored by french player",french.hasExplored(tile2));
     }
 
-    public void testEmbark() {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-        Map map = getCoastTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        PreGameController pgc = (PreGameController) server.getController();
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-        // we need to update the reference
-        map = game.getMap();
-
-        //Game game = getStandardGame();
-        //Map map = getTestMap();
-        //Tile tile = map.getTile(6, 8);
-        //game.setMap(map);
-
-        InGameController igc = (InGameController) server.getController();
-        Tile landTile = map.getTile(9, 9);
-        Tile seaTile = map.getTile(10, 9);
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Unit colonist = new Unit(game, landTile, dutch, colonistType, UnitState.ACTIVE);
-        Unit galleon = new Unit(game, seaTile, dutch, galleonType, UnitState.ACTIVE);
-        Unit caravel = new Unit(game, seaTile, dutch, caravelType, UnitState.ACTIVE);
-        caravel.getType().setSpaceTaken(2);
-        Unit wagon = new Unit(game, landTile, dutch, wagonTrainType, UnitState.ACTIVE);
-
-        // can not put ship on carrier
-        assertFalse(igc.embarkUnit(dutch, caravel, galleon));
-
-        // can not put wagon on galleon at its normal size
-        wagon.getType().setSpaceTaken(12);
-        assertFalse(igc.embarkUnit(dutch, wagon, galleon));
-
-        // but we can if it is made smaller
-        wagon.getType().setSpaceTaken(2);
-        assertTrue(igc.embarkUnit(dutch, wagon, galleon));
-        assertEquals(UnitState.SENTRY, wagon.getState());
-
-        // can put colonist on carrier
-        assertTrue(igc.embarkUnit(dutch, colonist, caravel));
-        assertEquals(UnitState.SENTRY, colonist.getState());
-    }
-
     public void testLoadInColony() {
         if (server == null) {
             server = ServerTestHelper.startServer(false, true);

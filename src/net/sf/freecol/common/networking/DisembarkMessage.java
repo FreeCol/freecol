@@ -19,19 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -71,41 +65,22 @@ public class DisembarkMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return An update containing the disembarkd unit,
+     * @return An update containing the disembarked unit,
      *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        if (!(unit.getLocation() instanceof Unit)) {
-            return Message.clientError("Unit " + unitId
-                                       + " at " + unit.getLocation().getId()
-                                       + " which is not a carrier.");
-        }
 
         // Do the disembark.
-        Unit carrier = (Unit) unit.getLocation();
-        if (!server.getInGameController().disembarkUnit(serverPlayer, unit)) {
-            return Message.clientError("Unable to disembark " + unitId
-                                       + " from " + carrier.getId());
-        }
-
-        // Only have to update the new location, as it contains the carrier.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        if (carrier.isInEurope()) {
-            Europe europe = (Europe) carrier.getLocation();
-            reply.appendChild(europe.toXMLElement(player, doc));
-        } else {
-            Tile tile = (Tile) carrier.getLocation();
-            reply.appendChild(tile.toXMLElement(player, doc));
-        }
-        return reply;
+        return server.getInGameController()
+            .disembarkUnit(serverPlayer, unit);
     }
 
     /**

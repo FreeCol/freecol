@@ -2201,28 +2201,50 @@ public final class InGameController extends Controller {
      * Embark a unit onto a carrier.
      * Checking that the locations are appropriate is not done here.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose unit is
-     *                     embarking.
+     * @param serverPlayer The <code>ServerPlayer</code> embarking.
      * @param unit The <code>Unit</code> that is embarking.
      * @param carrier The <code>Unit</code> to embark onto.
-     * @return True if the the embarkation succeeds.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public boolean embarkUnit(ServerPlayer serverPlayer, Unit unit,
+    public Element embarkUnit(ServerPlayer serverPlayer, Unit unit,
                               Unit carrier) {
-        if (unit.isNaval() || carrier.getSpaceLeft() < unit.getSpaceTaken()) {
-            return false;
+        if (unit.isNaval()) {
+            return Message.clientError("Naval unit " + unit.getId()
+                                       + " can not embark.");
+        }
+        if (carrier.getSpaceLeft() < unit.getSpaceTaken()) {
+            return Message.clientError("No space available for unit "
+                                       + unit.getId() + " to embark.");
         }
 
+        List<Object> objects = new ArrayList<Object>();
         Location oldLocation = unit.getLocation();
+        boolean visible = oldLocation instanceof Tile
+            && ((Tile) oldLocation).getSettlement() == null
+            && carrier.getLocation() != oldLocation;
         unit.setLocation(carrier);
-        unit.setMovesLeft(0); // unit.getMovesLeft() -  3
+        unit.setMovesLeft(0);
         unit.setState(UnitState.SENTRY);
-
-        // Update others
-        if (oldLocation instanceof Tile) {
-            sendRemoveUnitToAll(serverPlayer, unit, (Tile) oldLocation);
+        objects.add(oldLocation);
+        if (carrier.getLocation() != oldLocation) {
+            objects.add(carrier);
+            addAnimate(objects, unit, oldLocation.getTile(),
+                       carrier.getTile());
         }
-        return true;
+
+        // Others can see the carrier capacity, and might see the
+        // embarking unit board, but will certainly see it disappear.
+        List<Object> otherObjects = new ArrayList<Object>();
+        otherObjects.add(oldLocation);
+        if (visible) {
+            objects.add(carrier);
+            addAnimate(objects, unit, oldLocation.getTile(),
+                       carrier.getTile());
+        } else {
+            addRemove(otherObjects, unit);
+        }
+        sendToOthers(serverPlayer, otherObjects);
+        return buildUpdate(serverPlayer, objects);
     }
 
     /**
@@ -2231,24 +2253,27 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> whose unit is
      *                     embarking.
      * @param unit The <code>Unit</code> that is disembarking.
-     * @return True if the the disembark succeeds.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public boolean disembarkUnit(ServerPlayer serverPlayer, Unit unit) {
-        if (unit.isNaval() || !(unit.getLocation() instanceof Unit)) {
-            return false;
+    public Element disembarkUnit(ServerPlayer serverPlayer, Unit unit) {
+        if (unit.isNaval()) {
+            return Message.clientError("Naval unit " + unit.getId()
+                                       + " can not disembark.");
+        }
+        if (unit.getLocation() instanceof Unit) {
+            return Message.clientError("Unit " + unit.getId()
+                                       + " is not embarked.");
         }
 
         Unit carrier = (Unit) unit.getLocation();
-        Location destination = carrier.getLocation();
-        unit.setLocation(destination);
+        Location newLocation = carrier.getLocation();
+        unit.setLocation(newLocation);
         unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
         unit.setState(UnitState.ACTIVE);
 
-        // Update others, but not Europe.
-        if (destination.getTile() != null) {
-            sendToOthers(serverPlayer, destination.getTile());
-        }
-        return true;
+        // Others can (potentially) see the location.
+        sendToOthers(serverPlayer, newLocation);
+        return buildUpdate(serverPlayer, newLocation);
     }
 
     /**
