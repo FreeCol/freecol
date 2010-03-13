@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -63,12 +64,68 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         META_SERVER
     };
 
-    private final JTextField server, port1, port2, name;
-    private final JRadioButton single, join, start, meta;
-    private final JLabel ipLabel, port1Label, port2Label, advantageLabel;
-    private final JCheckBox publicServer;
-    private final JCheckBox selectColors;
-    private final JComboBox nationalAdvantages;
+    private final JLabel ipLabel = localizedLabel("host");
+    private final JLabel port1Label = localizedLabel("port");
+    private final JLabel port2Label = localizedLabel("startServerOnPort");
+    private final JLabel advantageLabel = localizedLabel("playerOptions.nationalAdvantages");
+    private final JLabel rulesLabel = localizedLabel("rules");
+    private final JLabel difficultyLabel = localizedLabel("difficulty");
+
+    private final JCheckBox publicServer = new JCheckBox(Messages.message("publicServer"));
+    private final JTextField name = new JTextField(System.getProperty("user.name",
+                                                                      Messages.message("defaultPlayerName")), 20);
+
+    private final JTextField server = new JTextField("127.0.0.1");
+    private final JTextField port1 = new JTextField(FreeCol.getDefaultPort());
+    private final JTextField port2 = new JTextField(FreeCol.getDefaultPort());
+    private final JRadioButton single = new JRadioButton(Messages.message("singlePlayerGame"), true);
+    private final JRadioButton join = new JRadioButton(Messages.message("joinMultiPlayerGame"), false);
+    private final JRadioButton start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
+    private final JRadioButton meta = new JRadioButton( Messages.message("getServerList")
+                                                        + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
+
+    // TODO: enable this option
+    private final JCheckBox selectColors = new JCheckBox(Messages.message("playerOptions.selectColors"));
+
+    private final Advantages[] choices = new Advantages[] {
+        Advantages.SELECTABLE,
+        Advantages.FIXED,
+        Advantages.NONE
+    };
+    private final JComboBox nationalAdvantages = new JComboBox(choices);
+
+    // TODO: read these from mods
+    private final JComboBox specificationBox =
+        new JComboBox(new String[] { "FreeCol", "Colonization" });
+
+    private final String[] filenames = new String[] {"freecol", "classic" };
+
+    private final String[] difficulties = new String[] {
+        "model.difficulty.veryEasy",
+        "model.difficulty.easy",
+        "model.difficulty.medium",
+        "model.difficulty.hard",
+        "model.difficulty.veryHard"
+    };
+
+    private final JComboBox difficultyBox = new JComboBox();
+
+    private final Component[] joinComponents = new Component[] {
+        ipLabel, server, port1Label, port1
+    };
+
+    private final Component[] serverComponents = new Component[] {
+        publicServer, port2Label, port2
+    };
+
+    private final Component[] gameComponents = new Component[] {
+        advantageLabel, nationalAdvantages,
+        difficultyLabel, difficultyBox,
+        rulesLabel, specificationBox
+        //, selectColors
+    };
+
+    private final ButtonGroup group = new ButtonGroup();
 
     private final ConnectController connectController;
 
@@ -82,40 +139,18 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         super(parent);
         this.connectController = getClient().getConnectController();
 
-        JButton         cancel = new JButton( Messages.message("cancel") );
-        ButtonGroup     group = new ButtonGroup();
-        JLabel          nameLabel = new JLabel( Messages.message("name") );
+        JButton cancel = new JButton( Messages.message("cancel") );
+        JLabel nameLabel = localizedLabel("name");
+
+        for (String key : difficulties) {
+            difficultyBox.addItem(Messages.message(key));
+        }
 
         setCancelComponent(cancel);
 
-        ipLabel = new JLabel( Messages.message("host") );
-        port1Label = new JLabel( Messages.message("port") );
-        port2Label = new JLabel( Messages.message("startServerOnPort") );
-        advantageLabel = new JLabel(Messages.message("playerOptions.nationalAdvantages"));
-
-        publicServer = new JCheckBox( Messages.message("publicServer") );
-        name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
-        name.setColumns(20);
-
-        server = new JTextField("127.0.0.1");
-        port1 = new JTextField(new Integer(FreeCol.getDefaultPort()).toString());
-        port2 = new JTextField(new Integer(FreeCol.getDefaultPort()).toString());
-        single = new JRadioButton(Messages.message("singlePlayerGame"), true);
-        join = new JRadioButton(Messages.message("joinMultiPlayerGame"), false);
-        start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
-        meta = new JRadioButton( Messages.message("getServerList") + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
-
-        // TODO: enable this option
-        selectColors = new JCheckBox(Messages.message("playerOptions.selectColors"));
         selectColors.setSelected(true);
         selectColors.setEnabled(false);
 
-        Advantages[] choices = new Advantages[] {
-            Advantages.SELECTABLE,
-            Advantages.FIXED,
-            Advantages.NONE
-        };
-        nationalAdvantages = new JComboBox(choices);
         nationalAdvantages.setRenderer(new AdvantageRenderer());
 
         group.add(single);
@@ -130,24 +165,28 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(nameLabel, "span, split 2");
         add(name, "growx");
 
-        add(meta, "newline, span 3");
+        add(start, "newline, span 3");
         add(advantageLabel);
-        add(nationalAdvantages);
+        add(nationalAdvantages, "growx");
+
+        add(port2Label, "newline, skip");
+        add(port2, "width 60:");
+        add(selectColors);
+
+        add(publicServer, "newline, skip, span 2");
+        add(rulesLabel);
+        add(specificationBox, "growx");
+
+        add(meta, "newline, span 3");
+        add(difficultyLabel);
+        add(difficultyBox, "growx");
 
         add(join, "newline, span 3");
-        add(selectColors);
 
         add(ipLabel, "newline, skip, split 2");
         add(server, "width 80:");
         add(port1Label, "split 2");
         add(port1, "width 60:");
-
-        add(start, "newline, span 3");
-
-        add(port2Label, "newline, skip");
-        add(port2, "width 60:");
-
-        add(publicServer, "newline, skip");
 
         add(okButton, "newline, span, split 2, tag ok");
         add(cancel, "tag cancel");
@@ -166,65 +205,51 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         meta.addActionListener(this);
 
         single.setSelected(true);
-        setEnabledComponents();
+        enableComponents();
 
         setSize(getPreferredSize());
     }
 
-    /**
-    * Sets whether or not this component is enabled. It also does this for
-    * its children.
-    * @param enabled 'true' if this component and its children should be
-    * enabled, 'false' otherwise.
-    */
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        Component[] components = getComponents();
-        for (int i = 0; i < components.length; i++) {
-            components[i].setEnabled(enabled);
-        }
-        setEnabledComponents();
+    private String getDifficulty() {
+        return difficulties[difficultyBox.getSelectedIndex()];
     }
 
-    private void setEnabledComponents() {
-        if (single.isSelected()) {
-            setJoinGameOptions(false);
-            setServerOptions(false);
-            setAdvantageOptions(true);
-        } else if (join.isSelected()) {
-            setJoinGameOptions(true);
-            setServerOptions(false);
-            setAdvantageOptions(false);
-        } else if (start.isSelected()) {
-            setJoinGameOptions(false);
-            setServerOptions(true);
-            setAdvantageOptions(true);
-        } else if (meta.isSelected()) {
-            setJoinGameOptions(false);
-            setServerOptions(false);
-            setAdvantageOptions(false);
+    private String getFilename() {
+        return filenames[specificationBox.getSelectedIndex()];
+    }
+
+    private void enableComponents(Component[] components, boolean enable) {
+        for (Component c : components) {
+            c.setEnabled(enable);
         }
     }
 
-    private void setJoinGameOptions(boolean enabled) {
-        ipLabel.setEnabled(enabled);
-        server.setEnabled(enabled);
-        port1Label.setEnabled(enabled);
-        port1.setEnabled(enabled);
+    private void enableComponents() {
+        NewPanelAction action = Enum.valueOf(NewPanelAction.class,
+                                             group.getSelection().getActionCommand());
+        switch(action) {
+        case SINGLE:
+            enableComponents(joinComponents, false);
+            enableComponents(serverComponents, false);
+            enableComponents(gameComponents, true);
+            break;
+        case JOIN:
+            enableComponents(joinComponents, true);
+            enableComponents(serverComponents, false);
+            enableComponents(gameComponents, false);
+            break;
+        case START:
+            enableComponents(joinComponents, false);
+            enableComponents(serverComponents, true);
+            enableComponents(gameComponents, true);
+            break;
+        case META_SERVER:
+            enableComponents(joinComponents, false);
+            enableComponents(serverComponents, false);
+            enableComponents(gameComponents, false);
+            break;
+        }
     }
-
-    private void setServerOptions(boolean enabled) {
-        port2Label.setEnabled(enabled);
-        port2.setEnabled(enabled);
-        publicServer.setEnabled(enabled);
-    }
-
-    private void setAdvantageOptions(boolean enabled) {
-        advantageLabel.setEnabled(enabled);
-        nationalAdvantages.setEnabled(enabled);
-        //selectColors.setEnabled(enabled);
-    }
-
 
     /**
     * This function analyses an event and calls the right methods to take
@@ -236,14 +261,17 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
-                if (single.isSelected()) {
-                    // TODO: select specification
-                    // getCanvas().showFreeColDialog(new SpecificationDialog(getCanvas()));
+                NewPanelAction action = Enum.valueOf(NewPanelAction.class,
+                                                     group.getSelection().getActionCommand());
+                switch(action) {
+                case SINGLE:
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     nationOptions.setSelectColors(selectColors.isSelected());
                     connectController.startSingleplayerGame(name.getText(), nationOptions);
-                } else if (join.isSelected()) {
+                    // getFilename(), getDifficulty());
+                    break;
+                case JOIN:
                     try {
                         int port = Integer.valueOf(port1.getText()).intValue();
                         // tell Canvas to launch client
@@ -251,18 +279,21 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     } catch (NumberFormatException e) {
                         port1Label.setForeground(Color.red);
                     }
-                } else if (start.isSelected()) {
+                    break;
+                case START:
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
-                        NationOptions nationOptions = NationOptions.getDefaults();
+                        nationOptions = NationOptions.getDefaults();
                         nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                         nationOptions.setSelectColors(selectColors.isSelected());
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(),
                                                                port, nationOptions);
+                        //, getFilename(), getDifficulty());
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }
-                } else if (meta.isSelected()) {
+                    break;
+                case META_SERVER:
                     ArrayList<ServerInfo> serverList = connectController.getServerList();
                     if (serverList != null) {
                         getCanvas().showServerListPanel(name.getText(), serverList);
@@ -277,7 +308,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             case JOIN:
             case START:
             case META_SERVER:
-                setEnabledComponents();
+                enableComponents();
                 break;
             default:
                 logger.warning("Invalid Action command: " + command);
@@ -289,15 +320,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     }
 
 
-    class AdvantageRenderer extends JLabel implements ListCellRenderer {
-
-        public Component getListCellRendererComponent(JList list,
-                                                      Object value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
-            setText(Messages.message("playerOptions." + value.toString()));
-            return this;
+    private class AdvantageRenderer extends FreeColComboBoxRenderer {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            label.setText(Messages.message("playerOptions." + value.toString()));
         }
     }
 }
