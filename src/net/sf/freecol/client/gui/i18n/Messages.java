@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -81,7 +82,24 @@ public class Messages {
 
         messageBundle = new Properties();
 
-        if (!language.equals("")) {
+        for (String fileName : getFileNames(language, country, variant)) {
+            File resourceFile = new File(getI18nDirectory(), fileName);
+            loadResources(resourceFile);
+        }
+    }
+
+    /**
+     * Returns an ordered string array containing the names of all
+     * message files to load.
+     *
+     * @param language a <code>String</code> value
+     * @param country a <code>String</code> value
+     * @param variant a <code>String</code> value
+     * @return a <code>String[]</code> value
+     */
+    public static String[] getFileNames(String language, String country, String variant) {
+
+       if (!language.equals("")) {
             language = "_" + language;
         }
         if (!country.equals("")) {
@@ -90,15 +108,14 @@ public class Messages {
         if (!variant.equals("")) {
             variant = "_" + variant;
         }
-        String[] fileNames = { FILE_PREFIX + FILE_SUFFIX, FILE_PREFIX + language + FILE_SUFFIX,
-                               FILE_PREFIX + language + country + FILE_SUFFIX,
-                               FILE_PREFIX + language + country + variant + FILE_SUFFIX };
+        return new String[] {
+            FILE_PREFIX + FILE_SUFFIX,
+            FILE_PREFIX + language + FILE_SUFFIX,
+            FILE_PREFIX + language + country + FILE_SUFFIX,
+            FILE_PREFIX + language + country + variant + FILE_SUFFIX
+        };
+   }
 
-        for (String fileName : fileNames) {
-            File resourceFile = new File(getI18nDirectory(), fileName);
-            loadResources(resourceFile);
-        }
-    }
 
     /**
      * Returns the directory containing language property files.
@@ -408,8 +425,7 @@ public class Messages {
 
 
     /**
-     * Calling this method can be used to replace the messages used currently
-     * with a new bundle. This is used only in the debugging of FreeCol.
+     * Loads a new resource file into the current message bundle.
      * 
      * @param resourceFile
      */
@@ -421,6 +437,19 @@ public class Messages {
             } catch (Exception e) {
                 logger.warning("Unable to load resource file " + resourceFile.getPath());
             }
+        }
+    }
+
+    /**
+     * Loads a new resource file into the current message bundle.
+     * 
+     * @param input an <code>InputStream</code> value
+     */
+    public static void loadResources(InputStream input) {
+        try {
+            messageBundle.load(input);
+        } catch (Exception e) {
+            logger.warning("Unable to load resource into message bundle.");
         }
     }
 
