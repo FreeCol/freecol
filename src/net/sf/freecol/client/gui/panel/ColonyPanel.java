@@ -1467,7 +1467,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                     canvas.errorMessage("tileTakenInd");
                                 }
                             } else {
-                                if (!workTile.isLand()) { // no docks
+                                if(colonyTile.getUnitCount() > 0) { // Tile is already occupied
+                                    ;
+                                } else if (!workTile.isLand()) { // no docks
                                     canvas.errorMessage("tileNeedsDocks");
                                 } else if (workTile.hasLostCityRumour()) {
                                     canvas.errorMessage("tileHasRumour");
