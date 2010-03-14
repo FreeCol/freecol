@@ -975,14 +975,34 @@ public final class Specification {
     }
 
     /**
-     * Applies the difficulty level to the current specification.
+     * Applies the difficulty level identified by the given integer to
+     * the current specification.
      *
-     * @param difficultyLevel difficulty level to apply
+     * @param difficultyLevel index of difficulty level to apply
      */
     public void applyDifficultyLevel(int difficultyLevel) {
-        DifficultyLevel level = difficultyLevels.get(difficultyLevel);
-        logger.info("Applying difficulty level '" + level.getId()
-                    +"' (" + Integer.toString(difficultyLevel) + ")." );
+        applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
+    }
+        
+    /**
+     * Applies the difficulty level identified by the given String to
+     * the current specification.
+     *
+     * @param difficultyLevel id of difficulty level to apply
+     */
+    public void applyDifficultyLevel(String difficultyLevel) {
+        applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
+    }
+        
+
+    /**
+     * Applies the given difficulty level to the current
+     * specification.
+     *
+     * @param level difficulty level to apply
+     */
+    public void applyDifficultyLevel(DifficultyLevel level) {
+        logger.info("Applying difficulty level " + level.getId());
         for (String key : level.getOptions().keySet()) {
             allOptions.put(key, level.getOptions().get(key));
         }
@@ -1054,4 +1074,5 @@ public final class Specification {
             return defaultValue;
         }
     }
+
 }
