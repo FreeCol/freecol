@@ -2444,7 +2444,7 @@ public final class InGameController implements NetworkConstants {
             if (canvas.showConfirmDialog(unit.getTile(),
                                          "missionarySettlement.inciteConfirm",
                                          "yes", "no",
-                                         "%player%", enemy.getName(),
+                                         "%player%", Messages.message(enemy.getName()),
                                          "%amount%", String.valueOf(gold))) {
                 int goldOut = askIncite(unit, direction, enemy, gold);
                 if (goldOut < 0) {
