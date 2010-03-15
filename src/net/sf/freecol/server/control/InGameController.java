@@ -200,7 +200,7 @@ public final class InGameController extends Controller {
      * TODO: public until clean up use in InGameInputHandler.
      */
     public static void addRemove(List<Object> objects,
-                                  FreeColGameObject fcgo) {
+                                 FreeColGameObject fcgo) {
         addMore(objects, UpdateType.REMOVE, fcgo);
     }
 
@@ -301,7 +301,8 @@ public final class InGameController extends Controller {
                         FreeColObject fco = (FreeColObject) objects.get(i+1);
                         // Count and collect the strings.
                         int n;
-                        for (n = i+3; objects.get(n) instanceof String; n++);
+                        for (n = i+3; n < objects.size()
+                                 && objects.get(n) instanceof String; n++);
                         n -= i+2;
                         String[] fields = new String[n];
                         for (int j = 0; j < n; j++) {
@@ -2158,6 +2159,95 @@ public final class InGameController extends Controller {
         return objects;
     }
 
+
+    /**
+     * Set land name.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> who landed.
+     * @param name The new land name.
+     * @param welcomer An optional <code>ServerPlayer</code> that has offered
+     *            a treaty.
+     * @param accept True if the treaty has been accepted.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element setNewLandName(ServerPlayer serverPlayer, String name,
+                                  ServerPlayer welcomer, boolean accept) {
+        List<Object> objects = new ArrayList<Object>();
+        serverPlayer.setNewLandName(name);
+
+        // Special case of a welcome from an adjacent native unit,
+        // offering the land the landing unit is on if a peace treaty
+        // is accepted.  Slight awkwardness that we have to find the
+        // unit that landed, which relies on this code being triggered
+        // from the first landing and thus there is only one land unit
+        // in the new world (which is not the case in a debug game).
+        if (welcomer != null) {
+            if (accept) { // Claim land
+                for (Unit u : serverPlayer.getUnits()) {
+                    if (u.isNaval()) continue;
+                    Tile tile = u.getTile();
+                    if (tile == null) continue;
+                    if (tile.isLand() && tile.getOwner() == welcomer) {
+                        tile.setOwner(serverPlayer);
+                        objects.add(tile);
+                        break;
+                    }
+                }
+                welcomer = null;
+            } else {
+                // Consider not accepting the treaty to be a minor
+                // insult.  WWC1D?
+                // TODO: rework modifyTension to notify of stance change
+                // which should be in the update.  Can not happen here,
+                // for now, but needs fixing.
+                welcomer.modifyTension(serverPlayer,
+                                       Tension.TENSION_ADD_MINOR);
+            }
+        }
+
+        // Only the tile change is not private.
+        sendToOthers(serverPlayer, objects);
+
+        // Update the name and note the history.
+        addPartial(objects, serverPlayer, "newLandName");
+        int turn = serverPlayer.getGame().getTurn().getNumber();
+        HistoryEvent h = new HistoryEvent(turn,
+                    HistoryEvent.EventType.DISCOVER_NEW_WORLD)
+            .addName("%name%", name);
+        objects.add(h);
+        serverPlayer.addHistory(h);
+
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Set region name.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> discovering.
+     * @param unit The <code>Unit</code> discovering the region.
+     * @param region The <code>Region</code> to discover.
+     * @param name The new region name.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element setNewRegionName(ServerPlayer serverPlayer, Unit unit,
+                                    Region region, String name) {
+        Game game = serverPlayer.getGame();
+        List<Object> objects = new ArrayList<Object>();
+        // Tell others about the region.
+        objects.add(region);
+
+        // History is private.
+        objects.add(UpdateType.PRIVATE);
+        HistoryEvent h = region.discover(serverPlayer, game.getTurn(), name);
+        serverPlayer.addHistory(h);
+        objects.add(h);
+
+        // Others do find out about region name changes.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
     /**
      * Demand a tribute from a native settlement.
      *
@@ -2195,7 +2285,6 @@ public final class InGameController extends Controller {
         player.modifyGold(gold);
         return gold;
     }
-
 
     /**
      * Embark a unit onto a carrier.
@@ -2275,6 +2364,7 @@ public final class InGameController extends Controller {
         sendToOthers(serverPlayer, newLocation);
         return buildUpdate(serverPlayer, newLocation);
     }
+
 
     /**
      * Learn a skill at an IndianSettlement.

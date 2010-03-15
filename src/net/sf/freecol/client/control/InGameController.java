@@ -1741,7 +1741,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean askNewLandName(String name) {
         Client client = freeColClient.getClient();
-        NewLandNameMessage message = new NewLandNameMessage(name);
+        NewLandNameMessage message = new NewLandNameMessage(name, null, false);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
         if (reply == null) return false;
