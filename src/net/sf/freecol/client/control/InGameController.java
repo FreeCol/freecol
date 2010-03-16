@@ -1619,6 +1619,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         final Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
+        Tile tile = unit.getTile();
         if (reply.hasAttribute("slowedBy")) { // ship slowed
             Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
             StringTemplate enemy = slowedBy.getOwner().getNationName();
@@ -1632,16 +1633,35 @@ public final class InGameController implements NetworkConstants {
         ModelMessage m = null;
         if (reply.hasAttribute("nameNewLand")) {
             String defaultName = reply.getAttribute("nameNewLand");
-            String newLandName = canvas.showInputDialog(unit.getTile(),
-                                                        "newLand.text",
+            String newLandName = canvas.showInputDialog(tile, "newLand.text",
                                                         defaultName,
                                                         "newLand.yes", null,
                                                         true);
             // Default out on null, 0-length invalid.
             if (newLandName == null) newLandName = defaultName;
-            if (askNewLandName(newLandName)
+
+            // Check for special welcome on landing.
+            Player welcomer = null;
+            boolean accept = false;
+            if (reply.hasAttribute("welcome")) {
+                String who = reply.getAttribute("welcome");
+                if (game.getFreeColGameObjectSafely(who) instanceof Player) {
+                    welcomer = (Player) game.getFreeColGameObjectSafely(who);
+                    String messageId = (tile.getOwner() == welcomer)
+                        ? "welcomeOffer.text" : "welcomeSimple.text";
+                    String nation = Messages.message(welcomer.getNationName());
+                    String camps = reply.getAttribute("camps");
+                    accept = canvas.showConfirmDialog(tile, messageId,
+                                                      "welcome.yes",
+                                                      "welcome.no",
+                                                      "%nation%", nation,
+                                                      "%camps%", camps);
+                }
+            }
+
+            if (askNewLandName(newLandName, welcomer, accept)
                 && newLandName.equals(player.getNewLandName())) {
-                canvas.showEventPanel(unit.getTile(), EventType.FIRST_LANDING);
+                canvas.showEventPanel(tile, EventType.FIRST_LANDING);
                 String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient.getActionManager()
                                                                    .getFreeColAction("buildColonyAction").getAccelerator());
                 m = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
@@ -1700,7 +1720,6 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Update the active unit and GUI.
-        Tile tile = unit.getTile();
         if (unit.isDisposed() || checkCashInTreasureTrain(unit)) {
             nextActiveUnit(tile);
         } else {
@@ -1740,11 +1759,15 @@ public final class InGameController implements NetworkConstants {
      * Server query-response for naming a new land.
      *
      * @param name The new land name.
+     * @param welcomer A welcoming native player with whom to make a treaty.
+     * @param accept True if the treaty was accepted.
      * @return True if the server interaction succeeded.
      */
-    private boolean askNewLandName(String name) {
+    private boolean askNewLandName(String name, Player welcomer,
+                                   boolean accept) {
         Client client = freeColClient.getClient();
-        NewLandNameMessage message = new NewLandNameMessage(name, null, false);
+        NewLandNameMessage message = new NewLandNameMessage(name,
+                                                            welcomer, accept);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
         if (reply == null) return false;

@@ -147,12 +147,12 @@ public final class InGameController extends Controller {
      *
      * @param objects The list of objects to add to.
      * @param unit The <code>Unit</code> that is moving.
-     * @param oldTile The old <code>Tile</code>.
+     * @param oldLocation The old <code>Location</code>.
      * @param newTile The new <code>Tile</code>.
      */
     private static void addAnimate(List<Object> objects, Unit unit,
-                                   Tile oldTile, Tile newTile) {
-        addMore(objects, UpdateType.ANIMATE, unit, oldTile, newTile);
+                                   Location oldLocation, Tile newTile) {
+        addMore(objects, UpdateType.ANIMATE, unit, oldLocation, newTile);
     }
 
     /**
@@ -261,16 +261,16 @@ public final class InGameController extends Controller {
                 continue;
             } else if (o instanceof UpdateType) {
                 switch ((UpdateType) o) {
-                case ANIMATE: // expect Unit Tile Tile
+                case ANIMATE: // expect Unit Location Tile
                     if (i+3 < objects.size()
                         && objects.get(i+1) instanceof Unit
-                        && objects.get(i+2) instanceof Tile
+                        && objects.get(i+2) instanceof FreeColGameObject
                         && objects.get(i+3) instanceof Tile) {
                         Unit unit = (Unit) objects.get(i+1);
-                        Tile oldTile = (Tile) objects.get(i+2);
+                        FreeColGameObject oldLocation = (FreeColGameObject) objects.get(i+2);
                         Tile newTile = (Tile) objects.get(i+3);
                         Element animate = buildAnimate(serverPlayer, doc, unit,
-                                                       oldTile, newTile);
+                                                       oldLocation, newTile);
                         if (animate != null) {
                             extras.add(animate);
                             // Clean up units that disappear.
@@ -450,15 +450,18 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> to update.
      * @param doc The owner <code>Document</code> to build the element in.
      * @param unit The <code>Unit</code> that is moving.
-     * @param oldTile The <code>Tile</code> from which the unit is moving.
+     * @param oldLocation The location from which the unit is moving.
      * @param newTile The <code>Tile</code> to which the unit is moving.
      * @return An "animateMove" element, or null if the move can not be
      *         seen by the serverPlayer.
      */
     private Element buildAnimate(ServerPlayer serverPlayer, Document doc,
-                                 Unit unit, Tile oldTile, Tile newTile) {
+                                 Unit unit,
+                                 FreeColGameObject oldLocation, Tile newTile) {
+        Tile oldTile = ((Location) oldLocation).getTile();
         boolean seeOld = unit.getOwner() == serverPlayer
-            || (serverPlayer.canSee(oldTile) && oldTile.getSettlement()==null);
+            || (serverPlayer.canSee(oldTile) && oldLocation instanceof Tile
+                && oldTile.getSettlement() == null);
         boolean seeNew = unit.isVisibleTo(serverPlayer);
         if (seeOld || seeNew) {
             Element element = doc.createElement("animateMove");
@@ -1717,7 +1720,7 @@ public final class InGameController extends Controller {
      * @param newTile The <code>Tile</code> the unit is moving to.
      * @return Either an enemy unit that causes a slowdown, or null if none.
      */
-    public Unit getSlowedBy(Unit unit, Tile newTile) {
+    private Unit getSlowedBy(Unit unit, Tile newTile) {
         Player player = unit.getOwner();
         Game game = unit.getGame();
         CombatModel combatModel = game.getCombatModel();
@@ -1762,7 +1765,6 @@ public final class InGameController extends Controller {
         }
         return attacker;
     }
-
 
     /**
      * Returns a type of Lost City Rumour. The type of rumour depends on the
@@ -1931,14 +1933,16 @@ public final class InGameController extends Controller {
      *
      * @param unit The <code>Unit</code> that is exploring.
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @return A list of FreeColObjects to send to the client as a result.
+     * @return A list of objects to update.
      */
-    public List<FreeColObject> exploreLostCityRumour(ServerPlayer serverPlayer,
-                                                     Unit unit) {
-        List<FreeColObject> result = new ArrayList<FreeColObject>();
+    private List<Object> exploreLostCityRumour(ServerPlayer serverPlayer,
+                                               Unit unit) {
+        List<Object> objects = new ArrayList<Object>();
         Tile tile = unit.getTile();
         LostCityRumour lostCity = tile.getLostCityRumour();
-        if (lostCity == null) return result;
+        if (lostCity == null) return objects;
+        objects.add(tile);
+        objects.add(UpdateType.PRIVATE);
 
         Specification specification = FreeCol.getSpecification();
         int difficulty = specification.getRangeOption("model.option.difficulty").getValue();
@@ -1952,26 +1956,26 @@ public final class InGameController extends Controller {
         case BURIAL_GROUND:
             Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit());
-            result.add(indianPlayer);
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            objects.add(indianPlayer);
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.BurialGround",
                                         serverPlayer, unit)
                        .addStringTemplate("%nation%", indianPlayer.getNationName()));
             break;
         case EXPEDITION_VANISHES:
-            result.addAll(unit.disposeList());
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            objects.addAll(unit.disposeList());
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.ExpeditionVanishes", serverPlayer));
             break;
         case NOTHING:
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Nothing", serverPlayer, unit));
             break;
         case LEARN:
             List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
             StringTemplate oldName = unit.getLabel();
             unit.setType(learntUnitTypes.get(getPseudoRandom().nextInt(learntUnitTypes.size())));
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Learn", serverPlayer, unit)
                        .addStringTemplate("%unit%", oldName)
                        .add("%type%", unit.getType().getNameKey()));
@@ -1979,8 +1983,8 @@ public final class InGameController extends Controller {
         case TRIBAL_CHIEF:
             int chiefAmount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
             serverPlayer.modifyGold(chiefAmount);
-            result.add(serverPlayer);
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            addPartial(objects, serverPlayer, "gold", "score");
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.TribalChief", serverPlayer, unit)
                        .addAmount("%money%", chiefAmount));
             break;
@@ -1989,7 +1993,7 @@ public final class InGameController extends Controller {
             newUnit = new Unit(game, tile, serverPlayer,
                                newUnitTypes.get(getPseudoRandom().nextInt(newUnitTypes.size())),
                                UnitState.ACTIVE);
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Colonist", serverPlayer, newUnit));
             break;
         case CIBOLA:
@@ -2002,11 +2006,11 @@ public final class InGameController extends Controller {
                 unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
                 newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
                 newUnit.setTreasureAmount(treasureAmount);
-                result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                             "lostCityRumour.Cibola", serverPlayer, newUnit)
                            .add("%city%", cityName)
                            .addAmount("%money%", treasureAmount));
-                result.add(new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
+                objects.add(new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
                            .add("%city%", cityName)
                            .addAmount("%treasure%", treasureAmount));
                 break;
@@ -2016,7 +2020,7 @@ public final class InGameController extends Controller {
             int ruinsAmount = getPseudoRandom().nextInt(dx * 2) * 300 + 50;
             if (ruinsAmount < 500) { // TODO remove magic number
                 serverPlayer.modifyGold(ruinsAmount);
-                result.add(serverPlayer);
+                addPartial(objects, serverPlayer, "gold", "score");
             } else {
                 if (treasureUnitTypes == null) {
                     treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
@@ -2025,7 +2029,7 @@ public final class InGameController extends Controller {
                 newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
                 newUnit.setTreasureAmount(ruinsAmount);
             }
-            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+            objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Ruins",
                                         serverPlayer, ((newUnit != null) ? newUnit : unit))
                        .addAmount("%money%", ruinsAmount));
@@ -2033,23 +2037,23 @@ public final class InGameController extends Controller {
         case FOUNTAIN_OF_YOUTH:
             Europe europe = serverPlayer.getEurope();
             if (europe == null) {
-                result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                             "lostCityRumour.FountainOfYouthWithoutEurope",
                                             serverPlayer, unit));
             } else {
                 if (serverPlayer.hasAbility("model.ability.selectRecruit")
-                    && !serverPlayer.isAI() // TODO: let the AI select
-                    ) {
+                    && !serverPlayer.isAI()) { // TODO: let the AI select
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
+                    addAttribute(objects, "fountainOfYouth", Integer.toString(dx));
                 } else {
                     for (int k = 0; k < dx; k++) {
                         new Unit(game, europe, serverPlayer, serverPlayer.generateRecruitable(serverPlayer.getId() + "fountain." + Integer.toString(k)),
                                  UnitState.ACTIVE);
                     }
-                    result.add(europe);
+                    objects.add(europe);
                 }
-                result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                             "lostCityRumour.FountainOfYouth",
                                             serverPlayer, unit));
             }
@@ -2059,8 +2063,7 @@ public final class InGameController extends Controller {
             throw new IllegalStateException("No such rumour.");
         }
         tile.removeLostCityRumour();
-        result.add(tile);
-        return result;
+        return objects;
     }
 
     /**
@@ -2074,8 +2077,8 @@ public final class InGameController extends Controller {
      * @param tile The <code>Tile</code> to check.
      * @return A list of <code>ServerPlayer</code>s newly contacted.
      */
-    public List<ServerPlayer> findAdjacentUncontacted(ServerPlayer serverPlayer,
-                                                      Tile tile) {
+    private List<ServerPlayer> findUncontacted(ServerPlayer serverPlayer,
+                                               Tile tile) {
         List<ServerPlayer> players = new ArrayList<ServerPlayer>();
         for (Tile t : getGame().getMap().getSurroundingTiles(tile, 1)) {
             if (t == null || !t.isLand()) {
@@ -2104,61 +2107,163 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that is moving.
      * @param unit The <code>Unit</code> to move.
      * @param newTile The <code>Tile</code> to move to.
-     * @return A list of newly contacted <code>ServerPlayer</code>s as
-     *         a result of this move.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public List<FreeColObject> move(ServerPlayer serverPlayer, Unit unit,
-                                    Tile newTile) {
+    public Element move(ServerPlayer serverPlayer, Unit unit, Tile newTile) {
+        List<Object> objects = new ArrayList<Object>();
+        Game game = getGame();
+        Turn turn = game.getTurn();
+
+        // Plan to update tiles that could not be seen before but will
+        // now be within the line-of-sight.
+        List<Object> privateObjects = new ArrayList<Object>();
+        int los = unit.getLineOfSight();
+        for (Tile tile : game.getMap().getSurroundingTiles(newTile, los)) {
+            if (!serverPlayer.canSee(tile)) privateObjects.add(tile);
+        }
+
+        // Update unit state.
+        Location oldLocation = unit.getLocation();
         unit.setState(UnitState.ACTIVE);
         unit.setStateToAllChildren(UnitState.SENTRY);
-        unit.setMovesLeft(unit.getMovesLeft() - unit.getMoveCost(newTile));
+        if (oldLocation instanceof Unit) {
+            unit.setMovesLeft(0); // Disembark always consumes all moves.
+        } else {
+            unit.setMovesLeft(unit.getMovesLeft() - unit.getMoveCost(newTile));
+        }
         unit.setLocation(newTile);
         unit.activeAdjacentSentryUnits(newTile);
-
         // Clear the alreadyOnHighSea flag if we move onto a non-highsea tile.
         unit.setAlreadyOnHighSea(newTile.canMoveToEurope());
 
-        // Explore a rumour if present.
-        List<FreeColObject> objects
-            = (newTile.hasLostCityRumour() && serverPlayer.isEuropean())
-            ? exploreLostCityRumour(serverPlayer, unit)
-            : new ArrayList<FreeColObject>();
+        // Always update old location.  Explore a rumour if present,
+        // otherwise always update new location.  We can not ignore
+        // the rumour objects as the only way the unit can die is the
+        // vanishes rumour.
+        objects.add((FreeColGameObject) oldLocation);
+        if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
+            List<Object> rumourObjects
+                = exploreLostCityRumour(serverPlayer, unit);
+            if (unit.isDisposed()) {
+                privateObjects.clear(); // No discovery if died.
+            }
+            List<Object> addto = objects;
+            for (Object o : rumourObjects) {
+                if (o == UpdateType.PRIVATE) {
+                    addto = privateObjects;
+                } else {
+                    addto.add(o);
+                }
+            }
+        } else {
+            objects.add(newTile);
+        }
 
-        // If the unit died we do not get to see the formerly unseen
-        // objects or make new contacts.  However we do not ignore the
-        // rumour objects as the only way the unit can die is the
-        // burial ground rumour, for which the rumour object is the
-        // now aggravated Indian player which we do want to update.
-        if (!unit.isDisposed()) {
-            List<ServerPlayer> contacts = findAdjacentUncontacted(serverPlayer, newTile);
-            for (ServerPlayer other : contacts) {
+        // Add the animation, even if the unit dies.
+        addAnimate(objects, unit, oldLocation, newTile);
+
+        // Check for new contacts.
+        if (!unit.isDisposed() && newTile.isLand()) {
+            ServerPlayer welcomer = null;
+            for (ServerPlayer other : findUncontacted(serverPlayer, newTile)) {
+                // Special meeting on first landing.
+                if (serverPlayer.isEuropean() && other.isIndian()
+                    && !serverPlayer.isNewLandNamed()
+                    && (welcomer == null || newTile.getOwner() == other)) {
+                    welcomer = other;
+                }
                 serverPlayer.setContacted(other);
                 other.setContacted(serverPlayer);
-                objects.add(other);
+                addStance(objects, Stance.PEACE, serverPlayer, other);
+                if (serverPlayer.isEuropean()) {
+                    HistoryEvent h = new HistoryEvent(turn.getNumber(),
+                            HistoryEvent.EventType.MEET_NATION)
+                        .addStringTemplate("%nation%", other.getNationName());
+                    serverPlayer.addHistory(h);
+                    privateObjects.add(h);
+                }
             }
+            if (welcomer != null) {
+                addAttribute(privateObjects, "welcome", welcomer.getId());
+                addAttribute(privateObjects, "camps",
+                    Integer.toString(welcomer.getNumberOfSettlements()));
+            }
+        }
 
+        // Everything afterwards is private to the moving player... almost.
+        objects.add(UpdateType.PRIVATE);
+        objects.addAll(privateObjects);
+
+        if (!unit.isDisposed() && serverPlayer.isEuropean()) {
             // Also check for arriving next to an IndianSettlement
             // without alarm set, in which case it should be initialized.
-            if (serverPlayer.isEuropean()) {
-                for (Tile t : getGame().getMap().getSurroundingTiles(newTile, 1)) {
-                    Settlement settlement = t.getSettlement();
-                    if (settlement != null
-                        && settlement instanceof IndianSettlement) {
-                        IndianSettlement indians = (IndianSettlement) settlement;
-                        if (indians.getAlarm(serverPlayer) == null) {
-                            Player indianPlayer = indians.getOwner();
-                            indians.setAlarm(serverPlayer,
-                                             indianPlayer.getTension(serverPlayer));
-                            objects.add(indians);
-                        }
+            for (Tile t : game.getMap().getSurroundingTiles(newTile, 1)) {
+                Settlement settlement = t.getSettlement();
+                if (settlement != null
+                    && settlement instanceof IndianSettlement) {
+                    IndianSettlement indians = (IndianSettlement) settlement;
+                    if (indians.getAlarm(serverPlayer) == null) {
+                        Player indianPlayer = indians.getOwner();
+                        indians.setAlarm(serverPlayer,
+                                         indianPlayer.getTension(serverPlayer));
+                        objects.add(indians);
                     }
+                }
+            }
+
+            // Check for slowing units.
+            Unit slowedBy = getSlowedBy(unit, newTile);
+            if (slowedBy != null) {
+                addAttribute(objects, "slowedBy", slowedBy.getId());
+            }
+
+            // Check for first landing
+            if (newTile.isLand() && !serverPlayer.isNewLandNamed()) {
+                String newLandName = Messages.getNewLandName(serverPlayer);
+                if (serverPlayer.isAI()) {
+                    // TODO: Not convinced shortcutting the AI like
+                    // this is a good idea--- even though this is
+                    // trivial functionality, it really should be in
+                    // the AI code.
+                    serverPlayer.setNewLandName(newLandName);
+                } else { // Ask player to name the land.
+                    addAttribute(objects, "nameNewLand", newLandName);
+                }
+            }
+
+            // Check for region discovery
+            Region region = newTile.getDiscoverableRegion();
+            if (region != null) {
+                HistoryEvent h = null;
+                if (region.isPacific()) {
+                    addAttribute(objects, "discoverPacific", "true");
+                    h = region.discover(serverPlayer, turn,
+                                        "model.region.pacific");
+                    objects.add(0, region); // Public discovery!
+                } else {
+                    String regionName
+                        = Messages.getDefaultRegionName(serverPlayer,
+                                                        region.getType());
+                    if (serverPlayer.isAI()) {
+                        // TODO: here is another dubious AI shortcut.
+                        region.discover(serverPlayer, turn, regionName);
+                        objects.add(0, region); // Public discovery!
+                    } else { // Ask player to name the region.
+                        addAttribute(objects, "discoverRegion", regionName);
+                        addAttribute(objects, "regionType",
+                                     Messages.message(region.getLabel()));
+                    }
+                }
+                if (h != null) {
+                    serverPlayer.addHistory(h);
+                    objects.add(h);
                 }
             }
         }
 
-        return objects;
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
     }
-
 
     /**
      * Set land name.
@@ -2317,8 +2422,7 @@ public final class InGameController extends Controller {
         objects.add(oldLocation);
         if (carrier.getLocation() != oldLocation) {
             objects.add(carrier);
-            addAnimate(objects, unit, oldLocation.getTile(),
-                       carrier.getTile());
+            addAnimate(objects, unit, oldLocation, carrier.getTile());
         }
 
         // Others can see the carrier capacity, and might see the
@@ -2327,8 +2431,7 @@ public final class InGameController extends Controller {
         otherObjects.add(oldLocation);
         if (visible) {
             objects.add(carrier);
-            addAnimate(objects, unit, oldLocation.getTile(),
-                       carrier.getTile());
+            addAnimate(objects, unit, oldLocation, carrier.getTile());
         } else {
             addRemove(otherObjects, unit);
         }
