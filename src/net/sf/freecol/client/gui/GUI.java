@@ -1473,7 +1473,7 @@ public final class GUI {
                         BufferedImage stringImage =
                             createSettlementNameImage(g, settlement);
                         g.drawImage(stringImage, 
-                                    xx + (lib.getTerrainImageWidth(tile.getType()) - 
+                                    xx + (tileWidth - 
                                           stringImage.getWidth())/2 + 1,
                                     yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
                     }
@@ -2345,9 +2345,9 @@ public final class GUI {
                     Image colonyImage = lib.getSettlementImage(settlement);
                     // Draw image of colony in center of the tile.
                     g.drawImage(colonyImage,
-                                x + (lib.getTerrainImageWidth(tile.getType()) -
+                                x + (tileWidth -
                                      colonyImage.getWidth(null)) / 2,
-                                y + (lib.getTerrainImageHeight(tile.getType()) -
+                                y + (tileHeight -
                                      colonyImage.getHeight(null)) / 2, null);
 
                     if (withNumber) {
@@ -2374,8 +2374,10 @@ public final class GUI {
                         }
 
                         g.setFont(new Font("Dialog", Font.BOLD, 12));
-                        BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
-                        g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
+                        BufferedImage stringImage = createStringImage(g, populationString, theColor, tileWidth, 12);
+                        g.drawImage(stringImage,
+                                    x + (tileWidth - stringImage.getWidth())/2 + 1,
+                                    y + ((tileHeight - stringImage.getHeight()) / 2) + 1, null);
                     }
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
@@ -2384,9 +2386,9 @@ public final class GUI {
 
                     // Draw image of indian settlement in center of the tile.
                     g.drawImage(settlementImage,
-                                x + (lib.getTerrainImageWidth(tile.getType()) -
+                                x + (tileWidth -
                                      settlementImage.getWidth(null)) / 2,
-                                y + (lib.getTerrainImageHeight(tile.getType()) - 
+                                y + (tileHeight - 
                                      settlementImage.getHeight(null)) / 2, null);
 
                     // Draw the color chip for the settlement.
