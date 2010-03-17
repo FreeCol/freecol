@@ -72,7 +72,7 @@ public final class ReportIndianPanel extends ReportPanel {
         result.add(localizedLabel("report.indian.nameOfTribe"));
         result.add(localizedLabel(opponent.getNationName()), "span");
         result.add(localizedLabel("report.indian.chieftain"));
-        result.add(new JLabel(opponent.getName()), "span");
+        result.add(new JLabel(Messages.message(opponent.getName())), "span");
         result.add(localizedLabel("report.indian.typeOfSettlements"));
         result.add(localizedLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeKey()), "span");
         result.add(localizedLabel("report.indian.numberOfSettlements"));
