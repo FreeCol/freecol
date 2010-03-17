@@ -1244,20 +1244,28 @@ public final class GUI {
                         textColor = Color.WHITE;
                     }                
                     if (image != null) {
-                        g.drawImage(image, p.x + (tileWidth - image.getWidth(null))/2, p.y + (tileHeight - image.getHeight(null))/2, null);
+                        centerImage(g, image, p.x, p.y);
                     } else {
                         g.fillOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
                         g.setColor(Color.BLACK);
                         g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
                     }                
                     if (temp.getTurns() > 0) {
-                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), textColor, tileWidth, 12);
-                        g.drawImage(stringImage, p.x + (tileWidth - stringImage.getWidth(null))/2, p.y + (tileHeight - stringImage.getHeight()) / 2, null);
+                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
+                                                                      textColor, tileWidth, 12);
+                        centerImage(g, stringImage, p.x, p.y);
                     }
                 }                    
                 temp = temp.next;
             }
         }
+    }
+
+    private void centerImage(Graphics2D g, Image image, int x, int y) {
+        g.drawImage(image,
+                    x + (tileWidth - image.getWidth(null))/2,
+                    y + (tileHeight - image.getHeight(null))/2,
+                    null);
     }
 
     private int getXOffset(int clipLeftX, int tileY) {
@@ -1445,7 +1453,7 @@ public final class GUI {
                 final Unit u = darkUnits.get(index);
                 final int x = darkUnitsX.get(index);
                 final int y = darkUnitsY.get(index);            
-                g.drawImage(im, x  + tileWidth/2 - im.getWidth(null)/2, y + tileHeight/2 - im.getHeight(null)/2, null);
+                centerImage(g, im, x, y);
                 displayUnit(g, u, x, y);
             }
         }
@@ -1940,7 +1948,7 @@ public final class GUI {
         if (price > 0 && tile.getSettlement() == null) {
             // tile is owned by an IndianSettlement
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            g.drawImage(image, x+tileWidth/2-image.getWidth(null)/2, y+tileHeight/2-image.getHeight(null)/2, null);
+            centerImage(g, image, x, y);
         }
         
         if (occupyingUnit != null) {
@@ -2270,8 +2278,7 @@ public final class GUI {
         if (item instanceof Resource) {
             Image bonusImage = lib.getBonusImage(((Resource) item).getType());
             if (bonusImage != null) {
-                g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2,
-                            y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
+                centerImage(g, bonusImage, x, y);
             }
         } else if (item instanceof LostCityRumour) {
             g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
@@ -2344,12 +2351,7 @@ public final class GUI {
                 if (settlement instanceof Colony) {
                     Image colonyImage = lib.getSettlementImage(settlement);
                     // Draw image of colony in center of the tile.
-                    g.drawImage(colonyImage,
-                                x + (tileWidth -
-                                     colonyImage.getWidth(null)) / 2,
-                                y + (tileHeight -
-                                     colonyImage.getHeight(null)) / 2, null);
-
+                    centerImage(g, colonyImage, x, y);
                     if (withNumber) {
                         String populationString = Integer.toString(((Colony)settlement).getUnitCount());
                         Color theColor = null;
@@ -2375,9 +2377,7 @@ public final class GUI {
 
                         g.setFont(new Font("Dialog", Font.BOLD, 12));
                         BufferedImage stringImage = createStringImage(g, populationString, theColor, tileWidth, 12);
-                        g.drawImage(stringImage,
-                                    x + (tileWidth - stringImage.getWidth())/2 + 1,
-                                    y + ((tileHeight - stringImage.getHeight()) / 2) + 1, null);
+                        centerImage(g, stringImage, x, y);
                     }
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
@@ -2385,11 +2385,7 @@ public final class GUI {
                     Image settlementImage = lib.getSettlementImage(settlement);
 
                     // Draw image of indian settlement in center of the tile.
-                    g.drawImage(settlementImage,
-                                x + (tileWidth -
-                                     settlementImage.getWidth(null)) / 2,
-                                y + (tileHeight - 
-                                     settlementImage.getHeight(null)) / 2, null);
+                    centerImage(g, settlementImage, x, y);
 
                     // Draw the color chip for the settlement.
                     g.drawImage(lib.getColorChip(indianSettlement.getOwner().getColor()),
