@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.24 -->
+<!-- specification version 0.25 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1427,7 +1427,7 @@
     </founding-father>
   </founding-fathers>
 
-  <nation-types>
+  <european-nation-types>
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nationType.default">
       <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
@@ -1551,7 +1551,9 @@
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
                 type="percentage" value="50" />
     </european-nation-type>
+  </european-nation-types>
 
+  <indian-nation-types>
     <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
@@ -1715,7 +1717,7 @@
       <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
                 type="percentage" value="100" />
     </indian-nation-type>
-  </nation-types>
+  </indian-nation-types>
 
   <nations>
     <nation id="model.nation.dutch" color="#ff9d3c" anthem="anthem_dutch"

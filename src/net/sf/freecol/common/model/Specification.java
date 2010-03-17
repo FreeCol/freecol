@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,6 +23,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -143,6 +145,7 @@ public final class Specification {
 
     private boolean initialized = false;
 
+
     /**
      * Creates a new Specification object by loading it from the
      * specification.xml.
@@ -218,6 +221,37 @@ public final class Specification {
             allTypes.put(source.getId(), source);
         }
 
+        Map<String, ChildReader> readerMap =
+            new HashMap<String, ChildReader>();
+        readerMap.put("nations",
+                      new TypeReader<Nation>(Nation.class, nations));
+        readerMap.put("building-types",
+                      new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
+        readerMap.put("difficultyLevels",
+                      new TypeReader<DifficultyLevel>(DifficultyLevel.class, difficultyLevels));
+        readerMap.put("european-nation-types",
+                      new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
+        readerMap.put("equipment-types",
+                      new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
+        readerMap.put("founding-fathers",
+                      new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
+        readerMap.put("goods-types",
+                      new TypeReader<GoodsType>(GoodsType.class, goodsTypeList));
+        readerMap.put("improvementaction-types",
+                      new TypeReader<ImprovementActionType>(ImprovementActionType.class, improvementActionTypeList));
+        readerMap.put("indian-nation-types",
+                      new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
+        readerMap.put("resource-types",
+                      new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
+        readerMap.put("tile-types",
+                      new TypeReader<TileType>(TileType.class, tileTypeList));
+        readerMap.put("tileimprovement-types",
+                      new TypeReader<TileImprovementType>(TileImprovementType.class, tileImprovementTypeList));
+        readerMap.put("unit-types",
+                      new TypeReader<UnitType>(UnitType.class, unitTypeList));
+        readerMap.put("modifiers", new ModifierReader());
+        readerMap.put("options", new OptionReader());
+
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
@@ -225,227 +259,159 @@ public final class Specification {
                 String childName = xsr.getLocalName();
                 logger.finest("Found child named " + childName);
 
-                if ("modifiers".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        Modifier modifier = new Modifier(xsr, this);
-                        addModifier(modifier);
-                    }
-
-                } else if ("goods-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        GoodsType goodsType = new GoodsType();
-                        goodsType.readFromXML(xsr, this);
-                        goodsTypeList.add(goodsType);
-                        allTypes.put(goodsType.getId(), goodsType);
-                        if (goodsType.isFarmed()) {
-                            farmedGoodsTypeList.add(goodsType);
-                        }
-                        if (goodsType.isFoodType()) {
-                            foodGoodsTypeList.add(goodsType);
-                        }
-                        if (goodsType.isNewWorldGoodsType()) {
-                            newWorldGoodsTypeList.add(goodsType);
-                        }
-                        if (goodsType.isLibertyGoodsType()) {
-                            libertyGoodsTypeList.add(goodsType);
-                        }
-                        if (goodsType.isImmigrationGoodsType()) {
-                            immigrationGoodsTypeList.add(goodsType);
-                        }
-                        if (goodsType.isStorable()) {
-                            storableTypes++;
-                        }
-                    }
-
-                } else if ("building-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        BuildingType buildingType = new BuildingType();
-                        buildingType.readFromXML(xsr, this);
-                        allTypes.put(buildingType.getId(), buildingType);
-                        buildingTypeList.add(buildingType);
-                    }
-
-                } else if ("resource-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        ResourceType resourceType = new ResourceType();
-                        resourceType.readFromXML(xsr, this);
-                        allTypes.put(resourceType.getId(), resourceType);
-                        resourceTypeList.add(resourceType);
-                    }
-
-                } else if ("tile-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        TileType tileType = new TileType();
-                        tileType.readFromXML(xsr, this);
-                        allTypes.put(tileType.getId(), tileType);
-                        tileTypeList.add(tileType);
-                    }
-
-                } else if ("tileimprovement-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        TileImprovementType tileImprovementType = new TileImprovementType();
-                        tileImprovementType.readFromXML(xsr, this);
-                        allTypes.put(tileImprovementType.getId(), tileImprovementType);
-                        tileImprovementTypeList.add(tileImprovementType);
-                    }
-
-                } else if ("improvementaction-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        ImprovementActionType impActionType = new ImprovementActionType();
-                        impActionType.readFromXML(xsr, this);
-                        allTypes.put(impActionType.getId(), impActionType);
-                        improvementActionTypeList.add(impActionType);
-                    }
-
-                } else if ("unit-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        UnitType unitType = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG),
-                                                    UnitType.class);
-                        unitType.readFromXML(xsr, this);
-                        unitTypeList.add(unitType);
-                        if (unitType.getExpertProduction() != null) {
-                            experts.put(unitType.getExpertProduction(), unitType);
-                        }
-                        if (unitType.hasPrice()) {
-                            if (unitType.getSkill() > 0) {
-                                unitTypesTrainedInEurope.add(unitType);
-                            } else if (!unitType.hasSkill()) {
-                                unitTypesPurchasedInEurope.add(unitType);
-                            }
-                        }
-                    }
-
-                } else if ("founding-fathers".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        FoundingFather foundingFather = new FoundingFather();
-                        foundingFather.readFromXML(xsr, this);
-                        allTypes.put(foundingFather.getId(), foundingFather);
-                        foundingFathers.add(foundingFather);
-                    }
-
-                } else if ("nation-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        NationType nationType;
-                        if ("european-nation-type".equals(xsr.getLocalName())) {
-                            nationType = new EuropeanNationType();
-                            nationType.readFromXML(xsr, this);
-                            if (nationType.isREF()) {
-                                REFNationTypes.add((EuropeanNationType) nationType);
-                            } else {
-                                europeanNationTypes.add((EuropeanNationType) nationType);
-                            }
-                        } else {
-                            nationType = new IndianNationType();
-                            nationType.readFromXML(xsr, this);
-                            indianNationTypes.add((IndianNationType) nationType);
-                        }
-                        allTypes.put(nationType.getId(), nationType);
-                        nationTypes.add(nationType);
-
-                    }
-
-                } else if ("nations".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        Nation nation = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG),
-                                                Nation.class);
-                        nation.readFromXML(xsr, this);
-                        nations.add(nation);
-
-                        if (nation.getType().isEuropean()) {
-                            if (nation.getType().isREF()) {
-                                REFNations.add(nation);
-                            } else {
-                                europeanNations.add(nation);
-                            }
-                        } else {
-                            indianNations.add(nation);
-                        }
-                    }
-
-                } else if ("equipment-types".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        EquipmentType equipmentType = new EquipmentType();
-                        equipmentType.readFromXML(xsr, this);
-                        allTypes.put(equipmentType.getId(), equipmentType);
-                        equipmentTypes.add(equipmentType);
-                    }
-
-                } else if ("difficultyLevels".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        DifficultyLevel level = new DifficultyLevel();
-                        level.readFromXML(xsr, this);
-                        allTypes.put(level.getId(), level);
-                        difficultyLevels.add(level);
-                    }
-
-                } else if ("options".equals(childName)) {
-
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractOption option = null;
-                        String optionType = xsr.getLocalName();
-                        if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                            option = new OptionGroup(xsr);
-                        } else if (IntegerOption.getXMLElementTagName().equals(optionType)
-                                   || "integer-option".equals(optionType)) {
-                            option = new IntegerOption(xsr);
-                        } else if (BooleanOption.getXMLElementTagName().equals(optionType)
-                                   || "boolean-option".equals(optionType)) {
-                            option = new BooleanOption(xsr);
-                        } else if (StringOption.getXMLElementTagName().equals(optionType)
-                                   || "string-option".equals(optionType)) {
-                            option = new StringOption(xsr);
-                        } else if (RangeOption.getXMLElementTagName().equals(optionType)
-                                   || "range-option".equals(optionType)) {
-                            option = new RangeOption(xsr);
-                        } else if (SelectOption.getXMLElementTagName().equals(optionType)
-                                   || "select-option".equals(optionType)) {
-                            option = new SelectOption(xsr);
-                        } else if (LanguageOption.getXMLElementTagName().equals(optionType)
-                                   || "language-option".equals(optionType)) {
-                            option = new LanguageOption(xsr);
-                        } else if (FileOption.getXMLElementTagName().equals(optionType)
-                                   || "file-option".equals(optionType)) {
-                            option = new FileOption(xsr);
-                        } else {
-                            logger.finest("Parsing of " + optionType + " is not implemented yet");
-                            xsr.nextTag();
-                        }
-
-                        // If the option is valid, add it to Specification options
-                        if (option != null) {
-                            if(option instanceof OptionGroup) {
-                                this.addOptionGroup((OptionGroup) option);
-                            } else {
-                                this.addAbstractOption(option);
-                            }
-                        }
-                    }
-
-                } else {
+                ChildReader reader = readerMap.get(childName);
+                if (reader == null) {
                     throw new RuntimeException("unexpected: " + childName);
+                } else {
+                    reader.readChildren(xsr, this);
                 }
             }
-
-            initialized = true;
-            logger.info("Specification initialization complete");
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
             throw new RuntimeException("Error parsing specification");
+        }
+
+        for (Nation nation : nations) {
+            if (nation.getType().isEuropean()) {
+                if (nation.getType().isREF()) {
+                    REFNations.add(nation);
+                } else {
+                    europeanNations.add(nation);
+                }
+            } else {
+                indianNations.add(nation);
+            }
+        }
+
+        nationTypes.addAll(indianNationTypes);
+        nationTypes.addAll(europeanNationTypes);
+        Iterator<EuropeanNationType> iterator = europeanNationTypes.iterator();
+        while (iterator.hasNext()) {
+            EuropeanNationType nationType = iterator.next();
+            if (nationType.isREF()) {
+                REFNationTypes.add(nationType);
+                iterator.remove();
+            }
+        }
+
+        for (UnitType unitType : unitTypeList) {
+            if (unitType.getExpertProduction() != null) {
+                experts.put(unitType.getExpertProduction(), unitType);
+            }
+            if (unitType.hasPrice()) {
+                if (unitType.getSkill() > 0) {
+                    unitTypesTrainedInEurope.add(unitType);
+                } else if (!unitType.hasSkill()) {
+                    unitTypesPurchasedInEurope.add(unitType);
+                }
+            }
+        }
+
+        for (GoodsType goodsType : goodsTypeList) {
+            if (goodsType.isFarmed()) {
+                farmedGoodsTypeList.add(goodsType);
+            }
+            if (goodsType.isFoodType()) {
+                foodGoodsTypeList.add(goodsType);
+            }
+            if (goodsType.isNewWorldGoodsType()) {
+                newWorldGoodsTypeList.add(goodsType);
+            }
+            if (goodsType.isLibertyGoodsType()) {
+                libertyGoodsTypeList.add(goodsType);
+            }
+            if (goodsType.isImmigrationGoodsType()) {
+                immigrationGoodsTypeList.add(goodsType);
+            }
+            if (goodsType.isStorable()) {
+                storableTypes++;
+            }
+        }
+
+        initialized = true;
+        logger.info("Specification initialization complete");
+    }
+
+    private interface ChildReader {
+        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException;
+    }
+
+    private class ModifierReader implements ChildReader {
+
+        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                Modifier modifier = new Modifier(xsr, specification);
+                specification.addModifier(modifier);
+            }
+        }
+    }
+
+    private class TypeReader<T extends FreeColGameObjectType> implements ChildReader {
+
+        private Class<T> type;
+        private List<T> result;
+
+        // Is there really no easy way to capture T?
+        public TypeReader(Class<T> type, List<T> listToFill) {
+            result = listToFill;
+            this.type = type;
+        }
+
+        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
+                object.readFromXML(xsr, specification);
+                allTypes.put(object.getId(), object);
+                result.add(object);
+            }
+        }
+    }
+
+    private class OptionReader implements ChildReader {
+
+        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                AbstractOption option = null;
+                String optionType = xsr.getLocalName();
+                if (OptionGroup.getXMLElementTagName().equals(optionType)) {
+                    option = new OptionGroup(xsr);
+                } else if (IntegerOption.getXMLElementTagName().equals(optionType)
+                           || "integer-option".equals(optionType)) {
+                    option = new IntegerOption(xsr);
+                } else if (BooleanOption.getXMLElementTagName().equals(optionType)
+                           || "boolean-option".equals(optionType)) {
+                    option = new BooleanOption(xsr);
+                } else if (StringOption.getXMLElementTagName().equals(optionType)
+                           || "string-option".equals(optionType)) {
+                    option = new StringOption(xsr);
+                } else if (RangeOption.getXMLElementTagName().equals(optionType)
+                           || "range-option".equals(optionType)) {
+                    option = new RangeOption(xsr);
+                } else if (SelectOption.getXMLElementTagName().equals(optionType)
+                           || "select-option".equals(optionType)) {
+                    option = new SelectOption(xsr);
+                } else if (LanguageOption.getXMLElementTagName().equals(optionType)
+                           || "language-option".equals(optionType)) {
+                    option = new LanguageOption(xsr);
+                } else if (FileOption.getXMLElementTagName().equals(optionType)
+                           || "file-option".equals(optionType)) {
+                    option = new FileOption(xsr);
+                } else {
+                    logger.finest("Parsing of " + optionType + " is not implemented yet");
+                    xsr.nextTag();
+                }
+
+                // If the option is valid, add it to Specification options
+                if (option != null) {
+                    if(option instanceof OptionGroup) {
+                        specification.addOptionGroup((OptionGroup) option);
+                    } else {
+                        specification.addAbstractOption(option);
+                    }
+                }
+            }
         }
     }
 
@@ -1017,20 +983,6 @@ public final class Specification {
         }
     }
 
-    // -- Bonus or Penalty --
-    /**
-     * Returns the <code>getFreeColGameObjectType</code> with the given id.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>FreeColGameObjectType</code> value
-     */
-    /*
-    public FreeColGameObjectType getFreeColGameObjectType(String id) {
-        return getType(id, FreeColGameObjectType.class);
-    }
-    */
-
-
     /**
      * Loads the specification.
      *
@@ -1040,7 +992,11 @@ public final class Specification {
         specification = new Specification(is);
     }
 
-    // FIXME urgently!
+
+    /* FIXME urgently! The specification should not be implicitly
+     * loaded when it is referenced for the first time. It should be
+     * explicitly loaded when setting up the game.
+     */
     public static Specification getSpecification() {
         if (specification == null) {
             try {

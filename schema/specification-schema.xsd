@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.24 -->
+<!-- XSD for specification version 0.25 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="freecol-specification">
     <xs:complexType>
@@ -13,7 +13,8 @@
         <xs:element ref="unit-types"/>
         <xs:element ref="building-types"/>
         <xs:element ref="founding-fathers"/>
-        <xs:element ref="nation-types"/>
+        <xs:element ref="european-nation-types"/>
+        <xs:element ref="indian-nation-types"/>
         <xs:element ref="nations"/>
         <xs:element ref="difficultyLevels"/>
         <xs:element ref="options"/>
@@ -385,10 +386,16 @@
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="nation-types">
+  <xs:element name="european-nation-types">
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="european-nation-type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="indian-nation-types">
+    <xs:complexType>
+      <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="indian-nation-type"/>
       </xs:sequence>
     </xs:complexType>
