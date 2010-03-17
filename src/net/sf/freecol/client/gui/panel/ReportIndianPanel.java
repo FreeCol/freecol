@@ -81,60 +81,71 @@ public final class ReportIndianPanel extends ReportPanel {
         result.add(new JLabel(opponent.getTension(player).toString()), "span");
 
         result.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
-        result.add(localizedLabel("Settlement"), "newline 10");
-        result.add(localizedLabel("report.indian.tension"));
-        result.add(localizedLabel("report.indian.skillTaught"));
-        result.add(localizedLabel("report.indian.tradeInterests"));
 
-        for (IndianSettlement settlement : opponent.getIndianSettlements()) {
-            String settlementName = Messages.message("indianSettlement.nameUnknown");
-            if (settlement.hasBeenVisited(player)) {
-                settlementName = settlement.getName();
-            }
+        boolean anyKnownSettlements = false;
+        if(opponent.getIndianSettlements().size() > 0) {
+                anyKnownSettlements = true;
+        }
+        
+        if(anyKnownSettlements) {
+            result.add(localizedLabel("Settlement"), "newline 10");
+            result.add(localizedLabel("report.indian.tension"));
+            result.add(localizedLabel("report.indian.skillTaught"));
+            result.add(localizedLabel("report.indian.tradeInterests"));
+
             
-            String locationName = settlementName
+            for (IndianSettlement settlement : opponent.getIndianSettlements()) {
+                String settlementName = Messages.message("indianSettlement.nameUnknown");
+                if (settlement.hasBeenVisited(player)) {
+                    settlementName = settlement.getName();
+                }
+
+                String locationName = settlementName
                 + ((settlement.isCapital()) ? "*" : "")
                 + ((settlement.getMissionary() != null) ? "+" : "")
                 + " (" + settlement.getTile().getX()
                 + ", " + settlement.getTile().getY() + ")";
-            result.add(new JLabel(locationName), "newline 15");
+                result.add(new JLabel(locationName), "newline 15");
 
-            Tension tension = settlement.getAlarm(player);
-            result.add(new JLabel((tension == null)
-                                  ? Messages.message("indianSettlement.tensionUnknown")
-                                  : tension.toString()));
+                Tension tension = settlement.getAlarm(player);
+                result.add(new JLabel((tension == null)
+                        ? Messages.message("indianSettlement.tensionUnknown")
+                                : tension.toString()));
 
-            JLabel skillLabel = new JLabel();
-            UnitType skillType = settlement.getLearnableSkill();
-            String skill;
-            if (skillType != null) {
-                skill = Messages.message(skillType.getNameKey());
-                ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType);
-                skillLabel.setIcon(getLibrary().getScaledImageIcon(skillImage, 0.66f));
-            } else if (settlement.hasBeenVisited(player)) {
-                skill = Messages.message("indianSettlement.skillNone");
-            } else {
-                skill = Messages.message("indianSettlement.skillUnknown");
-            }
-            skillLabel.setText(skill);
-            result.add(skillLabel);
+                JLabel skillLabel = new JLabel();
+                UnitType skillType = settlement.getLearnableSkill();
+                String skill;
+                if (skillType != null) {
+                    skill = Messages.message(skillType.getNameKey());
+                    ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType);
+                    skillLabel.setIcon(getLibrary().getScaledImageIcon(skillImage, 0.66f));
+                } else if (settlement.hasBeenVisited(player)) {
+                    skill = Messages.message("indianSettlement.skillNone");
+                } else {
+                    skill = Messages.message("indianSettlement.skillUnknown");
+                }
+                skillLabel.setText(skill);
+                result.add(skillLabel);
 
-            GoodsType[] wantedGoods = settlement.getWantedGoods();
-            if (wantedGoods[0] == null) {
-                result.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
-            } else {
-                JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
-                goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[0]), 0.66f));
-                String split = "split " + String.valueOf(wantedGoods.length);
-                result.add(goodsLabel, split);
-                for (int i = 1; i < wantedGoods.length; i++) {
-                    if (wantedGoods[i] != null) {
-                        goodsLabel = localizedLabel(wantedGoods[i].getNameKey());
-                        goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[i]), 0.5f));
-                        result.add(goodsLabel);
+                GoodsType[] wantedGoods = settlement.getWantedGoods();
+                if (wantedGoods[0] == null) {
+                    result.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+                } else {
+                    JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
+                    goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[0]), 0.66f));
+                    String split = "split " + String.valueOf(wantedGoods.length);
+                    result.add(goodsLabel, split);
+                    for (int i = 1; i < wantedGoods.length; i++) {
+                        if (wantedGoods[i] != null) {
+                            goodsLabel = localizedLabel(wantedGoods[i].getNameKey());
+                            goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[i]), 0.5f));
+                            result.add(goodsLabel);
+                        }
                     }
                 }
             }
+        } else {
+            result.add(localizedLabel("report.indian.noKnownSettlements"));
         }
         result.add(new JSeparator(JSeparator.HORIZONTAL), "newline 10, span, growx");
         return result;
