@@ -19,20 +19,18 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -87,6 +85,7 @@ public class DemandTributeMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -115,32 +114,8 @@ public class DemandTributeMessage extends Message {
         }
 
         // Do the demand
-        IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        int gold = server.getInGameController().demandTribute(player,
-                                                              indianSettlement);
-        unit.setMovesLeft(0);
-
-        // Build the reply.  Update the unit (no moves left), and the
-        // player gold if the tribute succeeded, and add a suitable
-        // message.
-        Element reply = createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
-        if (gold > 0) {
-            update.appendChild(player.toXMLElementPartial(doc, "gold"));
-        }
-        Element messages = doc.createElement("addMessages");
-        reply.appendChild(messages);
-        String messageId = (gold > 0) ? "scoutSettlement.tributeAgree"
-            : "scoutSettlement.tributeDisagree";
-        ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                          messageId, unit, indianSettlement)
-            .addAmount("%amount%", gold);
-
-        m.addToOwnedElement(messages, player);
-        return reply;
+        return server.getInGameController()
+            .demandTribute(serverPlayer, unit, (IndianSettlement) settlement);
     }
 
     /**

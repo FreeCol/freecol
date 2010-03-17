@@ -2356,18 +2356,23 @@ public final class InGameController extends Controller {
     /**
      * Demand a tribute from a native settlement.
      *
-     * @param player The <code>Player</code> demanding the tribute.
+     * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
+     * @param unit The <code>Unit</code> that is demanding the tribute.
      * @param settlement The <code>IndianSettlement</code> demanded of.
-     * @return The amount of gold offered as tribute.
+     * @return An <code>Element</code> encapsulating this action.
      * TODO: Move TURNS_PER_TRIBUTE magic number to the spec.
      */
-    public int demandTribute(Player player, IndianSettlement settlement) {
+    public Element demandTribute(ServerPlayer serverPlayer, Unit unit,
+                                 IndianSettlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
+
         final int TURNS_PER_TRIBUTE = 5;
         Player indianPlayer = settlement.getOwner();
         int gold = 0;
         int year = getGame().getTurn().getNumber();
-        if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year) {
-            switch (indianPlayer.getTension(player).getLevel()) {
+        if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
+            && indianPlayer.getGold() > 0) {
+            switch (indianPlayer.getTension(serverPlayer).getLevel()) {
             case HAPPY:
             case CONTENT:
                 gold = Math.min(indianPlayer.getGold() / 10, 100);
@@ -2382,13 +2387,30 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Increase tension whether we paid or not.
-        // Apply tension directly to the settlement and let propagation work.
-        settlement.modifyAlarm(player, Tension.TENSION_ADD_NORMAL);
+        // Increase tension whether we paid or not.  Apply tension
+        // directly to the settlement and let propagation work.
+        settlement.modifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL);
         settlement.setLastTribute(year);
-        indianPlayer.modifyGold(-gold);
-        player.modifyGold(gold);
-        return gold;
+        ModelMessage m;
+        if (gold > 0) {
+            indianPlayer.modifyGold(-gold);
+            serverPlayer.modifyGold(gold);
+            addPartial(objects, serverPlayer, "gold", "score");
+            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "scoutSettlement.tributeAgree",
+                                 unit, settlement)
+                .addAmount("%amount%", gold);
+        } else {
+            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "scoutSettlement.tributeDisagree",
+                                 unit, settlement);
+        }
+        objects.add(m);
+        unit.setMovesLeft(0);
+        addPartial(objects, unit, "movesLeft");
+
+        // Do not update others, this is all private.
+        return buildUpdate(serverPlayer, objects);
     }
 
     /**
