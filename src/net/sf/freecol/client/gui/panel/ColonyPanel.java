@@ -1504,47 +1504,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              */
             @Override
             public boolean contains(int px, int py) {
-                /**
-                 * We are assuming the tile size is 128x64.
-                 * 
-                 * How this nasty piece of code works:
-                 * 
-                 * We have a rectangle of 128x64. Inside of it is a diamond
-                 * (rectangle on its side) whose corners are in the middle of
-                 * the rectangle edges.
-                 * 
-                 * We have to figure out if the (x,y) coords are within this
-                 * diamond.
-                 * 
-                 * I do this by using the y axis as a reference point. If you
-                 * look at this diamond, it is widest when y=32, and smallest
-                 * when y=0 && y=63.
-                 * 
-                 * So we'return basically saying, when y=32, active x is 100% of
-                 * 128. When y=10 then active x = 31.25% of 128. 31.25% of
-                 * 128pixels is 40 pixels, situated in the middle of 128. The
-                 * middle 40 pixels of 128 is 63-20 and 63+20
-                 * 
-                 * Tada. A way of detecting if the x,y is within the diamond.
-                 * This algorithm should work no matter how tall or short the
-                 * rectangle (and therefore the diamond within) is.
-                 */
-
-                int activePixels;
-
-                // Check if the value is in the rectangle at all.
-                if (!super.contains(px, py)) {
-                    return false;
-                }
-
-                if (py >= 32) {
-                    py = 32 - (py - 31);
-                }
-
-                // Determine active amount of pixels
-                activePixels = (py * 128) / 64; // 64 --> /32 /2
-                // Now determine if x is in the diamond.
-                return ((px >= 63 - activePixels) && (px <= 63 + activePixels));
+                int w = getWidth();
+                int h = getHeight();
+                int dx = Math.abs(w/2 - px);
+                int dy = Math.abs(h/2 - py);
+                return (dx + w * dy / h) <= w/2;
             }
         }
     }
