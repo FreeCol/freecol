@@ -2301,8 +2301,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askSkill(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
         AskSkillMessage message = new AskSkillMessage(unit, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -2320,8 +2319,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askLearnSkill(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
         LearnSkillMessage message = new LearnSkillMessage(unit, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

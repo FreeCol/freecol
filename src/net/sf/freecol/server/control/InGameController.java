@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
@@ -2354,66 +2355,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Demand a tribute from a native settlement.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
-     * @param unit The <code>Unit</code> that is demanding the tribute.
-     * @param settlement The <code>IndianSettlement</code> demanded of.
-     * @return An <code>Element</code> encapsulating this action.
-     * TODO: Move TURNS_PER_TRIBUTE magic number to the spec.
-     */
-    public Element demandTribute(ServerPlayer serverPlayer, Unit unit,
-                                 IndianSettlement settlement) {
-        List<Object> objects = new ArrayList<Object>();
-
-        final int TURNS_PER_TRIBUTE = 5;
-        Player indianPlayer = settlement.getOwner();
-        int gold = 0;
-        int year = getGame().getTurn().getNumber();
-        if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
-            && indianPlayer.getGold() > 0) {
-            switch (indianPlayer.getTension(serverPlayer).getLevel()) {
-            case HAPPY:
-            case CONTENT:
-                gold = Math.min(indianPlayer.getGold() / 10, 100);
-                break;
-            case DISPLEASED:
-                gold = Math.min(indianPlayer.getGold() / 20, 100);
-                break;
-            case ANGRY:
-            case HATEFUL:
-            default:
-                break; // do nothing
-            }
-        }
-
-        // Increase tension whether we paid or not.  Apply tension
-        // directly to the settlement and let propagation work.
-        settlement.modifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL);
-        settlement.setLastTribute(year);
-        ModelMessage m;
-        if (gold > 0) {
-            indianPlayer.modifyGold(-gold);
-            serverPlayer.modifyGold(gold);
-            addPartial(objects, serverPlayer, "gold", "score");
-            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "scoutSettlement.tributeAgree",
-                                 unit, settlement)
-                .addAmount("%amount%", gold);
-        } else {
-            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "scoutSettlement.tributeDisagree",
-                                 unit, settlement);
-        }
-        objects.add(m);
-        unit.setMovesLeft(0);
-        addPartial(objects, unit, "movesLeft");
-
-        // Do not update others, this is all private.
-        return buildUpdate(serverPlayer, objects);
-    }
-
-    /**
      * Embark a unit onto a carrier.
      * Checking that the locations are appropriate is not done here.
      *
@@ -2492,41 +2433,144 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Learn a skill at an IndianSettlement.
+     * Ask about learning a skill at an IndianSettlement.
      *
+     * @param serverPlayer The <code>ServerPlayer</code> that is learning.
      * @param unit The <code>Unit</code> that is learning.
      * @param settlement The <code>Settlement</code> to learn from.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public void learnFromIndianSettlement(Unit unit,
-                                          IndianSettlement settlement) {
-        Player player = unit.getOwner();
+    public Element askLearnSkill(ServerPlayer serverPlayer, Unit unit,
+                                 IndianSettlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
+        Tile tile = settlement.getTile();
+        PlayerExploredTile pet = tile.getPlayerExploredTile(serverPlayer);
+        pet.setVisited();
+        pet.setSkill(settlement.getLearnableSkill());
+        objects.add(tile);
+        unit.setMovesLeft(0);
+        addPartial(objects, unit, "movesLeft");
+
+        // Do not update others, nothing to see yet.
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Learn a skill at an IndianSettlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is learning.
+     * @param unit The <code>Unit</code> that is learning.
+     * @param settlement The <code>Settlement</code> to learn from.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element learnFromIndianSettlement(ServerPlayer serverPlayer,
+                                             Unit unit,
+                                             IndianSettlement settlement) {
         // Sanity checks.
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
-        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
-            throw new IllegalStateException("Unable to enter "
-                                            + settlement.getName()
-                                            + ": " + type.whyIllegal());
-        }
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
-            throw new IllegalStateException("No skill to learn at "
-                                            + settlement.getName());
+            return Message.clientError("No skill to learn at "
+                                       + settlement.getName());
         }
         if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            throw new IllegalStateException("Unit " + unit.toString()
-                                            + " can not learn skill " + skill
-                                            + " at " + settlement.getName());
+            return Message.clientError("Unit " + unit.toString()
+                                       + " can not learn skill " + skill
+                                       + " at " + settlement.getName());
         }
 
-        // Teach the unit, end its move and expend the skill if necessary.
-        unit.setType(skill);
+        // Try to learn
+        List<Object> objects = new ArrayList<Object>();
         unit.setMovesLeft(0);
-        if (!settlement.isCapital()) {
-            settlement.setLearnableSkill(null);
+        FreeColGameObject fcgo = (FreeColGameObject) unit.getLocation();
+        Tension tension = settlement.getAlarm(serverPlayer);
+        switch (tension.getLevel()) {
+        case HATEFUL: // Killed
+            objects.addAll(unit.disposeList());
+            objects.add(fcgo);
+            break;
+        case ANGRY: // Learn nothing, not even a pet update
+            objects.add(UpdateType.PRIVATE);
+            addPartial(objects, unit, "movesLeft");
+            break;
+        default:
+            // Teach the unit, and expend the skill if necessary.
+            // Do a full information update as the unit is in the settlement.
+            unit.setType(skill);
+            if (!settlement.isCapital()) {
+                settlement.setLearnableSkill(null);
+            }
+            Tile tile = settlement.getTile();
+            tile.updateIndianSettlementInformation(serverPlayer);
+            objects.add(unit);
+            objects.add(UpdateType.PRIVATE);
+            objects.add(tile);
+            break;
         }
 
-        // Do a full information update as the unit is in the settlement.
-        settlement.getTile().updateIndianSettlementInformation(player);
+        // Update others as the unit type change should be visible.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
+     * Demand a tribute from a native settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
+     * @param unit The <code>Unit</code> that is demanding the tribute.
+     * @param settlement The <code>IndianSettlement</code> demanded of.
+     * @return An <code>Element</code> encapsulating this action.
+     * TODO: Move TURNS_PER_TRIBUTE magic number to the spec.
+     */
+    public Element demandTribute(ServerPlayer serverPlayer, Unit unit,
+                                 IndianSettlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
+
+        final int TURNS_PER_TRIBUTE = 5;
+        Player indianPlayer = settlement.getOwner();
+        int gold = 0;
+        int year = getGame().getTurn().getNumber();
+        if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
+            && indianPlayer.getGold() > 0) {
+            switch (indianPlayer.getTension(serverPlayer).getLevel()) {
+            case HAPPY:
+            case CONTENT:
+                gold = Math.min(indianPlayer.getGold() / 10, 100);
+                break;
+            case DISPLEASED:
+                gold = Math.min(indianPlayer.getGold() / 20, 100);
+                break;
+            case ANGRY:
+            case HATEFUL:
+            default:
+                break; // do nothing
+            }
+        }
+
+        // Increase tension whether we paid or not.  Apply tension
+        // directly to the settlement and let propagation work.
+        settlement.modifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL);
+        settlement.setLastTribute(year);
+        ModelMessage m;
+        if (gold > 0) {
+            indianPlayer.modifyGold(-gold);
+            serverPlayer.modifyGold(gold);
+            addPartial(objects, serverPlayer, "gold", "score");
+            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "scoutSettlement.tributeAgree",
+                                 unit, settlement)
+                .addAmount("%amount%", gold);
+        } else {
+            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "scoutSettlement.tributeDisagree",
+                                 unit, settlement);
+        }
+        objects.add(m);
+        unit.setMovesLeft(0);
+        addPartial(objects, unit, "movesLeft");
+
+        // Do not update others, this is all private.
+        return buildUpdate(serverPlayer, objects);
     }
 
     /**
@@ -2549,7 +2593,6 @@ public final class InGameController extends Controller {
         Player player = unit.getOwner();
         Tension tension = settlement.getAlarm(player);
         if (tension != null && tension.getLevel() == Tension.Level.HATEFUL) {
-            unit.dispose();
             return "die";
         }
 

@@ -19,25 +19,19 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -91,6 +85,7 @@ public class LearnSkillMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -113,43 +108,17 @@ public class LearnSkillMessage extends Message {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
+            return Message.clientError("Unable to enter "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
+        }
 
         // Learn the skill if possible.
-        // Bit of a mess building the reply given the multiple results.
-        InGameController igc = server.getInGameController();
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        Tension tension = indianSettlement.getAlarm(player);
-        switch (tension.getLevel()) {
-        case HATEFUL: // Killed
-            unit.dispose();
-
-            Element remove = doc.createElement("remove");
-            reply.appendChild(remove);
-            unit.addToRemoveElement(remove);
-            break;
-        case ANGRY: // Learn nothing, not even a pet update
-            unit.setMovesLeft(0);
-
-            Element updateFail = doc.createElement("update");
-            reply.appendChild(updateFail);
-            updateFail.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
-            break;
-        default: // Unit clear to try to learn
-            try {
-                igc.learnFromIndianSettlement(unit, indianSettlement);
-            } catch (Exception e) {
-                return Message.clientError(e.getMessage());
-            }
-
-            Element updateSuccess = doc.createElement("update");
-            reply.appendChild(updateSuccess);
-            updateSuccess.appendChild(unit.toXMLElement(player, doc));
-            updateSuccess.appendChild(tile.toXMLElement(player, doc));
-            break;
-        }
-        return reply;
+        return server.getInGameController()
+            .learnFromIndianSettlement(serverPlayer, unit,
+                                       (IndianSettlement) settlement);
     }
 
     /**

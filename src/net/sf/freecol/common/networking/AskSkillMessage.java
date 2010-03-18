@@ -19,22 +19,19 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -88,6 +85,7 @@ public class AskSkillMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -121,17 +119,8 @@ public class AskSkillMessage extends Message {
         }
 
         // Update the skill
-        PlayerExploredTile pet = tile.getPlayerExploredTile(player);
-        pet.setVisited();
-        pet.setSkill(((IndianSettlement) settlement).getLearnableSkill());
-        unit.setMovesLeft(0);
-
-        // Return an update of the tile with the skill, and unit move change.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(tile.toXMLElement(player, doc, false, false));
-        reply.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
-        return reply;
+        return server.getInGameController()
+            .askLearnSkill(serverPlayer, unit, (IndianSettlement) settlement);
     }
 
     /**
