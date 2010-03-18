@@ -241,8 +241,7 @@ public final class GUI {
     private boolean gotoStarted = false;
 
     // Helper variables for displaying the map.
-    private int tileHeight,
-    tileWidth,
+    private int tileHeight, tileWidth, halfHeight, halfWidth,
     topSpace,
     topRows,
     //bottomSpace,
@@ -353,7 +352,9 @@ public final class GUI {
         // ATTENTION: we assume that all base tiles have the same size
         TileType tileType = FreeCol.getSpecification().getTileTypeList().get(0);
         tileHeight = lib.getTerrainImageHeight(tileType);
+        halfHeight = tileHeight/2;
         tileWidth = lib.getTerrainImageWidth(tileType);
+        halfWidth = tileWidth/2;
 
         int dx = tileWidth/16;
         int dy = tileHeight/16;
@@ -361,24 +362,24 @@ public final class GUI {
         int ddy = dy + dy/2;
 
         // small corners
-        controlPoints.put(Direction.N, new Dimension(tileWidth/2, dy));
-        controlPoints.put(Direction.E, new Dimension(tileWidth - dx, tileHeight/2));
-        controlPoints.put(Direction.S, new Dimension(tileWidth/2, tileHeight - dy));
-        controlPoints.put(Direction.W, new Dimension(dx, tileHeight/2));
+        controlPoints.put(Direction.N, new Dimension(halfWidth, dy));
+        controlPoints.put(Direction.E, new Dimension(tileWidth - dx, halfHeight));
+        controlPoints.put(Direction.S, new Dimension(halfWidth, tileHeight - dy));
+        controlPoints.put(Direction.W, new Dimension(dx, halfHeight));
         // big corners
-        controlPoints.put(Direction.SE, new Dimension(tileWidth/2, tileHeight));
-        controlPoints.put(Direction.NE, new Dimension(tileWidth, tileHeight/2));
-        controlPoints.put(Direction.SW, new Dimension(0, tileHeight/2));
-        controlPoints.put(Direction.NW, new Dimension(tileWidth/2, 0));
+        controlPoints.put(Direction.SE, new Dimension(halfWidth, tileHeight));
+        controlPoints.put(Direction.NE, new Dimension(tileWidth, halfHeight));
+        controlPoints.put(Direction.SW, new Dimension(0, halfHeight));
+        controlPoints.put(Direction.NW, new Dimension(halfWidth, 0));
         // small corners
-        borderPoints.put(Direction.NW, new Dimension(dx + ddx, tileHeight/2 - ddy));
-        borderPoints.put(Direction.N, new Dimension(tileWidth/2 - ddx, dy + ddy));
-        borderPoints.put(Direction.NE, new Dimension(tileWidth/2 + ddx, dy + ddy));
-        borderPoints.put(Direction.E, new Dimension(tileWidth - dx - ddx, tileHeight/2 - ddy));
-        borderPoints.put(Direction.SE, new Dimension(tileWidth - dx - ddx, tileHeight/2 + ddy));
-        borderPoints.put(Direction.S, new Dimension(tileWidth/2 + ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.SW, new Dimension(tileWidth/2 - ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.W, new Dimension(dx + ddx, tileHeight/2 + ddy));
+        borderPoints.put(Direction.NW, new Dimension(dx + ddx, halfHeight - ddy));
+        borderPoints.put(Direction.N, new Dimension(halfWidth - ddx, dy + ddy));
+        borderPoints.put(Direction.NE, new Dimension(halfWidth + ddx, dy + ddy));
+        borderPoints.put(Direction.E, new Dimension(tileWidth - dx - ddx, halfHeight - ddy));
+        borderPoints.put(Direction.SE, new Dimension(tileWidth - dx - ddx, halfHeight + ddy));
+        borderPoints.put(Direction.S, new Dimension(halfWidth + ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.SW, new Dimension(halfWidth - ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.W, new Dimension(dx + ddx, halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
 
@@ -450,7 +451,7 @@ public final class GUI {
         final Image unitImg = lib.getUnitImageIcon(unit).getImage();
         //final Image chipImg = getOccupationIndicatorImage(unit);
 
-        final int width = tileWidth/2 + unitImg.getWidth(null)/2;
+        final int width = halfWidth + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
 
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -460,7 +461,7 @@ public final class GUI {
         g.drawImage(unitImg, unitX, 0, null);
 
         //final int chipX = ((int) (STATE_OFFSET_X * lib.getScalingFactor()));
-        //final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - tileHeight / 2);
+        //final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - halfHeight);
         //g.drawImage(chipImg, chipX, chipY, null);
 
         final JLabel label = new JLabel(new ImageIcon(img));
@@ -471,10 +472,10 @@ public final class GUI {
     private void updateMapDisplayVariables() {
         // Calculate the amount of rows that will be drawn above the central Tile
         topSpace = (size.height - tileHeight) / 2;
-        if ((topSpace % (tileHeight / 2)) != 0) {
-            topRows = topSpace / (tileHeight / 2) + 2;
+        if ((topSpace % (halfHeight)) != 0) {
+            topRows = topSpace / (halfHeight) + 2;
         } else {
-            topRows = topSpace / (tileHeight / 2) + 1;
+            topRows = topSpace / (halfHeight) + 1;
         }
         bottomRows = topRows;
         leftSpace = (size.width - tileWidth) / 2;
@@ -1142,31 +1143,31 @@ public final class GUI {
 
         if (y < topRows) {
             // We are at the top of the map
-            bottomRow = (size.height / (tileHeight / 2)) - 1;
-            if ((size.height % (tileHeight / 2)) != 0) {
+            bottomRow = (size.height / (halfHeight)) - 1;
+            if ((size.height % (halfHeight)) != 0) {
                 bottomRow++;
             }
             topRow = 0;
-            bottomRowY = bottomRow * (tileHeight / 2);
+            bottomRowY = bottomRow * (halfHeight);
             topRowY = 0;
         } else if (y >= (gameData.getMap().getHeight() - bottomRows)) {
             // We are at the bottom of the map
             bottomRow = gameData.getMap().getHeight() - 1;
 
-            topRow = size.height / (tileHeight / 2);
-            if ((size.height % (tileHeight / 2)) > 0) {
+            topRow = size.height / (halfHeight);
+            if ((size.height % (halfHeight)) > 0) {
                 topRow++;
             }
             topRow = gameData.getMap().getHeight() - topRow;
 
             bottomRowY = size.height - tileHeight;
-            topRowY = bottomRowY - (bottomRow - topRow) * (tileHeight / 2);
+            topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
         } else {
             // We are not at the top of the map and not at the bottom
             bottomRow = y + bottomRows;
             topRow = y - topRows;
-            bottomRowY = topSpace + (tileHeight / 2) * bottomRows;
-            topRowY = topSpace - topRows * (tileHeight / 2);
+            bottomRowY = topSpace + (halfHeight) * bottomRows;
+            topRowY = topSpace - topRows * (halfHeight);
         }
 
         /*
@@ -1177,7 +1178,7 @@ public final class GUI {
         leftColumn until and including rightColumn).
         leftColumnX will tell us at which x-coordinate the left column needs
         to be drawn (this is for the Tiles where y%2==0; the others should be
-        tileWidth / 2 more to the right).
+        halfWidth more to the right).
         */
 
         if (x < leftColumns) {
@@ -1199,7 +1200,7 @@ public final class GUI {
                 leftColumn++;
             }
 
-            leftColumnX = size.width - tileWidth - tileWidth / 2 -
+            leftColumnX = size.width - tileWidth - halfWidth -
                 leftColumn * tileWidth;
             leftColumn = rightColumn - leftColumn;
         } else {
@@ -1246,9 +1247,9 @@ public final class GUI {
                     if (image != null) {
                         centerImage(g, image, p.x, p.y);
                     } else {
-                        g.fillOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
+                        g.fillOval(p.x + halfWidth, p.y + halfHeight, 10, 10);
                         g.setColor(Color.BLACK);
-                        g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
+                        g.drawOval(p.x + halfWidth, p.y + halfHeight, 10, 10);
                     }                
                     if (temp.getTurns() > 0) {
                         BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
@@ -1271,7 +1272,7 @@ public final class GUI {
     private int getXOffset(int clipLeftX, int tileY) {
         int xx = clipLeftX;
         if ((tileY % 2) != 0) {
-            xx += tileWidth / 2;
+            xx += halfWidth;
         }
         return xx;
     }
@@ -1305,15 +1306,15 @@ public final class GUI {
         =======
         Determine which tiles need to be redrawn.
         */
-        int clipTopRow = (clipBounds.y - topRowY) / (tileHeight / 2) - 1;
-        int clipTopY = topRowY + clipTopRow * (tileHeight / 2);
+        int clipTopRow = (clipBounds.y - topRowY) / (halfHeight) - 1;
+        int clipTopY = topRowY + clipTopRow * (halfHeight);
         clipTopRow = topRow + clipTopRow;
 
         int clipLeftCol = (clipBounds.x - leftColumnX) / tileWidth - 1;
         int clipLeftX = leftColumnX + clipLeftCol * tileWidth;
         clipLeftCol = leftColumn + clipLeftCol;
 
-        int clipBottomRow = (clipBounds.y + clipBounds.height - topRowY) / (tileHeight / 2);
+        int clipBottomRow = (clipBounds.y + clipBounds.height - topRowY) / (halfHeight);
         clipBottomRow = topRow + clipBottomRow;
 
         int clipRightCol = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
@@ -1327,17 +1328,17 @@ public final class GUI {
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
             gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
-            int nextX = tileWidth / 2;
-            int nextY = - (tileHeight / 2);
+            int nextX = halfWidth;
+            int nextY = - (halfHeight);
 
             for (int i = 0; i <= ((clipRightCol - clipLeftCol) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
-                nextX += tileWidth / 2;
-                if (nextY == - (tileHeight / 2)) {
+                nextX += halfWidth;
+                if (nextY == - (halfHeight)) {
                     nextY = 0;
                 }
                 else {
-                    nextY = - (tileHeight / 2);
+                    nextY = - (halfHeight);
                 }
             }
         }
@@ -1371,7 +1372,7 @@ public final class GUI {
                 xx += tileWidth;
             }
 
-            yy += tileHeight / 2;
+            yy += halfHeight;
         }
 
         /*
@@ -1392,10 +1393,10 @@ public final class GUI {
 
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
                 // Display the grid.
-                g.translate(xx, yy + (tileHeight / 2));
+                g.translate(xx, yy + (halfHeight));
                 g.setColor(Color.BLACK);
                 g.draw(gridPath);
-                g.translate(- xx, - (yy + (tileHeight / 2)));
+                g.translate(- xx, - (yy + (halfHeight)));
             }
 
             // Column per column; start at the left side to display the tiles.
@@ -1438,7 +1439,7 @@ public final class GUI {
                 xx += tileWidth;
             }
 
-            yy += tileHeight / 2;
+            yy += halfHeight;
         }
 
         /*
@@ -1488,7 +1489,7 @@ public final class GUI {
                 }
                 xx += tileWidth;
             }
-            yy += tileHeight / 2;
+            yy += halfHeight;
         }
 
         /*
@@ -1954,7 +1955,7 @@ public final class GUI {
         if (occupyingUnit != null) {
             ImageIcon image = lib.getScaledImageIcon(lib.getUnitImageIcon(occupyingUnit), 0.5f);
             g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
-                    (y + tileHeight / 2) - image.getIconHeight() / 2, null);
+                    (y + halfHeight) - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
             displayOccupationIndicator(g, occupyingUnit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
         }
@@ -2141,10 +2142,10 @@ public final class GUI {
                     } else {
                         int dx = 0, dy = 0;
                         switch(d) {
-                        case NW: dx = tileWidth/2; dy = -tileHeight/2; break;
-                        case NE: dx = tileWidth/2; dy = tileHeight/2; break;
-                        case SE: dx = -tileWidth/2; dy = tileHeight/2; break;
-                        case SW: dx = -tileWidth/2; dy = -tileHeight/2; break;
+                        case NW: dx = halfWidth; dy = -halfHeight; break;
+                        case NE: dx = halfWidth; dy = halfHeight; break;
+                        case SE: dx = -halfWidth; dy = halfHeight; break;
+                        case SW: dx = -halfWidth; dy = -halfHeight; break;
                         }
                         if (tile1 != null && tile1.getOwner() == owner) {
                             // short straight line
@@ -2302,30 +2303,30 @@ public final class GUI {
                     if (borderingTile!=null) {
                         if (borderingTile.hasRoad()) {
                             connectedRoad =  true;
-                            int nx = x + tileWidth/2;
-                            int ny = y + tileHeight/2;
+                            int nx = x + halfWidth;
+                            int ny = y + halfHeight;
 
                             switch (direction) {
-                            case N : nx = x + tileWidth/2; ny = y; break;
+                            case N : nx = x + halfWidth; ny = y; break;
                             case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
-                            case E : nx = x + tileWidth; ny = y + tileHeight/2; break;
+                            case E : nx = x + tileWidth; ny = y + halfHeight; break;
                             case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
-                            case S : nx = x + tileWidth/2; ny = y + tileHeight; break;
+                            case S : nx = x + halfWidth; ny = y + tileHeight; break;
                             case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
-                            case W : nx = x; ny = y + tileHeight/2; break;
+                            case W : nx = x; ny = y + halfHeight; break;
                             case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
                             }
 
-                            drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
+                            drawRoad(g, seed, x + halfWidth, y + halfHeight, nx, ny);
                         }
                     }
                 }
 
                 if (!connectedRoad) {
-                    drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2,
-                             x + tileWidth/2 + 10, y + tileHeight/2);
-                    drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10,
-                             x + tileWidth/2, y + tileHeight/2 + 10);
+                    drawRoad(g, seed, x + halfWidth - 10, y + halfHeight,
+                             x + halfWidth + 10, y + halfHeight);
+                    drawRoad(g, seed, x + halfWidth, y + halfHeight - 10,
+                             x + halfWidth, y + halfHeight + 10);
                 }
             }
         }
@@ -2454,8 +2455,8 @@ public final class GUI {
                 g.setColor(Color.BLACK);
                 Composite oldComposite = g.getComposite();
                 g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
-                Polygon pol = new Polygon(new int[] {x + tileWidth/2, x + tileWidth, x + tileWidth/2, x},
-                                          new int[] {y, y + tileHeight/2, y + tileHeight, y + tileHeight/2},
+                Polygon pol = new Polygon(new int[] {x + halfWidth, x + tileWidth, x + halfWidth, x},
+                                          new int[] {y, y + halfHeight, y + tileHeight, y + halfHeight},
                                           4);
                 g.fill(pol);
                 g.setComposite(oldComposite);
@@ -2541,11 +2542,11 @@ public final class GUI {
                 g.drawString(text.substring(0, b),
                              x + (tileWidth -
                                   g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
-                             y + tileHeight/2 - (g.getFontMetrics().getAscent()*2)/3);
+                             y + halfHeight - (g.getFontMetrics().getAscent()*2)/3);
                 g.drawString(text.substring(b+1),
                              x + (tileWidth -
                                   g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
-                             y + tileHeight/2 + (g.getFontMetrics().getAscent()*2)/3);
+                             y + halfHeight + (g.getFontMetrics().getAscent()*2)/3);
             }
         }
 
@@ -3000,7 +3001,7 @@ public final class GUI {
         if (focus.getX() < getLeftColumns()) {
             // we are at the left side of the map
             if ((focus.getY() % 2) == 0) {
-                leftOffset = tileWidth * focus.getX() + tileWidth / 2;
+                leftOffset = tileWidth * focus.getX() + halfWidth;
             } else {
                 leftOffset = tileWidth * (focus.getX() + 1);
             }
@@ -3009,23 +3010,23 @@ public final class GUI {
             if ((focus.getY() % 2) == 0) {
                 leftOffset = size.width - (gameData.getMap().getWidth() - focus.getX()) * tileWidth;
             } else {
-                leftOffset = size.width - (gameData.getMap().getWidth() - focus.getX() - 1) * tileWidth - tileWidth / 2;
+                leftOffset = size.width - (gameData.getMap().getWidth() - focus.getX() - 1) * tileWidth - halfWidth;
             }
         } else {
             if ((focus.getY() % 2) == 0) {
                 leftOffset = (size.width / 2);
             } else {
-                leftOffset = (size.width / 2) + tileWidth / 2;
+                leftOffset = (size.width / 2) + halfWidth;
             }
         }
 
         int topOffset;
         if (focus.getY() < topRows) {
             // we are at the top of the map
-            topOffset = (focus.getY() + 1) * (tileHeight / 2);
+            topOffset = (focus.getY() + 1) * (halfHeight);
         } else if (focus.getY() >= (gameData.getMap().getHeight() - bottomRows)) {
             // we are at the bottom of the map
-            topOffset = size.height - (gameData.getMap().getHeight() - focus.getY()) * (tileHeight / 2);
+            topOffset = size.height - (gameData.getMap().getHeight() - focus.getY()) * (halfHeight);
         } else {
             topOffset = (size.height / 2);
         }
@@ -3577,9 +3578,9 @@ public final class GUI {
                 && t.getX() >= leftColumn 
                 && t.getX() <= rightColumn) {
             int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
-            int y = ((t.getY() - topRow) * tileHeight / 2) + topRowY;
+            int y = ((t.getY() - topRow) * halfHeight) + topRowY;
             if ((t.getY() % 2) != 0) {     
-                x += tileWidth / 2;
+                x += halfWidth;
             }
             return new Point(x, y);
         } else {
@@ -3611,10 +3612,10 @@ public final class GUI {
     public Rectangle getTileBounds(int x, int y) {
         Rectangle result = new Rectangle(0, 0, size.width, size.height);
         if (y >= topRow && y <= bottomRow && x >= leftColumn && x <= rightColumn) {
-            result.y = ((y - topRow) * tileHeight / 2) + topRowY - tileHeight;
+            result.y = ((y - topRow) * halfHeight) + topRowY - tileHeight;
             result.x = ((x - leftColumn) * tileWidth) + leftColumnX;
             if ((y % 2) != 0) {
-                result.x += tileWidth / 2;
+                result.x += halfWidth;
             }
             result.width = tileWidth;
             result.height = tileHeight * 2;
