@@ -2402,8 +2402,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         ScoutIndianSettlementMessage message
             = new ScoutIndianSettlementMessage(unit, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return null;
 
         Connection conn = client.getConnection();

@@ -19,10 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -31,9 +27,11 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -87,6 +85,8 @@ public class ScoutIndianSettlementMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = serverPlayer.getGame();
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -97,7 +97,6 @@ public class ScoutIndianSettlementMessage extends Message {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Game game = serverPlayer.getGame();
         Map map = game.getMap();
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         if (tile == null) {
@@ -110,61 +109,17 @@ public class ScoutIndianSettlementMessage extends Message {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
+            throw new IllegalStateException("Unable to enter "
+                                            + settlement.getName()
+                                            + ": " + type.whyIllegal());
+        }
 
         // Valid request, do the scouting.
-        IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        InGameController igc = server.getInGameController();
-        String result;
-        try {
-            result = igc.scoutIndianSettlement(unit, indianSettlement);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-
-        // Build the reply, either a remove or an update.
-        // Always return the result string to help the client display
-        // something informative.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        reply.setAttribute("result", result);
-        if (unit.isDisposed()) {
-            Element remove = doc.createElement("remove");
-            reply.appendChild(remove);
-            unit.addToRemoveElement(remove);
-        } else {
-            Element update = doc.createElement("update");
-            reply.appendChild(update);
-            // Always update the tile, as the settlement is now visited.
-            update.appendChild(tile.toXMLElement(player, doc));
-            // Update any new tiles the unit can see from the settlement,
-            // which can include an enhanced radius from tales.
-            int radius = unit.getLineOfSight();
-            for (Tile t : map.getSurroundingTiles(tile, radius)) {
-                if (!player.canSee(t)) {
-                    update.appendChild(t.toXMLElement(player, doc));
-                }
-            }
-            if ("tales".equals(result) && radius <= IndianSettlement.TALES_RADIUS) {
-                for (Tile t : map.getSurroundingTiles(tile, radius+1, IndianSettlement.TALES_RADIUS)) {
-                    if ((t.isLand() || t.isCoast()) && !player.canSee(t)) {
-                        update.appendChild(t.toXMLElement(player, doc));
-                    }
-                }
-            }
-
-            // Update the gold if it was given.
-            if ("beads".equals(result)) {
-                update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
-            }
-            // Update the whole unit if it upgraded, otherwise just
-            // the moves left.
-            if ("expert".equals(result)) {
-                update.appendChild(unit.toXMLElement(player, doc));
-            } else {
-                update.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
-            }
-        }
-        return reply;
+        return server.getInGameController()
+            .scoutIndianSettlement(serverPlayer, unit,
+                                   (IndianSettlement) settlement);
     }
 
     /**

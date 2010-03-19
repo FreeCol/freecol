@@ -2566,69 +2566,93 @@ public final class InGameController extends Controller {
     /**
      * Scout a native settlement.
      *
+     * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
      * @param unit The scout <code>Unit</code>.
      * @param settlement The <code>IndianSettlement</code> to scout.
-     * @return A string describing the result.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public String scoutIndianSettlement(Unit unit,
-                                        IndianSettlement settlement) {
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
-        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-            throw new IllegalStateException("Unable to enter "
-                                            + settlement.getName()
-                                            + ": " + type.whyIllegal());
-        }
+    public Element scoutIndianSettlement(ServerPlayer serverPlayer,
+                                         Unit unit,
+                                         IndianSettlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
+        String result;
 
         // Hateful natives kill the scout right away.
         Player player = unit.getOwner();
         Tension tension = settlement.getAlarm(player);
         if (tension != null && tension.getLevel() == Tension.Level.HATEFUL) {
-            return "die";
-        }
+            objects.addAll(unit.disposeList());
+            result = "die";
+        } else {
+            // Otherwise player gets to visit, and learn about the settlement.
+            int gold = 0;
+            Tile tile = settlement.getTile();
+            settlement.setVisited(player);
+            tile.updateIndianSettlementInformation(player);
+            unit.setMovesLeft(0);
 
-        // Otherwise player gets to visit, and learn about the settlement.
-        String result;
-        Tile tile = settlement.getTile();
-        UnitType skill = settlement.getLearnableSkill();
-        if (settlement.hasBeenVisited()) {
-            // Pre-visited settlements are a noop.
-            result = "nothing";
-        } else if (skill != null
-                   && skill.hasAbility("model.ability.expertScout")
-                   && unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            // If the scout can be taught to be an expert it will be.
-            // TODO: in the old code the settlement retains the
-            // teaching ability.  Is this Col1 compliant?
-            unit.setType(settlement.getLearnableSkill());
-            // settlement.setLearnableSkill(null);
-            result = "expert";
-        } else if (getPseudoRandom().nextInt(3) == 0) {
-            // Otherwise 1/3 of cases are tales...
+            int radius = unit.getLineOfSight();
+            UnitType skill = settlement.getLearnableSkill();
+            if (settlement.hasBeenVisited()) {
+                // Pre-visited settlements are a noop.
+                result = "nothing";
+            } else if (skill != null
+                       && skill.hasAbility("model.ability.expertScout")
+                       && unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+                // If the scout can be taught to be an expert it will be.
+                // TODO: in the old code the settlement retains the
+                // teaching ability.  Is this Col1 compliant?
+                unit.setType(settlement.getLearnableSkill());
+                // settlement.setLearnableSkill(null);
+                objects.add(unit);
+                result = "expert";
+            } else if (getPseudoRandom().nextInt(3) == 0) {
+                // Otherwise 1/3 of cases are tales...
+                radius = Math.max(radius, IndianSettlement.TALES_RADIUS);
+                result = "tales";
+            } else {
+                // ...and the rest are beads.
+                gold = (getPseudoRandom().nextInt(400)
+                            * settlement.getBonusMultiplier()) + 50;
+                if (unit.hasAbility("model.ability.expertScout")) {
+                    gold = (gold * 11) / 10;
+                }
+                serverPlayer.modifyGold(gold);
+                settlement.getOwner().modifyGold(-gold);
+                result = "beads";
+            }
+
+            // Private information from here.
+            objects.add(UpdateType.PRIVATE);
+            if (gold > 0) {
+                addPartial(objects, serverPlayer, "gold", "score");
+            }
+
+            // Update settlement tile with new information, and any
+            // newly visible tiles, possibly with enhanced radius.
+            objects.add(tile);
             Map map = getFreeColServer().getGame().getMap();
-            for (Tile t : map.getSurroundingTiles(tile, IndianSettlement.TALES_RADIUS)) {
-                if (t.isLand() || t.isCoast()) {
+            for (Tile t : map.getSurroundingTiles(tile, radius)) {
+                if (!serverPlayer.canSee(t) && (t.isLand() || t.isCoast())) {
                     player.setExplored(t);
+                    objects.add(t);
                 }
             }
-            result = "tales";
-        } else {
-            // ...and the rest are beads.
-            int gold = (getPseudoRandom().nextInt(400)
-                        * settlement.getBonusMultiplier()) + 50;
-            if (unit.hasAbility("model.ability.expertScout")) {
-                gold = (gold * 11) / 10;
-            }
-            player.modifyGold(gold);
-            settlement.getOwner().modifyGold(-gold);
-            result = "beads";
-        }
 
-        // Always visit.
-        settlement.setVisited(player);
-        tile.updateIndianSettlementInformation(player);
-        unit.setMovesLeft(0);
-        return result;
+            // If the unit did not get promoted, update it for moves.
+            if (!objects.contains(unit)) {
+                addPartial(objects, unit, "movesLeft");
+            }
+        }
+        // Always add result.
+        addAttribute(objects, "result", result);
+
+        // Other players may be able to see unit disappearing, or
+        // learning.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
     }
+
 
     /**
      * Denounce an existing mission.
