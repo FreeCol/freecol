@@ -1934,7 +1934,7 @@ public final class InGameController extends Controller {
      *
      * @param unit The <code>Unit</code> that is exploring.
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @return A list of objects to update.
+     * @return A list of private objects to update.
      */
     private List<Object> exploreLostCityRumour(ServerPlayer serverPlayer,
                                                Unit unit) {
@@ -1942,8 +1942,6 @@ public final class InGameController extends Controller {
         Tile tile = unit.getTile();
         LostCityRumour lostCity = tile.getLostCityRumour();
         if (lostCity == null) return objects;
-        objects.add(tile);
-        objects.add(UpdateType.PRIVATE);
 
         Specification specification = FreeCol.getSpecification();
         int difficulty = specification.getRangeOption("model.option.difficulty").getValue();
@@ -2137,27 +2135,19 @@ public final class InGameController extends Controller {
         // Clear the alreadyOnHighSea flag if we move onto a non-highsea tile.
         unit.setAlreadyOnHighSea(newTile.canMoveToEurope());
 
-        // Always update old location.  Explore a rumour if present,
-        // otherwise always update new location.  We can not ignore
-        // the rumour objects as the only way the unit can die is the
-        // vanishes rumour.
+        // Always update old location and new tile.
         objects.add((FreeColGameObject) oldLocation);
+        objects.add(newTile);
+
+        // Explore a rumour if present, but do not ignore the rumour
+        // objects as the only way the unit can die is the VANISHES rumour.
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
             List<Object> rumourObjects
                 = exploreLostCityRumour(serverPlayer, unit);
             if (unit.isDisposed()) {
                 privateObjects.clear(); // No discovery if died.
             }
-            List<Object> addto = objects;
-            for (Object o : rumourObjects) {
-                if (o == UpdateType.PRIVATE) {
-                    addto = privateObjects;
-                } else {
-                    addto.add(o);
-                }
-            }
-        } else {
-            objects.add(newTile);
+            privateObjects.addAll(rumourObjects);
         }
 
         // Add the animation, even if the unit dies.
