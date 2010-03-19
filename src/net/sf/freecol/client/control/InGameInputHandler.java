@@ -418,13 +418,20 @@ public final class InGameInputHandler extends InputHandler {
      *            XML tree) that holds all the information.
      */
     private Element setCurrentPlayer(Element setCurrentPlayerElement) {
+        Game game = getGame();
+        // Is it our player whose move is ending?  If so we should close
+        // any outstanding popups.
+        final boolean popDown = getFreeColClient().getMyPlayer().equals(game.getCurrentPlayer());
 
-        final Player currentPlayer = (Player) getGame().getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
+        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
         logger.finest("About to set currentPlayer to " + currentPlayer.getName());
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
+                    if (popDown) {
+                        getFreeColClient().getCanvas().closeMenus();
+                    }
                     getFreeColClient().getInGameController().setCurrentPlayer(currentPlayer);
                     getFreeColClient().getActionManager().update();
                 }

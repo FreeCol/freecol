@@ -347,9 +347,6 @@ public final class InGameController implements NetworkConstants {
      */
     public void setCurrentPlayer(Player player) {
         logger.finest("Entering client setCurrentPlayer: " + player.getName());
-        // Close any popups left over from the old player.
-        freeColClient.getCanvas().closeMenus();
-
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
 
