@@ -110,52 +110,52 @@
   </goods-types>
 
   <resource-types>
-    <resource-type id="model.resource.Game">
+    <resource-type id="model.resource.game">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <modifier id="model.goods.food" type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
       <modifier id="model.goods.furs" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
+    <resource-type id="model.resource.minerals" minimum-value="40" maximum-value="400">
       <modifier id="model.goods.ore" type="additive" value="3"/>
       <!-- Col1 had silver here, even if not mentioned in the Colonizopedia -->
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </resource-type>
-    <resource-type id="model.resource.Ore" minimum-value="200" maximum-value="4000">
+    <resource-type id="model.resource.ore" minimum-value="200" maximum-value="4000">
       <modifier id="model.goods.ore" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Silver" minimum-value="80" maximum-value="800">
+    <resource-type id="model.resource.silver" minimum-value="80" maximum-value="800">
       <modifier id="model.goods.silver" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Lumber">
+    <resource-type id="model.resource.lumber">
       <modifier id="model.goods.lumber" type="additive" value="4"/>
     </resource-type>
-    <resource-type id="model.resource.Furs">
+    <resource-type id="model.resource.furs">
       <modifier id="model.goods.furs" type="additive" value="3"/>
     </resource-type>
-    <resource-type id="model.resource.Tobacco">
+    <resource-type id="model.resource.tobacco">
       <modifier id="model.goods.tobacco" type="multiplicative" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Sugar">
+    <resource-type id="model.resource.sugar">
       <modifier id="model.goods.sugar" type="multiplicative" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Cotton">
+    <resource-type id="model.resource.cotton">
       <modifier id="model.goods.cotton" type="multiplicative" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Oasis">
+    <resource-type id="model.resource.oasis">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <modifier id="model.goods.food" type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
     </resource-type>
-    <resource-type id="model.resource.Grain">
+    <resource-type id="model.resource.grain">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <modifier id="model.goods.food" type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
     </resource-type>
-    <resource-type id="model.resource.Fish">
+    <resource-type id="model.resource.fish">
       <modifier id="model.goods.fish" type="additive" value="3"/>
       <modifier id="model.goods.fish" type="additive" value="3">
         <scope type="model.unit.expertFisherman" matchesNull="false"/>
@@ -195,7 +195,7 @@
       <production goods-type="model.goods.food"       value="5"/>
       <production goods-type="model.goods.cotton"     value="2"/>
       <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.Grain"         probability="100"/>
+      <resource   type="model.resource.grain"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.grassland" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/grassland/" minimap-color="#24801f"/>
@@ -204,7 +204,7 @@
       <secondary-production goods-type="model.goods.tobacco" value="3"/>
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="3"/>
-      <resource   type="model.resource.Tobacco"       probability="100"/>
+      <resource   type="model.resource.tobacco"       probability="100"/>
     </tile-type>
     <tile-type id="model.tile.prairie" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/prairie/" minimap-color="#24801f"/>
@@ -213,7 +213,7 @@
       <secondary-production goods-type="model.goods.cotton" value="3"/>
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.cotton"     value="3"/>
-      <resource   type="model.resource.Cotton"        probability="100"/>
+      <resource   type="model.resource.cotton"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.savannah" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/savannah/" minimap-color="#24801f"/>
@@ -222,7 +222,7 @@
       <secondary-production goods-type="model.goods.sugar" value="3"/>
       <production goods-type="model.goods.food"       value="4"/>
       <production goods-type="model.goods.sugar"      value="3"/>
-      <resource   type="model.resource.Sugar"         probability="100"/>
+      <resource   type="model.resource.sugar"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.marsh" basic-move-cost="6" basic-work-turns="5">
       <art basic="terrain/marsh/" minimap-color="#24803d"/>
@@ -231,7 +231,7 @@
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="2"/>
       <production goods-type="model.goods.ore"        value="2"/>
-      <resource   type="model.resource.Minerals"         probability="100"/>
+      <resource   type="model.resource.minerals"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.swamp" basic-move-cost="6" basic-work-turns="7">
       <art basic="terrain/swamp/" minimap-color="#24803d"/>
@@ -242,7 +242,7 @@
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.sugar"      value="2"/>
       <production goods-type="model.goods.ore"        value="2"/>
-      <resource   type="model.resource.Minerals"      probability="100"/>
+      <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.desert" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/desert/" minimap-color="#63732b"/><!--0.39,0.45,0.17"-->
@@ -252,7 +252,7 @@
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.ore"        value="2"/>
-      <resource   type="model.resource.Oasis"         probability="100"/>
+      <resource   type="model.resource.oasis"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.tundra" basic-move-cost="3" basic-work-turns="4">
       <art basic="terrain/tundra/" minimap-color="#639e5e"/><!--0.39,0.62,0.37"-->
@@ -262,7 +262,7 @@
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.ore"        value="2"/>
       <!-- Col1 had minerals here, even if not mentioned in the Colonizopedia -->
-      <resource   type="model.resource.Minerals"      probability="100"/>
+      <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.mixedForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/plains/" forest="forest/mixed.png" minimap-color="#24731f"/>
@@ -274,7 +274,7 @@
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.furs"       value="3"/>
       <production goods-type="model.goods.lumber"     value="6"/>
-      <resource   type="model.resource.Furs"          probability="100"/>
+      <resource   type="model.resource.furs"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.coniferForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/grassland/" forest="forest/conifer.png" minimap-color="#24731f"/>
@@ -286,7 +286,7 @@
       <production goods-type="model.goods.tobacco"    value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="6"/>
-      <resource   type="model.resource.Lumber"        probability="100"/>
+      <resource   type="model.resource.lumber"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.broadleafForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/prairie/" forest="forest/broadleaf.png" minimap-color="#24731f"/>
@@ -298,7 +298,7 @@
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
-      <resource   type="model.resource.Game"          probability="100"/>
+      <resource   type="model.resource.game"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.tropicalForest" basic-move-cost="6" basic-work-turns="6" is-forest="true">
       <art basic="terrain/savannah/" forest="forest/tropical.png" minimap-color="#24731f"/>
@@ -310,7 +310,7 @@
       <production goods-type="model.goods.sugar"      value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
-      <resource   type="model.resource.Lumber"        probability="100"/>
+      <resource   type="model.resource.lumber"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.wetlandForest" basic-move-cost="9" basic-work-turns="6" is-forest="true">
       <art basic="terrain/marsh/" forest="forest/wetland.png" minimap-color="#24731f"/>
@@ -323,7 +323,7 @@
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.Minerals"      probability="100"/>
+      <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.rainForest" basic-move-cost="9" basic-work-turns="7" is-forest="true">
       <art basic="terrain/swamp/" forest="forest/rain.png" minimap-color="#24731f"/>
@@ -336,7 +336,7 @@
       <production goods-type="model.goods.furs"       value="1"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.Minerals"      probability="100"/>
+      <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.scrubForest" basic-move-cost="3" basic-work-turns="4" is-forest="true">
       <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="#24731f"/>
@@ -349,7 +349,7 @@
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="2"/>
       <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.Oasis"         probability="100"/>
+      <resource   type="model.resource.oasis"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.borealForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/tundra/" forest="forest/boreal.png" minimap-color="#24731f"/>
@@ -361,7 +361,7 @@
       <production goods-type="model.goods.furs"       value="3"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.Game"          probability="100"/>
+      <resource   type="model.resource.game"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.hills" basic-move-cost="6" basic-work-turns="4">
       <art basic="terrain/plains/" overlay="terrain/hills/hills" minimap-color="#708052"/>
@@ -371,7 +371,7 @@
       <secondary-production goods-type="model.goods.ore" value="4"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.ore"        value="4"/>
-      <resource   type="model.resource.Ore"           probability="100"/>
+      <resource   type="model.resource.ore"           probability="100"/>
     </tile-type>
     <tile-type id="model.tile.mountains" basic-move-cost="9" basic-work-turns="7" can-settle="false">
       <art basic="terrain/plains/" overlay="terrain/mountains/mountains" minimap-color="#577352"/>
@@ -379,7 +379,7 @@
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <production goods-type="model.goods.ore"        value="4"/>
       <production goods-type="model.goods.silver"     value="1"/>
-      <resource   type="model.resource.Silver"        probability="100"/>
+      <resource   type="model.resource.silver"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.arctic" basic-move-cost="6" basic-work-turns="4">
       <art basic="terrain/arctic/" minimap-color="#ffffff"/>
@@ -392,14 +392,14 @@
       <art basic="terrain/ocean/" minimap-color="#0000ff"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
       <production goods-type="model.goods.fish"       value="2"/>
-      <resource   type="model.resource.Fish"          probability="100"/>
+      <resource   type="model.resource.fish"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.lake" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="false">
       <art basic="terrain/ocean/" minimap-color="#0000ff"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
       <production goods-type="model.goods.fish"       value="2"/>
-      <resource   type="model.resource.Fish"          probability="100"/>
+      <resource   type="model.resource.fish"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.highSeas" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
@@ -414,7 +414,7 @@
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" 
            altitudeMin="-3" altitudeMax="-2" />
       <production goods-type="model.goods.fish"       value="2"/>
-      <resource   type="model.resource.Fish"          probability="100"/>
+      <resource   type="model.resource.fish"          probability="100"/>
     </tile-type>
   </tile-types>
 
@@ -503,7 +503,7 @@
               resources of 400, lost city rumours of 500
     -->
   <tileimprovement-types>
-    <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0" magnitude="1"
+    <tileimprovement-type id="model.improvement.river" natural="true" add-work-turns="0" magnitude="1"
                           movement-cost="1" zIndex="150">
       <tiles all-land-tiles="true"/>
       <tile id="model.tile.arctic" value="false"/>
@@ -518,7 +518,7 @@
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Road" add-work-turns="0" 
+    <tileimprovement-type id="model.improvement.road" add-work-turns="0" 
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
                           movement-cost="1" zIndex="350">
       <tiles all-land-tiles="true"/>
@@ -527,8 +527,8 @@
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" zIndex="250"
-                          overlay="model.improvement.Plow.image"
+    <tileimprovement-type id="model.improvement.plow" add-work-turns="2" zIndex="250"
+                          overlay="model.improvement.plow.image"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <tile id="model.tile.arctic" value="false"/>
@@ -539,7 +539,7 @@
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
       <modifier id="model.goods.cotton" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
+    <tileimprovement-type id="model.improvement.clearForest" add-work-turns="2"
                           expended-equipment-type="model.equipment.tools" expended-amount="1"
                           deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1">
       <tiles all-forest-tiles="true"/>
@@ -576,8 +576,8 @@
       considered.
       Structure:
       <improvementaction-type id="plowAction" accelerator='P'>
-        <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
-        <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action" image-id="4"/>
+        <action tileimprovement-type="model.improvement.plow" name="model.improvement.plow.action" image-id="5"/>
+        <action tileimprovement-type="model.improvement.clearForest" name="model.improvement.clearForest.action" image-id="4"/>
       </improvementaction-type>
       Notes:
       image-id is the reference for the unit-button index in ImageLibrary.java
@@ -585,11 +585,11 @@
       -->
   <improvementaction-types>
     <improvementaction-type id="impPlowAction" accelerator="P">
-      <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
-      <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action" image-id="4"/>
+      <action tileimprovement-type="model.improvement.plow" name="model.improvement.plow.action" image-id="5"/>
+      <action tileimprovement-type="model.improvement.clearForest" name="model.improvement.clearForest.action" image-id="4"/>
     </improvementaction-type>
     <improvementaction-type id="impRoadAction" accelerator="R">
-      <action tileimprovement-type="model.improvement.Road" name="model.improvement.Road.action" image-id="6"/>
+      <action tileimprovement-type="model.improvement.road" name="model.improvement.road.action" image-id="6"/>
     </improvementaction-type>
   </improvementaction-types>
 
@@ -1037,125 +1037,125 @@
   </unit-types>
   
   <building-types>
-    <building-type id="model.building.TownHall" basicProduction="3" workplaces="3"
+    <building-type id="model.building.townHall" basicProduction="3" workplaces="3"
                    produces="model.goods.bells" sequence="1">
       <modifier id="model.goods.bells" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
+    <building-type id="model.building.carpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
       <ability id="model.ability.build">
         <scope type="model.unit.wagonTrain"/>
       </ability>
     </building-type>
-    <building-type id="model.building.LumberMill"     basicProduction="6" workplaces="3" 
+    <building-type id="model.building.lumberMill"     basicProduction="6" workplaces="3" 
                    consumes="model.goods.lumber" produces="model.goods.hammers"
-                   upgradesFrom="model.building.CarpenterHouse" required-population="3" sequence="2">
+                   upgradesFrom="model.building.carpenterHouse" required-population="3" sequence="2">
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.build">
         <scope type="model.unit.wagonTrain"/>
       </ability>
     </building-type>
-    <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
+    <building-type id="model.building.blacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
       <ability id="model.ability.build">
         <scope type="model.equipment.tools"/>
         <scope type="model.equipment.muskets"/>
       </ability>
     </building-type>
-    <building-type id="model.building.BlacksmithShop"  basicProduction="6" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" upgradesFrom="model.building.BlacksmithHouse" sequence="3">
+    <building-type id="model.building.blacksmithShop"  basicProduction="6" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" upgradesFrom="model.building.blacksmithHouse" sequence="3">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.IronWorks"       basicProduction="6" workplaces="3"
+    <building-type id="model.building.ironWorks"       basicProduction="6" workplaces="3"
                    consumes="model.goods.ore" produces="model.goods.tools"
-                   upgradesFrom="model.building.BlacksmithShop" required-population="8" sequence="3">
+                   upgradesFrom="model.building.blacksmithShop" required-population="8" sequence="3">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.tools" type="percentage" value="50"/> 
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.TobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" sequence="4">
+    <building-type id="model.building.tobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" sequence="4">
     </building-type>
-    <building-type id="model.building.TobacconistShop"  basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" upgradesFrom="model.building.TobacconistHouse" sequence="4">
+    <building-type id="model.building.tobacconistShop"  basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" upgradesFrom="model.building.tobacconistHouse" sequence="4">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.CigarFactory"     basicProduction="6" workplaces="3"
+    <building-type id="model.building.cigarFactory"     basicProduction="6" workplaces="3"
                    consumes="model.goods.tobacco" produces="model.goods.cigars"
-                   upgradesFrom="model.building.TobacconistShop" required-population="8" sequence="4">
+                   upgradesFrom="model.building.tobacconistShop" required-population="8" sequence="4">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cigars" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" sequence="5">
+    <building-type id="model.building.weaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" sequence="5">
     </building-type>
-    <building-type id="model.building.WeaverShop"  basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.WeaverHouse" sequence="5">
+    <building-type id="model.building.weaverShop"  basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.weaverHouse" sequence="5">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.TextileMill" basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.WeaverShop" required-population="8" sequence="5">
+    <building-type id="model.building.textileMill" basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.weaverShop" required-population="8" sequence="5">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cloth" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.DistillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" sequence="6">
+    <building-type id="model.building.distillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" sequence="6">
     </building-type>
-    <building-type id="model.building.RumDistillery"  basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.DistillerHouse" sequence="6">
+    <building-type id="model.building.rumDistillery"  basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.distillerHouse" sequence="6">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.RumFactory"     basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.RumDistillery" required-population="8" sequence="6">
+    <building-type id="model.building.rumFactory"     basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.rumDistillery" required-population="8" sequence="6">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.rum" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.FurTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" sequence="7">
+    <building-type id="model.building.furTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" sequence="7">
     </building-type>
-    <building-type id="model.building.FurTradingPost" basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.FurTraderHouse" sequence="7">
+    <building-type id="model.building.furTradingPost" basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.furTraderHouse" sequence="7">
       <required-goods id="model.goods.hammers" value="56"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.FurFactory"     basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.FurTradingPost" required-population="6" sequence="7">
+    <building-type id="model.building.furFactory"     basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.furTradingPost" required-population="6" sequence="7">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.coats" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.Schoolhouse" workplaces="1" minSkill="1" maxSkill="1"
+    <building-type id="model.building.schoolhouse" workplaces="1" minSkill="1" maxSkill="1"
                    required-population="4" sequence="8">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.College"     workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse" required-population="8" sequence="8">
+    <building-type id="model.building.college"     workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.schoolhouse" required-population="8" sequence="8">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.University"  workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College" required-population="10" sequence="8">
+    <building-type id="model.building.university"  workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.college" required-population="10" sequence="8">
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.Armory"   basicProduction="3" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
+    <building-type id="model.building.armory"   basicProduction="3" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.build">
         <scope type="model.unit.artillery"/>
       </ability>
     </building-type>
-    <building-type id="model.building.Magazine" basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Armory" required-population="8" sequence="9">
+    <building-type id="model.building.magazine" basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.armory" required-population="8" sequence="9">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
       <ability id="model.ability.build">
         <scope type="model.unit.artillery"/>
       </ability>
     </building-type>
-    <building-type id="model.building.Arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Magazine" required-population="8" sequence="9">
+    <building-type id="model.building.arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.magazine" required-population="8" sequence="9">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
@@ -1165,26 +1165,26 @@
         <scope type="model.unit.artillery"/>
       </ability>
     </building-type>
-    <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.crosses" sequence="10">
+    <building-type id="model.building.chapel"    workplaces="0" produces="model.goods.crosses" sequence="10">
       <modifier id="model.goods.crosses" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.Church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Chapel" required-population="3" sequence="10">
+    <building-type id="model.building.church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.chapel" required-population="3" sequence="10">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.goods.crosses" type="additive" value="2"/>
       <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Cathedral" basicProduction="6" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Church" required-population="8" sequence="10">
+    <building-type id="model.building.cathedral" basicProduction="6" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.church" required-population="8" sequence="10">
       <required-goods id="model.goods.hammers" value="176"/>
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.goods.crosses" type="additive" value="3"/>
       <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Stockade" workplaces="0" required-population="3" sequence="11">
+    <building-type id="model.building.stockade" workplaces="0" required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
-    <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade"
+    <building-type id="model.building.fort"     workplaces="0" upgradesFrom="model.building.stockade"
                    required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="100"/>
@@ -1192,7 +1192,7 @@
       <ability id="model.ability.bombardShips" value="true"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
-    <building-type id="model.building.Fortress" workplaces="0" upgradesFrom="model.building.Fort"
+    <building-type id="model.building.fortress" workplaces="0" upgradesFrom="model.building.fort"
                    required-population="8" sequence="12">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
@@ -1200,19 +1200,19 @@
       <ability id="model.ability.bombardShips" value="true"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
-    <building-type id="model.building.Depot"              workplaces="0" sequence="13">
+    <building-type id="model.building.depot"              workplaces="0" sequence="13">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.Warehouse"          workplaces="0" upgradesFrom="model.building.Depot" sequence="13">
+    <building-type id="model.building.warehouse"          workplaces="0" upgradesFrom="model.building.depot" sequence="13">
       <required-goods id="model.goods.hammers" value="80"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="200"/>
     </building-type>
-    <building-type id="model.building.WarehouseExpansion" workplaces="0" upgradesFrom="model.building.Warehouse" sequence="13">
+    <building-type id="model.building.warehouseExpansion" workplaces="0" upgradesFrom="model.building.warehouse" sequence="13">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
     </building-type>
-    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.food"
+    <building-type id="model.building.country" workplaces="0" consumes="model.goods.food"
                    produces="model.goods.horses" sequence="14">
       <modifier id="model.goods.horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />
@@ -1220,17 +1220,17 @@
         <scope type="model.equipment.horses"/>
       </ability>
     </building-type>
-    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.food"
-                   produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
+    <building-type id="model.building.stables" workplaces="0" consumes="model.goods.food"
+                   produces="model.goods.horses" upgradesFrom="model.building.country" sequence="14">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.Docks"   workplaces="0" sequence="15">
+    <building-type id="model.building.docks"   workplaces="0" sequence="15">
       <required-ability id="model.ability.hasPort" value="true" />
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
     </building-type>
-    <building-type id="model.building.Drydock" workplaces="0" upgradesFrom="model.building.Docks"
+    <building-type id="model.building.drydock" workplaces="0" upgradesFrom="model.building.docks"
                    required-population="4" sequence="15">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="50"/>
@@ -1239,7 +1239,7 @@
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.Shipyard" workplaces="0" upgradesFrom="model.building.Drydock"
+    <building-type id="model.building.shipyard" workplaces="0" upgradesFrom="model.building.drydock"
                    required-population="8" sequence="15">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
@@ -1251,18 +1251,18 @@
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.PrintingPress" workplaces="0" sequence="16">
+    <building-type id="model.building.printingPress" workplaces="0" sequence="16">
       <required-goods id="model.goods.hammers" value="52"/>
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.goods.bells" type="percentage" value="50"/>
     </building-type>
-    <building-type id="model.building.Newspaper" workplaces="0" upgradesFrom="model.building.PrintingPress"
+    <building-type id="model.building.newspaper" workplaces="0" upgradesFrom="model.building.printingPress"
                    required-population="4" sequence="16">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
       <modifier id="model.goods.bells" type="percentage" value="100"/>
     </building-type>
-    <building-type id="model.building.CustomHouse" workplaces="0" sequence="17">
+    <building-type id="model.building.customHouse" workplaces="0" sequence="17">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
       <required-ability id="model.ability.buildCustomHouse"/>
@@ -1326,9 +1326,9 @@
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
                      weight1="7" weight2="5" weight3="3">
-      <event id="model.event.freeBuilding" value="model.building.Stockade"/>
+      <event id="model.event.freeBuilding" value="model.building.stockade"/>
       <modifier id="model.modifier.buildingPriceBonus" type="percentage" value="-100">
-        <scope type="model.building.Stockade"/>
+        <scope type="model.building.stockade"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
