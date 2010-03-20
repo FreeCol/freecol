@@ -507,6 +507,9 @@ public final class Specification {
             throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID 'null'.");
         } else if (allTypes.containsKey(Id)) {
             return type.cast(allTypes.get(Id));
+        } else if (allTypes.containsKey(mangle(Id))) {
+            // TODO: remove compatibility code
+            return type.cast(allTypes.get(mangle(Id)));
         } else if (initialized) {
             throw new IllegalArgumentException("Undefined FreeColGameObjectType" + " with ID '" + Id + "'.");
         } else {
@@ -519,6 +522,17 @@ public final class Specification {
                 logger.warning(e.toString());
                 return null;
             }
+        }
+    }
+
+    // TODO: remove compatibility code
+    private String mangle(String id) {
+        int index = id.lastIndexOf('.');
+        if (index == -1) {
+            return id;
+        } else {
+            return id.substring(0, index + 1) + id.substring(index + 1, index + 2).toLowerCase()
+                + id.substring(index + 2);
         }
     }
 
