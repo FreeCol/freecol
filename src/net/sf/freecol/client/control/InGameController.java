@@ -2498,8 +2498,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         MissionaryMessage message
             = new MissionaryMessage(unit, direction, denounce);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

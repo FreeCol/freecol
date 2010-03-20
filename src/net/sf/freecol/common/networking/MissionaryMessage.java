@@ -19,10 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -33,9 +29,11 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -136,50 +134,19 @@ public class MissionaryMessage extends Message {
                                            + indianSettlement.getId());
             }
         }
-
-        // Valid, proceed to establish/denounce.
-        InGameController igc = server.getInGameController();
-        Location oldLocation = unit.getLocation();
-        ModelMessage m;
-        try {
-            m = (denounce) ? igc.denounceMission(indianSettlement, unit)
-                : igc.establishMission(indianSettlement, unit);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        if (oldLocation instanceof Tile) {
-            igc.sendRemoveUnitToAll(serverPlayer, unit, (Tile) oldLocation);
-        }
-        if (!unit.isDisposed()) {
-            settlement.getTile().updateIndianSettlementInformation(player);
-            unit.setMovesLeft(0);
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
+            return Message.clientError("Unable to enter "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
         }
 
-        // Build the reply, updating the settlement for tension,
-        // missionary presence and other information.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(indianSettlement.toXMLElement(player, doc));
-        if (m != null) {
-            Element messages = doc.createElement("addMessages");
-            reply.appendChild(messages);
-            m.addToOwnedElement(messages, player);
-        }
-        if (unit.isDisposed()) {
-            Element remove = doc.createElement("remove");
-            reply.appendChild(remove);
-            unit.addToRemoveElement(remove);
-        } else {
-            update.appendChild(unit.toXMLElement(player, doc));
-            if (oldLocation instanceof Tile) {
-                update.appendChild(((Tile) oldLocation).toXMLElement(player, doc));
-            } else if (oldLocation instanceof Unit) {
-                update.appendChild(((Unit) oldLocation).toXMLElement(player, doc));
-            }
-        }
-        return reply;
+        // Valid, proceed to denounce/establish.
+        return (denounce)
+            ? server.getInGameController()
+                .denounceMission(serverPlayer, unit, indianSettlement)
+            : server.getInGameController()
+                .establishMission(serverPlayer, unit, indianSettlement);
     }
 
     /**

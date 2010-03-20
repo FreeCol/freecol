@@ -507,37 +507,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Tell all players to remove a unit, optionally excluding one
-     * player.  Only send if the tile the unit was on is visible to
-     * the recipient player.  The unit may or may not have already
-     * been disposed of on the server side, but is known to have left
-     * the supplied tile so the client is told to remove it regardless.
-     *
-     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
-     * @param unit The <code>Unit</code> to remove.
-     * @param tile The <code>Tile</code> the unit has left.
-     */
-    public void sendRemoveUnitToAll(ServerPlayer serverPlayer,
-                                    Unit unit, Tile tile) {
-        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-            if (other.canSee(tile)) {
-                Element element = Message.createNewRootElement("multiple");
-                Document doc = element.getOwnerDocument();
-                Element update = doc.createElement("update");
-                update.appendChild(tile.toXMLElement(other, doc, false,false));
-                Element remove = doc.createElement("remove");
-                element.appendChild(remove);
-                unit.addToRemoveElement(remove);
-                try {
-                    other.getConnection().sendAndWait(element);
-                } catch (IOException e) {
-                    logger.warning(e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
      * Deprecated. Going away soon.
      *
      * @param serverPlayer A <code>ServerPlayer</code> to exclude.
@@ -2657,25 +2626,20 @@ public final class InGameController extends Controller {
     /**
      * Denounce an existing mission.
      *
+     * @param serverPlayer The <code>ServerPlayer</code> that is denouncing.
+     * @param unit The <code>Unit</code> denouncing.
      * @param settlement The <code>IndianSettlement</code> containing the
      *                   mission to denounce.
-     * @param unit The <code>Unit</code> denouncing.
-     * @return A <code>ModelMessage</code> describing the result.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public ModelMessage denounceMission(IndianSettlement settlement, Unit unit) {
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
-        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
-            throw new IllegalStateException("Unable to enter "
-                                            + settlement.getName()
-                                            + ": " + type.whyIllegal());
-        }
-
+    public Element denounceMission(ServerPlayer serverPlayer, Unit unit,
+                                   IndianSettlement settlement) {
         // Determine result
-        Player player = unit.getOwner();
+        Location oldLocation = unit.getLocation();
         Unit missionary = settlement.getMissionary();
-        Player enemy = missionary.getOwner();
+        ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
         double random = Math.random();
-        random *= enemy.getImmigration() / (player.getImmigration() + 1);
+        random *= enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
         if (missionary.hasAbility("model.ability.expertMissionary")) {
             random += 0.2;
         }
@@ -2685,115 +2649,132 @@ public final class InGameController extends Controller {
 
         if (random < 0.5) { // Success, remove old mission and establish ours
             settlement.setMissionary(null);
-            // TODO: send enemy a message informing of the loss of mission.
-            return establishMission(settlement, unit);
+
+            // Inform the enemy of loss of mission
+            if (enemy.isConnected()) {
+                List<Object> objects = new ArrayList<Object>();
+                objects.addAll(missionary.disposeList());
+                ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                             "indianSettlement.mission.denounced",
+                                             settlement)
+                            .addStringTemplate("%settlement%", settlement.getLocationName());
+                objects.add(m);
+                objects.add(settlement);
+                sendElement(enemy, objects);
+            }
+
+            return establishMission(serverPlayer, unit, settlement);
         }
 
-        // Failed, missionary dies.
-        unit.dispose();
-        return new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                "indianSettlement.mission.noDenounce", player, unit)
-            .addStringTemplate("%nation%", settlement.getOwner().getNationName());
+        // Denounce failed
+        List<Object> objects = new ArrayList<Object>();
+        objects.addAll(unit.disposeList());
+        objects.add((FreeColGameObject) oldLocation);
+        objects.add(UpdateType.PRIVATE);
+        objects.add(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "indianSettlement.mission.noDenounce",
+                                     serverPlayer, unit)
+                    .addStringTemplate("%nation%", settlement.getOwner().getNationName()));
+
+        // Others can see missionary disappear
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
     }
 
     /**
      * Establish a new mission.
      *
-     * @param settlement The <code>IndianSettlement</code> to establish at.
+     * @param serverPlayer The <code>ServerPlayer</code> that is establishing.
      * @param unit The missionary <code>Unit</code>.
-     * @return A <code>ModelMessage</code> describing the result.
+     * @param settlement The <code>IndianSettlement</code> to establish at.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public ModelMessage establishMission(IndianSettlement settlement,
-                                         Unit unit) {
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
-        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
-            throw new IllegalStateException("Unable to enter "
-                                            + settlement.getName()
-                                            + ": " + type.whyIllegal());
-        }
+    public Element establishMission(ServerPlayer serverPlayer, Unit unit,
+                                    IndianSettlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
+        // Always update old location.
+        objects.add((FreeColGameObject) unit.getLocation());
 
         // Result depends on tension wrt this settlement.
-        Player player = unit.getOwner();
-        Tension tension = settlement.getAlarm(player);
+        // Establish if at least not angry.
+        Tension tension = settlement.getAlarm(serverPlayer);
         if (tension == null) {
             tension = new Tension(0);
-            settlement.setAlarm(player, tension);
+            settlement.setAlarm(serverPlayer, tension);
         }
-
-        // Establish, or dispose.
         switch (tension.getLevel()) {
+        case HATEFUL: case ANGRY:
+            objects.addAll(unit.disposeList());
+            break;
         case HAPPY: case CONTENT: case DISPLEASED:
             settlement.setMissionary(unit);
-            break;
-        case ANGRY: case HATEFUL:
-            unit.dispose();
-            break;
+            objects.add(settlement);
         }
+        objects.add(UpdateType.PRIVATE);
+        String messageId = "indianSettlement.mission."
+            + settlement.getAlarm(serverPlayer).toString().toLowerCase();
+        objects.add(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     messageId, serverPlayer, unit)
+                    .addStringTemplate("%nation%", settlement.getOwner().getNationName()));
 
-        // Report result.
-        String messageId = "indianSettlement.mission." + tension.toString().toLowerCase();
-        return new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                messageId, player, unit)
-            .addStringTemplate("%nation%", settlement.getOwner().getNationName());
-    }
-
-    /**
-     * Gets the amount of gold needed for inciting. This method should
-     * NEVER be randomized: it should always return the same amount if
-     * given the same three parameters.
-     *
-     * @param payingPlayer The <code>Player</code> paying for the incite.
-     * @param targetPlayer The <code>Player</code> to be attacked by the
-     *            <code>attackingPlayer</code>.
-     * @param attackingPlayer The player that would be receiving the
-     *            money for incite.
-     * @return The amount of gold that should be payed by
-     *         <code>payingPlayer</code> to <code>attackingPlayer</code> in
-     *         order for <code>attackingPlayer</code> to attack
-     *         <code>targetPlayer</code>.
-     * TODO: Magic numbers.
-     */
-    public int getInciteAmount(Player payingPlayer, Player targetPlayer,
-                               Player attackingPlayer) {
-        Tension payingTension = attackingPlayer.getTension(payingPlayer);
-        Tension targetTension = attackingPlayer.getTension(targetPlayer);
-        int payingValue = (payingTension == null) ? 0 : payingTension.getValue();
-        int targetValue = (targetTension == null) ? 0 : targetTension.getValue();
-        int amount = (payingTension != null && targetTension != null
-                      && payingValue > targetValue) ? 10000 : 5000;
-        amount += 20 * (payingValue - targetValue);
-        return Math.max(amount, 650);
+        // Others can see missionary disappear and settlement acquire
+        // mission.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
     }
 
     /**
      * Incite a settlement against an enemy.
      *
+     * @param serverPlayer The <code>ServerPlayer</code> that is inciting.
+     * @param unit The missionary <code>Unit</code> inciting.
      * @param settlement The <code>IndianSettlement</code> to incite.
-     * @param inciter The <code>Player</code> that is inciting.
      * @param enemy The <code>Player</code> to be incited against.
      * @param gold The amount of gold in the bribe.
-     * @return True if the incitement succeeded.
-     * TODO: Magic numbers.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public boolean inciteIndianSettlement(IndianSettlement settlement,
-                                          Player inciter, Player enemy,
-                                          int gold) {
-        // Enough gold?
-        Player indianPlayer = settlement.getOwner();
-        int toIncite = getInciteAmount(inciter, enemy, indianPlayer);
-        if (inciter.getGold() < gold) {
-            return false;
+    public Element incite(ServerPlayer serverPlayer, Unit unit,
+                          IndianSettlement settlement, Player enemy, int gold) {
+        List<Object> objects = new ArrayList<Object>();
+
+        // How much gold will be needed?
+        Player nativePlayer = settlement.getOwner();
+        Tension payingTension = nativePlayer.getTension(serverPlayer);
+        Tension targetTension = nativePlayer.getTension(enemy);
+        int payingValue = (payingTension == null) ? 0 : payingTension.getValue();
+        int targetValue = (targetTension == null) ? 0 : targetTension.getValue();
+        int goldToPay = (payingTension != null && targetTension != null
+                      && payingValue > targetValue) ? 10000 : 5000;
+        goldToPay += 20 * (payingValue - targetValue);
+        goldToPay = Math.max(goldToPay, 650);
+
+        // Try to incite?
+        unit.setMovesLeft(0);
+        addPartial(objects, unit, "movesLeft");
+        if (gold < 0) { // Initial enquiry.
+            addAttribute(objects, "gold", Integer.toString(goldToPay));
+        } else if (gold < goldToPay || serverPlayer.getGold() < gold) {
+            objects.add(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                         "indianSettlement.inciteGoldFail",
+                                         serverPlayer, settlement)
+                        .addStringTemplate("%player%", enemy.getNationName())
+                        .addAmount("%amount%", goldToPay));
+            addAttribute(objects, "gold", "0");
+        } else {
+            // Success.  Set the indian player at war with the european
+            // player (and vice versa) and raise tension.
+            serverPlayer.modifyGold(-gold);
+            nativePlayer.modifyGold(gold);
+            addAttribute(objects, "gold", Integer.toString(gold));
+            addPartial(objects, serverPlayer, "gold");
+            nativePlayer.changeRelationWithPlayer(enemy, Stance.WAR);
+            settlement.modifyAlarm(enemy, 1000); // Let propagation work.
+            enemy.modifyTension(nativePlayer, 500);
+            enemy.modifyTension(serverPlayer, 250);
         }
 
-        // Success.  Set the indian player at war with the european
-        // player (and vice versa) and raise tension.
-        inciter.modifyGold(-gold);
-        indianPlayer.modifyGold(gold);
-        indianPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
-        settlement.modifyAlarm(enemy, 1000); // Let propagation work.
-        enemy.modifyTension(indianPlayer, 500);
-        enemy.modifyTension(inciter, 250);
-        return true;
+        // Do not update others, they can not see what happened.
+        return buildUpdate(serverPlayer, objects);
     }
 
 

@@ -19,10 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -33,8 +29,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -106,6 +103,7 @@ public class InciteMessage extends Message {
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -134,11 +132,10 @@ public class InciteMessage extends Message {
         if (enemyId == null || enemyId.length() == 0) {
             return Message.clientError("Empty enemyId.");
         }
-        FreeColGameObject obj = game.getFreeColGameObjectSafely(enemyId);
-        if (!(obj instanceof Player)) {
+        if (!(game.getFreeColGameObjectSafely(enemyId) instanceof Player)) {
             return Message.clientError("Not a player: " + enemyId);
         }
-        enemy = (Player) obj;
+        enemy = (Player) game.getFreeColGameObjectSafely(enemyId);
         if (enemy == player) {
             return Message.clientError("Inciting against oneself!");
         }
@@ -151,37 +148,16 @@ public class InciteMessage extends Message {
                                        + settlement.getName()
                                        + ": " + type.whyIllegal());
         }
+        int gold;
+        try {
+            gold = Integer.parseInt(goldString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad gold: " + goldString);
+        }
 
         // Valid, proceed to incite.
-        InGameController igc = server.getInGameController();
-        int gold = Integer.parseInt(goldString);
-        int goldToPay;
-        try {
-            if (gold < 0) { // Initial inquiry.
-                goldToPay = igc.getInciteAmount(player, enemy, settlementPlayer);
-            } else if (igc.inciteIndianSettlement(indianSettlement, player,
-                                                  enemy, gold)) {
-                goldToPay = gold; // Pay this amount.
-            } else {
-                goldToPay = 0;
-            }
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        unit.setMovesLeft(0);
-
-        // Build the reply, updating unit for moves left, and player
-        // gold if it changed.  The settlement itself does not need to
-        // be updated as alarm wrt other players is not public.
-        // Always add the goldToPay value as an attribute.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.setAttribute("gold", Integer.toString(goldToPay));
-        reply.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
-        if (gold > 0 && goldToPay > 0) {
-            reply.appendChild(player.toXMLElementPartial(doc, "gold"));
-        }
-        return reply;
+        return server.getInGameController()
+            .incite(serverPlayer, unit, indianSettlement, enemy, gold);
     }
 
     /**

@@ -104,7 +104,7 @@ public class InGameControllerTest extends FreeColTestCase {
         
         assertEquals("Wrong camp alarm", tension, camp.getAlarm(dutchPlayer));
         InGameController igc = (InGameController) server.getController();
-        igc.establishMission(camp,jesuit);
+        igc.establishMission((ServerPlayer) dutchPlayer, jesuit, camp);
         boolean result = !jesuit.isDisposed();
 
         assertFalse("Mission creation should have failed",result);
