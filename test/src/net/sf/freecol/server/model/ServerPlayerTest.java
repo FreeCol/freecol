@@ -48,7 +48,7 @@ import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class ServerPlayerTest extends FreeColTestCase {	
-    BuildingType schoolHouseType = spec().getBuildingType("model.building.Schoolhouse");
+    BuildingType schoolHouseType = spec().getBuildingType("model.building.schoolhouse");
 
     GoodsType cottonType = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
 

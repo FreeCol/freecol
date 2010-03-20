@@ -29,10 +29,10 @@ public class TileItemContainerTest extends FreeColTestCase {
     				boolean addResources,
     				boolean addRumours){
     	final TileImprovementType riverImprov =
-            spec().getTileImprovementType("model.improvement.River");
+            spec().getTileImprovementType("model.improvement.river");
     	final TileImprovementType roadImprov =
-            spec().getTileImprovementType("model.improvement.Road");
-    	final ResourceType oreRsc = spec().getResourceType("model.resource.Ore"); 
+            spec().getTileImprovementType("model.improvement.road");
+    	final ResourceType oreRsc = spec().getResourceType("model.resource.ore"); 
     	
     	TileItemContainer cont = new TileItemContainer(game,t);
     	

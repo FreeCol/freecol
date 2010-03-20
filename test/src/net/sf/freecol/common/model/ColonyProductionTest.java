@@ -45,7 +45,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Map map = new Map(game, tiles);
 
         Resource grain = new Resource(game, map.getTile(5, 8),
-                                      FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+                                      FreeCol.getSpecification().getResourceType("model.resource.grain"));
         map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
@@ -107,7 +107,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Map map = new Map(game, tiles);
 
         Resource grain = new Resource(game, map.getTile(5, 8),
-                                      FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+                                      FreeCol.getSpecification().getResourceType("model.resource.grain"));
         map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
@@ -187,7 +187,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
-        Building pasture = colony.getBuilding(spec().getBuildingType("model.building.Country"));
+        Building pasture = colony.getBuilding(spec().getBuildingType("model.building.country"));
         assertEquals(horsesType, pasture.getGoodsOutputType());
         assertEquals("Wrong warehouse capacity in colony",100,colony.getWarehouseCapacity());
         

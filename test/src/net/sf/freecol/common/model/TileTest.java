@@ -51,10 +51,10 @@ public class TileTest extends FreeColTestCase {
     TileType marshForest = spec().getTileType("model.tile.wetlandForest");
     TileType swampForest = spec().getTileType("model.tile.rainForest");
 
-    TileImprovementType plow = spec().getTileImprovementType("model.improvement.Plow");
-    TileImprovementType river = spec().getTileImprovementType("model.improvement.River");
-    TileImprovementType road = spec().getTileImprovementType("model.improvement.Road");
-    TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.ClearForest");
+    TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
+    TileImprovementType river = spec().getTileImprovementType("model.improvement.river");
+    TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
+    TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.clearForest");
     TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
     TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
 
@@ -172,7 +172,7 @@ public class TileTest extends FreeColTestCase {
         Tile tile = new Tile(game, spec().getTileType("model.tile.mountains"), 0, 0);
         assertEquals(0,tile.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(1,tile.potential(spec().getGoodsType("model.goods.silver"), null));
-        tile.setResource(new Resource(game, tile, spec().getResourceType("model.resource.Silver")));
+        tile.setResource(new Resource(game, tile, spec().getResourceType("model.resource.silver")));
         assertEquals(0,tile.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(3,tile.potential(spec().getGoodsType("model.goods.silver"), null));
     }
@@ -185,7 +185,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(0, tile1.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(1, tile1.potential(spec().getGoodsType("model.goods.silver"), null));
         assertEquals(2, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
-        tile1.setResource(new Resource(game, tile1, spec().getResourceType("model.resource.Silver")));
+        tile1.setResource(new Resource(game, tile1, spec().getResourceType("model.resource.silver")));
         assertEquals(0, tile1.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(3, tile1.potential(spec().getGoodsType("model.goods.silver"), null));
         assertEquals(4, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
@@ -193,7 +193,7 @@ public class TileTest extends FreeColTestCase {
         Tile tile2 = new Tile(game, spec().getTileType("model.tile.plains"), 0, 1);
         assertEquals(5, tile2.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(6, tile2.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
-        tile2.setResource(new Resource(game, tile2, spec().getResourceType("model.resource.Grain")));
+        tile2.setResource(new Resource(game, tile2, spec().getResourceType("model.resource.grain")));
         // potential assumes expert
         assertEquals(9, tile2.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(10, tile2.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
@@ -338,7 +338,7 @@ public class TileTest extends FreeColTestCase {
         assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar, null), road2.getType()));
         assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
 
-        ResourceType sugarResource = spec().getResourceType("model.resource.Sugar");
+        ResourceType sugarResource = spec().getResourceType("model.resource.sugar");
         tile1.setResource(new Resource(game, tile1, sugarResource));
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), savannah));

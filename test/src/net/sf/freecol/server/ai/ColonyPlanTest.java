@@ -132,7 +132,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         AIMain aiMain = server.getAIMain();
             
         Colony colony = getStandardColony();
-        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+        final BuildingType warehouse = spec().getBuildingType("model.building.warehouse");
         colony.setCurrentlyBuilding(warehouse);
         
         ColonyPlan plan = new ColonyPlan(aiMain,colony);
@@ -174,7 +174,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         
         // colony has enough hammers, requires tools
-        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+        final BuildingType warehouse = spec().getBuildingType("model.building.warehouse");
         final GoodsType oreType = spec().getGoodsType("model.goods.ore");
         final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
         final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
@@ -274,7 +274,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         colony.addGoods(lumberType, fullStock);
         colony.addGoods(oreType, fullStock);
         
-        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+        final BuildingType warehouse = spec().getBuildingType("model.building.warehouse");
         colony.setCurrentlyBuilding(warehouse);
 
         ColonyPlan plan = new ColonyPlan(aiMain,colony);        

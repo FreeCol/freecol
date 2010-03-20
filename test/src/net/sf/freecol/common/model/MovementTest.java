@@ -92,7 +92,7 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
-        TileImprovementType roadType = spec().getTileImprovementType("model.improvement.Road");
+        TileImprovementType roadType = spec().getTileImprovementType("model.improvement.road");
         TileImprovement road1 = new TileImprovement(game, tile1, roadType);
         assertTrue(road1.isRoad());
         assertFalse(road1.isComplete());
@@ -129,7 +129,7 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
-        TileImprovementType riverType = spec().getTileImprovementType("model.improvement.River");
+        TileImprovementType riverType = spec().getTileImprovementType("model.improvement.river");
         TileImprovement river1 = new TileImprovement(game, tile1, riverType);
         assertTrue(river1.isRiver());
         assertTrue(river1.isComplete());
@@ -236,7 +236,7 @@ public class MovementTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(6);
-        BuildingType churchType = spec().getBuildingType("model.building.Chapel");
+        BuildingType churchType = spec().getBuildingType("model.building.chapel");
         assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
 
         Building church = colony.getBuilding(churchType);

@@ -243,10 +243,10 @@ public class ClientModelController implements ModelController {
         Tile tile = unit.getTile();
         TileType changeType = improvement.getChange(tile.getType());
         if (changeType != null) {
-            // "model.improvement.ClearForest"
+            // "model.improvement.clearForest"
             tile.setType(changeType);
         } else {
-            // "model.improvement.Road", "model.improvement.Plow"
+            // "model.improvement.road", "model.improvement.plow"
             tile.add(improvement);
             // FIXME: how should we compute the style better?
         }

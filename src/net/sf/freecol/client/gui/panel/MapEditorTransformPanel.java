@@ -88,7 +88,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private ButtonGroup group;
 
     private static final TileImprovementType riverType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.River");
+        Specification.getSpecification().getTileImprovementType("model.improvement.river");
 
     /**
      * Describe nativePlayer here.

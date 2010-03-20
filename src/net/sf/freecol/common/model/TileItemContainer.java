@@ -531,7 +531,7 @@ public class TileItemContainer extends FreeColGameObject {
             return null;
         }
         TileImprovement river = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
-                                                    .getTileImprovementType("model.improvement.River"));
+                                                    .getTileImprovementType("model.improvement.river"));
         river = (TileImprovement) addTileItem(river);
         river.setMagnitude(magnitude);
         river.setStyle(style);

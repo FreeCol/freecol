@@ -768,9 +768,9 @@ public class MapGenerator implements IMapGenerator {
                             if (!t.isWater()) {
                                 ct.setType(t);
                                 TileImprovementType plowType = FreeCol.getSpecification()
-                                    .getTileImprovementType("model.improvement.Plow");
+                                    .getTileImprovementType("model.improvement.plow");
                                 TileImprovementType roadType = FreeCol.getSpecification()
-                                    .getTileImprovementType("model.improvement.Road");
+                                    .getTileImprovementType("model.improvement.road");
                                 TileImprovement road = new TileImprovement(game, ct, roadType);
                                 road.setTurnsToComplete(0);
                                 TileImprovement plow = new TileImprovement(game, ct, plowType);
@@ -782,7 +782,7 @@ public class MapGenerator implements IMapGenerator {
                             }
                         }
                     }
-                    BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
+                    BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.schoolhouse");
                     Building schoolhouse = new Building(game, colony, schoolType);
                     colony.addBuilding(schoolhouse);
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");

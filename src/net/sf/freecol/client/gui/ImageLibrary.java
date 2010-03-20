@@ -75,7 +75,7 @@ public final class ImageLibrary extends ImageProvider {
  
     public static final String UNIT_SELECT = "unitSelect.image",
                                DELETE = "delete.image",
-                               PLOWED = "model.improvement.Plow.image",
+                               PLOWED = "model.improvement.plow.image",
                                TILE_TAKEN = "tileTaken.image",
                                TILE_OWNED_BY_INDIANS = "nativeLand.image",
                                LOST_CITY_RUMOUR = "lostCityRumour.image",

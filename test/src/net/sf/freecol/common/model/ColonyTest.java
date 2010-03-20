@@ -24,12 +24,12 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyTest extends FreeColTestCase {
-    BuildingType depotType = spec().getBuildingType("model.building.Depot");
-    BuildingType warehouseType = spec().getBuildingType("model.building.Warehouse");
-    BuildingType warehouseExpansionType = spec().getBuildingType("model.building.WarehouseExpansion");
-    BuildingType churchType = spec().getBuildingType("model.building.Chapel");
-    BuildingType townHallType = spec().getBuildingType("model.building.TownHall");
-    BuildingType carpenterHouseType =  spec().getBuildingType("model.building.CarpenterHouse");
+    BuildingType depotType = spec().getBuildingType("model.building.depot");
+    BuildingType warehouseType = spec().getBuildingType("model.building.warehouse");
+    BuildingType warehouseExpansionType = spec().getBuildingType("model.building.warehouseExpansion");
+    BuildingType churchType = spec().getBuildingType("model.building.chapel");
+    BuildingType townHallType = spec().getBuildingType("model.building.townHall");
+    BuildingType carpenterHouseType =  spec().getBuildingType("model.building.carpenterHouse");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
@@ -201,7 +201,7 @@ public class ColonyTest extends FreeColTestCase {
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
         UnitType cottonPlanter = spec().getUnitType("model.unit.masterCottonPlanter");
         UnitType statesman = spec().getUnitType("model.unit.elderStatesman");
-        BuildingType townHall = spec().getBuildingType("model.building.TownHall");
+        BuildingType townHall = spec().getBuildingType("model.building.townHall");
 
         Game game = getGame();
         game.setMap(getTestMap(true));
@@ -278,8 +278,8 @@ public class ColonyTest extends FreeColTestCase {
         GoodsType bells = spec().getGoodsType("model.goods.bells");
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-        BuildingType townHall = spec().getBuildingType("model.building.TownHall");
-        BuildingType weaversHouse = spec().getBuildingType("model.building.WeaverHouse");
+        BuildingType townHall = spec().getBuildingType("model.building.townHall");
+        BuildingType weaversHouse = spec().getBuildingType("model.building.weaverHouse");
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
         UnitType weaver = spec().getUnitType("model.unit.masterWeaver");

@@ -166,7 +166,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         tile.setOwner(owner);
         if (!tile.hasRoad()) {
             TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
-                                                       .getTileImprovementType("model.improvement.Road"));
+                                                       .getTileImprovementType("model.improvement.road"));
             road.setTurnsToComplete(0);
             road.setVirtual(true);
             tile.add(road);
@@ -191,9 +191,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
         if (landLocked) {
-            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.Warehouse"));
+            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.warehouse"));
         } else {
-            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.Docks"));
+            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.docks"));
             featureContainer.addAbility(HAS_PORT);
         }
         Building building;

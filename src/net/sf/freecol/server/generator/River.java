@@ -46,7 +46,7 @@ public class River {
     private static final TileType greatRiver = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
 
     private static final TileImprovementType riverType = 
-        FreeCol.getSpecification().getTileImprovementType("model.improvement.River");
+        FreeCol.getSpecification().getTileImprovementType("model.improvement.river");
 
     /**
      * Possible direction changes for a river.

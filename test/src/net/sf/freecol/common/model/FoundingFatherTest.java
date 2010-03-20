@@ -130,14 +130,14 @@ public class FoundingFatherTest extends FreeColTestCase {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
 
-        BuildingType press = spec().getBuildingType("model.building.PrintingPress");
+        BuildingType press = spec().getBuildingType("model.building.printingPress");
 
         Colony colony = getStandardColony(4);
         assertEquals(null, colony.getBuilding(press));
 
         FoundingFather father = new FoundingFather();
         Map<String, String> events = new HashMap<String, String>();
-        events.put("model.event.freeBuilding", "model.building.PrintingPress");
+        events.put("model.event.freeBuilding", "model.building.printingPress");
         father.setEvents(events);
         colony.getOwner().addFather(father);
 
@@ -147,7 +147,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     public void testBuildingBonus() {
-        BuildingType press = spec().getBuildingType("model.building.PrintingPress");
+        BuildingType press = spec().getBuildingType("model.building.printingPress");
 
     	Game game = getGame();
     	game.setMap(getTestMap(true));
@@ -157,7 +157,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         FoundingFather father = new FoundingFather();
         Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus", -100f, Modifier.Type.PERCENTAGE);
         Scope pressScope = new Scope();
-        pressScope.setType("model.building.PrintingPress");
+        pressScope.setType("model.building.printingPress");
         List<Scope> scopeList = new ArrayList<Scope>();
         scopeList.add(pressScope);
         priceBonus.setScopes(scopeList);
@@ -178,7 +178,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player player = colony.getOwner();
         
         // The custom house is not buildable initially
-        BuildableType customHouse = spec().getBuildingType("model.building.CustomHouse");
+        BuildableType customHouse = spec().getBuildingType("model.building.customHouse");
         assertFalse(colony.canBuild(customHouse));
         
         // But it should become available after Peter Stuyvesant has joined continental congress
@@ -220,7 +220,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(2, colony.getUnitCount());
         
         // the colony has no stockade initially
-        BuildingType stockadeType = spec().getBuildingType("model.building.Stockade");
+        BuildingType stockadeType = spec().getBuildingType("model.building.stockade");
         Building b = colony.getBuilding(stockadeType);
         assertNull(b);
         
@@ -283,7 +283,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         GoodsType bells = spec().getGoodsType("model.goods.bells");
-        Building townHall = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
+        Building townHall = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
         
         Unit statesman1 = colony.getUnitList().get(0);
         Unit statesman2 = colony.getUnitList().get(1);

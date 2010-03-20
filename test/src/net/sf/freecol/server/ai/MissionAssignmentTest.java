@@ -51,7 +51,7 @@ import net.sf.freecol.util.test.MockMapGenerator;
 public class MissionAssignmentTest extends FreeColTestCase {
 	TileType plainsType = spec().getTileType("model.tile.plains");
 	
-	BuildingType stockadeType = spec().getBuildingType("model.building.Stockade");
+	BuildingType stockadeType = spec().getBuildingType("model.building.stockade");
 	
 	UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 	UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");

@@ -70,7 +70,7 @@ public class SchoolTest extends FreeColTestCase {
         for (int turn = 0; turn < requiredTurns; turn++) {
            /* assertEquals("wrong number of units in turn " + turn + ": " + unitType,
                          1, getUnitList(colony, unitType).size()); */
-            colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse")).newTurn();
+            colony.getBuilding(spec().getBuildingType("model.building.schoolhouse")).newTurn();
         }
     }
     
@@ -78,13 +78,13 @@ public class SchoolTest extends FreeColTestCase {
     	BuildingType schoolType = null;;
         switch(level){
         	case SCHOOLHOUSE:
-        		schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        		schoolType = spec().getBuildingType("model.building.schoolhouse");
         		break;
         	case COLLEGE:
-        		schoolType = spec().getBuildingType("model.building.College");
+        		schoolType = spec().getBuildingType("model.building.college");
         		break;
         	case UNIVERSITY:
-        		schoolType = spec().getBuildingType("model.building.University");
+        		schoolType = spec().getBuildingType("model.building.university");
         		break;
         	default:
         		fail("Setup error, cannot setup school");
@@ -94,7 +94,7 @@ public class SchoolTest extends FreeColTestCase {
     }
 
 
-    BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+    BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
     
 
     public void testUpgrades() {
@@ -133,9 +133,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(expertOreMinerType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(game, colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         assertTrue(schoolType.hasAbility("model.ability.teach"));
         assertTrue(colony.canTrain(ore));
 
@@ -159,9 +159,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit blackSmith = units.next();
         blackSmith.setType(masterBlacksmithType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(game, colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         school.upgrade();
 
         blackSmith.setLocation(school);
@@ -189,7 +189,7 @@ public class SchoolTest extends FreeColTestCase {
                    colonist.getLocation() instanceof WorkLocation);
         elder.setType(elderStatesmanType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         Building school = new Building(game, colony, schoolType);
         colony.addBuilding(school);
         school.upgrade();
@@ -261,9 +261,9 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(expertOreMinerType);
 
         // Build a college...
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(getGame(), colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         school.upgrade();
 
         blacksmith.setLocation(school);
@@ -343,9 +343,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(expertOreMinerType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(game, colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         school.upgrade();
         school.upgrade();
 
@@ -399,7 +399,7 @@ public class SchoolTest extends FreeColTestCase {
             u.setType(elderStatesmanType);
         }
 
-        BuildingType schoolType = spec().getBuildingType("model.building.University");
+        BuildingType schoolType = spec().getBuildingType("model.building.university");
         colony.addBuilding(new Building(getGame(), colony, schoolType));
         return colony;
     }
@@ -424,7 +424,7 @@ public class SchoolTest extends FreeColTestCase {
         Unit black = units.next();
         black.setType(masterBlacksmithType);
 
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
 
         // It should take 4 turns to train an expert lumber jack and 6 to train
         // a blacksmith
@@ -1100,9 +1100,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit regular = units.next();
         regular.setType(colonialRegularType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(getGame(), colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         school.upgrade();
         school.upgrade();
 
@@ -1129,9 +1129,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit student = units.next();
         student.setType(pettyCriminalType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(getGame(), colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         assertTrue(schoolType.hasAbility("model.ability.teach"));
         assertTrue(colony.canTrain(lumber));
 
@@ -1178,9 +1178,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new Building(getGame(), colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         assertTrue(schoolType.hasAbility("model.ability.teach"));
         assertTrue(colony.canTrain(lumberJack));
         assertFalse(game.getGameOptions().getBoolean(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST));

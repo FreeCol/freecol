@@ -55,9 +55,9 @@ public class UnitTest extends FreeColTestCase {
     TileType hills = spec().getTileType("model.tile.hills");
     TileType mountains = spec().getTileType("model.tile.mountains");
 
-    TileImprovementType road = spec().getTileImprovementType("model.improvement.Road");
-    TileImprovementType plow = spec().getTileImprovementType("model.improvement.Plow");
-    TileImprovementType clear = spec().getTileImprovementType("model.improvement.ClearForest");
+    TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
+    TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
+    TileImprovementType clear = spec().getTileImprovementType("model.improvement.clearForest");
 
     EquipmentType toolsType = spec().getEquipmentType("model.equipment.tools");
     EquipmentType horsesType = spec().getEquipmentType("model.equipment.horses");
@@ -75,7 +75,7 @@ public class UnitTest extends FreeColTestCase {
     GoodsType foodType = spec().getGoodsType("model.goods.food");
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
 
-    BuildingType carpenterHouseType = spec().getBuildingType("model.building.CarpenterHouse");
+    BuildingType carpenterHouseType = spec().getBuildingType("model.building.carpenterHouse");
     
     /**
      * Test Plowing with a hardy pioneer
@@ -530,7 +530,7 @@ public class UnitTest extends FreeColTestCase {
         UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
         
         Colony colony = getStandardColony(3);
-        BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
+        BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.chapel");
         Building church = colony.getBuilding(churchType);
         church.upgrade();
         Unit jesuit = new Unit(game, tile, dutch, missionaryType, UnitState.ACTIVE);

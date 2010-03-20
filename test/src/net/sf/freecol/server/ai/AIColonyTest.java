@@ -109,7 +109,7 @@ public class AIColonyTest extends FreeColTestCase {
         //the number needs to be high to ensure allocation
         Colony colony = getStandardColony(6);
 
-        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+        final BuildingType warehouse = spec().getBuildingType("model.building.warehouse");
         final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
         final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
         final GoodsType oreType = spec().getGoodsType("model.goods.ore");
@@ -177,7 +177,7 @@ public class AIColonyTest extends FreeColTestCase {
         final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
         final GoodsType oreType = spec().getGoodsType("model.goods.ore");
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+        final BuildingType warehouse = spec().getBuildingType("model.building.warehouse");
         for(ColonyTile t : colony.getColonyTiles()){
             Tile tile = t.getTile();
             assertTrue(msg1,tile.potential(lumberType, colonistType) == 0);
@@ -395,7 +395,7 @@ public class AIColonyTest extends FreeColTestCase {
         assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
 
-        Building townHall = new Building(game, colony, spec().getBuildingType("model.building.TownHall"));
+        Building townHall = new Building(game, colony, spec().getBuildingType("model.building.townHall"));
         units.clear();
         units.add(servant);
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, townHall, null));

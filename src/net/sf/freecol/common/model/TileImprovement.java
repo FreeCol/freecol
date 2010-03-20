@@ -154,7 +154,7 @@ public class TileImprovement extends TileItem implements Named {
      * @return a <code>boolean</code> value
      */
     public boolean isRoad() {
-        return getType().getId().equals("model.improvement.Road");
+        return getType().getId().equals("model.improvement.road");
     }
 
     /**
@@ -162,7 +162,7 @@ public class TileImprovement extends TileItem implements Named {
      * @return a <code>boolean</code> value
      */
     public boolean isRiver() {
-        return getType().getId().equals("model.improvement.River");
+        return getType().getId().equals("model.improvement.river");
     }
 
     public String getNameKey() {

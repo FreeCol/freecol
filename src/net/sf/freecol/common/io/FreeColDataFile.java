@@ -128,7 +128,7 @@ public class FreeColDataFile {
         return new BufferedInputStream(connection.getInputStream());
     }
     
-    private URL getURL(String filename) {
+    protected URL getURL(String filename) {
         try {
             if (file.isDirectory()) {
                 return new URL("file", null, (new File(file, filename)).getAbsolutePath());

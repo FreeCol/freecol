@@ -69,7 +69,7 @@ public class TerrainGenerator {
     private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
     private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
     private TileImprovementType riverType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.River");
+        Specification.getSpecification().getTileImprovementType("model.improvement.river");
     private TileImprovementType fishBonusLandType =
         Specification.getSpecification().getTileImprovementType("model.improvement.fishBonusLand");
     private TileImprovementType fishBonusRiverType =
