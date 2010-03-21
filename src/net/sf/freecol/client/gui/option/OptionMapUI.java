@@ -173,7 +173,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     optionUIs.put(o.getId(), c);
                 }
             } else {
-                logger.warning("Unknown option.");
+                logger.warning("Unknown option: " + o.getId() + " (" + o.getClass() + ")");
             }
         }
         optionUpdaters = ou.toArray(new OptionUpdater[0]);

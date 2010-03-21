@@ -31,11 +31,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
@@ -43,6 +41,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 
@@ -69,7 +68,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JLabel port2Label = localizedLabel("startServerOnPort");
     private final JLabel advantageLabel = localizedLabel("playerOptions.nationalAdvantages");
     private final JLabel rulesLabel = localizedLabel("rules");
-    private final JLabel difficultyLabel = localizedLabel("difficulty");
 
     private final JCheckBox publicServer = new JCheckBox(Messages.message("publicServer"));
     private final JTextField name = new JTextField(System.getProperty("user.name",
@@ -100,16 +98,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private final String[] filenames = new String[] {"freecol", "classic" };
 
-    private final String[] difficulties = new String[] {
-        "model.difficulty.veryEasy",
-        "model.difficulty.easy",
-        "model.difficulty.medium",
-        "model.difficulty.hard",
-        "model.difficulty.veryHard"
-    };
-
-    private final JComboBox difficultyBox = new JComboBox();
-
     private final Component[] joinComponents = new Component[] {
         ipLabel, server, port1Label, port1
     };
@@ -120,7 +108,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private final Component[] gameComponents = new Component[] {
         advantageLabel, nationalAdvantages,
-        difficultyLabel, difficultyBox,
         rulesLabel, specificationBox
         //, selectColors
     };
@@ -141,10 +128,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         JButton cancel = new JButton( Messages.message("cancel") );
         JLabel nameLabel = localizedLabel("name");
-
-        for (String key : difficulties) {
-            difficultyBox.addItem(Messages.message(key));
-        }
 
         setCancelComponent(cancel);
 
@@ -178,8 +161,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(specificationBox, "growx");
 
         add(meta, "newline, span 3");
-        add(difficultyLabel);
-        add(difficultyBox, "growx");
 
         add(join, "newline, span 3");
 
@@ -208,10 +189,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         enableComponents();
 
         setSize(getPreferredSize());
-    }
-
-    private String getDifficulty() {
-        return difficulties[difficultyBox.getSelectedIndex()];
     }
 
     private String getFilename() {
@@ -268,6 +245,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     nationOptions.setSelectColors(selectColors.isSelected());
+                    DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas()));
                     connectController.startSingleplayerGame(name.getText(), nationOptions);
                     // getFilename(), getDifficulty());
                     break;

@@ -1871,6 +1871,22 @@
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
+    <difficultyLevel id="model.difficulty.custom">
+      <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
+      <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="80" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.nativeConvertProbability" value="10" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.burnProbability" value="10" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
+    </difficultyLevel>
   </difficultyLevels>
   <options>
     <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>

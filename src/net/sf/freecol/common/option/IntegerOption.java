@@ -153,9 +153,10 @@ public class IntegerOption extends AbstractOption {
             setValue(Integer.parseInt(value));
         } else {
             setValue(Integer.parseInt(defaultValue));
-            minimumValue = Integer.parseInt(in.getAttributeValue(null, "minimumValue"));
-            maximumValue = Integer.parseInt(in.getAttributeValue(null, "maximumValue"));
         }
+        minimumValue = getAttribute(in, "minimumValue", Integer.MIN_VALUE);
+        maximumValue = getAttribute(in, "maximumValue", Integer.MAX_VALUE);
+
         in.nextTag();
     }
 
