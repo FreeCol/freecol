@@ -1619,6 +1619,113 @@ public final class InGameController extends Controller {
         return true;
     }
 
+
+    /**
+     * Propagate an European market change to the other European markets.
+     *
+     * @param type The type of goods that was traded.
+     * @param amount The amount of goods that was traded.
+     * @param serverPlayer The player that performed the trade.
+     */
+    private void propagateToEuropeanMarkets(GoodsType type, int amount,
+                                            ServerPlayer serverPlayer) {
+        // Propagate 5-30% of the original change.
+        final int lowerBound = 5; // TODO: make into game option?
+        final int upperBound = 30;// TODO: make into game option?
+        amount *= getPseudoRandom().nextInt(upperBound - lowerBound + 1)
+            + lowerBound;
+        amount /= 100;
+        if (amount == 0) return;
+
+        // Do not need to update the clients here, these changes happen
+        // while it is not their turn, and they will get a fresh copy
+        // of the altered market in the update sent in nextPlayer above.
+        Market market;
+        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+            if (other.isEuropean() && (market = other.getMarket()) != null) {
+                market.addGoodsToMarket(type, amount);
+            }
+        }
+    }
+
+    /**
+     * Buy goods.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
+     * @param unit The <code>Unit</code> to carry the goods.
+     * @param type The <code>GoodsType</code> to buy.
+     * @param amount The amount of goods to buy.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element buyGoods(ServerPlayer serverPlayer, Unit unit,
+                            GoodsType type, int amount) {
+        List<Object> objects = new ArrayList<Object>();
+        Market market = serverPlayer.getMarket();
+
+        // FIXME: market.buy() should be here in the controller, but
+        // there are two cases remaining that are hard to move still.
+        //
+        // 1. There is a shortcut buying of equipment in Europe in
+        // Unit.equipWith().
+        // 2. Also for the goods required for a building in
+        // Colony.payForBuilding().  This breaks the pattern implemented
+        // here as there is no unit involved.
+        market.buy(type, amount, serverPlayer);
+        unit.getGoodsContainer().addGoods(type, amount);
+        objects.add(unit);
+        addPartial(objects, serverPlayer, "gold");
+        if (market.hasPriceChanged(type)) {
+            // This type of goods has changed price, so we will update
+            // the market and send a message as well.
+            objects.add(market.makePriceChangeMessage(type));
+            market.flushPriceChange(type);
+        }
+        propagateToEuropeanMarkets(type, amount, serverPlayer);
+
+        // Action occurs in Europe, nothing is visible to other players.
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Sell goods.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is selling.
+     * @param unit The <code>Unit</code> carrying the goods.
+     * @param type The <code>GoodsType</code> to sell.
+     * @param amount The amount of goods to sell.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element sellGoods(ServerPlayer serverPlayer, Unit unit,
+                             GoodsType type, int amount) {
+        List<Object> objects = new ArrayList<Object>();
+        Market market = serverPlayer.getMarket();
+
+        // FIXME: market.sell() should be in the controller, but the
+        // following cases will have to wait.
+        //
+        // 1. Unit.dumpEquipment() gets called from a few places.
+        // 2. Colony.exportGoods() is in the newTurn mess.
+        // Its also still in MarketTest, which needs to be moved to
+        // ServerPlayerTest where it also is already.
+        //
+        // Try to sell.
+        market.sell(type, amount, serverPlayer);
+        unit.getGoodsContainer().addGoods(type, -amount);
+        objects.add(unit);
+        addPartial(objects, serverPlayer, "gold");
+        if (market.hasPriceChanged(type)) {
+            // This type of goods has changed price, so update the
+            // market and send a message as well.
+            objects.add(market.makePriceChangeMessage(type));
+            market.flushPriceChange(type);
+        }
+        propagateToEuropeanMarkets(type, amount, serverPlayer);
+
+        // Action occurs in Europe, nothing is visible to other players.
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
     /**
      * A unit migrates from Europe.
      *
@@ -2884,34 +2991,6 @@ public final class InGameController extends Controller {
         if (loc != null) {
             loc.add(goods);
             goods.setLocation(loc);
-        }
-    }
-
-    /**
-     * Propagate an European market change to the other European markets.
-     *
-     * @param type The type of goods that was traded.
-     * @param amount The amount of goods that was traded.
-     * @param serverPlayer The player that performed the trade.
-     */
-    public void propagateToEuropeanMarkets(GoodsType type, int amount,
-                                           ServerPlayer serverPlayer) {
-        // Propagate 5-30% of the original change.
-        final int lowerBound = 5; // TODO: make into game option?
-        final int upperBound = 30;// TODO: make into game option?
-        amount *= getPseudoRandom().nextInt(upperBound - lowerBound + 1)
-            + lowerBound;
-        amount /= 100;
-        if (amount == 0) return;
-
-        // Do not need to update the clients here, these changes happen
-        // while it is not their turn, and they will get a fresh copy
-        // of the altered market in the update sent in nextPlayer above.
-        Market market;
-        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-            if (other.isEuropean() && (market = other.getMarket()) != null) {
-                market.addGoodsToMarket(type, amount);
-            }
         }
     }
 

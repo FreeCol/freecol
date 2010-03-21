@@ -19,21 +19,16 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -53,7 +48,7 @@ public class BuyGoodsMessage extends Message {
     /**
      * The amount of goods to buy.
      */
-    private int amount;
+    private String amountString;
 
     /**
      * Create a new <code>BuyGoodsMessage</code>.
@@ -65,7 +60,7 @@ public class BuyGoodsMessage extends Message {
     public BuyGoodsMessage(Unit carrier, GoodsType type, int amount) {
         this.carrierId = carrier.getId();
         this.goodsTypeId = type.getId();
-        this.amount = amount;
+        this.amountString = Integer.toString(amount);
     }
 
     /**
@@ -78,7 +73,7 @@ public class BuyGoodsMessage extends Message {
     public BuyGoodsMessage(Game game, Element element) {
         this.carrierId = element.getAttribute("carrier");
         this.goodsTypeId = element.getAttribute("type");
-        this.amount = Integer.parseInt(element.getAttribute("amount"));
+        this.amountString = element.getAttribute("amount");
     }
 
     /**
@@ -111,52 +106,20 @@ public class BuyGoodsMessage extends Message {
         if (type == null) {
             return Message.clientError("Not a goods type: " + goodsTypeId);
         }
+        int amount;
+        try {
+            amount = Integer.parseInt(amountString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad amount: " + amountString);
+        }
         if (amount <= 0) {
             return Message.clientError("Amount must be positive: "
-                                       + Integer.toString(amount));
+                                       + amountString);
         }
 
-        // FIXME: market.buy() should be in the controller, but there
-        // are two cases remaining that are hard to move still.
-        //
-        // 1. There is a shortcut buying of equipment in Europe in
-        // Unit.equipWith().
-        // 2. Also for the goods required for a building in
-        // Colony.payForBuilding().  This breaks the pattern implemented
-        // here as there is no unit involved.
-        //
         // Try to buy.
-        InGameController igc = server.getInGameController();
-        ModelMessage message = null;
-        Market market = player.getMarket();
-        try {
-            market.buy(type, amount, player);
-            carrier.getGoodsContainer().addGoods(type, amount);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so we will update
-            // the market and send a message as well.
-            message = market.makePriceChangeMessage(type);
-            market.flushPriceChange(type);
-        }
-        igc.propagateToEuropeanMarkets(type, amount, serverPlayer);
-
-        // Build reply.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
-        update.appendChild(carrier.toXMLElement(player, doc));
-        if (message != null) {
-            update.appendChild(market.toXMLElement(player, doc));
-            Element addMessages = doc.createElement("addMessages");
-            reply.appendChild(addMessages);
-            message.addToOwnedElement(addMessages, player);
-        }
-        return reply;
+        return server.getInGameController()
+            .buyGoods(serverPlayer, carrier, type, amount);
     }
 
     /**
@@ -168,7 +131,7 @@ public class BuyGoodsMessage extends Message {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("carrier", carrierId);
         result.setAttribute("type", goodsTypeId);
-        result.setAttribute("amount", Integer.toString(amount));
+        result.setAttribute("amount", amountString);
         return result;
     }
 
@@ -181,5 +144,5 @@ public class BuyGoodsMessage extends Message {
         return "buyGoods";
     }
 }
-//TODO: this and SellGoodsMessage are almost identical, collapse into
-//a single TradeGoods?
+// TODO: this and SellGoodsMessage are almost identical, collapse into
+// a single TradeGoods?

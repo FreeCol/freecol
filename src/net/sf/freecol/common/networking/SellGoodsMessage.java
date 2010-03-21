@@ -19,21 +19,16 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -54,7 +49,7 @@ public class SellGoodsMessage extends Message {
     /**
      * The amount of goods to sell.
      */
-    private int amount;
+    private String amountString;
 
     /**
      * Create a new <code>SellGoodsMessage</code>.
@@ -65,7 +60,7 @@ public class SellGoodsMessage extends Message {
     public SellGoodsMessage(Goods goods, Unit carrier) {
         this.carrierId = carrier.getId();
         this.goodsTypeId = goods.getType().getId();
-        this.amount = goods.getAmount();
+        this.amountString = Integer.toString(goods.getAmount());
     }
 
     /**
@@ -78,7 +73,7 @@ public class SellGoodsMessage extends Message {
     public SellGoodsMessage(Game game, Element element) {
         this.carrierId = element.getAttribute("carrier");
         this.goodsTypeId = element.getAttribute("type");
-        this.amount = Integer.parseInt(element.getAttribute("amount"));
+        this.amountString = element.getAttribute("amount");
     }
 
     /**
@@ -113,9 +108,15 @@ public class SellGoodsMessage extends Message {
         if (type == null) {
             return Message.clientError("Not a goods type: " + goodsTypeId);
         }
+        int amount;
+        try {
+            amount = Integer.parseInt(amountString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad amount: " + amountString);
+        }
         if (amount <= 0) {
             return Message.clientError("Amount must be positive: "
-                                       + Integer.toString(amount));
+                                       + amountString);
         }
         int present = carrier.getGoodsContainer().getGoodsCount(type);
         if (present < amount) {
@@ -124,46 +125,9 @@ public class SellGoodsMessage extends Message {
                                        + Integer.toString(present) + " present.");
         }
 
-        // FIXME: market.sell() should be in the controller, but the
-        // following cases will have to wait.
-        //
-        // 1. Unit.dumpEquipment() gets called from a few places.
-        // 2. Colony.exportGoods() is in the newTurn mess.
-        // Its also still in MarketTest, which needs to be moved to
-        // ServerPlayerTest where it also is already.
-        //
         // Try to sell.
-        InGameController igc = server.getInGameController();
-        ModelMessage message = null;
-        Market market = player.getMarket();
-        try {
-            market.sell(type, amount, player); //FIXME:move to controller
-            carrier.getGoodsContainer().addGoods(type, -amount);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so update the
-            // market and send a message as well.
-            message = market.makePriceChangeMessage(type);
-            market.flushPriceChange(type);
-        }
-        igc.propagateToEuropeanMarkets(type, amount, serverPlayer);
-
-        // Build reply.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
-        update.appendChild(carrier.toXMLElement(player, doc));
-        if (message != null) {
-            update.appendChild(market.toXMLElement(player, doc));
-            Element addMessages = doc.createElement("addMessages");
-            reply.appendChild(addMessages);
-            message.addToOwnedElement(addMessages, player);
-        }
-        return reply;
+        return server.getInGameController()
+            .sellGoods(serverPlayer, carrier, type, amount);
     }
 
     /**
@@ -175,7 +139,7 @@ public class SellGoodsMessage extends Message {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("carrier", carrierId);
         result.setAttribute("type", goodsTypeId);
-        result.setAttribute("amount", Integer.toString(amount));
+        result.setAttribute("amount", amountString);
         return result;
     }
 
