@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,14 +30,11 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.FreeColMenuBar;
-import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.model.DifficultyLevel;
@@ -115,8 +112,6 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         
         add(cancelButton, "tag cancel");
 
-        //setCancelComponent(cancelButton);
-
         setSize(780, 540);
     }
 
@@ -147,19 +142,6 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
             ui.updateOption();
             getCanvas().remove(this);
             setResponse(level);
-            /*
-            JMenuBar menuBar = getClient().getFrame().getJMenuBar();
-            if (menuBar != null) {
-                ((FreeColMenuBar) menuBar).reset();
-            }
-                    
-            // Immediately redraw the minimap if that was updated.
-            MapControlsAction mca = (MapControlsAction) getClient()
-                .getActionManager().getFreeColAction(MapControlsAction.id);
-            if(mca.getMapControls() != null) {
-                mca.getMapControls().update();                        
-            }
-            */
         } else if (CANCEL.equals(command)) {
             ui.rollback();
             ui.unregister();
