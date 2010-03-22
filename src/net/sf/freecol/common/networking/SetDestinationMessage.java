@@ -19,14 +19,14 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -79,9 +79,17 @@ public class SetDestinationMessage extends Message {
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = serverPlayer.getGame();
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
-        Location destination;
 
+        Unit unit;
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
+        if (unit.getTile() == null) {
+            return Message.clientError("Unit is not on the map: " + unitId);
+        }
+        Location destination;
         if (destinationId == null || destinationId.length() == 0) {
             destination = null;
         } else if (!(game.getFreeColGameObject(destinationId) instanceof Location)) {
@@ -89,11 +97,10 @@ public class SetDestinationMessage extends Message {
         } else {
             destination = (Location) game.getFreeColGameObject(destinationId);
         }
-        unit.setDestination(destination);
 
-        Element reply = Message.createNewRootElement("update");
-        reply.appendChild(unit.toXMLElement(serverPlayer, reply.getOwnerDocument()));
-        return reply;
+        // Set destination
+        return server.getInGameController()
+            .setDestination(serverPlayer, unit, destination);
     }
 
     /**

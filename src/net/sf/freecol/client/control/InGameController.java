@@ -1407,6 +1407,14 @@ public final class InGameController implements NetworkConstants {
      * @see Unit#setDestination(Location)
      */
     public void setDestination(Unit unit, Location destination) {
+        if (unit.getTradeRoute() != null) {
+            Canvas canvas = freeColClient.getCanvas();
+            StringTemplate template = StringTemplate.template("traderoute.reassignRoute")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .add("%route%", unit.getTradeRoute().getName());
+            if (!canvas.showConfirmDialog(unit.getTile(), template,
+                                          "yes", "no")) return;
+        }
         askSetDestination(unit, destination);
     }
 

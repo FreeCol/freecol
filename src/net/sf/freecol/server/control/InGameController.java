@@ -2886,6 +2886,24 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Set a unit destination.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to set the destination for.
+     * @param destination The <code>Location</code> to set as destination.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element setDestination(ServerPlayer serverPlayer, Unit unit,
+                                  Location destination) {
+        if (unit.getTradeRoute() != null) unit.setTradeRoute(null);
+        unit.setDestination(destination);
+
+        // Others can not see a destination change.
+        return buildUpdate(serverPlayer, unit);
+    }
+
+
+    /**
      * Set current stop of a unit to the next valid stop if any.
      *
      * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
