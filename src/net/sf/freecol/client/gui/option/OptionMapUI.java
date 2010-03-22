@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,6 +43,8 @@ import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class provides visualization for an {@link OptionMap}. In order to
@@ -82,7 +83,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         super(new BorderLayout());
 
         JPanel northPanel = new JPanel();
-        northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
+        northPanel.setLayout(new MigLayout("wrap 2"));
         northPanel.setOpaque(false);
         
         optionUIs = new HashMap<String, JComponent>();
@@ -178,9 +179,13 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         }
         optionUpdaters = ou.toArray(new OptionUpdater[0]);
 
-        add(northPanel, BorderLayout.NORTH);
         if (tb.getTabCount() > 0) {
+            if (northPanel.getComponentCount() > 0) {
+                tb.addTab(" *** ", northPanel);
+            }
             add(tb, BorderLayout.CENTER);
+        } else {
+            add(northPanel, BorderLayout.CENTER);
         }
 
         setOpaque(false);
