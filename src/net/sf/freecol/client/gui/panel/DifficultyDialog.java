@@ -60,18 +60,8 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
     private DifficultyLevel level;
     private JPanel optionPanel;
 
-    // TODO: read these items from specification
-    private static final String[] difficulties = new String[] {
-        "model.difficulty.veryEasy",
-        "model.difficulty.easy",
-        "model.difficulty.medium",
-        "model.difficulty.hard",
-        "model.difficulty.veryHard",
-        "model.difficulty.custom"
-    };
-
-    private static final int DEFAULT_INDEX = 2;
-    private static final int CUSTOM_INDEX = difficulties.length - 1;
+    private int DEFAULT_INDEX = 0;
+    private int CUSTOM_INDEX = -1;
 
     private final JComboBox difficultyBox = new JComboBox();
 
@@ -88,8 +78,14 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
         add(header, "center, wrap 20");
 
-        for (String key : difficulties) {
-            difficultyBox.addItem(Messages.message(key));
+        for (DifficultyLevel level : Specification.getSpecification().getDifficultyLevels()) {
+            String id = level.getId();
+            if ("model.difficulty.medium".equals(id)) {
+                DEFAULT_INDEX = difficultyBox.getItemCount();
+            } else if ("model.difficulty.custom".equals(id)) {
+                CUSTOM_INDEX = difficultyBox.getItemCount();
+            }
+            difficultyBox.addItem(Messages.message(id));
         }
         difficultyBox.setSelectedIndex(DEFAULT_INDEX);
         difficultyBox.addItemListener(this);
@@ -150,11 +146,12 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
             ui.unregister();
             ui.updateOption();
             getCanvas().remove(this);
+            setResponse(level);
+            /*
             JMenuBar menuBar = getClient().getFrame().getJMenuBar();
             if (menuBar != null) {
                 ((FreeColMenuBar) menuBar).reset();
             }
-            setResponse(level);
                     
             // Immediately redraw the minimap if that was updated.
             MapControlsAction mca = (MapControlsAction) getClient()
@@ -162,6 +159,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
             if(mca.getMapControls() != null) {
                 mca.getMapControls().update();                        
             }
+            */
         } else if (CANCEL.equals(command)) {
             ui.rollback();
             ui.unregister();
@@ -170,7 +168,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         } else if (RESET.equals(command)) {
             ui.reset();
         } else {
-            logger.warning("Invalid ActionCommand: invalid number.");
+            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 
@@ -203,11 +201,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         }
 
         protected void addDefaultOptions() {
-            /*
-            for (AbstractOption option: level.getOptions().values()) {
-                add(option);
-            }
-            */
+            // do nothing
         }
 
         protected boolean isCorrectTagName(String tagName) {

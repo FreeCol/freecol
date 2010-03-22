@@ -45,12 +45,13 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -90,9 +91,10 @@ public final class ConnectController {
      * @param username The name to use when logging in.
      * @param port The port in which the server should listen for new clients.
      * @param nationOptions a <code>NationOptions</code> value
+     * @param level a <code>DifficultyLevel</code> value
      */
     public void startMultiplayerGame(boolean publicServer, String username, int port,
-                                     NationOptions nationOptions) {
+                                     NationOptions nationOptions, DifficultyLevel level) {
 
         freeColClient.setMapEditor(false);
 
@@ -112,7 +114,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null, nationOptions);
+            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null, nationOptions, level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             freeColClient.getCanvas().errorMessage("server.noRouteToServer");
@@ -131,8 +133,10 @@ public final class ConnectController {
      *
      * @param username The name to use when logging in.
      * @param nationOptions a <code>NationOptions</code> value
+     * @param level a <code>DifficultyLevel</code> value
      */
-    public void startSingleplayerGame(String username, NationOptions nationOptions) {
+    public void startSingleplayerGame(String username, NationOptions nationOptions,
+                                      DifficultyLevel level) {
 
         freeColClient.setMapEditor(false);
         
@@ -155,7 +159,8 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(false, true, port, null, nationOptions);
+            FreeColServer freeColServer = new FreeColServer(false, true, port, null, nationOptions, level);
+            FreeCol.getSpecification().applyDifficultyLevel(level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
@@ -262,7 +267,6 @@ public final class ConnectController {
                 
                 // this completes the client's view of the spec with options obtained from the server difficulty
                 // it should not be required in the client, to be removed later, when newTurn() only runs in the server
-                Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
                 
                 Player thisPlayer = game.getPlayerByName(username);
 

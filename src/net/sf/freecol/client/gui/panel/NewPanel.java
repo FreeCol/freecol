@@ -246,7 +246,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     nationOptions.setSelectColors(selectColors.isSelected());
                     DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas()));
-                    connectController.startSingleplayerGame(name.getText(), nationOptions);
+                    connectController.startSingleplayerGame(name.getText(), nationOptions, level);
                     // getFilename(), getDifficulty());
                     break;
                 case JOIN:
@@ -264,9 +264,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         nationOptions = NationOptions.getDefaults();
                         nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                         nationOptions.setSelectColors(selectColors.isSelected());
+                        level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas()));
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(),
-                                                               port, nationOptions);
-                        //, getFilename(), getDifficulty());
+                                                               port, nationOptions, level);
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }

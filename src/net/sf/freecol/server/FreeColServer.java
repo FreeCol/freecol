@@ -55,9 +55,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -200,11 +201,13 @@ public final class FreeColServer {
      */
     public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(publicServer, singleplayer, port, name, NationOptions.getDefaults());
+        this(publicServer, singleplayer, port, name, NationOptions.getDefaults(),
+             FreeCol.getSpecification().getDifficultyLevel("model.difficulty.medium"));
     }
 
     public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name,
-                         NationOptions nationOptions) throws IOException, NoRouteToServerException {
+                         NationOptions nationOptions, DifficultyLevel level)
+        throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
@@ -213,6 +216,7 @@ public final class FreeColServer {
         modelController = new ServerModelController(this);
         game = new ServerGame(modelController);
         game.setNationOptions(nationOptions);
+        FreeCol.getSpecification().applyDifficultyLevel(level);
         mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);

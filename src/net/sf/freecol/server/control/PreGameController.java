@@ -96,7 +96,6 @@ public final class PreGameController extends Controller {
 
         Game game = freeColServer.getGame();
         // Apply the difficulty level
-        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
         
         IMapGenerator mapGenerator = freeColServer.getMapGenerator();
         AIMain aiMain = new AIMain(freeColServer);
