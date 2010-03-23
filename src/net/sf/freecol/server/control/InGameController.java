@@ -2904,31 +2904,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Set current stop of a unit to the next valid stop if any.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
-     * @param unit The <code>Unit</code> to update.
-     */
-    public void updateCurrentStop(ServerPlayer serverPlayer, Unit unit) {
-        // Check if there is a valid current stop?
-        int current = unit.validateCurrentStop();
-        if (current < 0) return;
-
-        // Step to next valid stop.
-        ArrayList<Stop> stops = unit.getTradeRoute().getStops();
-        int next = current;
-        for (;;) {
-            if (++next >= stops.size()) next = 0;
-            if (next == current) break;
-            if (hasWorkAtStop(unit, stops.get(next))) break;
-        }
-
-        // Next is the updated stop.
-        unit.setCurrentStop(next);
-        unit.setDestination(stops.get(next).getLocation());
-    }
-
-    /**
      * Is there work for a unit to do at a stop?
      *
      * @param unit The <code>Unit</code> to check.
@@ -2963,6 +2938,38 @@ public final class InGameController extends Controller {
 
         // Return true if there is space left, and something to load.
         return unit.getSpaceLeft() > 0 && cargoSize > 0;
+    }
+
+    /**
+     * Set current stop of a unit to the next valid stop if any.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
+     * @param unit The <code>Unit</code> to update.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element updateCurrentStop(ServerPlayer serverPlayer, Unit unit) {
+        List<Object> objects = new ArrayList<Object>();
+
+        // Check if there is a valid current stop?
+        int current = unit.validateCurrentStop();
+        if (current < 0) return null; // No valid stop.
+
+        ArrayList<Stop> stops = unit.getTradeRoute().getStops();
+        int next = current;
+        for (;;) {
+            if (++next >= stops.size()) next = 0;
+            if (next == current) break;
+            if (hasWorkAtStop(unit, stops.get(next))) break;
+        }
+
+        // Next is the updated stop.
+        // Could do just a partial update of currentStop if we did not
+        // also need to set the unit destination.
+        unit.setCurrentStop(next);
+        unit.setDestination(stops.get(next).getLocation());
+
+        // Others can not see a stop change.
+        return buildUpdate(serverPlayer, unit);
     }
 
     /**

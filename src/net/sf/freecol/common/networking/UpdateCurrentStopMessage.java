@@ -19,13 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -69,6 +68,7 @@ public class UpdateCurrentStopMessage extends Message {
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -76,14 +76,9 @@ public class UpdateCurrentStopMessage extends Message {
             return Message.clientError(e.getMessage());
         }
 
-        server.getInGameController().updateCurrentStop(serverPlayer, unit);
-
-        // Could do just a partial update of currentStop if we did not
-        // also need to set the unit destination.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(unit.toXMLElement(serverPlayer, doc));
-        return reply;
+        // Valid, update.
+        return server.getInGameController()
+            .updateCurrentStop(serverPlayer, unit);
     }
 
     /**
