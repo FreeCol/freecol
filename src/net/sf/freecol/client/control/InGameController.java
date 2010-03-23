@@ -3530,8 +3530,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askBuyGoods(Unit carrier, GoodsType type, int amount) {
         Client client = freeColClient.getClient();
         BuyGoodsMessage message = new BuyGoodsMessage(carrier, type, amount);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -3597,8 +3596,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askSellGoods(Goods goods, Unit carrier) {
         Client client = freeColClient.getClient();
         SellGoodsMessage message = new SellGoodsMessage(goods, carrier);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
