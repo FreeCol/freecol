@@ -1285,16 +1285,17 @@ public final class Canvas extends JDesktopPane {
      *            by <code>messageID</code> is unavailable.
      */
     public void errorMessage(String messageID, String message) {
+        String display = null;
         if (messageID != null) {
             try {
-                message = Messages.message(messageID);
+                display = Messages.message(messageID);
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + messageID);
             }
         }
-
+        if (display == null || "".equals(display)) display = message;
         ErrorPanel errorPanel = new ErrorPanel(this);
-        errorPanel.initialize(message);
+        errorPanel.initialize(display);
         showFreeColDialog(errorPanel);
     }
 
