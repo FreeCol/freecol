@@ -2481,7 +2481,7 @@ public final class InGameController extends Controller {
             return Message.clientError("Naval unit " + unit.getId()
                                        + " can not disembark.");
         }
-        if (unit.getLocation() instanceof Unit) {
+        if (!(unit.getLocation() instanceof Unit)) {
             return Message.clientError("Unit " + unit.getId()
                                        + " is not embarked.");
         }
