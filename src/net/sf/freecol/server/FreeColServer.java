@@ -293,8 +293,10 @@ public final class FreeColServer {
         }
 
         // Apply the difficulty level
+        /*
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions()
-                                                              .getInteger(GameOptions.DIFFICULTY));        
+                                                              .getInteger(GameOptions.DIFFICULTY));
+        */
 
         getModelController().updateModelListening();
         updateMetaServer(true);

@@ -135,7 +135,7 @@ public class GameOptions extends OptionMap {
         /* Victory Conditions */
         add(spec.getOptionGroup("gameOptions.victoryConditions"));
         /* Difficulty settings */
-        add(spec.getOptionGroup("gameOptions.difficultySettings"));
+        //add(spec.getOptionGroup("gameOptions.difficultySettings"));
 
     }
 

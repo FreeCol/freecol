@@ -112,7 +112,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         IMapGenerator gen = new MapGenerator();
 
         // Apply the difficulty level
-        Specification.getSpecification().applyDifficultyLevel(g.getGameOptions().getInteger(GameOptions.DIFFICULTY));
+        Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
 
         Vector<Player> players = new Vector<Player>();
 

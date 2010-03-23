@@ -124,7 +124,7 @@ public class ListOption<T> extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         for (String id : getValueIds()) {
             out.writeStartElement(VALUE_TAG);
             out.writeAttribute(ID_ATTRIBUTE_TAG, id);

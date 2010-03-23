@@ -3298,16 +3298,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the difficulty level.
-     *
-     * @return The difficulty level.
-     */
-    public DifficultyLevel getDifficulty() {
-        int level = getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
-        return FreeCol.getSpecification().getDifficultyLevel(level);
-    }
-
-    /**
      * Checks if the given <code>Player</code> equals this object.
      *
      * @param o The <code>Player</code> to compare against this object.

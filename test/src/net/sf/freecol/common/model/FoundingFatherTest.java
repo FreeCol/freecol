@@ -381,7 +381,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     	Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
 
-        assertEquals(2, getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY));
+        //assertEquals(2, getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY));
         assertEquals(40, spec().getIntegerOption("model.option.foundingFatherFactor").getValue());
 
         for (int index = 0; index < expectedValues.length; index++) {

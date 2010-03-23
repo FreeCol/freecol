@@ -151,7 +151,8 @@ public class HighScore extends FreeColObject {
         } else {
             independenceTurn = -1;
         }
-        difficulty = player.getDifficulty().getId();
+        // TODO: how difficult is a custom difficulty?
+        difficulty = "model.difficulty.medium"; //player.getDifficulty().getId();
         newLandName = player.getNewLandName();
     }
 

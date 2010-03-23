@@ -116,8 +116,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.player = player;
         this.name = name;
 
-        // TODO: make this work with DifficultyLevel
-        int number = game.getGameOptions().getInteger(GameOptions.DIFFICULTY) * 2 + 3;
+        int number = Specification.getSpecification().getIntegerOption("model.option.refStrength")
+            .getValue() + 3;
 
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.refUnit")) {
@@ -213,8 +213,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     public List<RandomChoice<MonarchAction>> getActionChoices() {
-        // TODO: make this work with DifficultyLevel
-        int dx = getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY) + 1; // 1-5
+        int dx = Specification.getSpecification().getIntegerOption("model.option.monarchMeddling")
+            .getValue() + 1;
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
 
@@ -325,19 +325,20 @@ public final class Monarch extends FreeColGameObject implements Named {
     public int getNewTax(MonarchAction taxChange) {
     	
     	int newTax = 110; // set bigger that 100% to catch errors
-        int adjustment = 0;
+        int taxAdjustment = Specification.getSpecification().getIntegerOption("model.option.taxAdjustment")
+            .getValue();
         
         switch(taxChange){
         case RAISE_TAX:
             int turn = getGame().getTurn().getNumber();
-            adjustment = (6 - player.getDifficulty().getIndex()) * 10; // 20-60
+            int adjustment = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
             // later in the game, the taxes will increase by more
             int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
             newTax = player.getTax() + increase;
             newTax = Math.min(newTax, MAXIMUM_TAX_RATE);
             break;
         case LOWER_TAX:
-            adjustment = 10 - player.getDifficulty().getIndex(); // 5-10
+            adjustment = Math.max(1, 10 - taxAdjustment); // 5-10
             int decrease = getGame().getModelController().getPseudoRandom().nextInt(adjustment) + 1;
             newTax = player.getTax() - decrease;
             newTax = Math.max(newTax, MINIMUM_TAX_RATE);
@@ -490,7 +491,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                 price += getEquipmentPrice(muskets);
                 price += getEquipmentPrice(horses);
             }
-            return price / 10 + 25 * player.getDifficulty().getIndex();
+            return price / 10 + Specification.getSpecification()
+                .getIntegerOption("model.option.mercenaryPrice").getValue();
         } else {
             return 1000000;
         }

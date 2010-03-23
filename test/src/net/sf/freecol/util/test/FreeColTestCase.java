@@ -127,7 +127,7 @@ public class FreeColTestCase extends TestCase {
         game = new ServerGame(new MockModelController());
         game.setNationOptions(NationOptions.getDefaults());
 
-        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
+        Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
         for (Nation n : FreeCol.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){

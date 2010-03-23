@@ -189,8 +189,8 @@ public class IndianDemandMission extends Mission {
                 if (unit.getIndianSettlement() != null) {
                     unitTension += unit.getIndianSettlement().getOwner().getTension(enemy).getValue();
                 }
-                // TODO: make this work with DifficultyLevel
-                int difficulty = enemy.getDifficulty().getIndex();
+                int difficulty = FreeCol.getSpecification().getIntegerOption("model.option.nativeDemands")
+                    .getValue();
                 if (accepted) {
                     // TODO: if very happy, the brave should convert
                     tension = -(5 - difficulty) * 50;
@@ -228,7 +228,8 @@ public class IndianDemandMission extends Mission {
      */
     public Goods selectGoods(Colony target) {
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
-        int dx = target.getOwner().getDifficulty().getIndex() + 1;
+        int dx = FreeCol.getSpecification().getIntegerOption("model.option.nativeDemands")
+            .getValue() + 1;
         GoodsType food = FreeCol.getSpecification().getGoodsType("model.goods.food");
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
