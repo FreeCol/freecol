@@ -426,7 +426,10 @@ public final class InGameController extends Controller {
         }
         switch (n) {
         case 0:
-            return null;
+            if (attributes.isEmpty()) return null;
+            doc.appendChild(update);
+            result = update;
+            break;
         case 1:
             multiple.removeChild(child);
             doc.appendChild(child);
@@ -1536,43 +1539,49 @@ public final class InGameController extends Controller {
     }
 
 
-    public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement){
+    /**
+     * Get a transaction session.  Either the current one if it exists,
+     * or create a fresh one.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return A session describing the transaction.
+     */
+    public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement) {
         java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
-
-        if(transactionSessions.containsKey(unit.getId())){
+        // Check for existing session, return it if present.
+        if (transactionSessions.containsKey(unit.getId())) {
             unitTransactions = transactionSessions.get(unit.getId());
-            if(unitTransactions.containsKey(settlement.getId())){
+            if (unitTransactions.containsKey(settlement.getId())) {
                 return unitTransactions.get(settlement.getId());
             }
         }
-        // Session does not exist, create, store, and return it
+
+        // Session does not exist, create, store, and return it.
         java.util.Map<String,Object> session = new HashMap<String,Object>();
-        // default values
+        // Default values
         session.put("canGift", true);
-        session.put("canSell", true);
-        session.put("canBuy", true);
         session.put("actionTaken", false);
         session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
         session.put("unitMoves", unit.getMovesLeft());
-        if(settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR){
+        if (settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR){
             session.put("canSell", false);
             session.put("canBuy", false);
+        } else {
+            session.put("canBuy", true);
+            // The unit took nothing to sell, so nothing should be in
+            // this session.
+            session.put("canSell", unit.getSpaceTaken() != 0);
         }
-        else{
-        	// the unit took nothing to sell, so nothing should be in this session
-            if(unit.getSpaceTaken() == 0){
-                session.put("canSell", false);
-            }
-        }
-        // only keep track of human player sessions
-        if(unit.getOwner().isAI()){
+
+        // Only keep track of human player sessions.
+        if (unit.getOwner().isAI()) {
             return session;
         }
         
         // Save session for tracking
-        
-        // unit has no open transactions
-        if(unitTransactions == null){
+        // Unit has no open transactions?
+        if (unitTransactions == null) {
             unitTransactions = new HashMap<String,java.util.Map<String, Object>>();
             transactionSessions.put(unit.getId(), unitTransactions);
         }
@@ -1580,43 +1589,120 @@ public final class InGameController extends Controller {
         return session;
     }
 
-    public void closeTransactionSession(Unit unit, Settlement settlement){
-        java.util.Map<String, java.util.Map<String,Object>> unitTransactions;
-        
-        // only keep track of human player sessions
-        if(unit.getOwner().isAI()){
-          return;  
+    /**
+     * Close a transaction session.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    public void closeTransactionSession(Unit unit, Settlement settlement) {
+        // Only keep track of human player sessions.
+        if (unit.getOwner().isAI()) {
+            return;
         }
-        
-        if(!transactionSessions.containsKey(unit.getId())){
-            throw new IllegalStateException("Trying to close a non-existing session");
+
+        if (!transactionSessions.containsKey(unit.getId())) {
+            throw new IllegalStateException("Trying to close a non-existing session (unit)");
         }
-        
-        unitTransactions = transactionSessions.get(unit.getId());   
-        if(!unitTransactions.containsKey(settlement.getId())){
-            throw new IllegalStateException("Trying to close a non-existing session");
+
+        java.util.Map<String, java.util.Map<String,Object>> unitTransactions
+            = transactionSessions.get(unit.getId());
+        if (!unitTransactions.containsKey(settlement.getId())) {
+            throw new IllegalStateException("Trying to close a non-existing session (settlement)");
         }
-        
+
         unitTransactions.remove(settlement.getId());
-        if(unitTransactions.isEmpty()){
+        if (unitTransactions.isEmpty()) {
             transactionSessions.remove(unit.getId());
         }
     }
     
-    public boolean isTransactionSessionOpen(Unit unit, Settlement settlement){
+    /**
+     * Query whether a transaction session exists.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return True if a session is already open.
+     */
+    public boolean isTransactionSessionOpen(Unit unit, Settlement settlement) {
         // AI does not need to send a message to open a session
-        if(unit.getOwner().isAI()){
-            return true;
+        if (unit.getOwner().isAI()) return true;
+
+        return transactionSessions.containsKey(unit.getId())
+            && settlement != null
+            && transactionSessions.get(unit.getId()).containsKey(settlement.getId());
+    }
+
+    /**
+     * Get the client view of a transaction session, either existing or
+     * newly opened.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element getTransaction(ServerPlayer serverPlayer, Unit unit,
+                                  Settlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
+        java.util.Map<String,Object> session;
+
+        if (isTransactionSessionOpen(unit, settlement)) {
+            session = getTransactionSession(unit, settlement);
+        } else {
+            if (unit.getMovesLeft() <= 0) {
+                return Message.clientError("Unit " + unit.getId()
+                                           + " has no moves left.");
+            }
+            session = getTransactionSession(unit, settlement);
+            // Sets unit moves to zero to avoid cheating.  If no
+            // action is taken, the moves will be restored when
+            // closing the session
+            unit.setMovesLeft(0);
+            addPartial(objects, unit, "movesLeft");
         }
-        
-        if(!transactionSessions.containsKey(unit.getId())){
-            return false;
+
+        // Add just the attributes the client needs.
+        addAttribute(objects, "canBuy",
+                     ((Boolean) session.get("canBuy")).toString());
+        addAttribute(objects, "canSell",
+                     ((Boolean) session.get("canSell")).toString());
+        addAttribute(objects, "canGift",
+                     ((Boolean) session.get("canGift")).toString());
+
+        // Others can not see transactions.
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Close a transaction.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element closeTransaction(ServerPlayer serverPlayer, Unit unit,
+                                    Settlement settlement) {
+        if (!isTransactionSessionOpen(unit, settlement)) {
+            return Message.clientError("No such transaction session.");
         }
-        if(settlement != null &&
-           !transactionSessions.get(unit.getId()).containsKey(settlement.getId())){
-                return false;
+
+        java.util.Map<String,Object> session
+            = getTransactionSession(unit, settlement);
+        List<Object> objects = new ArrayList<Object>();
+
+        // Restore unit movement if no action taken.
+        Boolean actionTaken = (Boolean) session.get("actionTaken");
+        if (!actionTaken) {
+            Integer unitMoves = (Integer) session.get("unitMoves");
+            unit.setMovesLeft(unitMoves);
+            addPartial(objects, unit, "movesLeft");
         }
-        return true;
+        closeTransactionSession(unit, settlement);
+
+        // Others can not see end of transaction.
+        return (objects.isEmpty()) ? null : buildUpdate(serverPlayer, objects);
     }
 
 

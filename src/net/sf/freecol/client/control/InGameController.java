@@ -2789,12 +2789,11 @@ public final class InGameController implements NetworkConstants {
     private java.util.Map<String,Boolean> askOpenTransactionSession(Unit unit, Settlement settlement) {
         Client client = freeColClient.getClient();
         GetTransactionMessage message = new GetTransactionMessage(unit, settlement);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "getTransactionAnswer");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return null;
 
         java.util.Map<String,Boolean> session = new HashMap<String,Boolean>();
-        session.put("canBuy", new Boolean(reply.getAttribute("canBuy")));
+        session.put("canBuy",  new Boolean(reply.getAttribute("canBuy")));
         session.put("canSell", new Boolean(reply.getAttribute("canSell")));
         session.put("canGift", new Boolean(reply.getAttribute("canGift")));
         return session;

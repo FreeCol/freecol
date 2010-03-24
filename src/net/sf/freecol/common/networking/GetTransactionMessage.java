@@ -19,26 +19,22 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.Map;
-
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
  * The message sent to initiate a transaction.
  */
 public class GetTransactionMessage extends Message {
+
     /**
      * The ID of the unit performing the transaction.
      */
@@ -96,33 +92,8 @@ public class GetTransactionMessage extends Message {
             return Message.clientError(e.getMessage());
         }
 
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
-        if (type != MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS) {
-            return Message.clientError("Unable to enter "
-                                       + settlement.getName()
-                                       + ": " + type.whyIllegal());
-        }
-
-        // If starting a transaction session, the unit needs movement points
-        InGameController igc = server.getInGameController();
-        if (!igc.isTransactionSessionOpen(unit, settlement)
-            && unit.getMovesLeft() <= 0) {
-            return Message.clientError("Unit " + unitId + "has 0 moves left.");
-        }
-
-        java.util.Map<String,Object> session
-            = igc.getTransactionSession(unit, settlement);
-        Element reply = Message.createNewRootElement("getTransactionAnswer");
-        reply.setAttribute("canBuy", ((Boolean) session.get("canBuy")).toString());
-        reply.setAttribute("canSell", ((Boolean) session.get("canSell")).toString());
-        reply.setAttribute("canGift", ((Boolean) session.get("canGift")).toString());
-
-        // Sets unit moves to zero to avoid cheating.
-        // If no action was done, the moves will be restored when closing
-        // the session
-        unit.setMovesLeft(0);
-
-        return reply;
+        return server.getInGameController()
+            .getTransaction(serverPlayer, unit, settlement);
     }
 
     /**
