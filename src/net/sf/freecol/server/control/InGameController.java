@@ -85,6 +85,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
@@ -1703,6 +1704,34 @@ public final class InGameController extends Controller {
 
         // Others can not see end of transaction.
         return (objects.isEmpty()) ? null : buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
+     * Get the goods for sale in a settlement.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return An list of <code>Goods</code> for sale at the settlement.
+     */
+    public List<Goods> getGoodsForSale(Unit unit, Settlement settlement)
+        throws IllegalStateException {
+        List<Goods> sellGoods = null;
+
+        if (settlement instanceof IndianSettlement) {
+            IndianSettlement indianSettlement = (IndianSettlement) settlement;
+            sellGoods = indianSettlement.getSellGoods();
+            if (!sellGoods.isEmpty()) {
+                AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain()
+                    .getAIObject(indianSettlement.getOwner());
+                for (Goods goods : sellGoods) {
+                    aiPlayer.registerSellGoods(goods);
+                }
+            }
+        } else { // Colony might be supported one day?
+            throw new IllegalStateException("Bogus settlement");
+        }
+        return sellGoods;
     }
 
 

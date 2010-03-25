@@ -2890,7 +2890,8 @@ public final class InGameController implements NetworkConstants {
     private List<Goods> askGoodsForSaleInSettlement(Unit unit,
                                                     Settlement settlement) {
         Client client = freeColClient.getClient();
-        GoodsForSaleMessage message = new GoodsForSaleMessage(unit, settlement);
+        GoodsForSaleMessage message
+            = new GoodsForSaleMessage(unit, settlement, null);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      message.getXMLElementTagName());
         if (reply == null) return null;

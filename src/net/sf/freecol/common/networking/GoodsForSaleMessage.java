@@ -19,10 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -30,17 +29,18 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 
 /**
- * The message sent when renaming a FreeColGameObject.
+ * The message sent when querying a settlement for what it has for sale.
  */
 public class GoodsForSaleMessage extends Message {
+
     /**
      * The id of the unit that is trading.
      */
@@ -63,11 +63,13 @@ public class GoodsForSaleMessage extends Message {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
+     * @param sellGoods A list of <code>Goods</code> to be sold.
      */
-    public GoodsForSaleMessage(Unit unit, Settlement settlement) {
+    public GoodsForSaleMessage(Unit unit, Settlement settlement,
+                               List<Goods> sellGoods) {
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
-        this.sellGoods = new ArrayList<Goods>();
+        this.sellGoods = sellGoods;
     }
 
     /**
@@ -90,32 +92,35 @@ public class GoodsForSaleMessage extends Message {
     /**
      * Handle a "goodsForSale"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> message was received on.
      *
      * @return This <code>GoodsForSaleMessage</code> with the goods for
      *         sale attached as children,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
+
         Unit unit;
         IndianSettlement settlement;
-
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
-            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+            settlement = server.getAdjacentIndianSettlementSafely(settlementId,
+                                                                  unit);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        sellGoods = settlement.getSellGoods();
-        if (!sellGoods.isEmpty()) {
-            AIPlayer aiPlayer = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());
-            for (Goods goods : sellGoods) {
-                aiPlayer.registerSellGoods(goods);
-            }
+
+        // Try to collect the goods for sale.
+        try {
+            sellGoods = server.getInGameController()
+                .getGoodsForSale(unit, settlement);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
         }
         return this.toXMLElement();
     }
@@ -127,11 +132,12 @@ public class GoodsForSaleMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
+        Document doc = result.getOwnerDocument();
         result.setAttribute("unit", unitId);
         result.setAttribute("settlement", settlementId);
-        if (!sellGoods.isEmpty()) {
+        if (sellGoods != null) {
             for (Goods goods : sellGoods) {
-                result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
+                result.appendChild(goods.toXMLElement(null, doc));
             }
         }
         return result;
