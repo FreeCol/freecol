@@ -3202,6 +3202,118 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Buy from a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
+     * @param unit The <code>Unit</code> that will carry the goods.
+     * @param settlement The <code>IndianSettlement</code> to buy from.
+     * @param goods The <code>Goods</code> to buy.
+     * @param amount How much gold to pay.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
+                                     IndianSettlement settlement,
+                                     Goods goods, int amount) {
+        if (!isTransactionSessionOpen(unit, settlement)) {
+            return Message.clientError("Trying to trade without opening a transaction session");
+        }
+        java.util.Map<String,Object> session
+            = getTransactionSession(unit, settlement);
+        if (!(Boolean) session.get("canBuy")) {
+            return Message.clientError("Trying to buy in a session where buying is not allowed.");
+        }
+        // TODO: why are we not just checking the unit capacity?
+        if (!(Boolean) session.get("hasSpaceLeft")) {
+            return Message.clientError("No space to buy.");
+        }
+        // Check that this is the agreement that was made
+        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
+        int returnGold = ai.buyProposition(unit, settlement, goods, amount);
+        if (returnGold != amount) {
+            return Message.clientError("This was not the price we agreed upon! Cheater?");
+        }
+        // Check this is funded.
+        if (serverPlayer.getGold() < amount) {
+            return Message.clientError("Insufficient gold to buy.");
+        }
+
+        // Valid, make the trade.
+        List<Object> objects = new ArrayList<Object>();
+        moveGoods(goods, unit);
+        objects.add(unit);
+
+        Player settlementPlayer = settlement.getOwner();
+        settlement.updateWantedGoods();
+        settlement.getTile().updateIndianSettlementInformation(serverPlayer);
+        settlement.modifyAlarm(serverPlayer, -amount / 50);
+        settlementPlayer.modifyGold(amount);
+        serverPlayer.modifyGold(-amount);
+        objects.add(UpdateType.PRIVATE);
+        objects.add(settlement.getTile());
+        addPartial(objects, serverPlayer, "gold");
+        session.put("actionTaken", true);
+        session.put("canBuy", false);
+        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
+
+        // Others can see the unit capacity.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Sell to a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is selling.
+     * @param unit The <code>Unit</code> carrying the goods.
+     * @param settlement The <code>IndianSettlement</code> to sell to.
+     * @param goods The <code>Goods</code> to sell.
+     * @param amount How much gold to expect.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
+                                    IndianSettlement settlement,
+                                    Goods goods, int amount) {
+        if (!isTransactionSessionOpen(unit, settlement)) {
+            return Message.clientError("Trying to sell without opening a transaction session");
+        }
+        java.util.Map<String,Object> session
+            = getTransactionSession(unit, settlement);
+        if (!(Boolean) session.get("canSell")) {
+            return Message.clientError("Trying to sell in a session where selling is not allowed.");
+        }
+
+        // Check that the gold is the agreed amount
+        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
+        int returnGold = ai.sellProposition(unit, settlement, goods, amount);
+        if (returnGold != amount) {
+            return Message.clientError("This was not the price we agreed upon! Cheater?");
+        }
+
+        // Valid, make the trade.
+        List<Object> objects = new ArrayList<Object>();
+        moveGoods(goods, settlement);
+        objects.add(unit);
+
+        Player settlementPlayer = settlement.getOwner();
+        settlementPlayer.modifyGold(-amount);
+        settlement.modifyAlarm(serverPlayer, -settlement.getPrice(goods) / 500);
+        serverPlayer.modifyGold(amount);
+        settlement.updateWantedGoods();
+        settlement.getTile().updateIndianSettlementInformation(serverPlayer);
+        objects.add(UpdateType.PRIVATE);
+        objects.add(settlement.getTile());
+        addPartial(objects, serverPlayer, "gold");
+        session.put("actionTaken", true);
+        session.put("canSell", false);
+        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
+
+        // Others can see the unit capacity.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
      * Clear the specialty of a unit.
      *
      * @param unit The <code>Unit</code> to clear the speciality of.

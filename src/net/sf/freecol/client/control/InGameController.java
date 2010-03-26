@@ -2944,8 +2944,7 @@ public final class InGameController implements NetworkConstants {
                                          Goods goods, int gold) {
         Client client = freeColClient.getClient();
         BuyMessage message = new BuyMessage(unit, settlement, goods, gold);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -3048,8 +3047,7 @@ public final class InGameController implements NetworkConstants {
                                         Goods goods, int gold) {
         Client client = freeColClient.getClient();
         SellMessage message = new SellMessage(unit, settlement, goods, gold);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

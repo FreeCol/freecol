@@ -19,10 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -30,9 +26,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -57,7 +53,7 @@ public class BuyMessage extends Message {
     /**
      * The price to pay.
      */
-    private int gold;
+    private String goldString;
 
     /**
      * Create a new <code>BuyMessage</code>.
@@ -71,7 +67,7 @@ public class BuyMessage extends Message {
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
         this.goods = goods;
-        this.gold = gold;
+        this.goldString = Integer.toString(gold);
     }
 
     /**
@@ -84,8 +80,8 @@ public class BuyMessage extends Message {
     public BuyMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.gold = Integer.parseInt(element.getAttribute("gold"));
         this.goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        this.goldString = element.getAttribute("gold");
     }
 
     /**
@@ -101,63 +97,31 @@ public class BuyMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
+
         Unit unit;
         IndianSettlement settlement;
-
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
             settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
             return Message.createError("server.trade.noGoods",
                                        "Goods " + goods.getId()
                                        + " is not at settlement " + settlementId);
         }
-
-        InGameController controller = (InGameController) server.getController();
-        if (!controller.isTransactionSessionOpen(unit, settlement)) {
-            return Message.clientError("Trying to trade without opening a transaction session");
-        }
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if (!(Boolean) session.get("canBuy")
-            || !(Boolean) session.get("hasSpaceLeft")) {
-            return Message.clientError("Trying to buy in a session where buying is not allowed.");
+        int gold;
+        try {
+            gold = Integer.parseInt(goldString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad gold: " + goldString);
         }
 
-        // Check that this is the agreement that was made
-        AIPlayer ai = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());
-        int returnGold = ai.buyProposition(unit, settlement, goods, gold);
-        if (returnGold != gold) {
-            return Message.clientError("This was not the price we agreed upon! Cheater?");
-        }
-        // Check this is funded.
-        if (player.getGold() < gold) {
-            return Message.clientError("Insufficient gold to buy.");
-        }
-
-        Player settlementPlayer = settlement.getOwner();
-        settlement.modifyAlarm(player, -gold / 50);
-        settlementPlayer.modifyGold(gold);
-        player.modifyGold(-gold);
-
-        server.getInGameController().moveGoods(goods, unit);
-        settlement.updateWantedGoods();
-        settlement.getTile().updateIndianSettlementInformation(player);
-
-        session.put("actionTaken", true);
-        session.put("canBuy", false);
-        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
-
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
-        reply.appendChild(unit.toXMLElement(player, doc));
-        reply.appendChild(settlement.getTile().toXMLElement(player, doc, false, false));
-        return reply;
+        // Try to buy.
+        return server.getInGameController()
+            .buyFromSettlement(serverPlayer, unit, settlement, goods, gold);
     }
 
     /**
@@ -169,8 +133,8 @@ public class BuyMessage extends Message {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("unit", unitId);
         result.setAttribute("settlement", settlementId);
-        result.setAttribute("gold", Integer.toString(gold));
         result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
+        result.setAttribute("gold", goldString);
         return result;
     }
 
