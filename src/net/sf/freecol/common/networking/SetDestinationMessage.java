@@ -86,9 +86,6 @@ public class SetDestinationMessage extends Message {
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        if (unit.getTile() == null && !unit.isBetweenEuropeAndNewWorld()) {
-            return Message.clientError("Unit is not on the map: " + unitId);
-        }
         Location destination;
         if (destinationId == null || destinationId.length() == 0) {
             destination = null;
