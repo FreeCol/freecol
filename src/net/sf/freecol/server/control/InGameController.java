@@ -1736,6 +1736,73 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Price some goods for sale from a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to buy.
+     * @param price The buyers proposed price for the goods.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element buyProposition(ServerPlayer serverPlayer,
+                                  Unit unit, Settlement settlement,
+                                  Goods goods, int price) {
+        if (!isTransactionSessionOpen(unit, settlement)) {
+            return Message.clientError("Proposing to buy without opening a transaction session?!");
+        }
+        java.util.Map<String,Object> session
+            = getTransactionSession(unit, settlement);
+        if (!(Boolean) session.get("canBuy")) {
+            return Message.clientError("Proposing to buy in a session where buying is not allowed.");
+        }
+
+        // AI considers the proposition, return with a gold value
+        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain()
+            .getAIObject(settlement.getOwner());
+        int gold = ai.buyProposition(unit, settlement, goods, price);
+
+        // Others can not see proposals.
+        List<Object> objects = new ArrayList<Object>();
+        addAttribute(objects, "gold", Integer.toString(gold));
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Price some goods for sale to a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to sell.
+     * @param price The sellers proposed price for the goods.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element sellProposition(ServerPlayer serverPlayer,
+                                   Unit unit, Settlement settlement,
+                                   Goods goods, int price) {
+        if (!isTransactionSessionOpen(unit, settlement)) {
+            return Message.clientError("Proposing to sell without opening a transaction session");
+        }
+        java.util.Map<String,Object> session
+            = getTransactionSession(unit, settlement);
+        if (!(Boolean) session.get("canSell")) {
+            return Message.clientError("Proposing to sell in a session where selling is not allowed.");
+        }
+
+        // AI considers the proposition, return with a gold value
+        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain()
+            .getAIObject(settlement.getOwner());
+        int gold = ai.sellProposition(unit, settlement, goods, price);
+
+        // Others can not see proposals.
+        List<Object> objects = new ArrayList<Object>();
+        addAttribute(objects, "gold", Integer.toString(gold));
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
      * Propagate an European market change to the other European markets.
      *
      * @param type The type of goods that was traded.

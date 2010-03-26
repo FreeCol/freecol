@@ -130,7 +130,7 @@ public class BuyMessage extends Message {
 
         // Check that this is the agreement that was made
         AIPlayer ai = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());
-        int returnGold = ai.buyProposition(unit, goods, gold);
+        int returnGold = ai.buyProposition(unit, settlement, goods, gold);
         if (returnGold != gold) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
         }

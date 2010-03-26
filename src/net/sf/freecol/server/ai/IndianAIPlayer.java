@@ -346,7 +346,7 @@ public class IndianAIPlayer extends NewAIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes a sale.
      *
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
@@ -357,8 +357,8 @@ public class IndianAIPlayer extends NewAIPlayer {
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
+    public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method sellProposition");
         String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
         int price;

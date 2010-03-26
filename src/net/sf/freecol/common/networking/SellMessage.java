@@ -130,7 +130,7 @@ public class SellMessage extends Message {
 
         // Check that the gold is the agreed amount
         AIPlayer ai = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());
-        int returnGold = ai.tradeProposition(unit, settlement, goods, gold);
+        int returnGold = ai.sellProposition(unit, settlement, goods, gold);
         if (returnGold != gold) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
         }

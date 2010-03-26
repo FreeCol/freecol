@@ -849,7 +849,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes a sale.
      *
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
@@ -860,8 +860,8 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
+    public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method sellProposition");
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
         // the client should have prevented this

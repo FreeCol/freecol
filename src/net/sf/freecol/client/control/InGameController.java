@@ -2921,12 +2921,14 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         BuyPropositionMessage message
             = new BuyPropositionMessage(unit, settlement, goods, gold);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     message.getXMLElementTagName());
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return NO_TRADE - 1; // signal failure
 
-        message = new BuyPropositionMessage(freeColClient.getGame(), reply);
-        return message.getGold();
+        try {
+            return Integer.parseInt(reply.getAttribute("gold"));
+        } catch (NumberFormatException e) {
+            return NO_TRADE - 1;
+        }
     }
 
     /**
@@ -3023,12 +3025,14 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         SellPropositionMessage message
             = new SellPropositionMessage(unit, settlement, goods, gold);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     message.getXMLElementTagName());
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return NO_TRADE - 1; // Signal failure
 
-        message = new SellPropositionMessage(freeColClient.getGame(), reply);
-        return message.getGold();
+        try {
+            return Integer.parseInt(reply.getAttribute("gold"));
+        } catch (NumberFormatException e) {
+            return NO_TRADE - 1;
+        }
     }
 
     /**

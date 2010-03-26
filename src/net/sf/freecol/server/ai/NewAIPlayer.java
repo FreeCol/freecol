@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -523,25 +524,26 @@ public abstract class NewAIPlayer extends AIObject {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes to buy.
      *
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> is trading.
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int buyProposition(Unit unit, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
-        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+    public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method buyProposition");
         String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
 
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
-            int price = settlement.getPriceToSell(goods)
+            int price = ((IndianSettlement) settlement).getPriceToSell(goods)
                 + player.getTension(unit.getOwner()).getValue();
             sessionRegister.put(goldKey, new Integer(price));
             return price;

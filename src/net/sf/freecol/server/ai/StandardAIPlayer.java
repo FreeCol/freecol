@@ -512,25 +512,26 @@ public class StandardAIPlayer extends AIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes to buy.
      *
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> is trading.
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int buyProposition(Unit unit, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
-        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+    public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method buyProposition");
         String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
 
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
-            int price = settlement.getPriceToSell(goods)
+            int price = ((IndianSettlement) settlement).getPriceToSell(goods)
                 + getPlayer().getTension(unit.getOwner()).getValue();
             sessionRegister.put(goldKey, new Integer(price));
             return price;
@@ -560,7 +561,7 @@ public class StandardAIPlayer extends AIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes a sale.
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
@@ -570,8 +571,8 @@ public class StandardAIPlayer extends AIPlayer {
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
+    public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method sellProposition");
         if (settlement instanceof IndianSettlement) {
             String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
             String hagglingKey = "tradeHaggling#" + unit.getId();

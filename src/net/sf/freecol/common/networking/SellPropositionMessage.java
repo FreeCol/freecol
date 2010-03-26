@@ -19,10 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -30,9 +26,10 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -57,7 +54,7 @@ public class SellPropositionMessage extends Message {
     /**
      * The price being negotiated.
      */
-    private int gold;
+    private String goldString;
 
     /**
      * Create a new <code>SellPropositionMessage</code>.
@@ -71,7 +68,7 @@ public class SellPropositionMessage extends Message {
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
         this.goods = goods;
-        this.gold = gold;
+        this.goldString = Integer.toString(gold);
     }
 
     /**
@@ -84,7 +81,7 @@ public class SellPropositionMessage extends Message {
     public SellPropositionMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.gold = Integer.parseInt(element.getAttribute("gold"));
+        this.goldString = element.getAttribute("gold");
         this.goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
     }
 
@@ -94,7 +91,11 @@ public class SellPropositionMessage extends Message {
      * @return The current price.
      */
     public int getGold() {
-        return gold;
+        try {
+            return Integer.parseInt(goldString);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     /**
@@ -107,38 +108,36 @@ public class SellPropositionMessage extends Message {
      * @return This message with updated gold value,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
+
         Unit unit;
         IndianSettlement settlement;
-
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
-            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+            settlement = server.getAdjacentIndianSettlementSafely(settlementId,
+                                                                  unit);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-
         // Make sure we are trying to sell something that is there
         if (goods.getLocation() != unit) {
-            return Message.createError("server.trade.noGoods", "Goods " + goods.getId()
+            return Message.createError("server.trade.noGoods", "Goods "
+                                       + goods.getId()
                                        + " are not with unit " + unitId);
         }
-
-        InGameController controller = (InGameController) server.getController();
-        if (!controller.isTransactionSessionOpen(unit, settlement)) {
-            return Message.clientError("Trying to sell without opening a transaction session");
-        }
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if (!(Boolean) session.get("canSell")) {
-            return Message.clientError("Trying to sell in a session where selling is not allowed.");
+        int gold;
+        try {
+            gold = Integer.parseInt(goldString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad gold: " + goldString);
         }
 
-        // AI considers the proposition, return with a gold value
-        AIPlayer ai = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());
-        gold = ai.tradeProposition(unit, settlement, goods, gold);
-        return this.toXMLElement();
+        // Proceed to price.
+        return server.getInGameController()
+            .sellProposition(serverPlayer, unit, settlement, goods, gold);
     }
 
     /**
@@ -151,8 +150,8 @@ public class SellPropositionMessage extends Message {
         Document doc = result.getOwnerDocument();
         result.setAttribute("unit", unitId);
         result.setAttribute("settlement", settlementId);
-        result.setAttribute("gold", Integer.toString(gold));
         result.appendChild(goods.toXMLElement(null, doc));
+        result.setAttribute("gold", goldString);
         return result;
     }
 

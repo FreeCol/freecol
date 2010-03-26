@@ -494,19 +494,21 @@ public class ColonialAIPlayer extends AIPlayer {
      * 
      * 
      * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> is trying to trade.
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int buyProposition(Unit unit, Goods goods, int gold) {
+    public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         //method currently only called for owners of indian settlements
         logger.warning("buyProposition() not implemented for ColonialAIPlayer!");
         return NetworkConstants.NO_TRADE;
     }
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes a sale.
      * 
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
@@ -516,8 +518,8 @@ public class ColonialAIPlayer extends AIPlayer {
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link NetworkConstants#NO_TRADE}.
      */
-    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
+    public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method sellProposition");
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
             Player otherPlayer = unit.getOwner();

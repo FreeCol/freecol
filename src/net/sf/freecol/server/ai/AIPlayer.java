@@ -447,19 +447,21 @@ public abstract class AIPlayer extends AIObject {
     public abstract void registerSellGoods(Goods goods);
     
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes to buy.
      * 
      * 
      * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> is trading.
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
      */
-    public abstract int buyProposition(Unit unit, Goods goods, int gold);
+    public abstract int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold);
 
     /**
-     * Called when another <code>Player</code> proposes a trade.
+     * Called when another <code>Player</code> proposes a sale.
      * 
      * 
      * @param unit The foreign <code>Unit</code> trying to trade.
@@ -470,7 +472,7 @@ public abstract class AIPlayer extends AIObject {
      * @return The price this <code>AIPlayer</code> suggests or
      *         {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
      */
-    public abstract int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold);
+    public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
     
     /**
      * Writes this object to an XML stream.
