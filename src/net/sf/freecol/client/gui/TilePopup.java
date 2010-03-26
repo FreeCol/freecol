@@ -402,7 +402,8 @@ public final class TilePopup extends JPopupMenu {
 
         boolean hasGoods = false;
         for (Goods goods: unit.getGoodsList()) {
-            text = (indent ? "         " : "     ") + goods.toString();
+            text = (indent ? "         " : "     ")
+                + Messages.message(goods.getLabel(true));
             menuItem = new JMenuItem(text);
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
             menuItem.setEnabled(false);
