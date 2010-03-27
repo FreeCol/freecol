@@ -216,6 +216,7 @@ public final class FreeColServer {
         modelController = new ServerModelController(this);
         game = new ServerGame(modelController);
         game.setNationOptions(nationOptions);
+        game.setDifficultyLevel(level);
         FreeCol.getSpecification().applyDifficultyLevel(level);
         mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
@@ -293,10 +294,9 @@ public final class FreeColServer {
         }
 
         // Apply the difficulty level
-        /*
-        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions()
-                                                              .getInteger(GameOptions.DIFFICULTY));
-        */
+        if (game.getDifficultyLevel() != null) {
+            Specification.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
+        }
 
         getModelController().updateModelListening();
         updateMetaServer(true);
