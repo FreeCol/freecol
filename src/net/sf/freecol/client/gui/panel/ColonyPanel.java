@@ -978,16 +978,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             Tile colonyTile = colony.getTile();
             for (Unit unit : colonyTile.getUnitList()) {
+            	// we only deal with land, non-carrier units here
+            	if(unit.isNaval() || unit.isCarrier()){
+            		continue;
+            	}
 
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                 if (isEditable()) {
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                 }
-
-                if (!unit.isCarrier()) {
-                    add(unitLabel, false);
-                }
+                add(unitLabel, false);
             }
             revalidate();
             repaint();
