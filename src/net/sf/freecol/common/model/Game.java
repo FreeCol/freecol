@@ -93,6 +93,11 @@ public class Game extends FreeColGameObject {
      */
     private boolean spanishSuccession = false;
 
+    /**
+     * Describe difficultyLevel here.
+     */
+    private DifficultyLevel difficultyLevel;
+
     protected ModelController modelController;
 
     protected FreeColGameObjectListener freeColGameObjectListener;
@@ -287,6 +292,24 @@ public class Game extends FreeColGameObject {
      */
     public final void setCombatModel(final CombatModel newCombatModel) {
         this.combatModel = newCombatModel;
+    }
+
+    /**
+     * Get the <code>DifficultyLevel</code> value.
+     *
+     * @return a <code>DifficultyLevel</code> value
+     */
+    public final DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    /**
+     * Set the <code>DifficultyLevel</code> value.
+     *
+     * @param newDifficultyLevel The new DifficultyLevel value.
+     */
+    public final void setDifficultyLevel(final DifficultyLevel newDifficultyLevel) {
+        this.difficultyLevel = newDifficultyLevel;
     }
 
     /**
@@ -895,6 +918,11 @@ public class Game extends FreeColGameObject {
             }
         }
 
+        // serialize difficulty level
+        if (difficultyLevel != null) {
+            difficultyLevel.toXML(out);
+        }
+
         out.writeEndElement();
     }
 
@@ -973,6 +1001,9 @@ public class Game extends FreeColGameObject {
             } else if (CIBOLA_TAG.equals(in.getLocalName())) {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
+            } else if (DifficultyLevel.getXMLElementTagName().equals(in.getLocalName())) {
+                difficultyLevel = new DifficultyLevel();
+                difficultyLevel.readFromXML(in, null);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
                 in.nextTag();
