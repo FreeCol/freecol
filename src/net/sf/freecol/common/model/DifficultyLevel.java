@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -34,6 +35,7 @@ import net.sf.freecol.common.option.StringOption;
 /**
  * Represents a difficulty level.
  */
+// TODO: couldn't we just use an OptionGroup?
 public class DifficultyLevel extends FreeColGameObjectType {
 
     private static int nextIndex = 0;
@@ -70,7 +72,7 @@ public class DifficultyLevel extends FreeColGameObjectType {
                                          "> tag : no id attribute found.");
         }
 
-        setId(in.getAttributeValue(null, "id"));
+        setId(id);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String optionType = in.getLocalName();
@@ -94,6 +96,26 @@ public class DifficultyLevel extends FreeColGameObjectType {
 
     }
 
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+
+        for (AbstractOption option : levelOptions.values()) {
+            option.toXML(out);
+        }
+
+        out.writeEndElement();
+
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     * 
+     * @return the tag name.
+     */
+    public static String getXMLElementTagName() {
+        return "difficultyLevel";
+    }
+    
+
 }
-
-
