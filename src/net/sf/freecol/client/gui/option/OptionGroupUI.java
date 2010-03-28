@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.option;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -52,6 +50,8 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class provides visualization for an {@link OptionGroup}. In order to
@@ -77,7 +77,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      */
     public OptionGroupUI(OptionGroup option, boolean editable, int level, HashMap<String, JComponent> optionUIs) {
         
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
         
         JPanel horizontalPanel = null;
         boolean buttonAdded = false;
@@ -95,36 +95,30 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                     if ((horizontalPanel == null) || !buttonAdded) {
                         horizontalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
                         horizontalPanel.setOpaque(false);
-                        add(horizontalPanel);
+                        add(horizontalPanel, "newline, span");
                     }
                     horizontalPanel.add(ogb);
                     buttonAdded = true;
                 } else {
                     final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, level+1, optionUIs);
-                    add(groupUI);
+                    add(groupUI, "newline, span");
                     ou.add(groupUI);
                     buttonAdded = false;
                 }
             } else if (o instanceof BooleanOption) {                
                 final BooleanOptionUI boi = new BooleanOptionUI((BooleanOption) o, editable);
                 ou.add(boi);
-                final boolean alreadyAdded = (horizontalPanel != null && !buttonAdded);
-                if (!alreadyAdded || buttonAdded) {
-                    horizontalPanel = new JPanel(new GridLayout(1, 2, H_GAP, 5));
-                    horizontalPanel.setOpaque(false);
-                    add(horizontalPanel);
+                if (boi.getLabel().length() > 40) {
+                    add(boi, "newline, span");
+                } else {
+                    add(boi, "span 2");
                 }
-                horizontalPanel.add(boi);
-                if (alreadyAdded) {
-                    horizontalPanel = null;
-                }
-                buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), boi);
                 }
             } else if (o instanceof PercentageOption) {
                 final PercentageOptionUI soi = new PercentageOptionUI((PercentageOption) o, editable);
-                add(soi);
+                add(soi, "newline, span");
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -141,6 +135,11 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof IntegerOption) {
                 final IntegerOptionUI iou = new IntegerOptionUI((IntegerOption) o, editable);
+                if (iou.getLabel().getText().length() > 30) {
+                    add(iou.getLabel(), "newline, span 3, right");
+                } else {
+                    add(iou.getLabel(), "right");
+                }
                 add(iou);
                 ou.add(iou);
                 buttonAdded = false;
@@ -149,7 +148,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof FileOption) {
                 final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
-                add(iou);
+                add(iou, "newline, span");
                 ou.add(iou);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -157,7 +156,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof RangeOption) {
                 final RangeOptionUI soi = new RangeOptionUI((RangeOption) o, editable);
-                add(soi);
+                add(soi, "newline, span");
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -165,6 +164,11 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof SelectOption) {
                 final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
+                if (soi.getLabel().getText().length() > 30) {
+                    add(soi.getLabel(), "newline, span 3, right");
+                } else {
+                    add(soi.getLabel(), "right");
+                }
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;
@@ -173,7 +177,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof LanguageOption) {
                 final LanguageOptionUI soi = new LanguageOptionUI((LanguageOption) o, editable);
-                add(soi);
+                add(soi, "span 2");
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -181,7 +185,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof AudioMixerOption) {
                 final AudioMixerOptionUI soi = new AudioMixerOptionUI((AudioMixerOption) o, editable);
-                add(soi);
+                add(soi, "newline, span");
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -190,20 +194,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             } else if (o instanceof FreeColAction) {
                 final FreeColActionUI fau = new FreeColActionUI((FreeColAction) o, this);
                 ou.add(fau);
-                add(fau);
-                /*
-                final boolean alreadyAdded = (horizontalPanel != null && !buttonAdded);
-                if (!alreadyAdded || buttonAdded) {
-                    horizontalPanel = new JPanel(new GridLayout(1, 2, H_GAP, 5));
-                    horizontalPanel.setOpaque(false);
-                }
-                horizontalPanel.add(fau);
-                add(horizontalPanel);
-                if (alreadyAdded) {
-                    horizontalPanel = null;
-                }
-                buttonAdded = false;
-                */
+                add(fau, "newline, span");
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), fau);
                 }

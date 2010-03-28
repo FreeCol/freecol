@@ -83,7 +83,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         super(new BorderLayout());
 
         JPanel northPanel = new JPanel();
-        northPanel.setLayout(new MigLayout("wrap 2"));
+        northPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
         northPanel.setOpaque(false);
         
         optionUIs = new HashMap<String, JComponent>();
@@ -109,22 +109,26 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 c = scroll;
                 tb.addTab(o.getName(), null, c, o.getShortDescription());
             } else if (o instanceof BooleanOption) {
-                JComponent c = new BooleanOptionUI((BooleanOption) o, editable);
-                northPanel.add(c);
+                BooleanOptionUI c = new BooleanOptionUI((BooleanOption) o, editable);
+                if (c.getText().length() > 40) {
+                    northPanel.add(c, "newline, span");
+                } else {
+                    northPanel.add(c, "span 2");
+                }
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof FileOption) {
                 final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
-                northPanel.add(iou);
+                northPanel.add(iou, "newline, span");
                 ou.add(iou);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), iou);
                 }
             } else if (o instanceof PercentageOption) {
                 JComponent c = new PercentageOptionUI((PercentageOption) o, editable);
-                northPanel.add(c);
+                northPanel.add(c, "newline, span");
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
@@ -138,7 +142,12 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof IntegerOption) {
-                JComponent c = new IntegerOptionUI((IntegerOption) o, editable);
+                IntegerOptionUI c = new IntegerOptionUI((IntegerOption) o, editable);
+                if (c.getLabel().getText().length() > 30) {
+                    northPanel.add(c.getLabel(), "newline, span 3, right");
+                } else {
+                    northPanel.add(c.getLabel(), "right");
+                }
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -146,13 +155,18 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof RangeOption) {
                 JComponent c = new RangeOptionUI((RangeOption) o, editable);
-                northPanel.add(c);
+                northPanel.add(c, "newline, span");
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof SelectOption) {
-                JComponent c = new SelectOptionUI((SelectOption) o, editable);
+                SelectOptionUI c = new SelectOptionUI((SelectOption) o, editable);
+                if (c.getLabel().getText().length() > 30) {
+                    northPanel.add(c.getLabel(), "newline, span 3, right");
+                } else {
+                    northPanel.add(c.getLabel(), "right");
+                }
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -161,7 +175,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             } else if (o instanceof LanguageOption) {
                 System.out.println("found languageOption");
                 JComponent c = new LanguageOptionUI((LanguageOption) o, editable);
-                northPanel.add(c);
+                northPanel.add(c, "span 2");
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
