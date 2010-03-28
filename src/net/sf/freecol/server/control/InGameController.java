@@ -1563,9 +1563,8 @@ public final class InGameController extends Controller {
         // Default values
         session.put("canGift", true);
         session.put("actionTaken", false);
-        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
         session.put("unitMoves", unit.getMovesLeft());
-        if (settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR){
+        if (settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR) {
             session.put("canSell", false);
             session.put("canBuy", false);
         } else {
@@ -3215,16 +3214,15 @@ public final class InGameController extends Controller {
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
         if (!isTransactionSessionOpen(unit, settlement)) {
-            return Message.clientError("Trying to trade without opening a transaction session");
+            return Message.clientError("Trying to buy without opening a transaction session");
         }
         java.util.Map<String,Object> session
             = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canBuy")) {
             return Message.clientError("Trying to buy in a session where buying is not allowed.");
         }
-        // TODO: why are we not just checking the unit capacity?
-        if (!(Boolean) session.get("hasSpaceLeft")) {
-            return Message.clientError("No space to buy.");
+        if (unit.getSpaceLeft() <= 0) {
+            return Message.clientError("Unit is full, unable to buy.");
         }
         // Check that this is the agreement that was made
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
@@ -3253,7 +3251,6 @@ public final class InGameController extends Controller {
         addPartial(objects, serverPlayer, "gold");
         session.put("actionTaken", true);
         session.put("canBuy", false);
-        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, objects);
@@ -3305,7 +3302,6 @@ public final class InGameController extends Controller {
         addPartial(objects, serverPlayer, "gold");
         session.put("actionTaken", true);
         session.put("canSell", false);
-        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, objects);
@@ -3343,7 +3339,6 @@ public final class InGameController extends Controller {
         }
         session.put("actionTaken", true);
         session.put("canGift", false);
-        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
 
         // Inform the receiver of the gift.
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
