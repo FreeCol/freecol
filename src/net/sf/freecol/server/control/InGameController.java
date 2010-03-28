@@ -3312,6 +3312,60 @@ public final class InGameController extends Controller {
         return buildUpdate(serverPlayer, objects);
     }
 
+    /**
+     * Deliver gift to settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is delivering.
+     * @param unit The <code>Unit</code> that is delivering.
+     * @param goods The <code>Goods</code> to deliver.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element deliverGiftToSettlement(ServerPlayer serverPlayer,
+                                           Unit unit, Settlement settlement,
+                                           Goods goods) {
+        if (!isTransactionSessionOpen(unit, settlement)) {
+            return Message.clientError("Trying to deliverGift without opening a transaction session");
+        }
+
+        List<Object> objects = new ArrayList<Object>();
+        java.util.Map<String,Object> session
+            = getTransactionSession(unit, settlement);
+        Tile tile = settlement.getTile();
+        moveGoods(goods, settlement);
+        objects.add(unit);
+        if (settlement instanceof IndianSettlement) {
+            IndianSettlement indianSettlement = (IndianSettlement) settlement;
+            indianSettlement.modifyAlarm(serverPlayer, -indianSettlement.getPrice(goods) / 50);
+            indianSettlement.updateWantedGoods();
+            tile.updateIndianSettlementInformation(serverPlayer);
+            objects.add(UpdateType.PRIVATE);
+            objects.add(tile);
+        }
+        session.put("actionTaken", true);
+        session.put("canGift", false);
+        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
+
+        // Inform the receiver of the gift.
+        ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
+        if (!receiver.isAI() && receiver.isConnected()
+            && settlement instanceof Colony) {
+            List<Object> giftObjects = new ArrayList<Object>();
+            giftObjects.add(unit);
+            giftObjects.add(settlement);
+            giftObjects.add(new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
+                                             "model.unit.gift", settlement, goods.getType())
+                            .addStringTemplate("%player%", serverPlayer.getNationName())
+                            .add("%type%", goods.getNameKey())
+                            .addAmount("%amount%", goods.getAmount())
+                            .addName("%colony%", settlement.getName()));
+            sendElement(receiver, giftObjects);
+        }
+
+        // Others can see unit capacity.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
 
     /**
      * Clear the specialty of a unit.
