@@ -19,24 +19,22 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
  * The message sent when unloading cargo onto a carrier.
  */
 public class UnloadCargoMessage extends Message {
+
     /**
      * The goods to be unloaded.
      */
@@ -85,34 +83,16 @@ public class UnloadCargoMessage extends Message {
         } else if (!(loc instanceof Unit)) {
             return Message.clientError("Unload from non-unit.");
         }
-        Unit carrier = (Unit) loc;
-        if (carrier.getOwner() != player) {
+        Unit unit = (Unit) loc;
+        if (unit.getOwner() != player) {
             return Message.clientError("Unload from non-owned unit.");
-        } else if (carrier.getTile() == null) {
+        } else if (unit.getTile() == null) {
             return Message.clientError("Unload from unit not on the map.");
         }
 
         // Perform the unload.
-        Tile tile = carrier.getTile();
-        Colony colony = (tile.getSettlement() instanceof Colony)
-            ? (Colony) tile.getSettlement()
-            : null;
-        goods.adjustAmount();
-        try {
-            server.getInGameController().moveGoods(goods, colony);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
-            carrier.setMovesLeft(0);
-        }
-
-        // Build response.  Only have to update the carrier location,
-        // as that *must* include the original location of the goods.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(tile.toXMLElement(player, doc));
-        return reply;
+        return server.getInGameController()
+            .unloadCargo(serverPlayer, unit, goods);
     }
 
     /**
@@ -122,8 +102,7 @@ public class UnloadCargoMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
-        result.appendChild(goods.toXMLElement(null, doc));
+        result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
         return result;
     }
 

@@ -19,19 +19,14 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -87,37 +82,16 @@ public class LoadCargoMessage extends Message {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
 
-        Unit carrier;
+        Unit unit;
         try {
-            carrier = server.getUnitSafely(carrierId, serverPlayer);
+            unit = server.getUnitSafely(carrierId, serverPlayer);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
 
         // Perform the load.
-        goods.adjustAmount();
-        try {
-            server.getInGameController().moveGoods(goods, carrier);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
-            carrier.setMovesLeft(0);
-        }
-
-        // Build response.  Only have to update the carrier location,
-        // as that *must* include the original location of the goods.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        Location loc = carrier.getLocation();
-        if (loc instanceof Europe) {
-            reply.appendChild(((Europe) loc).toXMLElement(player, doc));
-        } else if (loc instanceof Tile) {
-            reply.appendChild(((Tile) loc).toXMLElement(player, doc));
-        } else { // ``Can not happen''
-            throw new IllegalStateException("Carrier not in Europe or Tile.");
-        }
-        return reply;
+        return server.getInGameController()
+            .loadCargo(serverPlayer, unit, goods);
     }
 
     /**
@@ -127,9 +101,8 @@ public class LoadCargoMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
         result.setAttribute("carrier", carrierId);
-        result.appendChild(goods.toXMLElement(null, doc));
+        result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
         return result;
     }
 

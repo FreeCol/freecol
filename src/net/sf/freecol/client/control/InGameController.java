@@ -606,8 +606,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askLoadCargo(Goods goods, Unit carrier) {
         Client client = freeColClient.getClient();
         LoadCargoMessage message = new LoadCargoMessage(goods, carrier);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -740,8 +739,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askUnloadCargo(Goods goods) {
         Client client = freeColClient.getClient();
         UnloadCargoMessage message = new UnloadCargoMessage(goods);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

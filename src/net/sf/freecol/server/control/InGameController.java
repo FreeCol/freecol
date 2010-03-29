@@ -3362,6 +3362,58 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Load cargo.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is loading.
+     * @param unit The <code>Unit</code> to load.
+     * @param goods The <code>Goods</code> to load.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element loadCargo(ServerPlayer serverPlayer, Unit unit,
+                             Goods goods) {
+        goods.adjustAmount();
+        moveGoods(goods, unit);
+        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
+            unit.setMovesLeft(0);
+        }
+
+        // Only have to update the carrier location, as that *must*
+        // include the original location of the goods.
+        // Others can see capacity change.
+        FreeColGameObject fcgo = (FreeColGameObject) unit.getLocation();
+        sendToOthers(serverPlayer, fcgo);
+        return buildUpdate(serverPlayer, fcgo);
+    }
+
+    /**
+     * Unload cargo.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is unloading.
+     * @param unit The <code>Unit</code> to unload.
+     * @param goods The <code>Goods</code> to unload.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element unloadCargo(ServerPlayer serverPlayer, Unit unit,
+                               Goods goods) {
+        Tile tile = unit.getTile();
+        Colony colony = (tile.getSettlement() instanceof Colony)
+            ? (Colony) tile.getSettlement()
+            : null;
+        goods.adjustAmount();
+        moveGoods(goods, colony);
+        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
+            unit.setMovesLeft(0);
+        }
+
+        // Only have to update the carrier location, as that *must*
+        // include the location of the goods.
+        // Others can see the capacity change.
+        sendToOthers(serverPlayer, tile);
+        return buildUpdate(serverPlayer, tile);
+    }
+
+
+    /**
      * Clear the specialty of a unit.
      *
      * @param unit The <code>Unit</code> to clear the speciality of.
