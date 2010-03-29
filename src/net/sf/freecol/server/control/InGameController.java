@@ -2844,10 +2844,6 @@ public final class InGameController extends Controller {
             // Otherwise player gets to visit, and learn about the settlement.
             int gold = 0;
             Tile tile = settlement.getTile();
-            settlement.setVisited(player);
-            tile.updateIndianSettlementInformation(player);
-            unit.setMovesLeft(0);
-
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
             if (settlement.hasBeenVisited()) {
@@ -2887,6 +2883,8 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
+            settlement.setVisited(player);
+            tile.updateIndianSettlementInformation(player);
             objects.add(tile);
             Map map = getFreeColServer().getGame().getMap();
             for (Tile t : map.getSurroundingTiles(tile, radius)) {
@@ -2897,6 +2895,7 @@ public final class InGameController extends Controller {
             }
 
             // If the unit did not get promoted, update it for moves.
+            unit.setMovesLeft(0);
             if (!objects.contains(unit)) {
                 addPartial(objects, unit, "movesLeft");
             }
