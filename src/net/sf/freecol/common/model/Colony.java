@@ -895,6 +895,14 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
+     * Get the amount of gold plundered when this colony is captured.
+     */
+    public int getPlunder() {
+        return (owner.getGold() * getUnitCount())
+            / owner.getColoniesPopulation();
+    }
+
+    /**
      * Returns a <code>List</code> with every unit type this colony may
      * build.
      * 

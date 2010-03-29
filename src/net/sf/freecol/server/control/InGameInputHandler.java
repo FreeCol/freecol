@@ -814,14 +814,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             result = unit.getGame().getCombatModel().generateAttackResult(unit, defender); 
         }
         if (result.type == CombatResultType.DONE_SETTLEMENT) {
-            Settlement s = newTile.getSettlement();
-            if (s instanceof Colony) {
-                //colony: take amount proportional to colony-size/overall-colony-population
-                plunderGold = (s.getOwner().getGold()*s.getUnitCount())/s.getOwner().getColoniesPopulation();
-            } else {
-                //indian settlement: 10% of their gold
-                plunderGold = s.getOwner().getGold() / 10;
-            }
+            plunderGold = newTile.getSettlement().getPlunder();
         }
         
         // Gets repair location if necessary

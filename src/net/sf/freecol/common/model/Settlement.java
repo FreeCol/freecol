@@ -206,12 +206,19 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     
 
     /**
-     * Gets the <code>Unit</code> that is currently defending this <code>Settlement</code>.
-     * @param attacker The target that would be attacking this <code>Settlement</code>.
-     * @return The <code>Unit</code> that has been chosen to defend this <code>Settlement</code>.
+     * Gets the <code>Unit</code> that is currently defending this
+     * <code>Settlement</code>.
+     *
+     * @param attacker The unit be attacking this <code>Settlement</code>.
+     * @return The <code>Unit</code> that has been chosen to defend
+     * this <code>Settlement</code>.
      */
     abstract public Unit getDefendingUnit(Unit attacker);
 
+    /**
+     * Get the amount of gold plundered when this settlement is captured.
+     */
+    abstract public int getPlunder();
     
     /**
      * Gets the <code>Tile</code> where this <code>Settlement</code> is located.

@@ -1448,6 +1448,13 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Get the amount of gold plundered when this settlement is captured.
+     */
+    public int getPlunder() {
+        return owner.getGold() / 10;
+    }
+
+    /**
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
      *
