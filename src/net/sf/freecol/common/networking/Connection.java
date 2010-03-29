@@ -92,7 +92,7 @@ public class Connection {
 
     /**
      * Sets up a new socket with specified host and port and uses
-     * {@link #Connection(Socket, MessageHandler)}.
+     * {@link #Connection(Socket, MessageHandler, String)}.
      * 
      * @param host The host to connect to.
      * @param port The port to connect to.

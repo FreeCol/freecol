@@ -187,7 +187,7 @@ public class LanguageOption extends AbstractOption {
      * Returns the <code>Locale</code> decided by the given name. 
      * 
      * @param languageID A String using the same format as
-     *         {@link #getStringValue()}.
+     *         {@link #getValue()}.
      * @return The Locale.
      */
     public static Locale getLocale(String languageID) {

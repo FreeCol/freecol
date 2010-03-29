@@ -548,7 +548,7 @@ public final class InGameController extends Controller {
      * Send an update to all players except one.
      *
      * @param serverPlayer A <code>ServerPlayer</code> to exclude.
-     * @param objects The objects to consider.
+     * @param allObjects The objects to consider.
      */
     public void sendToOthers(ServerPlayer serverPlayer,
                              List<Object> allObjects) {

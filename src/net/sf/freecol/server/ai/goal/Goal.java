@@ -525,7 +525,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Returns a string describing just this goal.
      * An implementing class may override this method to add specialized information.          
-     * Used by {@link getDebugDescription}.
+     * Used by {@link #getDebugDescription()}.
      * 
      * @return a string describing this goal
      */ 

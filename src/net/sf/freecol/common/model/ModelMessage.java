@@ -209,8 +209,8 @@ public class ModelMessage extends StringTemplate {
      *
      * @param sourceId A new source ID.
      */
-    public void setSourceId(String source) {
-        this.sourceId = source;
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
     
     /**
