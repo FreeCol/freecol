@@ -174,14 +174,24 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof LanguageOption) {
                 System.out.println("found languageOption");
-                JComponent c = new LanguageOptionUI((LanguageOption) o, editable);
-                northPanel.add(c, "span 2");
+                LanguageOptionUI c = new LanguageOptionUI((LanguageOption) o, editable);
+                if (c.getLabel().getText().length() > 30) {
+                    northPanel.add(c.getLabel(), "newline, span 3");
+                } else {
+                    northPanel.add(c.getLabel());
+                }
+                northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof AudioMixerOption) {
-                JComponent c = new AudioMixerOptionUI((AudioMixerOption) o, editable);
+                AudioMixerOptionUI c = new AudioMixerOptionUI((AudioMixerOption) o, editable);
+                if (c.getLabel().getText().length() > 30) {
+                    northPanel.add(c.getLabel(), "newline, span 3");
+                } else {
+                    northPanel.add(c.getLabel());
+                }
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {

@@ -177,7 +177,12 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof LanguageOption) {
                 final LanguageOptionUI soi = new LanguageOptionUI((LanguageOption) o, editable);
-                add(soi, "span 2");
+                if (soi.getLabel().getText().length() > 30) {
+                    add(soi.getLabel(), "newline, span 3");
+                } else {
+                    add(soi.getLabel());
+                }
+                add(soi);
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
@@ -185,7 +190,12 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof AudioMixerOption) {
                 final AudioMixerOptionUI soi = new AudioMixerOptionUI((AudioMixerOption) o, editable);
-                add(soi, "newline, span");
+                if (soi.getLabel().getText().length() > 30) {
+                    add(soi.getLabel(), "newline, span 3");
+                } else {
+                    add(soi.getLabel());
+                }
+                add(soi);
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {

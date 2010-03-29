@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,9 +27,9 @@ import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -41,13 +41,12 @@ import net.sf.freecol.common.option.RangeOption;
  * This class provides visualization for an {@link RangeOption}. In order to
  * enable values to be both seen and changed.
  */
-public final class RangeOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
+public final class RangeOptionUI extends JSlider implements OptionUpdater, PropertyChangeListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RangeOptionUI.class.getName());
 
     private final RangeOption option;
-    private final JSlider slider;
     private int originalValue;
 
 
@@ -60,42 +59,39 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
      */
     public RangeOptionUI(final RangeOption option, boolean editable) {
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
-                                                   option.getName()));
         this.option = option;
         this.originalValue = option.getValue();
 
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
+                                                   option.getName()));
         String name = option.getName();
         String description = option.getShortDescription();
-        //JLabel label = new JLabel(name, JLabel.LEFT);
-        //label.setToolTipText((description != null) ? description : name);
-        //add(label);
 
-        String[] strings = option.getItemValues().values().toArray(new String[0]);
-
-        slider = new JSlider(JSlider.HORIZONTAL, 0, strings.length - 1, option.getValueRank());
+        setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0, 0, option.getItemValues().size() - 1));
+        setOrientation(JSlider.HORIZONTAL);
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
-        for (int i = 0; i < strings.length; i++) {
-            labels.put(new Integer(i), new JLabel(strings[i]));
+        int index = 0;
+        for (String string : option.getItemValues().values()) {
+            labels.put(index, new JLabel(string));
+            index++;
         }
 
-        slider.setLabelTable(labels);
-        slider.setValue(option.getValueRank());
-        slider.setPaintLabels(true);
-        slider.setMajorTickSpacing(1);
-        slider.setExtent(0);
-        slider.setPaintTicks(true);
-        slider.setSnapToTicks(true);
-        slider.setPreferredSize(new Dimension(500, 50));
-        slider.setToolTipText((description != null) ? description : name);
-        add(slider);
+        setLabelTable(labels);
+        setValue(option.getValueRank());
+        setPaintLabels(true);
+        setMajorTickSpacing(1);
+        setExtent(0);
+        setPaintTicks(true);
+        setSnapToTicks(true);
+        setPreferredSize(new Dimension(500, 50));
+        setToolTipText((description != null) ? description : name);
 
-        slider.setEnabled(editable);
-        slider.setOpaque(false);
-        slider.addChangeListener(new ChangeListener() {
+        setEnabled(editable);
+        setOpaque(false);
+        addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (option.isPreviewEnabled()) {
-                    final int value = slider.getValue();
+                    final int value = getValue();
                     if (option.getValue() != value) {
                         option.setValueRank(value);
                     }
@@ -133,8 +129,8 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
             final int value = ((Integer) event.getNewValue()).intValue();
-            if (value != slider.getValue()) {
-                slider.setValue(value);
+            if (value != getValue()) {
+                setValue(value);
                 originalValue = value;
             }
         }
@@ -144,13 +140,13 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
      * Updates the value of the {@link Option} this object keeps.
      */
     public void updateOption() {
-        option.setValueRank(slider.getValue());
+        option.setValueRank(getValue());
     }
 
     /**
      * Reset with the value from the option.
      */
     public void reset() {
-        slider.setValue(option.getValueRank());
+        setValue(option.getValueRank());
     }
 }

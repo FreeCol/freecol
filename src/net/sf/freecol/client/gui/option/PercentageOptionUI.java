@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,9 +27,9 @@ import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -42,16 +42,13 @@ import net.sf.freecol.common.option.RangeOption;
  * This class provides visualization for an {@link RangeOption}. In order to
  * enable values to be both seen and changed.
  */
-public final class PercentageOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
+public final class PercentageOptionUI extends JSlider implements OptionUpdater, PropertyChangeListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(PercentageOptionUI.class.getName());
 
     private final PercentageOption option;
-
-    private final JSlider slider;
     private int originalValue;
-
 
     /**
      * Creates a new <code>PercentageOptionUI</code> for the given
@@ -62,40 +59,41 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
      */
     public PercentageOptionUI(final PercentageOption option, boolean editable) {
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
-                                                   option.getName()));
         this.option = option;
         this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
 
-        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, option.getValue());
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
+                                                   option.getName()));
+
+        setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
+        setOrientation(JSlider.HORIZONTAL);
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
         labels.put(new Integer(0), new JLabel("0 %"));
         labels.put(new Integer(25), new JLabel("25 %"));
         labels.put(new Integer(50), new JLabel("50 %"));
         labels.put(new Integer(75), new JLabel("75 %"));
         labels.put(new Integer(100), new JLabel("100 %"));
-        slider.setLabelTable(labels);
-        slider.setValue(option.getValue());
-        slider.setPaintLabels(true);
-        slider.setMajorTickSpacing(5);
-        slider.setExtent(0);
-        slider.setPaintTicks(true);
-        slider.setSnapToTicks(false);
-        slider.setPreferredSize(new Dimension(500, 50));
-        slider.setToolTipText((description != null) ? description : name);
-        add(slider);
+        setLabelTable(labels);
+        setValue(option.getValue());
+        setPaintLabels(true);
+        setMajorTickSpacing(5);
+        setExtent(0);
+        setPaintTicks(true);
+        setSnapToTicks(false);
+        setPreferredSize(new Dimension(500, 50));
+        setToolTipText((description != null) ? description : name);
 
-        slider.setEnabled(editable);
-        slider.setOpaque(false);
+        setEnabled(editable);
+        setOpaque(false);
 
-        slider.addChangeListener(new ChangeListener () {
+        addChangeListener(new ChangeListener () {
             public void stateChanged(ChangeEvent e) {
                 if (option.isPreviewEnabled()) {
-                    if (option.getValue() != slider.getValue()) {
-                        option.setValue(slider.getValue());
+                    if (option.getValue() != getValue()) {
+                        option.setValue(getValue());
                     }
                 }
             }
@@ -131,8 +129,8 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
             final int value = ((Integer) event.getNewValue()).intValue();
-            if (value != slider.getValue()) {
-                slider.setValue(value);
+            if (value != getValue()) {
+                setValue(value);
                 originalValue = value;
             }
         }
@@ -142,13 +140,13 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
      * Updates the value of the {@link Option} this object keeps.
      */
     public void updateOption() {
-        option.setValue(slider.getValue());
+        option.setValue(getValue());
     }
 
     /**
      * Reset with the value from the option.
      */
     public void reset() {
-        slider.setValue(option.getValue());
+        setValue(option.getValue());
     }
 }
