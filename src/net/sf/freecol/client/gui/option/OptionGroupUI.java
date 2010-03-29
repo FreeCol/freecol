@@ -108,7 +108,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             } else if (o instanceof BooleanOption) {                
                 final BooleanOptionUI boi = new BooleanOptionUI((BooleanOption) o, editable);
                 ou.add(boi);
-                if (boi.getLabel().length() > 40) {
+                if (boi.getText().length() > 40) {
                     add(boi, "newline, span");
                 } else {
                     add(boi, "span 2");
