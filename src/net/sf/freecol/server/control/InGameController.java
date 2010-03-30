@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
@@ -1536,6 +1537,27 @@ public final class InGameController extends Controller {
 
         // Do not update others, they can not see cash-ins which
         // happen in colony or in Europe.
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
+     * Rename an object.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is naming.
+     * @param object The <code>Nameable</code> to rename.
+     * @param newName The new name.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element renameObject(ServerPlayer serverPlayer, Nameable object,
+                                String newName) {
+        object.setName(newName);
+
+        // Others may be able to see the name change.
+        List<Object> objects = new ArrayList<Object>();
+        FreeColGameObject fcgo = (FreeColGameObject) object;
+        addPartial(objects, fcgo, "name");
+        sendToOthers(serverPlayer, objects);
         return buildUpdate(serverPlayer, objects);
     }
 

@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nameable;
@@ -29,11 +27,14 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Element;
+
 
 /**
  * The message sent when renaming a FreeColGameObject.
  */
 public class RenameMessage extends Message {
+
     /**
      * The id of the object to be renamed.
      */
@@ -71,29 +72,29 @@ public class RenameMessage extends Message {
     /**
      * Handle a "rename"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> message was received on.
      *
      * @return An update containing the renamed unit,
      *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Nameable object = (Nameable) player.getGame().getFreeColGameObject(id);
 
+        Nameable object = (Nameable) player.getGame().getFreeColGameObject(id);
         if (object == null) {
             return Message.clientError("Tried to rename an object with id " + id
                                        + " which could not be found.");
         }
-        if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != serverPlayer) {
+        if (!(object instanceof Ownable)
+            || ((Ownable) object).getOwner() != serverPlayer) {
             return Message.clientError("Not the owner of nameable: " + id);
         }
-        object.setName(newName);
 
-        Element reply = Message.createNewRootElement("update");
-        reply.appendChild(((FreeColGameObject) object).toXMLElement(player, reply.getOwnerDocument()));
-        return reply;
+        // Proceed to rename.
+        return server.getInGameController()
+            .renameObject(serverPlayer, object, newName);
     }
 
     /**
