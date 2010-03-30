@@ -205,7 +205,7 @@ public class BuildColonyMission extends Mission {
                 } catch (IOException e) {
                     logger.warning("Could not send BuildColony message.");
                 }
-                if (reply != null) {
+                if (reply != null && reply.getTagName() != "error") {
                     colonyBuilt = true;
                     Settlement settlement = unit.getTile().getSettlement();
                     AIColony aiColony = (AIColony) getAIMain().getAIObject(settlement);
@@ -306,6 +306,7 @@ public class BuildColonyMission extends Mission {
         
         while (it.hasNext()) {
             Tile tile = game.getMap().getTile(it.next());
+            if (tile.getOwner() != null) continue;
             int newColonyValue = -1;
             int tileColonyValue = unit.getOwner().getColonyValue(tile);
             
