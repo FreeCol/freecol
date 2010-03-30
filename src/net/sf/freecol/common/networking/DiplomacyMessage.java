@@ -364,8 +364,9 @@ public class DiplomacyMessage extends Message {
                 Colony colony = (Colony) object;
                 Tile colonyTile = colony.getTile();
                 Map map = colony.getGame().getMap();
+                int radius = colony.getRadius();
                 update.appendChild(colonyTile.toXMLElement(player, doc));
-                for (Tile tile : map.getSurroundingTiles(colonyTile, 1)) {
+                for (Tile tile : map.getSurroundingTiles(colonyTile, radius)) {
                     update.appendChild(tile.toXMLElement(player, doc));
                 }
             } else {
