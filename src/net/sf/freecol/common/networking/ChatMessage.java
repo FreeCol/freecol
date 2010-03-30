@@ -19,15 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Nameable;
-import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -125,10 +122,13 @@ public class ChatMessage extends Message {
      * @return Null.
      */
     public Element handle(FreeColServer server, Connection connection) {
+        ServerPlayer serverPlayer = server.getPlayer(connection);
+
         /* Do not trust the client-supplied sender name */
-        player = server.getPlayer(connection);
-        sender = player.getId();
-        server.getServer().sendToAll(toXMLElement(), connection);
+        sender = serverPlayer.getId();
+
+        server.getInGameController().sendToOthers(serverPlayer,
+                                                  toXMLElement());
         return null;
     }
 
