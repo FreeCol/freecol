@@ -2662,8 +2662,8 @@ public final class InGameController extends Controller {
         List<Object> otherObjects = new ArrayList<Object>();
         otherObjects.add(oldLocation);
         if (visible) {
-            objects.add(carrier);
-            addAnimate(objects, unit, oldLocation, carrier.getTile());
+            otherObjects.add(carrier);
+            addAnimate(otherObjects, unit, oldLocation, carrier.getTile());
         } else {
             addRemove(otherObjects, unit);
         }
