@@ -761,7 +761,9 @@ public class MapGenerator implements IMapGenerator {
                     Unit buildColonyUnit = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     String colonyName = Messages.message(player.getNationName()) + " Colony";
                     Colony colony = new Colony(game, player, colonyName, colonyTile);
-                    buildColonyUnit.buildColony(colony);
+                    colony.placeSettlement();
+                    buildColonyUnit.setState(UnitState.IN_COLONY);
+                    buildColonyUnit.setLocation(colony);
                     if (buildColonyUnit.getLocation() instanceof ColonyTile) {
                         Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
                         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {

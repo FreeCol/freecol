@@ -213,7 +213,7 @@ public class ColonyTest extends FreeColTestCase {
 
         // colonist with no skill or experience will produce food
         Unit colonist = new Unit(game, colony.getOwner(), freeColonist);
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(food, colonist.getWorkType());
 
@@ -222,21 +222,21 @@ public class ColonyTest extends FreeColTestCase {
         colonist.putOutsideColony();
         colonist.setWorkType(cotton);
         colonist.modifyExperience(100);
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(cotton, colonist.getWorkType());
         
         // expert will produce expert goods
         colonist.putOutsideColony();
         colonist.setType(cottonPlanter);
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(cotton, colonist.getWorkType());
         
         // expert will produce expert goods
         colonist.putOutsideColony();
         colonist.setType(statesman);
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         assertEquals(townHall, ((Building) colonist.getLocation()).getType());
 
@@ -294,7 +294,7 @@ public class ColonyTest extends FreeColTestCase {
 
         // colonist produces bells because they require no input
         Unit colonist = new Unit(game, colony.getOwner(), spec().getUnitType("model.unit.freeColonist"));
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         assertEquals(townHall, colony.getBuildingFor(colonist).getType());
         assertEquals(townHall, ((Building) colonist.getLocation()).getType());
@@ -303,14 +303,14 @@ public class ColonyTest extends FreeColTestCase {
         colonist.putOutsideColony();
         colonist.setWorkType(cotton);
         colonist.modifyExperience(100);
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertEquals(townHall, colony.getBuildingFor(colonist).getType());
         assertEquals(townHall, ((Building) colonist.getLocation()).getType());
         assertEquals(bells, colonist.getWorkType());
 
         colonist.putOutsideColony();
         colonist.setType(spec().getUnitType("model.unit.masterCottonPlanter"));
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertEquals(townHall, colony.getBuildingFor(colonist).getType());
         assertEquals(townHall, ((Building) colonist.getLocation()).getType());
         assertEquals(bells, colonist.getWorkType());
@@ -319,7 +319,7 @@ public class ColonyTest extends FreeColTestCase {
         colonist.putOutsideColony();
         colonist.setType(weaver);
         colony.addGoods(cotton, 100);
-        colonist.joinColony(colony);
+        nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         assertEquals(weaversHouse, colony.getBuildingFor(colonist).getType());
         assertEquals(weaversHouse, ((Building) colonist.getLocation()).getType());

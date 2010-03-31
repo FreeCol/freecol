@@ -153,7 +153,7 @@ public class UnitTest extends FreeColTestCase {
         GoodsType foodType = spec().getGoodsType("model.goods.food");
 
         soldier.setWorkType(foodType);
-        soldier.buildColony(colony);
+        nonServerBuildColony(soldier, colony);
 
         soldier.setLocation(colony.getColonyTile(plain58));
 
@@ -417,35 +417,6 @@ public class UnitTest extends FreeColTestCase {
         UnitType braveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
         Unit brave = new Unit(game, tile2, sioux, braveType, UnitState.ACTIVE);
         assertFalse("A brave is not a colonist", brave.isColonist());
-    }
-
-    /**
-     * Make sure that a colony can only be built by a worker on the
-     * same tile as the colony to be built.
-     * 
-     */
-    public void testBuildColonySameTile() {
-        Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(plains, true);
-        game.setMap(map);
-
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
-                                UnitState.ACTIVE);
-
-        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(6, 9));
-        soldier.setWorkType(foodType);
-
-        try {
-            soldier.buildColony(colony);
-            fail();
-        } catch (IllegalStateException e) {
-        }
-
-        soldier.setLocation(map.getTile(6, 9));
-        soldier.buildColony(colony);
-
-        assertEquals(colony, map.getTile(6, 9).getSettlement());
     }
 
     public void testCanAdd() {
@@ -864,7 +835,7 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Unit not found in tile",found);
         
         Colony colony = new Colony(game, dutch, "New Amsterdam", colonyTile);
-        soldier.buildColony(colony);
+        nonServerBuildColony(soldier, colony);
         
         assertFalse("soldier should be inside the colony",soldier.getLocation() == colonyTile);
         // There is some inconsistence with the results below

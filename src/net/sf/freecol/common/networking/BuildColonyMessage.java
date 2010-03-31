@@ -19,35 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.IndianNationType;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Map.CircleIterator;
-import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -101,7 +79,8 @@ public class BuildColonyMessage extends Message {
      *         and updating its surrounding tiles,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
@@ -122,60 +101,16 @@ public class BuildColonyMessage extends Message {
                                        "Unit " + builderId
                                        + " can not build colony " + colonyName);
         }
-
         Tile tile = unit.getTile();
-        if(tile.getOwner() != null && tile.getOwner() != player){
-        	return Message.createError("server.buildColony.tileHasOwner",
-        			"Tile " + tile + " belongs to someone else");
+        if (tile.getOwner() != null && tile.getOwner() != player) {
+            return Message.createError("server.buildColony.tileHasOwner",
+                                       "Tile " + tile
+                                       + " belongs to someone else");
         }
 
-        Settlement settlement = null;
         // Build can proceed.
-        if (player.isEuropean()) {
-            settlement = new Colony(game, serverPlayer, colonyName, tile);
-            unit.buildColony((Colony)settlement);
-        } else {
-            settlement = new IndianSettlement(game, serverPlayer, tile, 
-                                              colonyName, false,
-                                              generateSkillForLocation(game.getMap(), tile, player.getNationType()),
-                                              new HashSet<Player>(), null);
-            unit.buildIndianSettlement((IndianSettlement)settlement);
-        }
-        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
-                                          HistoryEvent.EventType.FOUND_COLONY)
-            .addName("%colony%", settlement.getName());
-        player.getHistory().add(h);
-        server.getInGameController().sendUpdateToAll(serverPlayer, (FreeColObject) tile);
-
-        // Reply, updating the surrounding tiles now owned by the colony.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(tile.toXMLElement(player, doc));
-        Map map = game.getMap();
-        for (Tile t : map.getSurroundingTiles(tile, settlement.getRadius())) {
-            if (t.getOwningSettlement() == settlement) {
-                update.appendChild(t.toXMLElement(player, doc));
-            }
-        }
-        
-        // Also send any tiles that can now be seen because the colony
-        // can see further than the founding unit.  TODO: do this a bit
-        // smarter--- collect the tiles before building so we can filter
-        // out the ones we could see anyway with canSee().
-        for (int range = unit.getLineOfSight() + 1; 
-             range <= settlement.getLineOfSight(); range++) {
-            CircleIterator circle = map.getCircleIterator(tile.getPosition(),
-                                                          false, range);
-            while (circle.hasNext()) {
-                update.appendChild(map.getTile(circle.next()).toXMLElement(player, doc));
-            }
-        }
-        Element history = doc.createElement("addHistory");
-        reply.appendChild(history);
-        h.addToOwnedElement(history, player);
-        return reply;
+        return server.getInGameController()
+            .buildSettlement(serverPlayer, unit, colonyName);
     }
 
     /**
@@ -197,47 +132,5 @@ public class BuildColonyMessage extends Message {
      */
     public static String getXMLElementTagName() {
         return "buildColony";
-    }
-    
-    /**
-     * Generates a skill that could be taught from a settlement on the given Tile.
-     *       
-     * @param map The <code>Map</code>.
-     * @param tile The tile where the settlement will be located.
-     * @return A skill that can be taught to Europeans.
-     */
-    private UnitType generateSkillForLocation(Map map, Tile tile, NationType nationType) {
-        List<RandomChoice<UnitType>> skills = ((IndianNationType) nationType).getSkills();
-        java.util.Map<GoodsType, Integer> scale = new HashMap<GoodsType, Integer>();
-        Random random = new Random();
-        
-        for (RandomChoice<UnitType> skill : skills) {
-            scale.put(skill.getObject().getExpertProduction(), 1);
-        }
-
-        Iterator<Position> iter = map.getAdjacentIterator(tile.getPosition());
-        while (iter.hasNext()) {
-            Map.Position p = iter.next();
-            Tile t = map.getTile(p);
-            for (GoodsType goodsType : scale.keySet()) {
-                scale.put(goodsType, scale.get(goodsType).intValue() + t.potential(goodsType, null));
-            }
-        }
-
-        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<RandomChoice<UnitType>>();
-        for (RandomChoice<UnitType> skill : skills) {
-            UnitType unitType = skill.getObject();
-            int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
-            scaledSkills.add(new RandomChoice<UnitType>(unitType, skill.getProbability() * scaleValue));
-        }
-        
-        UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
-        if (skill == null) {
-            // Seasoned Scout
-            List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
-            return unitList.get(random.nextInt(unitList.size()));
-        } else {
-            return skill;
-        }
     }
 }

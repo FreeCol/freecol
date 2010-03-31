@@ -2977,64 +2977,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Makes this unit build the specified colony.
-     * 
-     * @param colony The colony this unit shall build.
-     */
-    public void buildColony(Colony colony) {
-        if (!canBuildColony()) {
-            throw new IllegalStateException("Unit " + toString() + " can not build colony on "
-                                            + getTile().toString() + "!");
-        }
-        if (!getTile().getPosition().equals(colony.getTile().getPosition())) {
-            throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
-        }
-
-        colony.placeSettlement();
-        joinColony(colony);
-    }
-    
-    /**
-     * Makes this unit build the specified Indian settlement.
-     * 
-     * @param indianSettlement The settlement this unit shall build.
-     */
-    public void buildIndianSettlement(IndianSettlement indianSettlement) {
-        if (!canBuildColony()) {
-            throw new IllegalStateException("Unit " + toString() + " can not build settlement on "
-                                            + getTile().toString() + "!");
-        }
-        if (!getTile().getPosition().equals(indianSettlement.getTile().getPosition())) {
-            throw new IllegalStateException("A Unit can only build a settlement if on the same tile as the settlement");
-        }
-
-        indianSettlement.placeSettlement();
-        joinIndianSettlement(indianSettlement);
-    }
-
-    /**
-     * Join existing colony.
-     *
-     * @param colony a <code>Colony</code> value
-     */
-    public void joinColony(Colony colony) {
-        setState(UnitState.IN_COLONY);
-        setLocation(colony);
-        setMovesLeft(0);
-    }
-    
-    /**
-     * Join existing settlement.
-     *
-     * @param indianSettlement a <code>IndianSettlement</code> value
-     */
-    public void joinIndianSettlement(IndianSettlement indianSettlement) {
-        setState(UnitState.IN_COLONY);
-        setLocation(indianSettlement);
-        setMovesLeft(0);
-    }
-
-    /**
      * Returns the Tile where this Unit is located. Or null if its location is
      * Europe.
      * 

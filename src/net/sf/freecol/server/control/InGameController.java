@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -49,11 +51,13 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Market;
@@ -3469,6 +3473,147 @@ public final class InGameController extends Controller {
             sendToOthers(serverPlayer, (Tile) oldLocation);
         }
     }
+
+
+    /**
+     * Generates a skill that could be taught from a settlement on the
+     * given Tile.
+     *
+     * @param map The <code>Map</code>.
+     * @param tile The <code>Tile</code> where the settlement will be located.
+     * @param nationType The <code>IndianNationType</code> teaching.
+     * @return A skill that can be taught to Europeans.
+     */
+    private UnitType generateSkillForLocation(Map map, Tile tile,
+                                              IndianNationType nationType) {
+        List<RandomChoice<UnitType>> skills = nationType.getSkills();
+        java.util.Map<GoodsType, Integer> scale
+            = new HashMap<GoodsType, Integer>();
+
+        for (RandomChoice<UnitType> skill : skills) {
+            scale.put(skill.getObject().getExpertProduction(), 1);
+        }
+
+        Iterator<Position> iter = map.getAdjacentIterator(tile.getPosition());
+        while (iter.hasNext()) {
+            Map.Position p = iter.next();
+            Tile t = map.getTile(p);
+            for (GoodsType goodsType : scale.keySet()) {
+                scale.put(goodsType, scale.get(goodsType).intValue()
+                          + t.potential(goodsType, null));
+            }
+        }
+
+        List<RandomChoice<UnitType>> scaledSkills
+            = new ArrayList<RandomChoice<UnitType>>();
+        for (RandomChoice<UnitType> skill : skills) {
+            UnitType unitType = skill.getObject();
+            int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
+            scaledSkills.add(new RandomChoice<UnitType>(unitType, skill.getProbability() * scaleValue));
+        }
+
+        PseudoRandom prng = getPseudoRandom();
+        UnitType skill = RandomChoice.getWeightedRandom(prng, scaledSkills);
+        if (skill == null) {
+            // Seasoned Scout
+            Specification spec = FreeCol.getSpecification();
+            List<UnitType> unitList
+                = spec.getUnitTypesWithAbility("model.ability.expertScout");
+            return unitList.get(prng.nextInt(unitList.size()));
+        }
+        return skill;
+    }
+
+    /**
+     * Build a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is building.
+     * @param unit The <code>Unit</code> that is building.
+     * @param name The new settlement name.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element buildSettlement(ServerPlayer serverPlayer, Unit unit,
+                                   String name) {
+        Game game = serverPlayer.getGame();
+        Tile tile = unit.getTile();
+        Settlement settlement;
+        if (serverPlayer.isEuropean()) {
+            settlement = new Colony(game, serverPlayer, name, tile);
+        } else {
+            IndianNationType nationType
+                = (IndianNationType) serverPlayer.getNationType();
+            UnitType skill = generateSkillForLocation(game.getMap(), tile,
+                                                      nationType);
+            settlement = new IndianSettlement(game, serverPlayer, tile,
+                                              name, false, skill,
+                                              new HashSet<Player>(), null);
+            // TODO: its lame that the settlement starts with no contacts
+        }
+        settlement.placeSettlement();
+
+        // Join.
+        unit.setState(UnitState.IN_COLONY);
+        unit.setLocation(settlement);
+        unit.setMovesLeft(0);
+
+        // Update with settlement tile, and newly owned tiles.
+        List<Object> objects = new ArrayList<Object>();
+        objects.add(tile);
+        Map map = game.getMap();
+        for (Tile t : map.getSurroundingTiles(tile, settlement.getRadius())) {
+            if (t.getOwningSettlement() == settlement) objects.add(t);
+        }
+
+        // History is private.
+        objects.add(UpdateType.PRIVATE);
+        objects.add(new HistoryEvent(game.getTurn().getNumber(),
+                                     HistoryEvent.EventType.FOUND_COLONY)
+                    .addName("%colony%", settlement.getName()));
+        // Also send any tiles that can now be seen because the colony
+        // can perhaps see further than the founding unit.
+        for (Tile t : map.getSurroundingTiles(tile, unit.getLineOfSight() + 1,
+                                              settlement.getLineOfSight())) {
+            if (!objects.contains(t)) objects.add(t);
+        }
+
+        // Potentially lots to see.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Join a colony.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> that is joining.
+     * @param colony The <code>Colony</code> to join.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element joinColony(ServerPlayer serverPlayer, Unit unit,
+                              Colony colony) {
+        List<Tile> ownedTiles = colony.getOwnedTiles();
+        Tile tile = colony.getTile();
+
+        // Join.
+        unit.setState(UnitState.IN_COLONY);
+        unit.setLocation(colony);
+        unit.setMovesLeft(0);
+
+        // Update with colony tile, and tiles now owned.
+        List<Object> objects = new ArrayList<Object>();
+        objects.add(tile);
+        Map map = serverPlayer.getGame().getMap();
+        for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
+            if (t.getOwningSettlement() == colony && !ownedTiles.contains(t)) {
+                objects.add(t);
+            }
+        }
+
+        // Potentially lots to see.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
 
     /**
      * Abandon a settlement.

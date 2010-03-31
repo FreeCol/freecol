@@ -57,7 +57,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         GoodsType foodType = spec().getGoodsType("model.goods.food");
         soldier.setWorkType(foodType);
-        soldier.buildColony(colony);
+        nonServerBuildColony(soldier, colony);
 
         // Test the colony
         assertEquals(map.getTile(6, 8), colony.getTile());
@@ -120,7 +120,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", pioneer.getTile());
         pioneer.setWorkType(foodType);
-        pioneer.buildColony(colony);
+        nonServerBuildColony(pioneer, colony);
 
         // Test the colony
         assertEquals(map.getTile(6, 8), colony.getTile());

@@ -19,19 +19,15 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -87,6 +83,7 @@ public class JoinColonyMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         Colony colony;
         try {
@@ -101,21 +98,9 @@ public class JoinColonyMessage extends Message {
                                        + " can not join colony " + colony.getName());
         }
 
-        unit.joinColony(colony);
-        // Reply, updating the surrounding tiles now owned by the colony.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        Tile tile = unit.getTile();
-        reply.appendChild(update);
-        update.appendChild(tile.toXMLElement(player, doc));
-        Map map = game.getMap();
-        for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
-            if (t.getOwningSettlement() == colony) {
-                update.appendChild(t.toXMLElement(player, doc));
-            }
-        }
-        return reply;
+        // Try to buy.
+        return server.getInGameController()
+            .joinColony(serverPlayer, unit, colony);
     }
 
     /**
