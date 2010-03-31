@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.animation;
 
 import java.awt.Rectangle;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -34,20 +33,16 @@ import net.sf.freecol.common.io.sza.ImageAnimationEvent;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map.Direction;
+
 
 /**
- * Class for the animation of units movement.
+ * Class for in-place animation of units.
  */
 public final class UnitImageAnimation {
-    
-    private static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
     
     private final Canvas canvas;
     private final Unit unit;
     private final SimpleZippedAnimation animation;
-    private final Direction direction;
-    
     private final Location currentLocation;
     
     private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
@@ -58,16 +53,19 @@ public final class UnitImageAnimation {
      * @param canvas The canvas where the animation will be drawn
      * @param unit The unit to be animated. 
      * @param animation The animation.
-     * @param direction The Direction of the animation (if applicable).
      */
-    public UnitImageAnimation(Canvas canvas, Unit unit, SimpleZippedAnimation animation, Direction direction) {
+    public UnitImageAnimation(Canvas canvas, Unit unit,
+                              SimpleZippedAnimation animation) {
         this.canvas = canvas;
         this.unit = unit;
-        this.direction = direction;
         this.currentLocation = unit.getLocation();
         this.animation = animation;
     }
     
+
+    /**
+     * Do the animation.
+     */
     public void animate() {
         final GUI gui = canvas.getGUI();
         if (gui.getTilePosition(unit.getTile()) == null) {

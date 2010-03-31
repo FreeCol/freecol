@@ -21,12 +21,9 @@ package net.sf.freecol.client.gui.animation;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
@@ -34,11 +31,11 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 
+
 /**
  * Class for the animation of units movement.
  */
 final class UnitMoveAnimation {
-    private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
 
     /*
      * Display delay between one frame and another, in milliseconds.
@@ -53,7 +50,7 @@ final class UnitMoveAnimation {
     
     /**
      * Constructor
-     * @param canvas The <code>Canvas</code> where the animation will be drawn.
+     * @param canvas The <code>Canvas</code> to draw the animation on.
      * @param unit The <code>Unit</code> to be animated.
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
@@ -66,16 +63,13 @@ final class UnitMoveAnimation {
         this.destinationTile = destinationTile;
     }
     
+
     /**
      * Do the animation.
      */
     public void animate() {
-        FreeColClient client = canvas.getClient();
         final GUI gui = canvas.getGUI();
-        final String key = (client.getMyPlayer() == unit.getOwner())
-            ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        final int movementSpeed = client.getClientOptions().getInteger(key);
+        final int movementSpeed = Animations.getAnimationSpeed(canvas, unit);
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
         
