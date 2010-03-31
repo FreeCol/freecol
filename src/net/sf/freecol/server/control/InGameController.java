@@ -3186,7 +3186,7 @@ public final class InGameController extends Controller {
         if (oldLoc == null) {
             throw new IllegalStateException("Goods in null location.");
         } else if (loc == null) {
-            ;
+            ; // Dumping is allowed
         } else if (loc instanceof Unit) {
             if (((Unit) loc).isInEurope()) {
                 if (!(oldLoc instanceof Unit && ((Unit) oldLoc).isInEurope())) {
@@ -3417,21 +3417,29 @@ public final class InGameController extends Controller {
      */
     public Element unloadCargo(ServerPlayer serverPlayer, Unit unit,
                                Goods goods) {
-        Tile tile = unit.getTile();
-        Colony colony = (tile.getSettlement() instanceof Colony)
-            ? (Colony) tile.getSettlement()
-            : null;
+        FreeColGameObject update;
+        Location loc;
+        if (unit.isInEurope()) { // Must be a dump of boycotted goods
+            loc = null;
+            update = unit;
+        } else if (unit.getTile() == null) {
+            return Message.clientError("Unit not on the map.");
+        } else if (unit.getTile().getSettlement() instanceof Colony) {
+            loc = unit.getTile().getSettlement();
+            update = unit.getTile();
+        } else { // Dump of goods onto a tile
+            loc = null;
+            update = unit;
+        }
         goods.adjustAmount();
-        moveGoods(goods, colony);
+        moveGoods(goods, loc);
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
         }
 
-        // Only have to update the carrier location, as that *must*
-        // include the location of the goods.
         // Others can see the capacity change.
-        sendToOthers(serverPlayer, tile);
-        return buildUpdate(serverPlayer, tile);
+        if (update == unit) sendToOthers(serverPlayer, update);
+        return buildUpdate(serverPlayer, update);
     }
 
 

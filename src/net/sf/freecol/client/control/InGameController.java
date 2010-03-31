@@ -581,6 +581,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean loadGoods(Goods goods, Colony colony, Unit carrier) {
         if (colony == null) {
+            if (!carrier.getOwner().canTrade(goods)) return false;
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
@@ -712,18 +713,29 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unload succeeded.
      */
     private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
-        if (colony == null && carrier.isInEurope()) {
+        if (colony == null && carrier.isInEurope()
+            && carrier.getOwner().canTrade(goods)) {
             return sellGoods(goods);
         }
         GoodsType type = goods.getType();
-        int oldAmount = (colony == null) ? 0 
+        int colonyAmount = (colony == null) ? 0
             : colony.getGoodsContainer().getGoodsCount(type);
-        if (askUnloadCargo(goods)
-            && (carrier.getGoodsContainer().getGoodsCount(type)) == 0) {
+        int amount = goods.getAmount();
+        int carrierAmount = carrier.getGoodsContainer().getGoodsCount(type);
+        if (askUnloadCargo(goods)) {
+            int newAmount = carrier.getGoodsContainer().getGoodsCount(type);
+            if (newAmount != carrierAmount - amount) {
+                logger.warning("Bogus unload of " + goods.toString()
+                               + " from " + carrier.toString()
+                               + " with initial count " + Integer.toString(carrierAmount)
+                               + " leaving " + Integer.toString(newAmount));
+                return false;
+            }
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
             if (colony != null) {
-                colony.firePropertyChange(type.getId(), oldAmount,
-                                          colony.getGoodsContainer().getGoodsCount(type));
+                newAmount = colony.getGoodsContainer().getGoodsCount(type);
+                colony.firePropertyChange(type.getId(), colonyAmount,
+                                          newAmount);
             }
             return true;
         }
@@ -3480,6 +3492,8 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalArgumentException("Carrier owned by someone else.");
         } else if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be positive.");
+        } else if (!player.canTrade(type)) {
+            throw new IllegalArgumentException("Goods are boycotted.");
         }
 
         // Size check, if there are spare holds they can be filled, but...
@@ -3504,13 +3518,14 @@ public final class InGameController implements NetworkConstants {
         // Try to purchase.
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         int newAmount;
+        int price = market.costToBuy(type);
         if (askBuyGoods(carrier, type, toBuy)
             && (newAmount = carrier.getGoodsContainer().getGoodsCount(type)) > oldAmount) {
             freeColClient.playSound(SoundEffect.LOAD_CARGO);
             canvas.updateGoldLabel();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
             for (TransactionListener listener : market.getTransactionListener()) {
-                listener.logPurchase(type, toBuy, market.costToBuy(type));
+                listener.logPurchase(type, toBuy, price);
             }
             return true;
         }
@@ -3563,21 +3578,34 @@ public final class InGameController implements NetworkConstants {
         }
         if (carrier == null) {
             throw new IllegalStateException("Goods not on carrier.");
-        }
-        if (!carrier.isInEurope()) {
+        } else if (!carrier.isInEurope()) {
             throw new IllegalStateException("Goods not on carrier in Europe.");
+        } else if (!player.canTrade(goods)) {
+            throw new IllegalStateException("Goods are boycotted.");
         }
 
-        // Try to sell.
+        // Try to sell.  Remember a bunch of stuff first so the transaction
+        // can be logged.
+        Market market = player.getMarket();
+        GoodsType type = goods.getType();
+        int amount = goods.getAmount();
+        int price = market.paidForSale(type);
+        int tax = player.getTax();
+        int carrierAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askSellGoods(goods, carrier)) {
+            int newAmount = carrier.getGoodsContainer().getGoodsCount(type);
+            if (newAmount != carrierAmount - amount) {
+                logger.warning("Bogus sale of " + goods.toString()
+                               + " from " + carrier.toString()
+                               + " with initial count " + Integer.toString(carrierAmount)
+                               + " leaving " + Integer.toString(newAmount));
+                return false;
+            }
             freeColClient.playSound(SoundEffect.SELL_CARGO);
             canvas.updateGoldLabel();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
-            Market market = player.getMarket();
             for (TransactionListener listener : market.getTransactionListener()) {
-                listener.logSale(goods.getType(), goods.getAmount(),
-                                 market.paidForSale(goods.getType()),
-                                 player.getTax());
+                listener.logSale(type, amount, price, tax);
             }
             return true;
         }

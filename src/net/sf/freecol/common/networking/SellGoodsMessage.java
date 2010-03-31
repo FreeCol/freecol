@@ -108,6 +108,9 @@ public class SellGoodsMessage extends Message {
         if (type == null) {
             return Message.clientError("Not a goods type: " + goodsTypeId);
         }
+        if (!player.canTrade(type)) {
+            return Message.clientError("Goods are boycotted: " + goodsTypeId);
+        }
         int amount;
         try {
             amount = Integer.parseInt(amountString);

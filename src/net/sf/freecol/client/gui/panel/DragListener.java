@@ -571,23 +571,41 @@ public final class DragListener extends MouseAdapter {
         menu.add(name);
                 
         if (!(goods.getLocation() instanceof Colony)) {
-            JMenuItem unload = new JMenuItem(Messages.message("unload"));
-            unload.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    inGameController.unloadCargo(goods, false);
-                    if (parentPanel instanceof CargoPanel) {
-                        CargoPanel cargoPanel = (CargoPanel) parentPanel;
-                        cargoPanel.initialize();
-                        /*
-                        if (cargoPanel.getParentPanel() instanceof ColonyPanel) {
-                            ((ColonyPanel) cargoPanel.getParentPanel()).updateWarehouse();
+            if (canvas.getClient().getMyPlayer().canTrade(goods)) {
+                JMenuItem unload = new JMenuItem(Messages.message("unload"));
+                unload.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            inGameController.unloadCargo(goods, false);
+                            if (parentPanel instanceof CargoPanel) {
+                                CargoPanel cargoPanel = (CargoPanel) parentPanel;
+                                cargoPanel.initialize();
+                                /*
+                                  if (cargoPanel.getParentPanel() instanceof ColonyPanel) {
+                                  ((ColonyPanel) cargoPanel.getParentPanel()).updateWarehouse();
+                                  }
+                                */
+                            }
+                            parentPanel.revalidate();
                         }
-                         */
-                    }
-                    parentPanel.revalidate();
+                    });
+                menu.add(unload);
+            } else {
+                if (goods.getLocation() instanceof Unit
+                    && ((Unit)goods.getLocation()).isInEurope()) {
+                    JMenuItem pay = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
+                    pay.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                inGameController.payArrears(goods);
+                                if (parentPanel instanceof CargoPanel) {
+                                    CargoPanel cargoPanel = (CargoPanel) parentPanel;
+                                    cargoPanel.initialize();
+                                }
+                                parentPanel.revalidate();
+                            }
+                        });
+                    menu.add(pay);
                 }
-            });
-            menu.add(unload);
+            }
             JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
             dump.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

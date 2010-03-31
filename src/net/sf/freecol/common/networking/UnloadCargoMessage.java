@@ -86,8 +86,6 @@ public class UnloadCargoMessage extends Message {
         Unit unit = (Unit) loc;
         if (unit.getOwner() != player) {
             return Message.clientError("Unload from non-owned unit.");
-        } else if (unit.getTile() == null) {
-            return Message.clientError("Unload from unit not on the map.");
         }
 
         // Perform the unload.
