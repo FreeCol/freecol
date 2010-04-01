@@ -167,31 +167,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Claim the given land.
-     *
-     * @param tile The <code>Tile</code> to claim.
-     * @param settlement The <code>Settlement</code> that will own the
-     *                   tile, if any.
-     * @param price The price to pay for the land, which must agree with
-     *              the owner valuation, unless negative which denotes stealing.
-     */
-    public void claimLand(Tile tile, Settlement settlement, int price) {
-        Player owner = tile.getOwner();
-        Settlement ownerSettlement = tile.getOwningSettlement();
-
-        if (price > 0) {
-            modifyGold(-price);
-            owner.modifyGold(price);
-        } else if (price < 0 && ownerSettlement instanceof IndianSettlement) {
-            owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN,
-                                (IndianSettlement) ownerSettlement);
-        }
-        tile.setOwningSettlement(settlement);
-        tile.setOwner(this);
-        tile.updatePlayerExploredTiles();
-    }
-
-    /**
      * Declare independence.
      *
      * @param nationName The new name for the independent nation.

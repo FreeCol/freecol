@@ -19,25 +19,23 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Element;
+
 
 /**
  * The message sent when the client requests claiming land.
  */
 public class ClaimLandMessage extends Message {
-	public static int STEAL_LAND = -1;
+
+    public static int STEAL_LAND = -1;
     /**
      * The ID of the tile to claim.
      */
@@ -51,7 +49,7 @@ public class ClaimLandMessage extends Message {
     /**
      * The price to pay for the tile.
      */
-    private int price;
+    private String priceString;
 
 
     /**
@@ -64,7 +62,7 @@ public class ClaimLandMessage extends Message {
     public ClaimLandMessage(Tile tile, Settlement settlement, int price) {
         this.tileId = tile.getId();
         this.settlementId = (settlement == null) ? null : settlement.getId();
-        this.price = price;
+        this.priceString = Integer.toString(price);
     }
 
     /**
@@ -78,7 +76,7 @@ public class ClaimLandMessage extends Message {
         this.settlementId = (element.hasAttribute("settlement"))
             ? element.getAttribute("settlement")
             : null;
-        this.price = Integer.parseInt(element.getAttribute("price"));
+        this.priceString = element.getAttribute("price");
     }
 
     /**
@@ -93,6 +91,7 @@ public class ClaimLandMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
+
         Tile tile;
         if (game.getFreeColGameObjectSafely(tileId) instanceof Tile) {
             tile = (Tile) game.getFreeColGameObjectSafely(tileId);
@@ -107,7 +106,12 @@ public class ClaimLandMessage extends Message {
         } else {
             return Message.clientError("Invalid settlementId");
         }
-
+        int price;
+        try {
+            price = Integer.parseInt(priceString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad price: " + priceString);
+        }
         // Request is well formed, but there are more possibilities...
         int value = player.getLandPrice(tile);
         Player owner = tile.getOwner();
@@ -137,28 +141,9 @@ public class ClaimLandMessage extends Message {
             }
         }
 
-        // All is well
-        serverPlayer.claimLand(tile, settlement, price);
-        server.getInGameController().sendUpdateToAll(serverPlayer, (FreeColObject) tile);
-
-        // Update the tile, and any now-angrier owners, and the player gold
-        // if a price was paid.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(tile.toXMLElement(player, doc));
-        if (price < 0) {
-            if (ownerSettlement != null) {
-                reply.appendChild(ownerSettlement.toXMLElement(player, doc, false, false));
-                // previous owner will be less happy, so an update is required
-                reply.appendChild(ownerSettlement.getOwner().toXMLElement(player, doc, false, false));
-            }
-            else{
-            	logger.warning("Stealing land from a non-existing settlement");
-            }
-        } else if (price > 0) {
-            reply.appendChild(player.toXMLElementPartial(doc, "gold"));
-        }
-        return reply;
+        // Proceed to claim.
+        return server.getInGameController()
+            .claimLand(serverPlayer, tile, settlement, price);
     }
 
     /**
@@ -172,7 +157,7 @@ public class ClaimLandMessage extends Message {
         if (settlementId != null) {
             result.setAttribute("settlement", settlementId);
         }
-        result.setAttribute("price", Integer.toString(price));
+        result.setAttribute("price", priceString);
         return result;
     }
 

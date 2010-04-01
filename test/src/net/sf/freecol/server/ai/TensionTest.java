@@ -126,7 +126,7 @@ public class TensionTest extends FreeColTestCase {
             // the european player steals 1 tile from the indians
             Tile tile2 = map.getTile(6,8);
             assertEquals(indian, tile2.getOwner());
-            european.claimLand(tile2, null, ClaimLandMessage.STEAL_LAND);
+            server.getInGameController().claimLand(european, tile2, null, ClaimLandMessage.STEAL_LAND);
             assertEquals(european, tile2.getOwner());
 
             // check the tension and stance have expected values

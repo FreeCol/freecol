@@ -1126,7 +1126,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             Colony colony = workLocation.getColony();
             if (tile.getOwningSettlement() != colony) {
                 // Claim known free land (because canAdd() succeeded).
-                serverPlayer.claimLand(tile, colony, 0);
+                igc.claimLand(serverPlayer, tile, colony, 0);
             }
         }
 

@@ -3652,4 +3652,44 @@ public final class InGameController extends Controller {
         return buildUpdate(serverPlayer, objects);
     }
 
+
+    /**
+     * Claim land.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> claiming.
+     * @param tile The <code>Tile</code> to claim.
+     * @param settlement The <code>Settlement</code> to claim for.
+     * @param price The price to pay for the land, which must agree
+     *              with the owner valuation, unless negative which
+     *              denotes stealing.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element claimLand(ServerPlayer serverPlayer, Tile tile,
+                             Settlement settlement, int price) {
+        Player owner = tile.getOwner();
+        Settlement ownerSettlement = tile.getOwningSettlement();
+        tile.setOwningSettlement(settlement);
+        tile.setOwner(serverPlayer);
+        tile.updatePlayerExploredTiles();
+
+        // Update the tile for all, and privately any now-angrier
+        // owners, or the player gold if a price was paid.
+        List<Object> objects = new ArrayList<Object>();
+        objects.add(tile);
+        objects.add(UpdateType.PRIVATE);
+        if (price > 0) {
+            serverPlayer.modifyGold(-price);
+            owner.modifyGold(price);
+            addPartial(objects, serverPlayer, "gold");
+        } else if (price < 0 && owner.isIndian()) {
+            owner.modifyTension(serverPlayer, Tension.TENSION_ADD_LAND_TAKEN,
+                                (IndianSettlement) ownerSettlement);
+            objects.add(ownerSettlement);
+        }
+
+        // Others can see the tile.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
+    }
+
 }
