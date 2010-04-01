@@ -1473,19 +1473,13 @@ public final class GUI {
             // Column per column; start at the left side
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
-                if (tile != null && tile.getSettlement() != null
-                    && tile.getSettlement().getName() != null) {
+                if (tile != null && tile.getSettlement() != null) {
                     Settlement settlement = tile.getSettlement();
-
-                    if (!(settlement instanceof IndianSettlement)
-                        ||(((IndianSettlement)settlement).hasBeenVisited(freeColClient.getMyPlayer()))) {
-                        BufferedImage stringImage =
-                            createSettlementNameImage(g, settlement);
-                        g.drawImage(stringImage, 
-                                    xx + (tileWidth - 
-                                          stringImage.getWidth())/2 + 1,
-                                    yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
-                    }
+                    BufferedImage stringImage
+                        = createSettlementNameImage(g, settlement);
+                    g.drawImage(stringImage,
+                                xx + (tileWidth - stringImage.getWidth())/2 + 1,
+                                yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
                 }
                 xx += tileWidth;
             }
@@ -1805,18 +1799,18 @@ public final class GUI {
     }
 
     private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement) {        
-//        Font oldFont = g.getFont();
-//        g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
-//        BufferedImage result = createStringImage((Graphics2D) g,
-//                settlement.getName(),
-//                settlement.getOwner().getColor(),
-//                -1,
-//                18);
-        BufferedImage result = createStringImage(null, (Graphics2D) g,
-                settlement.getName(),
-                ((Font)UIManager.get("BoldFont")).deriveFont(18.0f),
-                settlement.getOwner().getColor());
-//        g.setFont(oldFont);
+        Font oldFont = g.getFont();
+        g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
+        BufferedImage result = createStringImage((Graphics2D) g,
+                Messages.message(settlement.getNameFor(freeColClient.getMyPlayer())),
+                settlement.getOwner().getColor(),
+                -1,
+                18);
+        //      BufferedImage result = createStringImage(null, (Graphics2D) g,
+        //        settlement.getNameFor(freeColClient.getMyPlayer()),
+        //        ((Font)UIManager.get("BoldFont")).deriveFont(18.0f),
+        //        settlement.getOwner().getColor());
+        g.setFont(oldFont);
         return result;
     }
 
