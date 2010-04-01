@@ -202,6 +202,17 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the name of this <code>Settlement</code> for a particular player.
+     *
+     * @param player A <code>Player</code> to return the name for.
+     * @return The name as a <code>String</code>.
+     */
+    public String getNameFor(Player player) {
+        return (hasBeenVisited(player)) ? getName()
+            : "indianSettlement.nameUnknown";
+    }
+
+    /**
      * Returns a suitable (non-unique) name.
      * @return The name of this settlement.
      */

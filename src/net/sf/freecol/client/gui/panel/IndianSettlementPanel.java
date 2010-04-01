@@ -53,20 +53,19 @@ public final class IndianSettlementPanel extends FreeColPanel {
         
         JLabel settlementLabel = new JLabel(canvas.getImageIcon(settlement, false));
         Player indian = settlement.getOwner();
-        String text = settlement.getName() + ", "
+        Player player = getMyPlayer();
+        boolean visited = settlement.hasBeenVisited(player);
+        String text = Messages.message(settlement.getNameFor(player)) + ", "
             + Messages.message(StringTemplate.template(settlement.isCapital()
                                                        ? "indianCapital"
                                                        : "indianSettlement")
                                .addStringTemplate("%nation%", indian.getNationName()));
-
-        Player player = getMyPlayer();
-        boolean contacted = player.hasContacted(indian);
         Tension tension = settlement.getAlarm(player);
-        if (!contacted) {
-            text += " (" + Messages.message("notContacted") + ")";
-        } else if (tension != null) {
-            text += " (" + tension.toString() + ")";
-        }
+        String tensionString
+            = (!player.hasContacted(indian)) ? "notContacted"
+            : (tension != null) ? tension.toString()
+            : "indianSettlement.tensionUnknown";
+        text += " (" + Messages.message(tensionString) + ")";
         settlementLabel.setText(text);
         add(settlementLabel);
 
@@ -78,36 +77,32 @@ public final class IndianSettlementPanel extends FreeColPanel {
             add(new JLabel(missionaryName, canvas.getImageIcon(missionary, true), JLabel.CENTER));
         }
 
-        add(new JLabel(Messages.message("indianSettlement.learnableSkill")), "newline");
-        UnitType skill = settlement.getLearnableSkill();
-        if (contacted) {
-            if (skill == null) {
-                if (settlement.hasBeenVisited(player)) {
-                    add(new JLabel(Messages.message("indianSettlement.skillNone")));
-                } else {
-                    add(new JLabel(Messages.message("indianSettlement.skillUnknown")));
-                }
+        add(localizedLabel("indianSettlement.learnableSkill"), "newline");
+        UnitType skillType = settlement.getLearnableSkill();
+        if (visited) {
+            if (skillType == null) {
+                add(localizedLabel("indianSettlement.skillNone"));
             } else {
-                add(new JLabel(Messages.message(skill.getNameKey()),
-                               canvas.getImageIcon(skill, true), JLabel.CENTER));
+                add(new JLabel(Messages.message(skillType.getNameKey()),
+                               canvas.getImageIcon(skillType, true), JLabel.CENTER));
             }
         } else {
-            add(new JLabel(Messages.message("indianSettlement.skillUnknown")));
+            add(localizedLabel("indianSettlement.skillUnknown"));
         }
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
-        add(new JLabel(Messages.message("indianSettlement.highlyWanted")), "newline");
-        if (wantedGoods.length == 0 || wantedGoods[0] == null) {
-            add(new JLabel(Messages.message("indianSettlement.wantedGoodsUnknown")));
+        add(localizedLabel("indianSettlement.highlyWanted"), "newline");
+        if (!visited || wantedGoods.length == 0 || wantedGoods[0] == null) {
+            add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
         } else {
             add(new JLabel(Messages.message(wantedGoods[0].getNameKey()),
                            canvas.getImageIcon(wantedGoods[0], false),
                            JLabel.CENTER));
         }
 
-        add(new JLabel(Messages.message("indianSettlement.otherWanted")), "newline");
-        if (wantedGoods.length <= 1 || wantedGoods[1] == null) {
-            add(new JLabel(Messages.message("indianSettlement.wantedGoodsUnknown")));
+        add(localizedLabel("indianSettlement.otherWanted"), "newline");
+        if (!visited || wantedGoods.length <= 1 || wantedGoods[1] == null) {
+            add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
         } else {
             int i, n = 1;
             for (i = 2; i < wantedGoods.length; i++) {

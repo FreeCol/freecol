@@ -78,7 +78,7 @@ public final class ReportIndianPanel extends ReportPanel {
         result.add(localizedLabel("report.indian.numberOfSettlements"));
         result.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "span");
         result.add(new JLabel(Messages.message("report.indian.tension")+":"));
-        result.add(new JLabel(opponent.getTension(player).toString()), "span");
+        result.add(localizedLabel(opponent.getTension(player).toString()), "span");
 
         result.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
 
@@ -95,42 +95,43 @@ public final class ReportIndianPanel extends ReportPanel {
 
             
             for (IndianSettlement settlement : opponent.getIndianSettlements()) {
-                String settlementName = Messages.message("indianSettlement.nameUnknown");
-                if (settlement.hasBeenVisited(player)) {
-                    settlementName = settlement.getName();
+                boolean known = settlement.getTile().isExplored();
+                boolean visited = settlement.hasBeenVisited(player);
+                String locationName = Messages.message(settlement.getNameFor(player));
+                if (known) {
+                    locationName += ((settlement.isCapital()) ? "*" : "")
+                        + ((settlement.getMissionary() != null) ? "+" : "")
+                        + " (" + settlement.getTile().getX()
+                        + ", " + settlement.getTile().getY() + ")";
                 }
-
-                String locationName = settlementName
-                + ((settlement.isCapital()) ? "*" : "")
-                + ((settlement.getMissionary() != null) ? "+" : "")
-                + " (" + settlement.getTile().getX()
-                + ", " + settlement.getTile().getY() + ")";
                 result.add(new JLabel(locationName), "newline 15");
 
                 Tension tension = settlement.getAlarm(player);
-                result.add(new JLabel((tension == null)
-                        ? Messages.message("indianSettlement.tensionUnknown")
-                                : tension.toString()));
+                String tensionString
+                    = (!player.hasContacted(opponent)) ? "notContacted"
+                    : (known && tension != null) ? tension.toString()
+                    : "indianSettlement.tensionUnknown";
+                result.add(localizedLabel(tensionString));
 
                 JLabel skillLabel = new JLabel();
                 UnitType skillType = settlement.getLearnableSkill();
-                String skill;
-                if (skillType != null) {
-                    skill = Messages.message(skillType.getNameKey());
-                    ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType);
-                    skillLabel.setIcon(getLibrary().getScaledImageIcon(skillImage, 0.66f));
-                } else if (settlement.hasBeenVisited(player)) {
-                    skill = Messages.message("indianSettlement.skillNone");
+                String skillString;
+                if (visited) {
+                    if (skillType == null) {
+                        skillString = "indianSettlement.skillNone";
+                    } else {
+                        skillString = skillType.getNameKey();
+                        ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType);
+                        skillLabel.setIcon(getLibrary().getScaledImageIcon(skillImage, 0.66f));
+                    }
                 } else {
-                    skill = Messages.message("indianSettlement.skillUnknown");
+                    skillString = "indianSettlement.skillUnknown";
                 }
-                skillLabel.setText(skill);
+                skillLabel.setText(Messages.message(skillString));
                 result.add(skillLabel);
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
-                if (wantedGoods[0] == null) {
-                    result.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
-                } else {
+                if (visited && wantedGoods[0] != null) {
                     JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
                     goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[0]), 0.66f));
                     String split = "split " + String.valueOf(wantedGoods.length);
@@ -142,6 +143,8 @@ public final class ReportIndianPanel extends ReportPanel {
                             result.add(goodsLabel);
                         }
                     }
+                } else {
+                    result.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
                 }
             }
         } else {

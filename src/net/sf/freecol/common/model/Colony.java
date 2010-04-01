@@ -245,6 +245,18 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         super(game, id);
     }
 
+
+    /**
+     * Gets the name of this <code>Settlement</code> for a particular player.
+     *
+     * @param player A <code>Player</code> to return the name for.
+     * @return The name as a <code>String</code>.
+     */
+    public String getNameFor(Player player) {
+        // Europeans can always work out the colony name.
+        return getName();
+    }
+
     /**
      * Returns <code>true</code> if a building of the given type can
      * be built for free.
