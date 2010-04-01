@@ -242,7 +242,9 @@ public class Connection {
         } else {
             NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
             send(questionElement);
-            Element rootElement = ((Message) nro.getResponse()).getDocument().getDocumentElement();
+            Message response = (Message) nro.getResponse();
+            if (response == null) return null;
+            Element rootElement = response.getDocument().getDocumentElement();
             return (Element) rootElement.getFirstChild();
         }
     }
