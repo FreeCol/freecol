@@ -261,6 +261,7 @@ public final class InGameController extends Controller {
         Element messages = doc.createElement("addMessages");
         Element history = doc.createElement("addHistory");
         Element remove = doc.createElement("remove");
+        boolean allVisible = false;
 
         for (int i = 0; i < objects.size(); i++) {
             Object o = objects.get(i);
@@ -323,7 +324,8 @@ public final class InGameController extends Controller {
                         throw new IllegalArgumentException("bogus PARTIAL");
                     }
                     break;
-                case PRIVATE: // ignore
+                case PRIVATE: // ignore visibility test for what follows
+                    allVisible = true;
                     break;
                 case REMOVE: // expect FreeColGameObject
                     if (i+1 < objects.size()
@@ -364,6 +366,9 @@ public final class InGameController extends Controller {
                 if (fcgo.isDisposed()) {
                     // Always remove disposed objects
                     fcgo.addToRemoveElement(remove);
+                } else if (allVisible) {
+                    // Ignore visibility test
+                    update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
                 } else if (fcgo instanceof Ownable
                            && ((Ownable) fcgo).getOwner() == (Player) serverPlayer) {
                     // Always update our own objects
@@ -513,28 +518,6 @@ public final class InGameController extends Controller {
             return element;
         }
         return null;
-    }
-
-    /**
-     * Deprecated. Going away soon.
-     *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
-     * @param objects The objects to consider.
-     */
-    public void sendUpdateToAll(ServerPlayer serverPlayer, Object... objects) {
-        List<Object> objectList = new ArrayList<Object>();
-        for (Object o : objects) objectList.add(o);
-        sendToOthers(serverPlayer, objectList);
-    }
-
-    /**
-     * Deprecated. Going away soon.
-     *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
-     * @param objects The objects to consider.
-     */
-    public void sendUpdateToAll(ServerPlayer serverPlayer, List<Object> objects) {
-        sendToOthers(serverPlayer, objects);
     }
 
     /**
