@@ -3192,7 +3192,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
         if (!equipment.containsKey(tools)) {
             String messageId = (getType().getDefaultEquipmentType() == type)
-                ? getId() + ".noMoreTools" : "model.unit.noMoreTools";
+                ? getType() + ".noMoreTools" : "model.unit.noMoreTools";
             getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
                                                         messageId, this)
                             .addStringTemplate("%unit%", getLabel())
