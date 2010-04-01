@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,6 +23,7 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -54,7 +55,9 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
 
     private static final Logger logger = Logger.getLogger(OptionMapUI.class.getName());
 
-    private final OptionUpdater[] optionUpdaters;
+    public static final int H_GAP = 10;
+
+    private final List<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
     
     private final HashMap<String, JComponent> optionUIs;
 
@@ -97,17 +100,16 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             Option o = it.next();
 
             if (o instanceof OptionGroup) {
-                JComponent c = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs);
+                OptionGroupUI c = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs);
                 c.setOpaque(true);
-                ou.add(c);
+                optionUpdaters.add(c);
                 JScrollPane scroll = new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                 scroll.getVerticalScrollBar().setUnitIncrement(16);
                 scroll.setBorder(BorderFactory.createEmptyBorder());
-                c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP - 5, OptionGroupUI.H_GAP, 0,
-                        OptionGroupUI.H_GAP));
-                c = scroll;
-                tb.addTab(o.getName(), null, c, o.getShortDescription());
+                c.setBorder(BorderFactory.createEmptyBorder(H_GAP - 5, H_GAP, 0,
+                        H_GAP));
+                tb.addTab(o.getName(), null, scroll, o.getShortDescription());
             } else if (o instanceof BooleanOption) {
                 BooleanOptionUI c = new BooleanOptionUI((BooleanOption) o, editable);
                 if (c.getText().length() > 40) {
@@ -115,29 +117,29 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 } else {
                     northPanel.add(c, "span 2");
                 }
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof FileOption) {
                 final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
                 northPanel.add(iou, "newline, span");
-                ou.add(iou);
+                optionUpdaters.add(iou);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), iou);
                 }
             } else if (o instanceof PercentageOption) {
-                JComponent c = new PercentageOptionUI((PercentageOption) o, editable);
+                PercentageOptionUI c = new PercentageOptionUI((PercentageOption) o, editable);
                 northPanel.add(c, "newline, span");
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof ListOption) {
                 @SuppressWarnings("unchecked")
-                JComponent c = new ListOptionUI((ListOption) o, editable);
+                ListOptionUI c = new ListOptionUI((ListOption) o, editable);
                 northPanel.add(c);
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
@@ -149,14 +151,14 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     northPanel.add(c.getLabel(), "right");
                 }
                 northPanel.add(c);
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof RangeOption) {
-                JComponent c = new RangeOptionUI((RangeOption) o, editable);
+                RangeOptionUI c = new RangeOptionUI((RangeOption) o, editable);
                 northPanel.add(c, "newline, span");
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
@@ -168,12 +170,11 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     northPanel.add(c.getLabel(), "right");
                 }
                 northPanel.add(c);
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof LanguageOption) {
-                System.out.println("found languageOption");
                 LanguageOptionUI c = new LanguageOptionUI((LanguageOption) o, editable);
                 if (c.getLabel().getText().length() > 30) {
                     northPanel.add(c.getLabel(), "newline, span 3");
@@ -181,7 +182,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     northPanel.add(c.getLabel());
                 }
                 northPanel.add(c);
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
@@ -193,7 +194,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     northPanel.add(c.getLabel());
                 }
                 northPanel.add(c);
-                ou.add(c);
+                optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
@@ -201,7 +202,6 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 logger.warning("Unknown option: " + o.getId() + " (" + o.getClass() + ")");
             }
         }
-        optionUpdaters = ou.toArray(new OptionUpdater[0]);
 
         if (tb.getTabCount() > 0) {
             if (northPanel.getComponentCount() > 0) {
@@ -223,8 +223,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * when an option dialoag has been cancelled.
      */
     public void rollback() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].rollback();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.rollback();
         }
     }
     
@@ -232,8 +232,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].unregister();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.unregister();
         }
     }
 
@@ -241,8 +241,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * Updates the value of the {@link Option} this object keeps.
      */
     public void updateOption() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].updateOption();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.updateOption();
         }
     }
     
@@ -254,8 +254,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * Reset with the value from the option.
      */
     public void reset() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].reset();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.reset();
         }
     }
 }

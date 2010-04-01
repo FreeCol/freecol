@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,12 +27,15 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.FreeCol;
@@ -58,15 +61,10 @@ import net.miginfocom.swing.MigLayout;
  * enable values to be both seen and changed.
  */
 public final class OptionGroupUI extends JPanel implements OptionUpdater {
+
     private static final Logger logger = Logger.getLogger(OptionGroupUI.class.getName());
 
-
-
-
-    /** The horizontal gap between components in this <code>OptionGroupUI</code>. */
-    public static final int H_GAP = 10;
-
-    private final OptionUpdater[] optionUpdaters;
+    private final ArrayList<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
 
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
@@ -75,148 +73,129 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * @param option The <code>OptionGroup</code> to make a user interface
      *            for.
      */
-    public OptionGroupUI(OptionGroup option, boolean editable, int level, HashMap<String, JComponent> optionUIs) {
+    public OptionGroupUI(OptionGroup option, boolean editable, int level, Map<String, JComponent> optionUIs) {
         
         setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
-        
-        JPanel horizontalPanel = null;
-        boolean buttonAdded = false;
-        
-        ArrayList<OptionUpdater> ou = new ArrayList<OptionUpdater>();
+
         Iterator<Option> it = option.iterator();
         while (it.hasNext()) {
             Option o = it.next();
-
-            if (o instanceof OptionGroup) {
-                if (level == 2) {
-                    final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs);
-                    final OptionGroupButton ogb = new OptionGroupButton(o.getName(), groupUI);
-                    ou.add(ogb);
-                    if ((horizontalPanel == null) || !buttonAdded) {
-                        horizontalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                        horizontalPanel.setOpaque(false);
-                        add(horizontalPanel, "newline, span");
-                    }
-                    horizontalPanel.add(ogb);
-                    buttonAdded = true;
-                } else {
-                    final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, level+1, optionUIs);
-                    add(groupUI, "newline, span");
-                    ou.add(groupUI);
-                    buttonAdded = false;
-                }
-            } else if (o instanceof BooleanOption) {                
-                final BooleanOptionUI boi = new BooleanOptionUI((BooleanOption) o, editable);
-                ou.add(boi);
-                if (boi.getText().length() > 40) {
-                    add(boi, "newline, span");
-                } else {
-                    add(boi, "span 2");
-                }
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), boi);
-                }
-            } else if (o instanceof PercentageOption) {
-                final PercentageOptionUI soi = new PercentageOptionUI((PercentageOption) o, editable);
-                add(soi, "newline, span");
-                ou.add(soi);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), soi);
-                }
-            } else if (o instanceof ListOption) {
-                @SuppressWarnings("unchecked")
-                final ListOptionUI soi = new ListOptionUI((ListOption) o, editable);
-                add(soi);
-                ou.add(soi);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), soi);
-                }
-            } else if (o instanceof IntegerOption) {
-                final IntegerOptionUI iou = new IntegerOptionUI((IntegerOption) o, editable);
-                if (iou.getLabel().getText().length() > 30) {
-                    add(iou.getLabel(), "newline, span 3, right");
-                } else {
-                    add(iou.getLabel(), "right");
-                }
-                add(iou);
-                ou.add(iou);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), iou);
-                }
-            } else if (o instanceof FileOption) {
-                final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
-                add(iou, "newline, span");
-                ou.add(iou);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), iou);
-                }
-            } else if (o instanceof RangeOption) {
-                final RangeOptionUI soi = new RangeOptionUI((RangeOption) o, editable);
-                add(soi, "newline, span");
-                ou.add(soi);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), soi);
-                }
-            } else if (o instanceof SelectOption) {
-                final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
-                if (soi.getLabel().getText().length() > 30) {
-                    add(soi.getLabel(), "newline, span 3, right");
-                } else {
-                    add(soi.getLabel(), "right");
-                }
-                add(soi);
-                ou.add(soi);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), soi);
-                }
-            } else if (o instanceof LanguageOption) {
-                final LanguageOptionUI soi = new LanguageOptionUI((LanguageOption) o, editable);
-                if (soi.getLabel().getText().length() > 30) {
-                    add(soi.getLabel(), "newline, span 3");
-                } else {
-                    add(soi.getLabel());
-                }
-                add(soi);
-                ou.add(soi);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), soi);
-                }
-            } else if (o instanceof AudioMixerOption) {
-                final AudioMixerOptionUI soi = new AudioMixerOptionUI((AudioMixerOption) o, editable);
-                if (soi.getLabel().getText().length() > 30) {
-                    add(soi.getLabel(), "newline, span 3");
-                } else {
-                    add(soi.getLabel());
-                }
-                add(soi);
-                ou.add(soi);
-                buttonAdded = false;
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), soi);
-                }
-            } else if (o instanceof FreeColAction) {
-                final FreeColActionUI fau = new FreeColActionUI((FreeColAction) o, this);
-                ou.add(fau);
-                add(fau, "newline, span");
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), fau);
-                }
-            } else {
-                logger.warning("Unknown option.");
-            }
+            addOptionUI(o, editable, level, optionUIs);
         }
-        optionUpdaters = ou.toArray(new OptionUpdater[0]);
 
-        setBorder(BorderFactory.createTitledBorder(option.getName()));
         setOpaque(false);
     }
+
+
+    private void addOptionUI(Option o, boolean editable, int level, Map<String, JComponent> optionUIs) {
+        if (o instanceof OptionGroup) {
+            add(new JLabel(o.getName()), "span, split 2");
+            add(new JSeparator(), "growx");
+            Iterator<Option> it = ((OptionGroup) o).iterator();
+            while (it.hasNext()) {
+                Option option = it.next();
+                addOptionUI(option, editable, level, optionUIs);
+            }
+        } else if (o instanceof BooleanOption) {                
+            final BooleanOptionUI boi = new BooleanOptionUI((BooleanOption) o, editable);
+            optionUpdaters.add(boi);
+            if (boi.getText().length() > 40) {
+                add(boi, "newline, span");
+            } else {
+                add(boi, "span 2");
+            }
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), boi);
+            }
+        } else if (o instanceof PercentageOption) {
+            final PercentageOptionUI soi = new PercentageOptionUI((PercentageOption) o, editable);
+            add(soi, "newline, span");
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof ListOption) {
+            @SuppressWarnings("unchecked")
+            final ListOptionUI soi = new ListOptionUI((ListOption) o, editable);
+            add(soi);
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof IntegerOption) {
+            final IntegerOptionUI iou = new IntegerOptionUI((IntegerOption) o, editable);
+            if (iou.getLabel().getText().length() > 30) {
+                add(iou.getLabel(), "newline, span 3, right");
+            } else {
+                add(iou.getLabel(), "right");
+            }
+            add(iou);
+            optionUpdaters.add(iou);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), iou);
+            }
+        } else if (o instanceof FileOption) {
+            final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
+            add(iou, "newline, span");
+            optionUpdaters.add(iou);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), iou);
+            }
+        } else if (o instanceof RangeOption) {
+            final RangeOptionUI soi = new RangeOptionUI((RangeOption) o, editable);
+            add(soi, "newline, span");
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof SelectOption) {
+            final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
+            if (soi.getLabel().getText().length() > 30) {
+                add(soi.getLabel(), "newline, span 3, right");
+            } else {
+                add(soi.getLabel(), "right");
+            }
+            add(soi);
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof LanguageOption) {
+            final LanguageOptionUI soi = new LanguageOptionUI((LanguageOption) o, editable);
+            if (soi.getLabel().getText().length() > 30) {
+                add(soi.getLabel(), "newline, span 3");
+            } else {
+                add(soi.getLabel());
+            }
+            add(soi);
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof AudioMixerOption) {
+            final AudioMixerOptionUI soi = new AudioMixerOptionUI((AudioMixerOption) o, editable);
+            if (soi.getLabel().getText().length() > 30) {
+                add(soi.getLabel(), "newline, span 3");
+            } else {
+                add(soi.getLabel());
+            }
+            add(soi);
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof FreeColAction) {
+            final FreeColActionUI fau = new FreeColActionUI((FreeColAction) o, this);
+            optionUpdaters.add(fau);
+            add(fau, "newline, span");
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), fau);
+            }
+        } else {
+            logger.warning("Unknown option.");
+        }
+    }
+
 
     /**
      * Rollback to the original value.
@@ -226,8 +205,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * when an option dialoag has been cancelled.
      */
     public void rollback() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].rollback();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.rollback();
         }
     }
     
@@ -235,8 +214,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].unregister();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.unregister();
         }
     }
 
@@ -244,8 +223,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * Updates the value of the {@link Option} this object keeps.
      */
     public void updateOption() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].updateOption();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.updateOption();
         }
     }
     
@@ -253,8 +232,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * Reset with the value from the option.
      */
     public void reset() {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            optionUpdaters[i].reset();
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            optionUpdater.reset();
         }
     }
 
@@ -265,9 +244,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * @param keyStroke The <code>KeyStroke</code> to be removed.
      */
     public void removeKeyStroke(KeyStroke keyStroke) {
-        for (int i = 0; i < optionUpdaters.length; i++) {
-            if (optionUpdaters[i] instanceof FreeColActionUI) {
-                ((FreeColActionUI) optionUpdaters[i]).removeKeyStroke(keyStroke);
+        for (OptionUpdater optionUpdater : optionUpdaters) {
+            if (optionUpdater instanceof FreeColActionUI) {
+                ((FreeColActionUI) optionUpdater).removeKeyStroke(keyStroke);
             }
         }
     }
