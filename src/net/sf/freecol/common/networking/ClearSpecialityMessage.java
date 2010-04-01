@@ -19,15 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -83,18 +81,8 @@ public class ClearSpecialityMessage extends Message {
         }
 
         // Try to clear.
-        InGameController igc = server.getInGameController();
-        try {
-            igc.clearSpeciality(unit, serverPlayer);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-
-        // Build reply.
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(unit.toXMLElement(player, doc));
-        return reply;
+        return server.getInGameController()
+            .clearSpeciality(serverPlayer, unit);
     }
 
     /**

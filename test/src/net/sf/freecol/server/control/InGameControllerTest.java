@@ -23,6 +23,8 @@ import java.io.File;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -49,6 +51,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class InGameControllerTest extends FreeColTestCase {
+    BuildingType schoolHouseType = spec().getBuildingType("model.building.Schoolhouse");
     TileType plains = spec().getTileType("model.tile.plains");
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
@@ -270,4 +273,44 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals(UnitState.SENTRY, colonist.getState());
     }
 
+    public void testClearSpecialty() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+
+        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+        Map map = game.getMap();
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Unit unit = new Unit(game, map.getTile(5, 8), dutch, hardyPioneerType,
+                             UnitState.ACTIVE);
+        assertTrue("Unit should be a hardy pioneer",
+                   unit.getType() == hardyPioneerType);
+        InGameController igc = (InGameController) server.getController();
+
+        // Basic function
+        igc.clearSpeciality(dutch, unit);
+        assertFalse("Unit was not cleared of its specialty",
+                    unit.getType() == hardyPioneerType);
+
+        // Can not clear speciality while teaching
+        Colony colony = getStandardColony();
+        Building school = new Building(game, colony, schoolHouseType);
+        colony.addBuilding(school);
+        Unit teacher = new Unit(game, school, colony.getOwner(),
+                                hardyPioneerType, UnitState.ACTIVE);
+        assertTrue("Unit should be a hardy pioneer",
+                   teacher.getType() == hardyPioneerType);
+        igc.clearSpeciality(dutch, teacher);
+        assertTrue("Teacher specialty cannot be cleared, should still be hardy pioneer",
+                   teacher.getType() == hardyPioneerType);
+    }
 }

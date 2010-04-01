@@ -3682,8 +3682,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askClearSpeciality(Unit unit) {
         Client client = freeColClient.getClient();
         ClearSpecialityMessage message = new ClearSpecialityMessage(unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

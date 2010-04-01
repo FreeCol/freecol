@@ -3450,14 +3450,16 @@ public final class InGameController extends Controller {
     /**
      * Clear the specialty of a unit.
      *
-     * @param unit The <code>Unit</code> to clear the speciality of.
      * @param serverPlayer The owner of the unit.
+     * @param unit The <code>Unit</code> to clear the speciality of.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public void clearSpeciality(Unit unit, ServerPlayer serverPlayer) {
-        UnitType newType = unit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL,
-                                                            serverPlayer);
+    public Element clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
+        UnitType newType = unit.getType()
+            .getUnitTypeChange(ChangeType.CLEAR_SKILL, serverPlayer);
         if (newType == null) {
-            throw new IllegalStateException("Can not clear this unit speciality: " + unit.getId());
+            return Message.clientError("Can not clear unit speciality: "
+                                       + unit.getId());
         }
         // There can be some restrictions that may prevent the
         // clearing of the speciality.  For example, teachers cannot
@@ -3465,13 +3467,14 @@ public final class InGameController extends Controller {
         Location oldLocation = unit.getLocation();
         if (oldLocation instanceof Building
             && !((Building) oldLocation).canAdd(newType)) {
-            throw new IllegalStateException("Cannot clear speciality, building does not allow new unit type");
+            return Message.clientError("Cannot clear speciality, building does not allow new unit type");
         }
 
+        // Valid, change type.
         unit.setType(newType);
-        if (oldLocation instanceof Tile) {
-            sendToOthers(serverPlayer, (Tile) oldLocation);
-        }
+
+        // Update just the unit, others can not see it.
+        return buildUpdate(serverPlayer, unit);
     }
 
 
