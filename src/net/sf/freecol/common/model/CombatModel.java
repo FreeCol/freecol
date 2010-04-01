@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Set;
 
+
 public interface CombatModel {
 
     public static enum CombatResultType {
@@ -60,7 +61,6 @@ public interface CombatModel {
 
     /**
      * Odds a particular outcome will occur in combat.
-     * 
      */
     public class CombatOdds {
         public static final float UNKNOWN_ODDS = -1.0f;
@@ -77,126 +77,150 @@ public interface CombatModel {
 
 
     /**
-     * Calculates the chance of the outcomes of combat between the units.
+     * Calculates the chance of the outcomes of combat between units.
      * 
      * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending unit.
-     * @return A <code>CombatOdds</code> value.
+     * @param defender The defending <code>Unit</code>.
+     * @return The <code>CombatOdds</code>.
      */
     public CombatOdds calculateCombatOdds(Unit attacker, Unit defender);
 
     /**
-     * Generates a result of an attack.
-     * 
-     * @param attacker The <code>Unit</code> attacking.
-     * @param defender The defending unit.
-     * @return a <code>CombatResult</code> value
+     * Calculates the chance of the outcomes of a colony bombarding a unit.
+     *
+     * @param attacker The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The <code>CombatOdds</code>.
+     */
+    public CombatOdds calculateCombatOdds(Colony attacker, Unit defender);
+
+
+    /**
+     * Generates a result of a unit attacking another.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The <code>CombatResult</code>.
      */
     public CombatResult generateAttackResult(Unit attacker, Unit defender);
 
     /**
-     * Generates the result of a colony bombarding a Unit.
+     * Generates the result of a colony bombarding a unit.
      *
-     * @param colony the bombarding <code>Colony</code>
-     * @param defender the defending <code>Unit</code>
-     * @return a <code>CombatResult</code> value
+     * @param attacker The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The <code>CombatResult</code>.
      */
-    public CombatResult generateAttackResult(Colony colony, Unit defender);
+    public CombatResult generateAttackResult(Colony attacker, Unit defender);
+
 
     /**
-     * Returns the power for bombarding
+     * Get the offensive power of a unit attacking another.
+     *
+     * Null can be passed for the defender when only the attacker unit
+     * stats are required.
      * 
-     * @param colony a <code>Colony</code> value
-     * @param defender an <code>Unit</code> value
-     * @return the power for bombarding
-     */
-    public float getOffencePower(Colony colony, Unit defender);
-
-    /**
-     * Return the offensive power of the attacker versus the defender.
-     * 
-     * @param attacker an <code>Unit</code> value
-     * @param defender an <code>Unit</code> value
-     * @return a <code>float</code> value
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The offensive power.
      */
     public float getOffencePower(Unit attacker, Unit defender);
 
     /**
-     * Return the defensive power of the defender versus the
-     * bombarding colony.
+     * Get the offensive power of a colony bombarding a unit.
      * 
-     * @param colony a <code>Colony</code> value
-     * @param defender a <code>Unit</code> value
-     * @return an <code>float</code> value
+     * @param attacker The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The offensive power.
      */
-    public float getDefencePower(Colony colony, Unit defender);
+    public float getOffencePower(Colony attacker, Unit defender);
 
     /**
-     * Return the defensive power of the defender versus the attacker.
+     * Get the defensive power of a unit defending against another.
      * 
-     * @param attacker an <code>Unit</code> value
-     * @param defender an <code>Unit</code> value
-     * @return an <code>float</code> value
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The defensive power.
      */
     public float getDefencePower(Unit attacker, Unit defender);
 
     /**
-     * Return a list of all offensive modifiers that apply to the attacker
-     * versus the defender.
+     * Get the defensive power of a unit defending against a colony.
      * 
-     * @param colony an <code>Colony</code> value
-     * @param defender an <code>Unit</code> value
-     * @return a <code>List</code> of Modifiers
+     * @param attacker The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return The defensive power.
      */
-    public Set<Modifier> getOffensiveModifiers(Colony colony, Unit defender);
+    public float getDefencePower(Colony attacker, Unit defender);
+
 
     /**
-     * Return a list of all offensive modifiers that apply to the attacker
-     * versus the defender.
+     * Collect all the offensive modifiers that apply to a unit
+     * attacking another.
      * 
-     * @param attacker an <code>Unit</code> value
-     * @param defender an <code>Unit</code> value
-     * @return a <code>List</code> of Modifiers
+     * Null can be passed as the defender when only the attacker unit
+     * stats are required.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return All the applicable offensive modifiers.
      */
     public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender);
 
     /**
-     * Return a list of all defensive modifiers that apply to the defender
-     * versus the attacker.
+     * Collect all the offensive modifiers that apply to a colony
+     * bombarding a unit.
      * 
-     * @param attacker an <code>Unit</code> value
-     * @param defender an <code>Unit</code> value
-     * @return a <code>List</code> of Modifiers
+     * @param attacker The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return All the applicable offensive modifiers.
+     */
+    public Set<Modifier> getOffensiveModifiers(Colony attacker, Unit defender);
+
+    /**
+     * Collect all defensive modifiers that apply to a unit defending
+     * against another.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return All the applicable defensive modifiers.
      */
     public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender);
 
     /**
-     * Return a list of all defensive modifiers that apply to the defender
-     * versus the bombarding colony.
+     * Collect all defensive modifiers that apply to a unit defending
+     * against a colony.
      * 
-     * @param colony a <code>Colony</code> value
-     * @param defender an <code>Unit</code> value
-     * @return a <code>List</code> of Modifiers
+     * @param attacker The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @return All the applicable defensive modifiers.
      */
-    public Set<Modifier> getDefensiveModifiers(Colony colony, Unit defender);
+    public Set<Modifier> getDefensiveModifiers(Colony attacker, Unit defender);
+
 
     /**
      * Attack a unit with the given outcome.
      * 
-     * @param attacker an <code>Unit</code> value
-     * @param defender The <code>Unit</code> defending against attack.
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
      * @param result The result of the attack.
-     * @param plunderGold an <code>int</code> value
+     * @param plunderGold The amount of gold plundered.
+     * @param repairLocation A <code>Location</code> to send damaged
+     *            naval units.
      */
-    public void attack(Unit attacker, Unit defender, CombatResult result, int plunderGold, Location repairLocation);
+    public void attack(Unit attacker, Unit defender, CombatResult result,
+                       int plunderGold, Location repairLocation);
 
     /**
      * Bombard a unit with the given outcome.
      * 
-     * @param colony a <code>Colony</code> value
-     * @param defender The <code>Unit</code> defending against bombardment.
+     * @param colony The attacking <code>Colony</code>.
+     * @param defender The defending <code>Unit</code>.
      * @param result The result of the bombardment.
+     * @param repairLocation A <code>Location</code> to send damaged
+     *            naval units.
      */
-    public void bombard(Colony colony, Unit defender, CombatResult result, Location repairLocation);
+    public void bombard(Colony colony, Unit defender, CombatResult result,
+                        Location repairLocation);
 
 }

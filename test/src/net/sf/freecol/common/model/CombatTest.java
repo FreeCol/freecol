@@ -388,7 +388,8 @@ public class CombatTest extends FreeColTestCase {
         // this should force DONE_SETTLEMENT
         assertFalse(defender.isDefensiveUnit());
 
-        combatModel.captureColony(attacker, colony, 0, dutch.getEurope());
+        CombatResult done = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
+        combatModel.attack(attacker, defender, done, 0, dutch.getEurope());
         assertFalse(attacker.isMounted());
         assertTrue(attacker.isArmed());
         assertEquals(veteranType, attacker.getType());
@@ -397,7 +398,6 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(colonistType, defender.getType());
         assertEquals(colony.getTile(), attacker.getTile());
         assertEquals(colony.getTile(), defender.getTile());
-
         assertEquals(attacker.getOwner(), colony.getOwner());
         assertEquals(colonist.getType(), colonistType);
 
@@ -452,7 +452,8 @@ public class CombatTest extends FreeColTestCase {
         assertFalse(defender.isDefensiveUnit());
 
         // colony should be destroyed
-        combatModel.captureColony(attacker, colony, 0, dutch.getEurope());
+        CombatResult done = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
+        combatModel.attack(attacker, defender, done, 0, dutch.getEurope());
         assertTrue(attacker.isMounted());
         assertTrue(attacker.isArmed());
         assertEquals(braveType, attacker.getType());
