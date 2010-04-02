@@ -77,7 +77,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             "model.option.turnsToSail").getValue();
 
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
-
+    public static final String EQUIPMENT_CHANGE = "EQUIPMENT_CHANGE";
+    
     /**
      * A state a Unit can have.
      */
@@ -2282,6 +2283,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
         setRole();
+        firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
     }
     
     public void removeEquipment(EquipmentType equipmentType) {
@@ -2317,6 +2319,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             setMovesLeft(0);
         }
         setRole();
+        firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
     }
 
     public void removeAllEquipment(boolean asResultOfCombat) {
@@ -2326,6 +2329,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         equipment.clear();
         setMovesLeft(0);
         setRole();
+        firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
     }
 
     private void dumpEquipment(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
@@ -3197,6 +3201,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                                         messageId, this)
                             .addStringTemplate("%unit%", getLabel())
                             .addStringTemplate("%location%", getLocation().getLocationName()));
+            firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
         }
     }
 
