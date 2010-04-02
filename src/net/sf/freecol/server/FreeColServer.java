@@ -294,7 +294,9 @@ public final class FreeColServer {
         }
 
         // Apply the difficulty level
-        if (game.getDifficultyLevel() != null) {
+        if (game.getDifficultyLevel() == null) {
+            Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+        } else {
             Specification.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
         }
 
