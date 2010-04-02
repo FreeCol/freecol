@@ -28,6 +28,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -52,7 +54,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
  * This label holds Unit data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.
  */
-public final class UnitLabel extends JLabel implements ActionListener {
+public final class UnitLabel extends JLabel implements ActionListener, PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
@@ -84,6 +86,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
         this.unit = unit;
+        unit.addPropertyChangeListener(Unit.EQUIPMENT_CHANGE, this);
         setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
         StringTemplate label = unit.getEquipmentLabel();
         if (label != null) {
@@ -379,20 +382,16 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 if (unit.getColony() == null) {
                     parent.remove(uc);
                     parent.getClient().getActionManager().update();
-                } else {
-                    // ((ColonyPanel) uc).reinitialize();
                 }
-
                 break;
-            } else if (uc instanceof EuropePanel) {
+            }
+            
+            if (uc instanceof EuropePanel) {
                 break;
             }
 
             uc = uc.getParent();
         }
-
-        // repaint(0, 0, getWidth(), getHeight());
-        // uc.refresh();
     }
     
     public boolean canUnitBeEquipedWith(JLabel data){
@@ -409,5 +408,11 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
         
         return false;
+    }
+    
+    public void propertyChange(PropertyChangeEvent evt) {
+    	if(evt.getPropertyName() == Unit.EQUIPMENT_CHANGE){
+    		updateIcon();
+    	}
     }
 }
