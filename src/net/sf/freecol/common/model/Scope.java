@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
  * The <code>Scope</code> class determines whether a given
  * <code>FreeColGameObjectType</code> fulfills certain requirements.
  */
-public final class Scope extends FreeColObject implements Cloneable {
+public class Scope extends FreeColObject implements Cloneable {
 
 
     /**
@@ -224,8 +224,30 @@ public final class Scope extends FreeColObject implements Cloneable {
         if (object == null) {
             return matchesNull;
         }
-        if (type != null && !type.equals(object.getId())) {
-            return matchNegated;
+        if (type != null) {
+            if (object instanceof FreeColGameObjectType) {
+                if (!type.equals(object.getId())) {
+                    return matchNegated;
+                }
+            } else if (object instanceof FreeColGameObject) {
+                try {
+                    Method method = object.getClass().getMethod("getType");
+                    if (FreeColGameObjectType.class.isAssignableFrom(method.getReturnType())) {
+                        FreeColGameObjectType objectType =
+                            (FreeColGameObjectType) method.invoke(object);
+                        if (!type.equals(objectType.getId())) {
+                            return matchNegated;
+                        }
+                    } else {
+                        return matchNegated;
+                    }
+                } catch(Exception e) {
+                    return matchNegated;
+                }
+            } else {
+                
+                return matchNegated;
+            }
         }
         if (abilityID != null && object.hasAbility(abilityID) != abilityValue) {
             return matchNegated;

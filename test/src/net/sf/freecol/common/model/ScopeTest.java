@@ -197,6 +197,26 @@ public class ScopeTest extends FreeColTestCase {
         assertTrue(testScope1.equals(testScope2));
         assertTrue(testScope2.equals(testScope1));
 
+    }
+
+    public void testGameObjects() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap();
+        game.setMap(map);
+
+        Tile unitTile = map.getTile(6, 8);
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        
+        Unit unit = new Unit(game, unitTile, dutch, colonistType, Unit.UnitState.ACTIVE);
+
+        Scope scope = new Scope();
+        scope.setAbilityID("model.ability.foundColony");
+        assertTrue(scope.appliesTo(unit));
+        scope.setType("model.unit.freeColonist");
+        assertTrue(scope.appliesTo(unit));
+        scope.setType("model.unit.hardyPioneer");
+        assertFalse(scope.appliesTo(unit));
 
     }
         
