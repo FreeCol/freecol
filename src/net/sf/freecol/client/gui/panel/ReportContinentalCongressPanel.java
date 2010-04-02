@@ -82,18 +82,14 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         }
 
         // founding fathers
-        if (player.getFatherCount() > 0) {
-            for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (player.hasFather(father)) {
-                    JLabel fatherLabel = new JLabel(Messages.message(father.getNameKey()),
-                                                   new ImageIcon(getLibrary().getFoundingFatherImage(father)),
-                                                   JLabel.CENTER);
-                    fatherLabel.setVerticalTextPosition(JLabel.TOP);
-                    fatherLabel.setHorizontalTextPosition(JLabel.CENTER);
-                    fatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
-                    reportPanel.add(fatherLabel);
-                }
-            }
+        for (FoundingFather father : player.getFathers()) {
+            JLabel fatherLabel = new JLabel(Messages.message(father.getNameKey()),
+                                            new ImageIcon(getLibrary().getFoundingFatherImage(father)),
+                                            JLabel.CENTER);
+            fatherLabel.setVerticalTextPosition(JLabel.TOP);
+            fatherLabel.setHorizontalTextPosition(JLabel.CENTER);
+            fatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
+            reportPanel.add(fatherLabel);
         }
     }
 }

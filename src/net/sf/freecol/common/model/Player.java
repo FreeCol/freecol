@@ -1605,6 +1605,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Returns the founding fathers in this player's congress.
+     *
+     * @return the founding fathers in this player's congress.
+     */
+    public Set<FoundingFather> getFathers() {
+        return allFathers;
+    }
+
+    /**
      * Sets this players liberty bell production to work towards recruiting
      * <code>father</code> to its congress.
      *
