@@ -232,7 +232,8 @@ public class Scope extends FreeColObject implements Cloneable {
             } else if (object instanceof FreeColGameObject) {
                 try {
                     Method method = object.getClass().getMethod("getType");
-                    if (FreeColGameObjectType.class.isAssignableFrom(method.getReturnType())) {
+                    if (method != null
+                        && FreeColGameObjectType.class.isAssignableFrom(method.getReturnType())) {
                         FreeColGameObjectType objectType =
                             (FreeColGameObjectType) method.invoke(object);
                         if (!type.equals(objectType.getId())) {
@@ -255,7 +256,8 @@ public class Scope extends FreeColObject implements Cloneable {
         if (methodName != null) {
             try {
                 Method method = object.getClass().getMethod(methodName);
-                if (!method.invoke(object).toString().equals(methodValue)) {
+                if (method != null 
+                    && !String.valueOf(method.invoke(object)).equals(methodValue)) {
                     return matchNegated;
                 }
             } catch(Exception e) {
@@ -326,14 +328,8 @@ public class Scope extends FreeColObject implements Cloneable {
     }
 
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         matchNegated = getAttribute(in, "matchNegated", false);
         matchesNull = getAttribute(in, "matchesNull", true);
         type = in.getAttributeValue(null, "type");
@@ -341,9 +337,8 @@ public class Scope extends FreeColObject implements Cloneable {
         abilityValue = getAttribute(in, "ability-value", true);
         methodName = in.getAttributeValue(null, "method-name");
         methodValue = in.getAttributeValue(null, "method-value");
-        in.nextTag();
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -355,7 +350,12 @@ public class Scope extends FreeColObject implements Cloneable {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
+        writeAttributes(out);
+        out.writeEndElement();
+    }
 
+
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         out.writeAttribute("matchNegated", Boolean.toString(matchNegated));
         out.writeAttribute("matchesNull", Boolean.toString(matchesNull));
         out.writeAttribute("type", type);
@@ -363,8 +363,6 @@ public class Scope extends FreeColObject implements Cloneable {
         out.writeAttribute("ability-value", String.valueOf(abilityValue));
         out.writeAttribute("method-name", methodName);
         out.writeAttribute("method-value", methodValue);
-
-        out.writeEndElement();
     }
     
     public static String getXMLElementTagName() {
