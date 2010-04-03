@@ -309,6 +309,45 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Handles an "animateAttack"-message.
+     * This only performs animation, if required.  It does not actually
+     * perform any attacks.
+     *
+     * @param element An element (root element in a DOM-parsed XML tree)
+     *                that holds attributes for the old and new tiles and
+     *                an element for the unit that is moving (which are
+     *                used solely to operate the animation).
+     */
+    private Element animateAttack(Element element) {
+        FreeColClient client = getFreeColClient();
+        if (client.isHeadless()) return null;
+        Game game = getGame();
+        Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
+        Unit defender = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("defender"));
+        CombatResultType result = Enum.valueOf(CombatResultType.class, element.getAttribute("result"));
+        if (unit == null || defender == null) {
+            throw new IllegalStateException("animateAttack"
+                                            + ((unit == null) ? ": null unit" : "")
+                                            + ((defender == null) ? ": null defender" : "")
+                                            );
+        }
+
+        // All is well, queue the animation.
+        // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
+        try {
+            new UnitAttackAnimationCanvasSwingTask(unit, defender, result,
+                                                   unit != lastAnimatedUnit)
+                .invokeSpecial();
+        } catch (Exception exception) {
+            logger.warning("UnitAttackAnimationCanvasSwingTask raised "
+                           + exception.toString());
+        }
+        lastAnimatedUnit = unit;
+        return null;
+    }
+
+
+    /**
      * Handles an "opponentAttack"-message.
      * 
      * @param opponentAttackElement The element (root element in a DOM-parsed
@@ -1468,6 +1507,57 @@ public final class InGameInputHandler extends InputHandler {
                 gui.setFocusImmediately(sourceTile.getPosition());
             }
             Animations.unitMove(canvas, unit, sourceTile, destinationTile);
+            canvas.refresh();
+        }
+    }
+
+    /**
+     * This task plays an unit attack animation in the Canvas.
+     */
+    class UnitAttackAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
+
+        private final Unit unit;
+        private final Unit defender;
+        private final CombatResultType result;
+        private boolean focus;
+
+        /**
+         * Constructor - Play the unit attack animation, always
+         * focusing on the source tile.
+         *
+         * @param unit The <code>Unit</code> that is attacking.
+         * @param defender The <code>Unit</code> that is defending.
+         * @param result The result of the attack.
+         */
+        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
+                                                  CombatResultType result) {
+            this(unit, defender, result, true);
+        }
+
+        /**
+         * Constructor - Play the unit attack animation, optionally
+         * focusing on the source tile.
+         *
+         * @param unit The <code>Unit</code> that is attacking.
+         * @param defender The <code>Unit</code> that is defending.
+         * @param result The result of the attack.
+         * @param focus Focus on the source tile before the animation.
+         */
+        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
+                                                  CombatResultType result,
+                                                  boolean focus) {
+            this.unit = unit;
+            this.defender = defender;
+            this.result = result;
+            this.focus = focus;
+        }
+
+        protected void doWork(Canvas canvas) {
+            GUI gui = canvas.getGUI();
+            if (focus || !gui.onScreen(unit.getTile().getPosition())) {
+                gui.setFocusImmediately(unit.getTile().getPosition());
+            }
+            Animations.unitAttack(canvas, unit, defender, result);
             canvas.refresh();
         }
     }

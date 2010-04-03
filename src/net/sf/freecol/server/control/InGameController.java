@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -142,9 +143,10 @@ public final class InGameController extends Controller {
 
     // Magic cookies to specify an overriding of the standard object
     // handling in arguments to buildUpdate().
-    public static enum UpdateType {
-        ANIMATE,    // Animate a move
+    private static enum UpdateType {
+        ATTACK,     // Animate an attack
         ATTRIBUTE,  // Set an attribute on the final result
+        MOVE,       // Animate a move
         PARTIAL,    // Do a partial update
         PRIVATE,    // Marker for private objects
         REMOVE,     // Remove an object
@@ -153,16 +155,16 @@ public final class InGameController extends Controller {
     };
 
     /**
-     * Helper function to add objects for an animation to a list.
+     * Helper function to add objects for an attack animation to a list.
      *
      * @param objects The list of objects to add to.
-     * @param unit The <code>Unit</code> that is moving.
-     * @param oldLocation The old <code>Location</code>.
-     * @param newTile The new <code>Tile</code>.
+     * @param unit The <code>Unit</code> that is attacking.
+     * @param defender The <code>Unit</code> that is defending.
+     * @param result The result of the combat.
      */
-    private static void addAnimate(List<Object> objects, Unit unit,
-                                   Location oldLocation, Tile newTile) {
-        addMore(objects, UpdateType.ANIMATE, unit, oldLocation, newTile);
+    private static void addAttack(List<Object> objects, Unit unit,
+                                  Unit defender, CombatResult result) {
+        addMore(objects, UpdateType.ATTACK, unit, defender, result);
     }
 
     /**
@@ -175,6 +177,19 @@ public final class InGameController extends Controller {
     private static void addAttribute(List<Object> objects, String attr,
                                      String value) {
         addMore(objects, UpdateType.ATTRIBUTE, attr, value);
+    }
+
+    /**
+     * Helper function to add objects for a move animation to a list.
+     *
+     * @param objects The list of objects to add to.
+     * @param unit The <code>Unit</code> that is moving.
+     * @param oldLocation The old <code>Location</code>.
+     * @param newTile The new <code>Tile</code>.
+     */
+    private static void addMove(List<Object> objects, Unit unit,
+                                Location oldLocation, Tile newTile) {
+        addMore(objects, UpdateType.MOVE, unit, oldLocation, newTile);
     }
 
     /**
@@ -272,26 +287,20 @@ public final class InGameController extends Controller {
                 continue;
             } else if (o instanceof UpdateType) {
                 switch ((UpdateType) o) {
-                case ANIMATE: // expect Unit Location Tile
+                case ATTACK: // expect Unit Unit CombatResult
                     if (i+3 < objects.size()
                         && objects.get(i+1) instanceof Unit
-                        && objects.get(i+2) instanceof FreeColGameObject
-                        && objects.get(i+3) instanceof Tile) {
+                        && objects.get(i+2) instanceof Unit
+                        && objects.get(i+3) instanceof CombatResult) {
                         Unit unit = (Unit) objects.get(i+1);
-                        FreeColGameObject oldLocation = (FreeColGameObject) objects.get(i+2);
-                        Tile newTile = (Tile) objects.get(i+3);
-                        Element animate = buildAnimate(serverPlayer, doc, unit,
-                                                       oldLocation, newTile);
-                        if (animate != null) {
-                            extras.add(animate);
-                            // Clean up units that disappear.
-                            if (!unit.isVisibleTo(serverPlayer)) {
-                                unit.addToRemoveElement(remove);
-                            }
-                        }
+                        Unit defender = (Unit) objects.get(i+2);
+                        CombatResult result = (CombatResult) objects.get(i+3);
+                        Element animate = buildAttack(serverPlayer, doc, unit,
+                                                      defender, result);
+                        if (animate != null) extras.add(animate);
                         i += 3;
                     } else {
-                        throw new IllegalArgumentException("bogus ANIMATE");
+                        throw new IllegalArgumentException("bogus ATTACK");
                     }
                     break;
                 case ATTRIBUTE: // expect String String
@@ -303,6 +312,28 @@ public final class InGameController extends Controller {
                         i += 2;
                     } else {
                         throw new IllegalArgumentException("bogus ATTRIBUTE");
+                    }
+                    break;
+                case MOVE: // expect Unit Location Tile
+                    if (i+3 < objects.size()
+                        && objects.get(i+1) instanceof Unit
+                        && objects.get(i+2) instanceof FreeColGameObject
+                        && objects.get(i+3) instanceof Tile) {
+                        Unit unit = (Unit) objects.get(i+1);
+                        FreeColGameObject oldLocation = (FreeColGameObject) objects.get(i+2);
+                        Tile newTile = (Tile) objects.get(i+3);
+                        Element animate = buildMove(serverPlayer, doc, unit,
+                                                    oldLocation, newTile);
+                        if (animate != null) {
+                            extras.add(animate);
+                            // Clean up units that disappear.
+                            if (!unit.isVisibleTo(serverPlayer)) {
+                                unit.addToRemoveElement(remove);
+                            }
+                        }
+                        i += 3;
+                    } else {
+                        throw new IllegalArgumentException("bogus MOVE");
                     }
                     break;
                 case PARTIAL: // expect FCO String String...
@@ -409,7 +440,7 @@ public final class InGameController extends Controller {
 
         // Decide what to return.  If there are several parts with children
         // then return multiple, if there is one viable part, return that,
-        // else null.  Always put animate+setStance first, remove last.
+        // else null.  Always put animations+setStance first, remove last.
         int n = 0;
         Element child = null;
         Element result;
@@ -463,6 +494,32 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Build an "animateAttack" element for an update.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to update.
+     * @param doc The owner <code>Document</code> to build the element in.
+     * @param unit The <code>Unit</code> that is attacking.
+     * @param defender The <code>Unit</code> which is defending.
+     * @param result The result of the attack.
+     * @return An "animateAttack" element, or null if the move can not be
+     *         seen by the serverPlayer.
+     */
+    private Element buildAttack(ServerPlayer serverPlayer, Document doc,
+                                Unit unit, Unit defender, CombatResult result) {
+        if (serverPlayer == unit.getOwner()
+            || serverPlayer == defender.getOwner()
+            || (unit.isVisibleTo(serverPlayer)
+                && defender.isVisibleTo(serverPlayer))) {
+            Element element = doc.createElement("animateAttack");
+            element.setAttribute("unit", unit.getId());
+            element.setAttribute("defender", defender.getId());
+            element.setAttribute("result", result.type.toString());
+            return element;
+        }
+        return null;
+    }
+
+    /**
      * Build an "animateMove" element for an update.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to update.
@@ -473,9 +530,9 @@ public final class InGameController extends Controller {
      * @return An "animateMove" element, or null if the move can not be
      *         seen by the serverPlayer.
      */
-    private Element buildAnimate(ServerPlayer serverPlayer, Document doc,
-                                 Unit unit,
-                                 FreeColGameObject oldLocation, Tile newTile) {
+    private Element buildMove(ServerPlayer serverPlayer, Document doc,
+                              Unit unit, FreeColGameObject oldLocation,
+                              Tile newTile) {
         Tile oldTile = ((Location) oldLocation).getTile();
         boolean seeOld = unit.getOwner() == serverPlayer
             || (serverPlayer.canSee(oldTile) && oldLocation instanceof Tile
@@ -2527,7 +2584,7 @@ public final class InGameController extends Controller {
         }
 
         // Add the animation, even if the unit dies.
-        addAnimate(objects, unit, oldLocation, newTile);
+        addMove(objects, unit, oldLocation, newTile);
 
         // Check for new contacts.
         if (!unit.isDisposed() && newTile.isLand()) {
@@ -2751,7 +2808,7 @@ public final class InGameController extends Controller {
         objects.add(oldLocation);
         if (carrier.getLocation() != oldLocation) {
             objects.add(carrier);
-            addAnimate(objects, unit, oldLocation, carrier.getTile());
+            addMove(objects, unit, oldLocation, carrier.getTile());
         }
 
         // Others can see the carrier capacity, and might see the
@@ -2760,7 +2817,7 @@ public final class InGameController extends Controller {
         otherObjects.add(oldLocation);
         if (visible) {
             otherObjects.add(carrier);
-            addAnimate(otherObjects, unit, oldLocation, carrier.getTile());
+            addMove(otherObjects, unit, oldLocation, carrier.getTile());
         } else {
             addRemove(otherObjects, unit);
         }
