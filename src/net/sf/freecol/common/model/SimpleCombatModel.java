@@ -1354,49 +1354,44 @@ public class SimpleCombatModel implements CombatModel {
         enemyCapturesEquipment(unit,enemyUnit,typeToLose);
     }
 
-    private void enemyCapturesEquipment(Unit unit, Unit enemyUnit, EquipmentType typeToLose) {
-        if (!enemyUnit.hasAbility("model.ability.captureEquipment")){
-            return;
-        }
-        
-        // we may need to change the equipment type if:
-        //    - the attacker is an indian and the defender is not, or vice-versa
-        //  and
-        //    - the equipment is muskets or horses
-        EquipmentType newEquipType = typeToLose;
-        boolean defenderIsIndian = unit.getOwner().isIndian();
-        boolean attackerIsIndian = enemyUnit.getOwner().isIndian();
-        if(!defenderIsIndian && attackerIsIndian){
-            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.horses")){
-                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+    /*
+     * Capture equipment.
+     *
+     * @param unit The <code>Unit</code> that is losing equipment.
+     * @param enemyUnit The <code>Unit</code> that is capturing equipment.
+     * @param equipType The type of equipment to be captured.
+     */
+    private void enemyCapturesEquipment(Unit unit, Unit enemyUnit,
+                                        EquipmentType equipType) {
+        if (enemyUnit.hasAbility("model.ability.captureEquipment")) {
+            Player enemy = enemyUnit.getOwner();
+            EquipmentType newEquip = equipType;
+            if (unit.getOwner().isIndian() != enemy.isIndian()) {
+                // May need to change the equipment type if the attacker is
+                // native and the defender is not, or vice-versa.
+                newEquip = equipType.getCaptureEquipment(enemy.isIndian());
             }
-            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.muskets")){
-                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
-            }
-        }
-        if(defenderIsIndian && !attackerIsIndian){
-            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses")){
-                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
-            }
-            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets")){
-                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
-            }
-        }
-        
-        if(!enemyUnit.canBeEquippedWith(newEquipType)){
-            return;
-        }
-        
-        enemyUnit.equipWith(newEquipType, 1, true);
-        unit.getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                                         "model.unit.equipmentCaptured",
-                                                         unit)
-                             .addStringTemplate("%nation%", enemyUnit.getOwner().getNationName())
-                             .add("%equipment%", typeToLose.getNameKey()));
-        IndianSettlement settlement = enemyUnit.getIndianSettlement();
-        if (settlement != null) {
-            for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
-                settlement.addGoods(goods);
+
+            if (enemyUnit.canBeEquippedWith(newEquip)) {
+                enemyUnit.equipWith(newEquip, true);
+                ModelMessage m
+                    = new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                       "model.unit.equipmentCaptured", unit)
+                    .addStringTemplate("%nation%", enemyUnit.getOwner().getNationName())
+                    .add("%equipment%", newEquip.getNameKey());
+                unit.getOwner().addModelMessage(m);
+
+                // TODO: Immediately transferring the captured goods back
+                // to a potentially remote settlement is pretty dubious.
+                // Apparently Col1 did it, but its cheating nonetheless.
+                // Better would be to give the capturing unit a return-home-
+                // -with-plunder mission.
+                IndianSettlement settlement = enemyUnit.getIndianSettlement();
+                if (settlement != null) {
+                    for (AbstractGoods goods : equipType.getGoodsRequired()) {
+                        settlement.addGoods(goods);
+                    }
+                }
             }
         }
     }

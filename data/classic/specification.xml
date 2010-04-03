@@ -431,6 +431,7 @@
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
+      <capture-equipment id="model.equipment.indian.horses" by-indians="true"/>
     </equipment-type>
     <equipment-type id="model.equipment.muskets" combat-loss-priority="10" role="soldier">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
@@ -443,6 +444,7 @@
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
+      <capture-equipment id="model.equipment.indian.muskets" by-indians="true"/>
     </equipment-type>
     <equipment-type id="model.equipment.tools" maximum-count="5" role="pioneer">
       <ability id="model.ability.improveTerrain" value="true"/>
@@ -466,6 +468,7 @@
       <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.horses" value="25"/>
       <compatible-equipment id="model.equipment.indian.muskets"/>
+      <capture-equipment id="model.equipment.horses" by-indians="false"/>
     </equipment-type>
     <equipment-type id="model.equipment.indian.muskets" combat-loss-priority="10" role="soldier">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
@@ -475,6 +478,7 @@
       <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.muskets" value="25"/>
       <compatible-equipment id="model.equipment.indian.horses"/>
+      <capture-equipment id="model.equipment.muskets" by-indians="false"/>
     </equipment-type>
   </equipment-types>
 

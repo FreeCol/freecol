@@ -168,6 +168,7 @@
         <xs:element ref="required-location-ability"/>
         <xs:element ref="required-goods"/>
         <xs:element ref="compatible-equipment"/>
+        <xs:element ref="capture-equipment"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="combat-loss-priority" type="xs:int"/>
@@ -189,6 +190,12 @@
   <xs:element name="compatible-equipment">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="capture-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:IDREF"/>
+      <xs:attribute name="by-indians" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="tileimprovement-types">

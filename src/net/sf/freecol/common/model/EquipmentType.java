@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.Role;
 
 public class EquipmentType extends BuildableType {
@@ -47,6 +48,13 @@ public class EquipmentType extends BuildableType {
      * Muskets, for example.
      */
     private int combatLossPriority;
+
+    /**
+     * What this equipment type becomes if it is captured by Indians
+     * (if captureEquipmentByIndians is true) or Europeans (otherwise).
+     */
+    private String captureEquipmentId = null;
+    private boolean captureEquipmentByIndians = false;
 
     /**
      * The default Role of the Unit carrying this type of Equipment.
@@ -120,6 +128,15 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
+     * Set the <code>CombatLossPriority</code> value.
+     *
+     * @param newCombatLossPriority The new CombatLossPriority value.
+     */
+    public final void setCombatLossPriority(final int newCombatLossPriority) {
+        this.combatLossPriority = newCombatLossPriority;
+    }
+
+    /**
      * Returns true if this EquipmentType can be captured in combat.
      *
      * @return a <code>boolean</code> value
@@ -129,12 +146,19 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
-     * Set the <code>CombatLossPriority</code> value.
+     * Get the type of equipment to capture, handling the case where
+     * Europeans and Indians use different <code>EquipmentType</code>s
+     * for the same underlying goods.
      *
-     * @param newCombatLossPriority The new CombatLossPriority value.
+     * @param byIndians is the capture by the Indians?
+     *
+     * @return an <code>EquipmentType</code> value
      */
-    public final void setCombatLossPriority(final int newCombatLossPriority) {
-        this.combatLossPriority = newCombatLossPriority;
+    public EquipmentType getCaptureEquipment(boolean byIndians) {
+        return (captureEquipmentId != null
+                && byIndians == captureEquipmentByIndians)
+            ? FreeCol.getSpecification().getEquipmentType(captureEquipmentId)
+            : this;
     }
 
     /**
@@ -212,6 +236,10 @@ public class EquipmentType extends BuildableType {
                 String equipmentId = in.getAttributeValue(null, "id");
                 compatibleEquipment.add(equipmentId);
                 in.nextTag(); // close this element
+            } else if ("capture-equipment".equals(nodeName)) {
+                captureEquipmentId = in.getAttributeValue(null, "id");
+                captureEquipmentByIndians = getAttribute(in, "by-indians", false);
+                in.nextTag();
             } else {
                 FreeColObject object = super.readChild(in, specification);
                 if (object instanceof Modifier) {
