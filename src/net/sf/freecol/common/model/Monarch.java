@@ -266,7 +266,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         // provide no more than one frigate
-        if (player.hasBeenAttackedByPrivateers() && !supportSea) {
+        if (player.getAttackedByPrivateers() && !supportSea) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_SEA, 6 - dx));
         }
 

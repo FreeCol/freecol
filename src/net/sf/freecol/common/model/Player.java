@@ -1332,13 +1332,17 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return <code>true</code> if this <code>Player</code> has been
      *         attacked by privateers.
      */
-    public boolean hasBeenAttackedByPrivateers() {
+    public boolean getAttackedByPrivateers() {
         return attackedByPrivateers;
     }
 
-    /** Sets the variable attackedByPrivateers to true. */
-    public void setAttackedByPrivateers() {
-        attackedByPrivateers = true;
+    /**
+     * Sets whether this player has been attacked by privateers.
+     *
+     * @param attacked True if the player has been attacked by privateers.
+     */
+    public void setAttackedByPrivateers(boolean attacked) {
+        attackedByPrivateers = attacked;
     }
 
     /**

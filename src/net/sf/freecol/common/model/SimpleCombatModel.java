@@ -505,7 +505,7 @@ public class SimpleCombatModel implements CombatModel {
 
         // make sure we are at war, unless one of both units is a privateer
         if (attacker.hasAbility("model.ability.piracy")) {
-            defendingPlayer.setAttackedByPrivateers();
+            defendingPlayer.setAttackedByPrivateers(true);
         } else if (!defender.hasAbility("model.ability.piracy")) {
             attackingPlayer.changeRelationWithPlayer(defendingPlayer, Stance.WAR);
         }
