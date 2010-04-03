@@ -31,9 +31,11 @@ import org.w3c.dom.Element;
 
 /**
  * The <code>Limit</code> class encapsulates a limit on the
- * availability of FreeColObjects. It can be used to limit the number
+ * availability of FreeColObjects. It consists of a left hand side, an
+ * operator and a right hand side, and can be used to limit the number
  * of units of a particular type (e.g. wagon trains) to the number of
- * a player's colonies, for example.
+ * a player's colonies, for example. The left hand side must apply to
+ * the object on which a limit is to be placed.
  */
 public final class Limit extends FreeColGameObjectType {
 
@@ -131,37 +133,110 @@ public final class Limit extends FreeColGameObjectType {
         this.rightHandSide = newRightHandSide;
     }
 
+    public boolean appliesTo(FreeColObject object) {
+        return leftHandSide.appliesTo(object);
+    }
+
     /**
-     * Describe <code>appliesTo</code> method here.
+     * Describe <code>evaluate</code> method here.
      *
      * @param game a <code>Game</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean appliesTo(Game game) {
-        return evaluate(leftHandSide.getValue(game),
-                        rightHandSide.getValue(game));
+    public boolean evaluate(Game game) {
+        Integer lhs = null;
+        switch(leftHandSide.getScopeLevel()) {
+        case GAME:
+            lhs = leftHandSide.getValue(game);
+            break;
+        default:
+            lhs = leftHandSide.getValue();
+        }
+
+        Integer rhs = null;
+        switch(rightHandSide.getScopeLevel()) {
+        case GAME:
+            rhs = rightHandSide.getValue(game);
+            break;
+        default:
+            rhs = rightHandSide.getValue();
+        }
+
+        return evaluate(lhs, rhs);
     }
 
     /**
-     * Describe <code>appliesTo</code> method here.
+     * Describe <code>evaluate</code> method here.
      *
      * @param player a <code>Player</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean appliesTo(Player player) {
-        return evaluate(leftHandSide.getValue(player),
-                        rightHandSide.getValue(player));
+    public boolean evaluate(Player player) {
+        Integer lhs = null;
+        switch(leftHandSide.getScopeLevel()) {
+        case PLAYER:
+            lhs = leftHandSide.getValue(player);
+            break;
+        case GAME:
+            lhs = leftHandSide.getValue(player.getGame());
+            break;
+        default:
+            lhs = leftHandSide.getValue();
+        }
+
+        Integer rhs = null;
+        switch(rightHandSide.getScopeLevel()) {
+        case PLAYER:
+            rhs = rightHandSide.getValue(player);
+            break;
+        case GAME:
+            rhs = rightHandSide.getValue(player.getGame());
+            break;
+        default:
+            rhs = rightHandSide.getValue();
+        }
+
+        return evaluate(lhs, rhs);
     }
 
     /**
-     * Describe <code>appliesTo</code> method here.
+     * Describe <code>evaluate</code> method here.
      *
      * @param settlement a <code>Settlement</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean appliesTo(Settlement settlement) {
-        return evaluate(leftHandSide.getValue(settlement),
-                        rightHandSide.getValue(settlement));
+    public boolean evaluate(Settlement settlement) {
+        Integer lhs = null;
+        switch(leftHandSide.getScopeLevel()) {
+        case SETTLEMENT:
+            lhs = leftHandSide.getValue(settlement);
+            break;
+        case PLAYER:
+            lhs = leftHandSide.getValue(settlement.getOwner());
+            break;
+        case GAME:
+            lhs = leftHandSide.getValue(settlement.getGame());
+            break;
+        default:
+            lhs = leftHandSide.getValue();
+        }
+
+        Integer rhs = null;
+        switch(rightHandSide.getScopeLevel()) {
+        case SETTLEMENT:
+            rhs = rightHandSide.getValue(settlement);
+            break;
+        case PLAYER:
+            rhs = rightHandSide.getValue(settlement.getOwner());
+            break;
+        case GAME:
+            rhs = rightHandSide.getValue(settlement.getGame());
+            break;
+        default:
+            rhs = rightHandSide.getValue();
+        }
+
+        return evaluate(lhs, rhs);
     }
 
     /**
@@ -178,7 +253,6 @@ public final class Limit extends FreeColGameObjectType {
 
     private boolean evaluate(Integer lhs, Integer rhs) {
         if (lhs == null || rhs == null) {
-            // this indicates wrong scope level
             return true;
         }
         switch(operator) {

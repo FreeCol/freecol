@@ -76,6 +76,8 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.Limit;
+import net.sf.freecol.common.model.Operand.OperandType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -232,6 +234,17 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                                                 Integer.toString(unitType.getPopulationRequired())));
             }
 
+            OperandType operandType = unitType.getLimitType();
+            if (operandType != null) {
+                for (Limit limit : FreeCol.getSpecification().getLimits()) {
+                    if (limit.hasOperandType(operandType)
+                        && limit.appliesTo(unitType)
+                        && !limit.evaluate(colony)) {
+                        lockReason.add(Messages.message(limit.getDescriptionKey()));
+                    }
+                }
+            }
+
             if (!(colony.getFeatureContainer()
                   .hasAbility("model.ability.build", unitType, getGame().getTurn())
                   || featureContainer.hasAbility("model.ability.build", unitType))) {
@@ -318,6 +331,20 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                         continue loop;
                     } else {
                         lockReason.add(Messages.message(sources.get(0).getNameKey()));
+                    }
+                }
+            }
+
+            OperandType operandType = buildingType.getLimitType();
+            if (operandType != null) {
+                for (Limit limit : FreeCol.getSpecification().getLimits()) {
+                    if (limit.hasOperandType(operandType)
+                        && limit.appliesTo(buildingType)) {
+                        if (!limit.evaluate(colony)
+                            || !limit.evaluate(colony.getOwner())
+                            || !limit.evaluate(getGame())) {
+                            lockReason.add(Messages.message(limit.getDescriptionKey()));
+                        }
                     }
                 }
             }

@@ -48,6 +48,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     public BuildingType() {
         setIndex(nextIndex++);
         setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
+        setLimitType(Operand.OperandType.BUILDINGS);
     }
     
     public BuildingType getUpgradesFrom() {

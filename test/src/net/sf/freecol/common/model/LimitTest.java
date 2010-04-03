@@ -49,20 +49,24 @@ public class LimitTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = getStandardColony(3);
-        Tile unitTile = map.getTile(6, 8);
+        Building armory = new Building(getGame(), colony, spec().getBuildingType("model.building.armory"));
+        colony.addBuilding(armory);
+
+        Limit wagonTrainLimit = spec().getLimit("model.limit.wagonTrains");
+
+        UnitType artillery = spec().getUnitType("model.unit.artillery");
+        assertTrue(colony.canBuild(artillery));
+        assertFalse(wagonTrainLimit.getLeftHandSide().appliesTo(artillery));
+
         UnitType wagonTrain = spec().getUnitType("model.unit.wagonTrain");
-        
-        Operand lhs = new Operand(OperandType.UNITS, ScopeLevel.PLAYER);
-        lhs.setType("model.unit.wagonTrain");
+        assertTrue(wagonTrainLimit.evaluate(colony));
+        assertTrue(colony.canBuild(wagonTrain));
 
-        Operand rhs = new Operand(OperandType.SETTLEMENTS, ScopeLevel.PLAYER);
-
-        Limit limit = new Limit("model.limit.wagonTrains", lhs, Operator.LT, rhs);
-
-        assertTrue(limit.appliesTo(dutch));
-
-        Unit unit = new Unit(game, unitTile, dutch, wagonTrain, Unit.UnitState.ACTIVE);
-        assertFalse(limit.appliesTo(dutch));
+        Unit wagon = new Unit(game, colony.getTile(), dutch, wagonTrain, Unit.UnitState.ACTIVE);
+        assertEquals(Colony.NoBuildReason.LIMIT_EXCEEDED, colony.getNoBuildReason(wagonTrain));
+        assertFalse(wagonTrainLimit.evaluate(colony));
+        assertFalse(colony.canBuild(wagonTrain));
+        assertTrue(colony.canBuild(artillery));
 
     }
 
@@ -83,11 +87,11 @@ public class LimitTest extends FreeColTestCase {
 
         Limit limit = new Limit("model.limit.independence", lhs, Operator.GE, rhs);
 
-        assertFalse(limit.appliesTo(dutch));
+        assertFalse(limit.evaluate(dutch));
 
         colony.incrementLiberty(10000);
         colony.updateSoL();
-        assertTrue(limit.appliesTo(dutch));
+        assertTrue(limit.evaluate(dutch));
 
     }
 

@@ -942,6 +942,10 @@ public final class Specification {
         return limits;
     }
 
+    public Limit getLimit(String id) {
+        return getType(id, Limit.class);
+    }
+
     /**
      * Describe <code>getDifficultyLevel</code> method here.
      *

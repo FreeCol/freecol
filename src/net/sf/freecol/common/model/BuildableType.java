@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.model.Operand.OperandType;
 
 /**
  * Contains information on buildable types.
@@ -42,6 +43,11 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * this type.
      */
     private int populationRequired = 1;
+
+    /**
+     * Describe limitType here.
+     */
+    private OperandType limitType = null;
 
     /**
      * A list of AbstractGoods required to build this type.
@@ -65,10 +71,10 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * Get amount required of given <code>GoodsType</code>
      */
     public final int getAmountRequiredOf(GoodsType type){
-    	for(AbstractGoods goods : this.goodsRequired){
-    		if(goods.getType() == type){
-    			return goods.getAmount();
-    		}
+    	for (AbstractGoods goods : this.goodsRequired){
+            if (goods.getType() == type){
+                return goods.getAmount();
+            }
     	}
     	return 0;
     }
@@ -98,6 +104,24 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public void setPopulationRequired(final int newPopulationRequired) {
         this.populationRequired = newPopulationRequired;
+    }
+
+    /**
+     * Get the <code>LimitType</code> value.
+     *
+     * @return an <code>OperandType</code> value
+     */
+    public final OperandType getLimitType() {
+        return limitType;
+    }
+
+    /**
+     * Set the <code>LimitType</code> value.
+     *
+     * @param newLimitType The new LimitType value.
+     */
+    public final void setLimitType(final OperandType newLimitType) {
+        this.limitType = newLimitType;
     }
 
     /**

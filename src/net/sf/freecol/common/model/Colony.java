@@ -75,7 +75,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         POPULATION_TOO_SMALL,
         MISSING_BUILD_ABILITY,
         MISSING_ABILITY,
-        WRONG_UPGRADE
+        WRONG_UPGRADE,
+        LIMIT_EXCEEDED
     }
 
     private class Occupation {
@@ -1481,6 +1482,16 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (hasAbility(entry.getKey()) != entry.getValue()) {
                     return NoBuildReason.MISSING_ABILITY;
+                }
+            }
+            Operand.OperandType operandType = buildableType.getLimitType();
+            if (operandType != null) {
+                for (Limit limit : Specification.getSpecification().getLimits()) {
+                    if (limit.hasOperandType(operandType)
+                        && limit.appliesTo(buildableType)
+                        && !limit.evaluate(this)) {
+                        return NoBuildReason.LIMIT_EXCEEDED;
+                    }
                 }
             }
         }
