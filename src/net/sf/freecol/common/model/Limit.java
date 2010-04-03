@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Operand.OperandType;
 
 import org.w3c.dom.Element;
 
@@ -34,7 +35,7 @@ import org.w3c.dom.Element;
  * of units of a particular type (e.g. wagon trains) to the number of
  * a player's colonies, for example.
  */
-public final class Limit extends FreeColObject {
+public final class Limit extends FreeColGameObjectType {
 
     public static enum Operator {
         EQ, LT, GT, LE, GE
@@ -63,6 +64,10 @@ public final class Limit extends FreeColObject {
      */
     public Limit(XMLStreamReader in) throws XMLStreamException {
         readFromXMLImpl(in);
+    }
+
+    public Limit() {
+        // empty constructor
     }
 
     public Limit(String id, Operand lhs, Operator op, Operand rhs) {
@@ -126,24 +131,55 @@ public final class Limit extends FreeColObject {
         this.rightHandSide = newRightHandSide;
     }
 
+    /**
+     * Describe <code>appliesTo</code> method here.
+     *
+     * @param game a <code>Game</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean appliesTo(Game game) {
         return evaluate(leftHandSide.getValue(game),
                         rightHandSide.getValue(game));
     }
 
+    /**
+     * Describe <code>appliesTo</code> method here.
+     *
+     * @param player a <code>Player</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean appliesTo(Player player) {
         return evaluate(leftHandSide.getValue(player),
                         rightHandSide.getValue(player));
     }
 
+    /**
+     * Describe <code>appliesTo</code> method here.
+     *
+     * @param settlement a <code>Settlement</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean appliesTo(Settlement settlement) {
         return evaluate(leftHandSide.getValue(settlement),
                         rightHandSide.getValue(settlement));
     }
 
+    /**
+     * Returns true if at least one of the Operands has the given
+     * OperandType.
+     *
+     * @param type an <code>OperandType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasOperandType(OperandType type) {
+        return leftHandSide.getOperandType() == type
+            || rightHandSide.getOperandType() == type;
+    }
+
     private boolean evaluate(Integer lhs, Integer rhs) {
         if (lhs == null || rhs == null) {
-            return false;
+            // this indicates wrong scope level
+            return true;
         }
         switch(operator) {
         case EQ: return lhs == rhs;
@@ -171,20 +207,24 @@ public final class Limit extends FreeColObject {
         out.writeEndElement();
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    @Override
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         operator = Enum.valueOf(Operator.class, in.getAttributeValue(null, "operator"));
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    @Override
+    public void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if ("left-hand-side".equals(in.getLocalName())) {
+            if ("leftHandSide".equals(in.getLocalName())) {
                 leftHandSide = new Operand();
                 leftHandSide.readFromXMLImpl(in);
-            } else if ("right-hand-side".equals(in.getLocalName())) {
+            } else if ("rightHandSide".equals(in.getLocalName())) {
                 rightHandSide = new Operand();
                 rightHandSide.readFromXMLImpl(in);
             } else {
-                logger.warning("Unknown child: " + in.getLocalName());
+                logger.warning("Unsupported child element: " + in.getLocalName());
             }
         }
     }
@@ -195,8 +235,8 @@ public final class Limit extends FreeColObject {
     }
 
     public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        leftHandSide.toXMLImpl(out, "left-hand-side");
-        rightHandSide.toXMLImpl(out, "right-hand-side");
+        leftHandSide.toXMLImpl(out, "leftHandSide");
+        rightHandSide.toXMLImpl(out, "rightHandSide");
     }
 
     /**

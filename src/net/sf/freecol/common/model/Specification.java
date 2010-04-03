@@ -140,6 +140,7 @@ public final class Specification {
     private final List<EquipmentType> equipmentTypes;
 
     private final List<DifficultyLevel> difficultyLevels;
+    private final List<Limit> limits;
 
     private int storableTypes = 0;
 
@@ -203,6 +204,7 @@ public final class Specification {
 
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
+        limits = new ArrayList<Limit>();
 
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
@@ -241,6 +243,7 @@ public final class Specification {
                       new TypeReader<ImprovementActionType>(ImprovementActionType.class, improvementActionTypeList));
         readerMap.put("indian-nation-types",
                       new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
+        readerMap.put("limits", new TypeReader<Limit>(Limit.class, limits));
         readerMap.put("resource-types",
                       new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
         readerMap.put("tile-types",
@@ -932,6 +935,11 @@ public final class Specification {
     // -- DifficultyLevels --
     public List<DifficultyLevel> getDifficultyLevels() {
         return difficultyLevels;
+    }
+
+    // -- Limits --
+    public List<Limit> getLimits() {
+        return limits;
     }
 
     /**

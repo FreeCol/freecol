@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.25 -->
+<!-- XSD for specification version 0.27
+     CHANGELOG:
+     0.26: add capture-equipment
+     0.27: add limits
+  -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
   <xs:element name="freecol-specification">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -19,9 +24,11 @@
         <xs:element ref="difficultyLevels"/>
         <xs:element ref="options"/>
         <xs:element ref="modifiers"/>
+        <xs:element ref="limits"/>
       </xs:choice>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="goods-types">
     <xs:complexType>
       <xs:sequence>
@@ -29,6 +36,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="goods-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -49,6 +57,7 @@
       <xs:attribute name="price" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="market">
     <xs:complexType>
       <xs:attribute name="initial-amount" use="required" type="xs:nonNegativeInteger"/>
@@ -56,6 +65,7 @@
       <xs:attribute name="price-difference" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="resource-types">
     <xs:complexType>
       <xs:sequence>
@@ -63,6 +73,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="resource-type">
     <xs:complexType>
       <xs:sequence>
@@ -73,6 +84,7 @@
       <xs:attribute name="maximum-value" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="tile-types">
     <xs:complexType>
       <xs:sequence>
@@ -80,6 +92,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="tile-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -102,6 +115,7 @@
       <xs:attribute name="is-connected" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="gen">
     <xs:complexType>
       <xs:attribute name="humidityMin" use="required" type="xs:int"/>
@@ -112,6 +126,7 @@
       <xs:attribute name="altitudeMax" use="required" type="xs:int"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="art">
     <xs:complexType>
       <xs:attribute name="basic" use="required" type="xs:string"/>
@@ -120,17 +135,20 @@
       <xs:attribute name="overlay" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="skirmish">
     <xs:complexType>
       <xs:attribute name="defence-factor" use="required" type="xs:int"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="resource">
     <xs:complexType>
       <xs:attribute name="type" use="required" type="xs:IDREF"/>
       <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="production">
     <xs:complexType>
       <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
@@ -138,6 +156,7 @@
       <xs:attribute name="difficulty" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="primary-production">
     <xs:complexType>
       <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
@@ -145,6 +164,7 @@
       <xs:attribute name="difficulty" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="secondary-production">
     <xs:complexType>
       <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
@@ -152,6 +172,7 @@
       <xs:attribute name="difficulty" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="equipment-types">
     <xs:complexType>
       <xs:sequence>
@@ -159,6 +180,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="equipment-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -187,17 +209,20 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="compatible-equipment">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="capture-equipment">
     <xs:complexType>
       <xs:attribute name="id" type="xs:IDREF"/>
       <xs:attribute name="by-indians" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="tileimprovement-types">
     <xs:complexType>
       <xs:sequence>
@@ -205,6 +230,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="tileimprovement-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -229,24 +255,28 @@
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="tiles">
     <xs:complexType>
       <xs:attribute name="all-land-tiles" type="xs:boolean"/>
       <xs:attribute name="all-forest-tiles" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="tile">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
       <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="change">
     <xs:complexType>
       <xs:attribute name="from" use="required" type="xs:IDREF"/>
       <xs:attribute name="to" use="required" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="improvementaction-types">
     <xs:complexType>
       <xs:sequence>
@@ -254,6 +284,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="improvementaction-type">
     <xs:complexType>
       <xs:sequence>
@@ -263,6 +294,7 @@
       <xs:attribute name="accelerator" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="action">
     <xs:complexType>
       <xs:attribute name="tileimprovement-type" use="required" type="xs:IDREF"/>
@@ -270,6 +302,7 @@
       <xs:attribute name="image-id" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="unit-types">
     <xs:complexType>
       <xs:sequence>
@@ -277,6 +310,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="unit-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -307,6 +341,7 @@
       <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="building-types">
     <xs:complexType>
       <xs:sequence>
@@ -314,6 +349,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="building-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -334,6 +370,7 @@
       <xs:attribute name="upgradesFrom" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="founding-fathers">
     <xs:complexType>
       <xs:sequence>
@@ -341,6 +378,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="founding-father">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -382,17 +420,20 @@
       <xs:attribute name="weight3" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="event">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="nation-type">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="european-nation-types">
     <xs:complexType>
       <xs:sequence>
@@ -400,6 +441,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="indian-nation-types">
     <xs:complexType>
       <xs:sequence>
@@ -407,6 +449,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="european-nation-type">
     <xs:complexType>
       <xs:sequence>
@@ -441,6 +484,7 @@
       <xs:attribute name="ref" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="indian-nation-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -482,12 +526,14 @@
       <xs:attribute name="capitalRadius" type="xs:int" use="optional" />
     </xs:complexType>
   </xs:element>
+
   <xs:element name="skill">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
       <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="region">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
@@ -509,6 +555,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="difficultyLevels">
     <xs:complexType>
       <xs:sequence>
@@ -516,6 +563,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="difficultyLevel">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -526,6 +574,15 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="limits">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="limit"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="modifiers">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -533,6 +590,7 @@
       </xs:choice>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="options">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -547,6 +605,7 @@
       </xs:choice>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="optionGroup">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -561,6 +620,7 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="integerOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
@@ -570,6 +630,7 @@
       <xs:attribute name="value" type="xs:int"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="booleanOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
@@ -577,6 +638,7 @@
       <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="stringOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
@@ -584,6 +646,7 @@
       <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="rangeOption">
     <xs:complexType>
       <xs:sequence>
@@ -594,12 +657,14 @@
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="rangeValue">
     <xs:complexType>
       <xs:attribute name="label" use="required" type="xs:string"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="selectOption">
     <xs:complexType>
       <xs:sequence>
@@ -610,22 +675,26 @@
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="selectValue">
     <xs:complexType>
       <xs:attribute name="label" use="required" type="xs:string"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="languageOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="fileOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="ability">
     <xs:complexType>
       <xs:sequence>
@@ -635,6 +704,7 @@
       <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="modifier">
     <xs:complexType>
       <xs:sequence>
@@ -655,29 +725,23 @@
       <xs:attribute name="index" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="scope">
-    <xs:complexType>
-      <xs:attribute name="matchesNull" type="xs:boolean"/>
-      <xs:attribute name="matchNegated" type="xs:boolean"/>
-      <xs:attribute name="type" type="xs:IDREF"/>
-      <xs:attribute name="ability-id" type="xs:string"/>
-      <xs:attribute name="ability-value" type="xs:boolean"/>
-      <xs:attribute name="method-name" type="xs:string"/>
-      <xs:attribute name="method-value" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
+
+  <xs:element name="scope" type="ScopeType" />
+
   <xs:element name="required-ability">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="required-location-ability">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="required-goods">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
@@ -689,6 +753,7 @@
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="upgrade">
     <xs:complexType>
       <xs:sequence>
@@ -706,6 +771,7 @@
       <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="downgrade">
     <xs:complexType>
       <xs:sequence>
@@ -717,4 +783,65 @@
       <xs:attribute name="clearSkill" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="limit">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="leftHandSide" type="OperandType" />
+        <xs:element name="rightHandSide" type="OperandType" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" />
+      <xs:attribute name="operator" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="LT"/>
+            <xs:enumeration value="LE"/>
+            <xs:enumeration value="GT"/>
+            <xs:enumeration value="GE"/>
+            <xs:enumeration value="EQ"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="ScopeType">
+    <xs:attribute name="matchesNull" type="xs:boolean"/>
+    <xs:attribute name="matchNegated" type="xs:boolean"/>
+    <xs:attribute name="type" type="xs:IDREF"/>
+    <xs:attribute name="ability-id" type="xs:string"/>
+    <xs:attribute name="ability-value" type="xs:boolean"/>
+    <xs:attribute name="method-name" type="xs:string"/>
+    <xs:attribute name="method-value" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="OperandType">
+    <xs:complexContent>
+      <xs:extension base="ScopeType">
+        <xs:attribute name="operandType">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="UNITS" />
+              <xs:enumeration value="BUILDINGS" />
+              <xs:enumeration value="SETTLEMENTS" />
+              <xs:enumeration value="FOUNDING_FATHERS" />
+              <xs:enumeration value="NONE" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="scopeLevel">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="SETTLEMENT" />
+              <xs:enumeration value="PLAYER" />
+              <xs:enumeration value="GAME" />
+              <xs:enumeration value="NONE" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:integer" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
 </xs:schema>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    *  Copyright (C) 2002-2007  The FreeCol Team
+    *  Copyright (C) 2002-2010  The FreeCol Team
     *
     *  This file is part of FreeCol.
     *
@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.25 -->
+<!-- specification version 0.27 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -46,6 +46,13 @@
               source="model.source.artilleryAgainstRaid"
               value="100" type="percentage" />
   </modifiers>
+
+  <limits>
+    <limit id="model.limit.wagonTrains" operator="LT">
+      <leftHandSide operandType="UNITS" scopeLevel="PLAYER" type="model.unit.wagonTrain" />
+      <rightHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER" />
+    </limit>
+  </limits>
 
   <goods-types>
     <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">

@@ -332,20 +332,9 @@ public class Operand extends Scope {
         out.writeEndElement();
     }
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        readAttributes(in);
-    }
-
     public void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
+        super.readAttributes(in);
         String attribute = in.getAttributeValue(null, "operandType");
         if (attribute != null) {
             operandType = Enum.valueOf(OperandType.class, attribute);
