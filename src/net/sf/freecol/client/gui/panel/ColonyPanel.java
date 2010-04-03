@@ -849,6 +849,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 add(aSingleBuildingPanel);
             }
         }
+        
+        public void update(){
+        	initialize();
+        }
 
         public void removePropertyChangeListeners() {
             for (Component component : getComponents()) {
@@ -1534,8 +1538,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateTilePanel();
             updateProductionPanel();
         } else if (property.startsWith("model.goods.")) {
+            // changes to warehouse goods count may affect building production
+            //which requires a view update
             updateProductionPanel();
             updateWarehousePanel();
+            buildingsPanel.update();
         } else if (Building.UNIT_CHANGE.equals(property)) {
             // already processed by BuildingPanel
         } else {
