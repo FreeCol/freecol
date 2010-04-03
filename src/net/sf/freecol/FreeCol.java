@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
@@ -514,21 +515,47 @@ public final class FreeCol {
      * home directory. This directory will be called "freecol"
      * and underneath that directory a "save" directory will
      * be created.
+     * 
+     * For MacOS X the Library/Application Support/FreeCol is used
+     * (which is the standard path for application related files).
+     * 
+     * For os.name beginning with "Windows" JFileChooser() is used to 
+     * find the path to "My Documents" (or localized equivalent)
      */
     private static File createAndSetDirectories() {
         // TODO: The location of the save directory should be determined by the installer.;
-        
+
         String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
-            ".freecol" : "freecol";
+                ".freecol" : "freecol";
+
+        String userHome = System.getProperty("user.home");
+        
+        // Checks for OS specific paths, however if the old {home}/.freecol exists
+        // that overrides OS-specifics for backwards compatibility.
+        if(System.getProperty("os.name").equals("Mac OS X")) {
+            // We are running on a Mac and should use {home}/Library/Application Support/FreeCol
+            
+            if(!new File(userHome, freeColDirectoryName).isDirectory()) {
+                userHome = userHome + System.getProperty("file.separator") + "Library" + System.getProperty("file.separator") + "Application Support";
+                freeColDirectoryName = "FreeCol";
+            }
+        } else if(System.getProperty("os.name").startsWith("Windows")) {
+            // We are running on Windows and should use "My Documents" (or localized equivalent)
+            
+            if(!new File(userHome, freeColDirectoryName).isDirectory()) {
+                userHome = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+                freeColDirectoryName = "FreeCol";
+            }
+        }
 
         if (mainUserDirectory == null) {
-            mainUserDirectory = new File(System.getProperty("user.home"), freeColDirectoryName);
+            mainUserDirectory = new File(userHome, freeColDirectoryName);
         }
         if (mainUserDirectory.exists()) {
             if (mainUserDirectory.isFile()) {
                 System.out.println("Could not create " + freeColDirectoryName + " under "
-                                   + System.getProperty("user.home") + " because there "
-                                   + "already exists a regular file with the same name.");
+                        + userHome + " because there "
+                        + "already exists a regular file with the same name.");
                 return null;
             }
         } else {
@@ -540,8 +567,8 @@ public final class FreeCol {
         if (saveDirectory.exists()) {
             if (saveDirectory.isFile()) {
                 System.out.println("Could not create freecol/save under "
-                                   + System.getProperty("user.home") + " because there "
-                                   + "already exists a regular file with the same name.");
+                        + userHome + " because there "
+                        + "already exists a regular file with the same name.");
                 return null;
             }
         } else {
@@ -551,8 +578,8 @@ public final class FreeCol {
         if (tcUserDirectory.exists()) {
             if (tcUserDirectory.isFile()) {
                 System.out.println("Could not create freecol/" + tc + " under "
-                                   + System.getProperty("user.home") + " because there "
-                                   + "already exists a regular file with the same name.");
+                        + userHome + " because there "
+                        + "already exists a regular file with the same name.");
                 return null;
             }
         } else {
