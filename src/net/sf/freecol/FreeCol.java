@@ -516,7 +516,7 @@ public final class FreeCol {
      * and underneath that directory a "save" directory will
      * be created.
      * 
-     * For MacOS X the Library/Application Support/FreeCol is used
+     * For MacOS X the Library/FreeCol is used
      * (which is the standard path for application related files).
      * 
      * For os.name beginning with "Windows" JFileChooser() is used to 
@@ -533,10 +533,10 @@ public final class FreeCol {
         // Checks for OS specific paths, however if the old {home}/.freecol exists
         // that overrides OS-specifics for backwards compatibility.
         if(System.getProperty("os.name").equals("Mac OS X")) {
-            // We are running on a Mac and should use {home}/Library/Application Support/FreeCol
+            // We are running on a Mac and should use {home}/Library/FreeCol
             
             if(!new File(userHome, freeColDirectoryName).isDirectory()) {
-                userHome = userHome + System.getProperty("file.separator") + "Library" + System.getProperty("file.separator") + "Application Support";
+                userHome = userHome + System.getProperty("file.separator") + "Library" + System.getProperty("file.separator");
                 freeColDirectoryName = "FreeCol";
             }
         } else if(System.getProperty("os.name").startsWith("Windows")) {
