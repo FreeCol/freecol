@@ -30,6 +30,7 @@ public class ColonyTest extends FreeColTestCase {
     BuildingType churchType = spec().getBuildingType("model.building.chapel");
     BuildingType townHallType = spec().getBuildingType("model.building.townHall");
     BuildingType carpenterHouseType =  spec().getBuildingType("model.building.carpenterHouse");
+    BuildingType lumberMillType =  FreeCol.getSpecification().getBuildingType("model.building.lumberMill");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
@@ -99,6 +100,34 @@ public class ColonyTest extends FreeColTestCase {
         colony.checkBuildableComplete();
         assertTrue("Colony should have warehouse",colony.getWarehouse().getType() == warehouseType);
         
+    }
+    
+    /**
+     * Tests invalid completion of buildable, having enough resources
+    */
+    public void testInvalidCompletion() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(true));
+
+    	Colony colony = getStandardColony(2);
+    	Building carpenterHouse = new Building(getGame(), colony, carpenterHouseType);
+    	colony.addBuilding(carpenterHouse);
+    	assertFalse("Colony should not be able to build lumber mill",colony.canBuild(lumberMillType));
+    	colony.setCurrentlyBuilding(lumberMillType);
+    	assertTrue("Colony should be building lumber mill",colony.getCurrentlyBuilding() == lumberMillType);
+    	// add sufficient goods to build lumber mill
+    	for(AbstractGoods reqGoods : lumberMillType.getGoodsRequired()){
+    		GoodsType type = reqGoods.getType();
+    		int ammount = reqGoods.getAmount() + 1;
+    		colony.addGoods(type, ammount);
+    		assertEquals("Wrong quantity of " + type,ammount, colony.getGoodsCount(type));
+    	}
+
+    	// test
+    	assertFalse("Colony should not have lumber mill",colony.getBuilding(lumberMillType).getType() == lumberMillType);
+    	colony.checkBuildableComplete();
+    	assertFalse("Colony should not have lumber mill",colony.getBuilding(lumberMillType).getType() == lumberMillType);
+    	assertFalse("Colony should no longer be building lumber mill",colony.getCurrentlyBuilding() == lumberMillType);
     }
     
     public void testNoBuildingMaterialsProductionWhenBuildingNothing(){

@@ -1529,11 +1529,32 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (buildable == null) {
             // building nothing
             return;
-        } else if (lastVisited == getGame().getTurn().getNumber()) {
+        }
+        
+        // In order to avoid duplicate messages:
+        if (lastVisited == getGame().getTurn().getNumber()) {
             return;
         }
-        // In order to avoid duplicate messages:
         lastVisited = getGame().getTurn().getNumber();
+        
+        // Always check first the currently build
+        while (!buildQueue.isEmpty() && !canBuild()) {
+            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                        "colonyPanel.unbuildable",
+                                                        this, buildable)
+                            .addName("%colony%", getName())
+                            .add("%object%", buildQueue.get(0).getNameKey()));
+            buildQueue.remove(0);
+            buildable = getCurrentlyBuilding();
+        }
+        // warn player that no build queue is empty
+        if (buildQueue.isEmpty()) {
+            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                        "model.colony.cannotBuild",
+                                                        this)
+                            .addName("%colony%", getName()));
+            return;
+        }
         
         // Check availability of goods required for construction
         ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
