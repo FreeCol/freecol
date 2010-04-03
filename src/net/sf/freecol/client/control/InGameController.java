@@ -1022,6 +1022,10 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("declareIndependence.needCoastalColony");
             return;
         }
+        if (player.getNewLandName() == null) {
+            // Can only happen in debug mode.
+            return;
+        }
 
         // Confirm intention, and collect nation+country names.
         List<String> names = canvas.showConfirmDeclarationDialog();

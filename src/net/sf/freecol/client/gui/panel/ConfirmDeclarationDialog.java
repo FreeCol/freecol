@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 
 import net.miginfocom.swing.MigLayout;
@@ -47,15 +48,18 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
      */
     public ConfirmDeclarationDialog(final Canvas parent) {
         super(parent);
+        Player player = getMyPlayer();
 
-        final JTextField nationField =
-            new JTextField(Messages.message(StringTemplate.template("declareIndependence.defaultNation")
-                                            .addStringTemplate("%nation%", getMyPlayer().getNationName())),
-                           20);
+        StringTemplate nation
+            = StringTemplate.template("declareIndependence.defaultNation")
+                .addStringTemplate("%nation%", player.getNationName());
+        final JTextField nationField
+            = new JTextField(Messages.message(nation), 20);
+        StringTemplate country
+            = StringTemplate.template("declareIndependence.defaultCountry")
+                .add("%nation%", player.getNewLandName());
         final JTextField countryField =
-            new JTextField(Messages.message("declareIndependence.defaultCountry",
-                                            "%nation%",
-                                            getMyPlayer().getNewLandName()), 20);
+            new JTextField(Messages.message(country), 20);
 
         okButton = new JButton(Messages.message("declareIndependence.areYouSure.yes"));
 
@@ -78,9 +82,11 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
                 }
             });
 
-        add(getDefaultTextArea(Messages.message("declareIndependence.areYouSure.text",
-                                                "%monarch%",
-                                                Messages.message(getMyPlayer().getMonarch().getNameKey()))));
+
+        StringTemplate sure
+            = StringTemplate.template("declareIndependence.areYouSure.text")
+                .add("%monarch%", player.getMonarch().getNameKey());
+        add(getDefaultTextArea(Messages.message(sure)));
         add(getDefaultTextArea(Messages.message("declareIndependence.enterCountry")));
         add(countryField);
         add(getDefaultTextArea(Messages.message("declareIndependence.enterNation")));

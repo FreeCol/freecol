@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -71,6 +70,8 @@ import net.sf.freecol.common.util.Utils;
 */
 public class ServerPlayer extends Player implements ServerModelObject {
     
+    public static final int SCORE_INDEPENDENCE_GRANTED = 1000;
+
     /** The network socket to the player's client. */
     private Socket socket;
 
@@ -167,92 +168,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Declare independence.
+     * Sever ties with the European homeland.
      *
-     * @param nationName The new name for the independent nation.
-     * @param countryName The new name for its residents.
+     * @return A list of objects disposed.
      */
-    public List<FreeColObject> declareIndependence(String nationName,
-                                                   String countryName) {
-        ArrayList<FreeColObject> result = new ArrayList<FreeColObject>();
-        // Cross the Rubicon
-        setIndependentNationName(nationName);
-        setNewLandName(countryName);
-        setPlayerType(PlayerType.REBEL);
-        getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
-        modifyScore(SCORE_INDEPENDENCE_DECLARED);
-        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                     HistoryEvent.EventType.DECLARE_INDEPENDENCE));
-
-        // Clean up unwanted connections
-        divertModelMessages(europe, null);
-
-        // Dispose of units in Europe.
-        List<FreeColGameObject> objects = europe.disposeList();
-        result.addAll(objects);
+    public List<Object> severEurope() {
+        List<Object> objects = new ArrayList<Object>();
+        objects.addAll(europe.disposeList());
         europe = null;
-        monarch = null; // "No more kings"
-        StringTemplate seized = StringTemplate.label(", ");
-        for (FreeColGameObject o : objects) {
-            if (o instanceof Unit) {
-                seized.addStringTemplate(((Unit) o).getLabel());
-            }
-        }
-        if (!seized.getReplacements().isEmpty()) {
-            result.add(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                        "model.player.independence.unitsSeized", this)
-                       .addStringTemplate("%units%", seized));
-        }
-
-        // Generalized continental army muster
-        java.util.Map<UnitType, UnitType> upgrades = new HashMap<UnitType, UnitType>();
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
-            UnitType upgrade = unitType.getUnitTypeChange(ChangeType.INDEPENDENCE, this);
-            if (upgrade != null) {
-                upgrades.put(unitType, upgrade);
-            }
-        }
-
-        for (Colony colony : getColonies()) {
-            int sol = colony.getSoL();
-            if (sol > 50) {
-                java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<UnitType, List<Unit>>();
-                List<Unit> allUnits = new ArrayList<Unit>(colony.getTile().getUnitList());
-                allUnits.addAll(colony.getUnitList());
-                for (Unit unit : allUnits) {
-                    if (upgrades.containsKey(unit.getType())) {
-                        List<Unit> unitList = unitMap.get(unit.getType());
-                        if (unitList == null) {
-                            unitList = new ArrayList<Unit>();
-                            unitMap.put(unit.getType(), unitList);
-                        }
-                        unitList.add(unit);
-                    }
-                }
-                for (Entry<UnitType, List<Unit>> entry : unitMap.entrySet()) {
-                    int limit = (entry.getValue().size() + 2) * (sol - 50) / 100;
-                    if (limit > 0) {
-                        for (int index = 0; index < limit; index++) {
-                            Unit unit = entry.getValue().get(index);
-                            if (unit == null) break;
-                            unit.setType(upgrades.get(entry.getKey()));
-                            result.add(unit);
-                        }
-                        result.add(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                                    "model.player.continentalArmyMuster",
-                                                    this, colony)
-                                   .addName("%colony%", colony.getName())
-                                   .addAmount("%number%", limit)
-                                   .add("%oldUnit%", entry.getKey().getNameKey())
-                                   .add("%unit%", upgrades.get(entry.getKey()).getNameKey()));
-                    }
-                }
-            }
-        }
-
-        // inelegant, but a lot happens here, once
-        result.add(this);
-        return result;
+        objects.add(monarch);
+        monarch = null;
+        return objects;
     }
 
     /**

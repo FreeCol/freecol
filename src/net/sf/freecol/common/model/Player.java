@@ -65,8 +65,6 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
     public static final int SCORE_SETTLEMENT_DESTROYED = -40;
-    public static final int SCORE_INDEPENDENCE_DECLARED = 100;
-    public static final int SCORE_INDEPENDENCE_GRANTED = 1000;
 
     /**
      * The XML tag name for the set of founding fathers.

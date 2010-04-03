@@ -36,6 +36,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -102,6 +103,8 @@ import org.w3c.dom.Element;
 public final class InGameController extends Controller {
 
     private static Logger logger = Logger.getLogger(InGameController.class.getName());
+
+    public static final int SCORE_INDEPENDENCE_DECLARED = 100;
 
     public int debugOnlyAITurns = 0;
 
@@ -391,8 +394,8 @@ public final class InGameController extends Controller {
                     if (serverPlayer.canSee(tile)) {
                         update.appendChild(tile.toXMLElement(serverPlayer, doc, false, false));
                     }
-                } else if (fcgo instanceof Region) {
-                    // Always update regions
+                } else if (fcgo instanceof Player || fcgo instanceof Region) {
+                    // Always update players and regions.
                     update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
                 } else {
                     logger.warning("Attempt to update hidden object: "
@@ -1255,18 +1258,18 @@ public final class InGameController extends Controller {
      * Create the Royal Expeditionary Force player corresponding to
      * a given player that is about to rebel.
      *
-     * @param player The <code>ServerPlayer</code> about to rebel.
+     * @param serverPlayer The <code>ServerPlayer</code> about to rebel.
      * @return The REF player.
      */
-    public ServerPlayer createREFPlayer(ServerPlayer player) {
-        Nation refNation = player.getNation().getRefNation();
+    public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
+        Nation refNation = serverPlayer.getNation().getRefNation();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
-        refPlayer.setEntryLocation(player.getEntryLocation());
+        refPlayer.setEntryLocation(serverPlayer.getEntryLocation());
         // This will change later, just for setup
-        player.setStance(refPlayer, Stance.PEACE);
-        refPlayer.setTension(player, new Tension(Tension.Level.CONTENT.getLimit()));
-        player.setTension(refPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
-        createREFUnits(player, refPlayer);
+        serverPlayer.setStance(refPlayer, Stance.PEACE);
+        refPlayer.setTension(serverPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
+        serverPlayer.setTension(refPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
+        createREFUnits(serverPlayer, refPlayer);
         return refPlayer;
     }
     
@@ -1524,6 +1527,113 @@ public final class InGameController extends Controller {
 
         // Do not update others, they can not see cash-ins which
         // happen in colony or in Europe.
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
+     * Declare independence.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is naming.
+     * @param nationName The new name for the independent nation.
+     * @param countryName The new name for its residents.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element declareIndependence(ServerPlayer serverPlayer,
+                                       String nationName, String countryName) {
+        List<Object> objects = new ArrayList<Object>();
+
+        // Cross the Rubicon
+        serverPlayer.setIndependentNationName(nationName);
+        serverPlayer.setNewLandName(countryName);
+        serverPlayer.setPlayerType(PlayerType.REBEL);
+        serverPlayer.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        serverPlayer.modifyScore(SCORE_INDEPENDENCE_DECLARED);
+        objects.add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                     HistoryEvent.EventType.DECLARE_INDEPENDENCE));
+        // Clean up unwanted connections
+        Europe europe = serverPlayer.getEurope();
+        serverPlayer.divertModelMessages(europe, null);
+
+        // Dispose of units in Europe.
+        StringTemplate seized = StringTemplate.label(", ");
+        for (Unit u : europe.getUnitList()) {
+            seized.addStringTemplate(u.getLabel());
+        }
+        if (!seized.getReplacements().isEmpty()) {
+            objects.add(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                         "model.player.independence.unitsSeized",
+                                         serverPlayer)
+                        .addStringTemplate("%units%", seized));
+        }
+
+        // Generalized continental army muster
+        java.util.Map<UnitType, UnitType> upgrades
+            = new HashMap<UnitType, UnitType>();
+        Specification spec = Specification.getSpecification();
+        for (UnitType unitType : spec.getUnitTypeList()) {
+            UnitType upgrade = unitType.getUnitTypeChange(ChangeType.INDEPENDENCE,
+                                                          serverPlayer);
+            if (upgrade != null) {
+                upgrades.put(unitType, upgrade);
+            }
+        }
+        for (Colony colony : serverPlayer.getColonies()) {
+            int sol = colony.getSoL();
+            if (sol > 50) {
+                java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<UnitType, List<Unit>>();
+                List<Unit> allUnits = new ArrayList<Unit>(colony.getTile().getUnitList());
+                allUnits.addAll(colony.getUnitList());
+                for (Unit unit : allUnits) {
+                    if (upgrades.containsKey(unit.getType())) {
+                        List<Unit> unitList = unitMap.get(unit.getType());
+                        if (unitList == null) {
+                            unitList = new ArrayList<Unit>();
+                            unitMap.put(unit.getType(), unitList);
+                        }
+                        unitList.add(unit);
+                    }
+                }
+                for (Entry<UnitType, List<Unit>> entry : unitMap.entrySet()) {
+                    int limit = (entry.getValue().size() + 2) * (sol - 50) / 100;
+                    if (limit > 0) {
+                        for (int index = 0; index < limit; index++) {
+                            Unit unit = entry.getValue().get(index);
+                            if (unit == null) break;
+                            unit.setType(upgrades.get(entry.getKey()));
+                            objects.add(unit);
+                        }
+                        objects.add(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                                     "model.player.continentalArmyMuster",
+                                                     serverPlayer, colony)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%number%", limit)
+                                    .add("%oldUnit%", entry.getKey().getNameKey())
+                                    .add("%unit%", upgrades.get(entry.getKey()).getNameKey()));
+                    }
+                }
+            }
+        }
+
+        // Create the REF.
+        ServerPlayer refPlayer = createREFPlayer(serverPlayer);
+
+        // Now the REF is ready, we can dispose of the European connection.
+        objects.addAll(serverPlayer.severEurope());
+
+        // Other players only need a partial player update.
+        List<Object> otherObjects = new ArrayList<Object>();
+        addPartial(otherObjects, serverPlayer, "playerType",
+                   "independentNationName", "newLandName");
+        sendToOthers(serverPlayer, otherObjects);
+
+        // Do this after the above update, so the other players see
+        // the new nation name declaring war.
+        serverPlayer.changeRelationWithPlayer(refPlayer, Stance.WAR);
+
+        // Pity to have to update such a heavy object as the player,
+        // but we do this, at most, once per player.
+        objects.add(serverPlayer);
         return buildUpdate(serverPlayer, objects);
     }
 

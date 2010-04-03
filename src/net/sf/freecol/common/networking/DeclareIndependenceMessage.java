@@ -19,20 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -85,6 +78,8 @@ public class DeclareIndependenceMessage extends Message {
      *         rebel player, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
+        ServerPlayer serverPlayer = server.getPlayer(connection);
+
         if (nationName == null || nationName.length() == 0
             || countryName == null || countryName.length() == 0) {
             return Message.clientError("Empty nation or country name.");
@@ -96,46 +91,9 @@ public class DeclareIndependenceMessage extends Message {
             return Message.clientError("Only colonial players can declare independence.");
         }
 
-        // Create and arm the REF player
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        ServerPlayer refPlayer = server.getInGameController().createREFPlayer(serverPlayer);
-
-        // Liberty or else
-        List<FreeColObject> changes = serverPlayer.declareIndependence(nationName, countryName);
-
-        // Tell the other players about the new names and rebel status
-        Element reply = Message.createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(player.toXMLElementPartial(doc, "playerType", "independentNationName", "newLandName"));
-        server.getServer().sendToAll(reply, connection);
-
-        // Do this after the above update, so the other players see
-        // the new nation name declaring war.
-        serverPlayer.changeRelationWithPlayer(refPlayer, Stance.WAR);
-
-        // Update the player
-        reply = Message.createNewRootElement("multiple");
-        doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        Element remove = doc.createElement("remove");
-        reply.appendChild(update);
-        Element messages = doc.createElement("addMessages");
-        for (FreeColObject obj : changes) {
-            if (obj instanceof ModelMessage) {
-                obj.addToOwnedElement(messages, player);
-            } else if (obj instanceof Unit && ((Unit) obj).isDisposed()) {
-                ((Unit) obj).addToRemoveElement(remove);
-            } else {
-                update.appendChild(obj.toXMLElement(player, doc));
-            }
-        }
-        if (remove.hasChildNodes()) {
-            reply.appendChild(remove);
-        }
-        if (messages.hasChildNodes()) {
-            reply.appendChild(messages);
-        }
-        return reply;
+        // Declare.
+        return server.getInGameController().
+            declareIndependence(serverPlayer, nationName, countryName);
     }
 
     /**
