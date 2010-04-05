@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -70,6 +71,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
@@ -1012,15 +1014,13 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Check for adequate support.
-        if (player.getSoL() < 50) {
-            canvas.showInformationMessage("declareIndependence.notMajority",
-                FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                "%percentage%", Integer.toString(player.getSoL()));
-            return;
-        }
-        if (!player.hasCoastalColony()) {
-            canvas.showInformationMessage("declareIndependence.needCoastalColony");
-            return;
+        Event event = FreeCol.getSpecification().getEvent("model.event.declareIndependence");
+        for (Limit limit : event.getLimits()) {
+            if (!limit.evaluate(player)) {
+                canvas.showInformationMessage(limit.getDescriptionKey(), "%limit%",
+                                              Integer.toString(limit.getRightHandSide().getValue()));
+                return;
+            }
         }
         if (player.getNewLandName() == null) {
             // Can only happen in debug mode.

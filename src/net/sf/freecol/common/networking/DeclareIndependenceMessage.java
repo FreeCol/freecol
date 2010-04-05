@@ -19,9 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -84,8 +87,12 @@ public class DeclareIndependenceMessage extends Message {
             || countryName == null || countryName.length() == 0) {
             return Message.clientError("Empty nation or country name.");
         }
-        if (player.getSoL() < 50) {
-            return Message.clientError("Cannot declare independence with SoL < 50: " + player.getSoL());
+        Event event = Specification.getSpecification().getEvent("model.event.declareIndependence");
+        for (Limit limit : event.getLimits()) {
+            if (!limit.evaluate(player)) {
+                return Message.clientError(limit.getDescriptionKey() + " "
+                                           + Integer.toString(limit.getRightHandSide().getValue()));
+            }
         }
         if (player.getPlayerType() != PlayerType.COLONIAL) {
             return Message.clientError("Only colonial players can declare independence.");
