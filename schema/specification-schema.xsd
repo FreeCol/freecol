@@ -4,6 +4,7 @@
      0.26: add capture-equipment
      0.27: add limits
      0.28: move limits into other elements
+     0.29: add events
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -25,6 +26,7 @@
         <xs:element ref="difficultyLevels"/>
         <xs:element ref="options"/>
         <xs:element ref="modifiers"/>
+        <xs:element ref="events"/>
       </xs:choice>
     </xs:complexType>
   </xs:element>
@@ -428,6 +430,22 @@
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="events">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="event">
+          <xs:complexType>
+            <xs:sequence maxOccurs="unbounded" >
+              <xs:element ref="limit" />
+            </xs:sequence>
+            <xs:attribute name="id" use="required" type="xs:ID"/>
+            <xs:attribute name="value" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 

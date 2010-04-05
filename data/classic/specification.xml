@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.28 -->
+<!-- specification version 0.29 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -46,6 +46,20 @@
               source="model.source.artilleryAgainstRaid"
               value="100" type="percentage" />
   </modifiers>
+
+  <events>
+    <event id="model.event.declareIndependence">
+      <limit id="model.limit.independence.rebels" operator="GE">
+        <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
+        <rightHandSide value="50" />
+      </limit>
+      <limit id="model.limit.independence.colonies" operator="GT">
+        <leftHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER"
+                      method-name="isConnected" method-value="true" />
+        <rightHandSide value="0" />
+      </limit>
+    </event>
+  </events>
 
   <goods-types>
     <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">

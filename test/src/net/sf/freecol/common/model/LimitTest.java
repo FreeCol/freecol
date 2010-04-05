@@ -71,7 +71,7 @@ public class LimitTest extends FreeColTestCase {
 
     }
 
-    public void testIndependenceLimit() {
+    public void testIndependenceLimits() {
 
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -79,20 +79,46 @@ public class LimitTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = getStandardColony(3);
+
+        Event event = spec().getEvent("model.event.declareIndependence");
+        assertNotNull(event);
+        assertNotNull(event.getLimits());
         
-        Operand lhs = new Operand();
-        lhs.setScopeLevel(ScopeLevel.PLAYER);
-        lhs.setMethodName("getSoL");
+        Limit rebelLimit = null, colonyLimit = null;
+        for (Limit limit : event.getLimits()) {
+            if (limit.getId().equals("model.limit.independence.rebels")) {
+                rebelLimit = limit;
+            } else if (limit.getId().equals("model.limit.independence.colonies")) {
+                colonyLimit = limit;
+            }
+        }
 
-        Operand rhs = new Operand(50);
+        assertNotNull(rebelLimit);
+        assertEquals(Limit.Operator.GE, rebelLimit.getOperator());
+        assertEquals(Operand.OperandType.NONE, rebelLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.PLAYER, rebelLimit.getLeftHandSide().getScopeLevel());
+        assertEquals(new Integer(0), rebelLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(new Integer(50), rebelLimit.getRightHandSide().getValue(dutch));
+        assertFalse(rebelLimit.evaluate(dutch));
 
-        Limit limit = new Limit("model.limit.independence", lhs, Operator.GE, rhs);
-
-        assertFalse(limit.evaluate(dutch));
+        assertNotNull(colonyLimit);
+        assertEquals(Limit.Operator.GT, colonyLimit.getOperator());
+        assertEquals(Operand.OperandType.SETTLEMENTS, colonyLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.PLAYER, colonyLimit.getLeftHandSide().getScopeLevel());
+        assertEquals(new Integer(0), colonyLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(new Integer(0), colonyLimit.getRightHandSide().getValue(dutch));
+        assertFalse(colonyLimit.evaluate(dutch));
 
         colony.incrementLiberty(10000);
         colony.updateSoL();
-        assertTrue(limit.evaluate(dutch));
+        assertTrue(rebelLimit.evaluate(dutch));
+
+        Tile tile = map.getNeighbourOrNull(Map.Direction.N, colony.getTile());
+        tile.setType(spec().getTileType("model.tile.ocean"));
+        tile.setConnected(true);
+        assertTrue(colony.isConnected());
+        assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
+        assertTrue(colonyLimit.evaluate(dutch));
 
     }
 

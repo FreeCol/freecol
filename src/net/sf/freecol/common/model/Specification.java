@@ -140,7 +140,7 @@ public final class Specification {
     private final List<EquipmentType> equipmentTypes;
 
     private final List<DifficultyLevel> difficultyLevels;
-    private final List<Limit> limits;
+    private final List<Event> events;
 
     private int storableTypes = 0;
 
@@ -204,7 +204,7 @@ public final class Specification {
 
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
-        limits = new ArrayList<Limit>();
+        events = new ArrayList<Event>();
 
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
@@ -235,6 +235,7 @@ public final class Specification {
                       new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
         readerMap.put("equipment-types",
                       new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
+        readerMap.put("events", new TypeReader<Event>(Event.class, events));
         readerMap.put("founding-fathers",
                       new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
         readerMap.put("goods-types",
@@ -243,7 +244,6 @@ public final class Specification {
                       new TypeReader<ImprovementActionType>(ImprovementActionType.class, improvementActionTypeList));
         readerMap.put("indian-nation-types",
                       new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
-        readerMap.put("limits", new TypeReader<Limit>(Limit.class, limits));
         readerMap.put("resource-types",
                       new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
         readerMap.put("tile-types",
@@ -938,12 +938,12 @@ public final class Specification {
     }
 
     // -- Limits --
-    public List<Limit> getLimits() {
-        return limits;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public Limit getLimit(String id) {
-        return getType(id, Limit.class);
+    public Event getEvent(String id) {
+        return getType(id, Event.class);
     }
 
     /**

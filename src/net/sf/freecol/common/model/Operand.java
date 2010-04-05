@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -44,6 +45,8 @@ import javax.xml.stream.XMLStreamWriter;
  * OperandType is NONE.
  */
 public class Operand extends Scope {
+
+    private static final Logger logger = Logger.getLogger(Operand.class.getName());
 
     public static enum OperandType {
         UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, NONE
@@ -173,6 +176,7 @@ public class Operand extends Scope {
                             return null;
                         }
                     } catch(Exception e) {
+                        logger.warning(e.toString());
                         return null;
                     }
                 } else {
@@ -242,6 +246,7 @@ public class Operand extends Scope {
                                 return (Integer) method.invoke(player);
                             }
                         } catch(Exception e) {
+                            logger.warning(e.toString());
                             return null;
                         }
                     }
@@ -286,6 +291,7 @@ public class Operand extends Scope {
                                 return (Integer) method.invoke(colony);
                             }
                         } catch(Exception e) {
+                            logger.warning(e.toString());
                             return null;
                         }
                     }
