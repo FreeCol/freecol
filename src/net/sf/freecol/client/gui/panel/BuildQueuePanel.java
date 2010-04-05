@@ -236,12 +236,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                                                 Integer.toString(unitType.getPopulationRequired())));
             }
 
-            OperandType operandType = unitType.getLimitType();
-            if (operandType != null) {
-                for (Limit limit : FreeCol.getSpecification().getLimits()) {
-                    if (limit.hasOperandType(operandType)
-                        && limit.appliesTo(unitType)
-                        && !limit.evaluate(colony)) {
+            if (unitType.getLimits() != null) {
+                for (Limit limit : unitType.getLimits()) {
+                    if (!limit.evaluate(colony)) {
                         lockReason.add(Messages.message(limit.getDescriptionKey()));
                     }
                 }
@@ -337,16 +334,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 }
             }
 
-            OperandType operandType = buildingType.getLimitType();
-            if (operandType != null) {
-                for (Limit limit : FreeCol.getSpecification().getLimits()) {
-                    if (limit.hasOperandType(operandType)
-                        && limit.appliesTo(buildingType)) {
-                        if (!limit.evaluate(colony)
-                            || !limit.evaluate(colony.getOwner())
-                            || !limit.evaluate(getGame())) {
-                            lockReason.add(Messages.message(limit.getDescriptionKey()));
-                        }
+            if (buildingType.getLimits() != null) {
+                for (Limit limit : buildingType.getLimits()) {
+                    if (!limit.evaluate(colony)) {
+                        lockReason.add(Messages.message(limit.getDescriptionKey()));
                     }
                 }
             }

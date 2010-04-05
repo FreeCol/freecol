@@ -52,13 +52,14 @@ public class LimitTest extends FreeColTestCase {
         Building armory = new Building(getGame(), colony, spec().getBuildingType("model.building.armory"));
         colony.addBuilding(armory);
 
-        Limit wagonTrainLimit = spec().getLimit("model.limit.wagonTrains");
-
+        UnitType wagonTrain = spec().getUnitType("model.unit.wagonTrain");
         UnitType artillery = spec().getUnitType("model.unit.artillery");
+
+        Limit wagonTrainLimit = wagonTrain.getLimits().get(0);
+
         assertTrue(colony.canBuild(artillery));
         assertFalse(wagonTrainLimit.getLeftHandSide().appliesTo(artillery));
 
-        UnitType wagonTrain = spec().getUnitType("model.unit.wagonTrain");
         assertTrue(wagonTrainLimit.evaluate(colony));
         assertTrue(colony.canBuild(wagonTrain));
 

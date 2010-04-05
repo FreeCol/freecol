@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.27
+<!-- XSD for specification version 0.28
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
+     0.28: move limits into other elements
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -24,7 +25,6 @@
         <xs:element ref="difficultyLevels"/>
         <xs:element ref="options"/>
         <xs:element ref="modifiers"/>
-        <xs:element ref="limits"/>
       </xs:choice>
     </xs:complexType>
   </xs:element>
@@ -191,6 +191,7 @@
         <xs:element ref="required-goods"/>
         <xs:element ref="compatible-equipment"/>
         <xs:element ref="capture-equipment"/>
+        <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="combat-loss-priority" type="xs:int"/>
@@ -321,6 +322,7 @@
         <xs:element ref="required-ability"/>
         <xs:element ref="required-goods"/>
         <xs:element ref="default-equipment"/>
+        <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="offence" use="required" type="xs:nonNegativeInteger"/>
@@ -357,6 +359,7 @@
         <xs:element ref="required-ability"/>
         <xs:element ref="ability"/>
         <xs:element ref="modifier"/>
+        <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="workplaces" use="required" type="xs:nonNegativeInteger"/>

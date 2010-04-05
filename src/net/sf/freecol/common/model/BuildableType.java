@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.model.Operand.OperandType;
 
 /**
  * Contains information on buildable types.
@@ -45,9 +44,9 @@ public abstract class BuildableType extends FreeColGameObjectType {
     private int populationRequired = 1;
 
     /**
-     * Describe limitType here.
+     * Limits on the production of this type.
      */
-    private OperandType limitType = null;
+    private List<Limit> limits;
 
     /**
      * A list of AbstractGoods required to build this type.
@@ -107,21 +106,21 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>LimitType</code> value.
+     * Get the <code>Limits</code> value.
      *
-     * @return an <code>OperandType</code> value
+     * @return a <code>List<Limit></code> value
      */
-    public final OperandType getLimitType() {
-        return limitType;
+    public final List<Limit> getLimits() {
+        return limits;
     }
 
     /**
-     * Set the <code>LimitType</code> value.
+     * Set the <code>Limits</code> value.
      *
-     * @param newLimitType The new LimitType value.
+     * @param newLimits The new Limits value.
      */
-    public final void setLimitType(final OperandType newLimitType) {
-        this.limitType = newLimitType;
+    public final void setLimits(final List<Limit> newLimits) {
+        this.limits = newLimits;
     }
 
     /**
@@ -140,7 +139,18 @@ public abstract class BuildableType extends FreeColGameObjectType {
     protected FreeColObject readChild(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         String childName = in.getLocalName();
-        if ("required-ability".equals(childName)) {
+        if (Limit.getXMLElementTagName().equals(childName)) {
+            if (limits == null) {
+                limits = new ArrayList<Limit>();
+            }
+            Limit limit = new Limit();
+            limit.readFromXML(in, specification);
+            if (limit.getLeftHandSide().getType() == null) {
+                limit.getLeftHandSide().setType(getId());
+            }
+            limits.add(limit);
+            return limit;
+        } else if ("required-ability".equals(childName)) {
             String abilityId = in.getAttributeValue(null, "id");
             boolean value = getAttribute(in, "value", true);
             getAbilitiesRequired().put(abilityId, value);

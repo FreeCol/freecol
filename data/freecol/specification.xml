@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.27 -->
+<!-- specification version 0.28 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -46,13 +46,6 @@
               source="model.source.artilleryAgainstRaid"
               value="100" type="percentage" />
   </modifiers>
-
-  <limits>
-    <limit id="model.limit.wagonTrains" operator="LT">
-      <leftHandSide operandType="UNITS" scopeLevel="PLAYER" type="model.unit.wagonTrain" />
-      <rightHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER" />
-    </limit>
-  </limits>
 
   <goods-types>
     <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">
@@ -1029,6 +1022,10 @@
       <required-goods id="model.goods.hammers" value="40"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
+      <limit id="model.limit.wagonTrains" operator="LT">
+        <leftHandSide operandType="UNITS" scopeLevel="PLAYER" />
+        <rightHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER" />
+      </limit>
     </unit-type>
     <!--<unit-type id="model.unit.milkmaid" offence="0"  defence="1" movement="3"  lineOfSight="1"-->
     <!--expert-production="model.goods.food" pathImage="foot">-->

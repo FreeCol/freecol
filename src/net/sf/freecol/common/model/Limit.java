@@ -58,16 +58,6 @@ public final class Limit extends FreeColGameObjectType {
      */
     private Operand rightHandSide;
 
-    /**
-     * Creates a new <code>Limit</code> instance.
-     *
-     * @param in a <code>XMLStreamReader</code> value
-     * @exception XMLStreamException if an error occurs
-     */
-    public Limit(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
-    }
-
     public Limit() {
         // empty constructor
     }

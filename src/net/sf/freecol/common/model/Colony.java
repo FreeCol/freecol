@@ -1484,12 +1484,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     return NoBuildReason.MISSING_ABILITY;
                 }
             }
-            Operand.OperandType operandType = buildableType.getLimitType();
-            if (operandType != null) {
-                for (Limit limit : Specification.getSpecification().getLimits()) {
-                    if (limit.hasOperandType(operandType)
-                        && limit.appliesTo(buildableType)
-                        && !limit.evaluate(this)) {
+            if (buildableType.getLimits() != null) {
+                for (Limit limit : buildableType.getLimits()) {
+                    if (!limit.evaluate(this)) {
                         return NoBuildReason.LIMIT_EXCEEDED;
                     }
                 }
