@@ -135,6 +135,8 @@ public final class FreeColClient {
 
     /** The player "owning" this client. */
     private Player player;
+    
+    private boolean isRetired = false;
 
     /** The Server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
@@ -645,6 +647,25 @@ public final class FreeColClient {
      */
     public boolean isSingleplayer() {
         return singleplayer;
+    }
+    
+    /**
+     * Sets whether or not the user has retired the game.
+     * 
+     * @param singleplayer Indicates whether or not the user has retired the game.
+     */
+    public void setIsRetired(boolean isRetired) {
+        this.isRetired = isRetired;
+    }
+    
+    /**
+     * Has the user retired the game.
+     * 
+     * @return <i>true</i> if the user has retired the game and
+     *         <i>false</i> otherwise.
+     */
+    public boolean isRetired() {
+        return isRetired;
     }
 
     /**

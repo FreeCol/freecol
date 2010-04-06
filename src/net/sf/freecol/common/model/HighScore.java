@@ -129,10 +129,16 @@ public class HighScore extends FreeColObject {
      * Describe date here.
      */
     private Date date;
-
+    
+    /**
+     * Retirement Game year
+     * 
+     */
+    private int retirementTurn;
 
     public HighScore(Player player, Date theDate) {
         date = theDate;
+        retirementTurn = player.getGame().getTurn().getNumber();
         score = player.getScore();
         for (Level someLevel : Level.values()) {
             if (score >= someLevel.getMinimumScore()) {
@@ -181,6 +187,24 @@ public class HighScore extends FreeColObject {
      */
     public final void setIndependenceTurn(final int newIndependenceTurn) {
         this.independenceTurn = newIndependenceTurn;
+    }
+    
+    /**
+     * Get the <code>RetirementTurn</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getRetirementTurn() {
+        return retirementTurn;
+    }
+
+    /**
+     * Set the <code>RetirementTurn</code> value.
+     *
+     * @param newRetirementTurn The new RetirementTurn value.
+     */
+    public final void setRetirementTurn(final int newRetirementTurn) {
+        this.retirementTurn = newRetirementTurn;
     }
 
     /**
@@ -409,6 +433,7 @@ public class HighScore extends FreeColObject {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("date", dateFormat.format(date));
+        out.writeAttribute("retirementTurn", Integer.toString(retirementTurn));
         out.writeAttribute("independenceTurn", Integer.toString(independenceTurn));
         out.writeAttribute("playerName", playerName);
         out.writeAttribute("nationID", nationID);
@@ -438,6 +463,7 @@ public class HighScore extends FreeColObject {
             logger.warning(e.toString());
             date = new Date();
         }
+        retirementTurn = getAttribute(in, "retirementTurn", 0);
         independenceTurn = getAttribute(in, "independenceTurn", 0);
         playerName = getAttribute(in, "playerName", "");
         nationID = getAttribute(in, "nationID", "model.nation.dutch");

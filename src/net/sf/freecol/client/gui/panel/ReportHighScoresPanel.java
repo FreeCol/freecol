@@ -19,19 +19,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 
 import javax.swing.JLabel;
 import javax.xml.stream.XMLStreamException;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.Turn;
 
 import org.w3c.dom.Element;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Foreign Affairs Report.
@@ -76,6 +76,12 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, "span, wrap 10");
 
+                reportPanel.add(new JLabel(Messages.message("report.highScores.turn")), "skip");    
+                int retirementTurn = highScore.getRetirementTurn();
+                String retirementTurnStr = (retirementTurn > 0) ? Turn.toString(retirementTurn) :
+                    Messages.message("N/A");   
+                reportPanel.add(new JLabel(retirementTurnStr));
+                
                 reportPanel.add(new JLabel(Messages.message("report.highScores.score")), "skip");
                 reportPanel.add(new JLabel(String.valueOf(highScore.getScore())));
 
@@ -116,5 +122,17 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
         reportPanel.doLayout();
     }
-
+    
+    /**
+     * This function tests if the player has chosen to retire previously and shows the quit menu
+     *if true.
+     * 
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+    	getCanvas().remove(this);
+    	if(getClient().isRetired()){
+    		getCanvas().quit();
+    	}
+    }
 }
