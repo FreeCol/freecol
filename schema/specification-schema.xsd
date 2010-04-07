@@ -5,6 +5,7 @@
      0.27: add limits
      0.28: move limits into other elements
      0.29: add events
+     0.30: extend string options
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -665,6 +666,19 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="defaultValue" type="xs:string"/>
       <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="addNone" type="xs:boolean" />
+      <xs:attribute name="generate">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="UNITS" />
+            <xs:enumeration value="IMMIGRANTS" />
+            <xs:enumeration value="LAND_UNITS" />
+            <xs:enumeration value="NAVAL_UNITS" />
+            <xs:enumeration value="BUILDINGS" />
+            <xs:enumeration value="FOUNDING_FATHERS" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 

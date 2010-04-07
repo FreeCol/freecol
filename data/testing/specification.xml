@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.29 -->
+<!-- specification version 0.30 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1971,6 +1971,30 @@
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+    </difficultyLevel>
+    <difficultyLevel id="model.difficulty.custom">
+      <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
+      <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="80" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.nativeConvertProbability" value="10" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.burnProbability" value="10" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
+      <integerOption id="model.option.refStrength" value="8" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
+      <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
+      <integerOption id="model.option.mercenaryPrice" value="125" minimumValue="0" maximumValue="1000"/>
+      <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
+      <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
+      <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />
     </difficultyLevel>
   </difficultyLevels>
   <options>

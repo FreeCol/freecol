@@ -20,8 +20,11 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -36,7 +39,28 @@ public class StringOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(StringOption.class.getName());
 
+    public static final String NONE = "none";
+
+    public static enum Generate {
+        UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS, BUILDINGS, FOUNDING_FATHERS
+    }
+
     private String value;
+
+    /**
+     * Describe addNone here.
+     */
+    private boolean addNone;
+
+    /**
+     * Describe generateChoices here.
+     */
+    private Generate generateChoices;
+
+    /**
+     * Describe choices here.
+     */
+    private List<String> choices;
 
     /**
      * Creates a new <code>StringOption</code>.
@@ -70,6 +94,59 @@ public class StringOption extends AbstractOption {
         isDefined = true;
     }
 
+    /**
+     * Get the <code>AddNone</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean addNone() {
+        return addNone;
+    }
+
+    /**
+     * Set the <code>AddNone</code> value.
+     *
+     * @param newAddNone The new AddNone value.
+     */
+    public final void setAddNone(final boolean newAddNone) {
+        this.addNone = newAddNone;
+    }
+
+    /**
+     * Get the <code>Choices</code> value.
+     *
+     * @return a <code>List<String></code> value
+     */
+    public final List<String> getChoices() {
+        return choices;
+    }
+
+    /**
+     * Set the <code>Choices</code> value.
+     *
+     * @param newChoices The new Choices value.
+     */
+    public final void setChoices(final List<String> newChoices) {
+        this.choices = newChoices;
+    }
+
+    /**
+     * Get the <code>GenerateChoices</code> value.
+     *
+     * @return a <code>Generate</code> value
+     */
+    public final Generate getGenerateChoices() {
+        return generateChoices;
+    }
+
+    /**
+     * Set the <code>GenerateChoices</code> value.
+     *
+     * @param newGenerateChoices The new GenerateChoices value.
+     */
+    public final void setGenerateChoices(final Generate newGenerateChoices) {
+        this.generateChoices = newGenerateChoices;
+    }
 
     /**
      * This method writes an XML-representation of this object to
@@ -85,6 +162,19 @@ public class StringOption extends AbstractOption {
 
         out.writeAttribute("id", getId());
         out.writeAttribute("value", value);
+        if (generateChoices != null) {
+            out.writeAttribute("generate", generateChoices.toString());
+        }
+        if (addNone) {
+            out.writeAttribute("addNone", Boolean.toString(addNone));
+        }
+        if (choices != null && !choices.isEmpty()) {
+            for (String choice : choices) {
+                out.writeStartElement("choice");
+                out.writeAttribute("value", choice);
+                out.writeEndElement();
+            }
+        }
 
         out.writeEndElement();
     }
@@ -101,10 +191,12 @@ public class StringOption extends AbstractOption {
         final String value = in.getAttributeValue(null, "value");
 
         if (id == null && getId().equals("NO_ID")){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                                         + "> tag : no id attribute found.");
         }
         if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                                         + "> tag : no value nor default value found.");
         }
 
         if(getId() == NO_ID) {
@@ -115,7 +207,19 @@ public class StringOption extends AbstractOption {
         } else {
             setValue(defaultValue);
         }
-        in.nextTag();
+
+        addNone = getAttribute(in, "addNone", false);
+        String generate = in.getAttributeValue(null, "generate");
+        if (generate != null) {
+            generateChoices = Enum.valueOf(StringOption.Generate.class, generate);
+        }
+
+        choices = new ArrayList<String>();
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if ("choice".equals(in.getLocalName())) {
+                choices.add(in.getAttributeValue(null, "value"));
+            }
+        }
 
     }
 

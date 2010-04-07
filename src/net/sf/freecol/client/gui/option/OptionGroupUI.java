@@ -53,6 +53,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.StringOption;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -150,6 +151,18 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             }
         } else if (o instanceof SelectOption) {
             final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
+            if (soi.getLabel().getText().length() > 30) {
+                add(soi.getLabel(), "newline, span 3, right");
+            } else {
+                add(soi.getLabel(), "right");
+            }
+            add(soi);
+            optionUpdaters.add(soi);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof StringOption) {
+            final StringOptionUI soi = new StringOptionUI((StringOption) o, editable);
             if (soi.getLabel().getText().length() > 30) {
                 add(soi.getLabel(), "newline, span 3, right");
             } else {

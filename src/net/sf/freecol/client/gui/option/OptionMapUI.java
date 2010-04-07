@@ -44,6 +44,7 @@ import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.StringOption;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -173,6 +174,18 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 optionUpdaters.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
+                }
+            } else if (o instanceof StringOption) {
+                final StringOptionUI soi = new StringOptionUI((StringOption) o, editable);
+                if (soi.getLabel().getText().length() > 30) {
+                    northPanel.add(soi.getLabel(), "newline, span 3, right");
+                } else {
+                    northPanel.add(soi.getLabel(), "right");
+                }
+                northPanel.add(soi);
+                optionUpdaters.add(soi);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), soi);
                 }
             } else if (o instanceof LanguageOption) {
                 LanguageOptionUI c = new LanguageOptionUI((LanguageOption) o, editable);

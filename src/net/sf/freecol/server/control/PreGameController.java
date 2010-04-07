@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
@@ -162,10 +163,13 @@ public final class PreGameController extends Controller {
                     if (Specification.getSpecification().hasOption(optionId)) {
                         String unitTypeId = Specification.getSpecification()
                             .getStringOption(optionId).getValue();
-                        europe.setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
-                    } else {
-                        europe.setRecruitable(index, player.generateRecruitable(player.getId() + "slot." + Integer.toString(index+1)));
+                        if (!StringOption.NONE.equals(unitTypeId)) {
+                            europe.setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
+                            continue;
+                        }
                     }
+                    europe.setRecruitable(index, player.generateRecruitable(player.getId() + "slot."
+                                                                            + Integer.toString(index+1)));
                 }
 
                 Market market = player.getMarket();
