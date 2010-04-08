@@ -537,8 +537,12 @@ public class DebugMenu extends JMenu {
                     }
 
                     Canvas canvas = freeColClient.getCanvas();
-                    int skipTurns = Integer.parseInt(canvas.showInputDialog(null,
-                                                                            "How many turns should be skipped:", Integer.toString(10), "ok", "cancel", true));
+                    String response = canvas.showInputDialog(null, "How many turns should be skipped:",
+                             Integer.toString(10), "ok", "cancel", true);
+                    if(response == null){
+                    	return;
+                    }
+                    int skipTurns = Integer.parseInt(response);
                     freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = skipTurns;
                     freeColClient.getInGameController().endTurn();
                 }
