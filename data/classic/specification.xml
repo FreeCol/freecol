@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.30 -->
+<!-- specification version 0.31 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -242,6 +242,8 @@
       <art basic="terrain/marsh/" minimap-color="#24803d"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
+      <primary-production goods-type="model.goods.food" value="3"/>
+      <secondary-production goods-type="model.goods.tobacco" value="2"/>
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="2"/>
       <production goods-type="model.goods.ore"        value="2"/>
@@ -261,7 +263,9 @@
     <tile-type id="model.tile.desert" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/desert/" minimap-color="#63732b"/><!--0.39,0.45,0.17"-->
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
+      <primary-production goods-type="model.goods.food" value="3" tile-production="veryHigh" />
       <primary-production goods-type="model.goods.food" value="2"/>
+      <primary-production goods-type="model.goods.food" value="1" tile-production="veryLow" />
       <secondary-production goods-type="model.goods.cotton" value="1"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
@@ -356,7 +360,9 @@
       <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="#24731f"/>
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <primary-production goods-type="model.goods.food" value="3" tile-production="veryHigh" />
       <primary-production goods-type="model.goods.food" value="2"/>
+      <primary-production goods-type="model.goods.food" value="1" tile-production="veryLow" />
       <secondary-production goods-type="model.goods.furs" value="2"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
@@ -398,8 +404,8 @@
     <tile-type id="model.tile.arctic" basic-move-cost="6" basic-work-turns="4">
       <art basic="terrain/arctic/" minimap-color="#ffffff"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="0" altitudeMin="1" altitudeMax="3"/>
-      <primary-production goods-type="model.goods.food" value="2" difficulty="model.difficulty.veryEasy"/>
-      <primary-production goods-type="model.goods.food" value="1" difficulty="model.difficulty.easy"/>
+      <primary-production goods-type="model.goods.food" value="2" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.food" value="1" tile-production="high" />
     </tile-type>
     <tile-type id="model.tile.ocean" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
@@ -441,6 +447,7 @@
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
+	  <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
@@ -462,6 +469,7 @@
     </equipment-type>
     <equipment-type id="model.equipment.tools" maximum-count="5" role="pioneer">
       <ability id="model.ability.improveTerrain" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
 	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
@@ -472,7 +480,7 @@
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
-    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
+    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
@@ -517,8 +525,8 @@
       change child options: from, to
 
       zIndex: tile improvements will be layered according to their z-index
-              tile overlays (e.g. hills) have a zIndex of 100, forests of 200,
-              resources of 400, lost city rumours of 500
+      tile overlays (e.g. hills) have a zIndex of 100, forests of 200,
+      resources of 400, lost city rumours of 500
     -->
   <tileimprovement-types>
     <tileimprovement-type id="model.improvement.river" natural="true" add-work-turns="0" magnitude="1"
@@ -531,17 +539,17 @@
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
       <modifier id="model.goods.cotton" type="additive" value="1"/>
-      <modifier id="model.goods.furs" type="additive" value="1"/>
-      <modifier id="model.goods.lumber" type="additive" value="1"/>
+      <modifier id="model.goods.furs" type="additive" value="2"/>
+      <modifier id="model.goods.lumber" type="additive" value="2"/>
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.road" add-work-turns="0" 
+    <tileimprovement-type id="model.improvement.road" add-work-turns="0"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
                           movement-cost="1" zIndex="350">
       <tiles all-land-tiles="true"/>
-      <modifier id="model.goods.furs" type="additive" value="1"/>
-      <modifier id="model.goods.lumber" type="additive" value="1"/>
+      <modifier id="model.goods.furs" type="additive" value="2"/>
+      <modifier id="model.goods.lumber" type="additive" value="2"/>
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
@@ -649,7 +657,7 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
-      <modifier id="model.goods.food" type="additive" value="2"/>
+      <modifier id="model.goods.food" type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman" offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.fish"
@@ -658,7 +666,7 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
-      <modifier id="model.goods.fish" type="additive" value="2"/>
+      <modifier id="model.goods.fish" type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.expertFurTrapper" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1"  expert-production="model.goods.furs"
@@ -914,9 +922,11 @@
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.bornInIndianSettlement" value="true"/>
       <ability id="model.ability.pillageUnprotectedColony" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <ability id="model.ability.captureUnits" value="false"/>
       <ability id="model.ability.captureEquipment" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <required-ability id="model.ability.native"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" movement="3" lineOfSight="1"
@@ -937,6 +947,7 @@
       <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -1004,12 +1015,14 @@
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="40"/>
       <ability id="model.ability.refUnit" value="true"/>
+      <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
       <downgrade unit="model.unit.damagedArtillery" demotion="true"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery" offence="5"  defence="3" movement="3"
                scoreValue="1" lineOfSight="1" pathImage="wagon">
+      <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
     </unit-type>
     <unit-type id="model.unit.treasureTrain" offence="0"  defence="0" movement="3"
@@ -1193,13 +1206,13 @@
     <building-type id="model.building.church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.chapel" required-population="3" sequence="10">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.goods.crosses" type="additive" value="2"/>
-      <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
+      <ability id="model.ability.dressMissionary" value="true"/>
     </building-type>
     <building-type id="model.building.cathedral" basicProduction="6" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.church" required-population="8" sequence="10">
       <required-goods id="model.goods.hammers" value="176"/>
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.goods.crosses" type="additive" value="3"/>
-      <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
+      <ability id="model.ability.dressMissionary" value="true"/>
     </building-type>
     <building-type id="model.building.stockade" workplaces="0" required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="64"/>
@@ -1320,6 +1333,7 @@
     <founding-father id="model.foundingFather.janDeWitt" type="trade"
                      weight1="2" weight2="6" weight3="10">
       <ability id="model.ability.tradeWithForeignColonies" value="true"/>
+      <ability id="model.ability.customHouseTradesWithForeignCountries" value="true"/>
       <ability id="model.ability.betterForeignAffairsReport" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
@@ -1647,9 +1661,9 @@
       <region id="model.region.southWest" />
       <region id="model.region.south" />
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
+                type="percentage" value="100" />
       <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
+                type="percentage" value="100" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
                         aggression="high" type-of-settlement="aztec_city"
@@ -1669,9 +1683,9 @@
       <region id="model.region.center" />
       <region id="model.region.east" />
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
+                type="percentage" value="100" />
       <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
+                type="percentage" value="100" />
     </indian-nation-type>
   </indian-nation-types>
 
@@ -1736,10 +1750,19 @@
       <integerOption id="model.option.nativeSettlementDensity" value="40"/>
       <integerOption id="model.option.nativeConvertProbability" value="50"/>
       <integerOption id="model.option.burnProbability" value="2"/>
+      <integerOption id="model.option.nativeDemands" value="0"/>
       <integerOption id="model.option.recruitPriceIncrease" value="20"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <integerOption id="model.option.monarchMeddling" value="0"/>
+      <integerOption id="model.option.refStrength" value="0"/>
+      <integerOption id="model.option.taxAdjustment" value="0"/>
+      <integerOption id="model.option.mercenaryPrice" value="25"/>
+      <stringOption  id="model.option.tileProduction" value="veryHigh" />
+      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+      <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
+      <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.easy">
       <integerOption id="model.option.startingMoney" value="300"/>
@@ -1752,10 +1775,18 @@
       <integerOption id="model.option.nativeSettlementDensity" value="50"/>
       <integerOption id="model.option.nativeConvertProbability" value="40"/>
       <integerOption id="model.option.burnProbability" value="4"/>
+      <integerOption id="model.option.nativeDemands" value="1"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <integerOption id="model.option.refStrength" value="2"/>
+      <integerOption id="model.option.monarchMeddling" value="1"/>
+      <integerOption id="model.option.taxAdjustment" value="1"/>
+      <integerOption id="model.option.mercenaryPrice" value="50"/>
+      <stringOption  id="model.option.tileProduction" value="high" />
+      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+      <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.medium">
       <integerOption id="model.option.startingMoney" value="0"/>
@@ -1768,10 +1799,17 @@
       <integerOption id="model.option.nativeSettlementDensity" value="60"/>
       <integerOption id="model.option.nativeConvertProbability" value="30"/>
       <integerOption id="model.option.burnProbability" value="6"/>
+      <integerOption id="model.option.nativeDemands" value="2"/>
       <integerOption id="model.option.recruitPriceIncrease" value="40"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <integerOption id="model.option.refStrength" value="4"/>
+      <integerOption id="model.option.monarchMeddling" value="2"/>
+      <integerOption id="model.option.taxAdjustment" value="2"/>
+      <integerOption id="model.option.mercenaryPrice" value="75"/>
+      <stringOption  id="model.option.tileProduction" value="medium" />
+      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.hard">
       <integerOption id="model.option.startingMoney" value="0"/>
@@ -1784,11 +1822,17 @@
       <integerOption id="model.option.nativeSettlementDensity" value="70"/>
       <integerOption id="model.option.nativeConvertProbability" value="20"/>
       <integerOption id="model.option.burnProbability" value="8"/>
+      <integerOption id="model.option.nativeDemands" value="3"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-    </difficultyLevel>
+      <integerOption id="model.option.refStrength" value="6"/>
+      <integerOption id="model.option.monarchMeddling" value="3"/>
+      <integerOption id="model.option.taxAdjustment" value="3"/>
+      <integerOption id="model.option.mercenaryPrice" value="100"/>
+      <stringOption  id="model.option.tileProduction" value="low" />
+   </difficultyLevel>
     <difficultyLevel id="model.difficulty.veryHard">
       <integerOption id="model.option.startingMoney" value="0"/>
       <integerOption id="model.option.crossesIncrement" value="14"/>
@@ -1798,12 +1842,18 @@
       <integerOption id="model.option.foundingFatherFactor" value="56"/>
       <integerOption id="model.option.arrearsFactor" value="700"/>
       <integerOption id="model.option.nativeSettlementDensity" value="80"/>
-      <integerOption id="model.option.nativeConvertProbability" value="40"/>
+      <integerOption id="model.option.nativeConvertProbability" value="10"/>
       <integerOption id="model.option.burnProbability" value="10"/>
+      <integerOption id="model.option.nativeDemands" value="4"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <integerOption id="model.option.refStrength" value="8"/>
+      <integerOption id="model.option.monarchMeddling" value="4"/>
+      <integerOption id="model.option.taxAdjustment" value="4"/>
+      <integerOption id="model.option.mercenaryPrice" value="125"/>
+      <stringOption  id="model.option.tileProduction" value="veryLow" />
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.custom">
       <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
@@ -1825,6 +1875,13 @@
       <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
       <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
       <integerOption id="model.option.mercenaryPrice" value="125" minimumValue="0" maximumValue="1000"/>
+      <stringOption  id="model.option.tileProduction" value="veryLow">
+        <choice value="veryLow" />
+        <choice value="low" />
+        <choice value="medium" />
+        <choice value="high" />
+        <choice value="veryHigh" />
+      </stringOption>
       <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
       <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
       <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />
@@ -1871,6 +1928,8 @@
       <integerOption id="model.option.guiMinNumberToDisplayGoodsCount" defaultValue="7" minimumValue="0" maximumValue="10"/>
       <!-- Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping. -->
       <integerOption id="model.option.guiMaxNumberOfGoodsImages" defaultValue="7" minimumValue="1" maximumValue="10"/>
+      <!-- Used by GUI, the good will be displayed in the warehouse panel when its quantity is at least this number. -->
+      <integerOption id="model.option.guiMinNumberToDisplayGoods" defaultValue="0" minimumValue="0" maximumValue="15"/>
       <!-- Selected tiles always gets centered if this option is enabled -->
       <booleanOption id="model.option.alwaysCenter" defaultValue="false"/>
       <!-- If this option is enabled, the display will recenter in order to display the active unit -->
@@ -1880,7 +1939,7 @@
       <!-- Option for activating autoscroll when dragging units on the mapboard. -->
       <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
       <!-- Option for autoscrolling when hitting the boundaries of the mapboard -->
-      <booleanOption id="model.option.autoScroll" defaultValue="true"/>
+      <booleanOption id="model.option.autoScroll" defaultValue="false"/>
       <!-- Whether to display a compass rose or not. -->
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
       <!-- Whether to display the map controls by default or not. -->

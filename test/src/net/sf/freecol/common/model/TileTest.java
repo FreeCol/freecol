@@ -475,27 +475,27 @@ public class TileTest extends FreeColTestCase {
     public void testArctic() {
         TileType arctic = spec().getTileType("model.tile.arctic");
 
-        arctic.applyDifficultyLevel("model.difficulty.veryEasy");
+        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.veryEasy"));
         assertTrue(arctic.canSettle());
         assertEquals(2, arctic.getPrimaryGoods().getAmount());
         assertNull(arctic.getSecondaryGoods());
 
-        arctic.applyDifficultyLevel("model.difficulty.easy");
+        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.easy"));
         assertTrue(arctic.canSettle());
         assertEquals(1, arctic.getPrimaryGoods().getAmount());
         assertNull(arctic.getSecondaryGoods());
 
-        arctic.applyDifficultyLevel("model.difficulty.medium");
+        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.medium"));
         assertTrue(arctic.canSettle());
         assertNull(arctic.getPrimaryGoods());
         assertNull(arctic.getSecondaryGoods());
 
-        arctic.applyDifficultyLevel("model.difficulty.hard");
+        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.hard"));
         assertTrue(arctic.canSettle());
         assertNull(arctic.getPrimaryGoods());
         assertNull(arctic.getSecondaryGoods());
 
-        arctic.applyDifficultyLevel("model.difficulty.veryHard");
+        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.veryHard"));
         assertTrue(arctic.canSettle());
         assertNull(arctic.getPrimaryGoods());
         assertNull(arctic.getSecondaryGoods());

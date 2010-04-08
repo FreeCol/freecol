@@ -68,7 +68,7 @@ public class StringOption extends AbstractOption {
      */
     public StringOption(XMLStreamReader in) throws XMLStreamException {
         super(NO_ID);
-        readFromXML(in);
+        readFromXMLImpl(in);
     }
 
     /**
@@ -218,9 +218,9 @@ public class StringOption extends AbstractOption {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if ("choice".equals(in.getLocalName())) {
                 choices.add(in.getAttributeValue(null, "value"));
+                in.nextTag();
             }
         }
-
     }
 
 

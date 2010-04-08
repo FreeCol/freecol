@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileType extends FreeColGameObjectType {
@@ -205,13 +206,13 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>PrimaryGoods</code> value at the difficulty level
+     * Get the <code>PrimaryGoods</code> value at the tileProduction level
      * with the ID given.
      *
      * @return an <code>AbstractGoods</code> value
      */
-    public AbstractGoods getPrimaryGoods(String difficulty) {
-        AbstractGoods result = primaryGoodsMap.get(difficulty);
+    public AbstractGoods getPrimaryGoods(String tileProduction) {
+        AbstractGoods result = primaryGoodsMap.get(tileProduction);
         if (result == null) {
             result = primaryGoodsMap.get(null);
         }
@@ -248,13 +249,13 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>SecondaryGoods</code> value at the difficulty level
+     * Get the <code>SecondaryGoods</code> value at the tileProduction level
      * with the ID given.
      *
      * @return an <code>AbstractGoods</code> value
      */
-    public AbstractGoods getSecondaryGoods(String difficulty) {
-        AbstractGoods result = secondaryGoodsMap.get(difficulty);
+    public AbstractGoods getSecondaryGoods(String tileProduction) {
+        AbstractGoods result = secondaryGoodsMap.get(tileProduction);
         if (result == null) {
             result = secondaryGoodsMap.get(null);
         }
@@ -295,13 +296,13 @@ public final class TileType extends FreeColGameObjectType {
      * Returns a list of all types of AbstractGoods produced by this
      * TileType when it is not the colony center tile.
      *
-     * @param difficulty
+     * @param tileProduction
      * @return a <code>List<AbstractGoods></code> value
      */
-    public List<AbstractGoods> getProduction(String difficulty) {
+    public List<AbstractGoods> getProduction(String tileProduction) {
         Map<GoodsType, AbstractGoods> result = new HashMap<GoodsType, AbstractGoods>();
         Map<GoodsType, AbstractGoods> defaultMap = productionMap.get(null);
-        Map<GoodsType, AbstractGoods> difficultyMap = productionMap.get(difficulty);
+        Map<GoodsType, AbstractGoods> difficultyMap = productionMap.get(tileProduction);
         if (defaultMap != null) {
             result.putAll(defaultMap);
         }
@@ -351,9 +352,12 @@ public final class TileType extends FreeColGameObjectType {
      *
      * @param difficulty difficulty level to apply
      */
-    public void applyDifficultyLevel(String difficulty) {
-        primaryGoods = getPrimaryGoods(difficulty);
-        secondaryGoods = getSecondaryGoods(difficulty);
+    @Override
+    public void applyDifficultyLevel(DifficultyLevel difficultyLevel) {
+        String tileProduction = ((StringOption) difficultyLevel.getOption("model.option.tileProduction"))
+            .getValue();
+        primaryGoods = getPrimaryGoods(tileProduction);
+        secondaryGoods = getSecondaryGoods(tileProduction);
         // remove old modifiers
         if (production != null) {
             for (AbstractGoods goods : production) {
@@ -362,7 +366,7 @@ public final class TileType extends FreeColGameObjectType {
                 getFeatureContainer().removeModifier(oldModifier);
             }
         }
-        production = getProduction(difficulty);
+        production = getProduction(tileProduction);
         // add new modifiers
         for (AbstractGoods goods : production) {
             addModifier(new Modifier(goods.getType().getId(), this, goods.getAmount(),
@@ -413,16 +417,16 @@ public final class TileType extends FreeColGameObjectType {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
                 AbstractGoods goods = new AbstractGoods(type, amount);
-                String difficulty = in.getAttributeValue(null, "difficulty");
+                String tileProduction = in.getAttributeValue(null, "tile-production");
                 if ("primary-production".equals(childName)) {
-                    primaryGoodsMap.put(difficulty, goods);
+                    primaryGoodsMap.put(tileProduction, goods);
                 } else if ("secondary-production".equals(childName)) {
-                    secondaryGoodsMap.put(difficulty, goods);
+                    secondaryGoodsMap.put(tileProduction, goods);
                 } else {
-                    Map<GoodsType, AbstractGoods> oldValue = productionMap.get(difficulty);
+                    Map<GoodsType, AbstractGoods> oldValue = productionMap.get(tileProduction);
                     if (oldValue == null) {
                         oldValue = new HashMap<GoodsType, AbstractGoods>();
-                        productionMap.put(difficulty, oldValue);
+                        productionMap.put(tileProduction, oldValue);
                     }
                     oldValue.put(type, goods);
                 }

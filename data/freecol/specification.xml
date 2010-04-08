@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.30 -->
+<!-- specification version 0.31 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -263,9 +263,9 @@
     <tile-type id="model.tile.desert" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/desert/" minimap-color="#63732b"/><!--0.39,0.45,0.17"-->
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
-      <primary-production goods-type="model.goods.food" value="3" difficulty="model.difficulty.veryEasy"/>
+      <primary-production goods-type="model.goods.food" value="3" tile-production="veryHigh" />
       <primary-production goods-type="model.goods.food" value="2"/>
-      <primary-production goods-type="model.goods.food" value="1" difficulty="model.difficulty.veryHard"/>
+      <primary-production goods-type="model.goods.food" value="1" tile-production="veryLow" />
       <secondary-production goods-type="model.goods.cotton" value="1"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
@@ -360,9 +360,9 @@
       <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="#24731f"/>
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <primary-production goods-type="model.goods.food" value="3" difficulty="model.difficulty.veryEasy"/>
+      <primary-production goods-type="model.goods.food" value="3" tile-production="veryHigh" />
       <primary-production goods-type="model.goods.food" value="2"/>
-      <primary-production goods-type="model.goods.food" value="1" difficulty="model.difficulty.veryHard"/>
+      <primary-production goods-type="model.goods.food" value="1" tile-production="veryLow" />
       <secondary-production goods-type="model.goods.furs" value="2"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
@@ -404,8 +404,8 @@
     <tile-type id="model.tile.arctic" basic-move-cost="6" basic-work-turns="4">
       <art basic="terrain/arctic/" minimap-color="#ffffff"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="0" altitudeMin="1" altitudeMax="3"/>
-      <primary-production goods-type="model.goods.food" value="2" difficulty="model.difficulty.veryEasy"/>
-      <primary-production goods-type="model.goods.food" value="1" difficulty="model.difficulty.easy"/>
+      <primary-production goods-type="model.goods.food" value="2" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.food" value="1" tile-production="high" />
     </tile-type>
     <tile-type id="model.tile.ocean" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
@@ -1827,6 +1827,7 @@
       <integerOption id="model.option.refStrength" value="0"/>
       <integerOption id="model.option.taxAdjustment" value="0"/>
       <integerOption id="model.option.mercenaryPrice" value="25"/>
+      <stringOption  id="model.option.tileProduction" value="veryHigh" />
       <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
       <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
       <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
@@ -1851,6 +1852,7 @@
       <integerOption id="model.option.monarchMeddling" value="1"/>
       <integerOption id="model.option.taxAdjustment" value="1"/>
       <integerOption id="model.option.mercenaryPrice" value="50"/>
+      <stringOption  id="model.option.tileProduction" value="high" />
       <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
       <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
     </difficultyLevel>
@@ -1874,6 +1876,7 @@
       <integerOption id="model.option.monarchMeddling" value="2"/>
       <integerOption id="model.option.taxAdjustment" value="2"/>
       <integerOption id="model.option.mercenaryPrice" value="75"/>
+      <stringOption  id="model.option.tileProduction" value="medium" />
       <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.hard">
@@ -1896,6 +1899,7 @@
       <integerOption id="model.option.monarchMeddling" value="3"/>
       <integerOption id="model.option.taxAdjustment" value="3"/>
       <integerOption id="model.option.mercenaryPrice" value="100"/>
+      <stringOption  id="model.option.tileProduction" value="low" />
    </difficultyLevel>
     <difficultyLevel id="model.difficulty.veryHard">
       <integerOption id="model.option.startingMoney" value="0"/>
@@ -1917,6 +1921,7 @@
       <integerOption id="model.option.monarchMeddling" value="4"/>
       <integerOption id="model.option.taxAdjustment" value="4"/>
       <integerOption id="model.option.mercenaryPrice" value="125"/>
+      <stringOption  id="model.option.tileProduction" value="veryLow" />
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.custom">
       <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
@@ -1938,6 +1943,13 @@
       <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
       <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
       <integerOption id="model.option.mercenaryPrice" value="125" minimumValue="0" maximumValue="1000"/>
+      <stringOption  id="model.option.tileProduction" value="veryLow">
+        <choice value="veryLow" />
+        <choice value="low" />
+        <choice value="medium" />
+        <choice value="high" />
+        <choice value="veryHigh" />
+      </stringOption>
       <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
       <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
       <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />

@@ -1000,7 +1000,7 @@ public final class Specification {
         }
 
         for (FreeColGameObjectType type : allTypes.values()) {
-            type.applyDifficultyLevel(level.getId());
+            type.applyDifficultyLevel(level);
         }
 
         // TODO: find a better place for this!

@@ -6,6 +6,7 @@
      0.28: move limits into other elements
      0.29: add events
      0.30: extend string options
+     0.31: change difficulty selection for tile types
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -156,7 +157,7 @@
     <xs:complexType>
       <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="difficulty" type="xs:IDREF"/>
+      <xs:attribute name="tile-production" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -164,7 +165,7 @@
     <xs:complexType>
       <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="difficulty" type="xs:IDREF"/>
+      <xs:attribute name="tile-production" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -172,7 +173,7 @@
     <xs:complexType>
       <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="difficulty" type="xs:IDREF"/>
+      <xs:attribute name="tile-production" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -663,6 +664,13 @@
 
   <xs:element name="stringOption">
     <xs:complexType>
+      <xs:sequence>
+        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="defaultValue" type="xs:string"/>
       <xs:attribute name="value" type="xs:string"/>

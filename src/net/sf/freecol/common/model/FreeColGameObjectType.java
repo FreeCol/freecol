@@ -132,7 +132,7 @@ public class FreeColGameObjectType extends FreeColObject {
      *
      * @param difficulty difficulty level to apply
      */
-    public void applyDifficultyLevel(String difficulty) {
+    public void applyDifficultyLevel(DifficultyLevel difficulty) {
         // do nothing
     }
 
