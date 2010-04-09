@@ -907,6 +907,7 @@ public class Game extends FreeColGameObject {
         // serialize map
         writeFreeColGameObject(map, out, player, showAll, toSavedGame);
 
+        /* Moved to within player.  Last used in 0.9.x.
         // serialize messages
         playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
@@ -917,6 +918,7 @@ public class Game extends FreeColGameObject {
                 }
             }
         }
+        */
 
         // serialize difficulty level
         if (difficultyLevel != null) {

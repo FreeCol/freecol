@@ -3587,6 +3587,11 @@ public class Player extends FreeColGameObject implements Nameable {
             if (monarch != null) {
                 monarch.toXML(out, player, showAll, toSavedGame);
             }
+            if (!modelMessages.isEmpty()) {
+                for (ModelMessage m : modelMessages) {
+                    m.toXML(out);
+                }
+            }
         }
 
         out.writeEndElement();
@@ -3652,6 +3657,7 @@ public class Player extends FreeColGameObject implements Nameable {
         monarch = null;
         history.clear();
         tradeRoutes.clear();
+        modelMessages.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
@@ -3684,6 +3690,11 @@ public class Player extends FreeColGameObject implements Nameable {
                 tradeRoutes.add(route);
             } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
                 market = updateFreeColGameObject(in, Market.class);
+            } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
+
+                ModelMessage message = new ModelMessage();
+                message.readFromXMLImpl(in);
+                addModelMessage(message);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();
