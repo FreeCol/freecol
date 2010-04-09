@@ -576,9 +576,9 @@ public class Map extends FreeColGameObject {
 
                 // Update parameters for the new tile.
                 if (moveUnit == null) {
-                    if (((type == PathType.ONLY_SEA && newTile.isLand())
+                    if ((!newTile.isExplored()
+                         || (type == PathType.ONLY_SEA && newTile.isLand())
                          || (type == PathType.ONLY_LAND && !newTile.isLand()))
-                        && newTile.isExplored()
                         && newTile != end) {
                         continue;
                     }
