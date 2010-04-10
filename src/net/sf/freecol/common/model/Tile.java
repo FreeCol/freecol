@@ -411,7 +411,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 // on land tiles, ships are docked in port and cannot defend
                 // on ocean tiles, land units behave as ship cargo and cannot defend
                 float tmpPower = getGame().getCombatModel().getDefencePower(attacker,nextUnit);
-                if ((tmpPower > defencePower && nextUnit.isDefensiveUnit()) || tileDefender == null) {
+                if (tileDefender == null
+                    || (tmpPower > defencePower
+                        && (!tileDefender.isDefensiveUnit() || nextUnit.isDefensiveUnit()))) {
                     tileDefender = nextUnit;
                     defencePower = tmpPower;
                 }
