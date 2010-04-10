@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -102,6 +104,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private JList buildQueueList;
     private JList unitList;
     private JList buildingList;
+    private ConstructionPanel constructionPanel;
     private JButton buyBuilding;
     private Colony colony;
     private int unitCount;
@@ -206,6 +209,12 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buyBuilding.setActionCommand(BUY);
         buyBuilding.addActionListener(this);
 
+        constructionPanel = new ConstructionPanel(getCanvas(), colony);
+        constructionPanel.setOpaque(false);
+        StringTemplate buildingNothing = StringTemplate.template("colonyPanel.currentlyBuilding")
+            .add("%buildable%", "nothing");
+        constructionPanel.setDefaultLabel(buildingNothing);
+
         updateAllLists();
 
         add(headLine, "span 3, align center, wrap 40");
@@ -213,6 +222,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         add(new JLabel(Messages.message("colonyPanel.buildQueue")), "align center");
         add(new JLabel(Messages.message("menuBar.colopedia.building")), "align center");
         add(new JScrollPane(unitList), "grow");
+        add(constructionPanel, "split 2, flowy");
         add(new JScrollPane(buildQueueList), "grow");
         add(new JScrollPane(buildingList), "grow, wrap 20");
         add(buyBuilding, "span, split 4");
@@ -377,6 +387,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         updateBuildingList();
         updateUnitList();
         updateBuyBuildingButton();
+        // work-around to re-initialize construction panel
+        PropertyChangeEvent event = new PropertyChangeEvent(colony, ConstructionPanel.EVENT, null,
+                                                            getBuildableTypes(buildQueueList));
+        constructionPanel.propertyChange(event);
     }
 
     private void updateBuyBuildingButton() {

@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -38,6 +39,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -50,6 +52,13 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     private Colony colony;
 
     private BuildableType buildable;
+
+    public static final String EVENT = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
+
+    /**
+     * The text to display if buildable == null.
+     */
+    private StringTemplate defaultLabel = StringTemplate.key("colonyPanel.clickToBuild");
 
     /**
      * Creates this BuildingToolTip.
@@ -65,32 +74,31 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     }
 
     public void setColony(Colony newColony) {
-    	if(newColony != colony){
-    		if (colony != null) {
-    			colony.removePropertyChangeListener(this);
-    		}
-    		this.colony = newColony;
+        if(newColony != colony){
+            if (colony != null) {
+                colony.removePropertyChangeListener(EVENT, this);
+            }
+            this.colony = newColony;
 
-    		// we are interested in changes to the build queue, as well as
-    		// changes to the warehouse and the colony's production bonus
-    		colony.addPropertyChangeListener(this);
-    		addMouseListener(new MouseAdapter() {
-    			public void mousePressed(MouseEvent e) {
-    				BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);
-    				parent.showSubPanel(queuePanel);
-    			}
-    		});
-    	}
-        initialize();
+            // we are interested in changes to the build queue, as well as
+            // changes to the warehouse and the colony's production bonus
+            colony.addPropertyChangeListener(EVENT, this);
+            addMouseListener(new MouseAdapter() {
+                    public void mousePressed(MouseEvent e) {
+                        BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);
+                        parent.showSubPanel(queuePanel);
+                    }
+                });
+        }
+        initialize(colony.getCurrentlyBuilding());
     }
 
-    private void initialize() {
+    private void initialize(BuildableType buildable) {
    
         removeAll();
 
-        buildable = colony.getCurrentlyBuilding();
         if (buildable == null) {
-            add(new JLabel(Messages.message("colonyPanel.clickToBuild")),
+            add(new JLabel(Messages.message(getDefaultLabel())),
                 "span, align center");
         } else {
             int turnsToComplete = colony.getTurnsToComplete(buildable);
@@ -101,7 +109,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             else if(turnsToComplete != Integer.MIN_VALUE){
                 turns = ">" + Integer.toString(turnsToComplete*-1);
             }
-            add(new JLabel(new ImageIcon(getScaledImage(ResourceManager.getImage(buildable.getId() + ".image"), 0.75))), "");
+            add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))));
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
                                             "%buildable%", Messages.message(buildable.getNameKey()))),
                 "span, align center, flowy, split " + (2 + buildable.getGoodsRequired().size()));
@@ -115,7 +123,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                 int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
                 int amountProduced = colony.getProductionNetOf(requiredGoods.getType());
                 add(new FreeColProgressBar(parent, requiredGoods.getType(), 0,
-                                                        amountNeeded, amountAvailable, amountProduced));
+                                           amountNeeded, amountAvailable, amountProduced),
+                    "height 20:");
             }
         }
 
@@ -123,20 +132,31 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
         repaint();
     }
 
-    private Image getScaledImage(Image inImage, double factor){
-        int w = (int)(factor * inImage.getWidth(null));
-        int h = (int)(factor * inImage.getHeight(null));
-	    BufferedImage outImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = outImage.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2d.scale(factor, factor);
-		g2d.drawImage(inImage, 0, 0, null);
-        g2d.dispose();
-        return outImage;
+    /**
+     * Get the <code>DefaultLabel</code> value.
+     *
+     * @return a <code>StringTemplate</code> value
+     */
+    public final StringTemplate getDefaultLabel() {
+        return defaultLabel;
+    }
+
+    /**
+     * Set the <code>DefaultLabel</code> value.
+     *
+     * @param newDefaultLabel The new DefaultLabel value.
+     */
+    public final void setDefaultLabel(final StringTemplate newDefaultLabel) {
+        this.defaultLabel = newDefaultLabel;
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        initialize();
+        List buildQueue = (List) event.getNewValue();
+        if (buildQueue == null || buildQueue.isEmpty()) {
+            initialize(null);
+        } else {
+            initialize((BuildableType) buildQueue.get(0));
+        }
     }
 
     public void removePropertyChangeListeners() {
