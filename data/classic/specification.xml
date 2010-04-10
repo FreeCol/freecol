@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.32 -->
+<!-- specification version 0.33 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -48,7 +48,7 @@
   </modifiers>
 
   <events>
-    <event id="model.event.declareIndependence">
+    <event id="model.event.declareIndependence" scoreValue="100">
       <limit id="model.limit.independence.rebels" operator="GE">
         <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
         <rightHandSide value="50" />
@@ -58,6 +58,7 @@
                       method-name="isConnected" method-value="true" />
         <rightHandSide value="0" />
       </limit>
+      <ability id="model.ability.independenceDeclared" />
     </event>
   </events>
 

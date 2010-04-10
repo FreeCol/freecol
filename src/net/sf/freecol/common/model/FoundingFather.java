@@ -52,17 +52,17 @@ public class FoundingFather extends FreeColGameObjectType {
     private FoundingFatherType type;
 
     /**
+     * Describe events here.
+     */
+    private List<Event> events = new ArrayList<Event>();
+
+    /**
      * Holds the upgrades of Units caused by this FoundingFather.
      */
     private Map<UnitType, UnitType> upgrades;
 
     public static enum FoundingFatherType { TRADE, EXPLORATION, MILITARY,
             POLITICAL, RELIGIOUS }
-
-    /**
-     * Stores the Events of this Type.
-     */
-    private Map<String, String> events = new HashMap<String, String>();
 
     /**
      * Stores the IDs of the Nations and NationTypes this
@@ -150,6 +150,24 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>Events</code> value.
+     *
+     * @return a <code>List<Event></code> value
+     */
+    public final List<Event> getEvents() {
+        return events;
+    }
+
+    /**
+     * Set the <code>Events</code> value.
+     *
+     * @param newEvents The new Events value.
+     */
+    public final void setEvents(final List<Event> newEvents) {
+        this.events = newEvents;
+    }
+
+    /**
      * Returns true if this <code>FoundingFather</code> is available
      * to the Player given.
      *
@@ -179,23 +197,6 @@ public class FoundingFather extends FreeColGameObjectType {
         this.upgrades = newUpgrades;
     }
 
-    /**
-     * Returns all events.
-     *
-     * @return a <code>List</code> of Events.
-     */
-    public Map<String, String> getEvents() {
-        return events;
-    }
-
-    /**
-     * Describe <code>setEvents</code> method here.
-     *
-     */
-    public void setEvents(Map<String, String> newEvents) {
-        events = newEvents;
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         String typeString = in.getAttributeValue(null, "type").toUpperCase();
@@ -211,11 +212,10 @@ public class FoundingFather extends FreeColGameObjectType {
         throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("event".equals(childName)) {
-                String eventId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                String value = in.getAttributeValue(null, "value");
-                events.put(eventId, value);
-                in.nextTag(); // close this element
+            if (Event.getXMLElementTagName().equals(childName)) {
+                Event event = new Event();
+                event.readFromXML(in, specification);
+                events.add(event);
             } else if ("nation".equals(childName) ||
                        "nation-type".equals(childName)) {
                 availableTo.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));

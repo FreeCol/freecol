@@ -1716,8 +1716,9 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
-        for (String event : father.getEvents().keySet()) {
-            if (event.equals("model.event.resetNativeAlarm")) {
+        for (Event event : father.getEvents()) {
+            String eventId = event.getId();
+            if (eventId.equals("model.event.resetNativeAlarm")) {
                 // reduce indian tension and alarm
                 for (Player player : getGame().getPlayers()) {
                     if (!player.isEuropean() && player.getTension(this) != null) {
@@ -1729,12 +1730,12 @@ public class Player extends FreeColGameObject implements Nameable {
                         }
                     }
                 }
-            } else if (event.equals("model.event.boycottsLifted")) {
+            } else if (eventId.equals("model.event.boycottsLifted")) {
                 for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                     resetArrears(goodsType);
                 }
-            } else if (event.equals("model.event.freeBuilding")) {
-                BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents().get(event));
+            } else if (eventId.equals("model.event.freeBuilding")) {
+                BuildingType type = FreeCol.getSpecification().getBuildingType(event.getValue());
                 for (Colony colony : getColonies()) {
                     if (colony.canBuild(type)) {
                         // Need to use a `special' taskID to avoid collision
@@ -1745,10 +1746,10 @@ public class Player extends FreeColGameObject implements Nameable {
                         colony.getBuildQueue().remove(type);
                     }
                 }
-            } else if (event.equals("model.event.seeAllColonies")) {
+            } else if (eventId.equals("model.event.seeAllColonies")) {
                 exploreAllColonies();
-            } else if (event.equals("model.event.increaseSonsOfLiberty")) {
-                int value = Integer.parseInt(father.getEvents().get(event));
+            } else if (eventId.equals("model.event.increaseSonsOfLiberty")) {
+                int value = Integer.parseInt(event.getValue());
                 GoodsType bells = Specification.getSpecification().getLibertyGoodsTypeList().get(0);
                 for (Colony colony : getColonies()) {
                     /*
@@ -1760,11 +1761,12 @@ public class Player extends FreeColGameObject implements Nameable {
                                            colony.getUnitCount()) / 100;
                     colony.addGoods(bells, requiredLiberty - colony.getGoodsCount(bells));
                 }
-            } else if (event.equals("model.event.newRecruits")) {
+            } else if (eventId.equals("model.event.newRecruits")) {
                 for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                     UnitType recruitable = getEurope().getRecruitable(index);
                     if (featureContainer.hasAbility("model.ability.canNotRecruitUnit", recruitable)) {
-                        getEurope().setRecruitable(index, generateRecruitable(getId() + "slot." + Integer.toString(index+1)));
+                        getEurope().setRecruitable(index, generateRecruitable(getId() + "slot."
+                                                                              + Integer.toString(index+1)));
                     }
                 }
             }

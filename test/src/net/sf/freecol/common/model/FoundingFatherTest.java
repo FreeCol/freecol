@@ -126,6 +126,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
+    /*
     public void testBuildingEvent() {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
@@ -145,6 +146,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         //assertTrue(colony.getBuilding(press) != null);
 
     }
+    */
 
     public void testBuildingBonus() {
         BuildingType press = spec().getBuildingType("model.building.printingPress");
@@ -226,6 +228,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         
         // adding LaSalle should have no effect when population is 2
         FoundingFather father = spec().getFoundingFather("model.foundingFather.laSalle");
+        assertEquals("model.building.stockade", father.getEvents().get(0).getValue());
         player.addFather(father);
         b = colony.getBuilding(stockadeType);
         assertNull(b);

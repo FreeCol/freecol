@@ -31,9 +31,14 @@ import javax.xml.stream.XMLStreamWriter;
 public class Event extends FreeColGameObjectType {
 
     /**
-     * Describe value here.
+     * A restriction on the scope of the event.
      */
     private String value;
+
+    /**
+     * The score value of this event.
+     */
+    private int scoreValue = 0;
 
     /**
      * Describe limits here.
@@ -76,6 +81,24 @@ public class Event extends FreeColGameObjectType {
         this.limits = newLimits;
     }
 
+    /**
+     * Get the <code>ScoreValue</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getScoreValue() {
+        return scoreValue;
+    }
+
+    /**
+     * Set the <code>ScoreValue</code> value.
+     *
+     * @param newScoreValue The new ScoreValue value.
+     */
+    public final void setScoreValue(final int newScoreValue) {
+        this.scoreValue = newScoreValue;
+    }
+
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         writeAttributes(out);
@@ -92,6 +115,9 @@ public class Event extends FreeColGameObjectType {
         if (value != null) {
             out.writeAttribute("value", value);
         }
+        if (scoreValue != 0) {
+            out.writeAttribute("scoreValue", Integer.toString(scoreValue));
+        }
     }
 
 
@@ -103,9 +129,11 @@ public class Event extends FreeColGameObjectType {
         }
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         value = in.getAttributeValue(null, "value");
+        scoreValue = getAttribute(in, "scoreValue", 0);
     }
 
     @Override

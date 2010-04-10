@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.32
+<!-- XSD for specification version 0.33
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -8,6 +8,7 @@
      0.30: extend string options
      0.31: change difficulty selection for tile types
      0.32: change difficulty selection for european nation types
+     0.33: add scoreValue to event
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -429,26 +430,24 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="event">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="value" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
   <xs:element name="events">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="event">
-          <xs:complexType>
-            <xs:sequence maxOccurs="unbounded" >
-              <xs:element ref="limit" />
-            </xs:sequence>
-            <xs:attribute name="id" use="required" type="xs:ID"/>
-            <xs:attribute name="value" type="xs:string"/>
-          </xs:complexType>
-        </xs:element>
+        <xs:element ref="event" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="event">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded" >
+        <xs:element ref="limit" />
+        <xs:element ref="ability" />
+        <xs:element ref="modifier" />
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="scoreValue" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
 
