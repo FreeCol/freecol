@@ -146,11 +146,11 @@ public class ListOption<T> extends AbstractOption {
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
-        in.nextTag();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("value")) {
                 // TODO: remove support for old format
                 setValueIds(readFromListElement("value", in, String.class));
+                in.nextTag();
             } else if (VALUE_TAG.equals(in.getLocalName())) {
                 String valueId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 value.add(selector.getObject(valueId));
