@@ -429,8 +429,8 @@ public final class InGameController extends Controller {
                     // Always update players and regions.
                     update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
                 } else {
-                    logger.warning("Attempt to update hidden object: "
-                                   + fcgo.getId());
+                    logger.warning("Attempt to update: " + fcgo.getId()
+                                   + " hidden from player " + serverPlayer.getId());
                 }
             } else {
                 throw new IllegalStateException("Bogus object: "
@@ -1606,8 +1606,11 @@ public final class InGameController extends Controller {
         serverPlayer.setPlayerType(PlayerType.REBEL);
         serverPlayer.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
         serverPlayer.modifyScore(SCORE_INDEPENDENCE_DECLARED);
-        objects.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                     HistoryEvent.EventType.DECLARE_INDEPENDENCE));
+        HistoryEvent h = new HistoryEvent(getGame().getTurn().getNumber(),
+                                          HistoryEvent.EventType.DECLARE_INDEPENDENCE);
+        serverPlayer.addHistory(h);
+        objects.add(h);
+
         // Clean up unwanted connections
         Europe europe = serverPlayer.getEurope();
         serverPlayer.divertModelMessages(europe, null);
@@ -2442,9 +2445,11 @@ public final class InGameController extends Controller {
                                             "lostCityRumour.Cibola", serverPlayer, newUnit)
                            .add("%city%", cityName)
                            .addAmount("%money%", treasureAmount));
-                objects.add(new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
-                           .add("%city%", cityName)
-                           .addAmount("%treasure%", treasureAmount));
+                HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
+                    .add("%city%", cityName)
+                    .addAmount("%treasure%", treasureAmount);
+                serverPlayer.addHistory(h);
+                objects.add(h);
                 break;
             }
             // Fall through, found all the cities of gold.
@@ -2526,7 +2531,8 @@ public final class InGameController extends Controller {
 
             // Ignore ourself and previously contacted nations.
             if (otherPlayer != null && otherPlayer != serverPlayer
-                && !serverPlayer.hasContacted(otherPlayer)) {
+                && !serverPlayer.hasContacted(otherPlayer)
+                && !players.contains(otherPlayer)) {
                 players.add(otherPlayer);
             }
         }
@@ -2743,8 +2749,8 @@ public final class InGameController extends Controller {
         HistoryEvent h = new HistoryEvent(turn,
                     HistoryEvent.EventType.DISCOVER_NEW_WORLD)
             .addName("%name%", name);
-        objects.add(h);
         serverPlayer.addHistory(h);
+        objects.add(h);
 
         return buildUpdate(serverPlayer, objects);
     }
@@ -3719,9 +3725,12 @@ public final class InGameController extends Controller {
 
         // History is private.
         objects.add(UpdateType.PRIVATE);
-        objects.add(new HistoryEvent(game.getTurn().getNumber(),
-                                     HistoryEvent.EventType.FOUND_COLONY)
-                    .addName("%colony%", settlement.getName()));
+        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
+                                          HistoryEvent.EventType.FOUND_COLONY)
+            .addName("%colony%", settlement.getName());
+        serverPlayer.addHistory(h);
+        objects.add(h);
+
         // Also send any tiles that can now be seen because the colony
         // can perhaps see further than the founding unit.
         for (Tile t : map.getSurroundingTiles(tile, unit.getLineOfSight() + 1,
@@ -3793,6 +3802,7 @@ public final class InGameController extends Controller {
         objects.addAll(settlement.disposeList());
 
         if (h != null) { // History is private.
+            serverPlayer.addHistory(h);
             objects.add(UpdateType.PRIVATE);
             objects.add(h);
         }
