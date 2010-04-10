@@ -445,11 +445,17 @@ public final class Canvas extends JDesktopPane {
      */
     public void showModelMessages(ModelMessage... modelMessages) {
         if (modelMessages.length == 1) {
-            try { // If this singleton message is an event, use an event panel
-                EventType e = EventType.valueOf(modelMessages[0].getId());
-                showEventPanel(e);
-                return;
-            } catch (IllegalArgumentException e) {} // ignore
+            // If this singleton message is an event, use an event panel
+            final String toMatch = "EventPanel.";
+            String id = modelMessages[0].getId();
+            if (id.startsWith(toMatch)) {
+                id = id.substring(toMatch.length());
+                try {
+                    EventType e = EventType.valueOf(id);
+                    showEventPanel(e);
+                    return;
+                } catch (IllegalArgumentException e) {} // ignore
+            }
         }
 
         Game game = freeColClient.getGame();
