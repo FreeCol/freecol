@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.option.BooleanOption;
 
 /**
  * Represents one of the European nations present in the game, i.e. both REFs
@@ -103,13 +104,13 @@ public class EuropeanNationType extends NationType {
      * Returns a list of this Nation's starting units at the given
      * difficulty.
      *
-     * @param difficulty the ID of a difficulty level.
+     * @param key the value of the expert-starting-units field
      * @return a list of this Nation's starting units.
      */
-    public List<AbstractUnit> getStartingUnits(String difficulty) {
+    public List<AbstractUnit> getStartingUnits(String key) {
         Map<String, AbstractUnit> result = new HashMap<String, AbstractUnit>();
         Map<String, AbstractUnit> defaultMap = startingUnitMap.get(null);
-        Map<String, AbstractUnit> difficultyMap = startingUnitMap.get(difficulty);
+        Map<String, AbstractUnit> difficultyMap = startingUnitMap.get(key);
         if (defaultMap != null) {
             result.putAll(defaultMap);
         }
@@ -126,7 +127,9 @@ public class EuropeanNationType extends NationType {
      */
     @Override
     public void applyDifficultyLevel(DifficultyLevel difficulty) {
-        startingUnits = getStartingUnits(difficulty.getId());
+        String experts = Boolean.toString(((BooleanOption) difficulty.getOption("model.option.expertStartingUnits"))
+                                          .getValue());
+        startingUnits = getStartingUnits(experts);
     }
 
 
@@ -143,12 +146,12 @@ public class EuropeanNationType extends NationType {
                 String id = in.getAttributeValue(null, "id");
                 String type = in.getAttributeValue(null, "type");
                 Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase());
-                String difficulty = in.getAttributeValue(null, "difficulty");
+                String useExperts = in.getAttributeValue(null, "expert-starting-units");
                 AbstractUnit unit = new AbstractUnit(type, role, 1);
-                Map<String, AbstractUnit> units = startingUnitMap.get(difficulty);
+                Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
                 if (units == null) {
                     units = new HashMap<String, AbstractUnit>();
-                    startingUnitMap.put(difficulty, units);
+                    startingUnitMap.put(useExperts, units);
                 }
                 units.put(id, unit);
                 in.nextTag();

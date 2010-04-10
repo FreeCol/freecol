@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.31 -->
+<!-- specification version 0.32 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1454,8 +1454,7 @@
     <european-nation-type id="model.nationType.default">
       <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1475,8 +1474,7 @@
       <modifier id="model.modifier.tradeBonus" type="percentage" value="-50"/>
       <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1488,8 +1486,7 @@
       <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
       <unit id="pioneer" type="model.unit.hardyPioneer" role="pioneer"/>
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1501,8 +1498,7 @@
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
       <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1527,8 +1523,7 @@
       </modifier>
       <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1540,8 +1535,7 @@
       <modifier id="model.goods.hammers" type="additive" value="2"/>
       <unit id="pioneer" type="model.unit.expertLumberJack" role="pioneer"/>
       <unit id="soldier" type="model.unit.masterCarpenter" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1552,8 +1546,7 @@
       <modifier id="model.goods.food" type="additive" value="2"/>
       <unit id="pioneer" type="model.unit.expertFarmer" role="pioneer"/>
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1565,8 +1558,7 @@
       <modifier id="model.goods.coats" type="additive" value="2"/>
       <unit id="pioneer" type="model.unit.expertFurTrapper" role="pioneer"/>
       <unit id="soldier" type="model.unit.masterFurTrader" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1821,12 +1813,13 @@
       <integerOption id="model.option.nativeDemands" value="0"/>
       <integerOption id="model.option.recruitPriceIncrease" value="20"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
       <integerOption id="model.option.monarchMeddling" value="0"/>
       <integerOption id="model.option.refStrength" value="0"/>
       <integerOption id="model.option.taxAdjustment" value="0"/>
       <integerOption id="model.option.mercenaryPrice" value="25"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="veryHigh" />
       <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
       <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
@@ -1846,12 +1839,13 @@
       <integerOption id="model.option.nativeDemands" value="1"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
       <integerOption id="model.option.refStrength" value="2"/>
       <integerOption id="model.option.monarchMeddling" value="1"/>
       <integerOption id="model.option.taxAdjustment" value="1"/>
       <integerOption id="model.option.mercenaryPrice" value="50"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="high" />
       <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
       <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
@@ -1870,12 +1864,13 @@
       <integerOption id="model.option.nativeDemands" value="2"/>
       <integerOption id="model.option.recruitPriceIncrease" value="40"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
       <integerOption id="model.option.refStrength" value="4"/>
       <integerOption id="model.option.monarchMeddling" value="2"/>
       <integerOption id="model.option.taxAdjustment" value="2"/>
       <integerOption id="model.option.mercenaryPrice" value="75"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="medium" />
       <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
     </difficultyLevel>
@@ -1893,12 +1888,13 @@
       <integerOption id="model.option.nativeDemands" value="3"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
       <integerOption id="model.option.refStrength" value="6"/>
       <integerOption id="model.option.monarchMeddling" value="3"/>
       <integerOption id="model.option.taxAdjustment" value="3"/>
       <integerOption id="model.option.mercenaryPrice" value="100"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="low" />
    </difficultyLevel>
     <difficultyLevel id="model.difficulty.veryHard">
@@ -1915,12 +1911,13 @@
       <integerOption id="model.option.nativeDemands" value="4"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
       <integerOption id="model.option.refStrength" value="8"/>
       <integerOption id="model.option.monarchMeddling" value="4"/>
       <integerOption id="model.option.taxAdjustment" value="4"/>
       <integerOption id="model.option.mercenaryPrice" value="125"/>
+      <booleanOption id="model.option.expertStartingUnits" value="false" />
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <stringOption  id="model.option.tileProduction" value="veryLow" />
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.custom">
@@ -1937,12 +1934,13 @@
       <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
       <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
       <integerOption id="model.option.refStrength" value="8" minimumValue="0" maximumValue="100"/>
       <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
       <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
       <integerOption id="model.option.mercenaryPrice" value="125" minimumValue="0" maximumValue="1000"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="veryLow">
         <choice value="veryLow" />
         <choice value="low" />

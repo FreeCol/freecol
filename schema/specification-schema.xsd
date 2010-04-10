@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.28
+<!-- XSD for specification version 0.32
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -7,6 +7,7 @@
      0.29: add events
      0.30: extend string options
      0.31: change difficulty selection for tile types
+     0.32: change difficulty selection for european nation types
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -493,7 +494,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:attribute>
-              <xs:attribute name="difficulty" type="xs:IDREF"/>
+              <xs:attribute name="expert-starting-units" type="xs:string"/>
               <xs:attribute name="mounted" type="xs:boolean"/>
               <xs:attribute name="missionary" type="xs:boolean"/>
               <xs:attribute name="tools" type="xs:nonNegativeInteger"/>
