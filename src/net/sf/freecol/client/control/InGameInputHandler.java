@@ -971,17 +971,24 @@ public final class InGameInputHandler extends InputHandler {
          *   if (first.getStance(second) == stance) { return null; }
          * TODO: fix opponentAttack.
          */
+
+        // Does this message involve this player and an other?
+        Player other = (player.equals(first)) ? second
+            : (player.equals(second)) ? first
+            : null;
+        // Prepare to ignore initial peaceful contacts as these are covered
+        // by `You meet the <nation> nation' message.
+        boolean firstContact = other != null && stance == Stance.PEACE
+            && player.getStance(other) == Stance.UNCONTACTED;
+
         first.setStance(second, stance);
         if (second.getStance(first) != stance) second.setStance(first, stance);
 
         // Message processing follows.  The AI is not interested.
         if (player.isAI()) return null;
 
-        // Does this message involve this player and an other?
-        Player other = (player.equals(first)) ? second
-            : (player.equals(second)) ? first
-            : null;
-
+        ModelMessage m = null;
+        String sta = stance.toString().toLowerCase();
         if (other == null) {
             // If not, always inform about wars, always inform
             // post-deWitt, generally inform if have met one of the
@@ -990,65 +997,21 @@ public final class InGameInputHandler extends InputHandler {
                    || player.hasAbility("model.ability.betterForeignAffairsReport")
                    || player.hasContacted(first)
                    || player.hasContacted(second)) {
-                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                        "model.diplomacy." + stance.toString().toLowerCase() + ".others",
-                                                        first)
-                                       .addStringTemplate("%attacker%", first.getNationName())
-                                       .addStringTemplate("%defender%", second.getNationName()));
+                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "model.diplomacy." + sta + ".others",
+                                     first)
+                    .addStringTemplate("%attacker%", first.getNationName())
+                    .addStringTemplate("%defender%", second.getNationName());
             }
-
         } else {
-            // If so, normally provide the standard diplomacy
-            // messages, unless this is a new peaceful contact in
-            // which case we do not have to inform of the
-            // UNCONTACTED->PEACE transition but there are special
-            // first contact messages to consider.
-            if (oldStance == Stance.UNCONTACTED && stance == Stance.PEACE) {
-                boolean contactedIndians = false;
-                boolean contactedEuro = false;
-                for (Player p : game.getPlayers()) {
-                    if (player.hasContacted(p) && p != other) {
-                        if (p.isEuropean()) {
-                            contactedEuro = true;
-                            if (contactedIndians) break;
-                        } else {
-                            contactedIndians = true;
-                            if (contactedEuro) break;
-                        }
-                    }
-                }
-                if (other.isEuropean() && !contactedEuro) {
-                    player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                            "EventPanel.MEETING_EUROPEANS",
-                                                            player, other));
-                } else if (!other.isIndian() && !contactedIndians) {
-                    player.addModelMessage(new ModelMessage(
-                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            "EventPanel.MEETING_NATIVES",
-                            player, other));
-                }
-                // Special cases for Aztec and Inca.  TODO: cleanup.
-                Specification spec = FreeCol.getSpecification();
-                if (other.getNationType()
-                    == spec.getNationType("model.nationType.aztec")) {
-                    player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                            "EventPanel.MEETING_AZTEC",
-                                                            player, other));
-                } else if (other.getNationType()
-                           == spec.getNationType("model.nationType.inca")) {
-                    player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                            "EventPanel.MEETING_INCA",
-                                                            player, other));
-                }
-
-            } else { // Standard diplomacy message.
-                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                        "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
-                                                        first)
-                                       .addStringTemplate("%nation%", other.getNationName()));
+            if (!firstContact) {
+                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "model.diplomacy." + sta + ".declared",
+                                     first)
+                    .addStringTemplate("%nation%", other.getNationName());
             }
         }
-
+        if (m != null) player.addModelMessage(m);
         return null;
     }
 

@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -2605,6 +2606,36 @@ public final class InGameController extends Controller {
                 serverPlayer.setContacted(other);
                 other.setContacted(serverPlayer);
                 addStance(objects, Stance.PEACE, serverPlayer, other);
+                // Add special first contact messages.
+                boolean contactedIndians = false;
+                boolean contactedEuro = false;
+                for (ServerPlayer p : getOtherPlayers(serverPlayer)) {
+                    if (serverPlayer.hasContacted(p) && p != other) {
+                        if (p.isEuropean()) {
+                            contactedEuro = true;
+                            if (contactedIndians) break;
+                        } else {
+                            contactedIndians = true;
+                            if (contactedEuro) break;
+                        }
+                    }
+                }
+                // Check first for a special panel for this nation
+                String key = "EventPanel.MEETING_"
+                    + Messages.message(other.getNationName()).toUpperCase();
+                if (!Messages.containsKey(key)) {
+                    key = (other.isEuropean() && !contactedEuro)
+                        ? "EventPanel.MEETING_EUROPEANS"
+                        : (other.isIndian() && !contactedIndians)
+                        ? "EventPanel.MEETING_NATIVES"
+                        : null;
+                }
+                if (key != null) {
+                    privateObjects.add(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                        key, serverPlayer, other));
+                }
+
+                // History event for European players.
                 if (serverPlayer.isEuropean()) {
                     HistoryEvent h = new HistoryEvent(turn.getNumber(),
                             HistoryEvent.EventType.MEET_NATION)
