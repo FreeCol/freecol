@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -40,7 +40,8 @@ public class DifficultyLevel extends FreeColGameObjectType {
 
     private static int nextIndex = 0;
 
-    private final Map<String, AbstractOption> levelOptions = new HashMap<String, AbstractOption>();
+    private final Map<String, AbstractOption> levelOptions =
+        new LinkedHashMap<String, AbstractOption>();
 
 
     public DifficultyLevel() {

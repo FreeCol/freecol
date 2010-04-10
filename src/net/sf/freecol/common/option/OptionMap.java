@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -28,8 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
@@ -50,12 +51,11 @@ import org.w3c.dom.Element;
 * Used for grouping objects of {@link Option}.
 */
 public abstract class OptionMap extends OptionGroup {
+
     private static Logger logger = Logger.getLogger(OptionMap.class.getName());
 
-
-
     private String xmlTagName;
-    private HashMap<String, Option> values;
+    private Map<String, Option> values;
    
 
 
@@ -69,7 +69,7 @@ public abstract class OptionMap extends OptionGroup {
         super(xmlTagName);
         this.xmlTagName = xmlTagName;
         
-        values = new HashMap<String, Option>();
+        values = new LinkedHashMap<String, Option>();
 
         addDefaultOptions();
         addToMap(this);
