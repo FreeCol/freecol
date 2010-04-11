@@ -43,6 +43,11 @@ public class FreeColGameObjectType extends FreeColObject {
     private int modifierIndex = 100;
 
     /**
+     * Whether the type is abstract or can be instantiated.
+     */
+    private boolean abstractType;
+
+    /**
      * Describe featureContainer here.
      */
     protected FeatureContainer featureContainer = new FeatureContainer();
@@ -164,6 +169,24 @@ public class FreeColGameObjectType extends FreeColObject {
         this.modifierIndex = newModifierIndex;
     }
 
+    /**
+     * Get the <code>Abstract</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isAbstractType() {
+        return abstractType;
+    }
+
+    /**
+     * Set the <code>Abstract</code> value.
+     *
+     * @param newAbstract The new Abstract value.
+     */
+    public final void setAbstractType(final boolean newAbstract) {
+        this.abstractType = newAbstract;
+    }
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // currently, FreeColGameObjectTypes are not serialized
     }
@@ -174,6 +197,7 @@ public class FreeColGameObjectType extends FreeColObject {
 
     public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        setAbstractType(getAttribute(in, "abstract", false));
         readAttributes(in, specification);
         readChildren(in, specification);
     }

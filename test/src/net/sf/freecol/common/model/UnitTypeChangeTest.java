@@ -119,6 +119,8 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
         Unit gardenerUnit = new Unit(game, dutch, gardener);
         assertEquals(gardener, gardenerUnit.getType());
+        assertEquals(farmer, gardenerUnit.getType().getUnitTypeChange(enterColony, dutch));
+        assertNotNull(colony.getVacantWorkLocationFor(gardenerUnit));
 
         gardenerUnit.setLocation(colony.getVacantWorkLocationFor(gardenerUnit));
         assertEquals(farmer, gardenerUnit.getType());

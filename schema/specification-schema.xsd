@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.33
+<!-- XSD for specification version 0.34
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -9,6 +9,7 @@
      0.31: change difficulty selection for tile types
      0.32: change difficulty selection for european nation types
      0.33: add scoreValue to event
+     0.34: add abstract buildable types
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -200,6 +201,8 @@
         <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="extends" use="optional" type="xs:IDREF" />
       <xs:attribute name="combat-loss-priority" type="xs:int"/>
       <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
       <xs:attribute name="role">
@@ -331,10 +334,12 @@
         <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="offence" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="defence" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="movement" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="lineOfSight" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="extends" use="optional" type="xs:IDREF" />
+      <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="lineOfSight" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="skill" type="xs:int"/>
       <xs:attribute name="space" type="xs:nonNegativeInteger"/>
       <xs:attribute name="spaceTaken" type="xs:nonNegativeInteger"/>
@@ -368,6 +373,8 @@
         <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="extends" use="optional" type="xs:IDREF" />
       <xs:attribute name="workplaces" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="basicProduction" type="xs:nonNegativeInteger"/>
       <xs:attribute name="produces" type="xs:IDREF"/>
@@ -802,7 +809,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
-      <xs:attribute name="unit" use="required" type="xs:string"/>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <xs:attribute name="learnFromNatives" type="xs:boolean"/>
       <xs:attribute name="learnFromExperience" type="xs:boolean"/>
       <xs:attribute name="learnInLostCity" type="xs:boolean"/>
@@ -820,7 +827,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
-      <xs:attribute name="unit" use="required" type="xs:string"/>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <xs:attribute name="capture" type="xs:boolean"/>
       <xs:attribute name="demotion" type="xs:boolean"/>
       <xs:attribute name="clearSkill" type="xs:boolean"/>

@@ -276,6 +276,14 @@ public final class Specification {
             throw new RuntimeException("Error parsing specification");
         }
 
+        Iterator<FreeColGameObjectType> typeIterator = allTypes.values().iterator();
+        while (typeIterator.hasNext()) {
+            FreeColGameObjectType type = typeIterator.next();
+            if (type.isAbstractType()) {
+                typeIterator.remove();
+            }
+        }
+
         for (Nation nation : nations) {
             if (nation.getType().isEuropean()) {
                 if (nation.getType().isREF()) {
@@ -334,7 +342,11 @@ public final class Specification {
         }
 
         initialized = true;
-        logger.info("Specification initialization complete");
+        logger.info("Specification initialization complete. "
+                    + allTypes.size() + " FreeColGameObjectTypes,\n"
+                    + allOptions.size() + " Options, "
+                    + allAbilities.size() + " Abilities, "
+                    + allModifiers.size() + " Modifiers read.");
     }
 
     private interface ChildReader {
@@ -367,7 +379,9 @@ public final class Specification {
                 T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
                 object.readFromXML(xsr, specification);
                 allTypes.put(object.getId(), object);
-                result.add(object);
+                if (!object.isAbstractType()) {
+                    result.add(object);
+                }
             }
         }
     }

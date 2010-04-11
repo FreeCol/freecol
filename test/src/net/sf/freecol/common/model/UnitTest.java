@@ -543,8 +543,10 @@ public class UnitTest extends FreeColTestCase {
         
         Unit colonist = new Unit(game, tile, player, colonistType, UnitState.ACTIVE);
         assertEquals(1, colonist.getLineOfSight());
+        assertTrue(colonist.hasAbility("model.ability.canBeEquipped"));
         
         EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+        assertTrue(colonist.canBeEquippedWith(horses));
         colonist.equipWith(horses, true);
         assertEquals(2, colonist.getLineOfSight());
         

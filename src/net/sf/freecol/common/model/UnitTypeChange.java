@@ -149,40 +149,45 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        newUnitType = specification.getType(in.getAttributeValue(null, "unit"), UnitType.class);
-        turnsToLearn = getAttribute(in, "turnsToLearn", UnitType.UNDEFINED);
-        if (getAttribute(in, "learnInSchool", false) || turnsToLearn > 0) {
-            changeTypes.add(ChangeType.EDUCATION);
-        }
-        if (getAttribute(in, "learnFromNatives", false)) {
-            changeTypes.add(ChangeType.NATIVES);
-        }
-        if (getAttribute(in, "learnFromExperience", false)) {
-            changeTypes.add(ChangeType.EXPERIENCE);
-        }
-        if (getAttribute(in, "learnInLostCity", false)) {
-            changeTypes.add(ChangeType.LOST_CITY);
-        }
-        if (getAttribute(in, "promotion", false)) {
-            changeTypes.add(ChangeType.PROMOTION);
-        }
-        if (getAttribute(in, "clearSkill", false)) {
-            changeTypes.add(ChangeType.CLEAR_SKILL);
-        }
-        if (getAttribute(in, "demotion", false)) {
-            changeTypes.add(ChangeType.DEMOTION);
-        }
-        if (getAttribute(in, "capture", false)) {
-            changeTypes.add(ChangeType.CAPTURE);
-        }
-        if (getAttribute(in, "creation", false)) {
-            changeTypes.add(ChangeType.CREATION);
-        }
-        if (getAttribute(in, "enterColony", false)) {
-            changeTypes.add(ChangeType.ENTER_COLONY);
-        }
-        if (getAttribute(in, "independence", false)) {
-            changeTypes.add(ChangeType.INDEPENDENCE);
+        String newTypeId = in.getAttributeValue(null, "unit");
+        if (newTypeId == null) {
+            newUnitType = null;
+        } else {
+            newUnitType = specification.getType(newTypeId, UnitType.class);
+            turnsToLearn = getAttribute(in, "turnsToLearn", UnitType.UNDEFINED);
+            if (getAttribute(in, "learnInSchool", false) || turnsToLearn > 0) {
+                changeTypes.add(ChangeType.EDUCATION);
+            }
+            if (getAttribute(in, "learnFromNatives", false)) {
+                changeTypes.add(ChangeType.NATIVES);
+            }
+            if (getAttribute(in, "learnFromExperience", false)) {
+                changeTypes.add(ChangeType.EXPERIENCE);
+            }
+            if (getAttribute(in, "learnInLostCity", false)) {
+                changeTypes.add(ChangeType.LOST_CITY);
+            }
+            if (getAttribute(in, "promotion", false)) {
+                changeTypes.add(ChangeType.PROMOTION);
+            }
+            if (getAttribute(in, "clearSkill", false)) {
+                changeTypes.add(ChangeType.CLEAR_SKILL);
+            }
+            if (getAttribute(in, "demotion", false)) {
+                changeTypes.add(ChangeType.DEMOTION);
+            }
+            if (getAttribute(in, "capture", false)) {
+                changeTypes.add(ChangeType.CAPTURE);
+            }
+            if (getAttribute(in, "creation", false)) {
+                changeTypes.add(ChangeType.CREATION);
+            }
+            if (getAttribute(in, "enterColony", false)) {
+                changeTypes.add(ChangeType.ENTER_COLONY);
+            }
+            if (getAttribute(in, "independence", false)) {
+                changeTypes.add(ChangeType.INDEPENDENCE);
+            }
         }
     }
 

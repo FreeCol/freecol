@@ -37,55 +37,57 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     public static final int DEFAULT_DEFENCE = 1;
     public static final int FOOD_CONSUMPTION = 2;
 
+    private static final UnitType defaultType = new UnitType();
+
     /**
      * Describe offence here.
      */
-    private int offence;
+    private int offence = DEFAULT_OFFENCE;
 
     /**
      * Describe defence here.
      */
-    private int defence;
+    private int defence = DEFAULT_DEFENCE;
 
     /**
      * Describe space here.
      */
-    private int space;
+    private int space = 0;
 
     /**
      * Describe hitPoints here.
      */
-    private int hitPoints;
+    private int hitPoints = 0;
 
     /**
      * Describe spaceTaken here.
      */
-    private int spaceTaken;
+    private int spaceTaken = 1;
 
     /**
      * Describe skill here.
      */
-    private int skill;
+    private int skill = 0;
 
     /**
      * Describe price here.
      */
-    private int price;
+    private int price = UNDEFINED;
 
     /**
      * Describe movement here.
      */
-    private int movement;
+    private int movement = 3;
     
     /**
      * Describe lineOfSight here.
      */
-    private int lineOfSight;
+    private int lineOfSight = 1;
 
     /**
      * Describe recruitProbability here.
      */
-    private int recruitProbability;
+    private int recruitProbability = 0;
 
     /**
      * Describe expertProduction here.
@@ -95,7 +97,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     /**
      * How much a Unit of this type contributes to the Player's score.
      */
-    private int scoreValue;
+    private int scoreValue = 0;
 
     /**
      * Describe pathImage here.
@@ -105,7 +107,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     /**
      * Describe maximumAttrition here.
      */
-    private int maximumAttrition;
+    private int maximumAttrition = Integer.MAX_VALUE;
 
     /**
      * The ID of the skill this UnitType teaches, mostly its own.
@@ -610,42 +612,54 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
 
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        offence = getAttribute(in, "offence", DEFAULT_OFFENCE);
-        defence = getAttribute(in, "defence", DEFAULT_DEFENCE);
-        movement = Integer.parseInt(in.getAttributeValue(null, "movement"));
-        lineOfSight = getAttribute(in, "lineOfSight", 1);
-        scoreValue = getAttribute(in, "scoreValue", 0);
-        space = getAttribute(in, "space", 0);
-        hitPoints = getAttribute(in, "hitPoints", 0);
-        spaceTaken = getAttribute(in, "spaceTaken", 1);
-        maximumAttrition = getAttribute(in, "maximumAttrition", Integer.MAX_VALUE);
+        String extendString = in.getAttributeValue(null, "extends");
+        UnitType parent = (extendString == null) ? defaultType :
+            specification.getUnitType(extendString);
+        offence = getAttribute(in, "offence", parent.offence);
+        defence = getAttribute(in, "defence", parent.defence);
+        movement = getAttribute(in, "movement", parent.movement);
+        lineOfSight = getAttribute(in, "lineOfSight", parent.lineOfSight);
+        scoreValue = getAttribute(in, "scoreValue", parent.scoreValue);
+        space = getAttribute(in, "space", parent.space);
+        hitPoints = getAttribute(in, "hitPoints", parent.hitPoints);
+        spaceTaken = getAttribute(in, "spaceTaken", parent.spaceTaken);
+        maximumAttrition = getAttribute(in, "maximumAttrition", parent.maximumAttrition);
         skillTaught = getAttribute(in, "skillTaught", getId());
 
-        pathImage = in.getAttributeValue(null, "pathImage");
+        pathImage = getAttribute(in, "pathImage", parent.pathImage);
 
-        recruitProbability = getAttribute(in, "recruitProbability", 0);
-        skill = getAttribute(in, "skill", UNDEFINED);
+        recruitProbability = getAttribute(in, "recruitProbability", parent.recruitProbability);
+        skill = getAttribute(in, "skill", parent.skill);
 
-        setPopulationRequired(getAttribute(in, "population-required", 1));
+        setPopulationRequired(getAttribute(in, "population-required", parent.getPopulationRequired()));
 
-        price = getAttribute(in, "price", UNDEFINED);
+        price = getAttribute(in, "price", parent.price);
 
-        expertProduction = specification.getType(in, "expert-production", GoodsType.class, null);
+        expertProduction = specification.getType(in, "expert-production", GoodsType.class,
+                                                 parent.expertProduction);
+
+        typeChanges.addAll(parent.typeChanges);
+        defaultEquipment = parent.defaultEquipment;
+        getFeatureContainer().add(parent.getFeatureContainer());
 
     }
 
     public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
-            if ("upgrade".equals(nodeName)) {
-                typeChanges.add(new UnitTypeChange(in, specification));
-            } else if ("downgrade".equals(nodeName)) {
+            if ("downgrade".equals(nodeName)
+                || "upgrade".equals(nodeName)) {
                 UnitTypeChange change = new UnitTypeChange(in, specification);
-                if (change.getChangeTypes().isEmpty()) {
-                    // add default downgrade type
-                    change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
+                if (change.getNewUnitType() == null) {
+                    typeChanges.clear();
+                } else {
+                    if ("downgrade".equals(nodeName)
+                        && change.getChangeTypes().isEmpty()) {
+                        // add default downgrade type
+                        change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
+                    }
+                    typeChanges.add(change);
                 }
-                typeChanges.add(change);
             } else if ("default-equipment".equals(nodeName)) {
                 String equipmentString = in.getAttributeValue(null, "id");
                 if (equipmentString != null) {
