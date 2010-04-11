@@ -1366,180 +1366,97 @@
                 type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the Dutch player -->
-    <european-nation-type id="model.nationType.trade">
+    <european-nation-type id="model.nationType.trade" extends="model.nationType.default">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="-50"/>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.merchantman"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the French player -->
-    <european-nation-type id="model.nationType.cooperation">
+    <european-nation-type id="model.nationType.cooperation" extends="model.nationType.default">
       <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
       <unit id="pioneer" type="model.unit.hardyPioneer" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the English player -->
-    <european-nation-type id="model.nationType.immigration">
+    <european-nation-type id="model.nationType.immigration" extends="model.nationType.default">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the Spanish player -->
-    <european-nation-type id="model.nationType.conquest">
+    <european-nation-type id="model.nationType.conquest" extends="model.nationType.default">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="200"/>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
       <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" mounted="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
-    <european-nation-type id="model.nationType.naval">
+    <european-nation-type id="model.nationType.naval" extends="model.nationType.default">
       <modifier id="model.modifier.movementBonus" type="additive" value="3">
         <scope ability-id="model.ability.navalUnit"/>
       </modifier>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.merchantman"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
-    <european-nation-type id="model.nationType.building">
+    <european-nation-type id="model.nationType.building" extends="model.nationType.default">
       <modifier id="model.goods.lumber" type="additive" value="2"/>
       <modifier id="model.goods.hammers" type="additive" value="2"/>
       <unit id="pioneer" type="model.unit.expertLumberJack" role="pioneer"/>
       <unit id="soldier" type="model.unit.masterCarpenter" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
-    <european-nation-type id="model.nationType.agriculture">
+    <european-nation-type id="model.nationType.agriculture" extends="model.nationType.default">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <unit id="pioneer" type="model.unit.expertFarmer" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
-    <european-nation-type id="model.nationType.furTrapping">
+    <european-nation-type id="model.nationType.furTrapping" extends="model.nationType.default">
       <modifier id="model.goods.furs" type="additive" value="2"/>
       <modifier id="model.goods.coats" type="additive" value="2"/>
       <unit id="pioneer" type="model.unit.expertFurTrapper" role="pioneer"/>
       <unit id="soldier" type="model.unit.masterFurTrader" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
   </european-nation-types>
 
   <indian-nation-types>
-    <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
+    <indian-nation-type id="default" abstract="true">
+      <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
+      </ability>
+      <ability id="model.ability.native"/>
+    </indian-nation-type>
+    <indian-nation-type id="camp-or-village" abstract="true" extends="default">
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
+    </indian-nation-type>
+    <indian-nation-type id="model.nationType.apache" extends="camp-or-village" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.west" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.sioux" extends="camp-or-village" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_camp">
       <skill id="model.unit.masterTobaccoPlanter" probability="20"/>
       <skill id="model.unit.expertFurTrapper" probability="10"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
       <skill id="model.unit.expertFarmer" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.northWest" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.tupi" extends="camp-or-village" number-of-settlements="low"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
       <skill id="model.unit.masterCottonPlanter" probability="10"/>
       <skill id="model.unit.expertFurTrapper" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.southEast" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.arawak" extends="camp-or-village" number-of-settlements="low"
                         aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.east" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.cherokee" extends="camp-or-village" number-of-settlements="average"
                         aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
@@ -1548,20 +1465,9 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFarmer" probability="3"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.northEast" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.iroquois" extends="camp-or-village" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_village">
       <skill id="model.unit.expertFurTrapper" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
@@ -1570,62 +1476,31 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFisherman" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.north" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
-                        aggression="low" type-of-settlement="inca_city"
+    <indian-nation-type id="city" abstract="true" extends="default" number-of-settlements="high"
                         settlementRadius="2" capitalRadius="3">
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="100" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="100" />
       <skill id="model.unit.expertSilverMiner" probability="20"/>
-      <skill id="model.unit.expertOreMiner" probability="10"/>
-      <skill id="model.unit.expertFisherman" probability="10"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
+      <skill id="model.unit.expertFisherman" probability="10"/>
+    </indian-nation-type>
+    <indian-nation-type id="model.nationType.inca" extends="city"
+                        aggression="low" type-of-settlement="inca_city">
+      <skill id="model.unit.expertOreMiner" probability="10"/>
       <skill id="model.unit.masterWeaver" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="100" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="100" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
-                        aggression="high" type-of-settlement="aztec_city"
-                        settlementRadius="2" capitalRadius="3">
-      <skill id="model.unit.expertSilverMiner" probability="20"/>
-      <skill id="model.unit.expertFarmer" probability="10"/>
-      <skill id="model.unit.expertFisherman" probability="10"/>
+    <indian-nation-type id="model.nationType.aztec" extends="city"
+                        aggression="high" type-of-settlement="aztec_city">
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.center" />
       <region id="model.region.east" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="100" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="100" />
     </indian-nation-type>
   </indian-nation-types>
 

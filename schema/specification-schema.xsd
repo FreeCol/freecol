@@ -511,6 +511,8 @@
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" type="xs:boolean" />
+      <xs:attribute name="extends" type="xs:IDREF" />
       <xs:attribute name="ref" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
@@ -524,7 +526,9 @@
         <xs:element ref="region"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="number-of-settlements" use="required">
+      <xs:attribute name="abstract" type="xs:boolean" />
+      <xs:attribute name="extends" type="xs:IDREF" />
+      <xs:attribute name="number-of-settlements">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="high"/>
@@ -533,7 +537,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="aggression" use="required">
+      <xs:attribute name="aggression">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="high"/>
@@ -542,7 +546,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="type-of-settlement" use="required">
+      <xs:attribute name="type-of-settlement">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="indian_camp"/>

@@ -38,18 +38,20 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public class IndianNationType extends NationType {
 
+    private static final IndianNationType defaultType = new IndianNationType();
+
     public static enum SettlementNumber { LOW, AVERAGE, HIGH }
     public static enum AggressionLevel { LOW, AVERAGE, HIGH }
 
     /**
      * The number of settlements this Nation has.
      */
-    private SettlementNumber numberOfSettlements;
+    private SettlementNumber numberOfSettlements = SettlementNumber.AVERAGE;
 
     /**
      * The aggression of this Nation.
      */
-    private AggressionLevel aggression;
+    private AggressionLevel aggression = AggressionLevel.AVERAGE;
 
     /**
      * Stores the ids of the skills taught by this Nation.
@@ -79,6 +81,7 @@ public class IndianNationType extends NationType {
     public boolean isREF() {
         return false;
     }
+
     /**
      * Get the <code>NumberOfSettlements</code> value.
      *
@@ -189,16 +192,35 @@ public class IndianNationType extends NationType {
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
 
-        String valueString = in.getAttributeValue(null, "number-of-settlements").toUpperCase();
-        numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString);
+        String extendString = in.getAttributeValue(null, "extends");
+        IndianNationType parent = (extendString == null) ? defaultType :
+            specification.getType(extendString, IndianNationType.class);
+        String valueString = in.getAttributeValue(null, "number-of-settlements");
+        if (valueString == null) {
+            numberOfSettlements = parent.numberOfSettlements;
+        } else {
+            numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString.toUpperCase());
+        }
 
-        valueString = in.getAttributeValue(null, "aggression").toUpperCase();
-        aggression = Enum.valueOf(AggressionLevel.class, valueString);
+        valueString = in.getAttributeValue(null, "aggression");
+        if (valueString == null) {
+            aggression = parent.aggression;
+        } else {
+            aggression = Enum.valueOf(AggressionLevel.class, valueString.toUpperCase());
+        }
 
-        valueString = in.getAttributeValue(null, "type-of-settlement").toUpperCase();
-        setTypeOfSettlement(Enum.valueOf(SettlementType.class, valueString));
-        setSettlementRadius(getAttribute(in, "settlementRadius", getSettlementRadius()));
-        setCapitalRadius(getAttribute(in, "capitalRadius", getCapitalRadius()));
+        valueString = in.getAttributeValue(null, "type-of-settlement");
+        if (valueString == null) {
+            setTypeOfSettlement(parent.getTypeOfSettlement());
+        } else {
+            setTypeOfSettlement(Enum.valueOf(SettlementType.class, valueString.toUpperCase()));
+        }
+        setSettlementRadius(getAttribute(in, "settlementRadius", parent.getSettlementRadius()));
+        setCapitalRadius(getAttribute(in, "capitalRadius", parent.getCapitalRadius()));
+
+        skills.addAll(parent.skills);
+        getFeatureContainer().add(parent.getFeatureContainer());
+
     }
 
     public void readChildren(XMLStreamReader in, Specification specification)
