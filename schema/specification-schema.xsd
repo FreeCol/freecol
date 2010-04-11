@@ -375,7 +375,7 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:IDREF" />
-      <xs:attribute name="workplaces" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="basicProduction" type="xs:nonNegativeInteger"/>
       <xs:attribute name="produces" type="xs:IDREF"/>
       <xs:attribute name="consumes" type="xs:IDREF"/>
