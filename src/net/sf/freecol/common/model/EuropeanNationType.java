@@ -39,8 +39,6 @@ import net.sf.freecol.common.option.BooleanOption;
  */
 public class EuropeanNationType extends NationType {
 
-    private static final EuropeanNationType defaultType = new EuropeanNationType();
-
     /**
      * Whether this is an REF Nation.
      */
@@ -137,15 +135,16 @@ public class EuropeanNationType extends NationType {
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
-        EuropeanNationType parent = (extendString == null) ? defaultType :
+        EuropeanNationType parent = (extendString == null) ? this :
             (EuropeanNationType) specification.getNationType(extendString);
         ref = getAttribute(in, "ref", parent.ref);
 
-        for (Map.Entry<String,Map<String, AbstractUnit>> entry : parent.startingUnitMap.entrySet()) {
-            startingUnitMap.put(entry.getKey(), new HashMap<String, AbstractUnit>(entry.getValue()));
+        if (parent != this) {
+            for (Map.Entry<String,Map<String, AbstractUnit>> entry : parent.startingUnitMap.entrySet()) {
+                startingUnitMap.put(entry.getKey(), new HashMap<String, AbstractUnit>(entry.getValue()));
+            }
+            getFeatureContainer().add(parent.getFeatureContainer());
         }
-        getFeatureContainer().add(parent.getFeatureContainer());
-
     }
 
     public void readChildren(XMLStreamReader in, Specification specification)

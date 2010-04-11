@@ -35,8 +35,6 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     
     private static int nextIndex = 0;
 
-    private static final BuildingType defaultType = new BuildingType();
-
     private int level = 1;
     private int workPlaces = 3;
     private int basicProduction = 3;
@@ -128,7 +126,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
     public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
-        BuildingType parent = (extendString == null) ? defaultType :
+        BuildingType parent = (extendString == null) ? this :
             specification.getBuildingType(extendString);
         String upgradeString = in.getAttributeValue(null, "upgradesFrom");
         if (upgradeString == null) {
@@ -156,8 +154,9 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         
         sequence = getAttribute(in, "sequence", parent.sequence);
 
-        getFeatureContainer().add(parent.getFeatureContainer());
-
+        if (parent != this) {
+            getFeatureContainer().add(parent.getFeatureContainer());
+        }
     }
 
     /**

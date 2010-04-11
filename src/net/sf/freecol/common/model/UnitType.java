@@ -37,8 +37,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     public static final int DEFAULT_DEFENCE = 1;
     public static final int FOOD_CONSUMPTION = 2;
 
-    private static final UnitType defaultType = new UnitType();
-
     /**
      * Describe offence here.
      */
@@ -613,7 +611,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
-        UnitType parent = (extendString == null) ? defaultType :
+        UnitType parent = (extendString == null) ? this :
             specification.getUnitType(extendString);
         offence = getAttribute(in, "offence", parent.offence);
         defence = getAttribute(in, "defence", parent.defence);
@@ -638,10 +636,11 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         expertProduction = specification.getType(in, "expert-production", GoodsType.class,
                                                  parent.expertProduction);
 
-        typeChanges.addAll(parent.typeChanges);
-        defaultEquipment = parent.defaultEquipment;
-        getFeatureContainer().add(parent.getFeatureContainer());
-
+        if (parent != this) {
+            typeChanges.addAll(parent.typeChanges);
+            defaultEquipment = parent.defaultEquipment;
+            getFeatureContainer().add(parent.getFeatureContainer());
+        }
     }
 
     public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {

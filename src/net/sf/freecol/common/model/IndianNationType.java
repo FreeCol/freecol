@@ -193,7 +193,7 @@ public class IndianNationType extends NationType {
             throws XMLStreamException {
 
         String extendString = in.getAttributeValue(null, "extends");
-        IndianNationType parent = (extendString == null) ? defaultType :
+        IndianNationType parent = (extendString == null) ? this :
             specification.getType(extendString, IndianNationType.class);
         String valueString = in.getAttributeValue(null, "number-of-settlements");
         if (valueString == null) {
