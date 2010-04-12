@@ -76,7 +76,11 @@ public class ResourceFactory {
         Resource r = getResource(uri);
         if (r == null) {
             try {
-                if (uri.getPath().endsWith(".sza")) {
+                if ("urn".equals(uri.getScheme())) {
+                    if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
+                        r = new ColorResource(uri);
+                    }
+                } else if (uri.getPath().endsWith(".sza")) {
                     r = new SZAResource(uri);
                 } else if (uri.getPath().endsWith("video.ogg")) {
                     r = new VideoResource(uri);

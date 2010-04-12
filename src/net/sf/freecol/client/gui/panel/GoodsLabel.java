@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * This label holds Goods data in addition to the JLabel data, which makes it
@@ -109,17 +110,17 @@ public final class GoodsLabel extends JLabel {
         if (!goods.getType().limitIgnored()
             && location instanceof Colony
             && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
-            setForeground(Color.RED);
+            setForeground(ResourceManager.getColor("goodsLabel.capacityExceeded.color"));
         } else if (location instanceof Colony
                    && goods.getType().isStorable()
                    && ((Colony) location).getExportData(goods.getType()).isExported()) {
-            setForeground(Color.GREEN);
+            setForeground(ResourceManager.getColor("goodsLabel.exported.color"));
         } else if (goods.getAmount() == 0) {
-            setForeground(Color.GRAY);
+            setForeground(ResourceManager.getColor("goodsLabel.zeroAmount.color"));
         } else if (goods.getAmount() < 0) {
-            setForeground(Color.RED);
+            setForeground(ResourceManager.getColor("goodsLabel.negativeAmount.color"));
         } else {
-            setForeground(Color.BLACK);
+            setForeground(ResourceManager.getColor("goodsLabel.positiveAmount.color"));
         }
         
         super.setText(String.valueOf(goods.getAmount()));

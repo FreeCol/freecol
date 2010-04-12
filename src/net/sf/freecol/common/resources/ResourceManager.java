@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.resources;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.util.LinkedList;
@@ -342,5 +343,21 @@ public class ResourceManager {
         updateIfDirty();
         final Image im = getImage(resource);
         return (im != null) ? new ImageIcon(im) : null;
+    }
+
+    /**
+     * Returns the <code>Color</code> with the given name.
+     * 
+     * @param resource The name of the resource to return.
+     * @return An <code>Color</code> created with the image
+     *      identified by <code>resource</code> or
+     *      <code>null</code> if there is no color identified
+     *      by that name.
+     * @see #getImage(String)
+     */
+    public static Color getColor(final String resource) {
+        updateIfDirty();
+        final ColorResource r = getResource(resource, ColorResource.class);
+        return (r != null) ? r.getColor() : null;
     }
 }
