@@ -20,7 +20,7 @@
 package net.sf.freecol.common.resources;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -43,11 +43,11 @@ public class SZAResource extends Resource {
     
     /**
      * Do not use directly.
-     * @param resourceLocator The <code>URL</code> used when loading this
+     * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URL)
+     * @see ResourceFactory#createResource(URI)
      */
-    SZAResource(URL resourceLocator) {
+    SZAResource(URI resourceLocator) {
         super(resourceLocator);
     }
     
@@ -65,7 +65,7 @@ public class SZAResource extends Resource {
                 return szAnimation;
             }
             try {
-                szAnimation = new SimpleZippedAnimation(getResourceLocator());
+                szAnimation = new SimpleZippedAnimation(getResourceLocator().toURL());
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not load SimpleZippedAnimation: " + getResourceLocator(), e);
             }

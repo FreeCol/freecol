@@ -25,7 +25,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -123,19 +123,19 @@ public class FreeColDataFile {
      * @exception IOException if an error occurs
      */
     protected InputStream getInputStream(String filename) throws IOException {
-        final URLConnection connection = getURL(filename).openConnection();
+        final URLConnection connection = getURI(filename).toURL().openConnection();
         connection.setDefaultUseCaches(false);
         return new BufferedInputStream(connection.getInputStream());
     }
     
-    protected URL getURL(String filename) {
+    protected URI getURI(String filename) {
         try {
             if (file.isDirectory()) {
-                return new URL("file", null, (new File(file, filename)).getAbsolutePath());
+                return new URI("file", (new File(file, filename)).getAbsolutePath(), null);
             } else {
-                return new URL("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + filename);
+                return new URI("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + filename);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
             return null;
         }
@@ -163,7 +163,7 @@ public class FreeColDataFile {
             Enumeration<?> pn = properties.propertyNames();
             while (pn.hasMoreElements()) {
                 final String key = (String) pn.nextElement();
-                final URL resourceLocator = getURL(properties.getProperty(key));
+                final URI resourceLocator = getURI(properties.getProperty(key));
                 rc.add(key, ResourceFactory.createResource(resourceLocator));
             }  
             return rc;

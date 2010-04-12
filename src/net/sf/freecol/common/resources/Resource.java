@@ -19,40 +19,40 @@
 
 package net.sf.freecol.common.resources;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Represents a resource that either has been or can be loaded using
- * a <code>URL</code>. There can only be one instance of
- * <code>Resource</code> having the same (as in URL's equals, not the identity)
- * <code>URL</code>.
+ * a <code>URI</code>. There can only be one instance of
+ * <code>Resource</code> having the same (as in URI's equals, not the identity)
+ * <code>URI</code>.
  * 
- * Instances are created using {@link ResourceManager#createResource(URL)}.
+ * Instances are created using {@link ResourceManager#createResource(URI)}.
  */
 public abstract class Resource {
 
     /**
-     * The <code>URL</code> used when loading this resource.
+     * The <code>URI</code> used when loading this resource.
      */
-    private final URL resourceLocator;
+    private final URI resourceLocator;
     
     
     /**
      * Do not use directly.
-     * @param resourceLocator The <code>URL</code> used when loading this
+     * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URL)
+     * @see ResourceFactory#createResource(URI)
      */
-    Resource(URL resourceLocator) {
+    Resource(URI resourceLocator) {
         this.resourceLocator = resourceLocator;
     }
     
     
     /**
-     * Returns the <code>URL</code> used for loading the resource.
-     * @return The <code>URL</code>.
+     * Returns the <code>URI</code> used for loading the resource.
+     * @return The <code>URI</code>.
      */
-    public URL getResourceLocator() {
+    public URI getResourceLocator() {
         return resourceLocator;
     }
 }

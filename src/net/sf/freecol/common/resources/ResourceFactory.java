@@ -20,9 +20,10 @@
 package net.sf.freecol.common.resources;
 
 import java.lang.ref.WeakReference;
-import java.net.URL;
+import java.net.URI;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Logger;
 
 /**
  * A factory class for creating <code>Resource</code> instances.
@@ -30,26 +31,28 @@ import java.util.WeakHashMap;
  */
 public class ResourceFactory {
 
+    private static final Logger logger = Logger.getLogger(ResourceFactory.class.getName());
+
     /**
      * A <code>WeakHashMap</code> to ensure that only one
      * <code>Resource</code> is created given the same
-     * <code>URL</code>.
+     * <code>URI</code>.
      */
-    private static Map<URL, WeakReference<Resource>> resources = new WeakHashMap<URL, WeakReference<Resource>>();
+    private static Map<URI, WeakReference<Resource>> resources = new WeakHashMap<URI, WeakReference<Resource>>();
     
 
     /**
-     * Gets the resource with the given <code>URL</code> from
+     * Gets the resource with the given <code>URI</code> from
      * {@link #resources}.
      * 
-     * @param url The <code>URL</code> to identify a previously created
+     * @param uri The <code>URI</code> to identify a previously created
      *      <code>Resource</code>.
      * @return The <code>Resource</code> identified by the given
-     *      <code>URL</code>, or <code>null</code> if no such
+     *      <code>URI</code>, or <code>null</code> if no such
      *      <code>Resource</code> exists.
      */
-    private static Resource getResource(URL url) {
-        final WeakReference<Resource> wr = resources.get(url);
+    private static Resource getResource(URI uri) {
+        final WeakReference<Resource> wr = resources.get(uri);
         if (wr != null) {
             final Resource r = wr.get();
             if (r != null) {
@@ -61,25 +64,29 @@ public class ResourceFactory {
     
     /**
      * Returns an instance of <code>Resource</code> with the
-     * given <code>URL</code> as the parameter.
+     * given <code>URI</code> as the parameter.
      * 
-     * @param url The <code>URL</code> used when creating the
+     * @param uri The <code>URI</code> used when creating the
      *      instance.
      * @return A previously created instance of <code>Resource</code>
-     *      with the given <code>URL</code> if such an object has
+     *      with the given <code>URI</code> if such an object has
      *      already been created, or a new instance if not.
      */
-    public static Resource createResource(URL url) {
-        Resource r = getResource(url);
+    public static Resource createResource(URI uri) {
+        Resource r = getResource(uri);
         if (r == null) {
-            if (url.getPath().endsWith(".sza")) {
-                r = new SZAResource(url);
-            } else if (url.getPath().endsWith("video.ogg")) {
-                r = new VideoResource(url);
-            } else {
-                r = new ImageResource(url);
+            try {
+                if (uri.getPath().endsWith(".sza")) {
+                    r = new SZAResource(uri);
+                } else if (uri.getPath().endsWith("video.ogg")) {
+                    r = new VideoResource(uri);
+                } else {
+                    r = new ImageResource(uri);
+                }
+                resources.put(uri, new WeakReference<Resource>(r));
+            } catch(Exception e) {
+                logger.warning("Failed to create resource with URI " + uri);
             }
-            resources.put(url, new WeakReference<Resource>(r));
         }
         return r;
     }

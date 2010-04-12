@@ -27,7 +27,7 @@ import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,11 +45,11 @@ public class ImageResource extends Resource {
     
     /**
      * Do not use directly.
-     * @param resourceLocator The <code>URL</code> used when loading this
+     * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URL)
+     * @see ResourceFactory#createResource(URI)
      */
-    ImageResource(URL resourceLocator) {
+    ImageResource(URI resourceLocator) {
         super(resourceLocator);
     }
     
@@ -67,11 +67,12 @@ public class ImageResource extends Resource {
                 return image;
             }
             MediaTracker mt = new MediaTracker(_c);
-            final Image im = Toolkit.getDefaultToolkit().createImage(getResourceLocator());
-            mt.addImage(im, 0);
+            Image im;
             try {
+                im = Toolkit.getDefaultToolkit().createImage(getResourceLocator().toURL());
+                mt.addImage(im, 0);
                 mt.waitForID(0);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 return null;
             }
             image = im;

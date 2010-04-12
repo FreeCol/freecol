@@ -93,7 +93,7 @@ public class FreeColTcFile extends FreeColModFile {
         for (ResourceType resourceType : Specification.getSpecification().getResourceTypeList()) {
             key = resourceType.getId() + ".image";
             value = urlPrefix + getShortId(resourceType).toLowerCase() + ".png";
-            map.add(key, ResourceFactory.createResource(getURL(value)));
+            map.add(key, ResourceFactory.createResource(getURI(value)));
         }
 
         // units
@@ -113,12 +113,12 @@ public class FreeColTcFile extends FreeColModFile {
                 roleId = role.getId();
                 key = keyPrefix + roleId + ".image";
                 value = urlPrefix + roleId + urlSuffix;
-                map.add(key, ResourceFactory.createResource(getURL(value)));
+                map.add(key, ResourceFactory.createResource(getURI(value)));
                 // attack animations
                 for (String[] animation : attackAnimations) {
                     key = keyPrefix + roleId + animation[0];
                     value = urlPrefix + roleId + "/" + shortId + animation[1];
-                    map.add(key, ResourceFactory.createResource(getURL(value)));
+                    map.add(key, ResourceFactory.createResource(getURI(value)));
                 }
             }
         }

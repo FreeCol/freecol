@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.resources;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.video.Video;
@@ -37,14 +37,14 @@ public class VideoResource extends Resource {
     
     /**
      * Do not use directly.
-     * @param resourceLocator The <code>URL</code> used when loading this
+     * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URL)
+     * @see ResourceFactory#createResource(URI)
      */
-    VideoResource(URL resourceLocator) {
+    VideoResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
         
-        this.video = new Video(resourceLocator);
+        this.video = new Video(resourceLocator.toURL());
     }
     
     
