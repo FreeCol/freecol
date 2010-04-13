@@ -324,7 +324,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(cargoScroll, "grow, height 60:121:");
         add(outsideColonyScroll, "grow, height 60:121:");
         add(warehouseScroll, "span, height 40:60:80, growx");
-        add(unloadButton, "span, split 4, align center");
+        add(unloadButton, "span, split 5, align center");
         add(fillButton);
         add(warehouseButton);
         add(buildQueueButton);
