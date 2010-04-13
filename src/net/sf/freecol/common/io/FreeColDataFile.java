@@ -130,7 +130,7 @@ public class FreeColDataFile {
     
     protected URI getURI(String filename) {
         try {
-            if (filename.startsWith("urn:color:")) {
+            if (filename.startsWith("urn:")) {
                 return new URI(filename);
             } else if (file.isDirectory()) {
                 return new URI("file", (new File(file, filename)).getAbsolutePath(), null);

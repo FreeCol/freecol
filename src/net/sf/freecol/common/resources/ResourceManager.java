@@ -360,4 +360,20 @@ public class ResourceManager {
         final ColorResource r = getResource(resource, ColorResource.class);
         return (r != null) ? r.getColor() : null;
     }
+
+    /**
+     * Returns the <code>Image</code> with the given name.
+     * 
+     * @param resource The name of the resource to return.
+     * @return An <code>Image</code> created with the image
+     *      identified by <code>resource</code> or
+     *      <code>null</code> if there is no image identified
+     *      by that name.
+     * @see #getImage(String)
+     */
+    public static Image getChip(final String resource) {
+        updateIfDirty();
+        final ChipResource r = getResource(resource, ChipResource.class);
+        return (r != null) ? r.getImage() : null;
+    }
 }

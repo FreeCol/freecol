@@ -1132,6 +1132,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The alarm chip.
      */
     public Image getAlarmChip(Tension.Level alarm, final boolean visited) {
+        /*
         Image alarmChip = (visited?alarmChips:alarmChipsUnvisited).get(alarm);
 
         if (alarmChip == null) {
@@ -1141,6 +1142,9 @@ public final class ImageLibrary extends ImageProvider {
             alarmChip = (visited?alarmChips:alarmChipsUnvisited).get(alarm);
         }
         return alarmChip;
+        */
+        return ResourceManager.getChip("alarmChip." + (visited ? "visited." : "unvisited.")
+                                       + alarm.toString().toLowerCase());
     }
 
     /**
