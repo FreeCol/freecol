@@ -109,7 +109,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      */
     public static final int SCROLL_SPEED = 40;
 
-    private static final int EXIT = 0, UNLOAD = 2, WAREHOUSE = 4, FILL = 5;
+    private static final int EXIT = 0, BUILDQUEUE = 1, UNLOAD = 2, WAREHOUSE = 4, FILL = 5;
 
     private final JLabel rebelShield = new JLabel();
     private final JLabel rebelLabel = new JLabel();
@@ -160,6 +160,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private JButton fillButton = new JButton(Messages.message("fill"));
 
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
+
+    private JButton buildQueueButton = new JButton(Messages.message("colonyPanel.buildQueue"));
 
     private static final Font hugeFont = new Font("Dialog", Font.BOLD, 24);
 
@@ -299,6 +301,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         enterPressesWhenFocused(warehouseButton);
         warehouseButton.addActionListener(this);
 
+        buildQueueButton.setActionCommand(String.valueOf(BUILDQUEUE));
+        enterPressesWhenFocused(buildQueueButton);
+        buildQueueButton.addActionListener(this);
+
         selectedUnit = null;
 
         // See the message of Ulf Onnen for more information about the presence
@@ -321,6 +327,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(unloadButton, "span, split 4, align center");
         add(fillButton);
         add(warehouseButton);
+        add(buildQueueButton);
         add(exitButton);
 
         initialize(colony);
@@ -593,6 +600,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if (getCanvas().showFreeColDialog(new WarehouseDialog(getCanvas(), colony))) {
                     warehousePanel.update();
                 }
+                break;
+            case BUILDQUEUE:
+                getCanvas().showSubPanel(new BuildQueuePanel(colony, getCanvas()));
                 break;
             case FILL:
                 fill();
