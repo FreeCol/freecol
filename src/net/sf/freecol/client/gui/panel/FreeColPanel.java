@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Superclass for all panels in FreeCol.
@@ -111,10 +112,12 @@ public class FreeColPanel extends JPanel implements ActionListener {
     protected static final int margin = 3;
 
     // The color to use for links
-    protected static final Color LINK_COLOR = new Color(122, 109, 82);
+    protected static final Color LINK_COLOR =
+        ResourceManager.getColor("lookAndFeel.link.color");
 
     // The color to use for selected items in lists
-    protected static final Color LIST_SELECT_COLOR = new Color(216, 194, 145);
+    protected static final Color LIST_SELECT_COLOR =
+        ResourceManager.getColor("lookAndFeel.listSelect.color");
 
     // The borders to use for table cells
     public static final Border TOPCELLBORDER =

@@ -47,20 +47,32 @@ public class ColorResource extends Resource {
      */
     ColorResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
-        if (resourceLocator.getFragment() == null) {
-            String colorName = resourceLocator.getSchemeSpecificPart().substring(SCHEME.length());
+        String colorName = resourceLocator.getSchemeSpecificPart().substring(SCHEME.length());
+        color = getColor(colorName);
+    }
+
+    /**
+     * Returns the <code>Color</code> identified by the given
+     * string. This is either a hexadecimal integer prefixed with
+     * "0x", or the name of a field of the Color class.
+     *
+     * @param colorName a <code>String</code> value
+     * @return a <code>Color</code> value
+     */
+    public static Color getColor(String colorName) {
+        if (colorName.startsWith("0x") || colorName.startsWith("0X")) {
+            return new Color(Integer.decode(colorName));
+        } else {
             try {
                 Field field = Color.class.getField(colorName);
-                color = (Color) field.get(null);
+                return (Color) field.get(null);
             } catch(Exception e) {
                 // probably a non-standard color name
                 logger.warning(e.toString());
             }
-        } else {
-            color = new Color(Integer.decode("0x" + resourceLocator.getFragment()));
+            return null;
         }
     }
-    
     
     /**
      * Gets the <code>Color</code> represented by this resource.

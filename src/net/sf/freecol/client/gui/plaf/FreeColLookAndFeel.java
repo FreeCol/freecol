@@ -47,6 +47,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.FAFile;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Implements the "FreeCol Look and Feel".
@@ -58,13 +59,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     private final static Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
     private File dataDirectory;
     
-    private static final Color PRIMARY_1 = new Color(122, 109, 82),
-                               BG_COLOR_SELECT = new Color(255, 244, 195),
-                               PRIMARY_3 = new Color(203, 182, 136),
-                               SECONDARY_1 = new Color(10, 10, 10),
-                               DISABLED_COLOR = new Color(166, 144, 95),
-                               BG_COLOR = new Color(216, 194, 145);
-                               
     private final Dimension windowSize;
 
 
@@ -107,27 +101,27 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         
         setCurrentTheme(new DefaultMetalTheme() {
             protected ColorUIResource getPrimary1() {
-                return new ColorUIResource(PRIMARY_1);
+                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary1.color"));
             }
 
             protected ColorUIResource getPrimary2() {
-                return new ColorUIResource(BG_COLOR_SELECT);
+                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.backgroundSelect.color"));
             }
 
             protected ColorUIResource getPrimary3() {
-                return new ColorUIResource(PRIMARY_3);
+                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary3.color"));
             }
 
             protected ColorUIResource getSecondary1() {
-                return new ColorUIResource(SECONDARY_1);
+                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.secondary1.color"));
             }
 
             protected ColorUIResource getSecondary2() {
-                return new ColorUIResource(DISABLED_COLOR);
+                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabled.color"));
             }
 
             protected ColorUIResource getSecondary3() {
-                return new ColorUIResource(BG_COLOR);
+                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
             }
         });
     }

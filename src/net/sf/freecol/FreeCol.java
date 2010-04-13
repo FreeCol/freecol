@@ -666,7 +666,7 @@ public final class FreeCol {
     public static boolean initializeResourceFolders() {
         FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
-        
+
         // This needs to be initialized before ImageLibrary
         InputStream si = null;
         try {
