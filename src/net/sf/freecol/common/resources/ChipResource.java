@@ -130,27 +130,29 @@ public class ChipResource extends Resource {
         if (image == null) {
             image = new BufferedImage(10, 17, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = (Graphics2D) image.getGraphics();
-            createColorChip(g, background, foreground);
-
-            if ("mission".equals(type)) {
-                createMissionChip(g, foreground);
+            if ("color".equals(type)) {
+                createColorChip(g);
+            } else if ("mission".equals(type)) {
+                createMissionChip(g);
             } else if ("alarm.visited".equals(type)) {
-                createVisitedAlarmChip(g, foreground);
+                createAlarmChip(g, true);
             } else if ("alarm.unvisited".equals(type)) {
-                createUnvisitedAlarmChip(g, foreground);
+                createAlarmChip(g, false);
             }
         }
         return image;
     }
 
-    private void createColorChip(Graphics2D g, Color background, Color foreground) {
+    private void createColorChip(Graphics2D g) {
         g.setColor(foreground);
         g.fillRect(0, 0, 10, 17);
         g.setColor(background);
         g.fillRect(1, 1, 8 , 15);
     }
 
-    private void createMissionChip(Graphics2D g, Color foreground) {
+    private void createMissionChip(Graphics2D g) {
+        g.setColor(background);
+        g.fillRect(0, 0, 10, 17);
         GeneralPath cross = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
         cross.moveTo(4, 1);
         cross.lineTo(6, 1);
@@ -170,18 +172,17 @@ public class ChipResource extends Resource {
         g.fill(cross);
     }
 
-    private void createVisitedAlarmChip(Graphics2D g, Color foreground) {
+    private void createAlarmChip(Graphics2D g, boolean visited) {
+        createColorChip(g);
         g.setColor(foreground);
-        g.fillRect(4, 3, 2, 7);
-        g.fillRect(4, 12, 2, 2);
-    }
-
-    private void createUnvisitedAlarmChip(Graphics2D g, Color foreground) {
-        g.setColor(foreground);
-        g.fillRect(3, 3, 4, 2);
-        g.fillRect(6, 4, 2, 2);
-        g.fillRect(4, 6, 3, 1);
-        g.fillRect(4, 7, 2, 3);
+        if (visited) {
+            g.fillRect(4, 3, 2, 7);
+        } else {
+            g.fillRect(3, 3, 4, 2);
+            g.fillRect(6, 4, 2, 2);
+            g.fillRect(4, 6, 3, 1);
+            g.fillRect(4, 7, 2, 3);
+        }
         g.fillRect(4, 12, 2, 2);
     }
 

@@ -2383,15 +2383,17 @@ public final class GUI {
                     centerImage(g, settlementImage, x, y);
 
                     // Draw the color chip for the settlement.
-                    g.drawImage(lib.getColorChip(indianSettlement.getOwner().getColor()),
+                    g.drawImage(ResourceManager.getChip(indianSettlement.getOwner().getNationID() + ".chip"),
                                 x + (int) (STATE_OFFSET_X * lib.getScalingFactor()),
                                 y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);
 
                     // Draw the mission chip if needed.
                     Unit missionary = indianSettlement.getMissionary();
                     if (missionary != null) {
-                        boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                        g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert),
+                        String expert = missionary.hasAbility("model.ability.expertMissionary") ?
+                            ".expert" : "";
+                        g.drawImage(ResourceManager.getChip(missionary.getOwner().getNationID()
+                                                            + ".mission" + expert + ".chip"),
                                     x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
                                     (MISSION_OFFSET_X - STATE_OFFSET_X),
                                     y + (int) (MISSION_OFFSET_Y * lib.getScalingFactor()), null);
@@ -2735,7 +2737,7 @@ public final class GUI {
         if (img!=null)
             return img;
         // Draw it and put it in the cache
-        Image chip = lib.getColorChip(backgroundColor);
+        Image chip = ResourceManager.getChip(unit.getOwner().getNationID() + ".chip");
         img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
         g.drawImage(chip, 0, 0, null);

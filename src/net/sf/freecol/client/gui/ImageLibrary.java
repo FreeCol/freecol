@@ -1084,6 +1084,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param color The color of the color chip to return.
      * @return The color chip with the given color.
      */
+    @Deprecated
     public Image getColorChip(Color color) {
         Image colorChip = colorChips.get(color);
         if (colorChip == null) {
@@ -1103,6 +1104,7 @@ public final class ImageLibrary extends ImageProvider {
      *            expert.
      * @return The color chip with the given color.
      */
+    @Deprecated
     public Image getMissionChip(Color color, boolean expertMission) {
         Image missionChip;
         if (expertMission) {
@@ -1132,17 +1134,6 @@ public final class ImageLibrary extends ImageProvider {
      * @return The alarm chip.
      */
     public Image getAlarmChip(Tension.Level alarm, final boolean visited) {
-        /*
-        Image alarmChip = (visited?alarmChips:alarmChipsUnvisited).get(alarm);
-
-        if (alarmChip == null) {
-            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                    .getDefaultConfiguration();
-            loadAlarmChip(gc, alarm, visited);
-            alarmChip = (visited?alarmChips:alarmChipsUnvisited).get(alarm);
-        }
-        return alarmChip;
-        */
         return ResourceManager.getChip("alarmChip." + (visited ? "visited." : "unvisited.")
                                        + alarm.toString().toLowerCase());
     }
