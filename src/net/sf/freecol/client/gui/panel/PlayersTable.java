@@ -59,6 +59,8 @@ import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.resources.ChipResource;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 public final class PlayersTable extends JTable {
@@ -398,6 +400,7 @@ public final class PlayersTable extends JTable {
             nations = new ArrayList<Nation>();
             players = new HashMap<Nation, Player>();
             for (Nation nation : Specification.getSpecification().getNations()) {
+                nation.setColor(ResourceManager.getColor(nation.getId() + ".color"));
                 NationState state = nationOptions.getNations().get(nation);
                 if (state != null) {
                     nations.add(nation);
@@ -547,10 +550,18 @@ public final class PlayersTable extends JTable {
                     update();
                     break;
                 case COLOR_COLUMN:
-                    preGameController.setColor((Color) value);
+                    Color color = (Color) value;
+                    preGameController.setColor(color);
+                    Nation nation = nations.get(row);
+                    ResourceManager.getResource(nation.getId() + ".chip",
+                                                ChipResource.class).setBackground(color);
+                    ResourceManager.getResource(nation.getId() + ".mission.chip",
+                                                ChipResource.class).setForeground(color);
+                    ResourceManager.getResource(nation.getId() + ".mission.expert.chip",
+                                                ChipResource.class).setForeground(color);
                     break;
                 case PLAYER_COLUMN:
-                    Nation nation = nations.get(row);
+                    nation = nations.get(row);
                     if (nationOptions.getNationState(nation) == NationState.AVAILABLE) {
                         preGameController.setNation(nation);
                         preGameController.setColor(nation.getColor());

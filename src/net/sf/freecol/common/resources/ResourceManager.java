@@ -197,7 +197,7 @@ public class ResourceManager {
      * @return The resource if there is one with the given
      *      resourceId and type, or else <code>null</code>.
      */
-    private static <T> T getResource(final String resourceId, final Class<T> type) {
+    public static <T> T getResource(final String resourceId, final Class<T> type) {
         final Resource r = mergedContainer.get(resourceId);
         if (type.isInstance(r)) {
             return type.cast(r);
