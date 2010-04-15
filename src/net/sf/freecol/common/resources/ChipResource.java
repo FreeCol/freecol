@@ -20,10 +20,13 @@
 package net.sf.freecol.common.resources;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -39,6 +42,9 @@ import java.net.URI;
 public class ChipResource extends Resource {
 
     public static final String SCHEME = "chip:";
+
+    public static final int WIDTH = 10;
+    public static final int HEIGHT = 17;
 
     /**
      * Describe foreground here.
@@ -59,6 +65,10 @@ public class ChipResource extends Resource {
      * Describe type here.
      */
     private final String type;
+
+
+    private Map<Double, Image> scaledImages = new HashMap<Double, Image>();
+
 
     /**
      * Do not use directly.
@@ -126,7 +136,7 @@ public class ChipResource extends Resource {
      *
      * @return a <code>BufferedImage</code> value
      */
-    public final BufferedImage getImage() {
+    public final Image getImage() {
         if (image == null) {
             image = new BufferedImage(10, 17, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = (Graphics2D) image.getGraphics();
@@ -143,29 +153,44 @@ public class ChipResource extends Resource {
         return image;
     }
 
+    public final Image getImage(double scale) {
+        Image scaledImage = scaledImages.get(scale);
+        if (scaledImage == null) {
+            Image image = getImage();
+            int width = (int) (WIDTH * scale);
+            int height = (int) (HEIGHT * scale);
+            scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            scaledImages.put(scale, scaledImage);
+        }
+        return scaledImage;
+    }
+
     private void createColorChip(Graphics2D g) {
+        int bw = WIDTH / 10;
         g.setColor(foreground);
-        g.fillRect(0, 0, 10, 17);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
         g.setColor(background);
-        g.fillRect(1, 1, 8 , 15);
+        g.fillRect(bw, bw, WIDTH - 2*bw , HEIGHT - 2*bw);
     }
 
     private void createMissionChip(Graphics2D g) {
+        int bw = WIDTH / 10;
+        int dw = WIDTH / 5;
         g.setColor(background);
-        g.fillRect(0, 0, 10, 17);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
         GeneralPath cross = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        cross.moveTo(4, 1);
-        cross.lineTo(6, 1);
-        cross.lineTo(6, 4);
-        cross.lineTo(9, 4);
-        cross.lineTo(9, 6);
-        cross.lineTo(6, 6);
-        cross.lineTo(6, 16);
-        cross.lineTo(4, 16);
-        cross.lineTo(4, 6);
-        cross.lineTo(1, 6);
-        cross.lineTo(1, 4);
-        cross.lineTo(4, 4);
+        cross.moveTo(2*dw, bw);
+        cross.lineTo(3*dw, bw);
+        cross.lineTo(3*dw, 2*dw);
+        cross.lineTo(WIDTH - bw, 2*dw);
+        cross.lineTo(WIDTH - bw, 3*dw);
+        cross.lineTo(3*dw, 3*dw);
+        cross.lineTo(3*dw, HEIGHT - bw);
+        cross.lineTo(2*dw, HEIGHT - bw);
+        cross.lineTo(2*dw, 3*dw);
+        cross.lineTo(bw, 3*dw);
+        cross.lineTo(bw, 2*dw);
+        cross.lineTo(2*dw, 2*dw);
         cross.closePath();
  
         g.setColor(foreground);
@@ -173,17 +198,19 @@ public class ChipResource extends Resource {
     }
 
     private void createAlarmChip(Graphics2D g, boolean visited) {
+        int bw = WIDTH / 10;
+        int dw = WIDTH / 5;
         createColorChip(g);
         g.setColor(foreground);
         if (visited) {
-            g.fillRect(4, 3, 2, 7);
+            g.fillRect(2*dw, bw+dw, dw, 3*dw+bw);
         } else {
-            g.fillRect(3, 3, 4, 2);
-            g.fillRect(6, 4, 2, 2);
-            g.fillRect(4, 6, 3, 1);
-            g.fillRect(4, 7, 2, 3);
+            g.fillRect(bw+dw, bw+dw, 2*dw, dw);
+            g.fillRect(3*dw, 2*dw, dw, dw);
+            g.fillRect(2*dw, 3*dw, bw+dw, bw);
+            g.fillRect(2*dw, 3*dw+bw, dw, bw+dw);
         }
-        g.fillRect(4, 12, 2, 2);
+        g.fillRect(2*dw, HEIGHT - 3*dw, dw, dw);
     }
 
 }

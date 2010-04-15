@@ -2383,17 +2383,15 @@ public final class GUI {
                     centerImage(g, settlementImage, x, y);
 
                     // Draw the color chip for the settlement.
-                    g.drawImage(ResourceManager.getChip(indianSettlement.getOwner().getNationID() + ".chip"),
+                    g.drawImage(lib.getColorChip(settlement, lib.getScalingFactor()),
                                 x + (int) (STATE_OFFSET_X * lib.getScalingFactor()),
                                 y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);
 
                     // Draw the mission chip if needed.
                     Unit missionary = indianSettlement.getMissionary();
                     if (missionary != null) {
-                        String expert = missionary.hasAbility("model.ability.expertMissionary") ?
-                            ".expert" : "";
-                        g.drawImage(ResourceManager.getChip(missionary.getOwner().getNationID()
-                                                            + ".mission" + expert + ".chip"),
+                        boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                        g.drawImage(lib.getMissionChip(missionary, expert, lib.getScalingFactor()),
                                     x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
                                     (MISSION_OFFSET_X - STATE_OFFSET_X),
                                     y + (int) (MISSION_OFFSET_Y * lib.getScalingFactor()), null);
@@ -2405,7 +2403,7 @@ public final class GUI {
                         if (alarm != null) {
                             // TODO: make it work
                             final boolean visited = indianSettlement.hasBeenVisited(freeColClient.getMyPlayer());
-                            g.drawImage(lib.getAlarmChip(alarm.getLevel(), visited),
+                            g.drawImage(lib.getAlarmChip(alarm.getLevel(), visited, lib.getScalingFactor()),
                                         x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
                                         (ALARM_OFFSET_X - STATE_OFFSET_X),
                                         y + (int) (ALARM_OFFSET_Y  * lib.getScalingFactor()), null);
@@ -2737,7 +2735,7 @@ public final class GUI {
         if (img!=null)
             return img;
         // Draw it and put it in the cache
-        Image chip = ResourceManager.getChip(unit.getOwner().getNationID() + ".chip");
+        Image chip = lib.getColorChip(unit, lib.getScalingFactor());
         img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
         g.drawImage(chip, 0, 0, null);
@@ -3552,6 +3550,7 @@ public final class GUI {
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");
         }
+        indicatorImageCache.clear();
         forceReposition();
         freeColClient.getCanvas().refresh();
     }

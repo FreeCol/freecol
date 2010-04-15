@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
@@ -66,7 +67,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  * Holds various images that can be called upon by others in order to display
  * certain things.
  */
-public final class ImageLibrary extends ImageProvider {
+public final class ImageLibrary {
 
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());    
     
@@ -1081,61 +1082,40 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * Returns the color chip with the given color.
      * 
-     * @param color The color of the color chip to return.
+     * @param ownable an <code>Ownable</code> value
+     * @param scale a <code>double</code> value
      * @return The color chip with the given color.
      */
-    @Deprecated
-    public Image getColorChip(Color color) {
-        Image colorChip = colorChips.get(color);
-        if (colorChip == null) {
-            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                    .getDefaultConfiguration();
-            loadColorChip(gc, color);
-            colorChip = colorChips.get(color);
-        }
-        return colorChip;
+    public Image getColorChip(Ownable ownable, double scale) {
+        return ResourceManager.getChip(ownable.getOwner().getNationID() + ".chip", scale);
     }
 
     /**
      * Returns the mission chip with the given color.
      * 
-     * @param color The color of the color chip to return.
+     * @param ownable an <code>Ownable</code> value
      * @param expertMission Indicates whether or not the missionary is an
      *            expert.
+     * @param scale a <code>double</code> value
      * @return The color chip with the given color.
      */
-    @Deprecated
-    public Image getMissionChip(Color color, boolean expertMission) {
-        Image missionChip;
-        if (expertMission) {
-            missionChip = expertMissionChips.get(color);
-        } else {
-            missionChip = missionChips.get(color);
-        }
-
-        if (missionChip == null) {
-            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                    .getDefaultConfiguration();
-            loadMissionChip(gc, color, expertMission);
-
-            if (expertMission) {
-                missionChip = expertMissionChips.get(color);
-            } else {
-                missionChip = missionChips.get(color);
-            }
-        }
-        return missionChip;
+    public Image getMissionChip(Ownable ownable, boolean expertMission, double scale) {
+        return ResourceManager.getChip(ownable.getOwner().getNationID()
+                                       + ".mission" + (expertMission ? ".expert" : "")
+                                       + ".chip", scale);
     }
 
     /**
      * Returns the alarm chip with the given color.
      * 
      * @param alarm The alarm level.
+     * @param visited a <code>boolean</code> value
+     * @param scale a <code>double</code> value
      * @return The alarm chip.
      */
-    public Image getAlarmChip(Tension.Level alarm, final boolean visited) {
-        return ResourceManager.getChip("alarmChip." + (visited ? "visited." : "unvisited.")
-                                       + alarm.toString().toLowerCase());
+    public Image getAlarmChip(Tension.Level alarm, final boolean visited, double scale) {
+        return ResourceManager.getChip("alarmChip." + (visited ? "visited." : "")
+                                       + alarm.toString().toLowerCase(), scale);
     }
 
     /**

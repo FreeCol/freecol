@@ -376,4 +376,11 @@ public class ResourceManager {
         final ChipResource r = getResource(resource, ChipResource.class);
         return (r != null) ? r.getImage() : null;
     }
+
+
+    public static Image getChip(final String resource, double scale) {
+        updateIfDirty();
+        final ChipResource r = getResource(resource, ChipResource.class);
+        return (r != null) ? r.getImage(scale) : null;
+    }
 }
