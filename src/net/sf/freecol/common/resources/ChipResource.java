@@ -228,8 +228,8 @@ public class ChipResource extends Resource {
 
     public static ChipResource missionChip(Color color, boolean expert) {
         return new ChipResource("mission",
-                                (expert ? ResourceManager.getColor("mission.background.color") :
-                                 ResourceManager.getColor("expertMission.background.color")),
+                                (expert ? ResourceManager.getColor("expertMission.background.color") :
+                                 ResourceManager.getColor("mission.background.color")),
                                 color);
     }
 
