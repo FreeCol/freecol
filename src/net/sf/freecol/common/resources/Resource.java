@@ -36,6 +36,10 @@ public abstract class Resource {
      */
     private final URI resourceLocator;
     
+    protected Resource() {
+        // empty constructor
+        resourceLocator = null;
+    }
     
     /**
      * Do not use directly.

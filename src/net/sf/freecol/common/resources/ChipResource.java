@@ -69,6 +69,11 @@ public class ChipResource extends Resource {
 
     private Map<Double, Image> scaledImages = new HashMap<Double, Image>();
 
+    private ChipResource(String type, Color bg, Color fg) {
+        this.type = type;
+        this.background = bg;
+        this.foreground = fg;
+    }
 
     /**
      * Do not use directly.
@@ -138,16 +143,15 @@ public class ChipResource extends Resource {
      */
     public final Image getImage() {
         if (image == null) {
-            image = new BufferedImage(10, 17, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = (Graphics2D) image.getGraphics();
+            image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
             if ("color".equals(type)) {
-                createColorChip(g);
+                createColorChip();
             } else if ("mission".equals(type)) {
-                createMissionChip(g);
+                createMissionChip();
             } else if ("alarm.visited".equals(type)) {
-                createAlarmChip(g, true);
+                createAlarmChip(true);
             } else if ("alarm.unvisited".equals(type)) {
-                createAlarmChip(g, false);
+                createAlarmChip(false);
             }
         }
         return image;
@@ -165,7 +169,8 @@ public class ChipResource extends Resource {
         return scaledImage;
     }
 
-    private void createColorChip(Graphics2D g) {
+    private void createColorChip() {
+        Graphics2D g = (Graphics2D) image.getGraphics();
         int bw = WIDTH / 10;
         g.setColor(foreground);
         g.fillRect(0, 0, WIDTH, HEIGHT);
@@ -173,7 +178,8 @@ public class ChipResource extends Resource {
         g.fillRect(bw, bw, WIDTH - 2*bw , HEIGHT - 2*bw);
     }
 
-    private void createMissionChip(Graphics2D g) {
+    private void createMissionChip() {
+        Graphics2D g = (Graphics2D) image.getGraphics();
         int bw = WIDTH / 10;
         int dw = WIDTH / 5;
         g.setColor(background);
@@ -197,10 +203,11 @@ public class ChipResource extends Resource {
         g.fill(cross);
     }
 
-    private void createAlarmChip(Graphics2D g, boolean visited) {
+    private void createAlarmChip(boolean visited) {
+        Graphics2D g = (Graphics2D) image.getGraphics();
         int bw = WIDTH / 10;
         int dw = WIDTH / 5;
-        createColorChip(g);
+        createColorChip();
         g.setColor(foreground);
         if (visited) {
             g.fillRect(2*dw, bw+dw, dw, 3*dw+bw);
@@ -211,6 +218,19 @@ public class ChipResource extends Resource {
             g.fillRect(2*dw, 3*dw+bw, dw, bw+dw);
         }
         g.fillRect(2*dw, HEIGHT - 3*dw, dw, dw);
+    }
+
+    // Factory methods
+
+    public static ChipResource colorChip(Color color) {
+        return new ChipResource("color", color, Color.BLACK);
+    }
+
+    public static ChipResource missionChip(Color color, boolean expert) {
+        return new ChipResource("mission",
+                                (expert ? ResourceManager.getColor("mission.background.color") :
+                                 ResourceManager.getColor("expertMission.background.color")),
+                                color);
     }
 
 }

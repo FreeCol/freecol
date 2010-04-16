@@ -48,6 +48,7 @@ public class ResourceManager {
     private static ResourceMapping tcMapping;
     private static ResourceMapping campaignMapping;
     private static ResourceMapping scenarioMapping;
+    private static ResourceMapping gameMapping;
     private static List<ResourceMapping> modMappings = new LinkedList<ResourceMapping>();
 
     /*
@@ -105,6 +106,15 @@ public class ResourceManager {
      */
     public static void setScenarioMapping(final ResourceMapping _scenarioMapping) {
         scenarioMapping = _scenarioMapping;
+        dirty = true;
+    }
+
+    /**
+     * Sets the mappings specified in a game, such as the player colors.
+     * @param _gameMapping The mapping between IDs and resources. 
+     */
+    public static void setGameMapping(final ResourceMapping _gameMapping) {
+        campaignMapping = _gameMapping;
         dirty = true;
     }
 
@@ -182,6 +192,7 @@ public class ResourceManager {
         _mergedContainer.addAll(tcMapping);
         _mergedContainer.addAll(campaignMapping);
         _mergedContainer.addAll(scenarioMapping);
+        _mergedContainer.addAll(gameMapping);
         ListIterator<ResourceMapping> it = modMappings.listIterator(modMappings.size()); 
         while (it.hasPrevious()) {
             _mergedContainer.addAll(it.previous());

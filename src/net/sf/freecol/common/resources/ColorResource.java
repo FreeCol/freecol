@@ -38,7 +38,12 @@ public class ColorResource extends Resource {
     public static final String SCHEME = "color:";
 
     private Color color;
-    
+
+
+    public ColorResource(Color color) {
+        this.color = color;
+    }
+
     /**
      * Do not use directly.
      * @param resourceLocator The <code>URI</code> used when loading this

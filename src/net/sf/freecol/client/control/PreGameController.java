@@ -43,6 +43,10 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.resources.ChipResource;
+import net.sf.freecol.common.resources.ColorResource;
+import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
@@ -231,6 +235,19 @@ public final class PreGameController {
     public void startGame() {
         Canvas canvas = freeColClient.getCanvas();
         GUI gui = freeColClient.getGUI();
+
+        ResourceMapping gameMapping = new ResourceMapping();
+        for (Player player : freeColClient.getGame().getPlayers()) {
+            gameMapping.add(player.getNationID() + ".color",
+                            new ColorResource(player.getColor()));
+            gameMapping.add(player.getNationID() + ".chip",
+                            ChipResource.colorChip(player.getColor()));
+            gameMapping.add(player.getNationID() + ".mission.chip",
+                            ChipResource.missionChip(player.getColor(), false));
+            gameMapping.add(player.getNationID() + ".mission.expert.chip",
+                            ChipResource.missionChip(player.getColor(), true));
+            ResourceManager.setGameMapping(gameMapping);
+        }
 
         if (!freeColClient.isHeadless()) {
             canvas.closeMainPanel();
