@@ -122,15 +122,6 @@ public final class ImageLibrary {
     // Holds the unit-order buttons
     private List<ArrayList<ImageIcon>> unitButtons; 
 
-    private EnumMap<Tension.Level, Image> alarmChips;
-    private EnumMap<Tension.Level, Image> alarmChipsUnvisited;
-
-    private Map<Color, Image> colorChips;
-
-    private Map<Color, Image> missionChips;
-
-    private Map<Color, Image> expertMissionChips;
-
     /**
      * The scaling factor used when creating this
      * <code>ImageLibrary</code>. The value
@@ -209,11 +200,6 @@ public final class ImageLibrary {
         loadRiverMouths(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
 
-        alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
-        alarmChipsUnvisited = new EnumMap<Tension.Level, Image>(Tension.Level.class);
-        colorChips = new HashMap<Color, Image>();
-        missionChips = new HashMap<Color, Image>();
-        expertMissionChips = new HashMap<Color, Image>();
     }
 
     /**
@@ -249,17 +235,6 @@ public final class ImageLibrary {
         scaledLibrary.coast2 = scaleImages2(coast2, scalingFactor);
         //scaledLibrary.unitButtons = scaleImages2(unitButtons);
         scaledLibrary.unitButtons = new ArrayList<ArrayList<ImageIcon>>(unitButtons);
-        /*
-        scaledLibrary.alarmChips = scaleChips(alarmChips, scalingFactor);
-        scaledLibrary.colorChips = scaleChips(colorChips, scalingFactor);
-        scaledLibrary.missionChips = scaleChips(missionChips, scalingFactor);
-        scaledLibrary.expertMissionChips = scaleChips(expertMissionChips, scalingFactor);
-        */
-        scaledLibrary.alarmChips = new EnumMap<Tension.Level, Image>(alarmChips);
-        scaledLibrary.alarmChipsUnvisited = new EnumMap<Tension.Level, Image>(alarmChipsUnvisited);
-        scaledLibrary.colorChips = new HashMap<Color, Image>(colorChips);
-        scaledLibrary.missionChips = new HashMap<Color, Image>(missionChips);
-        scaledLibrary.expertMissionChips = new HashMap<Color, Image>(expertMissionChips);
 
         return scaledLibrary;
     }
@@ -272,14 +247,6 @@ public final class ImageLibrary {
 
     public ImageIcon scaleIcon(ImageIcon icon, float scale) {
         return new ImageIcon(scaleImage(icon.getImage(), scale));
-    }
-
-    private Map<Color, Image> scaleChips(Map<Color, Image> input, float scale) {
-        HashMap<Color, Image> output = new HashMap<Color, Image>();
-        for (Entry<Color, Image> entry : input.entrySet()) {
-            output.put(entry.getKey(), scaleImage(entry.getValue(), scale));
-        }
-        return output;
     }
 
     private Map<String, ImageIcon> scaleImages(Map<String, ImageIcon> input, float scale) {
@@ -603,131 +570,6 @@ public final class ImageLibrary {
             }
         }
     }
-
-    /**
-     * Generates a color chip image and stores it in memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param c The color of the color chip to create.
-     */
-    private void loadColorChip(GraphicsConfiguration gc, Color c) {
-        logger.fine("creating color chips");
-        BufferedImage tempImage = gc.createCompatibleImage(11, 17);
-        Graphics g = tempImage.getGraphics();
-        if (c.equals(Color.BLACK)) {
-            g.setColor(Color.WHITE);
-        } else {
-            g.setColor(Color.BLACK);
-        }
-        g.drawRect(0, 0, 10, 16);
-        g.setColor(c);
-        g.fillRect(1, 1, 9, 15);
-        colorChips.put(c, tempImage);
-    }
-
-    /**
-     * Generates a mission chip image and stores it in memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param c The color of the color chip to create.
-     * @param expertMission Should be <code>true</code> if the mission chip
-     *            should represent an expert missionary.
-     */
-    private void loadMissionChip(GraphicsConfiguration gc, Color c, boolean expertMission) {
-        logger.fine("creating mission chips");
-        BufferedImage tempImage = gc.createCompatibleImage(10, 17);
-        Graphics2D g = (Graphics2D) tempImage.getGraphics();
-
-        if (expertMission) {
-            g.setColor(Color.BLACK);
-        } else {
-            g.setColor(Color.DARK_GRAY);
-        }
-        g.fillRect(0, 0, 10, 17);
-
-        GeneralPath cross = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        cross.moveTo(4, 1);
-        cross.lineTo(6, 1);
-        cross.lineTo(6, 4);
-        cross.lineTo(9, 4);
-        cross.lineTo(9, 6);
-        cross.lineTo(6, 6);
-        cross.lineTo(6, 16);
-        cross.lineTo(4, 16);
-        cross.lineTo(4, 6);
-        cross.lineTo(1, 6);
-        cross.lineTo(1, 4);
-        cross.lineTo(4, 4);
-        cross.closePath();
-
-        if (expertMission && c.equals(Color.BLACK)) {
-            g.setColor(Color.DARK_GRAY);
-        } else if ((!expertMission) && c.equals(Color.DARK_GRAY)) {
-            g.setColor(Color.BLACK);
-        } else {
-            g.setColor(c);
-        }
-        g.fill(cross);
-
-        if (expertMission) {
-            expertMissionChips.put(c, tempImage);
-        } else {
-            missionChips.put(c, tempImage);
-        }
-    }
-
-    /**
-     * Generates a alarm chip image and stores it in memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param alarm The alarm level.
-     * @param visited whether the village was visited before.
-     */
-    private void loadAlarmChip(GraphicsConfiguration gc, Tension.Level alarm, final boolean visited) {
-        logger.fine("creating alarm chips");
-        BufferedImage tempImage = gc.createCompatibleImage(10, 17);
-        Graphics2D g = (Graphics2D) tempImage.getGraphics();
-
-        g.setColor(Color.BLACK);
-        g.drawRect(0, 0, 10, 16);
-
-        switch(alarm) {
-        case HAPPY:
-            g.setColor(Color.GREEN);
-            break;
-        case CONTENT:
-            g.setColor(Color.BLUE);
-            break;
-        case DISPLEASED:
-            g.setColor(Color.YELLOW);
-            break;
-        case ANGRY:
-            g.setColor(Color.ORANGE);
-            break;
-        case HATEFUL:
-            g.setColor(Color.RED);
-            break;
-        }
-
-        g.fillRect(1, 1, 8, 15);
-        g.setColor(Color.BLACK);
-
-        if (visited) {
-        	g.fillRect(4, 3, 2, 7);
-        } else {
-        	g.fillRect(3, 3, 4, 2);
-        	g.fillRect(6, 4, 2, 2);
-        	g.fillRect(4, 6, 3, 1);
-        	g.fillRect(4, 7, 2, 3);
-        }
-        g.fillRect(4, 12, 2, 2);
-
-        (visited?alarmChips:alarmChipsUnvisited).put(alarm, tempImage);
-    }
-
 
     /**
      * Returns the portrait of this Founding Father.
@@ -1100,9 +942,13 @@ public final class ImageLibrary {
      * @return The color chip with the given color.
      */
     public Image getMissionChip(Ownable ownable, boolean expertMission, double scale) {
-        return ResourceManager.getChip(ownable.getOwner().getNationID()
-                                       + ".mission" + (expertMission ? ".expert" : "")
-                                       + ".chip", scale);
+        if (expertMission) {
+            return ResourceManager.getChip(ownable.getOwner().getNationID()
+                                           + ".mission.expert.chip", scale);
+        } else {
+            return ResourceManager.getChip(ownable.getOwner().getNationID()
+                                           + ".mission.chip", scale);
+        }
     }
 
     /**
@@ -1114,8 +960,12 @@ public final class ImageLibrary {
      * @return The alarm chip.
      */
     public Image getAlarmChip(Tension.Level alarm, final boolean visited, double scale) {
-        return ResourceManager.getChip("alarmChip." + (visited ? "visited." : "")
-                                       + alarm.toString().toLowerCase(), scale);
+        if (visited) {
+            return ResourceManager.getChip("alarmChip.visited."
+                                           + alarm.toString().toLowerCase(), scale);
+        } else {
+            return ResourceManager.getChip("alarmChip." + alarm.toString().toLowerCase(), scale);
+        }
     }
 
     /**
