@@ -97,6 +97,7 @@
             target="${java.target.version}"
             includeantruntime="false">
           <compilerarg value="-Xlint:unchecked"/>
+          <compilerarg value="-Xlint:deprecation"/>
           <compilerarg value="-g"/>
         </javac>
     </target>
