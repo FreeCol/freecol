@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.34
+<!-- XSD for specification version 0.35
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -10,6 +10,7 @@
      0.32: change difficulty selection for european nation types
      0.33: add scoreValue to event
      0.34: add abstract buildable types
+     0.35: remove minimap-color from tile-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -137,7 +138,6 @@
   <xs:element name="art">
     <xs:complexType>
       <xs:attribute name="basic" use="required" type="xs:string"/>
-      <xs:attribute name="minimap-color" use="required" type="xs:string"/>
       <xs:attribute name="forest" type="xs:string"/>
       <xs:attribute name="overlay" type="xs:string"/>
     </xs:complexType>

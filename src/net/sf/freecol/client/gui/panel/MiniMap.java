@@ -268,6 +268,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         graphics.drawImage(skin, 0, 0, null);
     }
 
+    private Color getMinimapColor(TileType type) {
+        return ResourceManager.getColor(type.getId() + ".color");
+    }
+
 
     /**
     * Paints a representation of the mapboard onto this component.
@@ -357,7 +361,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 int units = tile.getUnitCount();
                 g.setColor(Color.BLACK); //Default
                 if (tile.isExplored()) {
-                    g.setColor(tile.getType().getMinimapColor());
+                    g.setColor(getMinimapColor(tile.getType()));
                 }
                 if (tileSize == 4) {
                     int extra = (((tileY + yOffset) % 2) == 0) ? 0 : 2;

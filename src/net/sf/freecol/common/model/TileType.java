@@ -41,7 +41,6 @@ public final class TileType extends FreeColGameObjectType {
     private String artOverlay;
     private String artForest;
     private String artCoast;
-    private Color minimapColor;
 
     private boolean forest;
     private boolean water;
@@ -115,10 +114,6 @@ public final class TileType extends FreeColGameObjectType {
 
     public String getArtCoast() {
         return artCoast;
-    }
-
-    public Color getMinimapColor() {
-        return minimapColor;
     }
 
     public boolean isForested() {
@@ -401,7 +396,6 @@ public final class TileType extends FreeColGameObjectType {
                 artOverlay = in.getAttributeValue(null, "overlay");
                 artForest = in.getAttributeValue(null, "forest");
                 artCoast = getAttribute(in, "coast", (water ? null : "terrain/beach/"));
-                minimapColor = new Color(Integer.decode(in.getAttributeValue(null, "minimap-color")));
                 in.nextTag(); // close this element
             } else if ("gen".equals(childName)) {
                 humidity[0] = getAttribute(in, "humidityMin", 0);
