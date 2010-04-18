@@ -28,16 +28,15 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
  * An action for zooming out on the minimap.
  */
 public class MiniMapZoomOutAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MiniMapZoomOutAction.class.getName());
-
 
     public static final String id = "miniMapZoomOutAction";
 
@@ -48,10 +47,7 @@ public class MiniMapZoomOutAction extends MapboardAction {
      */
     MiniMapZoomOutAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.10", null, KeyEvent.VK_PLUS, KeyStroke.getKeyStroke('+', 0));
-        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_OUT, 0));
-        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_OUT, 1));
-        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_OUT, 2));
-        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_OUT, 3));
+        addImageIcons("zoom_out");
     }
     
     

@@ -32,11 +32,9 @@ import net.sf.freecol.common.model.Unit.UnitState;
  * An action for fortifying the active unit.
  */
 public class FortifyAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FortifyAction.class.getName());
-
-
-
 
     public static final String id = "fortifyAction";
 
@@ -48,14 +46,7 @@ public class FortifyAction extends MapboardAction {
      */
     FortifyAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.2", null, KeyStroke.getKeyStroke('F', 0));
-        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY,
-                0));
-        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_FORTIFY, 1));
-        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_FORTIFY, 2));
-        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_FORTIFY, 3));
+        addImageIcons("fortify");
     }
 
     /**

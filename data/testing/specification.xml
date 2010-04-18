@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.35 -->
+<!-- specification version 0.36 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -621,11 +621,11 @@
       -->
   <improvementaction-types>
     <improvementaction-type id="impPlowAction" accelerator="P">
-      <action tileimprovement-type="model.improvement.plow" name="model.improvement.plow.action" image-id="5"/>
-      <action tileimprovement-type="model.improvement.clearForest" name="model.improvement.clearForest.action" image-id="4"/>
+      <action tileimprovement-type="model.improvement.plow" name="model.improvement.plow.action" image-id="plow"/>
+      <action tileimprovement-type="model.improvement.clearForest" name="model.improvement.clearForest.action" image-id="clear"/>
     </improvementaction-type>
     <improvementaction-type id="impRoadAction" accelerator="R">
-      <action tileimprovement-type="model.improvement.road" name="model.improvement.road.action" image-id="6"/>
+      <action tileimprovement-type="model.improvement.road" name="model.improvement.road.action" image-id="road"/>
     </improvementaction-type>
   </improvementaction-types>
 

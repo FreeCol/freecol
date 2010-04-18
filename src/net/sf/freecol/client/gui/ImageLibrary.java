@@ -82,11 +82,6 @@ public final class ImageLibrary {
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
                                DARKNESS = "halo.dark.image";
 
-    public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
-            UNIT_BUTTON_SENTRY = 3, UNIT_BUTTON_CLEAR = 4, UNIT_BUTTON_PLOW = 5, UNIT_BUTTON_ROAD = 6,
-            UNIT_BUTTON_BUILD = 7, UNIT_BUTTON_DISBAND = 8, UNIT_BUTTON_ZOOM_IN = 9, UNIT_BUTTON_ZOOM_OUT = 10,
-            UNIT_BUTTON_COUNT = 11;
-
     private static final String path = new String("images/"),
         extension = new String(".png"),
         terrainDirectory = new String("terrain/"),
@@ -97,9 +92,7 @@ public final class ImageLibrary {
         unexploredDirectory = new String("unexplored/"),
         unexploredName = new String("unexplored"),
         riverDirectory = new String("river/"),
-        riverName = new String("river"),
-        unitButtonDirectory = new String("order-buttons/"),
-        unitButtonName = new String("button");
+        riverName = new String("river");
 
     private final String dataDirectory;
 
@@ -118,9 +111,6 @@ public final class ImageLibrary {
         forests, deltas;
 
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
-
-    // Holds the unit-order buttons
-    private List<ArrayList<ImageIcon>> unitButtons; 
 
     /**
      * The scaling factor used when creating this
@@ -198,7 +188,6 @@ public final class ImageLibrary {
         loadBeaches(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
         loadRiverMouths(gc, resourceLocator, doLookup);
-        loadUnitButtons(gc, resourceLocator, doLookup);
 
     }
 
@@ -233,8 +222,6 @@ public final class ImageLibrary {
         scaledLibrary.border2 = scaleImages2(border2, scalingFactor);
         scaledLibrary.coast1 = scaleImages2(coast1, scalingFactor);
         scaledLibrary.coast2 = scaleImages2(coast2, scalingFactor);
-        //scaledLibrary.unitButtons = scaleImages2(unitButtons);
-        scaledLibrary.unitButtons = new ArrayList<ArrayList<ImageIcon>>(unitButtons);
 
         return scaledLibrary;
     }
@@ -519,54 +506,6 @@ public final class ImageLibrary {
             if (type.getArtForest() != null) {
                 String filePath = dataDirectory + path + type.getArtForest();
                 forests.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
-            }
-        }
-    }
-
-    /**
-     * Loads the unit-order buttons from files into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadUnitButtons(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        logger.fine("loading unit buttons");
-        unitButtons = new ArrayList<ArrayList<ImageIcon>>(4);
-        for (int i = 0; i < 4; i++) {
-            unitButtons.add(new ArrayList<ImageIcon>(UNIT_BUTTON_COUNT));
-        }
-
-        for (int i = 0; i < 4; i++) {
-            String subDirectory;
-            switch (i) {
-            case 0:
-                subDirectory = new String("order-buttons00/");
-                break;
-            case 1:
-                subDirectory = new String("order-buttons01/");
-                break;
-            case 2:
-                subDirectory = new String("order-buttons02/");
-                break;
-            case 3:
-                subDirectory = new String("order-buttons03/");
-                break;
-            default:
-                subDirectory = new String("");
-                break;
-            }
-            for (int j = 0; j < UNIT_BUTTON_COUNT; j++) {
-                String filePath = dataDirectory + path + unitButtonDirectory + subDirectory + unitButtonName + j
-                        + extension;
-                unitButtons.get(i).add(findImage(filePath, resourceLocator, doLookup));
             }
         }
     }
@@ -877,17 +816,6 @@ public final class ImageLibrary {
      */
     public ImageIcon getMiscImageIcon(String id) {
         return new ImageIcon(getMiscImage(id));
-    }
-
-    /**
-     * Returns the unit-button image at the given index in the given state.
-     * 
-     * @param index The index of the image to return.
-     * @param state The state (normal, highlighted, pressed, disabled)
-     * @return The image pointer
-     */
-    public ImageIcon getUnitButtonImageIcon(int index, int state) {
-        return unitButtons.get(state).get(index);
     }
 
     /**

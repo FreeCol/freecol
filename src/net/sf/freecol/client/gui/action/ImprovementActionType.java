@@ -33,23 +33,20 @@ import net.sf.freecol.common.model.TileImprovementType;
  * A storage class for ImprovementActionType used to create ImprovementActions.
  * Filled by Specification.java, utilized by ActionManager.java
  */
-public final class ImprovementActionType extends FreeColGameObjectType
-{
-
-
+public final class ImprovementActionType extends FreeColGameObjectType {
 
     private char accelerator;
     
     private final List<String> names;
     private final List<TileImprovementType> impTypes;
-    private final List<Integer> imageIDs;
+    private final List<String> imageIDs;
     
     // ------------------------------------------------------------ constructors
     
     public ImprovementActionType() {
         names = new ArrayList<String>();
         impTypes = new ArrayList<TileImprovementType>();
-        imageIDs = new ArrayList<Integer>();
+        imageIDs = new ArrayList<String>();
     }
 
     // ------------------------------------------------------------ retrieval methods
@@ -66,7 +63,7 @@ public final class ImprovementActionType extends FreeColGameObjectType
         return impTypes;
     }
     
-    public List<Integer> getImageIDs() {
+    public List<String> getImageIDs() {
         return imageIDs;
     }
 
@@ -85,7 +82,7 @@ public final class ImprovementActionType extends FreeColGameObjectType
             names.add(in.getAttributeValue(null, "name"));
             String t = in.getAttributeValue(null, "tileimprovement-type");
             impTypes.add(specification.getTileImprovementType(t));
-            imageIDs.add(Integer.parseInt(in.getAttributeValue(null, "image-id")));
+            imageIDs.add(in.getAttributeValue(null, "image-id"));
             in.nextTag(); // close this element
         }
     }   

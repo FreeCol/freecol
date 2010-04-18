@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.35
+<!-- XSD for specification version 0.36
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -11,6 +11,7 @@
      0.33: add scoreValue to event
      0.34: add abstract buildable types
      0.35: remove minimap-color from tile-type
+     0.36: change image-id of improvement action to string
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -309,7 +310,7 @@
     <xs:complexType>
       <xs:attribute name="tileimprovement-type" use="required" type="xs:IDREF"/>
       <xs:attribute name="name" use="required" type="xs:string"/>
-      <xs:attribute name="image-id" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="image-id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

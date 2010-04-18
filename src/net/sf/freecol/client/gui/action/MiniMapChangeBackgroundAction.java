@@ -40,9 +40,9 @@ import net.sf.freecol.client.FreeColClient;
  * BUT WHAT HOOKS THE DIALOG TO THE ACTION???
  */
 public class MiniMapChangeBackgroundAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MiniMapChangeBackgroundAction.class.getName());
-
 
     public static final String id = "miniMapChangeBackgroundAction";
 
@@ -53,10 +53,6 @@ public class MiniMapChangeBackgroundAction extends MapboardAction {
      */
     MiniMapChangeBackgroundAction(FreeColClient freeColClient) {
         super(freeColClient, "black", null);
-//        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_IN, 0));
-//        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_IN, 1));
-//        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_IN, 2));
-//        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ZOOM_IN, 3));
     }
     
     

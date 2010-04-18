@@ -32,11 +32,9 @@ import net.sf.freecol.common.model.Unit;
  * An action for using the active unit to build a colony.
  */
 public class BuildColonyAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(BuildColonyAction.class.getName());
-
-
-
 
     public static final String id = "buildColonyAction";
 
@@ -48,14 +46,7 @@ public class BuildColonyAction extends MapboardAction {
      */
     BuildColonyAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.7", null, KeyStroke.getKeyStroke('B', 0));
-        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary()
-                .getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 0));
-        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_BUILD, 1));
-        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_BUILD, 2));
-        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_BUILD, 3));
+        addImageIcons("build");
     }
 
     /**

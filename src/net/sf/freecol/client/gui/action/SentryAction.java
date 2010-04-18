@@ -46,10 +46,7 @@ public class SentryAction extends MapboardAction {
      */
     public SentryAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.3", null, KeyStroke.getKeyStroke('S', 0));
-        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_SENTRY, 0));
-        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_SENTRY, 1));
-        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_SENTRY, 2));
-        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_SENTRY, 3));        
+        addImageIcons("sentry");
     }
     
     /**

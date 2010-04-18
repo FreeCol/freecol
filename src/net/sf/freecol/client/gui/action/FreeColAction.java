@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
@@ -48,6 +49,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,19 +61,13 @@ import org.xml.sax.SAXException;
  * stored in an {@link ActionManager}.
  */
 public abstract class FreeColAction extends AbstractAction implements Option {
+
     private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
-
-
-
     public static final String BUTTON_IMAGE = "BUTTON_IMAGE";
-
     public static final String BUTTON_ROLLOVER_IMAGE = "BUTTON_ROLLOVER_IMAGE";
-
     public static final String BUTTON_PRESSED_IMAGE = "BUTTON_PRESSED_IMAGE";
-
     public static final String BUTTON_DISABLED_IMAGE = "BUTTON_DISABLED_IMAGE";
-
     public static final Integer NO_MNEMONIC = null;
 
     protected final FreeColClient freeColClient;
@@ -197,6 +193,17 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      */
     protected FreeColClient getFreeColClient() {
         return freeColClient;
+    }
+
+    protected void addImageIcons(String key) {
+        putValue(BUTTON_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.normal." + key)));
+        putValue(BUTTON_ROLLOVER_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.highlighted." + key)));
+        putValue(BUTTON_PRESSED_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.pressed." + key)));
+        putValue(BUTTON_DISABLED_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.disabled." + key)));
     }
 
     /**

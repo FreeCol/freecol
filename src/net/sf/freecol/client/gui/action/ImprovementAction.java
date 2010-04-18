@@ -36,11 +36,9 @@ import net.sf.freecol.common.model.Unit.UnitState;
  * An action for using the active unit to plow/clear a forest.
  */
 public class ImprovementAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ImprovementAction.class.getName());
-
-
-
 
     public ImprovementActionType iaType;
     
@@ -67,17 +65,8 @@ public class ImprovementAction extends MapboardAction {
             return;
         }
         actionID = newActionID;
-
-        putValue(BUTTON_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.getImageIDs().get(actionID), 0));
-        putValue(BUTTON_ROLLOVER_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.getImageIDs().get(actionID), 1));
-        putValue(BUTTON_PRESSED_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.getImageIDs().get(actionID), 2));
-        putValue(BUTTON_DISABLED_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.getImageIDs().get(actionID), 3));
+        addImageIcons(iaType.getImageIDs().get(actionID));
         putValue(NAME, Messages.message(iaType.getNames().get(actionID)));
-
     }
 
     /**
