@@ -92,8 +92,7 @@ public final class ImageLibrary {
     /**
      * A ArrayList of Image objects.
      */
-    private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
-        forests;
+    private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2;
 
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
@@ -169,7 +168,6 @@ public final class ImageLibrary {
         Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
 
         loadTerrain(gc, resourceLocator, doLookup);
-        loadForests(gc, resourceLocator, doLookup);
     }
 
     /**
@@ -193,7 +191,6 @@ public final class ImageLibrary {
         scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
         scaledLibrary.overlay1 = scaleImages(overlay1, scalingFactor);
         scaledLibrary.overlay2 = scaleImages(overlay2, scalingFactor);
-        scaledLibrary.forests = scaleImages(forests, scalingFactor);
         
         scaledLibrary.border1 = scaleImages2(border1, scalingFactor);
         scaledLibrary.border2 = scaleImages2(border2, scalingFactor);
@@ -369,32 +366,6 @@ public final class ImageLibrary {
 
         border1.put(unexploredName, unexploredArrayList1);
         border2.put(unexploredName, unexploredArrayList2);
-    }
-
-    /**
-     * Loads the forest images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadForests(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        logger.fine("loading forest images");
-        forests = new HashMap<String, ImageIcon>();
-        
-        for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
-            if (type.getArtForest() != null) {
-                String filePath = dataDirectory + path + type.getArtForest();
-                forests.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
-            }
-        }
     }
 
     /**
@@ -682,7 +653,7 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getForestImage(TileType type) {
-        return forests.get(type.getId()).getImage();
+        return ResourceManager.getImage(type.getId() + ".forest");
     }
 
     /**
