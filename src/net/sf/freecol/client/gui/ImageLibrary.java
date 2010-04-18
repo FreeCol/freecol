@@ -79,23 +79,6 @@ public final class ImageLibrary {
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
                                DARKNESS = "halo.dark.image";
 
-    private static final String path = new String("images/"),
-        extension = new String(".png"),
-        terrainDirectory = new String("terrain/"),
-        tileName = new String("center"),
-        borderName = new String("border"),
-        unexploredDirectory = new String("unexplored/"),
-        unexploredName = new String("unexplored");
-
-    private final String dataDirectory;
-
-    /**
-     * A ArrayList of Image objects.
-     */
-    private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2;
-
-    private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
-
     /**
      * The scaling factor used when creating this
      * <code>ImageLibrary</code>. The value
@@ -126,18 +109,9 @@ public final class ImageLibrary {
      */
     public ImageLibrary(String freeColHome) throws FreeColException {
         this.scalingFactor = 1;
-        // TODO: normally this check shouldn't be here. init(false) is the way
-        // to go.
-        if ("".equals(freeColHome)) {
-            dataDirectory = "data/";
-        } else {
-            dataDirectory = freeColHome;
-        }
-        init();
     }
 
     private ImageLibrary(String dataDirectory, float scalingFactor) {
-        this.dataDirectory = dataDirectory;
         this.scalingFactor = scalingFactor;
     }
 
@@ -148,26 +122,6 @@ public final class ImageLibrary {
      * @throws FreeColException If one of the data files could not be found. *
      */
     public void init() throws FreeColException {
-        /* doLookup must be set to 'false' if the path to the image
-         * files has been manually provided by the user. If set to
-         * 'true' then a lookup will be done to search for image files
-         * from net.sf.freecol, in this case the images need to be
-         * placed in net.sf.freecol/images.
-         */
-        boolean doLookup = false;
-        if ("data/".equals(dataDirectory)) {
-            doLookup = true;
-        }
-        logger.info("initializing image library");
-        GraphicsConfiguration gc = null;
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        if (!GraphicsEnvironment.isHeadless()) {
-            gc = ge.getDefaultScreenDevice() .getDefaultConfiguration();
-        }
-
-        Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
-
-        loadTerrain(gc, resourceLocator, doLookup);
     }
 
     /**
@@ -186,18 +140,7 @@ public final class ImageLibrary {
      * @return A new <code>ImageLibrary</code>.
      */
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
-        ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
-        scaledLibrary.terrain1 = scaleImages(terrain1, scalingFactor);
-        scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
-        scaledLibrary.overlay1 = scaleImages(overlay1, scalingFactor);
-        scaledLibrary.overlay2 = scaleImages(overlay2, scalingFactor);
-        
-        scaledLibrary.border1 = scaleImages2(border1, scalingFactor);
-        scaledLibrary.border2 = scaleImages2(border2, scalingFactor);
-        scaledLibrary.coast1 = scaleImages2(coast1, scalingFactor);
-        scaledLibrary.coast2 = scaleImages2(coast2, scalingFactor);
-
-        return scaledLibrary;
+        return new ImageLibrary("", scalingFactor);
     }
 
     public Image scaleImage(Image image, float scale) {
@@ -316,56 +259,6 @@ public final class ImageLibrary {
      */
     private void loadTerrain(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        logger.fine("loading terrain images");
-        terrain1 = new HashMap<String, ImageIcon>();
-        terrain2 = new HashMap<String, ImageIcon>();
-        overlay1 = new HashMap<String, ImageIcon>();
-        overlay2 = new HashMap<String, ImageIcon>();
-        border1 = new HashMap<String, ArrayList<ImageIcon>>();
-        border2 = new HashMap<String, ArrayList<ImageIcon>>();
-        coast1 = new HashMap<String, ArrayList<ImageIcon>>();
-        coast2 = new HashMap<String, ArrayList<ImageIcon>>();
-        
-        for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
-            String filePath = dataDirectory + path + type.getArtBasic() + tileName;
-            terrain1.put(type.getId(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
-            terrain2.put(type.getId(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
-
-            if (type.getArtOverlay() != null) {
-                filePath = dataDirectory + path + type.getArtOverlay();
-                overlay1.put(type.getId(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
-                overlay2.put(type.getId(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
-            }
-            
-            ArrayList<ImageIcon> tempArrayList1 = new ArrayList<ImageIcon>();
-            ArrayList<ImageIcon> tempArrayList2 = new ArrayList<ImageIcon>();
-            for (Direction direction : Direction.values()) {
-                filePath = dataDirectory + path + type.getArtBasic() + borderName + "_" +
-                    direction.toString();
-                tempArrayList1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
-                tempArrayList2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
-            }
-
-            border1.put(type.getId(), tempArrayList1);
-            border2.put(type.getId(), tempArrayList2);
-            
-        }
-        
-        String unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + tileName;
-        terrain1.put(unexploredName, findImage(unexploredPath + "0" + extension, resourceLocator, doLookup));
-        terrain2.put(unexploredName, findImage(unexploredPath + "1" + extension, resourceLocator, doLookup));
-        
-        ArrayList<ImageIcon> unexploredArrayList1 = new ArrayList<ImageIcon>();
-        ArrayList<ImageIcon> unexploredArrayList2 = new ArrayList<ImageIcon>();
-        for (Direction direction : Direction.values()) {
-            unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + borderName + 
-                "_" + direction.toString();
-            unexploredArrayList1.add(findImage(unexploredPath + "_even" + extension, resourceLocator, doLookup));
-            unexploredArrayList2.add(findImage(unexploredPath + "_odd" + extension, resourceLocator, doLookup));
-        }
-
-        border1.put(unexploredName, unexploredArrayList1);
-        border2.put(unexploredName, unexploredArrayList2);
     }
 
     /**
@@ -518,11 +411,8 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getOverlayImage(TileType type, int x, int y) {
-        if ((x + y) % 2 == 0) {
-            return overlay1.get(type.getId()).getImage();
-        } else {
-            return overlay2.get(type.getId()).getImage();
-        }
+        int index = (x + y) % 2;
+        return ResourceManager.getImage(type.getId() + ".overlay" + index + ".image");
     }
 
     /**
@@ -536,19 +426,12 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getTerrainImage(TileType type, int x, int y) {
-        String key;
-        if (type != null) {
-            key = type.getId();
-        } else {
-            key = unexploredName;
-        }
-        if (( y % 8 <= 2) || ( (x+y) % 2 == 0 )) {
-            // the pattern is mostly visible on ocean tiles
-            // this is an attempt to break it up so it doesn't create big stripes or chess-board effect
-            return terrain1.get(key).getImage();
-        } else {
-            return terrain2.get(key).getImage();
-        }
+        String key = (type == null) ? "model.tile.unexplored" : type.getId();
+        // the pattern is mostly visible on ocean tiles this is an
+        // attempt to break it up so it doesn't create big stripes or
+        // chess-board effect
+        int index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? 0 : 1;
+        return ResourceManager.getImage(key + ".center" + index + ".image");
     }
 
     /**
@@ -563,21 +446,12 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getBorderImage(TileType type, Direction direction, int x, int y) {
-
-        int borderType = direction.ordinal();
-        
-        String key;
-        if (type != null) {
-            key = type.getId();
-        } else {
-            key = unexploredName;
-        }
-
-        if ((x + y) % 2 == 0) {
-            return border1.get(key).get(borderType).getImage();
-        } else {
-            return border2.get(key).get(borderType).getImage();
-        }
+        String key = (type == null) ? "model.tile.unexplored" : type.getId();
+        // the pattern is mostly visible on ocean tiles this is an
+        // attempt to break it up so it doesn't create big stripes or
+        // chess-board effect
+        String index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? "_event" : "_odd";
+        return ResourceManager.getImage(key + ".border_" + direction + index + ".image");
     }
 
     /**
@@ -595,35 +469,6 @@ public final class ImageLibrary {
 
         String key = "delta_" + direction + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key);
-    }
-
-    /**
-     * Returns the coast terrain-image for the given type.
-     * 
-     * @param type The type of the terrain-image to return.
-     * @param direction a <code>Direction</code> value
-     * @param x The x-coordinate of the location of the tile that is being
-     *            drawn.
-     * @param y The x-coordinate of the location of the tile that is being
-     *            drawn.
-     * @return The terrain-image at the given index.
-     */
-    public Image getCoastImage(TileType type, Direction direction, int x, int y) {
-
-        int borderType = direction.ordinal();
-        
-        String key;
-        if (type != null) {
-            key = type.getId();
-        } else {
-            key = unexploredName;
-        }
-
-        if ((x + y) % 2 == 0) {
-            return coast1.get(key).get(borderType).getImage();
-        } else {
-            return coast2.get(key).get(borderType).getImage();
-        }
     }
 
     /**
@@ -761,13 +606,7 @@ public final class ImageLibrary {
      * @return The width of the terrain-image at the given index.
      */
     public int getTerrainImageWidth(TileType type) {
-        String key;
-        if (type != null) {
-            key = type.getId();
-        } else {
-            key = unexploredName;
-        }
-        return terrain1.get(key).getIconWidth();
+        return getTerrainImage(type, 0, 0).getWidth(null);
     }
 
     /**
@@ -777,13 +616,7 @@ public final class ImageLibrary {
      * @return The height of the terrain-image at the given index.
      */
     public int getTerrainImageHeight(TileType type) {
-        String key;
-        if (type != null) {
-            key = type.getId();
-        } else {
-            key = unexploredName;
-        }
-        return terrain1.get(key).getIconHeight();
+        return getTerrainImage(type, 0, 0).getHeight(null);
     }
 
     /**
@@ -794,18 +627,16 @@ public final class ImageLibrary {
      * @return The height of the terrain-image at the given index.
      */
     public int getCompoundTerrainImageHeight(TileType type) {
-        if (type == null) {
-            return terrain1.get(unexploredName).getIconHeight();
-        } else {
-            int height = terrain1.get(type.getId()).getIconHeight();
+        int height = getTerrainImageHeight(type);
+        if (type != null) {
             if (type.getArtOverlay() != null) {
                 height = Math.max(height, getOverlayImage(type, 0, 0).getHeight(null));
             }
             if (type.isForested()) {
                 height = Math.max(height, getForestImage(type).getHeight(null));
             }
-            return height;
         }
+        return height;
     }
 
     /**
