@@ -96,10 +96,6 @@ public final class ImageLibrary {
 
     private final String dataDirectory;
 
-    private static final String deltaName = "delta_";
-    private static final String small = "_small";
-    private static final String large = "_large";
-
     /**
      * A ArrayList of Image objects.
      */
@@ -186,9 +182,6 @@ public final class ImageLibrary {
         loadTerrain(gc, resourceLocator, doLookup);
         loadForests(gc, resourceLocator, doLookup);
         loadBeaches(gc, resourceLocator, doLookup);
-        loadRivers(gc, resourceLocator, doLookup);
-        loadRiverMouths(gc, resourceLocator, doLookup);
-
     }
 
     /**
@@ -432,56 +425,6 @@ public final class ImageLibrary {
         // beach0 is never used
         beaches.add(0, beaches.get(0));
 
-    }
-
-    /**
-     * Loads the river images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadRivers(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        logger.fine("loading river images");
-        rivers = new ArrayList<ImageIcon>(RIVER_STYLES);
-        for (int i = 0; i < RIVER_STYLES; i++) {
-            String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
-            rivers.add(findImage(filePath, resourceLocator, doLookup));
-        }
-    }
-
-    /**
-     * Loads the river mouth images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadRiverMouths(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        logger.fine("loading river mouth images");
-        deltas = new HashMap<String, ImageIcon>();
-        for (Direction d : Direction.longSides) {
-            String key = deltaName + d + small;
-            String filePath = dataDirectory + path + riverDirectory + key + extension;
-            deltas.put(key, findImage(filePath, resourceLocator, doLookup));
-            key = deltaName + d + large;
-            filePath = dataDirectory + path + riverDirectory + key + extension;
-            deltas.put(key, findImage(filePath, resourceLocator, doLookup));
-        }
     }
 
     /**
@@ -735,8 +678,8 @@ public final class ImageLibrary {
      */
     public Image getRiverMouthImage(Direction direction, int magnitude, int x, int y) {
 
-        String key = deltaName + direction + (magnitude == 1 ? small : large);
-        return deltas.get(key).getImage();
+        String key = "delta_" + direction + (magnitude == 1 ? "_small" : "_large");
+        return ResourceManager.getImage(key);
     }
 
     /**
@@ -775,7 +718,7 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getRiverImage(int index) {
-        return rivers.get(index).getImage();
+        return ResourceManager.getImage("river" + index);
     }
 
     /**

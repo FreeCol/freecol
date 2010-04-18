@@ -24,8 +24,10 @@ import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceFactory;
@@ -52,20 +54,22 @@ public class FreeColTcFile extends FreeColModFile {
     @Override
     public ResourceMapping getResourceMapping() {
         //Specification.createSpecification(getSpecificationInputStream());
+        ResourceMapping result;
         try {
             final ModDescriptor info = getModDescriptor();
             if (info.getParent() != null) {
                 final FreeColTcFile parentTcData = new FreeColTcFile(info.getParent());
-                final ResourceMapping rc = parentTcData.getResourceMapping();
-                //rc.addAll(Specification.getSpecification().getDefaultMapping());
-                rc.addAll(super.getResourceMapping());
-                return rc;
+                result = parentTcData.getResourceMapping();
+                //result.addAll(Specification.getSpecification().getDefaultMapping());
             } else {
-                return super.getResourceMapping();
+                result = new ResourceMapping();
             }
+            result.addAll(createRiverMapping());
+            result.addAll(super.getResourceMapping());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return result;
     }
 
     /**
@@ -121,6 +125,25 @@ public class FreeColTcFile extends FreeColModFile {
                     map.add(key, ResourceFactory.createResource(getURI(value)));
                 }
             }
+        }
+        return map;
+    }
+
+    public ResourceMapping createRiverMapping() {
+        ResourceMapping map = new ResourceMapping();
+        String pathPrefix = "resources/images/river/";
+        String key, path;
+        for (int index = 0; index < TileImprovementType.RIVER_STYLES; index++) {
+            path = pathPrefix +"river" + index + ".png";
+            map.add("river" + index, ResourceFactory.createResource(getURI(path)));
+        }
+        for (Direction d : Direction.longSides) {
+            key = "delta_" + d + "_small";
+            path = pathPrefix + key + ".png";
+            map.add(key, ResourceFactory.createResource(getURI(path)));
+            key = "delta_" + d + "_large";
+            path = pathPrefix + key + ".png";
+            map.add(key, ResourceFactory.createResource(getURI(path)));
         }
         return map;
     }
