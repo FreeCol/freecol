@@ -87,6 +87,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -1641,30 +1642,6 @@ public final class GUI {
         return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
     }
     
-    /**
-     * For performance reason, string images are rendered once and cached for reuse.
-     * The class StringImageKey provide an identifier for looking up images
-     */
-    private class StringImageKey {
-        public String text;
-        public Font font;
-        public Color color;
-        public StringImageKey(String t, Font f, Color c) {
-            this.text = t;
-            this.font = f;
-            this.color = c;
-        }
-        public int hashCode() {
-            return text.hashCode();
-        }
-        public boolean equals(Object o) {
-            if (o==null || !(o instanceof StringImageKey))
-                return false;
-            StringImageKey other = (StringImageKey) o;
-            return (other.text.equals(this.text)) && (other.font.equals(this.font)) && (other.color.equals(this.color));
-        }
-    }
-    private HashMap<StringImageKey, BufferedImage> stringImageCache = new HashMap<StringImageKey, BufferedImage>();
     
     /**
      * Creates an image with a string of a given color and with 
@@ -1691,8 +1668,8 @@ public final class GUI {
 
         // Lookup in the cache if the image has been generated already
         Font nameFont = (c != null) ? c.getFont() : g.getFont();
-        StringImageKey key = new StringImageKey(nameString, nameFont, color);
-        BufferedImage bi = stringImageCache.get(key);
+        String key = nameString + nameFont.getFontName() + color.getRGB();
+        BufferedImage bi = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
         if (bi != null) {
             return bi;
         }
@@ -1729,7 +1706,9 @@ public final class GUI {
 
                 for (int cX = -1; cX <= 1; cX++) {
                     for (int cY = -1; cY <= 1; cY++) {
-                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == textColor) {
+                        if (biX+cX >= 0 && biY+cY >= 0
+                            && biX+cX < bi.getWidth() && biY+cY < bi.getHeight()
+                            && bi.getRGB(biX + cX, biY + cY) == textColor) {
                             bi.setRGB(biX, biY, borderColor);
                             continue;
                         }
@@ -1737,7 +1716,7 @@ public final class GUI {
                 }
             }
         }
-        this.stringImageCache.put(key, bi);
+        ResourceManager.getGameMapping().add(key, new ImageResource(bi));
         return bi;
     }
 
@@ -1762,8 +1741,8 @@ public final class GUI {
         }
 
         // Lookup in the cache if the image has been generated already
-        StringImageKey key = new StringImageKey(text, font, color);
-        BufferedImage bi = stringImageCache.get(key);
+        String key = text + font.getFontName() + color.getRGB();
+        BufferedImage bi = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
         if (bi != null) {
             return bi;
         }
@@ -1794,7 +1773,7 @@ public final class GUI {
         g2d.setColor(color);
         g2d.fill(textShape);
 
-        this.stringImageCache.put(key, bi);
+        ResourceManager.getGameMapping().add(key, new ImageResource(bi));
         return bi;
     }
 
@@ -2674,33 +2653,6 @@ public final class GUI {
         return -1;
     }
     
-    /**
-     * For performance reason, indicator images are rendered once and cached for reuse.
-     * The class IndicatorImageKey provide an identifier for looking up images
-     */
-    private class IndicatorImageKey {
-        public Color bgColor;
-        public Color fgColor;
-        public String name;
-        public IndicatorImageKey(Color bg, Color fg, String s) {
-            this.bgColor = bg;
-            this.fgColor = fg;
-            this.name = s;
-        }
-        public int hashCode() {
-            return name.hashCode();
-        }
-        public boolean equals(Object o) {
-            if (o==null || !(o instanceof IndicatorImageKey))
-                return false;
-            IndicatorImageKey other = (IndicatorImageKey) o;
-            return (other.bgColor.equals(this.bgColor)) && 
-                   (other.fgColor.equals(this.fgColor)) && 
-                   (other.name.equals(this.name));
-        }
-    }
-    private HashMap<IndicatorImageKey, BufferedImage> indicatorImageCache = new HashMap<IndicatorImageKey, BufferedImage>();
-
     private Image getOccupationIndicatorImage(Unit unit) {
         Color backgroundColor = unit.getOwner().getColor();
         Color foregroundColor = getForegroundColor(unit.getOwner().getColor());
@@ -2730,8 +2682,8 @@ public final class GUI {
                 foregroundColor = Color.GRAY;
         }
         // Lookup in the cache if the image has been generated already
-        IndicatorImageKey key = new IndicatorImageKey(backgroundColor, foregroundColor, occupationString);
-        BufferedImage img = indicatorImageCache.get(key);
+        String key = backgroundColor.getRGB() + foregroundColor.getRGB() + occupationString;
+        BufferedImage img = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img!=null)
             return img;
         // Draw it and put it in the cache
@@ -2741,7 +2693,7 @@ public final class GUI {
         g.drawImage(chip, 0, 0, null);
         g.setColor(foregroundColor);
         g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
-        indicatorImageCache.put(key, img);
+        ResourceManager.getGameMapping().add(key, new ImageResource(img));
         return img;
     }
 
@@ -3550,7 +3502,6 @@ public final class GUI {
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");
         }
-        indicatorImageCache.clear();
         forceReposition();
         freeColClient.getCanvas().refresh();
     }

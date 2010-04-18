@@ -52,7 +52,10 @@ public class ImageResource extends Resource {
     ImageResource(URI resourceLocator) {
         super(resourceLocator);
     }
-    
+
+    public ImageResource(Image image) {
+        this.image = image;
+    }
     
     /**
      * Gets the <code>Image</code> represented by this resource.
@@ -175,4 +178,5 @@ public class ImageResource extends Resource {
         srcImage.createGraphics().drawImage(image, 0, 0, null);
         return filter.filter(srcImage, null);
     }
+
 }

@@ -120,8 +120,12 @@ public class ResourceManager {
      * @param _gameMapping The mapping between IDs and resources. 
      */
     public static void setGameMapping(final ResourceMapping _gameMapping) {
-        campaignMapping = _gameMapping;
+        gameMapping = _gameMapping;
         dirty = true;
+    }
+
+    public static ResourceMapping getGameMapping() {
+        return gameMapping;
     }
 
     /**
