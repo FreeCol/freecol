@@ -422,7 +422,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     @Override
     public void changeOwner(Player owner) {
         // TODO: Move to the server
-        super.setOwner(owner);
+        super.changeOwner(owner);
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
             if (unit.getLocation() instanceof ColonyTile) {
