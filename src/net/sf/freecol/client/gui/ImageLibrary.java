@@ -19,31 +19,20 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
-import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -91,38 +80,15 @@ public final class ImageLibrary {
     /**
      * The constructor to use.
      * 
-     * @throws FreeColException If one of the data files could not be found.
      */
-    public ImageLibrary() throws FreeColException {
-        // This is the location of the data directory when running FreeCol
-        // from its default location in the CVS repository.
-        // dataDirectory = "";
-        // init(true);
-        this("");
+    public ImageLibrary() {
+        this(1);
     }
 
-    /**
-     * A constructor that takes a directory as FreeCol's home.
-     * 
-     * @param freeColHome The home of the freecol files.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    public ImageLibrary(String freeColHome) throws FreeColException {
-        this.scalingFactor = 1;
-    }
-
-    private ImageLibrary(String dataDirectory, float scalingFactor) {
+    public ImageLibrary(float scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
 
-
-    /**
-     * Performs all necessary init operations such as loading of data files.
-     * 
-     * @throws FreeColException If one of the data files could not be found. *
-     */
-    public void init() throws FreeColException {
-    }
 
     /**
      * Returns the scaling factor used when creating this ImageLibrary.
@@ -140,7 +106,7 @@ public final class ImageLibrary {
      * @return A new <code>ImageLibrary</code>.
      */
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
-        return new ImageLibrary("", scalingFactor);
+        return new ImageLibrary(scalingFactor);
     }
 
     public Image scaleImage(Image image, float scale) {
@@ -151,114 +117,6 @@ public final class ImageLibrary {
 
     public ImageIcon scaleIcon(ImageIcon icon, float scale) {
         return new ImageIcon(scaleImage(icon.getImage(), scale));
-    }
-
-    private Map<String, ImageIcon> scaleImages(Map<String, ImageIcon> input, float scale) {
-        HashMap<String, ImageIcon> output = new HashMap<String, ImageIcon>();
-        for (Entry<String, ImageIcon> entry : input.entrySet()) {
-            output.put(entry.getKey(), scaleIcon(entry.getValue(), scale));
-        }
-        return output;
-    }
-
-    private ArrayList<ImageIcon> scaleImages(List<ImageIcon> input, float scale) {
-        ArrayList<ImageIcon> output = new ArrayList<ImageIcon>();
-        for (ImageIcon icon : input) {
-            if (icon == null) {
-                output.add(null);
-            } else {
-                output.add(scaleIcon(icon, scale));
-            }
-        }
-        return output;
-    }
-
-    private Map<String, ArrayList<ImageIcon>> scaleImages2(Map<String, ArrayList<ImageIcon>> input, float scale) {
-        HashMap<String, ArrayList<ImageIcon>> output = new HashMap<String, ArrayList<ImageIcon>>();
-        for (Entry<String, ArrayList<ImageIcon>> entry : input.entrySet()) {
-            if (entry.getValue() == null) {
-                output.put(entry.getKey(), null);
-            } else {
-                output.put(entry.getKey(), scaleImages(entry.getValue(), scale));
-            }
-        }
-        return output;
-    }
-
-
-    private ArrayList<ArrayList<ImageIcon>> scaleImages2(ArrayList<ArrayList<ImageIcon>> input, float scale) {
-        ArrayList<ArrayList<ImageIcon>> output = new ArrayList<ArrayList<ImageIcon>>();
-        for (ArrayList<ImageIcon> list : input) {
-            if (list == null) {
-                output.add(null);
-            } else {
-                output.add(scaleImages(list, scale));
-            }
-        }
-        return output;
-    }
-
-
-    private EnumMap<Role, Map<UnitType, ImageIcon>> scaleUnitImages(EnumMap<Role, Map<UnitType, ImageIcon>> input,
-                                                                    float f) {
-        EnumMap<Role, Map<UnitType, ImageIcon>> result = new EnumMap<Role, Map<UnitType, ImageIcon>>(Role.class);
-        for (Role role : Role.values()) {
-            Map<UnitType, ImageIcon> oldMap = input.get(role);
-            Map<UnitType, ImageIcon> newMap = new HashMap<UnitType, ImageIcon>();
-            for (Entry<UnitType, ImageIcon> entry : oldMap.entrySet()) {
-                ImageIcon oldIcon = entry.getValue();
-                ImageIcon newIcon = new ImageIcon(oldIcon.getImage()
-                                                  .getScaledInstance(Math.round(oldIcon.getIconWidth() * f),
-                                                                     Math.round(oldIcon.getIconHeight() * f),
-                                                                     Image.SCALE_SMOOTH));
-                newMap.put(entry.getKey(), newIcon);
-            }
-            result.put(role, newMap);
-        }
-        return result;
-    }
-
-    /**
-     * Finds the image file in the given <code>filePath</code>.
-     * 
-     * @param filePath The path to the image file.
-     * @param doLookup If <i>true</i> then the <code>resourceLocator</code>
-     *            is used when searching for the image file.
-     * @return An ImageIcon with data loaded from the image file.
-     * @exception FreeColException If the image could not be found.
-     */
-    private ImageIcon findImage(String filePath, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        if (doLookup) {
-            URL url = resourceLocator.getResource(filePath);
-            if (url != null) {
-                return new ImageIcon(url);
-            }
-        }
-
-        File tmpFile = new File(filePath);
-        if (!tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-            throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-        }
-
-        return new ImageIcon(filePath);
-    }
-
-    /**
-     * Loads the terrain-images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadTerrain(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
     }
 
     /**
@@ -466,7 +324,6 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getRiverMouthImage(Direction direction, int magnitude, int x, int y) {
-
         String key = "delta_" + direction + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key);
     }

@@ -320,20 +320,7 @@ public final class FreeCol {
 
             logger.info("Now starting to load images.");
 
-            ImageLibrary lib;
-            try {
-                lib = new ImageLibrary(dataFolder);
-            } catch (FreeColException e) {
-                removeSplash(splash);
-                e.printStackTrace();
-                System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
-                System.out.println("they are present. If FreeCol is looking in the wrong directory");
-                System.out.println("then run the game with a command-line parameter:");
-                System.out.println("");
-                printUsage();
-                System.exit(1);
-                return;
-            }
+            ImageLibrary lib = new ImageLibrary();
 
             MusicLibrary    musicLibrary = null;
             SfxLibrary      sfxLibrary = null;

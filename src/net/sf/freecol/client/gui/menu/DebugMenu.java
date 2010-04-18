@@ -504,6 +504,8 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
+        /*
+          TODO: how do we force the ResourceManager to reload images?
         final JMenuItem loadResource = new JMenuItem("Reload images");
         loadResource.setOpaque(false);
         this.add(loadResource);
@@ -516,6 +518,7 @@ public class DebugMenu extends JMenu {
                     }
                 }
             });
+        */
 
     }
 

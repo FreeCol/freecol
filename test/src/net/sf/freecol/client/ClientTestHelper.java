@@ -35,24 +35,19 @@ public class ClientTestHelper {
 
     public static FreeColClient startClient(FreeColServer freeColServer) {
 
-        try {
-            FreeCol.initializeResourceFolders();
-            ImageLibrary imageLibrary = new ImageLibrary();
-            FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null, false);
-            ConnectController connectController = client.getConnectController();
-            client.setFreeColServer(freeColServer);
-            client.setSingleplayer(true);
-            client.setHeadless(true);
-            boolean connected = connectController.login(username, "127.0.0.1", port);
-            assertTrue(connected);
-            client.getPreGameController().setReady(true);
-            //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
-            //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));
-            return client;
-        } catch(FreeColException e) {
-            fail("Failed to create ImageLibrary.");
-        }
-        return null;
+        FreeCol.initializeResourceFolders();
+        ImageLibrary imageLibrary = new ImageLibrary();
+        FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null, false);
+        ConnectController connectController = client.getConnectController();
+        client.setFreeColServer(freeColServer);
+        client.setSingleplayer(true);
+        client.setHeadless(true);
+        boolean connected = connectController.login(username, "127.0.0.1", port);
+        assertTrue(connected);
+        client.getPreGameController().setReady(true);
+        //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
+        //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));
+        return client;
     }
     
     public static void stopClient(FreeColClient client) {

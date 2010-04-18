@@ -47,19 +47,12 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     public JMenuBar createMenuBar() {
         JMenuBar menuBar = null;
 
-        try {
-            ImageLibrary lib = new ImageLibrary("/home/johnathanj/work/freecol/freecol/data/");
-            FreeColClient client = new FreeColClient(true, new Dimension(-1, -1), lib, null, null, false); 
-            
-            //Create the menu bar.
-            menuBar = new InGameMenuBar(client);
-            
-            client.getActionManager().update();
-            ((FreeColMenuBar)menuBar).update();
-        }
-        catch (FreeColException e) {
-            e.printStackTrace();
-        }
+        ImageLibrary lib = new ImageLibrary();
+        FreeColClient client = new FreeColClient(true, new Dimension(-1, -1), lib, null, null, false); 
+        //Create the menu bar.
+        menuBar = new InGameMenuBar(client);
+        client.getActionManager().update();
+        ((FreeColMenuBar)menuBar).update();
 
         return menuBar;
     }
