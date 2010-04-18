@@ -289,7 +289,7 @@ public final class ImageLibrary {
         // attempt to break it up so it doesn't create big stripes or
         // chess-board effect
         int index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? 0 : 1;
-        return ResourceManager.getImage(key + ".center" + index + ".image");
+        return ResourceManager.getImage(key + ".center" + index + ".image", scalingFactor);
     }
 
     /**
@@ -309,7 +309,7 @@ public final class ImageLibrary {
         // attempt to break it up so it doesn't create big stripes or
         // chess-board effect
         String index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? "_event" : "_odd";
-        return ResourceManager.getImage(key + ".border_" + direction + index + ".image");
+        return ResourceManager.getImage(key + ".border_" + direction + index + ".image", scalingFactor);
     }
 
     /**
@@ -325,7 +325,7 @@ public final class ImageLibrary {
      */
     public Image getRiverMouthImage(Direction direction, int magnitude, int x, int y) {
         String key = "delta_" + direction + (magnitude == 1 ? "_small" : "_large");
-        return ResourceManager.getImage(key);
+        return ResourceManager.getImage(key, scalingFactor);
     }
 
     /**
@@ -335,7 +335,7 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getRiverImage(int index) {
-        return ResourceManager.getImage("river" + index);
+        return ResourceManager.getImage("river" + index, scalingFactor);
     }
 
     /**
@@ -345,7 +345,7 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getBeachImage(int index) {
-        return ResourceManager.getImage("beach" + index);
+        return ResourceManager.getImage("beach" + index, scalingFactor);
     }
 
     /**
@@ -355,7 +355,7 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getForestImage(TileType type) {
-        return ResourceManager.getImage(type.getId() + ".forest");
+        return ResourceManager.getImage(type.getId() + ".forest", scalingFactor);
     }
 
     /**
