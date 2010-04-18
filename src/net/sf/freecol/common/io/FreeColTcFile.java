@@ -87,6 +87,9 @@ public class FreeColTcFile extends FreeColModFile {
         return object.getId().substring(object.getId().lastIndexOf('.') + 1);
     }
 
+
+    /*
+      Don't attempt this before specification handling is sorted out.
     public ResourceMapping getDefaultResourceMapping() throws Exception {
         Specification.createSpecification(getSpecificationInputStream());
             
@@ -129,6 +132,7 @@ public class FreeColTcFile extends FreeColModFile {
         }
         return map;
     }
+    */
 
     public ResourceMapping createRiverMapping() {
         ResourceMapping map = new ResourceMapping();
