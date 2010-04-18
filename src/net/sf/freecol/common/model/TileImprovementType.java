@@ -33,9 +33,6 @@ import javax.xml.stream.XMLStreamReader;
 
 public final class TileImprovementType extends FreeColGameObjectType {
 
-    // the number of different river styles
-    public static final int RIVER_STYLES = 81;
-
     private static int nextIndex = 0;
 
     private boolean natural;

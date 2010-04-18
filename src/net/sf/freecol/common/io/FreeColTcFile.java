@@ -27,10 +27,10 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceFactory;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 /**
@@ -65,6 +65,7 @@ public class FreeColTcFile extends FreeColModFile {
                 result = new ResourceMapping();
             }
             result.addAll(createRiverMapping());
+            result.addAll(createBeachMapping());
             result.addAll(super.getResourceMapping());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -133,7 +134,7 @@ public class FreeColTcFile extends FreeColModFile {
         ResourceMapping map = new ResourceMapping();
         String pathPrefix = "resources/images/river/";
         String key, path;
-        for (int index = 0; index < TileImprovementType.RIVER_STYLES; index++) {
+        for (int index = 0; index < ResourceManager.RIVER_STYLES; index++) {
             path = pathPrefix +"river" + index + ".png";
             map.add("river" + index, ResourceFactory.createResource(getURI(path)));
         }
@@ -144,6 +145,18 @@ public class FreeColTcFile extends FreeColModFile {
             key = "delta_" + d + "_large";
             path = pathPrefix + key + ".png";
             map.add(key, ResourceFactory.createResource(getURI(path)));
+        }
+        return map;
+    }
+
+    public ResourceMapping createBeachMapping() {
+        ResourceMapping map = new ResourceMapping();
+        String pathPrefix = "resources/images/terrain/beach/";
+        String key, path;
+        // beach0 is never used
+        for (int index = 1; index < ResourceManager.BEACH_STYLES; index++) {
+            path = pathPrefix +"beach" + index + ".png";
+            map.add("beach" + index, ResourceFactory.createResource(getURI(path)));
         }
         return map;
     }

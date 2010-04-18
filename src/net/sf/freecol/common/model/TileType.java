@@ -40,7 +40,6 @@ public final class TileType extends FreeColGameObjectType {
     private String artBasic;
     private String artOverlay;
     private String artForest;
-    private String artCoast;
 
     private boolean forest;
     private boolean water;
@@ -110,10 +109,6 @@ public final class TileType extends FreeColGameObjectType {
 
     public String getArtForest() {
         return artForest;
-    }
-
-    public String getArtCoast() {
-        return artCoast;
     }
 
     public boolean isForested() {
@@ -395,7 +390,6 @@ public final class TileType extends FreeColGameObjectType {
                 artBasic = in.getAttributeValue(null, "basic");
                 artOverlay = in.getAttributeValue(null, "overlay");
                 artForest = in.getAttributeValue(null, "forest");
-                artCoast = getAttribute(in, "coast", (water ? null : "terrain/beach/"));
                 in.nextTag(); // close this element
             } else if ("gen".equals(childName)) {
                 humidity[0] = getAttribute(in, "humidityMin", 0);

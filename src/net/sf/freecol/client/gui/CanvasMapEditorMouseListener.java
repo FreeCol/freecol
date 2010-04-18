@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.TerrainGenerator;
 
 /**
@@ -155,7 +155,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                             // user canceled
                         } else if (style == 0) {
                             tile.getTileItemContainer().removeTileItem(river);
-                        } else if (0 < style && style < ImageLibrary.RIVER_STYLES) {
+                        } else if (0 < style && style < ResourceManager.RIVER_STYLES) {
                             river.setStyle(style);
                         } else {
                             logger.warning("Unknown river style: " + style);

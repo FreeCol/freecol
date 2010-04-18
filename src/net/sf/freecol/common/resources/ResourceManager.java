@@ -38,6 +38,12 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
  */
 public class ResourceManager {
     
+    // the number of different river styles
+    public static final int RIVER_STYLES = 81;
+
+    // the number of different beach styles
+    public static final int BEACH_STYLES = 256;
+ 
     /*
      * The following fields are mappings from resource IDs
      * to resources. A mapping is defined within a specific
