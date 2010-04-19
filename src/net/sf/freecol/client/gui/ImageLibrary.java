@@ -109,16 +109,6 @@ public final class ImageLibrary {
         return new ImageLibrary(scalingFactor);
     }
 
-    public Image scaleImage(Image image, float scale) {
-        return image.getScaledInstance(Math.round(image.getWidth(null) * scale),
-                                       Math.round(image.getHeight(null) * scale),
-                                       Image.SCALE_SMOOTH);
-    }
-
-    public ImageIcon scaleIcon(ImageIcon icon, float scale) {
-        return new ImageIcon(scaleImage(icon.getImage(), scale));
-    }
-
     /**
      * Returns the portrait of this Founding Father.
      *
@@ -184,7 +174,11 @@ public final class ImageLibrary {
     }
 
     public Image getBonusImage(ResourceType type) {
-        return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
+        return getBonusImage(type, scalingFactor);
+    }
+
+    public Image getBonusImage(ResourceType type, double scale) {
+        return ResourceManager.getImage(type.getId() + ".image", scale);
     }
 
     /**
@@ -284,12 +278,16 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getTerrainImage(TileType type, int x, int y) {
+        return getTerrainImage(type, x, y, scalingFactor);
+    }
+
+    public Image getTerrainImage(TileType type, int x, int y, double scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         // the pattern is mostly visible on ocean tiles this is an
         // attempt to break it up so it doesn't create big stripes or
         // chess-board effect
         int index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? 0 : 1;
-        return ResourceManager.getImage(key + ".center" + index + ".image", scalingFactor);
+        return ResourceManager.getImage(key + ".center" + index + ".image", scale);
     }
 
     /**
@@ -335,7 +333,11 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getRiverImage(int index) {
-        return ResourceManager.getImage("river" + index, scalingFactor);
+        return getRiverImage(index, scalingFactor);
+    }
+
+    public Image getRiverImage(int index, double scale) {
+        return ResourceManager.getImage("river" + index, scale);
     }
 
     /**
@@ -365,7 +367,11 @@ public final class ImageLibrary {
      * @return The image.
      */
     public Image getMiscImage(String id) {
-        return ResourceManager.getImage(id, scalingFactor);
+        return getMiscImage(id, scalingFactor);
+    }
+
+    public Image getMiscImage(String id, double scale) {
+        return ResourceManager.getImage(id, scale);
     }
 
     /**
@@ -503,7 +509,11 @@ public final class ImageLibrary {
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(SettlementType settlementType) {
-        return ResourceManager.getImage(settlementType.toString() + ".image", scalingFactor);
+        return getSettlementImage(settlementType, scalingFactor);
+    }
+
+    public Image getSettlementImage(SettlementType settlementType, double scale) {
+        return ResourceManager.getImage(settlementType.toString() + ".image", scale);
     }
 
     /**
@@ -591,8 +601,12 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
+        return getUnitImageIcon(unitType, role, scalingFactor);
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, double scale) {
         final String roleStr = (role != Role.DEFAULT) ? "." + role.getId() : "";
-        final Image im = ResourceManager.getImage(unitType.getId() + roleStr + ".image", scalingFactor);
+        final Image im = ResourceManager.getImage(unitType.getId() + roleStr + ".image", scale);
         return (im != null) ? new ImageIcon(im) : null;
     }
 

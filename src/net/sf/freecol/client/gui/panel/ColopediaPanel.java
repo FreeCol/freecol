@@ -611,7 +611,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     }
 
     private JButton getUnitButton(final UnitType unitType, Role role) {
-        ImageIcon unitIcon = getLibrary().scaleIcon(getLibrary().getUnitImageIcon(unitType, role), 0.66f);
+        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, 0.66);
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(SwingConstants.LEFT);
         return unitButton;

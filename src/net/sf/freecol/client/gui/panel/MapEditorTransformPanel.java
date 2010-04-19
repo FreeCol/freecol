@@ -135,22 +135,24 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         List<TileType> tileList = Specification.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
-            listPanel.add(buildButton(getLibrary().getScaledTerrainImage(type, 1f),
+            listPanel.add(buildButton(getLibrary().getTerrainImage(type, 0, 0, 0.5),
                                       Messages.message(type.getNameKey()),
                                       new TileTypeTransform(type)));
         }
-        listPanel.add(buildButton(getLibrary().getRiverImage(10), Messages.message("minorRiver"),
+        listPanel.add(buildButton(getLibrary().getRiverImage(10, 0.5),
+                                  Messages.message("minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(getLibrary().getRiverImage(20), Messages.message("majorRiver"),
+        listPanel.add(buildButton(getLibrary().getRiverImage(20, 0.5),
+                                  Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(getLibrary().getBonusImage(Specification.getSpecification()
-                                                             .getResourceTypeList().get(0)),
+                                                             .getResourceTypeList().get(0), 0.5),
                                   Messages.message("editor.resource"), new ResourceTransform()));
-        listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR),
+        listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR, 0.5),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();
-        settlementButton = buildButton(getLibrary().getSettlementImage(settlementType),
+        settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
                                        Messages.message("Settlement"), new SettlementTransform());
         listPanel.add(settlementButton);
     }
@@ -164,15 +166,13 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     private JToggleButton buildButton(Image image, String text, final MapTransform mt) {
 
-        Image scaledImage = getLibrary().scaleImage(image, 0.5f);
-
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
         descriptionPanel.add(new JLabel(text, JLabel.CENTER), BorderLayout.SOUTH);
         descriptionPanel.setBackground(Color.RED);
         mt.setDescriptionPanel(descriptionPanel);
 
-        ImageIcon icon = new ImageIcon(scaledImage);
+        ImageIcon icon = new ImageIcon(image);
         final JToggleButton button = new JToggleButton(icon);
         button.setToolTipText(text);
         button.setOpaque(false);
