@@ -2328,26 +2328,9 @@ public final class GUI {
                     centerImage(g, colonyImage, x, y);
                     if (withNumber) {
                         String populationString = Integer.toString(((Colony)settlement).getUnitCount());
-                        Color theColor = null;
-
-                        int bonus = ((Colony)settlement).getProductionBonus();
-                        switch (bonus) {
-                        case 2:
-                            theColor = Color.BLUE;
-                            break;
-                        case 1:
-                            theColor = Color.GREEN;
-                            break;
-                        case -1:
-                            theColor = Color.ORANGE;
-                            break;
-                        case -2:
-                            theColor = Color.RED;
-                            break;
-                        default:
-                            theColor = Color.WHITE;
-                        break;
-                        }
+                        Color theColor = ResourceManager
+                            .getColor("productionBonus." + ((Colony) settlement).getProductionBonus()
+                                      + ".color");
 
                         g.setFont(new Font("Dialog", Font.BOLD, 12));
                         BufferedImage stringImage = createStringImage(g, populationString, theColor, tileWidth, 12);
