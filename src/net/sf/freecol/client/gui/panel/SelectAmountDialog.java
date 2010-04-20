@@ -46,8 +46,6 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
 
     private static final int[] amounts = {20, 40, 50, 60, 80, 100};
 
-    private final JButton cancel, ok;
-
     private final JTextArea question;
 
     private final JComboBox comboBox;
@@ -81,32 +79,27 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
         comboBox = new JComboBox(values);
         comboBox.setEditable(true);
 
-        ok = new JButton(Messages.message("ok"));
-        enterPressesWhenFocused(ok);
-        ok.addActionListener(this);
+        okButton.addActionListener(this);
 
-        cancel = new JButton(Messages.message("cancel"));
-        enterPressesWhenFocused(cancel);
-        cancel.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     setResponse(new Integer(SELECT_CANCEL));
                 }
             });
-        setCancelComponent(cancel);
 
         setLayout(new MigLayout("wrap 1", "", ""));
 
         add(question);
         add(comboBox, "wrap 20, growx");
-        add(ok, "span, split 2, tag ok");
-        add(cancel, "tag cancel");
+        add(okButton, "span, split 2, tag ok");
+        add(cancelButton, "tag cancel");
         
         setSize(getPreferredSize());
 
     }
 
     public void requestFocus() {
-        cancel.requestFocus();
+        cancelButton.requestFocus();
     }
 
     /**
@@ -116,17 +109,17 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-    	if(OK.equals(event.getActionCommand())){
-    		Object item = comboBox.getSelectedItem();
-    		if (item instanceof Integer) {
-    			setResponse((Integer) item);
-    		} else if (item instanceof String) {
-    			try {
-    				setResponse(Integer.valueOf((String) item));
-    			} catch (NumberFormatException e) {
-    				// do nothing
-    			}
-    		}
+    	if (OK.equals(event.getActionCommand())){
+            Object item = comboBox.getSelectedItem();
+            if (item instanceof Integer) {
+                setResponse((Integer) item);
+            } else if (item instanceof String) {
+                try {
+                    setResponse(Integer.valueOf((String) item));
+                } catch (NumberFormatException e) {
+                    // do nothing
+                }
+            }
     	}
     }
 }
