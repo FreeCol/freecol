@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
@@ -115,7 +116,8 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             JButton newButton = new JButton();
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
 
-            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, (price > player.getGold()));
+            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, Role.DEFAULT,
+                                                               (price > player.getGold()), 0.66);
             JLabel unitName = localizedLabel(unitType.getNameKey());
             JLabel unitPrice = new JLabel(Messages.message("goldAmount", "%amount%", 
                                                            String.valueOf(price)));
@@ -124,7 +126,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
                 unitPrice.setEnabled(false);
                 newButton.setEnabled(false);
             }
-            newButton.add(new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.66f)), "span 1 2");
+            newButton.add(new JLabel(unitIcon), "span 1 2");
             newButton.add(unitName);
             newButton.add(unitPrice);
             newButton.setActionCommand(unitType.getId());

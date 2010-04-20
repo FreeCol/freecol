@@ -24,6 +24,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -57,12 +58,12 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
         setLayout(new BorderLayout());
         
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));
-        JButton deleteButton = new JButton(getLibrary().getScaledImageIcon(getLibrary().getMiscImageIcon(getLibrary().DELETE), 0.5f));
+        JButton deleteButton = new JButton(new ImageIcon(getLibrary().getMiscImage(getLibrary().DELETE, 0.5)));
         deleteButton.setActionCommand(String.valueOf(DELETE));
         deleteButton.addActionListener(this);
         stylesPanel.add(deleteButton);
         for (int index = 1; index < ResourceManager.RIVER_STYLES; index++) {
-            JButton riverButton = new JButton(getLibrary().getScaledImageIcon(getLibrary().getRiverImage(index), 0.5f));
+            JButton riverButton = new JButton(new ImageIcon(getLibrary().getRiverImage(index, 0.5)));
             riverButton.setActionCommand(String.valueOf(index));
             riverButton.addActionListener(this);
             stylesPanel.add(riverButton);

@@ -381,8 +381,8 @@ public final class InfoPanel extends FreeColPanel {
                         add(goodsLabel);
                     }
                     for (Unit carriedUnit : unit.getUnitList()) {
-                        ImageIcon unitIcon = getLibrary().getUnitImageIcon(carriedUnit);
-                        JLabel unitLabel = new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.5f));
+                        ImageIcon unitIcon = getLibrary().getUnitImageIcon(carriedUnit, 0.5);
+                        JLabel unitLabel = new JLabel(unitIcon);
                         unitLabel.setToolTipText(Messages.message(carriedUnit.getLabel()));
                         add(unitLabel);
                     }

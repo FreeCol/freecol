@@ -121,8 +121,8 @@ public final class ReportIndianPanel extends ReportPanel {
                         skillString = "indianSettlement.skillNone";
                     } else {
                         skillString = skillType.getNameKey();
-                        ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType);
-                        skillLabel.setIcon(getLibrary().getScaledImageIcon(skillImage, 0.66f));
+                        ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType, 0.66);
+                        skillLabel.setIcon(skillImage);
                     }
                 } else {
                     skillString = "indianSettlement.skillUnknown";
@@ -133,13 +133,13 @@ public final class ReportIndianPanel extends ReportPanel {
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
                 if (visited && wantedGoods[0] != null) {
                     JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
-                    goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[0]), 0.66f));
+                    goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
                     String split = "split " + String.valueOf(wantedGoods.length);
                     result.add(goodsLabel, split);
                     for (int i = 1; i < wantedGoods.length; i++) {
                         if (wantedGoods[i] != null) {
                             goodsLabel = localizedLabel(wantedGoods[i].getNameKey());
-                            goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[i]), 0.5f));
+                            goodsLabel.setIcon(getLibrary().getScaledGoodsImageIcon(wantedGoods[i], 0.5));
                             result.add(goodsLabel);
                         }
                     }

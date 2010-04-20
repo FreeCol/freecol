@@ -156,7 +156,11 @@ public final class ImageLibrary {
      * @return the coat-of-arms of this nation
      */
     public Image getCoatOfArmsImage(Nation nation) {
-        return ResourceManager.getImage(nation.getId() + ".coat-of-arms.image");
+        return getCoatOfArmsImage(nation, scalingFactor);
+    }
+
+    public Image getCoatOfArmsImage(Nation nation, double scale) {
+        return ResourceManager.getImage(nation.getId() + ".coat-of-arms.image", scale);
     }
 
     /**
@@ -191,7 +195,7 @@ public final class ImageLibrary {
     }
 
     public ImageIcon getScaledBonusImageIcon(ResourceType type, float scale) {
-        return getScaledImageIcon(getBonusImageIcon(type), scale);
+        return new ImageIcon(getBonusImage(type, scale));
     }
 
 
@@ -391,7 +395,11 @@ public final class ImageLibrary {
      * @return The goods-image at the given index.
      */
     public Image getGoodsImage(GoodsType goodsType) {
-        return ResourceManager.getImage(goodsType.getId() + ".image");
+        return getGoodsImage(goodsType, scalingFactor);
+    }
+
+    public Image getGoodsImage(GoodsType goodsType, double scale) {
+        return ResourceManager.getImage(goodsType.getId() + ".image", scale);
     }
 
     /**
@@ -411,8 +419,8 @@ public final class ImageLibrary {
      * @param scale The scale of the goods-ImageIcon to return.
      * @return The goods-ImageIcon at the given index.
      */
-    public ImageIcon getScaledGoodsImageIcon(GoodsType type, float scale) {
-        return getScaledImageIcon(getGoodsImageIcon(type), scale);
+    public ImageIcon getScaledGoodsImageIcon(GoodsType type, double scale) {
+        return new ImageIcon(getGoodsImage(type, scale));
     }
 
     /**
@@ -578,7 +586,11 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(Unit unit) {
-        return getUnitImageIcon(unit.getType(), unit.getRole());
+        return getUnitImageIcon(unit.getType(), unit.getRole(), scalingFactor);
+    }
+
+    public ImageIcon getUnitImageIcon(Unit unit, double scale) {
+        return getUnitImageIcon(unit.getType(), unit.getRole(), scale);
     }
 
     /**
@@ -588,8 +600,12 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        final Image im = ResourceManager.getImage(unitType.getId() + ".image", scalingFactor);
-        return (im != null) ? new ImageIcon(im) : null;
+        return getUnitImageIcon(unitType, scalingFactor);
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
+        Image im = ResourceManager.getImage(unitType.getId() + ".image", scale);
+        return (im == null) ? null : new ImageIcon(im);
     }
     
     /**
@@ -642,41 +658,18 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
+        return getUnitImageIcon(unitType, role, grayscale, scalingFactor);
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale, double scale) {
         if (grayscale) {
-            final String roleStr = (role != Role.DEFAULT) ? "." + role.getId() : "";
-            final Image im = ResourceManager.getGrayscaleImage(unitType.getId() + roleStr + ".image", scalingFactor);
+            String key = unitType.getId() + (role == Role.DEFAULT ? "" : "." + role.getId()) + ".image";
+            final Image im = ResourceManager.getGrayscaleImage(key, scale);
             return (im != null) ? new ImageIcon(im) : null;
         } else {
-            return getUnitImageIcon(unitType, role);
+            return getUnitImageIcon(unitType, role, scale);
         }
     }
 
-    /**
-     * Returns the scaled ImageIcon.
-     * 
-     * @param inputIcon an <code>ImageIcon</code> value
-     * @param scale The scale of the ImageIcon to return.
-     * @return The scaled ImageIcon.
-     */
-    public ImageIcon getScaledImageIcon(ImageIcon inputIcon, float scale) {
-        Image image = inputIcon.getImage();
-        return new ImageIcon(image.getScaledInstance(Math.round(image.getWidth(null) * scale),
-                                                     Math.round(image.getHeight(null) * scale),
-                                                     Image.SCALE_SMOOTH));
-    }
-
-    /**
-     * Returns the scaled ImageIcon.
-     * 
-     * @param image an <code>Image</code> value
-     * @param scale The scale of the ImageIcon to return.
-     * @return The scaled ImageIcon.
-     */
-    public ImageIcon getScaledImageIcon(Image image, float scale) {
-        return new ImageIcon(image.getScaledInstance(Math.round(image.getWidth(null) * scale),
-                                                     Math.round(image.getHeight(null) * scale),
-                                                     Image.SCALE_SMOOTH));
-    }
-    
 
 }

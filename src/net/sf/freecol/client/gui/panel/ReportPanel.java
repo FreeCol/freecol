@@ -148,8 +148,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     }
 
     public JLabel createUnitTypeLabel(UnitType unitType, Role role, int count) {
-        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, count == 0);
-        JLabel unitLabel = new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.66f));
+        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, (count == 0), 0.66);
+        JLabel unitLabel = new JLabel(unitIcon);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {
             unitLabel.setForeground(Color.GRAY);

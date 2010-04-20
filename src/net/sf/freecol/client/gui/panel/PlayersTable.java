@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.resources.ResourceManager;
+import javax.swing.ImageIcon;
 
 
 public final class PlayersTable extends JTable {
@@ -233,7 +234,7 @@ public final class PlayersTable extends JTable {
 
             Nation nation = (Nation) value;
             setText(Messages.message(nation.getNameKey()));
-            setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
+            setIcon(new ImageIcon(library.getCoatOfArmsImage(nation, 0.5)));
             return this;
         }
     }

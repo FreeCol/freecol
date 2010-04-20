@@ -168,11 +168,11 @@ public final class DragListener extends MouseAdapter {
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         final Unit tempUnit = unitLabel.getUnit();
         JPopupMenu menu = new JPopupMenu("Unit");
-        ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit);
+        ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit, 0.66);
 
         JMenuItem name = new JMenuItem(Messages.message(tempUnit.getLabel()) + " (" +
                                        Messages.message("menuBar.colopedia") + ")", 
-                                       imageLibrary.getScaledImageIcon(unitIcon, 0.66f));
+                                       unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
         name.addActionListener(unitLabel);
         menu.add(name);
@@ -330,8 +330,9 @@ public final class DragListener extends MouseAdapter {
                 if (tempUnit.canBeStudent(teacher) &&
                     tempUnit.getLocation() instanceof WorkLocation &&
                     teacher.getStudent() != tempUnit) {
+                    ImageIcon unitIcon = imageLibrary.getUnitImageIcon(teacher, 0.5);
                     JMenuItem menuItem = new JMenuItem(Messages.message("assignToTeacher"),
-                                                       imageLibrary.getScaledImageIcon(imageLibrary.getUnitImageIcon(teacher), 0.5f));
+                                                       unitIcon);
                     menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);

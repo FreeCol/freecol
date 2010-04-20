@@ -1926,7 +1926,7 @@ public final class GUI {
         }
         
         if (occupyingUnit != null) {
-            ImageIcon image = lib.getScaledImageIcon(lib.getUnitImageIcon(occupyingUnit), 0.5f);
+            ImageIcon image = lib.getUnitImageIcon(occupyingUnit, 0.5);
             g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
                     (y + halfHeight) - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.

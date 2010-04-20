@@ -85,9 +85,9 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             UnitType unitType = europe.getRecruitable(index);
-            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType);
+            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, 0.66);
             person[index].setText(Messages.message(unitType.getNameKey()));
-            person[index].setIcon(getLibrary().getScaledImageIcon(unitIcon, 0.66f));
+            person[index].setIcon(unitIcon);
 
             add(person[index]);
         }
