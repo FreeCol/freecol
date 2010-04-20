@@ -33,16 +33,17 @@ import org.w3c.dom.NodeList;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -63,23 +64,14 @@ public class DiplomacyMessage extends Message {
     private String unitId;
 
     /**
-     * The direction the trader is looking.
+     * The id of the settlement to negotiate with.
      */
-    private String directionString;
+    private String settlementId;
 
     /**
      * The trade to make.
      */
     private DiplomaticTrade agreement;
-
-    /**
-     * A type for the agreement status.
-     */
-    public static enum TradeStatus {
-        PROPOSE_TRADE,
-        ACCEPT_TRADE,
-        REJECT_TRADE
-    }
 
     /**
      * The agreement status.
@@ -88,17 +80,16 @@ public class DiplomacyMessage extends Message {
 
 
     /**
-     * Create a new <code>DiplomacyMessage</code> with the
-     * supplied unit, direction and agreement.
+     * Create a new <code>DiplomacyMessage</code>.
      *
-     * @param unit The <code>Unit</code> that is spying.
-     * @param direction The <code>Direction</code> the unit is looking.
+     * @param unit The <code>Unit</code> that is negotiating.
+     * @param settlement The <code>Settlement</code> to negotiate with.
      * @param agreement The <code>DiplomaticTrade</code> to make.
      */
-    public DiplomacyMessage(Unit unit, Direction direction,
+    public DiplomacyMessage(Unit unit, Settlement settlement,
                             DiplomaticTrade agreement) {
         this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        this.settlementId = settlement.getId();
         this.agreement = agreement;
         this.status = (agreement.isAccept()) ? TradeStatus.ACCEPT_TRADE
             : TradeStatus.PROPOSE_TRADE;
@@ -113,7 +104,7 @@ public class DiplomacyMessage extends Message {
      */
     public DiplomacyMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
-        this.directionString = element.getAttribute("direction");
+        this.settlementId = element.getAttribute("settlement");
         NodeList nodes = element.getChildNodes();
         this.agreement = (nodes.getLength() < 1) ? null
             : new DiplomaticTrade(game, (Element) nodes.item(0));
@@ -157,15 +148,10 @@ public class DiplomacyMessage extends Message {
      * @return The settlement, or null if none.
      */
     public Settlement getSettlement() {
-        try {
-            Game game = agreement.getGame();
-            Unit unit = (Unit) game.getFreeColGameObject(unitId);
-            Direction direction = Enum.valueOf(Direction.class, directionString);
-            Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
-            return tile.getSettlement();
-        } catch (Exception e) {
-        }
-        return null;
+        Game game = agreement.getGame();
+        return (game.getFreeColGameObject(settlementId) instanceof Settlement)
+            ? (Settlement) game.getFreeColGameObject(settlementId)
+            : null;
     }
 
     /**
@@ -265,7 +251,8 @@ public class DiplomacyMessage extends Message {
     /**
      * Try to find an agreement in the saved agreements.
      *
-     * @param message The <code>DiplomacyMessage</code> to find the original for.
+     * @param message The <code>DiplomacyMessage</code> to find the
+     *                original for.
      * @param turn The <code>Turn</code> of the agreement to find.
      * @return A suitable message or null on failure.
      */
@@ -299,7 +286,7 @@ public class DiplomacyMessage extends Message {
     private boolean isSameTransaction(DiplomacyMessage message) {
         return message != null
             && message.unitId.equals(unitId)
-            && message.directionString.equals(directionString)
+            && message.settlementId.equals(settlementId)
             && message.agreement != null
             && message.agreement.getGame() == agreement.getGame()
             && message.agreement.getSender() == agreement.getSender()
@@ -418,18 +405,21 @@ public class DiplomacyMessage extends Message {
         if (unit.getTile() == null) {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
-        Direction direction = Enum.valueOf(Direction.class, directionString);
-        Game game = serverPlayer.getGame();
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (newTile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+        Settlement settlement;
+        try {
+            settlement = server.getAdjacentSettlementSafely(settlementId, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
         }
-        Settlement settlement = newTile.getSettlement();
-        if (settlement == null || !(settlement instanceof Colony)) {
-            return Message.clientError("There is no colony at: "
-                                       + newTile.getId());
+        if (!(settlement instanceof Colony)) {
+            return Message.clientError("Settlement is not a colony: "
+                                       + settlementId);
+        }
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
+            return Message.clientError("Unable to enter "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
         }
         if (agreement == null) {
             return Message.clientError("DiplomaticTrade with null agreement.");
@@ -451,8 +441,8 @@ public class DiplomacyMessage extends Message {
                                        + " does not match Settlement owner: " + settlementPlayer);
         }
         if (enemyPlayer == serverPlayer.getREFPlayer()) {
-            return Message.clientError("Player " + serverPlayer.getId()
-                    + " tried to negotiate with his REF");
+            return Message.clientError("Player can not negotiate with the REF: "
+                                       + serverPlayer.getId());
         }
         Connection enemyConnection = enemyPlayer.getConnection();
         if (enemyConnection == null) {
@@ -461,6 +451,7 @@ public class DiplomacyMessage extends Message {
         }
 
         // Clean out continuations of existing trades
+        Game game = serverPlayer.getGame();
         DiplomacyMessage response;
         switch (status) {
         case ACCEPT_TRADE:
@@ -573,7 +564,7 @@ public class DiplomacyMessage extends Message {
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("unit", unitId);
-        result.setAttribute("direction", directionString);
+        result.setAttribute("settlement", settlementId);
         switch (status) {
         case PROPOSE_TRADE:result.setAttribute("status", ""); break;
         case ACCEPT_TRADE: result.setAttribute("status", "accept"); break;

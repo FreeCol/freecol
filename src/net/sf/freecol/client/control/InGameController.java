@@ -2614,7 +2614,7 @@ public final class InGameController implements NetworkConstants {
             if (newAgreement == null) {
                 if (oldAgreement != null) {
                     // Inform of rejection of the old agreement
-                    message = new DiplomacyMessage(unit, direction,
+                    message = new DiplomacyMessage(unit, settlement,
                                                    oldAgreement);
                     message.setReject();
                     client.sendAndWait(message.toXMLElement());
@@ -2623,7 +2623,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Send this acceptance or proposal to the other player
-            message = askDiplomacy(unit, direction, newAgreement);
+            message = askDiplomacy(unit, settlement, newAgreement);
 
             // What did they say?
             if (message == null || message.isReject()) {
@@ -2649,15 +2649,15 @@ public final class InGameController implements NetworkConstants {
      * Handler server query-response for diplomatic messages.
      *
      * @param unit The <code>Unit</code> conducting the diplomacy.
-     * @param direction The <code>Direction</code> in which the settlement is.
+     * @param settlement The <code>Settlement</code> to negotiate with.
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The agreement returned from the other party, or null.
      */
-    private DiplomacyMessage askDiplomacy(Unit unit, Direction direction,
+    private DiplomacyMessage askDiplomacy(Unit unit, Settlement settlement,
                                           DiplomaticTrade agreement) {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
-        DiplomacyMessage message = new DiplomacyMessage(unit, direction,
+        DiplomacyMessage message = new DiplomacyMessage(unit, settlement,
                                                         agreement);
         if (agreement.isAccept()) message.setAccept();
         Element reply = askExpecting(client, message.toXMLElement(),

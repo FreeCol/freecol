@@ -39,6 +39,14 @@ import net.sf.freecol.common.model.Player.Stance;
  */
 public class DiplomaticTrade extends FreeColObject {
 
+    /**
+     * A type for the trade status.
+     */
+    public static enum TradeStatus {
+        PROPOSE_TRADE,
+        ACCEPT_TRADE,
+        REJECT_TRADE
+    }
 
 
     /** 
