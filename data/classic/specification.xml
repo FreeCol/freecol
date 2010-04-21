@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.36 -->
+<!-- specification version 0.37 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -203,7 +203,6 @@
        -->
   <tile-types>
     <tile-type id="model.tile.plains" basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/plains/"/>
       <gen humidityMin="0" humidityMax="60" temperatureMin="0" temperatureMax="15" altitudeMin="1" altitudeMax="2"/>
       <primary-production goods-type="model.goods.food" value="5"/>
       <secondary-production goods-type="model.goods.cotton" value="2"/>
@@ -213,7 +212,6 @@
       <resource   type="model.resource.grain"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.grassland" basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/grassland/"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
       <primary-production goods-type="model.goods.food" value="3"/>
       <secondary-production goods-type="model.goods.tobacco" value="3"/>
@@ -222,7 +220,6 @@
       <resource   type="model.resource.tobacco"       probability="100"/>
     </tile-type>
     <tile-type id="model.tile.prairie" basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/prairie/"/>
       <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
       <primary-production goods-type="model.goods.food" value="3"/>
       <secondary-production goods-type="model.goods.cotton" value="3"/>
@@ -231,7 +228,6 @@
       <resource   type="model.resource.cotton"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.savannah" basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/savannah/"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <primary-production goods-type="model.goods.food" value="4"/>
       <secondary-production goods-type="model.goods.sugar" value="3"/>
@@ -240,7 +236,6 @@
       <resource   type="model.resource.sugar"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.marsh" basic-move-cost="6" basic-work-turns="5">
-      <art basic="terrain/marsh/"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
       <primary-production goods-type="model.goods.food" value="3"/>
@@ -251,7 +246,6 @@
       <resource   type="model.resource.minerals"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.swamp" basic-move-cost="6" basic-work-turns="7">
-      <art basic="terrain/swamp/"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
       <primary-production goods-type="model.goods.food" value="3"/>
@@ -262,7 +256,6 @@
       <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.desert" basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/desert/"/><!--0.39,0.45,0.17"-->
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <primary-production goods-type="model.goods.food" value="3" tile-production="veryHigh" />
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -274,7 +267,6 @@
       <resource   type="model.resource.oasis"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.tundra" basic-move-cost="3" basic-work-turns="4">
-      <art basic="terrain/tundra/"/><!--0.39,0.62,0.37"-->
       <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
       <primary-production goods-type="model.goods.food" value="3"/>
       <secondary-production goods-type="model.goods.ore" value="2"/>
@@ -284,7 +276,6 @@
       <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.mixedForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <art basic="terrain/plains/" forest="forest/mixed.png"/>
       <gen humidityMin="0" humidityMax="60" temperatureMin="0" temperatureMax="15" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <primary-production goods-type="model.goods.food" value="3"/>
@@ -296,7 +287,6 @@
       <resource   type="model.resource.furs"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.coniferForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <art basic="terrain/grassland/" forest="forest/conifer.png"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -308,7 +298,6 @@
       <resource   type="model.resource.lumber"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.broadleafForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <art basic="terrain/prairie/" forest="forest/broadleaf.png"/>
       <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -320,7 +309,6 @@
       <resource   type="model.resource.game"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.tropicalForest" basic-move-cost="6" basic-work-turns="6" is-forest="true">
-      <art basic="terrain/savannah/" forest="forest/tropical.png"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <primary-production goods-type="model.goods.food" value="3"/>
@@ -332,7 +320,6 @@
       <resource   type="model.resource.lumber"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.wetlandForest" basic-move-cost="9" basic-work-turns="6" is-forest="true">
-      <art basic="terrain/marsh/" forest="forest/wetland.png"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -345,7 +332,6 @@
       <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.rainForest" basic-move-cost="9" basic-work-turns="7" is-forest="true">
-      <art basic="terrain/swamp/" forest="forest/rain.png"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="75"/>
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -358,7 +344,6 @@
       <resource   type="model.resource.minerals"      probability="100"/>
     </tile-type>
     <tile-type id="model.tile.scrubForest" basic-move-cost="3" basic-work-turns="4" is-forest="true">
-      <art basic="terrain/desert/" forest="forest/scrub.png"/>
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <primary-production goods-type="model.goods.food" value="3" tile-production="veryHigh" />
@@ -373,7 +358,6 @@
       <resource   type="model.resource.oasis"         probability="100"/>
     </tile-type>
     <tile-type id="model.tile.borealForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <art basic="terrain/tundra/" forest="forest/boreal.png"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -385,7 +369,6 @@
       <resource   type="model.resource.game"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.hills" basic-move-cost="6" basic-work-turns="4">
-      <art basic="terrain/plains/" overlay="terrain/hills/hills"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="2" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <primary-production goods-type="model.goods.food" value="2"/>
@@ -395,7 +378,6 @@
       <resource   type="model.resource.ore"           probability="100"/>
     </tile-type>
     <tile-type id="model.tile.mountains" basic-move-cost="9" basic-work-turns="7" can-settle="false">
-      <art basic="terrain/plains/" overlay="terrain/mountains/mountains"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="3" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <production goods-type="model.goods.ore"        value="4"/>
@@ -403,35 +385,30 @@
       <resource   type="model.resource.silver"        probability="100"/>
     </tile-type>
     <tile-type id="model.tile.arctic" basic-move-cost="6" basic-work-turns="4">
-      <art basic="terrain/arctic/"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="0" altitudeMin="1" altitudeMax="3"/>
       <primary-production goods-type="model.goods.food" value="2" tile-production="veryHigh" />
       <primary-production goods-type="model.goods.food" value="1" tile-production="high" />
     </tile-type>
     <tile-type id="model.tile.ocean" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
-      <art basic="terrain/ocean/"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
       <production goods-type="model.goods.fish"       value="2"/>
       <resource   type="model.resource.fish"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.lake" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="false">
-      <art basic="terrain/ocean/"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
       <production goods-type="model.goods.fish"       value="2"/>
       <resource   type="model.resource.fish"          probability="100"/>
     </tile-type>
     <tile-type id="model.tile.highSeas" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
-      <art basic="terrain/highSeas/"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-3" altitudeMax="-2"/>
       <production goods-type="model.goods.fish"       value="2"/>
       <ability id="model.ability.moveToEurope"/>
     </tile-type>
     <tile-type id="model.tile.greatRiver" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false">
-      <art basic="terrain/ocean/"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" 
            altitudeMin="-3" altitudeMax="-2" />
       <production goods-type="model.goods.fish"       value="2"/>

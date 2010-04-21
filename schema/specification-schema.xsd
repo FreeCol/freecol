@@ -12,6 +12,7 @@
      0.34: add abstract buildable types
      0.35: remove minimap-color from tile-type
      0.36: change image-id of improvement action to string
+     0.37: remove art element from tile-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -107,7 +108,6 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="modifier"/>
         <xs:element ref="gen"/>
-        <xs:element ref="art"/>
         <xs:element ref="skirmish"/>
         <xs:element ref="resource"/>
         <xs:element ref="production"/>
@@ -133,14 +133,6 @@
       <xs:attribute name="temperatureMax" use="required" type="xs:int"/>
       <xs:attribute name="altitudeMin" use="required" type="xs:int"/>
       <xs:attribute name="altitudeMax" use="required" type="xs:int"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="art">
-    <xs:complexType>
-      <xs:attribute name="basic" use="required" type="xs:string"/>
-      <xs:attribute name="forest" type="xs:string"/>
-      <xs:attribute name="overlay" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

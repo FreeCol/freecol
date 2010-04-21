@@ -231,8 +231,8 @@ public final class ImageLibrary {
         int width = getTerrainImageWidth(type);
         int height = getCompoundTerrainImageHeight(type);
         // Currently used for hills and mountains
-        if (type.getArtOverlay() != null) {
-            Image overlayImage = getOverlayImage(type, 0, 0);
+        Image overlayImage = getOverlayImage(type, 0, 0);
+        if (overlayImage != null) {
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
@@ -310,7 +310,7 @@ public final class ImageLibrary {
         // the pattern is mostly visible on ocean tiles this is an
         // attempt to break it up so it doesn't create big stripes or
         // chess-board effect
-        String index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? "_event" : "_odd";
+        String index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? "_even" : "_odd";
         return ResourceManager.getImage(key + ".border_" + direction + index + ".image", scalingFactor);
     }
 
@@ -500,8 +500,9 @@ public final class ImageLibrary {
     public int getCompoundTerrainImageHeight(TileType type) {
         int height = getTerrainImageHeight(type);
         if (type != null) {
-            if (type.getArtOverlay() != null) {
-                height = Math.max(height, getOverlayImage(type, 0, 0).getHeight(null));
+            Image overlayImage = getOverlayImage(type, 0, 0);
+            if (overlayImage != null) {
+                height = Math.max(height, overlayImage.getHeight(null));
             }
             if (type.isForested()) {
                 height = Math.max(height, getForestImage(type).getHeight(null));

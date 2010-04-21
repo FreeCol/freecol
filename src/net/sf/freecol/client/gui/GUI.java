@@ -2064,15 +2064,14 @@ public final class GUI {
                         }
                     }
                } else if (tile.isExplored() && borderingTile.isExplored()) {
-                    if (tile.getType().getArtBasic().equals(borderingTile.getType().getArtBasic())) {
+                    if (lib.getTerrainImage(tile.getType(), 0, 0)
+                        .equals(lib.getTerrainImage(borderingTile.getType(), 0, 0))) {
                         // Do not draw limit between tile that share same graphics (ocean & great river)
                         continue;
-                    }
-                    else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
+                    } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                         // Draw land terrain with bordering land type, or ocean/high seas limit
                         g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                        tile.getX(), tile.getY()),
-                                                        x, y, null);
+                                                        tile.getX(), tile.getY()), x, y, null);
                     }
                 }
             }
@@ -2221,8 +2220,8 @@ public final class GUI {
                 }
             }
             // Tile Overlays (eg. hills and mountains)
-            if (tile.getType().getArtOverlay() != null) {
-                Image overlayImage = lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY());
+            Image overlayImage = lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY());
+            if (overlayImage != null) {
                 g.drawImage(overlayImage, x, y + tileHeight - overlayImage.getHeight(null), null);
             }
             for (int index = startIndex; index < tileItems.size(); index++) {

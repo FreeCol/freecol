@@ -37,10 +37,6 @@ public final class TileType extends FreeColGameObjectType {
 
     private static int nextIndex = 0;
 
-    private String artBasic;
-    private String artOverlay;
-    private String artForest;
-
     private boolean forest;
     private boolean water;
     private boolean canSettle;
@@ -98,18 +94,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     // ------------------------------------------------------------ retrieval methods
-
-    public String getArtBasic() {
-        return artBasic;
-    }
-
-    public String getArtOverlay() {
-        return artOverlay;
-    }
-
-    public String getArtForest() {
-        return artForest;
-    }
 
     public boolean isForested() {
         return forest;
@@ -380,18 +364,12 @@ public final class TileType extends FreeColGameObjectType {
     public void readChildren(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
 
-        artBasic = null;
         production = new ArrayList<AbstractGoods>();
         resourceType = new ArrayList<RandomChoice<ResourceType>>();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("art".equals(childName)) {
-                artBasic = in.getAttributeValue(null, "basic");
-                artOverlay = in.getAttributeValue(null, "overlay");
-                artForest = in.getAttributeValue(null, "forest");
-                in.nextTag(); // close this element
-            } else if ("gen".equals(childName)) {
+            if ("gen".equals(childName)) {
                 humidity[0] = getAttribute(in, "humidityMin", 0);
                 humidity[1] = getAttribute(in, "humidityMax", 100);
                 temperature[0] = getAttribute(in, "temperatureMin", -20);
@@ -427,10 +405,6 @@ public final class TileType extends FreeColGameObjectType {
             } else {
                 super.readChild(in, specification);
             }
-        }
-        
-        if (artBasic == null) {
-            throw new RuntimeException("TileType " + getId() + " has no art defined!");
         }
     }
 
