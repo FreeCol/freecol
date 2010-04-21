@@ -24,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 

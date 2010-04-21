@@ -48,7 +48,6 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -79,7 +78,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Limit;
-import net.sf.freecol.common.model.Operand.OperandType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
