@@ -65,7 +65,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     /**
      * Describe skill here.
      */
-    private int skill = 0;
+    private int skill = UNDEFINED;
 
     /**
      * Describe price here.
