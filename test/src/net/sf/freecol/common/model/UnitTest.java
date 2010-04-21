@@ -450,6 +450,11 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(caravel.canAdd(caravel));
         assertFalse(caravel.canAdd(galleon));
 
+        // Save old specification values to restore after test
+        int wagonTrainOldSpace = wagonTrain.getType().getSpace();
+        int wagonTrainOldSpaceTaken = wagonTrain.getType().getSpace();
+        int caravelOldSpaceTaken = caravel.getType().getSpace();
+        
         // tests according to other possible rules
         wagonTrain.getType().setSpace(1);
         wagonTrain.getType().setSpaceTaken(2);
@@ -461,6 +466,10 @@ public class UnitTest extends FreeColTestCase {
         assertTrue(galleon.canAdd(caravel));
         assertFalse(caravel.canAdd(caravel));
 
+        // restore values to not affect other tests
+        wagonTrain.getType().setSpace(wagonTrainOldSpace);
+        wagonTrain.getType().setSpaceTaken(wagonTrainOldSpaceTaken);
+        caravel.getType().setSpaceTaken(caravelOldSpaceTaken);
     }
     
     public void testFailedAddGoods(){
