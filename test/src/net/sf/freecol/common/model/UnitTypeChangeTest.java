@@ -104,6 +104,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         UnitType gardener = new UnitType();
+        gardener.setSkill(0);
         UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
 
         UnitTypeChange.ChangeType enterColony = UnitTypeChange.ChangeType.ENTER_COLONY;
