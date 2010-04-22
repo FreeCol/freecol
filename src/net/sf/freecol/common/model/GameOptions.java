@@ -79,8 +79,8 @@ public class GameOptions extends OptionMap {
      * behaviour of the original game and disallows manually assigning
      * students to teachers.
      */
-    public static final String EDUCATE_LEAST_SKILLED_UNIT_FIRST =
-        "model.option.educateLeastSkilledUnitFirst";
+    public static final String ALLOW_STUDENT_SELECTION =
+        "model.option.allowStudentSelection";
 
     /**
      * The difficulty of the game.

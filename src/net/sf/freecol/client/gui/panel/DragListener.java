@@ -325,7 +325,7 @@ public final class DragListener extends MouseAdapter {
         Unit tempUnit = unitLabel.getUnit();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
-        if (!tempUnit.getGame().getGameOptions().getBoolean(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST)) {
+        if (tempUnit.getGame().getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : tempUnit.getColony().getTeachers()) {
                 if (tempUnit.canBeStudent(teacher) &&
                     tempUnit.getLocation() instanceof WorkLocation &&

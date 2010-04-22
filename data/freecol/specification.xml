@@ -180,11 +180,8 @@
 
   <!-- Structure for tile-types
        Notes:
-       Parent options: ref, name, basic-move-cost, basic-work-turns, sail-to-europe
-       Children: art, gen, modifier, production, resource
-       art child options: basic, overlay, coast
-       - all tiles must have at least basic. overlay will be drawn after all the base tiles are drawn
-       - coast is for land tiles drawing their overlap on water tiles. default for coast = "terrain/beach/" for land tiles
+       Parent options: ref, name, basic-move-cost, basic-work-turns
+       Children: gen, modifier, production, resource
        gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
        - humidity is a percentage of water vapor saturation (0 is absolute dryness, 100 is total saturation)
        - temperature in degrees Celsius (from -20 to +40; 0 being the water freezing point)
@@ -1716,7 +1713,7 @@
       <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
       <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
       <!-- Whether to educate the least skilled unit first -->
-      <booleanOption id="model.option.educateLeastSkilledUnitFirst" defaultValue="false"/>
+      <booleanOption id="model.option.allowStudentSelection" defaultValue="true"/>
     </optionGroup>
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->

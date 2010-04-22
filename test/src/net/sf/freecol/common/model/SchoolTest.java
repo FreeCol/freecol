@@ -1183,7 +1183,7 @@ public class SchoolTest extends FreeColTestCase {
         Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
         assertTrue(schoolType.hasAbility("model.ability.teach"));
         assertTrue(colony.canTrain(lumberJack));
-        assertFalse(game.getGameOptions().getBoolean(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST));
+        assertTrue(game.getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION));
         lumberJack.setLocation(school);
 
         colonist1.setWorkType(cotton);
@@ -1195,8 +1195,8 @@ public class SchoolTest extends FreeColTestCase {
         lumberJack.setStudent(null);
         colonist2.setTeacher(null);
 
-        ((BooleanOption) game.getGameOptions().getObject(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST))
-        .setValue(true);
+        ((BooleanOption) game.getGameOptions().getObject(GameOptions.ALLOW_STUDENT_SELECTION))
+        .setValue(false);
         criminal1.setWorkType(cotton);
         criminal2.setWorkType(lumber);
         assertEquals(criminal2, school.findStudent(lumberJack));

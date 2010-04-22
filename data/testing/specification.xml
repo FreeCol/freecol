@@ -2030,7 +2030,7 @@
       <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
       <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
       <!-- Whether to educate the least skilled unit first -->
-      <booleanOption id="model.option.educateLeastSkilledUnitFirst" defaultValue="false"/>
+      <booleanOption id="model.option.allowStudentSelection" defaultValue="true"/>
     </optionGroup>
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
