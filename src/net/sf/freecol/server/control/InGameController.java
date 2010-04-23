@@ -42,6 +42,8 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -80,6 +82,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -91,6 +94,7 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -98,9 +102,11 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 
 /**
- * TODO: write class comment.
+ * The main server controller.
  */
 public final class InGameController extends Controller {
 
@@ -125,19 +131,20 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get a list of all server players, optionally excluding the supplied one.
+     * Get a list of all server players, optionally excluding supplied ones.
      *
-     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
-     * @return A list of all connected server players, perhaps except one.
+     * @param serverPlayers The <code>ServerPlayer</code>s to exclude.
+     * @return A list of all connected server players, with exclusions.
      */
-    public List<ServerPlayer> getOtherPlayers(ServerPlayer serverPlayer) {
+    public List<ServerPlayer> getOtherPlayers(ServerPlayer... serverPlayers) {
         List<ServerPlayer> result = new ArrayList<ServerPlayer>();
-        for (Player otherPlayer : getGame().getPlayers()) {
+        outer: for (Player otherPlayer : getGame().getPlayers()) {
             ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
-            if (!enemyPlayer.equals(serverPlayer)
-                && enemyPlayer.isConnected()) {
-                result.add(enemyPlayer);
+            if (!enemyPlayer.isConnected()) continue;
+            for (ServerPlayer exclude : serverPlayers) {
+                if (enemyPlayer == exclude) continue outer;
             }
+            result.add(enemyPlayer);
         }
         return result;
     }
@@ -244,6 +251,16 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Push a new child node onto the front of a root nodes children.
+     *
+     * @param root The root <code>Node</code>.
+     * @param node A <code>Node</code> to push.
+     */
+    private static void pushChild(Node root, Node node) {
+        root.insertBefore(node, root.getFirstChild());
+    }
+
+    /**
      * Build a generalized update.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to send the
@@ -298,7 +315,9 @@ public final class InGameController extends Controller {
                         CombatResult result = (CombatResult) objects.get(i+3);
                         Element animate = buildAttack(serverPlayer, doc, unit,
                                                       defender, result);
-                        if (animate != null) extras.add(animate);
+                        if (animate != null) {
+                            pushChild(multiple, animate);
+                        }
                         i += 3;
                     } else {
                         throw new IllegalArgumentException("bogus ATTACK");
@@ -326,7 +345,7 @@ public final class InGameController extends Controller {
                         Element animate = buildMove(serverPlayer, doc, unit,
                                                     oldLocation, newTile);
                         if (animate != null) {
-                            extras.add(animate);
+                            pushChild(multiple, animate);
                             // Clean up units that disappear.
                             if (!unit.isVisibleTo(serverPlayer)) {
                                 unit.addToRemoveElement(remove);
@@ -381,7 +400,9 @@ public final class InGameController extends Controller {
                                 (Stance) objects.get(i+1),
                                 (ServerPlayer) objects.get(i+2),
                                 (ServerPlayer) objects.get(i+3));
-                        if (setStance != null) extras.add(setStance);
+                        if (setStance != null) {
+                            pushChild(multiple, setStance);
+                        }
                         i += 3;
                     } else {
                         throw new IllegalArgumentException("bogus STANCE");
@@ -390,6 +411,8 @@ public final class InGameController extends Controller {
                 case UPDATE: // Syntactic sugar
                     break;
                 }
+            } else if (o instanceof Element) {
+                extras.add((Element) doc.importNode((Element) o, true));
             } else if (o instanceof ModelMessage) {
                 // Always send message objects
                 ((ModelMessage) o).addToOwnedElement(messages, serverPlayer);
@@ -441,15 +464,10 @@ public final class InGameController extends Controller {
 
         // Decide what to return.  If there are several parts with children
         // then return multiple, if there is one viable part, return that,
-        // else null.  Always put animations+setStance first, remove last.
-        int n = 0;
+        // else null.  Remove and extra elements need to be after updates.
+        int n = multiple.getChildNodes().getLength();
         Element child = null;
         Element result;
-        while (extras.size() > 0) {
-            child = extras.remove(0);
-            multiple.appendChild(child);
-            n++;
-        }
         if (update.hasChildNodes()) {
             multiple.appendChild(update);
             child = update;
@@ -463,6 +481,11 @@ public final class InGameController extends Controller {
         if (history.hasChildNodes()) {
             multiple.appendChild(history);
             child = history;
+            n++;
+        }
+        while (extras.size() > 0) {
+            child = extras.remove(0);
+            multiple.appendChild(child);
             n++;
         }
         if (remove.hasChildNodes()) {
@@ -582,6 +605,15 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Send an element to all players.
+     *
+     * @param element The <code>Element</code> to send.
+     */
+    public void sendToAll(Element element) {
+        sendToList(getOtherPlayers(), element);
+    }
+
+    /**
      * Send an update to all players except one.
      *
      * @param serverPlayer A <code>ServerPlayer</code> to exclude.
@@ -601,6 +633,17 @@ public final class InGameController extends Controller {
      */
     public void sendToOthers(ServerPlayer serverPlayer,
                              List<Object> allObjects) {
+        sendToList(getOtherPlayers(serverPlayer), allObjects);
+    }
+
+    /**
+     * Send an update to a list of players.
+     *
+     * @param serverPlayers The <code>ServerPlayer</code>s to send to.
+     * @param allObjects The objects to consider.
+     */
+    public void sendToList(List<ServerPlayer> serverPlayers,
+                           List<Object> allObjects) {
         // Strip off all objects at PRIVATE onward before updating.
         List<Object> objects = new ArrayList<Object>();
         for (Object o : allObjects) {
@@ -610,7 +653,7 @@ public final class InGameController extends Controller {
         if (objects.isEmpty()) return;
 
         // Now send each other player their update.
-        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+        for (ServerPlayer other : serverPlayers) {
             sendElement(other, objects);
         }
     }
@@ -622,21 +665,18 @@ public final class InGameController extends Controller {
      * @param element An <code>Element</code> to send.
      */
     public void sendToOthers(ServerPlayer serverPlayer, Element element) {
-        if (element != null) {
-            for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-                sendElement(other, element);
-            }
-        }
+        sendToList(getOtherPlayers(serverPlayer), element);
     }
 
     /**
-     * Send an element to all players.
+     * Send an element to a list of players.
      *
-     * @param element The <code>Element</code> to send.
+     * @param serverPlayers The <code>ServerPlayer</code>s to send to.
+     * @param element An <code>Element</code> to send.
      */
-    public void sendToAll(Element element) {
+    public void sendToList(List<ServerPlayer> serverPlayers, Element element) {
         if (element != null) {
-            for (ServerPlayer other : getOtherPlayers(null)) {
+            for (ServerPlayer other : serverPlayers) {
                 sendElement(other, element);
             }
         }
@@ -666,6 +706,23 @@ public final class InGameController extends Controller {
                 logger.warning(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Ask for a reply from a specific player.
+     *
+     * @param player The <code>ServerPlayer</code> to ask.
+     * @param element An <code>Element</code> containing a query.
+     */
+    public Element askElement(ServerPlayer player, Element element) {
+        if (element != null) {
+            try {
+                return player.getConnection().ask(element);
+            } catch (Exception e) {
+                logger.warning(e.getMessage());
+            }
+        }
+        return null;
     }
 
 
@@ -1741,9 +1798,9 @@ public final class InGameController extends Controller {
         // Session does not exist, create, store, and return it.
         java.util.Map<String,Object> session = new HashMap<String,Object>();
         // Default values
-        session.put("canGift", true);
         session.put("actionTaken", false);
         session.put("unitMoves", unit.getMovesLeft());
+        session.put("canGift", true);
         if (settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR) {
             session.put("canSell", false);
             session.put("canBuy", false);
@@ -1753,6 +1810,7 @@ public final class InGameController extends Controller {
             // this session.
             session.put("canSell", unit.getSpaceTaken() != 0);
         }
+        session.put("agreement", null);
 
         // Only keep track of human player sessions.
         if (unit.getOwner().isAI()) {
@@ -3881,6 +3939,207 @@ public final class InGameController extends Controller {
         // Others can see the tile.
         sendToOthers(serverPlayer, objects);
         return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
+     * Accept a diplomatic trade.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param other The other <code>ServerPlayer</code> that is trading.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> to trade with.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating the changes.
+     */
+    private Element acceptTrade(ServerPlayer serverPlayer, ServerPlayer other,
+                                Unit unit, Settlement settlement,
+                                DiplomaticTrade agreement) {
+        closeTransactionSession(unit, settlement);
+
+        ArrayList<Object> objects = new ArrayList<Object>();
+        boolean sawGold = false;
+        boolean sawGoods = false;
+        for (TradeItem tradeItem : agreement.getTradeItems()) {
+            // Check trade carefully before committing.
+            if (!tradeItem.isValid()) {
+                logger.warning("Trade with invalid tradeItem: "
+                               + tradeItem.toString());
+                continue;
+            }
+            ServerPlayer source = (ServerPlayer) tradeItem.getSource();
+            if (source != serverPlayer && source != other) {
+                logger.warning("Trade with invalid source: "
+                               + ((source == null) ? "null" : source.getId()));
+                continue;
+            }
+            ServerPlayer dest = (ServerPlayer) tradeItem.getDestination();
+            if (dest != serverPlayer && dest != other) {
+                logger.warning("Trade with invalid destination: "
+                               + ((dest == null) ? "null" : dest.getId()));
+                continue;
+            }
+            tradeItem.makeTrade();
+
+            // Collect objects for updating.  Not very OO but
+            // TradeItem should not know about server internals.
+            Colony colony = tradeItem.getColony();
+            if (colony != null) {
+                objects.addAll(colony.getOwnedTiles());
+            }
+            if (tradeItem.getGold() > 0) sawGold = true;
+            Goods goods = tradeItem.getGoods();
+            if (goods != null) {
+                sawGoods = true;
+                objects.add(unit);
+            }
+            Stance stance = tradeItem.getStance();
+            if (stance != null) {
+                addStance(objects, stance, serverPlayer, other);
+            }
+            Unit newUnit = tradeItem.getUnit();
+            if (newUnit != null) {
+                objects.add(newUnit);
+            }
+        }
+        sendToList(getOtherPlayers(serverPlayer, other), objects);
+        // Have to disable the visibility tests for objects that
+        // change hands.
+        ArrayList<Object> ourObjects = new ArrayList<Object>();
+        objects.add(0, UpdateType.PRIVATE);
+        ourObjects.addAll(objects);
+        if (sawGold) {
+            addPartial(ourObjects, serverPlayer, "gold", "score");
+            addPartial(objects, other, "gold", "score");
+        }
+        if (sawGoods) {
+            objects.add(settlement);
+        }
+        sendElement(other, objects);
+        // Original player sees conclusion of diplomacy, and move update.
+        addPartial(ourObjects, unit, "movesLeft");
+        objects.add(new DiplomacyMessage(unit, settlement, agreement)
+                    .toXMLElement());
+        return buildUpdate(serverPlayer, ourObjects);
+    }
+
+    /**
+     * Reject a diplomatic trade.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param other The other <code>ServerPlayer</code> that is trading.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> to trade with.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating the changes.
+     */
+    private Element rejectTrade(ServerPlayer serverPlayer, ServerPlayer other,
+                                Unit unit, Settlement settlement,
+                                DiplomaticTrade agreement) {
+        closeTransactionSession(unit, settlement);
+
+        ArrayList<Object> objects = new ArrayList<Object>();
+        addPartial(objects, unit, "movesLeft");
+        objects.add(new DiplomacyMessage(unit, settlement, agreement)
+                    .toXMLElement());
+        return buildUpdate(serverPlayer, objects);
+    }
+
+    /**
+     * Diplomatic trades.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> to trade with.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element diplomaticTrade(ServerPlayer serverPlayer, Unit unit,
+                                   Settlement settlement,
+                                   DiplomaticTrade agreement) {
+        DiplomacyMessage diplomacy;
+        java.util.Map<String,Object> session;
+        DiplomaticTrade current;
+        ServerPlayer other = (ServerPlayer) settlement.getOwner();
+        unit.setMovesLeft(0);
+
+        switch (agreement.getStatus()) {
+        case ACCEPT_TRADE:
+            if (!isTransactionSessionOpen(unit, settlement)) {
+                return Message.clientError("Accepting without open session.");
+            }
+            session = getTransactionSession(unit, settlement);
+            // Act on what was proposed, not what is in the accept
+            // message to frustrate tricksy client changing the conditions.
+            current = (DiplomaticTrade) session.get("agreement");
+            current.setStatus(TradeStatus.ACCEPT_TRADE);
+
+            diplomacy = new DiplomacyMessage(unit, settlement, current);
+            sendElement(other, diplomacy.toXMLElement());
+            return acceptTrade(serverPlayer, other, unit, settlement, current);
+
+        case REJECT_TRADE:
+            if (!isTransactionSessionOpen(unit, settlement)) {
+                return Message.clientError("Rejecting without open session.");
+            }
+            session = getTransactionSession(unit, settlement);
+            current = (DiplomaticTrade) session.get("agreement");
+            current.setStatus(TradeStatus.REJECT_TRADE);
+
+            diplomacy = new DiplomacyMessage(unit, settlement, current);
+            sendElement(other, diplomacy.toXMLElement());
+            return rejectTrade(serverPlayer, other, unit, settlement, current);
+
+        case PROPOSE_TRADE:
+            session = getTransactionSession(unit, settlement);
+            current = agreement;
+            session.put("agreement", agreement);
+
+            // If the unit is on a carrier we need to update the
+            // client with it first as the diplomacy message refers to it.
+            // Ask the other player about this proposal.
+            diplomacy = new DiplomacyMessage(unit, settlement, agreement);
+            Element proposal = (unit.isOnCarrier())
+                ? buildUpdate(other, UpdateType.PRIVATE, unit,
+                              diplomacy.toXMLElement())
+                : diplomacy.toXMLElement();
+            Element response = askElement(other, proposal);
+
+            // What did they think?
+            diplomacy = (response == null) ? null
+                : new DiplomacyMessage(getGame(), response);
+            agreement = (diplomacy == null) ? null : diplomacy.getAgreement();
+            TradeStatus status = (agreement == null) ? TradeStatus.REJECT_TRADE
+                : agreement.getStatus();
+            switch (status) {
+            case ACCEPT_TRADE:
+                // Act on the proposed agreement, not what was passed back
+                // as accepted.
+                current.setStatus(TradeStatus.ACCEPT_TRADE);
+                return acceptTrade(serverPlayer, other, unit, settlement,
+                                   current);
+
+            case PROPOSE_TRADE:
+                // Save the counter-proposal, sanity test, then pass back.
+                if ((ServerPlayer) agreement.getSender() == serverPlayer
+                    && (ServerPlayer) agreement.getRecipient() == other) {
+                    session.put("agreement", agreement);
+                    return diplomacy.toXMLElement();
+                }
+                logger.warning("Trade counter-proposal was incompatible.");
+                // Fall through
+
+            case REJECT_TRADE:
+            default:
+                // Reject the current trade.
+                current.setStatus(TradeStatus.REJECT_TRADE);
+                return rejectTrade(serverPlayer, other, unit, settlement,
+                                   current);
+            }
+
+        default:
+            return Message.clientError("Bogus trade");
+        }
     }
 
 }

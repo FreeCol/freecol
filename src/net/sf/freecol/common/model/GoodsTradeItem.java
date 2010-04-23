@@ -68,24 +68,6 @@ public class GoodsTradeItem extends TradeItem {
     }
 
     /**
-     * Get the <code>Goods</code> value.
-     *
-     * @return a <code>Goods</code> value
-     */
-    public final Goods getGoods() {
-        return goods;
-    }
-
-    /**
-     * Set the <code>Goods</code> value.
-     *
-     * @param newGoods The new Goods value.
-     */
-    public final void setGoods(final Goods newGoods) {
-        this.goods = newGoods;
-    }
-
-    /**
      * Get the <code>Settlement</code> value.
      *
      * @return a <code>Settlement</code> value
@@ -136,19 +118,35 @@ public class GoodsTradeItem extends TradeItem {
     }
 
     /**
-     * Concludes the trade.
-     *
-     * @return An item to be updated, or null if none required.
+     * Make the trade.
      */
-    public List<FreeColGameObject> makeTrade() {
+    public void makeTrade() {
         Location where = goods.getLocation();
         where.remove(goods);
         settlement.add(goods);
-        List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
-        result.add(where.getGoodsContainer());
-        result.add(settlement);
-        return result;
     }
+
+
+    /**
+     * Get the goods to trade.
+     *
+     * @return The goods to trade.
+     */
+    @Override
+    public Goods getGoods() {
+        return goods;
+    }
+
+    /**
+     * Set the goods to trade.
+     *
+     * @param goods The new <code>Goods</code> to trade.
+     */
+    @Override
+    public void setGoods(Goods goods) {
+        this.goods = goods;
+    }
+
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -158,10 +156,10 @@ public class GoodsTradeItem extends TradeItem {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readFromXMLImpl(in);
-        this.settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "settlement"));
+        this.settlement = (Settlement) game.getFreeColGameObject(in.getAttributeValue(null, "settlement"));
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
-                this.goods = new Goods(getGame(), in);
+                this.goods = new Goods(game, in);
             }
         }
     }

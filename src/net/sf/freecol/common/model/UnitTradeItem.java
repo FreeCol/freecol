@@ -59,30 +59,12 @@ public class UnitTradeItem extends TradeItem {
     }
 
     /**
-     * Get the <code>Unit</code> value.
-     *
-     * @return an <code>Unit</code> value
-     */
-    public final Unit getUnit() {
-        return unit;
-    }
-
-    /**
-     * Set the <code>Unit</code> value.
-     *
-     * @param newUnit The new Unit value.
-     */
-    public final void setUnit(final Unit newUnit) {
-        this.unit = newUnit;
-    }
-
-    /**
      * Returns whether this TradeItem is valid.
      *
      * @return a <code>boolean</code> value
      */
     public boolean isValid() {
-        return (unit.getOwner() == getSource());
+        return unit.getOwner() == getSource();
     }
 
     /**
@@ -97,17 +79,32 @@ public class UnitTradeItem extends TradeItem {
     }
     
     /**
-     * Concludes the trade.
-     *
-     * @return An item to be updated, or null if none required.
+     * Make the trade.
      */
-    public List<FreeColGameObject> makeTrade() {
+    public void makeTrade() {
         unit.setOwner(getDestination());
-        List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
-        result.add(unit);
-        return result;
     }
 
+
+    /**
+     * Get the unit to trade.
+     *
+     * @return The unit to trade.
+     */
+    @Override
+    public Unit getUnit() {
+        return unit;
+    }
+
+    /**
+     * Set the unit to trade.
+     *
+     * @param unit The new <code>Unit</code> to trade.
+     */
+    @Override
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -118,7 +115,7 @@ public class UnitTradeItem extends TradeItem {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readFromXMLImpl(in);
         String unitID = in.getAttributeValue(null, "unit");
-        this.unit = (Unit) getGame().getFreeColGameObject(unitID);
+        this.unit = (Unit) game.getFreeColGameObject(unitID);
         in.nextTag();
     }
 
@@ -146,4 +143,3 @@ public class UnitTradeItem extends TradeItem {
     }
 
 }
-

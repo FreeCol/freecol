@@ -20,11 +20,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.model.Player.Stance;
 
 
 /**
@@ -36,7 +36,7 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * The game this TradeItem belongs to.
      */
-    private Game game;
+    protected Game game;
 
     /**
      *  The player who is to provide this item.
@@ -71,24 +71,6 @@ public abstract class TradeItem extends FreeColObject {
      */
     public TradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
-    }
-
-    /**
-     * Get the <code>Game</code> value.
-     *
-     * @return a <code>Game</code> value
-     */
-    public final Game getGame() {
-        return game;
-    }
-
-    /**
-     * Set the <code>Game</code> value.
-     *
-     * @param newGame The new Game value.
-     */
-    public final void setGame(final Game newGame) {
-        this.game = newGame;
     }
 
     /**
@@ -134,7 +116,6 @@ public abstract class TradeItem extends FreeColObject {
      */
     public abstract boolean isValid();
 
-
     /**
      * Returns whether this TradeItem must be unique. This is true for
      * the StanceTradeItem and the GoldTradeItem, and false for all
@@ -145,11 +126,80 @@ public abstract class TradeItem extends FreeColObject {
     public abstract boolean isUnique();
 
     /**
-     * Concludes the trade.
-     *
-     * @return An item to be updated, or null if none required.
+     * Make the trade.
      */
-    public abstract List<FreeColGameObject> makeTrade();
+    public abstract void makeTrade();
+
+    /**
+     * Get the colony to trade.
+     *
+     * @return The colony to trade.
+     */
+    public Colony getColony() { return null; }
+
+    /**
+     * Set the colony to trade.
+     *
+     * @param colony The new <code>Colony</code> to trade.
+     */
+    public void setColony(Colony colony) {}
+
+    /**
+     * Get the goods to trade.
+     *
+     * @return The goods to trade.
+     */
+    public Goods getGoods() { return null; }
+
+    /**
+     * Set the goods to trade.
+     *
+     * @param goods The new <code>Goods</code> to trade.
+     */
+    public void setGoods(Goods goods) {}
+
+    /**
+     * Get the gold to trade.
+     *
+     * @return The gold to trade.
+     */
+    public int getGold() { return 0; }
+
+    /**
+     * Set the gold to trade.
+     *
+     * @param gold The new gold value.
+     */
+    public void setGold(int gold) {}
+
+    /**
+     * Get the stance to trade.
+     *
+     * @return The stance to trade.
+     */
+    public Stance getStance() { return null; }
+
+    /**
+     * Set the stance to trade.
+     *
+     * @param stance The new <code>Stance</code> to trade.
+     */
+    public void setStance(Stance stance) {}
+
+    /**
+     * Get the unit to trade.
+     *
+     * @return The unit to trade.
+     */
+    public Unit getUnit() { return null; }
+
+    /**
+     * Set the unit to trade.
+     *
+     * @param unit The new <code>Unit</code> to trade.
+     */
+    public void setUnit(Unit unit) {}
+
 
     /**
      * Initialize this object from an XML-representation of this object.

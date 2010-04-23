@@ -71,24 +71,6 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     /**
-     * Get the <code>Colony</code> value.
-     *
-     * @return a <code>Colony</code> value
-     */
-    public final Colony getColony() {
-        return colony;
-    }
-
-    /**
-     * Set the <code>Colony</code> value.
-     *
-     * @param newColony The new Colony value.
-     */
-    public final void setColony(final Colony newColony) {
-        this.colony = newColony;
-    }
-
-    /**
      * Returns whether this TradeItem is valid.
      *
      * @return a <code>boolean</code> value
@@ -110,6 +92,13 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     /**
+     * Make the trade.
+     */
+    public void makeTrade() {
+        colony.changeOwner(getDestination());
+    }
+
+    /**
      * Extract the colony name.  Necessary as the colony may not actually be
      * known by a recipient of an offer.
      *
@@ -119,17 +108,27 @@ public class ColonyTradeItem extends TradeItem {
         return colonyName;
     }
 
+
     /**
-     * Concludes the trade.
+     * Get the colony to trade.
      *
-     * @return An item to be updated, or null if none required.
+     * @return The colony to trade.
      */
-    public List<FreeColGameObject> makeTrade() {
-        colony.changeOwner(getDestination());
-        List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
-        result.add(colony);
-        return result;
+    @Override
+    public Colony getColony() {
+        return colony;
     }
+
+    /**
+     * Set the colony to trade.
+     *
+     * @param colony The new <code>Colony</code> to trade.
+     */
+    @Override
+    public void setColony(Colony colony) {
+        this.colony = colony;
+    }
+
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -141,7 +140,7 @@ public class ColonyTradeItem extends TradeItem {
         super.readFromXMLImpl(in);
         colonyID = in.getAttributeValue(null, "colony");
         colonyName = in.getAttributeValue(null, "colonyName");
-        colony = (Colony) getGame().getFreeColGameObject(colonyID);
+        colony = (Colony) game.getFreeColGameObject(colonyID);
         in.nextTag();
     }
 

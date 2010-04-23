@@ -28,14 +28,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Player.Stance;
+
 import org.w3c.dom.Element;
 
-import net.sf.freecol.common.model.Player.Stance;
 
 /**
  * The class <code>DiplomaticTrade</code> represents an offer one player can
  * make another.
- * 
  */
 public class DiplomaticTrade extends FreeColObject {
 
@@ -67,9 +67,10 @@ public class DiplomaticTrade extends FreeColObject {
     private Player recipient;
 
     /**
-     * Whether this is the accept instance.
+     * The status of this agreement.
      */
-    private boolean accept;
+    private TradeStatus status;
+
 
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
@@ -85,21 +86,24 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param sender a <code>Player</code> value
-     * @param recipient a <code>Player</code> value
+     * @param game The <code>Game</code> containing the trade.
+     * @param sender The sending <code>Player</code>.
+     * @param recipient The recipient <code>Player</code>.
+     * @param items A list of items to trade.
      */
-    public DiplomaticTrade(Game game, Player sender, Player recipient, List<TradeItem> items) {
+    public DiplomaticTrade(Game game, Player sender, Player recipient,
+                           List<TradeItem> items) {
         this.game = game;
         this.sender = sender;
         this.recipient = recipient;
         this.items = items;
+        this.status = TradeStatus.PROPOSE_TRADE;
     }
 
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game The <code>Game</code> containing the trade.
      * @param element an <code>Element</code> value
      */
     public DiplomaticTrade(Game game, Element element) {
@@ -107,73 +111,66 @@ public class DiplomaticTrade extends FreeColObject {
         readFromXMLElement(element);
     }
 
+
     /**
-     * Gets the game object this <code>DiplomaticTrade</code> belongs to.
-     * @return The <code>game</code>.
+     * Get the trade status.
+     *
+     * @return The status of this agreement.
      */
-    public Game getGame() {
-        return game;
+    public TradeStatus getStatus() {
+        return status;
     }
 
     /**
-     * Get the <code>Accept</code> value.
+     * Set the trade status.
      *
-     * @return a <code>boolean</code> value
+     * @param status The new <code>TradeStatus</code> for this agreement.
      */
-    public final boolean isAccept() {
-        return accept;
+    public void setStatus(TradeStatus status) {
+        this.status = status;
     }
 
     /**
-     * Set the <code>Accept</code> value.
+     * Get the sending player.
      *
-     * @param newAccept The new Accept value.
-     */
-    public final void setAccept(final boolean newAccept) {
-        this.accept = newAccept;
-    }
-
-    /**
-     * Get the <code>Sender</code> value.
-     *
-     * @return a <code>Player</code> value
+     * @return The sending <code>Player</code>.
      */
     public final Player getSender() {
         return sender;
     }
 
     /**
-     * Set the <code>Sender</code> value.
+     * Set the sending player.
      *
-     * @param newSender The new Sender value.
+     * @param newSender The new sending <code>Player</code>.
      */
     public final void setSender(final Player newSender) {
         this.sender = newSender;
     }
 
     /**
-     * Get the <code>Recipient</code> value.
+     * Get the recipient player.
      *
-     * @return a <code>Player</code> value
+     * @return The recipient <code>Player</code>.
      */
     public final Player getRecipient() {
         return recipient;
     }
 
     /**
-     * Set the <code>Recipient</code> value.
+     * Set the recieving player.
      *
-     * @param newRecipient The new Recipient value.
+     * @param newRecipient The new recipient <code>Player</code>.
      */
     public final void setRecipient(final Player newRecipient) {
         this.recipient = newRecipient;
     }
 
+
     /**
-     * Add a TradeItem to the DiplomaticTrade.
+     * Add to the DiplomaticTrade.
      * 
-     * @param newItem
-     *            a <code>TradeItem</code> value
+     * @param newItem The <code>TradeItem</code> to add.
      */
     public void add(TradeItem newItem) {
         if (newItem.isUnique()) {
@@ -183,30 +180,25 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
     /**
-     * Remove a TradeItem from the DiplomaticTrade.
+     * Remove a from the DiplomaticTrade.
      * 
-     * @param newItem
-     *            a <code>TradeItem</code> value
+     * @param newItem The <code>TradeItem</code> to remove.
      */
     public void remove(TradeItem newItem) {
         items.remove(newItem);
     }
 
-
     /**
-     * Remove a TradeItem from the DiplomaticTrade.
+     * Remove from the DiplomaticTrade.
      * 
-     * @param index
-     *            the index of the <code>TradeItem</code> to remove
+     * @param index The index of the <code>TradeItem</code> to remove
      */
     public void remove(int index) {
         items.remove(index);
     }
 
-
     /**
-     * Removes all trade items of the same class as the given
-     * argument.
+     * Removes all trade items of the same class as the given argument.
      *
      * @param someItem a <code>TradeItem</code> value
      */
@@ -221,10 +213,28 @@ public class DiplomaticTrade extends FreeColObject {
 
 
     /**
-     * Returns the stance being offered, or null if none
-     * is being offered.
+     * Get a list of all items to trade.
      *
-     * @return an <code>int</code> value
+     * @return A list of all the TradeItems.
+     */
+    public List<TradeItem> getTradeItems() {
+        return items;
+    }
+
+    /**
+     * Get an iterator for all the TradeItems.
+     *
+     * @return An iterator for all TradeItems.
+     */
+    public Iterator<TradeItem> iterator() {
+        return items.iterator();
+    }
+
+
+    /**
+     * Get the stance being offered.
+     *
+     * @return The <code>Stance</code> offered in this trade, or null if none.
      */
     public Stance getStance() {
         Iterator<TradeItem> itemIterator = items.iterator();
@@ -238,109 +248,70 @@ public class DiplomaticTrade extends FreeColObject {
     }
     
     /**
-     * Returns a list of goods given by <code>Player</code>
+     * Get the goods being offered.
      *
-     * @return a list of <code>Goods</code> offered by the player, empty if none given
+     * @return A list of <code>Goods</code> offered in this trade.
      */
     public List<Goods> getGoodsGivenBy(Player player){
-    	List<Goods> goodsList = new ArrayList<Goods>();
-    	Iterator<TradeItem> itemIterator = items.iterator();
+        List<Goods> goodsList = new ArrayList<Goods>();
+        Iterator<TradeItem> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
             TradeItem item = itemIterator.next();
             if (item instanceof GoodsTradeItem && player == item.getSource()) {
-            	goodsList.add(((GoodsTradeItem) item).getGoods());
+                goodsList.add(((GoodsTradeItem) item).getGoods());
             }
         }
         return goodsList;
     }
     
     /**
-     * Returns a list of colonies given by <code>Player</code>
+     * Get a list of colonies offered in this trade.
      *
-     * @return a list of <code>Colony</code> offered by the player, empty if none given
+     * @return A list of <code>Colony</code>s offered in this trade.
      */
     public List<Colony> getColoniesGivenBy(Player player){
-    	List<Colony> colonyList = new ArrayList<Colony>();
-    	Iterator<TradeItem> itemIterator = items.iterator();
+        List<Colony> colonyList = new ArrayList<Colony>();
+        Iterator<TradeItem> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
             TradeItem item = itemIterator.next();
-            if (item instanceof ColonyTradeItem && player == item.getSource()) {
-            	colonyList.add(((ColonyTradeItem) item).getColony());
+            if (item instanceof ColonyTradeItem && player==item.getSource()) {
+                colonyList.add(((ColonyTradeItem) item).getColony());
             }
         }
         return colonyList;
     }
     
-    
-    /**
-     * Calls the <code>makeTrade</code> method of all TradeItems.
-     *
-     * @return A list of all objects traded.
-     */
-    public List<FreeColGameObject> makeTrade() {
-        ArrayList<FreeColGameObject> all = new ArrayList<FreeColGameObject>();
-
-        for (TradeItem item : items) {
-            all.addAll(item.makeTrade());
-        }
-        return all;
-    }
-
-
-    /**
-     * Returns all TradeItems.
-     * 
-     * @return a List of TradeItems    
-     */
-    public List<TradeItem> getTradeItems() {
-        return items;
-    }    
-
-
-    /**
-     * Returns an iterator for all TradeItems.
-     * 
-     * @return an iterator for all TradeItems.
-     */
-    public Iterator<TradeItem> iterator() {
-        return items.iterator();
-    }
 
     /**
      * Initialize this object from an XML-representation of this object.
      * 
-     * @param in
-     *            The input stream with the XML.
-     * @throws XMLStreamException
-     *             if a problem was encountered during parsing.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        String acceptString = in.getAttributeValue(null, "accept");
-        if ("accept".equals(acceptString)) {
-            accept = true;
-        }
-
         String senderString = in.getAttributeValue(null, "sender");
-        sender = (Player) getGame().getFreeColGameObject(senderString);
+        sender = (Player) game.getFreeColGameObject(senderString);
 
         String recipientString = in.getAttributeValue(null, "recipient");
-        recipient = (Player) getGame().getFreeColGameObject(recipientString);
+        recipient = (Player) game.getFreeColGameObject(recipientString);
+
+        status = Enum.valueOf(TradeStatus.class,
+                              in.getAttributeValue(null, "status"));
 
         items = new ArrayList<TradeItem>();
         TradeItem item;
-        while (in.hasNext()){
-        	if(in.next() != XMLStreamConstants.START_ELEMENT)
-        		continue;
+        while (in.hasNext()) {
+            if (in.next() != XMLStreamConstants.START_ELEMENT) continue;
             if (in.getLocalName().equals(StanceTradeItem.getXMLElementTagName())) {
-                item = new StanceTradeItem(getGame(), in);
+                item = new StanceTradeItem(game, in);
             } else if (in.getLocalName().equals(GoodsTradeItem.getXMLElementTagName())) {
-                item = new GoodsTradeItem(getGame(), in);
+                item = new GoodsTradeItem(game, in);
             } else if (in.getLocalName().equals(GoldTradeItem.getXMLElementTagName())) {
-                item = new GoldTradeItem(getGame(), in);
+                item = new GoldTradeItem(game, in);
             } else if (in.getLocalName().equals(ColonyTradeItem.getXMLElementTagName())) {
-                item = new ColonyTradeItem(getGame(), in);
+                item = new ColonyTradeItem(game, in);
             } else if (in.getLocalName().equals(UnitTradeItem.getXMLElementTagName())) {
-                item = new UnitTradeItem(getGame(), in);
+                item = new UnitTradeItem(game, in);
             } else {
                 logger.warning("Unknown TradeItem: " + in.getLocalName());
                 continue;
@@ -354,29 +325,25 @@ public class DiplomaticTrade extends FreeColObject {
      * This method writes an XML-representation of this object to the given
      * stream.
      * 
-      * @param out
-     *            The target stream.
-      * @throws XMLStreamException
-     *             if there are any problems writing to the stream.
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *         the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("accept", accept ? "accept" : "");
         out.writeAttribute("sender", sender.getId());
         out.writeAttribute("recipient", recipient.getId());
-        for (TradeItem item : items) {
-            item.toXML(out);
-        }
+        out.writeAttribute("status", status.toString());
+        for (TradeItem item : items) item.toXML(out);
         out.writeEndElement();
     }
 
     /**
      * Gets the tag name of the root element representing this object.
      * 
-     * @return "goods".
+     * @return "diplomaticTrade".
      */
     public static String getXMLElementTagName() {
         return "diplomaticTrade";
     }
-
 }

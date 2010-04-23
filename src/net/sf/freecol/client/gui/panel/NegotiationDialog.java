@@ -46,6 +46,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -487,8 +488,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
 
     /**
-     * Returns the stance being offered, or Integer.MIN_VALUE if none
-     * is being offered.
+     * Returns the stance being offered.
      *
      * @return a <code>Stance</code> value
      */
@@ -506,11 +506,13 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (command.equals(CANCEL)) {
-            setResponse(null);
+            agreement.setStatus(TradeStatus.REJECT_TRADE);
+            setResponse(agreement);
         } else if (command.equals(ACCEPT)) {
-            agreement.setAccept(true);
+            agreement.setStatus(TradeStatus.ACCEPT_TRADE);
             setResponse(agreement);
         } else if (command.equals(SEND)) {
+            agreement.setStatus(TradeStatus.PROPOSE_TRADE);
             setResponse(agreement);
         } else {
             int index = Integer.parseInt(command);

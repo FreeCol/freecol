@@ -58,25 +58,6 @@ public class GoldTradeItem extends TradeItem {
         readFromXMLImpl(in);
     }
 
-
-    /**
-     * Get the <code>Gold</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getGold() {
-        return gold;
-    }
-
-    /**
-     * Set the <code>Gold</code> value.
-     *
-     * @param newGold The new Gold value.
-     */
-    public final void setGold(final int newGold) {
-        this.gold = newGold;
-    }
-
     /**
      * Returns whether this TradeItem is valid.
      *
@@ -98,17 +79,31 @@ public class GoldTradeItem extends TradeItem {
     }
 
     /**
-     * Concludes the trade.
-     *
-     * @return An item to be updated, or null if none required.
+     * Make the trade.
      */
-    public List<FreeColGameObject> makeTrade() {
+    public void makeTrade() {
         getSource().modifyGold(-gold);
         getDestination().modifyGold(gold);
-        List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
-        result.add(getSource());
-        result.add(getDestination());
-        return result;
+    }
+
+    /**
+     * Get the gold to trade.
+     *
+     * @return The gold to trade.
+     */
+    @Override
+    public int getGold() {
+        return gold;
+    }
+
+    /**
+     * Set the gold to trade.
+     *
+     * @param gold The new gold value.
+     */
+    @Override
+    public void setGold(int gold) {
+        this.gold = gold;
     }
 
 

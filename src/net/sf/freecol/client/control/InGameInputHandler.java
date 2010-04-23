@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -660,32 +661,41 @@ public final class InGameInputHandler extends InputHandler {
      * @return A diplomacy response, or null if none required.
      */
     private Element diplomacy(Element element) {
+        Game game = getGame();
         Player player = getFreeColClient().getMyPlayer();
-        DiplomacyMessage message = new DiplomacyMessage(getGame(), element);
-        DiplomaticTrade agreement;
+        DiplomacyMessage message = new DiplomacyMessage(game, element);
+        Unit unit = message.getUnit(game);
+        Settlement settlement = message.getSettlement(game);
+        Player other = (unit.getOwner() == player) ? settlement.getOwner()
+            : unit.getOwner();
+        String nation = Messages.message(other.getNationName());
+        DiplomaticTrade ourAgreement;
+        DiplomaticTrade theirAgreement = message.getAgreement();
 
-        if (message.isReject()) {
-            String nation = message.getOtherNationName(player);
-            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
-                                                "%nation%", nation).show();
-            return null;
-        }
-        if (message.isAccept()) {
-            String nation = message.getOtherNationName(player);
+        switch (theirAgreement.getStatus()) {
+        case ACCEPT_TRADE:
             new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
                                                 "%nation%", nation).show();
-            return null;
+            break;
+        case REJECT_TRADE:
+            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
+                                                "%nation%", nation).show();
+            break;
+        case PROPOSE_TRADE:
+            ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement,
+                                                              theirAgreement)
+                .select();
+            if (ourAgreement == null) {
+                ourAgreement = theirAgreement;
+                ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
+            }
+            return new DiplomacyMessage(unit, settlement,
+                                        ourAgreement).toXMLElement();
+        default:
+            logger.warning("Bogus trade status");
+            break;
         }
-        agreement = new ShowNegotiationDialogSwingTask(message.getUnit(element),
-                                                       message.getSettlement(),
-                                                       message.getAgreement()).select();
-        if (agreement == null) {
-            message.setReject();
-        } else {
-            message.setAgreement(agreement);
-            if (agreement.isAccept()) message.setAccept();
-        }
-        return message.toXMLElement();
+        return null;
     }
 
     /**

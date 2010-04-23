@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
@@ -315,14 +316,11 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     private Element diplomaticTrade(DummyConnection connection, Element element) {
         // TODO: make an informed decision
         DiplomacyMessage message = new DiplomacyMessage(freeColServer.getGame(), element);
-        boolean accept = getAIPlayer().acceptDiplomaticTrade(message.getAgreement());
-
-        if (accept) {
-            message.setAccept();
-            return message.toXMLElement();
-        } else {
-            return null;
-        }
+        DiplomaticTrade agreement = message.getAgreement();
+        boolean accept = getAIPlayer().acceptDiplomaticTrade(agreement);
+        agreement.setStatus((accept) ? TradeStatus.ACCEPT_TRADE
+                            : TradeStatus.REJECT_TRADE);
+        return message.toXMLElement();
     }
 
     /**

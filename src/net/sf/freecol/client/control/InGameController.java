@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
@@ -2601,45 +2602,52 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Unit tried to negotiate with REF");
         }
 
+        String nation = Messages.message(settlement.getOwner().getNationName());
         Player player = freeColClient.getMyPlayer();
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
-        DiplomaticTrade oldAgreement = null;
-        DiplomaticTrade newAgreement = null;
-        DiplomacyMessage message;
-        Element reply;
-        for (;;) {
-            newAgreement = canvas.showNegotiationDialog(unit, settlement,
-                                                        oldAgreement);
-            if (newAgreement == null) {
-                if (oldAgreement != null) {
+        DiplomaticTrade ourAgreement = null;
+        DiplomaticTrade theirAgreement = null;
+        Boolean done = false;
+        while (!done) {
+            ourAgreement = canvas.showNegotiationDialog(unit, settlement,
+                                                        theirAgreement);
+            if (ourAgreement == null) {
+                if (theirAgreement != null) {
                     // Inform of rejection of the old agreement
-                    message = new DiplomacyMessage(unit, settlement,
-                                                   oldAgreement);
-                    message.setReject();
-                    client.sendAndWait(message.toXMLElement());
+                    theirAgreement.setStatus(TradeStatus.REJECT_TRADE);
+                    client.sendAndWait(new DiplomacyMessage(unit,
+                            settlement, theirAgreement).toXMLElement());
                 }
                 break;
             }
 
             // Send this acceptance or proposal to the other player
-            message = askDiplomacy(unit, settlement, newAgreement);
+            theirAgreement = askDiplomacy(unit, settlement, ourAgreement);
 
             // What did they say?
-            if (message == null || message.isReject()) {
-                String nation = message.getOtherNationName(player);
-                canvas.showInformationMessage("negotiationDialog.offerRejected",
-                                              settlement,
-                                              "%nation%", nation);
-                break;
-            } else if (message.isAccept()) {
-                String nation = message.getOtherNationName(player);
+            TradeStatus status
+                = (theirAgreement == null) ? TradeStatus.REJECT_TRADE
+                : theirAgreement.getStatus();
+            switch (status) {
+            case ACCEPT_TRADE:
                 canvas.showInformationMessage("negotiationDialog.offerAccepted",
-                                              settlement,
-                                              "%nation%", nation);
+                                              settlement, "%nation%", nation);
+                // Colony and unit ownership could change!
+                player.invalidateCanSeeTiles();
+                done = true;
                 break;
-            } else { // Loop with this proposal
-                oldAgreement = message.getAgreement();
+            case REJECT_TRADE:
+                canvas.showInformationMessage("negotiationDialog.offerRejected",
+                                              settlement, "%nation%", nation);
+                done = true;
+                break;
+            case PROPOSE_TRADE:
+                break; // Loop with this proposal
+            default:
+                logger.warning("Bogus trade status");
+                done = true;
+                break;
             }
         }
         nextActiveUnit();
@@ -2653,31 +2661,35 @@ public final class InGameController implements NetworkConstants {
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The agreement returned from the other party, or null.
      */
-    private DiplomacyMessage askDiplomacy(Unit unit, Settlement settlement,
-                                          DiplomaticTrade agreement) {
+    private DiplomaticTrade askDiplomacy(Unit unit, Settlement settlement,
+                                         DiplomaticTrade agreement) {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         DiplomacyMessage message = new DiplomacyMessage(unit, settlement,
                                                         agreement);
-        if (agreement.isAccept()) message.setAccept();
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return null;
 
-        // The reply should contain updates, and the diplomacy last.
-        Node diplomacy = reply.getLastChild();
-        if (diplomacy == null
-            || diplomacy.getNodeType() != Node.ELEMENT_NODE
-            || !diplomacy.getNodeName().equals("diplomacy")) {
-            return null;
+        // The reply should contain diplomacy somewhere.  Hoick it out
+        // and return its agreement for interactive handling rather
+        // than processing it in the input handler.
+        Element diplomacy;
+        if (reply.getTagName().equals("diplomacy")) {
+            diplomacy = reply;
+            reply = null;
+        } else {
+            diplomacy = getChildElement(reply, "diplomacy");
+            if (diplomacy != null) {
+                reply.removeChild(diplomacy);
+            }
         }
-
-        // We extract the diplomacy to return for interactive handling
-        // rather than processing it in the input handler.
-        diplomacy = reply.removeChild(diplomacy);
-        Connection conn = client.getConnection();
-        freeColClient.getInGameInputHandler().handle(conn, reply);
-        return new DiplomacyMessage(game, (Element) diplomacy);
+        // Process any residual updates.
+        if (reply != null) {
+            Connection conn = client.getConnection();
+            freeColClient.getInGameInputHandler().handle(conn, reply);
+        }
+        return (diplomacy == null) ? null
+            : new DiplomacyMessage(game, (Element) diplomacy).getAgreement();
     }
 
     /**

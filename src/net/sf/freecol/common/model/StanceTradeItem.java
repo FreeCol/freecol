@@ -61,24 +61,6 @@ public class StanceTradeItem extends TradeItem {
     }
 
     /**
-     * Get the <code>Stance</code> value.
-     *
-     * @return an <code>Stance</code> value
-     */
-    public final Stance getStance() {
-        return stance;
-    }
-
-    /**
-     * Set the <code>Stance</code> value.
-     *
-     * @param newStance The new Stance value.
-     */
-    public final void setStance(final Stance newStance) {
-        this.stance = newStance;
-    }
-
-    /**
      * Returns whether this TradeItem is valid.
      *
      * @return a <code>boolean</code> value
@@ -99,14 +81,31 @@ public class StanceTradeItem extends TradeItem {
     }
 
     /**
-     * Concludes the trade.
-     *
-     * @return An item to be updated, or null if none required.
+     * Make the trade.
      */
-    public List<FreeColGameObject> makeTrade() {
+    public void makeTrade() {
         getSource().changeRelationWithPlayer(getDestination(), stance);
-        // changeRelationWithPlayer updates asynchronously
-        return Collections.emptyList();
+    }
+
+
+    /**
+     * Get the stance to trade.
+     *
+     * @return The stance to trade.
+     */
+    @Override
+    public Stance getStance() {
+        return stance;
+    }
+
+    /**
+     * Set the stance to trade.
+     *
+     * @param stance The new <code>Stance</code> to trade.
+     */
+    @Override
+    public void setStance(Stance stance) {
+        this.stance = stance;
     }
 
 
