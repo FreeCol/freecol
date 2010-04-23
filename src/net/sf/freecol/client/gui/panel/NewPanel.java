@@ -74,8 +74,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                                                       Messages.message("defaultPlayerName")), 20);
 
     private final JTextField server = new JTextField("127.0.0.1");
-    private final JTextField port1 = new JTextField(FreeCol.getDefaultPort());
-    private final JTextField port2 = new JTextField(FreeCol.getDefaultPort());
+    private final JTextField port1 = new JTextField(Integer.toString(FreeCol.getDefaultPort()));
+    private final JTextField port2 = new JTextField(Integer.toString(FreeCol.getDefaultPort()));
     private final JRadioButton single = new JRadioButton(Messages.message("singlePlayerGame"), true);
     private final JRadioButton join = new JRadioButton(Messages.message("joinMultiPlayerGame"), false);
     private final JRadioButton start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
