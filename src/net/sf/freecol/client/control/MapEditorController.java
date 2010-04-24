@@ -34,7 +34,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseListener;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.MapEditorMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -45,6 +44,8 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;
@@ -91,6 +92,10 @@ public final class MapEditorController {
             freeColClient.setFreeColServer(freeColServer);            
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);
+
+            if (ResourceManager.getGameMapping() == null) {
+                ResourceManager.setGameMapping(new ResourceMapping());
+            }
             
             final Canvas canvas = freeColClient.getCanvas();
             final GUI gui = freeColClient.getGUI();
