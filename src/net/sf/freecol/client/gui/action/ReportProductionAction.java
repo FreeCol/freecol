@@ -45,7 +45,8 @@ public class ReportProductionAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportProductionAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.production", null, KeyStroke.getKeyStroke(KeyEvent.VK_F15, 0));
+        super(freeColClient, "menuBar.report.production", null,
+              KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.SHIFT_MASK));
     }
     
     /**

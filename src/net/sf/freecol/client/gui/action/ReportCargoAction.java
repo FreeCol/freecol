@@ -44,7 +44,8 @@ public class ReportCargoAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportCargoAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.cargo", null, KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
+        super(freeColClient, "menuBar.report.cargo", null, 
+              KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.SHIFT_MASK));
     }
     
     /**

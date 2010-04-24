@@ -43,7 +43,8 @@ public class ReportExplorationAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportExplorationAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.exploration", null, KeyStroke.getKeyStroke(KeyEvent.VK_F13, 0));
+        super(freeColClient, "menuBar.report.exploration", null,
+              KeyStroke.getKeyStroke(KeyEvent.VK_F2, KeyEvent.SHIFT_MASK));
     }
     
     /**

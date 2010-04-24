@@ -44,7 +44,8 @@ public class ReportHistoryAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportHistoryAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.history", null, KeyStroke.getKeyStroke(KeyEvent.VK_F14, 0));
+        super(freeColClient, "menuBar.report.history", null,
+              KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_MASK));
     }
     
     /**
