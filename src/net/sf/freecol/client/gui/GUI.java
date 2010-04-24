@@ -1528,20 +1528,23 @@ public final class GUI {
         /*
         PART 6
         ======
-        Display the messages.
+        Display the messages, if there are any.
         */
 
-        // Don't edit the list of messages while I'm drawing them.
-        synchronized (this) {
-            BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
+        if (getMessageCount() > 0) {
+            // Don't edit the list of messages while I'm drawing them.
+            synchronized (this) {
+                BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
 
-            yy = size.height - 300 - getMessageCount() * si.getHeight();// 200 ;
-            xx = 40;
+                yy = size.height - 300 - getMessageCount() * si.getHeight();// 200 ;
+                xx = 40;
 
-            for (int i = 0; i < getMessageCount(); i++) {
-                GUIMessage message = getMessage(i);
-                g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12), xx, yy, null);
-                yy += si.getHeight();
+                for (int i = 0; i < getMessageCount(); i++) {
+                    GUIMessage message = getMessage(i);
+                    g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12),
+                                xx, yy, null);
+                    yy += si.getHeight();
+                }
             }
         }
 
