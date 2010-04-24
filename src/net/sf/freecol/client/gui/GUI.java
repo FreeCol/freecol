@@ -2262,46 +2262,47 @@ public final class GUI {
                         y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
         } else if (item instanceof TileImprovement) {
             TileImprovement improvement = (TileImprovement) item;
-            if (!improvement.isComplete()) {
-                return;
-            } else if (improvement.getType().getArtOverlay() != null) {
-                // Has its own Overlay Image in Misc, use it
-                g.drawImage(ResourceManager.getImage(improvement.getType().getArtOverlay(),
-                                                     lib.getScalingFactor()), x, y, null);
-            } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                g.drawImage(lib.getRiverImage(improvement.getStyle()), x, y, null);
-            } else if (improvement.isRoad()) {
-                long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
-                boolean connectedRoad = false;
-                for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
-                    if (borderingTile!=null) {
-                        if (borderingTile.hasRoad()) {
-                            connectedRoad =  true;
-                            int nx = x + halfWidth;
-                            int ny = y + halfHeight;
+            if (improvement.isComplete()) {
+                Image overlay = ResourceManager.getImage(improvement.getType().getId() + ".image", 
+                                                         lib.getScalingFactor());
+                if (overlay != null) {
+                    // Has its own Overlay Image in Misc, use it
+                    g.drawImage(overlay, x, y, null);
+                } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
+                    g.drawImage(lib.getRiverImage(improvement.getStyle()), x, y, null);
+                } else if (improvement.isRoad()) {
+                    long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
+                    boolean connectedRoad = false;
+                    for (Direction direction : Direction.values()) {
+                        Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
+                        if (borderingTile!=null) {
+                            if (borderingTile.hasRoad()) {
+                                connectedRoad =  true;
+                                int nx = x + halfWidth;
+                                int ny = y + halfHeight;
 
-                            switch (direction) {
-                            case N : nx = x + halfWidth; ny = y; break;
-                            case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
-                            case E : nx = x + tileWidth; ny = y + halfHeight; break;
-                            case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
-                            case S : nx = x + halfWidth; ny = y + tileHeight; break;
-                            case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
-                            case W : nx = x; ny = y + halfHeight; break;
-                            case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
+                                switch (direction) {
+                                case N : nx = x + halfWidth; ny = y; break;
+                                case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
+                                case E : nx = x + tileWidth; ny = y + halfHeight; break;
+                                case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
+                                case S : nx = x + halfWidth; ny = y + tileHeight; break;
+                                case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
+                                case W : nx = x; ny = y + halfHeight; break;
+                                case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
+                                }
+
+                                drawRoad(g, seed, x + halfWidth, y + halfHeight, nx, ny);
                             }
-
-                            drawRoad(g, seed, x + halfWidth, y + halfHeight, nx, ny);
                         }
                     }
-                }
 
-                if (!connectedRoad) {
-                    drawRoad(g, seed, x + halfWidth - 10, y + halfHeight,
-                             x + halfWidth + 10, y + halfHeight);
-                    drawRoad(g, seed, x + halfWidth, y + halfHeight - 10,
-                             x + halfWidth, y + halfHeight + 10);
+                    if (!connectedRoad) {
+                        drawRoad(g, seed, x + halfWidth - 10, y + halfHeight,
+                                 x + halfWidth + 10, y + halfHeight);
+                        drawRoad(g, seed, x + halfWidth, y + halfHeight - 10,
+                                 x + halfWidth, y + halfHeight + 10);
+                    }
                 }
             }
         }

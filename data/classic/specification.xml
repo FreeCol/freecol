@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.37 -->
+<!-- specification version 0.38 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -181,10 +181,7 @@
   <!-- Structure for tile-types
        Notes:
        Parent options: ref, name, basic-move-cost, basic-work-turns, sail-to-europe
-       Children: art, gen, modifier, production, resource
-       art child options: basic, overlay, coast
-       - all tiles must have at least basic. overlay will be drawn after all the base tiles are drawn
-       - coast is for land tiles drawing their overlap on water tiles. default for coast = "terrain/beach/" for land tiles
+       Children: gen, modifier, production, resource
        gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
        - humidity is a percentage of water vapor saturation (0 is absolute dryness, 100 is total saturation)
        - temperature in degrees Celsius (from -20 to +40; 0 being the water freezing point)
@@ -483,7 +480,7 @@
   </equipment-types>
 
   <!--
-      Parent options: name, add-work-turns, overlay, natural, type, required-improvement,
+      Parent options: name, add-work-turns, natural, type, required-improvement,
       expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
       - natural="true" means that this improvement cannot be built, but may be present on its own
       - expended goods/amount are the 'cost' of building this improvement
@@ -532,7 +529,6 @@
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.plow" add-work-turns="2" zIndex="250"
-                          overlay="model.improvement.plow.image"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <tile id="model.tile.arctic" value="false"/>

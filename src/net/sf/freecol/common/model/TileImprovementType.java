@@ -40,8 +40,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private int magnitude;
     private int addWorkTurns;
 
-    private String artOverlay;
-
     private List<TileType> allowedTileTypes;
     private TileImprovementType requiredImprovementType;
 
@@ -82,10 +80,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     public int getAddWorkTurns() {
         return addWorkTurns;
-    }
-
-    public String getArtOverlay() {
-        return artOverlay;
     }
 
     /**
@@ -271,7 +265,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
         requiredImprovementType = specification.getType(in, "required-improvement", 
                                                         TileImprovementType.class, null);
 
-        artOverlay = getAttribute(in, "overlay", null);
         zIndex = getAttribute(in, "zIndex", 0);
 
         expendedEquipmentType = specification.getType(in, "expended-equipment-type", EquipmentType.class, null);
