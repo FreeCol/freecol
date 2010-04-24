@@ -135,7 +135,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         List<TileType> tileList = Specification.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
-            listPanel.add(buildButton(getLibrary().getTerrainImage(type, 0, 0, 0.5),
+            listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5),
                                       Messages.message(type.getNameKey()),
                                       new TileTypeTransform(type)));
         }
@@ -146,9 +146,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(getLibrary().getBonusImage(Specification.getSpecification()
-                                                             .getResourceTypeList().get(0), 0.5),
+                                                             .getResourceTypeList().get(0), 0.8),
                                   Messages.message("editor.resource"), new ResourceTransform()));
-        listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR, 0.5),
+        listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR, 0.66),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();

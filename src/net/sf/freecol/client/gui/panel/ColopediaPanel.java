@@ -491,7 +491,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent - the parent node
      */
     private void buildTerrainItem(TileType tileType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = new ImageIcon(getLibrary().getScaledTerrainImage(tileType, 0.25f));
+        ImageIcon icon = new ImageIcon(getLibrary().getCompoundTerrainImage(tileType, 0.25));
         String name = Messages.message(tileType.getNameKey());
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, name, icon));
@@ -649,7 +649,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(nameLabel, "span, align center");
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")));
-        Image terrainImage = getLibrary().getScaledTerrainImage(tileType, 1f);
+        Image terrainImage = getLibrary().getCompoundTerrainImage(tileType, 1);
         detailPanel.add(new JLabel(new ImageIcon(terrainImage)));
 
         List<ResourceType> resourceList = tileType.getResourceTypeList();

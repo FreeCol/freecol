@@ -223,36 +223,35 @@ public final class ImageLibrary {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
      */
-    public Image getScaledTerrainImage(TileType type, float scale) {
-        // Index used for drawing the base is the artBasic value
-        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                .getDefaultConfiguration();
-        Image terrainImage = getTerrainImage(type, 0, 0);
-        int width = getTerrainImageWidth(type);
-        int height = getCompoundTerrainImageHeight(type);
+    public Image getCompoundTerrainImage(TileType type, double scale) {
         // Currently used for hills and mountains
-        Image overlayImage = getOverlayImage(type, 0, 0);
-        if (overlayImage != null) {
-            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-            Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
-            g.drawImage(overlayImage, 0, height - overlayImage.getHeight(null), null);
-            g.dispose();
-            terrainImage = compositeImage;
-        }
-        if (type.isForested()) {
-            Image forestImage = getForestImage(type);
-            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-            Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
-            g.drawImage(forestImage, 0, height - forestImage.getHeight(null), null);
-            g.dispose();
-            terrainImage = compositeImage;
-        }
-        if (scale == 1f) {
+        Image terrainImage = getTerrainImage(type, 0, 0, scale);
+        Image overlayImage = getOverlayImage(type, 0, 0, scale);
+        Image forestImage = getForestImage(type, scale);
+        if (overlayImage == null && forestImage == null) {
             return terrainImage;
         } else {
-            return terrainImage.getScaledInstance((int) (width * scale), (int) (height * scale), Image.SCALE_SMOOTH);
+            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice().getDefaultConfiguration();
+            int width = terrainImage.getWidth(null);
+            int height = terrainImage.getHeight(null);
+            if (overlayImage != null) {
+                height = Math.max(height, overlayImage.getHeight(null));
+            }
+            if (forestImage != null) {
+                height = Math.max(height, forestImage.getHeight(null));
+            }
+            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+            Graphics2D g = compositeImage.createGraphics();
+            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
+            if (overlayImage != null) {
+                g.drawImage(overlayImage, 0, height - overlayImage.getHeight(null), null);
+            }
+            if (forestImage != null) {
+                g.drawImage(forestImage, 0, height - forestImage.getHeight(null), null);
+            }
+            g.dispose();
+            return compositeImage;
         }
     }
 
@@ -267,8 +266,12 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getOverlayImage(TileType type, int x, int y) {
+        return getOverlayImage(type, x, y, scalingFactor);
+    }
+
+    public Image getOverlayImage(TileType type, int x, int y, double scale) {
         int index = (x + y) % 2;
-        return ResourceManager.getImage(type.getId() + ".overlay" + index + ".image");
+        return ResourceManager.getImage(type.getId() + ".overlay" + index + ".image", scale);
     }
 
     /**
@@ -361,7 +364,11 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public Image getForestImage(TileType type) {
-        return ResourceManager.getImage(type.getId() + ".forest", scalingFactor);
+        return getForestImage(type, scalingFactor);
+    }
+
+    public Image getForestImage(TileType type, double scale) {
+        return ResourceManager.getImage(type.getId() + ".forest", scale);
     }
 
     /**
