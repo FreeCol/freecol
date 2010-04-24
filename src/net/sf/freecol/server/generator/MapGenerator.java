@@ -135,7 +135,11 @@ public class MapGenerator implements IMapGenerator {
         // Create terrain:
         terrainGenerator.createMap(game, importGame, landMap);
 
-        Map map = game.getMap();        
+        Map map = game.getMap();
+        if (map.getRegions() == null || map.getRegions().isEmpty()) {
+            terrainGenerator.createOceanRegions(map);
+            terrainGenerator.createLandRegions(map);
+        }
         createIndianSettlements(map, game.getPlayers());
         createEuropeanUnits(map, game.getPlayers());
         createLostCityRumours(map, importGame);

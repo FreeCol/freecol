@@ -421,7 +421,7 @@ public class TerrainGenerator {
      *
      * @param map a <code>Map</code> value
      */
-    private void createOceanRegions(Map map) {
+    void createOceanRegions(Map map) {
         Game game = map.getGame();
 
         ServerRegion pacific =
@@ -536,7 +536,7 @@ public class TerrainGenerator {
      * For the remaining land tiles, one region per contiguous landmass is created.
      * @param map a <code>Map</code> value
      */
-    private void createLandRegions(Map map) {
+    void createLandRegions(Map map) {
         Game game = map.getGame();
 
         //Create arctic/antarctic regions first
