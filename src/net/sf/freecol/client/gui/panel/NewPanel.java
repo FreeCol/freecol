@@ -245,7 +245,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     nationOptions.setSelectColors(selectColors.isSelected());
-                    DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas()));
+                    DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
                     connectController.startSingleplayerGame(name.getText(), nationOptions, level);
                     // getFilename(), getDifficulty());
                     break;
@@ -264,7 +264,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         nationOptions = NationOptions.getDefaults();
                         nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                         nationOptions.setSelectColors(selectColors.isSelected());
-                        level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas()));
+                        level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(),
                                                                port, nationOptions, level);
                     } catch (NumberFormatException e) {

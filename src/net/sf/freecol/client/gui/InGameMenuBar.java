@@ -256,6 +256,8 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ReportExplorationAction.id));
         menu.add(getMenuItem(ReportHistoryAction.id));
         menu.add(getMenuItem(ReportProductionAction.id));
+        menu.add(getMenuItem(ShowDifficultyAction.id));
+        menu.add(getMenuItem(ShowGameOptionsAction.id));
 
         add(menu);
 

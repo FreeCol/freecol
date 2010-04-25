@@ -135,6 +135,8 @@ public class ActionManager extends OptionGroup {
         add(new SaveAction(freeColClient));
         add(new ScaleMapAction(freeColClient));
         add(new SentryAction(freeColClient));
+        add(new ShowDifficultyAction(freeColClient));
+        add(new ShowGameOptionsAction(freeColClient));
         add(new ShowMainAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
