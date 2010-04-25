@@ -99,6 +99,14 @@ public class ActionManager extends OptionGroup {
         add(new MiniMapChangeBackgroundAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));
         add(new MiniMapZoomOutAction(freeColClient));
+        add(new MoveNorthAction(freeColClient));
+        add(new MoveNorthEastAction(freeColClient));
+        add(new MoveEastAction(freeColClient));
+        add(new MoveSouthEastAction(freeColClient));
+        add(new MoveSouthAction(freeColClient));
+        add(new MoveSouthWestAction(freeColClient));
+        add(new MoveWestAction(freeColClient));
+        add(new MoveNorthWestAction(freeColClient));
         add(new NewAction(freeColClient));
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));

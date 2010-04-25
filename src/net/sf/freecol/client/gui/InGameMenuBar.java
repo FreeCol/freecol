@@ -32,74 +32,7 @@ import javax.swing.JMenuItem;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.action.AboutAction;
-import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
-import net.sf.freecol.client.gui.action.BuildColonyAction;
-import net.sf.freecol.client.gui.action.ChangeAction;
-import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
-import net.sf.freecol.client.gui.action.ChatAction;
-import net.sf.freecol.client.gui.action.ClearOrdersAction;
-import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
-import net.sf.freecol.client.gui.action.ColopediaFatherAction;
-import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
-import net.sf.freecol.client.gui.action.ColopediaNationAction;
-import net.sf.freecol.client.gui.action.ColopediaNationTypeAction;
-import net.sf.freecol.client.gui.action.ColopediaResourceAction;
-import net.sf.freecol.client.gui.action.ColopediaSkillAction;
-import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
-import net.sf.freecol.client.gui.action.ColopediaUnitAction;
-import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
-import net.sf.freecol.client.gui.action.DisbandUnitAction;
-import net.sf.freecol.client.gui.action.DisplayBordersAction;
-import net.sf.freecol.client.gui.action.DisplayGridAction;
-import net.sf.freecol.client.gui.action.DisplayTileEmptyAction;
-import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
-import net.sf.freecol.client.gui.action.DisplayTileOwnersAction;
-import net.sf.freecol.client.gui.action.DisplayTileRegionsAction;
-import net.sf.freecol.client.gui.action.EndTurnAction;
-import net.sf.freecol.client.gui.action.EuropeAction;
-import net.sf.freecol.client.gui.action.ExecuteGotoOrdersAction;
-import net.sf.freecol.client.gui.action.FindSettlementAction;
-import net.sf.freecol.client.gui.action.FortifyAction;
-import net.sf.freecol.client.gui.action.GotoAction;
-import net.sf.freecol.client.gui.action.GotoTileAction;
-import net.sf.freecol.client.gui.action.ImprovementActionType;
-import net.sf.freecol.client.gui.action.LoadAction;
-import net.sf.freecol.client.gui.action.MapControlsAction;
-import net.sf.freecol.client.gui.action.NewAction;
-import net.sf.freecol.client.gui.action.OpenAction;
-import net.sf.freecol.client.gui.action.PreferencesAction;
-import net.sf.freecol.client.gui.action.QuitAction;
-import net.sf.freecol.client.gui.action.ReconnectAction;
-import net.sf.freecol.client.gui.action.RenameAction;
-import net.sf.freecol.client.gui.action.ReportCargoAction;
-import net.sf.freecol.client.gui.action.ReportColonyAction;
-import net.sf.freecol.client.gui.action.ReportContinentalCongressAction;
-import net.sf.freecol.client.gui.action.ReportExplorationAction;
-import net.sf.freecol.client.gui.action.ReportForeignAction;
-import net.sf.freecol.client.gui.action.ReportHistoryAction;
-import net.sf.freecol.client.gui.action.ReportHighScoresAction;
-import net.sf.freecol.client.gui.action.ReportIndianAction;
-import net.sf.freecol.client.gui.action.ReportLabourAction;
-import net.sf.freecol.client.gui.action.ReportMilitaryAction;
-import net.sf.freecol.client.gui.action.ReportNavalAction;
-import net.sf.freecol.client.gui.action.ReportProductionAction;
-import net.sf.freecol.client.gui.action.ReportReligionAction;
-import net.sf.freecol.client.gui.action.ReportRequirementsAction;
-import net.sf.freecol.client.gui.action.ReportTradeAction;
-import net.sf.freecol.client.gui.action.ReportTurnAction;
-import net.sf.freecol.client.gui.action.RetireAction;
-import net.sf.freecol.client.gui.action.SaveAction;
-import net.sf.freecol.client.gui.action.SaveAndQuitAction;
-import net.sf.freecol.client.gui.action.SentryAction;
-import net.sf.freecol.client.gui.action.ShowMainAction;
-import net.sf.freecol.client.gui.action.SkipUnitAction;
-import net.sf.freecol.client.gui.action.ToggleViewModeAction;
-import net.sf.freecol.client.gui.action.TradeRouteAction;
-import net.sf.freecol.client.gui.action.UnloadAction;
-import net.sf.freecol.client.gui.action.WaitAction;
-import net.sf.freecol.client.gui.action.ZoomInAction;
-import net.sf.freecol.client.gui.action.ZoomOutAction;
+import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
 import net.sf.freecol.common.model.StringTemplate;
@@ -120,17 +53,11 @@ public class InGameMenuBar extends FreeColMenuBar {
     private static final Logger logger = Logger.getLogger(InGameMenuBar.class.getName());
 
     public static final int UNIT_ORDER_WAIT = 0;
-
     public static final int UNIT_ORDER_FORTIFY = 1;
-
     public static final int UNIT_ORDER_SENTRY = 2;
-
     public static final int UNIT_ORDER_CLEAR_ORDERS = 3;
-
     public static final int UNIT_ORDER_BUILD_COL = 5;
-
     public static final int UNIT_ORDER_SKIP = 9;
-
     public static final int UNIT_ORDER_DISBAND = 11;
 
     private JMenuItem reportsTradeMenuItem = null;
@@ -292,6 +219,17 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ClearOrdersAction.id));
         menu.add(getMenuItem(RenameAction.id));
         menu.add(getMenuItem(DisbandUnitAction.id));
+
+        menu.addSeparator();
+
+        menu.add(getMenuItem(MoveNorthAction.id));
+        menu.add(getMenuItem(MoveNorthEastAction.id));
+        menu.add(getMenuItem(MoveEastAction.id));
+        menu.add(getMenuItem(MoveSouthEastAction.id));
+        menu.add(getMenuItem(MoveSouthAction.id));
+        menu.add(getMenuItem(MoveSouthWestAction.id));
+        menu.add(getMenuItem(MoveWestAction.id));
+        menu.add(getMenuItem(MoveNorthWestAction.id));
 
         add(menu);
     }

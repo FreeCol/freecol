@@ -50,9 +50,9 @@ import net.sf.freecol.common.option.Option;
 * User interface for displaying/changing a keyboard accelerator for a <code>FreeColAction</code>.
 */
 public final class FreeColActionUI extends JPanel implements OptionUpdater, ActionListener {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColActionUI.class.getName());
-
 
     private final FreeColAction option;
     private final OptionGroupUI optionGroupUI;
@@ -85,6 +85,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         add(label, BorderLayout.CENTER);
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        p1.setOpaque(false);
         bl = new BlinkingLabel();
         p1.add(bl);
 
