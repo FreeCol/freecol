@@ -176,6 +176,7 @@ public final class MapEditorController {
         }
         
         try {
+            game.setMapGeneratorOptions(mapGenerator.getMapGeneratorOptions());
             mapGenerator.createMap(game);
             freeColClient.getGUI().setFocus(1, 1);
             freeColClient.getActionManager().update();

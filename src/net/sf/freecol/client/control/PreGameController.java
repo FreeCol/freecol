@@ -224,7 +224,9 @@ public final class PreGameController {
      public void sendMapGeneratorOptions() {
          if (mapGeneratorOptions != null) {
              Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
-             updateMapGeneratorOptionsElement.appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
+             updateMapGeneratorOptionsElement
+                 .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
+             freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
              freeColClient.getClient().send(updateMapGeneratorOptionsElement);
          }
      }    

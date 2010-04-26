@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 
 /**
@@ -62,6 +63,8 @@ public class Game extends FreeColGameObject {
     private Map map;
 
     protected GameOptions gameOptions;
+
+    protected MapGeneratorOptions mapGeneratorOptions;
 
     /** The name of the player whose turn it is. */
     protected Player currentPlayer = null;
@@ -794,6 +797,18 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Gets the <code>MapGeneratorOptions</code> that is associated with this
+     * {@link Game}.
+     */
+    public MapGeneratorOptions getMapGeneratorOptions() {
+        return mapGeneratorOptions;
+    }
+
+    public void setMapGeneratorOptions(MapGeneratorOptions options) {
+        mapGeneratorOptions = options;
+    }
+
+    /**
      * Get the next name for a city of Cibola.
      *
      * @return The next name for a city of Cibola, or null if none available.
@@ -895,6 +910,9 @@ public class Game extends FreeColGameObject {
         }
         gameOptions.toXML(out);
         nationOptions.toXML(out);
+        if (mapGeneratorOptions != null) {
+            mapGeneratorOptions.toXML(out);
+        }
 
         // serialize players
         Iterator<Player> playerIterator = getPlayerIterator();
@@ -1006,6 +1024,8 @@ public class Game extends FreeColGameObject {
             } else if (DifficultyLevel.getXMLElementTagName().equals(in.getLocalName())) {
                 difficultyLevel = new DifficultyLevel();
                 difficultyLevel.readFromXML(in, null);
+            } else if (MapGeneratorOptions.getXMLElementTagName().equals(in.getLocalName())) {
+                mapGeneratorOptions = new MapGeneratorOptions(in);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
                 in.nextTag();
@@ -1019,6 +1039,9 @@ public class Game extends FreeColGameObject {
         
         if (gameOptions == null) {
             gameOptions = new GameOptions();
+        }
+        if (mapGeneratorOptions == null) {
+            mapGeneratorOptions = new MapGeneratorOptions();
         }
     }
 
