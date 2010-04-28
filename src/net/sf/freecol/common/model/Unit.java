@@ -1212,17 +1212,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the type of a move made in a specified direction.
      * 
-     * @param direction The direction of the move.
+     * @param direction The <code>Direction</code> of the move.
      * @return The move type.
      */
     public MoveType getMoveType(Direction direction) {
-        if (getTile() == null) {
+        Tile tile = getTile();
+        if (tile == null) {
             throw new IllegalStateException("getTile() == null");
         }
 
-        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
-
-        return getMoveType(target);
+        Tile target = getGame().getMap().getNeighbourOrNull(direction, tile);
+        return (target == null) ? MoveType.MOVE_ILLEGAL : getMoveType(target);
     }
 
     /**
