@@ -76,6 +76,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
@@ -290,6 +291,8 @@ public final class GUI {
 
     public static final int OVERLAY_INDEX = 100;
     public static final int FOREST_INDEX = 200;
+
+    public static enum BorderType { COUNTRY, REGION };
 
     private int displayTileText = 0;
     private GeneralPath gridPath = null;
@@ -1405,7 +1408,7 @@ public final class GUI {
                 Tile tile = map.getTile(tileX, tileY);
                     
                 // paint full borders
-                paintBorders(g, tile, xx, yy, true);
+                paintBorders(g, tile, xx, yy, BorderType.COUNTRY, true);
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -1413,7 +1416,7 @@ public final class GUI {
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
-                paintBorders(g, tile, xx, yy, false);
+                paintBorders(g, tile, xx, yy, BorderType.COUNTRY, false);
 
                 if (viewMode.displayTileCursor(tile,xx,yy)) {
                     drawCursor(g, xx, yy);
@@ -2082,19 +2085,26 @@ public final class GUI {
     }    
 
 
-    private void paintBorders(Graphics2D g, Tile tile, int x, int y, boolean opaque) {
-        if (tile == null || !freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+    private void paintBorders(Graphics2D g, Tile tile, int x, int y, BorderType type, boolean opaque) {
+        if (tile == null ||
+            (type == BorderType.COUNTRY
+             && !freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS))) {
             return;
         }
         Player owner = tile.getOwner();
-        if (owner != null) {
+        Region region = tile.getRegion();
+        if ((type == BorderType.COUNTRY && owner != null)
+            || (type == BorderType.REGION && region != null)) {
             Stroke oldStroke = g.getStroke();
             g.setStroke(borderStroke);
             Color oldColor = g.getColor();
-            Color newColor = new Color(owner.getColor().getRed(),
-                                       owner.getColor().getGreen(),
-                                       owner.getColor().getBlue(),
-                                       opaque ? 255 : 100);
+            Color newColor = Color.WHITE;
+            if (type == BorderType.COUNTRY) {
+                newColor = new Color(owner.getColor().getRed(),
+                                     owner.getColor().getGreen(),
+                                     owner.getColor().getBlue(),
+                                     opaque ? 255 : 100);
+            }
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
             path.moveTo(borderPoints.get(Direction.longSides[0]).width,
@@ -2103,10 +2113,14 @@ public final class GUI {
                 Tile otherTile = tile.getNeighbourOrNull(d);
                 Direction next = d.getNextDirection();
                 Direction next2 = next.getNextDirection();
-                if (otherTile == null || otherTile.getOwner() != owner) {
+                if (otherTile == null
+                    || (type == BorderType.COUNTRY && otherTile.getOwner() != owner)
+                    || (type == BorderType.REGION && otherTile.getRegion() != region)) {
                     Tile tile1 = tile.getNeighbourOrNull(next);
                     Tile tile2 = tile.getNeighbourOrNull(next2);
-                    if (tile2 == null || tile2.getOwner() != owner) {
+                    if (tile2 == null
+                        || (type == BorderType.COUNTRY && tile2.getOwner() != owner)
+                        || (type == BorderType.REGION && tile2.getRegion() != region)) {
                         // small corner
                         path.lineTo(borderPoints.get(next).width,
                                     borderPoints.get(next).height);
@@ -2122,7 +2136,9 @@ public final class GUI {
                         case SE: dx = -halfWidth; dy = halfHeight; break;
                         case SW: dx = -halfWidth; dy = -halfHeight; break;
                         }
-                        if (tile1 != null && tile1.getOwner() == owner) {
+                        if (tile1 != null
+                            && ((type == BorderType.COUNTRY && tile1.getOwner() == owner)
+                                || (type == BorderType.REGION && tile1.getRegion() == region))) {
                             // short straight line
                             path.lineTo(borderPoints.get(next).width,
                                         borderPoints.get(next).height);
@@ -2483,6 +2499,7 @@ public final class GUI {
             if (tile.getRegion() != null) {
                 text = Messages.message(tile.getRegion().getLabel());
             }
+            paintBorders(g, tile, x, y, BorderType.REGION, true);
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
