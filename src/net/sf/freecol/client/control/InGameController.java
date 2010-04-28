@@ -1059,8 +1059,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         DeclareIndependenceMessage message
             = new DeclareIndependenceMessage(nation, country);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1338,8 +1337,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askBuildColony(String name, Unit unit) {
         Client client = freeColClient.getClient();
         BuildColonyMessage message = new BuildColonyMessage(name, unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1357,8 +1355,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askJoinColony(Unit unit, Colony colony) {
         Client client = freeColClient.getClient();
         JoinColonyMessage message = new JoinColonyMessage(colony, unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1404,8 +1401,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askAbandonColony(Colony colony) {
         AbandonColonyMessage message = new AbandonColonyMessage(colony);
         Client client = freeColClient.getClient();
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1445,8 +1441,7 @@ public final class InGameController implements NetworkConstants {
         SetDestinationMessage message
             = new SetDestinationMessage(unit, destination);
         Client client = freeColClient.getClient();
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1766,8 +1761,7 @@ public final class InGameController implements NetworkConstants {
     private Element askMove(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
         MoveMessage message = new MoveMessage(unit, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return null;
 
         Connection conn = client.getConnection();
@@ -1788,8 +1782,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         NewLandNameMessage message = new NewLandNameMessage(name,
                                                             welcomer, accept);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1808,8 +1801,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         NewRegionNameMessage message
             = new NewRegionNameMessage(name, unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1929,8 +1921,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         DemandTributeMessage message
             = new DemandTributeMessage(unit, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -3271,8 +3262,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         CashInTreasureTrainMessage message
             = new CashInTreasureTrainMessage(unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                    "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
