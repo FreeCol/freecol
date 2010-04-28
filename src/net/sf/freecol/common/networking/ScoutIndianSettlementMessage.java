@@ -109,11 +109,11 @@ public class ScoutIndianSettlementMessage extends Message {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-            throw new IllegalStateException("Unable to enter "
-                                            + settlement.getName()
-                                            + ": " + type.whyIllegal());
+            return Message.clientError("Unable to enter "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
         }
 
         // Valid request, do the scouting.

@@ -119,7 +119,8 @@ public class EmbarkMessage extends Message {
             }
             direction = null;
         } else {
-            // Units have to be on the map if a move is involved
+            // Units have to be on the map and have moves left if a
+            // move is involved.
             try {
                 direction = Enum.valueOf(Direction.class, directionString);
             } catch (Exception e) {
@@ -128,6 +129,9 @@ public class EmbarkMessage extends Message {
             sourceTile = unit.getTile();
             if (sourceTile == null) {
                 return Message.clientError("Unit is not on the map: " + unitId);
+            }
+            if (unit.getMovesLeft() <= 0) {
+                return Message.clientError("Unit has no moves left: " + unitId);
             }
             Map map = serverPlayer.getGame().getMap();
             destinationTile = map.getNeighbourOrNull(direction, sourceTile);

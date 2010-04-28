@@ -142,7 +142,7 @@ public class InciteMessage extends Message {
         if (!enemy.isEuropean()) {
             return Message.clientError("Inciting against non-European!");
         }
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return Message.clientError("Unable to enter "
                                        + settlement.getName()

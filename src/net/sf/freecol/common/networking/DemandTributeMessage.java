@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -111,6 +112,13 @@ public class DemandTributeMessage extends Message {
         if (settlement == null || !(settlement instanceof IndianSettlement)) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
+        }
+        MoveType type = unit.getMoveType(tile);
+        if (type != MoveType.ATTACK
+            && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
+            return Message.clientError("Unable to demand tribute at: "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
         }
 
         // Do the demand

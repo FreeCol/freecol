@@ -166,7 +166,7 @@ public class DiplomacyMessage extends Message {
             return Message.clientError("Settlement is not a colony: "
                                        + settlementId);
         }
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
             return Message.clientError("Unable to enter "
                                        + settlement.getName()

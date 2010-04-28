@@ -95,9 +95,6 @@ public class AskSkillMessage extends Message {
         if (unit.getTile() == null) {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
-        if (unit.getMovesLeft() == 0) {
-            return Message.clientError("Unit has no moves left: " + unitId);
-        }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile tile = serverPlayer.getGame().getMap()
             .getNeighbourOrNull(direction, unit.getTile());
@@ -111,7 +108,7 @@ public class AskSkillMessage extends Message {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
             return Message.clientError("Unable to enter "
                                        + settlement.getName()

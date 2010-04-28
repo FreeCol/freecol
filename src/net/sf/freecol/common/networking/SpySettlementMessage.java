@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -106,7 +107,14 @@ public class SpySettlementMessage extends Message {
         }
         Settlement settlement = tile.getSettlement();
         if (settlement == null) {
-            return Message.clientError("There is no settlement at: " + tile.getId());
+            return Message.clientError("There is no settlement at: "
+                                       + tile.getId());
+        }
+        MoveType type = unit.getMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
+            return Message.clientError("Unable to enter at: "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
         }
 
         unit.setMovesLeft(0);
