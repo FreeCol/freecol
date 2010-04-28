@@ -3624,10 +3624,12 @@ public final class InGameController extends Controller {
                             .addAmount("%amount%", goods.getAmount())
                             .addName("%colony%", settlement.getName()));
             sendElement(receiver, giftObjects);
+            logger.info("Gift delivered by unit: " + unit.getId()
+                        + " to settlement: " + settlement.getName());
         }
 
         // Others can see unit capacity.
-        sendToOthers(serverPlayer, objects);
+        sendToList(getOtherPlayers(serverPlayer, receiver), objects);
         return buildUpdate(serverPlayer, objects);
     }
 
