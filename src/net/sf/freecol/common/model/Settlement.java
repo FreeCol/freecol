@@ -20,9 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -275,7 +277,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @param tile The <code>Tile</code> to claim.
      * @return True if the settlement can claim this tile.
      */
-    private boolean canClaimTile(Tile tile) {
+   private boolean canClaimTile(Tile tile) {
         // Indian players do not own water tiles per Col1 rules
         return (owner.isIndian() && !tile.isLand()) ? false
             : (getTile().getDistanceTo(tile) > getRadius()) ? false
@@ -473,18 +475,49 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
             // Allow other settlements to claim the tiles we have just vacated.
             Map map = getGame().getMap();
+            HashMap<Settlement, Integer> votes
+                = new HashMap<Settlement, Integer>();
             for (Tile lostTile : lostTiles) {
                 if (lostTile.getOwningSettlement() != null) continue;
+                votes.clear();
                 for (Tile t : map.getSurroundingTiles(lostTile, 1)) {
-                    // Find any neighbouring settlements and give them a
-                    // turn at reclaiming the tiles.
-                    // TODO: perhaps favour certain types of settlements
-                    // with difficulty?
+                    // For each lost tile, find any neighbouring
+                    // settlements and give them a shout at claiming
+                    // the tile.
+                    // Note that settlements now can own tiles outside
+                    // their radius--- if we encounter any of these
+                    // clean them up too.
                     Settlement settlement = t.getOwningSettlement();
-                    if (settlement != null && settlement.canClaimTile(lostTile)) {
-                        settlement.claimTile(lostTile);
-                        break;
+                    if (settlement == null) {
+                        ;
+                    } else if (settlement == this) {
+                        t.setOwningSettlement(null);
+                        t.setOwner(null);
+                        t.updatePlayerExploredTiles();
+                    } else if (settlement.canClaimTile(lostTile)) {
+                        // Weight claimant settlements:
+                        //   settlements owned by the same player
+                        //     > settlements owned by same type of player
+                        //     > other settlements
+                        int value = (settlement.getOwner() == oldOwner) ? 3
+                            : (settlement.getOwner().isEuropean()
+                               == oldOwner.isEuropean()) ? 2
+                            : 1;
+                        Integer v = votes.get(settlement);
+                        votes.put(settlement, (v == null) ? new Integer(value)
+                                  : new Integer(v + value));
                     }
+                }
+                Settlement bestClaimant = null;
+                int bestClaim = 0;
+                for (Entry<Settlement, Integer> vote : votes.entrySet()) {
+                    if (vote.getValue().intValue() > bestClaim) {
+                        bestClaimant = vote.getKey();
+                        bestClaim = vote.getValue().intValue();
+                    }
+                }
+                if (bestClaimant != null) {
+                    bestClaimant.claimTile(lostTile);
                 }
             }
         }
