@@ -3624,9 +3624,9 @@ public final class InGameController extends Controller {
                             .addAmount("%amount%", goods.getAmount())
                             .addName("%colony%", settlement.getName()));
             sendElement(receiver, giftObjects);
-            logger.info("Gift delivered by unit: " + unit.getId()
-                        + " to settlement: " + settlement.getName());
         }
+        logger.info("Gift delivered by unit: " + unit.getId()
+                    + " to settlement: " + settlement.getName());
 
         // Others can see unit capacity.
         sendToList(getOtherPlayers(serverPlayer, receiver), objects);
