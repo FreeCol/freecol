@@ -599,7 +599,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return True if this is a trading unit.
      */
     public boolean isTradingUnit() {
-        return canCarryGoods() && goodsContainer.getGoodsCount() > 0;
+        return canCarryGoods() && goodsContainer.getGoodsCount() > 0
+            && owner.isEuropean();
     }
 
     /**
