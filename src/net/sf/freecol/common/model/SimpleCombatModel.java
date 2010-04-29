@@ -1112,7 +1112,7 @@ public class SimpleCombatModel implements CombatModel {
                                         .addName("%colony%", attackerColony.getName())
                                         .addStringTemplate("%unit%", sinkingShip.getLabel()));
         } else if (attackerUnit != null) {
-            Player enemy = attackerColony.getOwner();
+            Player enemy = attackerUnit.getOwner();
             StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
             enemy.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                    "model.unit.enemyShipSunk",
