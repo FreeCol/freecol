@@ -1316,19 +1316,20 @@ public class Map extends FreeColGameObject {
      * @param t The <code>Tile</code> that lies on the center.
      * @param rangeMin The inclusive minimum distance from the center tile.
      * @param rangeMax The inclusive maximum distance from the center tile.
-     * @return The tiles surrounding the given tile.
+     * @return A list of the tiles surrounding the given tile.
      */
     public List<Tile> getSurroundingTiles(Tile t, int rangeMin, int rangeMax) {
-        if (rangeMin > rangeMax || rangeMin < 0) {
-            throw new IllegalArgumentException("0 <= rangeMin <= rangeMax");
-        }
         List<Tile> result = new ArrayList<Tile>();
+        if (rangeMin > rangeMax || rangeMin < 0) {
+            return result;
+        }
         Position tilePosition = new Position(t.getX(), t.getY());
         if (rangeMax == 0) {
             result.add(getTile(tilePosition));
             return result;
         }
-        Iterator<Position> i = (rangeMax == 1) ? getAdjacentIterator(tilePosition)
+        Iterator<Position> i = (rangeMax == 1)
+            ? getAdjacentIterator(tilePosition)
             : getCircleIterator(tilePosition, true, rangeMax);
         while (i.hasNext()) { // add all tiles up to rangeMax
             result.add(getTile(i.next()));
