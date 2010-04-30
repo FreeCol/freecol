@@ -1887,8 +1887,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 // Tile.getDistanceTo(Tile) doesn't care about
                 // connectivity, so we need to check for an available
                 // path to target colony instead
-                PathNode pn = getGame().getMap().findPath(unit, unit.getTile(),
-                                                          colony.getTile());
+                PathNode pn = unit.findPath(colony.getTile());
                 if (pn != null && (distance = pn.getTotalTurns()) < shortestDistance) {
                     closestLocation = colony;
                     shortestDistance = distance;

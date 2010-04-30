@@ -389,7 +389,7 @@ public class PioneeringMission extends Mission {
         
         // Not there yet
         if(unit.getTile() != colonyWithTools.getTile()){
-            PathNode path = getGame().getMap().findPath(unit, unit.getTile(), colonyWithTools.getTile());         
+            PathNode path = unit.findPath(colonyWithTools.getTile());
 
             if(path == null){
                 invalidateMission = true;
@@ -601,7 +601,7 @@ public class PioneeringMission extends Mission {
             // check if it possible for the unit to reach the colony
             PathNode pathNode = null;
             if(unit.getTile() != colony.getTile()){
-                pathNode = aiu.getGame().getMap().findPath(unit, unit.getTile(), colony.getTile());
+                pathNode = unit.findPath(colony.getTile());
                 // no path found
                 if(pathNode == null){
                     continue;

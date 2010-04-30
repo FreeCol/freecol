@@ -902,7 +902,7 @@ public final class InGameController implements NetworkConstants {
         if (destination instanceof Europe) {
             path = map.findPathToEurope(unit, unit.getTile());
         } else {
-            path = map.findPath(unit, unit.getTile(), destination.getTile());
+            path = unit.findPath(destination.getTile());
         }
 
         if (path == null) {
