@@ -411,7 +411,8 @@ public class MapTest extends FreeColTestCase {
             .build();
         assertTrue("French colony not on the map",
                    colonyTile.getSettlement() != null);
-        dutchPlayer.changeRelationWithPlayer(frenchPlayer, Stance.WAR);
+        dutchPlayer.setStance(frenchPlayer, Stance.WAR);
+        frenchPlayer.setStance(dutchPlayer, Stance.WAR);
 
         // Test a GoalDecider with subgoals.
         // The scoring function is deliberately simple.

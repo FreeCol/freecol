@@ -3325,6 +3325,7 @@ public final class InGameController extends Controller {
             nativePlayer.modifyGold(gold);
             addAttribute(objects, "gold", Integer.toString(gold));
             addPartial(objects, serverPlayer, "gold");
+            // TODO: remove magic numbers, stance into update
             nativePlayer.changeRelationWithPlayer(enemy, Stance.WAR);
             settlement.modifyAlarm(enemy, 1000); // Let propagation work.
             enemy.modifyTension(nativePlayer, 500);

@@ -91,7 +91,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         Unit defender = new Unit(game, tile2, player2, veteranType, UnitState.ACTIVE);
         defender.equipWith(muskets, true);
         
-        player1.changeRelationWithPlayer(player2, Stance.WAR);
+        player1.setStance(player2, Stance.WAR);
+        player2.setStance(player1, Stance.WAR);
         
         UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.setMission(mission);
@@ -131,7 +132,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         Unit defender = new Unit(game, defenderTile, player2, veteranType, UnitState.ACTIVE);
         defender.equipWith(muskets, true);
         
-        player1.changeRelationWithPlayer(player2, Stance.WAR);
+        player1.setStance(player2, Stance.WAR);
+        player2.setStance(player1, Stance.WAR);
         
         UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.setMission(mission);

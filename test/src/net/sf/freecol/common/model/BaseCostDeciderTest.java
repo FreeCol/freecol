@@ -221,7 +221,8 @@ public class BaseCostDeciderTest extends FreeColTestCase {
 
         // Set players at war
         Player indianPlayer = settlement.getOwner();
-        indianPlayer.changeRelationWithPlayer(galleon.getOwner(), Stance.WAR);
+        indianPlayer.setStance(galleon.getOwner(), Stance.WAR);
+        galleon.getOwner().setStance(indianPlayer, Stance.WAR);
         cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
         assertTrue("Move should be invalid, players at war",
                    cost == CostDecider.ILLEGAL_MOVE);

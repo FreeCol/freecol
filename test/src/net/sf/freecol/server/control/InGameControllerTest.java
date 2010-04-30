@@ -100,16 +100,14 @@ public class InGameControllerTest extends FreeColTestCase {
         
         Unit jesuit = new Unit(game, tile, dutchPlayer, missionaryType, UnitState.ACTIVE);
         
-        // set players at war
-        indianPlayer.changeRelationWithPlayer(dutchPlayer, Stance.WAR);
+        // set tension to hateful
         Tension tension = new Tension(Level.HATEFUL.getLimit());
         camp.setAlarm(dutchPlayer, tension);
-        
         assertEquals("Wrong camp alarm", tension, camp.getAlarm(dutchPlayer));
+
         InGameController igc = (InGameController) server.getController();
         igc.establishMission((ServerPlayer) dutchPlayer, jesuit, camp);
         boolean result = !jesuit.isDisposed();
-
         assertFalse("Mission creation should have failed",result);
         assertNull("Indian settlement should not have a mission",camp.getMissionary());
     }

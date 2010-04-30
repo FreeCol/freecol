@@ -121,7 +121,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue("Cannot attack own unit", aiPlayer1.getUnitSeekAndDestroyMissionValue(soldier, friendlyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
         assertTrue("Players are not at war", aiPlayer1.getUnitSeekAndDestroyMissionValue(soldier, enemyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
 
-        player1.changeRelationWithPlayer(player2, Stance.WAR);
+        player1.setStance(player2, Stance.WAR);
+        player2.setStance(player1, Stance.WAR);
 
         assertFalse("Unit should be able to attack land unit", aiPlayer1.getUnitSeekAndDestroyMissionValue(soldier, enemyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
         assertTrue("Land unit cannot attack naval unit", aiPlayer1.getUnitSeekAndDestroyMissionValue(soldier, enemyGalleon.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);        
@@ -169,7 +170,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
         incaPlayer.setTension(dutchPlayer, new Tension(Tension.Level.HATEFUL.getLimit()));
         assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
 
-        incaPlayer.changeRelationWithPlayer(dutchPlayer, Stance.WAR);
+        incaPlayer.setStance(dutchPlayer, Stance.WAR);
+        dutchPlayer.setStance(incaPlayer, Stance.WAR);
         assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
 	}
 	
@@ -225,7 +227,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue("No hostile units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
 
         // Make unit hostile by changing stance to War,reassign mission and check
-        player1.changeRelationWithPlayer(player2, Stance.WAR);
+        player1.setStance(player2, Stance.WAR);
+        player2.setStance(player1, Stance.WAR);
         aiPlayer1.giveMilitaryMission(aiUnit);
 
         isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;

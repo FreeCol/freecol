@@ -536,7 +536,8 @@ public class CombatTest extends FreeColTestCase {
      
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
-        dutch.changeRelationWithPlayer(inca, Stance.WAR);
+        dutch.setStance(inca, Stance.WAR);
+        inca.setStance(dutch, Stance.WAR);
         
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
