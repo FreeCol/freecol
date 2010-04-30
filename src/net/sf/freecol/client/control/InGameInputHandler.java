@@ -272,8 +272,13 @@ public final class InGameInputHandler extends InputHandler {
         Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
         if (unit == null) {
             if (element.getFirstChild() == null) {
-                throw new IllegalStateException("Unit " + unitId
-                                                + " wrongly omitted from animateMove");
+                logger.warning("Animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " incorrectly omitted unit: " + unitId
+                    + " from: " + element.getAttribute("oldTile")
+                    + " to: " + element.getAttribute("newTile")
+                    );
+                return null;
             }
             unit = new Unit(game, (Element) element.getFirstChild());
         }
