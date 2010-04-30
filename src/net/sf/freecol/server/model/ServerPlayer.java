@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.ModelMessage;
@@ -70,6 +72,8 @@ import net.sf.freecol.common.util.Utils;
 */
 public class ServerPlayer extends Player implements ServerModelObject {
     
+    private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
+
     public static final int SCORE_INDEPENDENCE_GRANTED = 1000;
 
     /** The network socket to the player's client. */
@@ -139,25 +143,254 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
 
     /**
-    * Checks if this player is currently connected to the server.
-    * @return <i>true</i> if this player is currently connected to the server
-    *         and <code>false</code> otherwise.
-    */
+     * Checks if this player is currently connected to the server.
+     * @return <i>true</i> if this player is currently connected to the server
+     *         and <code>false</code> otherwise.
+     */
     public boolean isConnected() {
         return connected;
     }
 
-
     /**
-    * Sets the "connected"-status of this player.
-    * 
-    * @param connected Should be <i>true</i> if this player is currently 
-    *         connected to the server and <code>false</code> otherwise.
-    * @see #isConnected
-    */
+     * Sets the "connected"-status of this player.
+     *
+     * @param connected Should be <i>true</i> if this player is currently
+     *         connected to the server and <code>false</code> otherwise.
+     * @see #isConnected
+     */
     public void setConnected(boolean connected) {
         this.connected = connected;
     }
+
+
+    /**
+     * Checks if this player has died.
+     *
+     * @return <i>true</i> if this player should die.
+     */
+    public boolean checkForDeath() {
+        /*
+         * Die if: (isNative && (no colonies or units))
+         *      || ((rebel or independent) && !(has coastal colony))
+         *      || (isREF && !(rebel nation left) && (all units in Europe))
+         *      || ((no units in New World)
+         *         && ((year > 1600) || (cannot get a unit from Europe)))
+         */
+
+        switch (getPlayerType()) {
+        case NATIVE: // All natives units are viable
+            return getUnits().isEmpty();
+
+        case COLONIAL: // Handle the hard case below
+            break;
+
+        case REBEL: case INDEPENDENT:
+            // Post-declaration European player needs a coastal colony
+            // and can not hope for resupply from Europe.
+            for (Colony colony : getColonies()) {
+                if (colony.isConnected()) return false;
+            }
+            return true;
+
+        case ROYAL: // Still alive if there are rebels to quell
+            Iterator<Player> players = getGame().getPlayerIterator();
+            while (players.hasNext()) {
+                Player enemy = players.next();
+                if (enemy.getREFPlayer() == (Player) this
+                    && enemy.getPlayerType() == PlayerType.REBEL) {
+                    return false;
+                }
+            }
+
+            // Still alive if there are units not in Europe
+            Iterator<Unit> units = getUnitIterator();
+            while (units.hasNext()) {
+                if (!units.next().isInEurope()) {
+                    return false;
+                }
+            }
+
+            // Otherwise, the REF has been defeated and gone home.
+            return true;
+
+        case UNDEAD:
+            return getUnits().isEmpty();
+
+        default:
+            throw new IllegalStateException("Bogus player type");
+        }
+
+        // Quick check for a colony
+        if (!getColonies().isEmpty()) {
+            return false;
+        }
+
+        // Verify player units
+        boolean hasCarrier = false;
+        List<Unit> unitList = getUnits();
+        for(Unit unit : unitList){
+            boolean isValidUnit = false;
+
+            if(unit.isCarrier()){
+                hasCarrier = true;
+                continue;
+            }
+
+            // Can found new colony
+            if(unit.isColonist()){
+                isValidUnit = true;
+            }
+
+            // Can capture units
+            if(unit.isOffensiveUnit()){
+                isValidUnit = true;
+            }
+
+            if(!isValidUnit){
+                continue;
+            }
+
+            // Verify if unit is in new world
+            Location unitLocation = unit.getLocation();
+            // unit in new world
+            if(unitLocation instanceof Tile){
+                logger.info(getName() + " found colonist in new world");
+                return false;
+            }
+            // onboard a carrier
+            if(unit.isOnCarrier()){
+                Unit carrier = (Unit) unitLocation;
+                // carrier in new world
+                if(carrier.getLocation() instanceof Tile){
+                    logger.info(getName() + " found colonist aboard carrier in new world");
+                    return false;
+                }
+            }
+        }
+        /*
+         * At this point we know the player does not have any valid units or
+         * settlements on the map.
+         */
+
+        // After the year 1600, no presence in New World means endgame
+        if (getGame().getTurn().getYear() >= 1600) {
+            logger.info(getName() + " no presence in new world after 1600");
+            return true;
+        }
+
+        int goldNeeded = 0;
+        /*
+         * No carrier, check if has gold to buy one
+         */
+        if(!hasCarrier){
+            /*
+             * Find the cheapest naval unit
+             */
+
+            Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
+
+            int lowerPrice = Integer.MAX_VALUE;
+
+            while(navalUnits.hasNext()){
+                UnitType unit = navalUnits.next();
+
+                int unitPrice = getEurope().getUnitPrice(unit);
+
+                // cannot be bought
+                if(unitPrice == UnitType.UNDEFINED){
+                    continue;
+                }
+
+                if(unitPrice < lowerPrice){
+                    lowerPrice = unitPrice;
+                }
+            }
+
+            //Sanitation
+            if(lowerPrice == Integer.MAX_VALUE){
+                logger.warning(getName() + " could not find naval unit to buy");
+                return true;
+            }
+
+            goldNeeded += lowerPrice;
+
+            // cannot buy carrier
+            if(goldNeeded > getGold()){
+                logger.info(getName() + " does not have enough money to buy carrier");
+                return true;
+            }
+            logger.info(getName() + " has enough money to buy carrier, has=" + getGold() + ", needs=" + lowerPrice);
+        }
+
+        /*
+         * Check if player has colonists.
+         * We already checked that it has (or can buy) a carrier to
+         * transport them to New World
+         */
+        Iterator<Unit> unitIterator = getEurope().getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = unitIterator.next();
+            if (unit.isCarrier()) {
+                /*
+                 * The carrier has colonist units on board
+                 */
+                for(Unit u : unit.getUnitList()){
+                    if(u.isColonist()){
+                        return false;
+                    }
+                }
+
+                // The carrier has units or goods that can be sold.
+                if(unit.getGoodsCount() > 0){
+                    logger.info(getName() + " has goods to sell");
+                    return false;
+                }
+                continue;
+            }
+            if (unit.isColonist()){
+                logger.info(getName() + " has colonist unit waiting in port");
+                return false;
+            }
+        }
+
+        // No colonists, check if has gold to train or recruit one.
+        int goldToRecruit =  getEurope().getRecruitPrice();
+
+        /*
+         * Find the cheapest colonist, either by recruiting or training
+         */
+
+        Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
+
+        int goldToTrain = Integer.MAX_VALUE;
+
+        while(trainedUnits.hasNext()){
+            UnitType unit = trainedUnits.next();
+
+            if(!unit.hasAbility("model.ability.foundColony")){
+                continue;
+            }
+
+            int unitPrice = getEurope().getUnitPrice(unit);
+
+            // cannot be bought
+            if(unitPrice == UnitType.UNDEFINED){
+                continue;
+            }
+
+            if(unitPrice < goldToTrain){
+                goldToTrain = unitPrice;
+            }
+        }
+
+        goldNeeded += Math.min(goldToTrain, goldToRecruit);
+
+        if (goldNeeded <= getGold()) return false;
+        // Does not have enough money for recruiting or training
+        logger.info(getName() + " does not have enough money for recruiting or training");
+        return true;
+    }
+
 
     public int getRemainingEmigrants() {
         return remainingEmigrants;

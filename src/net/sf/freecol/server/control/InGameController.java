@@ -922,7 +922,7 @@ public final class InGameController extends Controller {
         }
         
         synchronized (newPlayer) {
-            if (Player.checkForDeath(newPlayer)) {
+            if (newPlayer.checkForDeath()) {
                 newPlayer.setDead(true);
                 Element element = killPlayerElement(newPlayer);
                 sendToAll(element);

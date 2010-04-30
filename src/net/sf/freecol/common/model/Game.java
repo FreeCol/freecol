@@ -275,7 +275,7 @@ public class Game extends FreeColGameObject {
         return turn;
     }
 
-    void setTurn(Turn newTurn) {
+    public void setTurn(Turn newTurn) {
         turn = newTurn;
     }
     
