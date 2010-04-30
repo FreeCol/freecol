@@ -26,6 +26,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -112,7 +113,7 @@ public class TensionTest extends FreeColTestCase {
                     unit.setLocation(settlement);
                 }
             }
-            indian.setContacted(european);
+            Player.makeContact(indian, european);
             tension = indian.getTension(european);
             stance = indian.getStance(european);
             assertNotNull(tension);

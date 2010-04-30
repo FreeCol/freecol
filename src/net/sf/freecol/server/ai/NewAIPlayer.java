@@ -384,7 +384,7 @@ public abstract class NewAIPlayer extends AIObject {
             return false;
         }
 
-        boolean notAtWar = attackerPlayer.getStance(defenderPlayer) != Stance.WAR;
+        boolean notAtWar = !attackerPlayer.atWarWith(defenderPlayer);
         // if european, can only attack units whose owners are at war
         if(attackerPlayer.isEuropean() && notAtWar){
             return false;

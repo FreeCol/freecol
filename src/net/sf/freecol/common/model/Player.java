@@ -875,9 +875,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean isAtWar() {
         for (Player player : getGame().getPlayers()) {
-            if (getStance(player) == Stance.WAR) {
-                return true;
-            }
+            if (atWarWith(player)) return true;
         }
         return false;
     }
@@ -1048,30 +1046,6 @@ public class Player extends FreeColGameObject implements Nameable {
         price += 100;
         return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier",
                                                     null, getGame().getTurn());
-    }
-
-    /**
-     * Returns whether this player has met with the <code>Player</code> if the
-     * given <code>nation</code>.
-     *
-     * @param player The Player.
-     * @return <code>true</code> if this <code>Player</code> has contacted
-     *         the given nation.
-     */
-    public boolean hasContacted(Player player) {
-        return getStance(player) != Stance.UNCONTACTED;
-    }
-
-    /**
-     * Set this player as having made initial contact with another player.
-     * Always start with PEACE, which can go downhill fast.
-     *
-     * @param player The <code>Player</code> to set contact with.
-     */
-    public void setContacted(Player player) {
-        if (player != null && player != this) {
-            stance.put(player.getId(), Stance.PEACE);
-        }
     }
 
     /**
@@ -2448,7 +2422,7 @@ public class Player extends FreeColGameObject implements Nameable {
                             }
                         //apply modifier for other colonies at this distance
                         } else {
-                            if (getStance(col.getOwner()) == Stance.WAR) {
+                            if (atWarWith(col.getOwner())) {
                                 advantage *= MOD_ENEMY_COLONY[radius];
                             } else {
                                 advantage *= MOD_NEUTRAL_COLONY[radius];
@@ -2460,8 +2434,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 Iterator<Unit> ui = tile.getUnitIterator();
                 while (ui.hasNext()) {
                     Unit u = ui.next();
-                    if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
-                        && getStance(u.getOwner()) == Stance.WAR) {
+                    if (u.getOwner() != this && u.isOffensiveUnit()
+                        && u.getOwner().isEuropean()
+                        && atWarWith(u.getOwner())) {
                         advantage *= MOD_ENEMY_UNIT[radius];
                     }
                 }
@@ -2531,6 +2506,105 @@ public class Player extends FreeColGameObject implements Nameable {
         stance.put(player.getId(), newStance);
     }
 
+    /**
+     * Is this player at war with the specified one.
+     *
+     * @param player The <code>Player</code> to check.
+     * @return True if the players are at war.
+     */
+    public boolean atWarWith(Player player) {
+        return getStance(player) == Stance.WAR;
+    }
+
+    /**
+     * Returns whether this player has met with the <code>Player</code> if the
+     * given <code>nation</code>.
+     *
+     * @param player The Player.
+     * @return <code>true</code> if this <code>Player</code> has contacted
+     *         the given nation.
+     */
+    public boolean hasContacted(Player player) {
+        return getStance(player) != Stance.UNCONTACTED;
+    }
+
+    /**
+     * Set this player as having made initial contact with another player.
+     * Always start with PEACE, which can go downhill fast.
+     *
+     * @param player The <code>Player</code> to set contact with.
+     */
+    public static void makeContact(Player player1, Player player2) {
+        player1.stance.put(player2.getId(), Stance.PEACE);
+        player2.stance.put(player1.getId(), Stance.PEACE);
+        player1.setTension(player2, new Tension(0));
+        player2.setTension(player1, new Tension(0));
+    }
+
+    /**
+     * Set the stance and modify the tension accordingly.
+     * TODO: should be server side only, in ServerPlayer perhaps.
+     *
+     * @param player The <code>Player</code> to set stance with respect to.
+     * @param newStance The new <code>Stance</code> to set.
+     * @return True if the stance changed.
+     */
+    public boolean setStanceAndTension(Player player, Stance newStance) {
+        Stance oldStance = getStance(player);
+
+        if (newStance == oldStance) return false;
+        setStance(player, newStance);
+
+        int modifier = 0;
+        switch (newStance) {
+        case UNCONTACTED:
+            throw new IllegalStateException("Can not set UNCONTACTED stance");
+        case PEACE:
+            switch (oldStance) {
+            case WAR:
+                modifier = Tension.CEASE_FIRE_MODIFIER
+                    + Tension.PEACE_TREATY_MODIFIER;
+                break;
+            case CEASE_FIRE:
+                modifier = Tension.PEACE_TREATY_MODIFIER;
+                break;
+            default:
+                break;
+            }
+            break;
+        case CEASE_FIRE:
+            if (oldStance == Stance.WAR) {
+                modifier = Tension.CEASE_FIRE_MODIFIER;
+            }
+            break;
+        default:
+            break;
+        }
+        modifyTension(player, modifier);
+
+        if (player.getStance(this) != newStance) {
+            player.setStance(this, newStance);
+
+            if (newStance == Stance.WAR) {
+                switch (oldStance) {
+                case UNCONTACTED: case PEACE:
+                    modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
+                    break;
+                case CEASE_FIRE:
+                    modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
+                    break;
+                default:
+                    break;
+                }
+            }
+            player.modifyTension(this, modifier);
+        }
+        return true;
+    }
+
+    /**
+     * Deprecated.  Should be all in the server.
+     */
     public void changeRelationWithPlayer(Player player,Stance newStance){
         Stance oldStance = getStance(player);
 

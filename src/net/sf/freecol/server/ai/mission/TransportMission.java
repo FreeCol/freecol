@@ -497,8 +497,8 @@ public class TransportMission extends Mission {
     }
     
     private boolean canAttackPlayer(Player target) {
-        return (getUnit().getOwner().getStance(target) == Stance.WAR
-                || getUnit().hasAbility("model.ability.piracy"));
+        return getUnit().getOwner().atWarWith(target)
+            || getUnit().hasAbility("model.ability.piracy");
     }
     
     /**

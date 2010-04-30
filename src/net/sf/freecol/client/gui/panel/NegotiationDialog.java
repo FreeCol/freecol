@@ -131,7 +131,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             this.otherPlayer = sender;
         }
 
-        if (player.getStance(otherPlayer) == Stance.WAR) {
+        if (player.atWarWith(otherPlayer)) {
             if (!hasPeaceOffer()) {
                 Stance stance = Stance.PEACE;
                 this.agreement.add(new StanceTradeItem(getGame(), player, otherPlayer, stance));

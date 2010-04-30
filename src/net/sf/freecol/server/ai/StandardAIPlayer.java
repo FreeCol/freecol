@@ -617,7 +617,7 @@ public class StandardAIPlayer extends AIPlayer {
             Colony colony = (Colony) settlement;
             Player otherPlayer = unit.getOwner();
             // the client should have prevented this
-            if (getPlayer().getStance(otherPlayer) == Stance.WAR) {
+            if (getPlayer().atWarWith(otherPlayer)) {
                 return NetworkConstants.NO_TRADE;
             }
             // don't pay for more than fits in the warehouse
@@ -2004,7 +2004,7 @@ public class StandardAIPlayer extends AIPlayer {
             return false;
         }
 
-        boolean atWar = attackerPlayer.getStance(defenderPlayer) == Stance.WAR;
+        boolean atWar = attackerPlayer.atWarWith(defenderPlayer);
         if (attackerPlayer.isEuropean()) {
             // If european, do not attack if not at war
             if (!atWar) {

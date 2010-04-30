@@ -865,7 +865,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
         // the client should have prevented this
-        if (getPlayer().getStance(otherPlayer) == Stance.WAR) {
+        if (getPlayer().atWarWith(otherPlayer)) {
             return NetworkConstants.NO_TRADE;
         }
         // don't pay for more than fits in the warehouse

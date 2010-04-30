@@ -194,8 +194,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
                    cost == CostDecider.ILLEGAL_MOVE);
 
         // Add contact
-        galleon.getOwner().setContacted(settlement.getOwner());
-        settlement.getOwner().setContacted(galleon.getOwner());
+        Player.makeContact(galleon.getOwner(), settlement.getOwner());
         cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
         assertTrue("Move should be invalid, no goods to trade",
                    cost == CostDecider.ILLEGAL_MOVE);

@@ -242,11 +242,11 @@ public final class InGameController extends Controller {
      *
      * @param objects The list of objects to add to.
      * @param stance The <code>Stance</code> to change to.
-     * @param player1 The first <code>ServerPlayer</code>.
-     * @param player2 The second <code>ServerPlayer</code>.
+     * @param player1 The first <code>Player</code>.
+     * @param player2 The second <code>Player</code>.
      */
     private static void addStance(List<Object> objects, Stance stance,
-                                  ServerPlayer player1, ServerPlayer player2) {
+                                  Player player1, Player player2) {
         addMore(objects, UpdateType.STANCE, stance, player1, player2);
     }
 
@@ -394,12 +394,12 @@ public final class InGameController extends Controller {
                 case STANCE: // expect Stance Player Player
                     if (i+3 < objects.size()
                         && objects.get(i+1) instanceof Stance
-                        && objects.get(i+2) instanceof ServerPlayer
-                        && objects.get(i+3) instanceof ServerPlayer) {
+                        && objects.get(i+2) instanceof Player
+                        && objects.get(i+3) instanceof Player) {
                         Element setStance = buildStance(serverPlayer, doc,
                                 (Stance) objects.get(i+1),
-                                (ServerPlayer) objects.get(i+2),
-                                (ServerPlayer) objects.get(i+3));
+                                (Player) objects.get(i+2),
+                                (Player) objects.get(i+3));
                         if (setStance != null) {
                             pushChild(multiple, setStance);
                         }
@@ -585,15 +585,14 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> to update.
      * @param doc The owner <code>Document</code> to build the element in.
      * @param stance The <code>Stance</code> to set.
-     * @param player1 The first <code>ServerPlayer</code> to set stance for.
-     * @param player2 The second <code>ServerPlayer</code> to set stance for.
+     * @param player1 The first <code>Player</code> to set stance for.
+     * @param player2 The second <code>Player</code> to set stance for.
      * @return A "setStance" element, or null if the stance change is not
      *         for the serverPlayer.
      */
     private Element buildStance(ServerPlayer serverPlayer, Document doc,
-                                Stance stance,
-                                ServerPlayer player1, ServerPlayer player2) {
-        if (serverPlayer == player1 || serverPlayer == player2
+                                Stance stance, Player player1, Player player2) {
+        if ((Player) serverPlayer == player1 || (Player) serverPlayer == player2
             || stance == Stance.WAR) {
             Element element = doc.createElement("setStance");
             element.setAttribute("stance", stance.toString());
@@ -1380,10 +1379,7 @@ public final class InGameController extends Controller {
         Nation refNation = serverPlayer.getNation().getRefNation();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
         refPlayer.setEntryLocation(serverPlayer.getEntryLocation());
-        // This will change later, just for setup
-        serverPlayer.setStance(refPlayer, Stance.PEACE);
-        refPlayer.setTension(serverPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
-        serverPlayer.setTension(refPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
+        Player.makeContact(serverPlayer, refPlayer); // Will change, setup only
         createREFUnits(serverPlayer, refPlayer);
         return refPlayer;
     }
@@ -1539,11 +1535,12 @@ public final class InGameController extends Controller {
             		}
 
             		// ignore friendly units
-            		if(currentPlayer.getStance(player) != Stance.WAR &&
-            				!unit.hasAbility("model.ability.piracy")){
-                            logger.warning(colony.getName() + " found unit to not bombard: "
-                                           + unit.toString());
-            			continue;
+            		if (!currentPlayer.atWarWith(player)
+                    && !unit.hasAbility("model.ability.piracy")) {
+                    logger.warning(colony.getName()
+                                   + " found unit to not bombard: "
+                                   + unit.toString());
+                    continue;
             		}
 
             		logger.warning(colony.getName() + " found enemy unit to bombard: " +
@@ -1747,6 +1744,7 @@ public final class InGameController extends Controller {
 
         // Do this after the above update, so the other players see
         // the new nation name declaring war.
+        // TODO: cut over to server-side stance handling.
         serverPlayer.changeRelationWithPlayer(refPlayer, Stance.WAR);
 
         // Pity to have to update such a heavy object as the player,
@@ -1801,7 +1799,7 @@ public final class InGameController extends Controller {
         session.put("actionTaken", false);
         session.put("unitMoves", unit.getMovesLeft());
         session.put("canGift", true);
-        if (settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR) {
+        if (settlement.getOwner().atWarWith(unit.getOwner())) {
             session.put("canSell", false);
             session.put("canBuy", false);
         } else {
@@ -2235,8 +2233,7 @@ public final class InGameController extends Controller {
                 || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
             for (Unit enemyUnit : tile.getUnitList()) {
                 if (pirate || enemyUnit.hasAbility("model.ability.piracy")
-                    || (enemyUnit.isOffensiveUnit()
-                        && player.getStance(enemy) == Stance.WAR)) {
+                    || (enemyUnit.isOffensiveUnit() && player.atWarWith(enemy))) {
                     attackPower += combatModel.getOffencePower(enemyUnit, unit);
                     if (attacker == null) {
                         attacker = enemyUnit;
@@ -2661,8 +2658,7 @@ public final class InGameController extends Controller {
                     && (welcomer == null || newTile.getOwner() == other)) {
                     welcomer = other;
                 }
-                serverPlayer.setContacted(other);
-                other.setContacted(serverPlayer);
+                Player.makeContact(serverPlayer, other);
                 addStance(objects, Stance.PEACE, serverPlayer, other);
                 // Add special first contact messages.
                 boolean contactedIndians = false;
@@ -3325,11 +3321,22 @@ public final class InGameController extends Controller {
             nativePlayer.modifyGold(gold);
             addAttribute(objects, "gold", Integer.toString(gold));
             addPartial(objects, serverPlayer, "gold");
-            // TODO: remove magic numbers, stance into update
-            nativePlayer.changeRelationWithPlayer(enemy, Stance.WAR);
-            settlement.modifyAlarm(enemy, 1000); // Let propagation work.
-            enemy.modifyTension(nativePlayer, 500);
-            enemy.modifyTension(serverPlayer, 250);
+
+            // TODO: Currently we brutally set the players to be at war.
+            // Better was the old method of just adding tension:
+            //    settlement.modifyAlarm(enemy, 1000);
+            // and letting propagation work.  Except, it did not work
+            // (1000 == HATEFUL, enough to cause war, but only if the
+            // settlement was the capital as modifyAlarm halves propagated
+            // alarm from non-capital settlements), and there was no
+            // provision for updates for settlements where the tension
+            // changed.  This needs work.
+            if (nativePlayer.setStanceAndTension(enemy, Stance.WAR)) {
+                addStance(objects, Stance.WAR, nativePlayer, enemy);
+            }
+            enemy.modifyTension(nativePlayer, Tension.TENSION_ADD_WAR_INCITED);
+            enemy.modifyTension(serverPlayer,
+                                Tension.TENSION_ADD_WAR_INCITED_INCITER);
         }
 
         // Do not update others, they can not see what happened.

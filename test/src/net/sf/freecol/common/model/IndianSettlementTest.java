@@ -336,7 +336,7 @@ public class IndianSettlementTest extends FreeColTestCase {
 
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
-        inca.setContacted(dutch);
+        Player.makeContact(inca, dutch);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.player(inca).build();

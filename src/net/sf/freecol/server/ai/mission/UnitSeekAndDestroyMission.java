@@ -154,7 +154,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     logger.warning("MoveType is ATTACK, but no defender is present!");
                 } else {
                     Player enemy = defender.getOwner();
-                    if (unit.getOwner().getStance(enemy) == Stance.WAR
+                    if (unit.getOwner().atWarWith(enemy)
                         || ((Ownable) target).getOwner() == enemy) {
                         attack(connection, unit, direction);
                     }

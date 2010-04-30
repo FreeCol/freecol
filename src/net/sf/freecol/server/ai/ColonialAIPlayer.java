@@ -524,7 +524,7 @@ public class ColonialAIPlayer extends AIPlayer {
             Colony colony = (Colony) settlement;
             Player otherPlayer = unit.getOwner();
             // the client should have prevented this
-            if (getPlayer().getStance(otherPlayer) == Stance.WAR) {
+            if (getPlayer().atWarWith(otherPlayer)) {
                 return NetworkConstants.NO_TRADE;
             }
             // don't pay for more than fits in the warehouse
@@ -1167,13 +1167,8 @@ public class ColonialAIPlayer extends AIPlayer {
             return false;
         }
 
-        boolean atWar = attackerPlayer.getStance(defenderPlayer) == Stance.WAR;
-
         // If european, do not attack if not at war
-        if (!atWar) {
-            return false;
-        }
-        return true;
+        return attackerPlayer.atWarWith(defenderPlayer);
     }
         
     /**

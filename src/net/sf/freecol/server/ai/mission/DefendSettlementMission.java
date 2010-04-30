@@ -139,7 +139,8 @@ public class DefendSettlementMission extends Mission {
                 if (t==null)
                     continue;
                 Unit defender = t.getFirstUnit();
-                if (defender != null && defender.getOwner().getStance(unit.getOwner()) == Stance.WAR
+                if (defender != null
+                    && defender.getOwner().atWarWith(unit.getOwner())
                     && unit.getMoveType(direction) == MoveType.ATTACK) {
                     Unit enemyUnit = t.getDefendingUnit(unit);
                     float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);

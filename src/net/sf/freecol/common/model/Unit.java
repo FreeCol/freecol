@@ -1466,7 +1466,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The appropriate <code>MoveType</code>.
      */
     private MoveType getTradeMoveType(Settlement settlement) {
-        if (getOwner().getStance(settlement.getOwner()) == Stance.WAR) {
+        if (getOwner().atWarWith(settlement.getOwner())) {
             return MoveType.MOVE_NO_ACCESS_WAR;
         } else if (settlement instanceof Colony) {
             return (hasAbility("model.ability.tradeWithForeignColonies"))
