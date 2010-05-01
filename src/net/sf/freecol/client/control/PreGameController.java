@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.CanvasKeyListener;
 import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
@@ -279,7 +278,6 @@ public final class PreGameController {
             gui.setFocus(((Tile) freeColClient.getMyPlayer().getEntryLocation()).getPosition());
         }
 
-        canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController));
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
         

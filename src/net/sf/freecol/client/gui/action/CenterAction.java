@@ -23,30 +23,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ViewMode;
 
 /**
  * An action for chosing the next unit as the active unit.
  */
-public class MoveEastAction extends MapboardAction {
+public class CenterAction extends MapboardAction {
 
-    public static final String id = "moveEastAction";
+    public static final String id = "centerAction";
 
     /**
-     * Creates a new <code>MoveEastAction</code>.
+     * Creates a new <code>CenterAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    MoveEastAction(FreeColClient freeColClient) {
-        super(freeColClient, "moveEast", null, KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6, 0));
+    CenterAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.view.center", null, KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
     }
 
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "waitAction"
+     * @return "centerAction"
      */
     public String getId() {
         return id;
@@ -58,13 +57,6 @@ public class MoveEastAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        switch(getFreeColClient().getGUI().getViewMode().getView()) {
-        case ViewMode.MOVE_UNITS_MODE:
-            getFreeColClient().getInGameController().moveActiveUnit(Direction.E);
-            break;
-        case ViewMode.VIEW_TERRAIN_MODE:
-            getFreeColClient().getGUI().moveTileCursor(Direction.E);
-            break;
-        }
+        getFreeColClient().getGUI().centerActiveUnit();
     }
 }

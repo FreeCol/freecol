@@ -169,6 +169,8 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.addSeparator();
         menu.add(getMenuItem(ZoomInAction.id));
         menu.add(getMenuItem(ZoomOutAction.id));
+        menu.add(getMenuItem(CenterAction.id));
+        menu.add(getMenuItem(TilePopupAction.id));
 
         menu.addSeparator();
 

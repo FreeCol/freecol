@@ -61,6 +61,7 @@ public class ActionManager extends OptionGroup {
         add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
+        add(new CenterAction(freeColClient));
         add(new ChangeAction(freeColClient));
         add(new ChangeWindowedModeAction(freeColClient));
         add(new ChatAction(freeColClient));
@@ -140,6 +141,7 @@ public class ActionManager extends OptionGroup {
         add(new ShowMainAction(freeColClient));
         add(new ShowMapGeneratorOptionsAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
+        add(new TilePopupAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
         add(new TradeRouteAction(freeColClient));
         add(new UnloadAction(freeColClient));

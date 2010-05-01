@@ -23,30 +23,30 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ViewMode;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for chosing the next unit as the active unit.
  */
-public class MoveEastAction extends MapboardAction {
+public class TilePopupAction extends MapboardAction {
 
-    public static final String id = "moveEastAction";
+    public static final String id = "tilePopupAction";
 
     /**
-     * Creates a new <code>MoveEastAction</code>.
+     * Creates a new <code>TilePopupAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    MoveEastAction(FreeColClient freeColClient) {
-        super(freeColClient, "moveEast", null, KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6, 0));
+    TilePopupAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.view.showTile", null,
+              KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.SHIFT_MASK));
     }
 
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "waitAction"
+     * @return "tilePopupAction"
      */
     public String getId() {
         return id;
@@ -58,13 +58,9 @@ public class MoveEastAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        switch(getFreeColClient().getGUI().getViewMode().getView()) {
-        case ViewMode.MOVE_UNITS_MODE:
-            getFreeColClient().getInGameController().moveActiveUnit(Direction.E);
-            break;
-        case ViewMode.VIEW_TERRAIN_MODE:
-            getFreeColClient().getGUI().moveTileCursor(Direction.E);
-            break;
-        }
+        GUI gui = getFreeColClient().getGUI();
+        getFreeColClient().getCanvas().showTilePopup(gui.getSelectedTile(),
+                                                     gui.getCursor().getCanvasX(),
+                                                     gui.getCursor().getCanvasY());
     }
 }

@@ -25,6 +25,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ViewMode;
 
 /**
  * An action for chosing the next unit as the active unit.
@@ -57,6 +58,13 @@ public class MoveNorthEastAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().moveActiveUnit(Direction.NE);
+        switch(getFreeColClient().getGUI().getViewMode().getView()) {
+        case ViewMode.MOVE_UNITS_MODE:
+            getFreeColClient().getInGameController().moveActiveUnit(Direction.NE);
+            break;
+        case ViewMode.VIEW_TERRAIN_MODE:
+            getFreeColClient().getGUI().moveTileCursor(Direction.NE);
+            break;
+        }
     }
 }
