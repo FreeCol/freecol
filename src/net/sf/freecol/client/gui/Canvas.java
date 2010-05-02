@@ -402,7 +402,7 @@ public final class Canvas extends JDesktopPane {
      * @param panel a <code>FreeColPanel</code> value
      */
     public void showPanel(FreeColPanel panel) {
-        closeMenus();
+        //closeMenus();
         showSubPanel(panel);
     }
 
@@ -413,7 +413,7 @@ public final class Canvas extends JDesktopPane {
      * @param centered a <code>boolean</code> value
      */
     public void showPanel(FreeColPanel panel, boolean centered) {
-        closeMenus();
+        //closeMenus();
         addAsFrame(panel, false, (centered) ? PopupPosition.CENTERED
                    : PopupPosition.ORIGIN);
         panel.requestFocus();
@@ -1244,7 +1244,6 @@ public final class Canvas extends JDesktopPane {
      * @param y The y-coordinate at which to show the popup.
      */
     public void showPopup(JPopupMenu popup, int x, int y) {
-        // closeMenus();
         popup.show(this, x, y);
         popup.repaint();
     }
@@ -2159,7 +2158,7 @@ public final class Canvas extends JDesktopPane {
      * @see EuropePanel
      */
     public void showEuropePanel() {
-        closeMenus();
+        //closeMenus();
 
         if (freeColClient.getGame() == null) {
             errorMessage("europe.noGame");
