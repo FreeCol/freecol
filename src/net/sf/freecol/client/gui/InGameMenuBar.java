@@ -254,27 +254,6 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     }
 
-    private void buildColopediaMenu() {
-        // --> Colopedia
-
-        JMenu menu = new JMenu(Messages.message("menuBar.colopedia"));
-        menu.setOpaque(false);
-        menu.setMnemonic(KeyEvent.VK_C);
-
-        menu.add(getMenuItem(ColopediaTerrainAction.id));
-        menu.add(getMenuItem(ColopediaResourceAction.id));
-        menu.add(getMenuItem(ColopediaUnitAction.id));
-        menu.add(getMenuItem(ColopediaGoodsAction.id));
-        menu.add(getMenuItem(ColopediaSkillAction.id));
-        menu.add(getMenuItem(ColopediaBuildingAction.id));
-        menu.add(getMenuItem(ColopediaFatherAction.id));
-        menu.add(getMenuItem(ColopediaNationAction.id));
-        menu.add(getMenuItem(ColopediaNationTypeAction.id));
-        menu.addSeparator();
-        menu.add(getMenuItem(AboutAction.id));
-
-        add(menu);
-    }
 
     /**
      * Paints information about gold, tax and year.

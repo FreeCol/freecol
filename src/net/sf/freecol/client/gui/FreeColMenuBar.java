@@ -23,20 +23,34 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
+import net.sf.freecol.client.gui.action.ColopediaFatherAction;
+import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
+import net.sf.freecol.client.gui.action.ColopediaNationAction;
+import net.sf.freecol.client.gui.action.ColopediaNationTypeAction;
+import net.sf.freecol.client.gui.action.ColopediaResourceAction;
+import net.sf.freecol.client.gui.action.ColopediaSkillAction;
+import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
+import net.sf.freecol.client.gui.action.ColopediaUnitAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.common.resources.ResourceManager;
+
+
 
 /**
  * The menu bar that is displayed on the top left corner of the
@@ -207,6 +221,28 @@ public abstract class FreeColMenuBar extends JMenuBar {
         // Not implemented (and possibly not needed).
 
         update();
+    }
+
+    protected void buildColopediaMenu() {
+        // --> Colopedia
+
+        JMenu menu = new JMenu(Messages.message("menuBar.colopedia"));
+        menu.setOpaque(false);
+        menu.setMnemonic(KeyEvent.VK_C);
+
+        menu.add(getMenuItem(ColopediaTerrainAction.id));
+        menu.add(getMenuItem(ColopediaResourceAction.id));
+        menu.add(getMenuItem(ColopediaUnitAction.id));
+        menu.add(getMenuItem(ColopediaGoodsAction.id));
+        menu.add(getMenuItem(ColopediaSkillAction.id));
+        menu.add(getMenuItem(ColopediaBuildingAction.id));
+        menu.add(getMenuItem(ColopediaFatherAction.id));
+        menu.add(getMenuItem(ColopediaNationAction.id));
+        menu.add(getMenuItem(ColopediaNationTypeAction.id));
+        menu.addSeparator();
+        menu.add(getMenuItem(AboutAction.id));
+
+        add(menu);
     }
 
     /**
