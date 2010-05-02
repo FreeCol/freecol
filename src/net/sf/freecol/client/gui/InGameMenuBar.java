@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -51,17 +50,6 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InGameMenuBar.class.getName());
-
-    public static final int UNIT_ORDER_WAIT = 0;
-    public static final int UNIT_ORDER_FORTIFY = 1;
-    public static final int UNIT_ORDER_SENTRY = 2;
-    public static final int UNIT_ORDER_CLEAR_ORDERS = 3;
-    public static final int UNIT_ORDER_BUILD_COL = 5;
-    public static final int UNIT_ORDER_SKIP = 9;
-    public static final int UNIT_ORDER_DISBAND = 11;
-
-    private JMenuItem reportsTradeMenuItem = null;
-
 
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
@@ -264,10 +252,6 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         add(menu);
 
-    }
-
-    public JMenuItem getReportsTradeMenuItem() {
-        return reportsTradeMenuItem;
     }
 
     private void buildColopediaMenu() {
