@@ -46,27 +46,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     private static final Logger logger = Logger.getLogger(FreeColMenuBar.class.getName());
 
-    public static final int UNIT_ORDER_WAIT = 0;
-
-    public static final int UNIT_ORDER_FORTIFY = 1;
-
-    public static final int UNIT_ORDER_SENTRY = 2;
-
-    public static final int UNIT_ORDER_CLEAR_ORDERS = 3;
-
-    public static final int UNIT_ORDER_BUILD_COL = 5;
-
-    public static final int UNIT_ORDER_PLOW = 6;
-
-    public static final int UNIT_ORDER_BUILD_ROAD = 7;
-
-    public static final int UNIT_ORDER_SKIP = 9;
-
-    public static final int UNIT_ORDER_DISBAND = 11;
-
     protected final FreeColClient freeColClient;
-
-    JMenuItem reportsTradeMenuItem = null;
 
     protected ActionManager am;
 
