@@ -263,56 +263,47 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         root = new DefaultMutableTreeNode(new ColopediaTreeItem(null, Messages.message("menuBar.colopedia")));
         
         DefaultMutableTreeNode terrain;
-        terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN,
-                                                                   Messages.message("menuBar.colopedia.terrain")));
+        terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN));
         buildTerrainSubtree(terrain);
         root.add(terrain);
         
         DefaultMutableTreeNode resource;
-        resource = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.RESOURCES, 
-                                                                    Messages.message("menuBar.colopedia.resource")));
+        resource = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.RESOURCES));
         buildResourceSubtree(resource);
         root.add(resource);
         
         DefaultMutableTreeNode units =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS,
-                                                             Messages.message("menuBar.colopedia.unit")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS));
         buildUnitSubtree(units);
         root.add(units);
         
         DefaultMutableTreeNode goods =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS,
-                                                             Messages.message("menuBar.colopedia.goods")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS));
         buildGoodsSubtree(goods);
         root.add(goods);
         
         DefaultMutableTreeNode skills =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS,
-                                                             Messages.message("menuBar.colopedia.skill")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS));
         buildSkillsSubtree(skills);
         root.add(skills);
         
         DefaultMutableTreeNode buildings =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS,
-                                                             Messages.message("menuBar.colopedia.building")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS));
         buildBuildingSubtree(buildings);
         root.add(buildings);
         
         DefaultMutableTreeNode fathers =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS,
-                                                             Messages.message("menuBar.colopedia.father")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS));
         buildFathersSubtree(fathers);
         root.add(fathers);
         
         DefaultMutableTreeNode nations =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATIONS,
-                                                             Messages.message("menuBar.colopedia.nation")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATIONS));
         buildNationsSubtree(nations);
         root.add(nations);
         
         DefaultMutableTreeNode nationTypes =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATION_TYPES,
-                                                             Messages.message("menuBar.colopedia.nationType")));
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATION_TYPES));
         buildNationTypesSubtree(nationTypes);
         root.add(nationTypes);
         

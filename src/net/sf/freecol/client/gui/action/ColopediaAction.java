@@ -17,6 +17,8 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
@@ -26,43 +28,47 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 
 
 /**
- * 
+ * Displays a section of the Colopedia.
  */
-public class ColopediaResourceAction extends MapboardAction {
+public class ColopediaAction extends FreeColAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ColopediaResourceAction.class.getName());
+    public static final String id = "colopediaAction.";
 
+    public static final int[] mnemonics = new int[] {
+        KeyEvent.VK_T,
+        KeyEvent.VK_R,
+        KeyEvent.VK_U,
+        KeyEvent.VK_G,
+        KeyEvent.VK_S,
+        KeyEvent.VK_B,
+        KeyEvent.VK_F,
+        KeyEvent.VK_N,
+        KeyEvent.VK_A
+    };
 
-    public static final String id = "colopediaResourceAction";
+    private PanelType panelType;
     
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
-    ColopediaResourceAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.colopedia.resource", null, KeyEvent.VK_R);
+    ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
+        super(freeColClient, id + panelType + ".name", null,
+              mnemonics[panelType.ordinal()]);
+        this.panelType = panelType;
     }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
     
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "colopediaResourceAction"
+     * @return "colopediaAction"
      */
     public String getId() {
-        return id;
+        return id + panelType;
     }
 
     /**
@@ -71,6 +77,6 @@ public class ColopediaResourceAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = freeColClient.getCanvas();
-        canvas.showPanel(new ColopediaPanel(canvas, ColopediaPanel.PanelType.RESOURCES, null));
+        canvas.showPanel(new ColopediaPanel(canvas, panelType, null));
     }
 }

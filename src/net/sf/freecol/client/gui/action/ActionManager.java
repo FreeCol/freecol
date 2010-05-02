@@ -21,11 +21,12 @@ package net.sf.freecol.client.gui.action;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
-
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -66,15 +67,9 @@ public class ActionManager extends OptionGroup {
         add(new ChangeWindowedModeAction(freeColClient));
         add(new ChatAction(freeColClient));
         add(new ClearOrdersAction(freeColClient));
-        add(new ColopediaBuildingAction(freeColClient));
-        add(new ColopediaFatherAction(freeColClient));
-        add(new ColopediaGoodsAction(freeColClient));
-        add(new ColopediaNationAction(freeColClient));
-        add(new ColopediaNationTypeAction(freeColClient));
-        add(new ColopediaResourceAction(freeColClient));
-        add(new ColopediaSkillAction(freeColClient));
-        add(new ColopediaTerrainAction(freeColClient));
-        add(new ColopediaUnitAction(freeColClient));
+        for (PanelType type : PanelType.values()) {
+            add(new ColopediaAction(freeColClient, type));
+        }
         add(new DeclareIndependenceAction(freeColClient));
         add(new DetermineHighSeasAction(freeColClient));
         add(new DisbandUnitAction(freeColClient));
@@ -100,14 +95,9 @@ public class ActionManager extends OptionGroup {
         add(new MiniMapChangeBackgroundAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));
         add(new MiniMapZoomOutAction(freeColClient));
-        add(new MoveNorthAction(freeColClient));
-        add(new MoveNorthEastAction(freeColClient));
-        add(new MoveEastAction(freeColClient));
-        add(new MoveSouthEastAction(freeColClient));
-        add(new MoveSouthAction(freeColClient));
-        add(new MoveSouthWestAction(freeColClient));
-        add(new MoveWestAction(freeColClient));
-        add(new MoveNorthWestAction(freeColClient));
+        for (Direction d : Direction.values()) {
+            add(new MoveAction(freeColClient, d));
+        }
         add(new NewAction(freeColClient));
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));

@@ -21,6 +21,8 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.client.gui.action.ColopediaAction;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 
@@ -34,6 +36,16 @@ class ColopediaTreeItem {
     private FreeColGameObjectType objectType;
     private String text;
     private ImageIcon icon;
+
+    /**
+     * The constructor that will add the items to this panel.
+     * 
+     * @param panelType The panel type.
+     */
+    ColopediaTreeItem(PanelType panelType) {
+        this.panelType = panelType;
+        this.text = Messages.message(ColopediaAction.id + panelType + ".name");
+    }
 
     /**
      * The constructor that will add the items to this panel.

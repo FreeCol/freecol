@@ -30,26 +30,41 @@ import net.sf.freecol.client.gui.ViewMode;
 /**
  * An action for chosing the next unit as the active unit.
  */
-public class MoveEastAction extends MapboardAction {
+public class MoveAction extends MapboardAction {
 
-    public static final String id = "moveEastAction";
+    public static final String id = "moveAction.";
+
+    public static final int[] accelerators = new int[] {
+        KeyEvent.VK_NUMPAD8,
+        KeyEvent.VK_NUMPAD9,
+        KeyEvent.VK_NUMPAD6,
+        KeyEvent.VK_NUMPAD3,
+        KeyEvent.VK_NUMPAD2,
+        KeyEvent.VK_NUMPAD1,
+        KeyEvent.VK_NUMPAD4,
+        KeyEvent.VK_NUMPAD7,
+    };
+
+    private Direction direction;
 
     /**
-     * Creates a new <code>MoveEastAction</code>.
+     * Creates a new <code>MoveAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    MoveEastAction(FreeColClient freeColClient) {
-        super(freeColClient, "moveEast", null, KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6, 0));
+    MoveAction(FreeColClient freeColClient, Direction direction) {
+        super(freeColClient, id + direction + ".name", null,
+              KeyStroke.getKeyStroke(accelerators[direction.ordinal()], 0));
+        this.direction = direction;
     }
 
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "waitAction"
+     * @return "moveAction"
      */
     public String getId() {
-        return id;
+        return id + direction;
     }
 
     /**
@@ -60,10 +75,10 @@ public class MoveEastAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         switch(getFreeColClient().getGUI().getViewMode().getView()) {
         case ViewMode.MOVE_UNITS_MODE:
-            getFreeColClient().getInGameController().moveActiveUnit(Direction.E);
+            getFreeColClient().getInGameController().moveActiveUnit(direction);
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            getFreeColClient().getGUI().moveTileCursor(Direction.E);
+            getFreeColClient().getGUI().moveTileCursor(direction);
             break;
         }
     }

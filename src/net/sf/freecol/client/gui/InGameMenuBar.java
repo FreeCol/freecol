@@ -34,6 +34,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.StringTemplate;
 
 /**
@@ -212,14 +213,9 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(MoveNorthAction.id));
-        menu.add(getMenuItem(MoveNorthEastAction.id));
-        menu.add(getMenuItem(MoveEastAction.id));
-        menu.add(getMenuItem(MoveSouthEastAction.id));
-        menu.add(getMenuItem(MoveSouthAction.id));
-        menu.add(getMenuItem(MoveSouthWestAction.id));
-        menu.add(getMenuItem(MoveWestAction.id));
-        menu.add(getMenuItem(MoveNorthWestAction.id));
+        for (Direction d : Direction.values()) {
+            menu.add(getMenuItem(MoveAction.id + d));
+        }
 
         add(menu);
     }
