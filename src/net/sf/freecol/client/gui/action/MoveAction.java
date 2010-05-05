@@ -53,18 +53,9 @@ public class MoveAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     MoveAction(FreeColClient freeColClient, Direction direction) {
-        super(freeColClient, id + direction + ".name", null,
-              KeyStroke.getKeyStroke(accelerators[direction.ordinal()], 0));
+        super(freeColClient, id + direction);
         this.direction = direction;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "moveAction"
-     */
-    public String getId() {
-        return id + direction;
+        setAccelerator(KeyStroke.getKeyStroke(accelerators[direction.ordinal()], 0));
     }
 
     /**

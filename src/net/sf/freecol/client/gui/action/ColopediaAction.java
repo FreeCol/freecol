@@ -57,20 +57,11 @@ public class ColopediaAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
-        super(freeColClient, id + panelType + ".name", null,
-              mnemonics[panelType.ordinal()]);
+        super(freeColClient, id + panelType);
         this.panelType = panelType;
+        setMnemonic(mnemonics[panelType.ordinal()]);
     }
     
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "colopediaAction"
-     */
-    public String getId() {
-        return id + panelType;
-    }
-
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

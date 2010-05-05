@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.option.Option;
@@ -75,10 +76,9 @@ public class ActionManager extends OptionGroup {
         add(new DisbandUnitAction(freeColClient));
         add(new DisplayBordersAction(freeColClient));
         add(new DisplayGridAction(freeColClient));
-        add(new DisplayTileEmptyAction(freeColClient));
-        add(new DisplayTileNamesAction(freeColClient));
-        add(new DisplayTileOwnersAction(freeColClient));
-        add(new DisplayTileRegionsAction(freeColClient));
+        for (DisplayText type : DisplayText.values()) {
+            add(new DisplayTileTextAction(freeColClient, type));
+        }
         add(new EndTurnAction(freeColClient));
         add(new EuropeAction(freeColClient));
         add(new ExecuteGotoOrdersAction(freeColClient));

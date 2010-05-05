@@ -64,6 +64,7 @@ import javax.swing.UIManager;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
@@ -2626,10 +2627,10 @@ public final class GUI {
     /**
      * Set the type of text drawn in the tiles.
      *
-     * @param tileTextType One of the <code>ClientOptions.DISPLAY_TILE_TEXT</code> values
+     * @param tileTextType a <code>DisplayText</code> value
      */
-    public void setDisplayTileText(int tileTextType) {
-        this.displayTileText = tileTextType;
+    public void setDisplayTileText(DisplayText tileTextType) {
+        this.displayTileText = tileTextType.ordinal();
     }
 
 

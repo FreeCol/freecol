@@ -35,9 +35,6 @@ import net.sf.freecol.common.model.Player;
 * @see MapControls
 */
 public abstract class SelectableAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SelectableAction.class.getName());
-
 
     public static final String id = "selectableAction";
 
@@ -57,6 +54,10 @@ public abstract class SelectableAction extends MapboardAction {
      *      selecting this action or <code>null</code> if this action
      *      does not have an accelerator.
      */
+    protected SelectableAction(FreeColClient freeColClient, String id) {
+        super(freeColClient, id);
+    }
+
     protected SelectableAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic, KeyStroke accelerator) {
         super(freeColClient, name, shortDescription, mnemonic, accelerator);
     }
@@ -84,14 +85,6 @@ public abstract class SelectableAction extends MapboardAction {
         if (game != null && player != null && !player.getNewModelMessages().isEmpty()) {
             enabled = false;
         }
-    }
-
-    /**
-    * Returns the id of this <code>Option</code>.
-    * @return "mapControlsAction"
-    */
-    public String getId() {
-        return id;
     }
 
     /**

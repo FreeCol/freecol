@@ -51,6 +51,10 @@ public abstract class MapboardAction extends FreeColAction {
      *      selecting this action or <code>null</code> if this action
      *      does not have an accelerator.
      */
+    protected MapboardAction(FreeColClient freeColClient, String id) {
+        super(freeColClient, id);
+    }
+
     protected MapboardAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic, KeyStroke accelerator) {
         super(freeColClient, name, shortDescription, mnemonic, accelerator);
     }

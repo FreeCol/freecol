@@ -34,10 +34,8 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
-import net.sf.freecol.client.gui.action.DisplayTileEmptyAction;
-import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
-import net.sf.freecol.client.gui.action.DisplayTileOwnersAction;
-import net.sf.freecol.client.gui.action.DisplayTileRegionsAction;
+import net.sf.freecol.client.gui.action.DisplayTileTextAction;
+import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.NewEmptyMapAction;
@@ -153,10 +151,9 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         menu.addSeparator();
         ButtonGroup tileTextGroup = new ButtonGroup();
-        menu.add(getRadioButtonMenuItem(DisplayTileEmptyAction.id, tileTextGroup));
-        menu.add(getRadioButtonMenuItem(DisplayTileNamesAction.id, tileTextGroup));
-        menu.add(getRadioButtonMenuItem(DisplayTileOwnersAction.id, tileTextGroup));
-        menu.add(getRadioButtonMenuItem(DisplayTileRegionsAction.id, tileTextGroup));
+        for (DisplayText type : DisplayText.values()) {
+            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type, tileTextGroup));
+        }
 
         menu.addSeparator();
         menu.add(getMenuItem(ZoomInAction.id));

@@ -64,6 +64,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
+    public static final String ACTION_ID = "ACTION_ID";
     public static final String BUTTON_IMAGE = "BUTTON_IMAGE";
     public static final String BUTTON_ROLLOVER_IMAGE = "BUTTON_ROLLOVER_IMAGE";
     public static final String BUTTON_PRESSED_IMAGE = "BUTTON_PRESSED_IMAGE";
@@ -72,6 +73,21 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     protected final FreeColClient freeColClient;
 
+
+    /**
+     * Creates a new <code>FreeColAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param id a <code>String</code> value
+     */
+    protected FreeColAction(FreeColClient freeColClient, String id) {
+        super(Messages.message(id + ".name"));
+
+        this.freeColClient = freeColClient;
+
+        putValue(SHORT_DESCRIPTION, Messages.message(id + ".shortDescription"));
+        putValue(ACTION_ID, id);
+    }
 
     /**
      * Creates a new <code>FreeColAction</code>.
@@ -187,6 +203,15 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     }
 
     /**
+     * Describe <code>setMnemonic</code> method here.
+     *
+     * @param mnemonic an <code>int</code> value
+     */
+    public void setMnemonic(int mnemonic) {
+        putValue(MNEMONIC_KEY, mnemonic);
+    }
+
+    /**
      * Gets the main controller object for the client.
      * 
      * @return The main controller object for the client.
@@ -276,7 +301,9 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * 
      * @return An unique identifier for this action.
      */
-    public abstract String getId();
+    public String getId() {
+        return (String) getValue(ACTION_ID);
+    }
 
     /**
      * Returns the name of this <code>Option</code>.

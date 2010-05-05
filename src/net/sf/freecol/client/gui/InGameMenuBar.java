@@ -32,6 +32,7 @@ import javax.swing.JMenu;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.*;
+import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
 import net.sf.freecol.common.model.Map.Direction;
@@ -150,10 +151,9 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.addSeparator();
         ButtonGroup group = new ButtonGroup();
-        menu.add(getRadioButtonMenuItem(DisplayTileEmptyAction.id, group));
-        menu.add(getRadioButtonMenuItem(DisplayTileNamesAction.id, group));
-        menu.add(getRadioButtonMenuItem(DisplayTileOwnersAction.id, group));
-        menu.add(getRadioButtonMenuItem(DisplayTileRegionsAction.id, group));
+        for (DisplayText type : DisplayText.values()) {
+            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type, group));
+        }
 
         menu.addSeparator();
         menu.add(getMenuItem(ZoomInAction.id));

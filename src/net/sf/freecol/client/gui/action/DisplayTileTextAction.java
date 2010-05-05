@@ -19,9 +19,8 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
@@ -30,28 +29,39 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
 /**
- * 
+ * Display text over tiles.
  */
-public class DisplayTileNamesAction extends SelectableAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DisplayTileNamesAction.class.getName());
+public class DisplayTileTextAction extends SelectableAction {
 
+    public static final String id = "displayTileTextAction.";
 
+    // TODO: make ClientOptions use enum
+    public static enum DisplayText {
+        EMPTY, NAMES, OWNERS, REGIONS
+    };
 
+    public static final int[] accelerators = new int[] {
+        KeyEvent.VK_E,
+        KeyEvent.VK_N,
+        KeyEvent.VK_O,
+        KeyEvent.VK_R
+    };
+        
 
-    public static final String id = "displayTileNamesAction";
-
+    private DisplayText display;
 
     /**
      * Creates this action
      * 
      * @param freeColClient The main controller object for the client.
+     * @param type a <code>DisplayText</code> value
      */
-    DisplayTileNamesAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.displayTileNames", null, 
-              KeyStroke.getKeyStroke('X', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        setSelected(freeColClient.getClientOptions().getDisplayTileText()
-                    == ClientOptions.DISPLAY_TILE_TEXT_NAMES);
+    DisplayTileTextAction(FreeColClient freeColClient, DisplayText type) {
+        super(freeColClient, id + type);
+        display = type;
+        setSelected(freeColClient.getClientOptions().getDisplayTileText() == type.ordinal());
+        setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
+                                              KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
     }
 
     /**
@@ -64,22 +74,13 @@ public class DisplayTileNamesAction extends SelectableAction {
     }
 
     /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "displayTileNamesAction"
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
      * Applies this action.
      * 
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
-            freeColClient.getGUI().setDisplayTileText(ClientOptions.DISPLAY_TILE_TEXT_NAMES);
+            freeColClient.getGUI().setDisplayTileText(display);
             freeColClient.getCanvas().refresh();
         }
     }
