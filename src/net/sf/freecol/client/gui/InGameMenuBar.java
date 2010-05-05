@@ -118,6 +118,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(PreferencesAction.id));
         menu.add(getMenuItem(ReconnectAction.id));
+        menu.add(getMenuItem(DebugAction.id));
 
         menu.addSeparator();
 

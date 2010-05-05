@@ -71,6 +71,7 @@ public class ActionManager extends OptionGroup {
         for (PanelType type : PanelType.values()) {
             add(new ColopediaAction(freeColClient, type));
         }
+        add(new DebugAction(freeColClient));
         add(new DeclareIndependenceAction(freeColClient));
         add(new DetermineHighSeasAction(freeColClient));
         add(new DisbandUnitAction(freeColClient));
