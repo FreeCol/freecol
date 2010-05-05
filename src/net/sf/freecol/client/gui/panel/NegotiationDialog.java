@@ -478,9 +478,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
 
     /**
-     * Sets the <code>stance</code> between the players.
+     * Trade a stance change between the players.
      *
-     * @param stance a <code>Stance</code> value
+     * @param stance The <code>Stance</code> to trade.
      */
     public void setStance(Stance stance) {
         agreement.add(new StanceTradeItem(getGame(), otherPlayer, player, stance));

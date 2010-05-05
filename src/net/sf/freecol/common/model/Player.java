@@ -2075,47 +2075,59 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Modifies the hostiliy against the given player.
+     * Modifies the hostility against the given player.
      *
      * @param player The <code>Player</code>.
      * @param addToTension The amount to add to the current tension level.
+     * @return A list of objects that may need updating due to the tension
+     *     change (such as native settlements).
      */
-    public void modifyTension(Player player, int addToTension) {
-        modifyTension(player, addToTension, null);
+    public List<Object> modifyTension(Player player, int addToTension) {
+        return modifyTension(player, addToTension, null);
     }
 
-    public void modifyTension(Player player, int addToTension, IndianSettlement origin) {
-        if (player == this || player == null) {
-            return;
+    /**
+     * Modifies the hostility against the given player.
+     *
+     * @param player The <code>Player</code>.
+     * @param addToTension The amount to add to the current tension level.
+     * @param origin An <code>IndianSettlement</code> where the alarming event
+     *     occurred.
+     * @return A list of objects that may need updating due to the tension
+     *     change (such as native settlements).
+     */
+    public List<Object> modifyTension(Player player, int addToTension,
+                                      IndianSettlement origin) {
+        if (player == null) {
+            throw new IllegalStateException("Null player");
+        } else if (player == this) {
+            throw new IllegalStateException("Self tension!");
+        } else if (origin != null && origin.getOwner() != this) {
+            throw new IllegalStateException("Bogus origin:"
+                                            + origin.getId());
         }
 
-        if (tension.get(player) == null) {
-            tension.put(player, new Tension(addToTension));
-        } else {
-            tension.get(player).modify(addToTension);
-        }
+        List<Object> objects = new ArrayList<Object>();
+        getTension(player).modify(addToTension);
 
-        // XXX: Can this really happen? Its not an error???
-        if(origin != null && origin.getOwner() != this){
-            return;
-        }
-
-        // For indian players, we also need to set each settlement alarm.
-        // If the alarm originated on a settlement, it is propagated to all others.
-        // Global effects, like declaration of war, affect all settlements
+        // For indian players, we also need to set each settlement
+        // alarm.  If the alarm originated on a settlement, it is
+        // propagated to all others.  Global effects, like declaration
+        // of war, affect all settlements.
         if (isIndian()) {
             for (Settlement settlement : settlements) {
-                // alarm originated on this settlement, has been already applied
-                if (origin != null && origin.equals(settlement)){
+                if (origin != null && origin.equals(settlement)) {
+                    // Alarm originated on this settlement, has been
+                    // already applied.
                     continue;
                 }
-                // Sanitation, should never occur?
-                if (!(settlement instanceof IndianSettlement)){
-                    throw new IllegalStateException("Indian player owns non indian settlement");
+                if (((IndianSettlement) settlement).propagateAlarm(player, addToTension)) {
+                    objects.add(settlement);
                 }
-                ((IndianSettlement) settlement).propagatedAlarm(player, addToTension);
             }
         }
+
+        return objects;
     }
 
     /**
@@ -2139,7 +2151,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Tension getTension(Player player) {
         if (player == null) {
-            return new Tension();
+            throw new IllegalStateException("Null player.");
         } else {
             Tension newTension = tension.get(player);
             if (newTension == null) {
@@ -2477,14 +2489,11 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the stance towards a given player. <BR>
-     * <BR>
-     * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
-     * This only sets this player stance,
-     *<code>changeRelationsWithPlayer</code> should be used to set both players
+     * Sets the stance towards a given player to one of
+     * WAR, CEASE_FIRE, PEACE and ALLIANCE.
      *
      * @param player The <code>Player</code>.
-     * @param newStance The stance.
+     * @param newStance The new <code>Stance</code>.
      */
     public void setStance(Player player, Stance newStance) {
         if (player == null) {
@@ -2539,67 +2548,6 @@ public class Player extends FreeColGameObject implements Nameable {
         player2.stance.put(player1.getId(), Stance.PEACE);
         player1.setTension(player2, new Tension(0));
         player2.setTension(player1, new Tension(0));
-    }
-
-    /**
-     * Set the stance and modify the tension accordingly.
-     * TODO: should be server side only, in ServerPlayer perhaps.
-     *
-     * @param player The <code>Player</code> to set stance with respect to.
-     * @param newStance The new <code>Stance</code> to set.
-     * @return True if the stance changed.
-     */
-    public boolean setStanceAndTension(Player player, Stance newStance) {
-        Stance oldStance = getStance(player);
-
-        if (newStance == oldStance) return false;
-        setStance(player, newStance);
-
-        int modifier = 0;
-        switch (newStance) {
-        case UNCONTACTED:
-            throw new IllegalStateException("Can not set UNCONTACTED stance");
-        case PEACE:
-            switch (oldStance) {
-            case WAR:
-                modifier = Tension.CEASE_FIRE_MODIFIER
-                    + Tension.PEACE_TREATY_MODIFIER;
-                break;
-            case CEASE_FIRE:
-                modifier = Tension.PEACE_TREATY_MODIFIER;
-                break;
-            default:
-                break;
-            }
-            break;
-        case CEASE_FIRE:
-            if (oldStance == Stance.WAR) {
-                modifier = Tension.CEASE_FIRE_MODIFIER;
-            }
-            break;
-        default:
-            break;
-        }
-        modifyTension(player, modifier);
-
-        if (player.getStance(this) != newStance) {
-            player.setStance(this, newStance);
-
-            if (newStance == Stance.WAR) {
-                switch (oldStance) {
-                case UNCONTACTED: case PEACE:
-                    modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
-                    break;
-                case CEASE_FIRE:
-                    modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
-                    break;
-                default:
-                    break;
-                }
-            }
-            player.modifyTension(this, modifier);
-        }
-        return true;
     }
 
     /**

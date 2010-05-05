@@ -251,16 +251,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Push a new child node onto the front of a root nodes children.
-     *
-     * @param root The root <code>Node</code>.
-     * @param node A <code>Node</code> to push.
-     */
-    private static void pushChild(Node root, Node node) {
-        root.insertBefore(node, root.getFirstChild());
-    }
-
-    /**
      * Build a generalized update.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to send the
@@ -291,11 +281,10 @@ public final class InGameController extends Controller {
                                List<Object> objects) {
         Document doc = Message.createNewDocument();
         List<String> attributes = new ArrayList<String>();
-        List<Element> extras = new ArrayList<Element>();
         Element multiple = doc.createElement("multiple");
         Element update = doc.createElement("update");
-        Element messages = doc.createElement("addMessages");
-        Element history = doc.createElement("addHistory");
+        Element messages = null;
+        Element history = null;
         Element remove = doc.createElement("remove");
         boolean allVisible = false;
 
@@ -316,7 +305,7 @@ public final class InGameController extends Controller {
                         Element animate = buildAttack(serverPlayer, doc, unit,
                                                       defender, result);
                         if (animate != null) {
-                            pushChild(multiple, animate);
+                            multiple.appendChild(animate);
                         }
                         i += 3;
                     } else {
@@ -345,7 +334,7 @@ public final class InGameController extends Controller {
                         Element animate = buildMove(serverPlayer, doc, unit,
                                                     oldLocation, newTile);
                         if (animate != null) {
-                            pushChild(multiple, animate);
+                            multiple.appendChild(animate);
                             // Clean up units that disappear.
                             if (!unit.isVisibleTo(serverPlayer)) {
                                 unit.addToRemoveElement(remove);
@@ -401,7 +390,7 @@ public final class InGameController extends Controller {
                                 (Player) objects.get(i+2),
                                 (Player) objects.get(i+3));
                         if (setStance != null) {
-                            pushChild(multiple, setStance);
+                            multiple.appendChild(setStance);
                         }
                         i += 3;
                     } else {
@@ -412,12 +401,19 @@ public final class InGameController extends Controller {
                     break;
                 }
             } else if (o instanceof Element) {
-                extras.add((Element) doc.importNode((Element) o, true));
+                multiple.appendChild((Element) doc.importNode((Element) o,
+                                                              true));
             } else if (o instanceof ModelMessage) {
                 // Always send message objects
+                if (messages == null) {
+                    messages = doc.createElement("addMessages");
+                }
                 ((ModelMessage) o).addToOwnedElement(messages, serverPlayer);
             } else if (o instanceof HistoryEvent) {
                 // Always send history objects
+                if (history == null) {
+                    history = doc.createElement("addHistory");
+                }
                 ((HistoryEvent) o).addToOwnedElement(history, serverPlayer);
             } else if (o instanceof FreeColGameObject) {
                 FreeColGameObject fcgo = (FreeColGameObject) o;
@@ -462,9 +458,10 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Decide what to return.  If there are several parts with children
-        // then return multiple, if there is one viable part, return that,
-        // else null.  Remove and extra elements need to be after updates.
+        // Decide what to return.  If there are several parts with
+        // children then return multiple, if there is one viable part,
+        // return that, else null.  Remove elements need to be last,
+        // then messages and history before everything else.
         int n = multiple.getChildNodes().getLength();
         Element child = null;
         Element result;
@@ -473,19 +470,14 @@ public final class InGameController extends Controller {
             child = update;
             n++;
         }
-        if (messages.hasChildNodes()) {
+        if (messages != null) {
             multiple.appendChild(messages);
             child = messages;
             n++;
         }
-        if (history.hasChildNodes()) {
+        if (history != null) {
             multiple.appendChild(history);
             child = history;
-            n++;
-        }
-        while (extras.size() > 0) {
-            child = extras.remove(0);
-            multiple.appendChild(child);
             n++;
         }
         if (remove.hasChildNodes()) {
@@ -722,6 +714,51 @@ public final class InGameController extends Controller {
             }
         }
         return null;
+    }
+
+    /**
+     * Stance change broadcast to all but the originating player.
+     *
+     * @param player The originating <code>Player</code>.
+     * @param stance The new <code>Stance</code>.
+     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @return A list of objects to update.
+     */
+    public List<Object> changeStance(Player player, Stance stance,
+                                     Player otherPlayer) {
+        List<Object> objects = new ArrayList<Object>();
+
+        if (player.getStance(otherPlayer) != stance) {
+            int pmodifier = ((ServerPlayer) player)
+                .getTensionModifier(otherPlayer, stance);
+            int omodifier = ((ServerPlayer) otherPlayer)
+                .getTensionModifier(player, stance);
+            player.setStance(otherPlayer, stance);
+            otherPlayer.setStance(player, stance);
+
+            // Players not involved may see the stance change if it
+            // meets the visibility criteria.
+            addStance(objects, stance, player, otherPlayer);
+            sendToList(getOtherPlayers((ServerPlayer) player,
+                                       (ServerPlayer) otherPlayer),
+                       objects);
+
+            // The other player certainly sees the stance change, and
+            // possibly some settlement alarm if player.isNative().
+            List<Object> otherObjects = new ArrayList<Object>();
+            otherObjects.addAll(objects);
+            if (pmodifier != 0) {
+                otherObjects.addAll(player.modifyTension(otherPlayer, pmodifier));
+            }
+            sendElement((ServerPlayer) otherPlayer, otherObjects);
+
+            // Player sees the stance change and similarly, possibly
+            // some settlement alarm.
+            if (omodifier != 0) {
+                objects.addAll(otherPlayer.modifyTension(player, omodifier));
+            }
+        }
+        return objects;
     }
 
 

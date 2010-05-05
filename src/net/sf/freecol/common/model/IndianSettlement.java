@@ -288,17 +288,21 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Propagates the tension felt towards a given nation 
-     * from the tribe down to each settlement that has already met that nation.
+     * Propagates the tension felt towards a given nation from the
+     * tribe down to each settlement that has already met that nation.
      * 
-     * @param player The Player towards whom the alarm is felt.
+     * @param player The <code>Player</code> towards whom the alarm is felt.
      * @param addToAlarm The amount to add to the current alarm level.
+     * @return True if the alarm level changes as a result of this change.
      */
-    public void propagatedAlarm(Player player, int addToAlarm) {
+    public boolean propagateAlarm(Player player, int addToAlarm) {
         Tension tension = alarm.get(player);
         if (tension != null) {
-            tension.modify(addToAlarm);            
+            Tension.Level oldLevel = tension.getLevel();
+            tension.modify(addToAlarm);
+            return tension.getLevel() != oldLevel;
         }
+        return false;
     }
 
     /**

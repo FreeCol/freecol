@@ -162,6 +162,63 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.connected = connected;
     }
 
+    /**
+     * A stance change is about to happen.  Get the appropriate tension
+     * modifier.
+     *
+     * @param player The <code>Player</code> to set stance with respect to.
+     * @param newStance The new <code>Stance</code> to set.
+     * @return A modifier to correct the tension between the players.
+     */
+    public int getTensionModifier(Player player, Stance newStance) {
+        Stance oldStance = getStance(player);
+        int modifier = 0;
+        switch (newStance) {
+        case UNCONTACTED:
+            throw new IllegalStateException("Can not set UNCONTACTED stance");
+        case ALLIANCE: case PEACE:
+            switch (oldStance) {
+            case UNCONTACTED: case ALLIANCE: case PEACE:
+                break;
+            case CEASE_FIRE:
+                modifier = Tension.PEACE_TREATY_MODIFIER;
+                break;
+            case WAR:
+                modifier = Tension.CEASE_FIRE_MODIFIER
+                    + Tension.PEACE_TREATY_MODIFIER;
+                break;
+            default:
+                throw new IllegalStateException("Bogus oldStance");
+            }
+            break;
+        case CEASE_FIRE:
+            switch (oldStance) {
+            case UNCONTACTED: case ALLIANCE: case PEACE: case CEASE_FIRE:
+                throw new IllegalStateException("Can only set CEASE_FIRE from WAR");
+            case WAR:
+                modifier = Tension.CEASE_FIRE_MODIFIER;
+                break;
+            default:
+                throw new IllegalStateException("Bogus oldStance");
+            }
+            break;
+        case WAR:
+            switch (oldStance) {
+            case UNCONTACTED: case ALLIANCE: case PEACE:
+                modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
+                break;
+            case CEASE_FIRE:
+                modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
+                break;
+            case WAR: default:
+                throw new IllegalStateException("Bogus oldStance");
+            }
+            break;
+        default:
+            throw new IllegalStateException("Bogus newStance");
+        }
+        return modifier;
+    }
 
     /**
      * Checks if this player has died.
