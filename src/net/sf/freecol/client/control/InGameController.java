@@ -501,8 +501,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askUpdateCurrentStop(Unit unit) {
         Client client = freeColClient.getClient();
         UpdateCurrentStopMessage message = new UpdateCurrentStopMessage(unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -1137,8 +1136,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askRename(FreeColGameObject object, String name) {
         RenameMessage message = new RenameMessage(object, name);
         Client client = freeColClient.getClient();
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -2467,31 +2465,29 @@ public final class InGameController implements NetworkConstants {
         case INCITE_INDIANS:
             List<Player> enemies
                 = new ArrayList<Player>(freeColClient.getGame().getEuropeanPlayers());
-            enemies.remove(freeColClient.getMyPlayer());
+            Player player = freeColClient.getMyPlayer();
+            enemies.remove(player);
             Player enemy = canvas.showSimpleChoiceDialog(unit.getTile(),
                                                          "missionarySettlement.inciteQuestion",
                                                          "missionarySettlement.cancel",
                                                          enemies);
             if (enemy == null) return;
             int gold = askIncite(unit, direction, enemy, -1);
-            if (gold < 0) return;
-            if (canvas.showConfirmDialog(unit.getTile(),
-                                         "missionarySettlement.inciteConfirm",
-                                         "yes", "no",
-                                         "%player%", Messages.message(enemy.getName()),
-                                         "%amount%", String.valueOf(gold))) {
-                int goldOut = askIncite(unit, direction, enemy, gold);
-                if (goldOut < 0) {
-                    ; // protocol fail
-                } else if (goldOut == 0) {
-                    canvas.showInformationMessage("notEnoughGold", settlement);
-                } else {
-                    // model messages from setStance are asynchronous
-                    // at present
-                    canvas.updateGoldLabel();
+            if (gold < 0) {
+                ; // protocol fail
+            } else if (player.getGold() < gold) {
+                canvas.showInformationMessage("notEnoughGold", settlement);
+            } else {
+                if (canvas.showConfirmDialog(unit.getTile(),
+                        "missionarySettlement.inciteConfirm", "yes", "no",
+                        "%player%", Messages.message(enemy.getName()),
+                        "%amount%", String.valueOf(gold))) {
+                    if (askIncite(unit, direction, enemy, gold) > 0) {
+                        canvas.updateGoldLabel();
+                    }
                 }
+                nextActiveUnit();
             }
-            nextActiveUnit();
             break;
         default:
             logger.warning("showUseMissionaryDialog fail");
@@ -2535,13 +2531,15 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         InciteMessage message
             = new InciteMessage(unit, direction, enemy, gold);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null || reply.getAttribute("gold") == null) return -1;
 
         Connection conn = client.getConnection();
         freeColClient.getInGameInputHandler().handle(conn, reply);
-        return Integer.parseInt(reply.getAttribute("gold"));
+        try {
+            return Integer.parseInt(reply.getAttribute("gold"));
+        } catch (NumberFormatException e) {}
+        return -1;
     }
 
     /**
@@ -2716,7 +2714,7 @@ public final class InGameController implements NetworkConstants {
     private Element askSpy(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
         SpySettlementMessage message = new SpySettlementMessage(unit, direction);
-        return askExpecting(client, message.toXMLElement(), "update");
+        return askExpecting(client, message.toXMLElement(), null);
     }
 
     /**
@@ -2827,8 +2825,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         CloseTransactionMessage message
             = new CloseTransactionMessage(unit, settlement);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -3101,8 +3098,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         DeliverGiftMessage message
             = new DeliverGiftMessage(unit, settlement, goods);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -3122,8 +3118,7 @@ public final class InGameController implements NetworkConstants {
         if (FreeCol.isInDebugMode() && tile != null) {
             DebugForeignColonyMessage message = new DebugForeignColonyMessage(tile);
             Element reply = askExpecting(freeColClient.getClient(),
-                                         message.toXMLElement(),
-                                         "update");
+                                         message.toXMLElement(), null);
             if (reply != null) {
                 // Similar sleight of hand as in moveSpy.
                 Element tileElement = (Element) reply.getFirstChild();
@@ -3197,8 +3192,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askClaimLand(Tile tile, Colony colony, int price) {
         Client client = freeColClient.getClient();
         ClaimLandMessage message = new ClaimLandMessage(tile, colony, price);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
@@ -3387,8 +3381,7 @@ public final class InGameController implements NetworkConstants {
     private boolean askDisembark(Unit unit) {
         Client client = freeColClient.getClient();
         DisembarkMessage message = new DisembarkMessage(unit);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

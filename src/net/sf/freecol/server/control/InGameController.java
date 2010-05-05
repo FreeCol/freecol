@@ -3288,13 +3288,15 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element incite(ServerPlayer serverPlayer, Unit unit,
-                          IndianSettlement settlement, Player enemy, int gold) {
+                          IndianSettlement settlement,
+                          Player enemy, int gold) {
         List<Object> objects = new ArrayList<Object>();
+        ServerPlayer enemyPlayer = (ServerPlayer) enemy;
 
         // How much gold will be needed?
         Player nativePlayer = settlement.getOwner();
         Tension payingTension = nativePlayer.getTension(serverPlayer);
-        Tension targetTension = nativePlayer.getTension(enemy);
+        Tension targetTension = nativePlayer.getTension(enemyPlayer);
         int payingValue = (payingTension == null) ? 0 : payingTension.getValue();
         int targetValue = (targetTension == null) ? 0 : targetTension.getValue();
         int goldToPay = (payingTension != null && targetTension != null
@@ -3303,43 +3305,35 @@ public final class InGameController extends Controller {
         goldToPay = Math.max(goldToPay, 650);
 
         // Try to incite?
-        unit.setMovesLeft(0);
-        addPartial(objects, unit, "movesLeft");
         if (gold < 0) { // Initial enquiry.
             addAttribute(objects, "gold", Integer.toString(goldToPay));
         } else if (gold < goldToPay || serverPlayer.getGold() < gold) {
             objects.add(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                          "indianSettlement.inciteGoldFail",
                                          serverPlayer, settlement)
-                        .addStringTemplate("%player%", enemy.getNationName())
+                        .addStringTemplate("%player%", enemyPlayer.getNationName())
                         .addAmount("%amount%", goldToPay));
             addAttribute(objects, "gold", "0");
+            unit.setMovesLeft(0);
+            addPartial(objects, unit, "movesLeft");
         } else {
-            // Success.  Set the indian player at war with the european
-            // player (and vice versa) and raise tension.
+            // Success.  Raise the tension for the native player with respect
+            // to the european player.  Let resulting stance changes happen
+            // naturally in the AI player turn/s.
+            nativePlayer.modifyTension(enemyPlayer,
+                Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+            enemyPlayer.modifyTension(serverPlayer,
+                Tension.TENSION_ADD_WAR_INCITER);
+
             serverPlayer.modifyGold(-gold);
             nativePlayer.modifyGold(gold);
             addAttribute(objects, "gold", Integer.toString(gold));
             addPartial(objects, serverPlayer, "gold");
-
-            // TODO: Currently we brutally set the players to be at war.
-            // Better was the old method of just adding tension:
-            //    settlement.modifyAlarm(enemy, 1000);
-            // and letting propagation work.  Except, it did not work
-            // (1000 == HATEFUL, enough to cause war, but only if the
-            // settlement was the capital as modifyAlarm halves propagated
-            // alarm from non-capital settlements), and there was no
-            // provision for updates for settlements where the tension
-            // changed.  This needs work.
-            if (nativePlayer.setStanceAndTension(enemy, Stance.WAR)) {
-                addStance(objects, Stance.WAR, nativePlayer, enemy);
-            }
-            enemy.modifyTension(nativePlayer, Tension.TENSION_ADD_WAR_INCITED);
-            enemy.modifyTension(serverPlayer,
-                                Tension.TENSION_ADD_WAR_INCITED_INCITER);
+            unit.setMovesLeft(0);
+            addPartial(objects, unit, "movesLeft");
         }
 
-        // Do not update others, they can not see what happened.
+        // Update the inciter.
         return buildUpdate(serverPlayer, objects);
     }
 

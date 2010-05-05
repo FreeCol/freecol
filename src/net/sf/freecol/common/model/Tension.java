@@ -39,10 +39,8 @@ public class Tension {
     public static final int TENSION_ADD_SETTLEMENT_ATTACKED = 500;
     // Capital attacked
     public static final int TENSION_ADD_CAPITAL_ATTACKED = 600;
-    // War incited
-    public static final int TENSION_ADD_WAR_INCITED = 500;
-    // War incited inciter
-    public static final int TENSION_ADD_WAR_INCITED_INCITER = 250;
+    // War inciter
+    public static final int TENSION_ADD_WAR_INCITER = 250;
     /** Tension modification to be used when war is declared from a peaceful state. */
     public static final int TENSION_ADD_DECLARE_WAR_FROM_PEACE = 1000;
 
