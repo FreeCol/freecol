@@ -2692,6 +2692,7 @@ public final class GUI {
             return img;
         // Draw it and put it in the cache
         Image chip = lib.getColorChip(unit, lib.getScalingFactor());
+        logger.finest("Retrieved color chip for unit " + unit + ": " + chip);
         img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
         g.drawImage(chip, 0, 0, null);

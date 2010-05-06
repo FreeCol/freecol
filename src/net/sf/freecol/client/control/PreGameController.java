@@ -243,6 +243,7 @@ public final class PreGameController {
                             new ColorResource(player.getColor()));
             gameMapping.add(player.getNationID() + ".chip",
                             ChipResource.colorChip(player.getColor()));
+            logger.finest("Added color chip with ID " + player.getNationID() + ".chip");
             gameMapping.add(player.getNationID() + ".mission.chip",
                             ChipResource.missionChip(player.getColor(), false));
             gameMapping.add(player.getNationID() + ".mission.expert.chip",
