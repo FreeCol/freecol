@@ -463,26 +463,21 @@ public final class InGameController extends Controller {
         // return that, else null.  Remove elements need to be last,
         // then messages and history before everything else.
         int n = multiple.getChildNodes().getLength();
-        Element child = null;
         Element result;
         if (update.hasChildNodes()) {
             multiple.appendChild(update);
-            child = update;
             n++;
         }
         if (messages != null) {
             multiple.appendChild(messages);
-            child = messages;
             n++;
         }
         if (history != null) {
             multiple.appendChild(history);
-            child = history;
             n++;
         }
         if (remove.hasChildNodes()) {
             multiple.appendChild(remove);
-            child = remove;
             n++;
         }
         switch (n) {
@@ -492,9 +487,8 @@ public final class InGameController extends Controller {
             result = update;
             break;
         case 1:
-            multiple.removeChild(child);
-            doc.appendChild(child);
-            result = child;
+            result = (Element) multiple.getFirstChild();
+            doc.appendChild(multiple.removeChild(result));
             break;
         default:
             doc.appendChild(multiple);
