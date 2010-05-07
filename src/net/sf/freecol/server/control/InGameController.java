@@ -823,12 +823,13 @@ public final class InGameController extends Controller {
      * Send the market and change messages to the player.
      * This method is public so it can be use in the Market test code.
      *
-     * @param player The player whose market is to be updated.
+     * @param serverPlayer The <code>ServerPlayer</code> whose market
+     *            is to be updated.
      */
-    public void yearlyGoodsRemoval(ServerPlayer player) {
-        List<ModelMessage> messages = new ArrayList<ModelMessage>();
+    public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
+        List<Object> objects = new ArrayList<Object>();
         List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
-        Market market = player.getMarket();
+        Market market = serverPlayer.getMarket();
 
         // Pick a random type of goods to remove an extra amount of.
         GoodsType removeType;
@@ -849,30 +850,14 @@ public final class InGameController extends Controller {
                 }
             }
             if (market.hasPriceChanged(type)) {
-                messages.add(market.makePriceChangeMessage(type));
+                objects.add(market.makePriceChangeMessage(type));
                 market.flushPriceChange(type);
             }
         }
 
         // Update the client
-        Element element = Message.createNewRootElement("multiple");
-        Document doc = element.getOwnerDocument();
-        Element update = doc.createElement("update");
-        element.appendChild(update);
-        update.appendChild(market.toXMLElement(player, doc));
-        Element mess = doc.createElement("addMessages");
-        for (ModelMessage m : messages) {
-            m.addToOwnedElement(mess, player);
-        }
-        if (mess.hasChildNodes()) {
-            element.appendChild(mess);
-        }
-        try {
-            player.getConnection().send(element);
-        } catch (Exception e) {
-            logger.warning("Error sending yearly market update to "
-                           + player.getName() + ": " + e.getMessage());
-        }
+        objects.add(market);
+        sendElement(serverPlayer, objects);
     }
 
     /**
