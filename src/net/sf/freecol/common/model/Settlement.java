@@ -452,6 +452,12 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @return A list of disposed objects.
      */
     public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        if (owner != null && goodsContainer != null) {
+            objects.addAll(goodsContainer.disposeList());
+            goodsContainer = null;
+        }
+
         if (owner != null && getTile() != null
             && getTile().getSettlement() != null) {
             // Defensive tests to handle transition from calling dispose()
@@ -522,10 +528,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             }
         }
 
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (goodsContainer != null) {
-            objects.addAll(goodsContainer.disposeList());
-        }
         objects.addAll(super.disposeList());
         return objects;
     }

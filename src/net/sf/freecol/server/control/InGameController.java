@@ -454,7 +454,8 @@ public final class InGameController extends Controller {
                 }
             } else {
                 throw new IllegalStateException("Bogus object: "
-                                                + o.toString());
+                                                + o.toString()
+                                                + " class: " + o.getClass().toString());
             }
         }
 

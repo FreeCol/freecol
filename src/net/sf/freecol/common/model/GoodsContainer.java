@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ownable;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -39,7 +41,7 @@ import org.w3c.dom.Element;
  * Contains goods and can be used by a {@link Location} to make certain
  * tasks easier.
  */
-public class GoodsContainer extends FreeColGameObject {
+public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Location.class.getName());
@@ -117,11 +119,45 @@ public class GoodsContainer extends FreeColGameObject {
     }
 
     /**
+     * Gets the owner of this <code>GoodsContainer</code>.
+     *
+     * @return The <code>Player</code> controlling this
+     *         {@link Ownable}.
+     */
+    public Player getOwner() {
+        return (parent instanceof Ownable) ? ((Ownable) parent).getOwner()
+            : null;
+    }
+
+    /**
+     * Sets the owner of this <code>Ownable</code>.
+     *
+     * @param p The <code>Player</code> that should take ownership
+     *      of this {@link Ownable}.
+     * @exception UnsupportedOperationException if not implemented.
+     */
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException("Can not set GoodsContainer owner");
+    }
+
+    /**
+     * Removes all references to this object.
+     *
+     * @return A list of disposed objects.
+     */
+    public List<FreeColGameObject> disposeList() {
+        storedGoods.clear();
+
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
      * Dispose of this GoodsContainer.
      */
     public void dispose() {
-        storedGoods.clear();
-        super.dispose();
+        disposeList();
     }
 
 
