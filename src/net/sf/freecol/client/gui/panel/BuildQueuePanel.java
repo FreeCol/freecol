@@ -216,9 +216,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         updateAllLists();
 
         add(headLine, "span 3, align center, wrap 40");
-        add(new JLabel(Messages.message("colonyPanel.Units")), "align center");
+        add(new JLabel(Messages.message("colonyPanel.units")), "align center");
         add(new JLabel(Messages.message("colonyPanel.buildQueue")), "align center");
-        add(new JLabel(Messages.message("colonyPanel.Buildings")), "align center");
+        add(new JLabel(Messages.message("colonyPanel.buildings")), "align center");
         add(new JScrollPane(unitList), "grow");
         add(constructionPanel, "split 2, flowy");
         add(new JScrollPane(buildQueueList), "grow");
