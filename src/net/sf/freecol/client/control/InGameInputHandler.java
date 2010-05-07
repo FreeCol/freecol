@@ -899,7 +899,6 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
-            player.changeRelationWithPlayer(enemy, Stance.WAR);
             new ShowMonarchPanelSwingTask(action,
                                           "%nation%", Messages.message(enemy.getNationName()))
                 .confirm();

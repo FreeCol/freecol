@@ -1327,22 +1327,14 @@ public final class InGameController extends Controller {
                             break;
                         case DECLARE_WAR:
                             Player enemy = monarch.declareWar();
-                            if (enemy == null) {
-                                // this should not happen
+                            if (enemy == null) { // this should not happen
                                 logger.warning("Declared war on nobody.");
                                 return;
                             }
-                            // We also need to change the tension to avoid the AI player declaring cease-fire right away
-                            if(nextPlayer.isAI()){
-                                nextPlayer.modifyTension(enemy, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
-                            }
-                            nextPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
                             monarchActionElement.setAttribute("enemy", enemy.getId());
-                            try {
-                                conn.send(monarchActionElement);
-                            } catch (IOException e) {
-                                logger.warning("Could not send message to: " + nextPlayer.getName());
-                            }
+                            List<Object> objects = changeStance(nextPlayer, Stance.WAR, enemy);
+                            objects.add(0, monarchActionElement);
+                            sendElement(nextPlayer, objects);
                             break;
                             /** TODO: restore
                                 case Monarch.SUPPORT_LAND:
