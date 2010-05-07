@@ -879,44 +879,62 @@ public final class InGameController extends Controller {
      * Create an element to mark a player as dead, inform other players, and
      * remove any leftover units.
      *
-     * @param serverPlayer The player to kill.
-     * @return An element to kill the player.
+     * @param serverPlayer The <code>ServerPlayer</code> to kill.
+     * @return An <code>Element</code> to kill the player.
      */
     private Element killPlayerElement(ServerPlayer serverPlayer) {
-        Element element = Message.createNewRootElement("multiple");
-        Document doc = element.getOwnerDocument();
+        List<Object> objects = new ArrayList<Object>();
+        List<Tile> tiles = new ArrayList<Tile>();
 
-        Element update = doc.createElement("update");
-        element.appendChild(update);
-        Player player = (Player) serverPlayer;
-        player.setDead(true);
-        update.appendChild(player.toXMLElementPartial(doc, "dead"));
+        // Notify
+        objects.add(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     ((serverPlayer.isEuropean())
+                                      ? "model.diplomacy.dead.european"
+                                      : "model.diplomacy.dead.native"),
+                                     serverPlayer)
+                    .addStringTemplate("%nation%",
+                                       serverPlayer.getNationName()));
 
-        if (!serverPlayer.getUnits().isEmpty()) {
-            Element remove = doc.createElement("remove");
-            element.appendChild(remove);
-            List<Unit> unitList = new ArrayList<Unit>(serverPlayer.getUnits());
-            for (Unit unit : unitList) {
-                serverPlayer.removeUnit(unit);
-                unit.addToRemoveElement(remove);
-                unit.dispose();
+        // Clean up missions
+        if (serverPlayer.isEuropean()) {
+            for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+                if (other.isIndian()) {
+                    for (IndianSettlement s : other.getIndianSettlements()) {
+                        Unit unit = s.getMissionary();
+                        if (unit != null && unit.getOwner() == serverPlayer) {
+                            s.setMissionary(null);
+                            objects.add(unit.disposeList());
+                            tiles.add(s.getTile());
+                        }
+                    }
+                }
             }
         }
 
-        Element messages = doc.createElement("addMessages");
-        element.appendChild(messages);
-        String messageId = serverPlayer.isEuropean() ? "model.diplomacy.dead.european"
-            : "model.diplomacy.dead.native";
-        ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                          messageId, serverPlayer)
-            .addStringTemplate("%nation%", serverPlayer.getNationName());
-        m.addToOwnedElement(messages, serverPlayer);
+        // Remove settlements
+        Map map = getGame().getMap();
+        for (Settlement settlement : serverPlayer.getSettlements()) {
+            for (Tile tile : settlement.getOwnedTiles()) {
+                if (!tiles.contains(tile)) tiles.add(tile);
+            }
+            objects.addAll(settlement.disposeList());
+        }
 
-        Element setDeadElement = doc.createElement("setDead");
-        element.appendChild(setDeadElement);
-        setDeadElement.setAttribute("player", serverPlayer.getId());
+        // Remove units
+        for (Unit unit : serverPlayer.getUnits()) {
+            Tile tile = unit.getTile();
+            if (tile != null && !tiles.contains(tile)) tiles.add(tile);
+            objects.addAll(unit.disposeList());
+        }
 
-        return element;
+        // Add setDead element
+        Element element = Message.createNewRootElement("setDead");
+        element.setAttribute("player", serverPlayer.getId());
+        objects.add(element);
+
+        // Add in the tiles, and return.
+        objects.addAll(0, tiles);
+        return buildUpdate(serverPlayer, objects);
     }
 
 
