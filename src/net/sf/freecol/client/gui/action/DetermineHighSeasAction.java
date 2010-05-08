@@ -42,11 +42,6 @@ import net.sf.freecol.server.generator.TerrainGenerator;
  * An action for determining the high seas tiles.
  */
 public class DetermineHighSeasAction extends FreeColAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DetermineHighSeasAction.class.getName());
-
-
-
 
     public static final String id = "determineHighSeasAction";
 
@@ -57,18 +52,9 @@ public class DetermineHighSeasAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     DetermineHighSeasAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.tools.determineHighSeas", null, 0, null);
+        super(freeColClient, id);
     }
 
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "determineHighSeasAction"
-     */
-    public String getId() {
-        return id;
-    }
-    
     /**
      * Checks if this action should be enabled.
      * 
@@ -77,9 +63,9 @@ public class DetermineHighSeasAction extends FreeColAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-                && freeColClient.isMapEditor()
-                && freeColClient.getGame() != null
-                && freeColClient.getGame().getMap() != null; 
+            && freeColClient.isMapEditor()
+            && freeColClient.getGame() != null
+            && freeColClient.getGame().getMap() != null; 
     }
     
     /**

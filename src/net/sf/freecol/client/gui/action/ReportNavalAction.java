@@ -22,22 +22,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportNavalPanel;
 
 
 /**
- * 
+ * An action for displaying a Naval Report.
  */
-public class ReportNavalAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportNavalAction.class.getName());
-
+public class ReportNavalAction extends FreeColAction {
 
     public static final String id = "reportNavalAction";
     
@@ -46,25 +40,7 @@ public class ReportNavalAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportNavalAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.naval", null, KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportNavalAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

@@ -21,9 +21,7 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -36,9 +34,6 @@ import net.sf.freecol.common.model.Unit;
  */
 public class LoadAction extends MapboardAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(LoadAction.class.getName());
-
     public static final String id = "loadAction";
 
     /**
@@ -46,15 +41,7 @@ public class LoadAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     public LoadAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.load", null, KeyStroke.getKeyStroke('L', 0));
-    }
-
-    /**
-    * Returns the id of this <code>Option</code>.
-    * @return "loadAction"
-    */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

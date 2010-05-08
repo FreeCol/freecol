@@ -100,7 +100,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
      */
     public ReportMilitaryPanel(Canvas parent) {
 
-        super(parent, Messages.message("menuBar.report.military"));
+        super(parent, Messages.message("reportMilitaryAction.name"));
 
         gatherData();
 

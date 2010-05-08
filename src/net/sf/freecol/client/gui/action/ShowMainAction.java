@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.MainPanel;
@@ -32,11 +31,6 @@ import net.sf.freecol.client.gui.panel.MainPanel;
  * @see MainPanel
  */
 public class ShowMainAction extends FreeColAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ShowMainAction.class.getName());
-
-
-
 
     public static final String id = "showMainAction";
 
@@ -47,23 +41,7 @@ public class ShowMainAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     ShowMainAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.returnToMain", null, null);
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * @return <code>true</code>
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * @return The <code>String</code>: "showMainAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**
@@ -71,7 +49,9 @@ public class ShowMainAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        if (!getFreeColClient().getCanvas().showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
+        if (!getFreeColClient().getCanvas().showConfirmDialog("stopCurrentGame.text",
+                                                              "stopCurrentGame.yes",
+                                                              "stopCurrentGame.no")) {
             return;
         }
         

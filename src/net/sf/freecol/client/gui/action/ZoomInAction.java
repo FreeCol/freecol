@@ -20,20 +20,15 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for zooming in on the main map.
  */
 public class ZoomInAction extends FreeColAction {
-
-    private static final Logger logger = Logger.getLogger(ZoomInAction.class.getName());
 
     public static final String id = "zoomInAction";
 
@@ -44,7 +39,7 @@ public class ZoomInAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     ZoomInAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.zoomIn", null, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0));
+        super(freeColClient, id);
     }
 
     /**
@@ -66,15 +61,6 @@ public class ZoomInAction extends FreeColAction {
         float oldScaling = getFreeColClient().getGUI().getMapScale();
 
         return oldScaling < 1.0;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "zoomInAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

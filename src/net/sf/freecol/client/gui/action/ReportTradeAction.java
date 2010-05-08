@@ -22,22 +22,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 
 
 /**
- * 
+ * An action for displaying a Trade Report.
  */
-public class ReportTradeAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportTradeAction.class.getName());
-
+public class ReportTradeAction extends FreeColAction {
 
     public static final String id = "reportTradeAction";
     
@@ -46,25 +40,7 @@ public class ReportTradeAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTradeAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.trade", null, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportTradeAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

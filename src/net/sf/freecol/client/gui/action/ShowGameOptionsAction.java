@@ -20,19 +20,17 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for displaying the Game Options.
  */
-public class ShowGameOptionsAction extends MapboardAction {
+public class ShowGameOptionsAction extends FreeColAction {
 
-    public static final String id = "gameOptions";
+    public static final String id = "gameOptionsAction";
 
     /**
      * Creates a new <code>ShowGameOptionsAction</code>.
@@ -40,25 +38,7 @@ public class ShowGameOptionsAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ShowGameOptionsAction(FreeColClient freeColClient) {
-        super(freeColClient, "gameOptions", null, KeyStroke.getKeyStroke(KeyEvent.VK_F11, KeyEvent.SHIFT_MASK));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "gameOptions"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

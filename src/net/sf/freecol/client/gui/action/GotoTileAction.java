@@ -22,30 +22,38 @@ package net.sf.freecol.client.gui.action;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 
 /**
  * An action to make a unit go to a specific tile.
  */
-public class GotoTileAction extends MapboardAction {
+public class GotoTileAction extends UnitAction {
 
     public static final String id = "gotoTileAction";
     
     /**
-     * Returns the id of this <code>Option</code>.
+     * Creates this action.
      * 
-     * @return "gotoTileAction"
+     * @param freeColClient The main controller object for the client.
      */
-    @Override
-    public String getId() {
-        return id;
+    GotoTileAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+    }
+
+    /**
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if there is no active unit, and 
+     *      <code>true</code> otherwise.
+     */
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled()
+            && getFreeColClient().getGUI().getActiveUnit().getTile() != null;
     }
 
     /**
@@ -64,7 +72,9 @@ public class GotoTileAction extends MapboardAction {
         if (!gui.isGotoStarted()) {
             gui.startGoto();
 
-            //Draw the path to the current mouse position, if the mouse is over the screen; see also CanvaseMouseMotionListener
+            //Draw the path to the current mouse position, if the
+            //mouse is over the screen; see also
+            //CanvaseMouseMotionListener
             Point pt = getFreeColClient().getCanvas().getMousePosition();
             if (pt != null) {
                 Map map = getFreeColClient().getGame().getMap();
@@ -87,26 +97,4 @@ public class GotoTileAction extends MapboardAction {
 
     }
     
-    /**
-     * Creates this action.
-     * 
-     * @param freeColClient The main controller object for the client.
-     */
-    GotoTileAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.11", null, KeyStroke.getKeyStroke('G', 0));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return <code>false</code> if there is no active unit, and 
-     *      <code>true</code> otherwise.
-     */
-    protected boolean shouldBeEnabled() {
-        if (!super.shouldBeEnabled()) {
-            return false;
-        }
-        Unit activeUnit = getFreeColClient().getGUI().getActiveUnit();
-        return (activeUnit != null && activeUnit.getTile() != null);
-    }
 }

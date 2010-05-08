@@ -20,23 +20,17 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
+
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for toggling between full-screen and windowed mode.
  */
 public class ChangeWindowedModeAction extends SelectableAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ChangeWindowedModeAction.class.getName());
-
-
-
 
     public static final String id = "changeWindowedModeAction";
 
@@ -47,7 +41,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     ChangeWindowedModeAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.changeWindowedModeAction", null, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
+        super(freeColClient, id);
     }
     
     /**
@@ -56,15 +50,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
     @Override
     public void update() {
         selected = !getFreeColClient().isWindowed();
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "changeWindowedModeAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

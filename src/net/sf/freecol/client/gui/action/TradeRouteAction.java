@@ -20,8 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -32,9 +30,6 @@ import net.sf.freecol.client.gui.panel.TradeRouteDialog;
  */
 public class TradeRouteAction extends MapboardAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(TradeRouteAction.class.getName());
-
     public static final String id = "tradeRouteAction";
 
 
@@ -43,29 +38,9 @@ public class TradeRouteAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     TradeRouteAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.tradeRoutes", null, KeyStroke.getKeyStroke('T', 0));
+        super(freeColClient, id);
     }
     
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return <code>true</code> if there is an active unit.
-     */
-    protected boolean shouldBeEnabled() { 
-        return super.shouldBeEnabled() 
-            && getFreeColClient().getMyPlayer() != null;
-    }
-    
-    /**
-    * Returns the id of this <code>Option</code>.
-    * @return "tradeRouteAction"
-    */
-    public String getId() {
-        return id;
-    }
-
-
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

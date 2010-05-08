@@ -39,7 +39,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class ReportContinentalCongressPanel extends ReportPanel {
 
-    static final String title = Messages.message("report.continentalCongress.title");
+    static final String title = Messages.message("reportCongressAction.name");
 
     static final String none = Messages.message("report.continentalCongress.none");
 

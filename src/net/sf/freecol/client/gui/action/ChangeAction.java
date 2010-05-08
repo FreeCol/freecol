@@ -22,11 +22,8 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -45,10 +42,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 *     <li>In other cases: switch to another unit on the same tile.
 * </ol>
 */
-public class ChangeAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ChangeAction.class.getName());
-
+public class ChangeAction extends UnitAction {
 
     public static final String id = "changeAction";
 
@@ -58,7 +52,8 @@ public class ChangeAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ChangeAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.nextUnitOnTile", null, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+        super(freeColClient, id);
+        update();
     }
     
     
@@ -76,11 +71,11 @@ public class ChangeAction extends MapboardAction {
             Unit unit = getFreeColClient().getGUI().getActiveUnit();
             if (unit.getTile() != null) {
                 if (unit.getColony() != null) {
-                    putValue(NAME, Messages.message("menuBar.orders.enterColony"));
+                    putValue(NAME, Messages.message("changeAction.enterColony.name"));
                 } else if (unit.isOnCarrier()) {
-                    putValue(NAME, Messages.message("menuBar.orders.selectCarrier"));
+                    putValue(NAME, Messages.message("changeAction.selectCarrier.name"));
                 } else {
-                    putValue(NAME, Messages.message("menuBar.orders.nextUnitOnTile"));
+                    putValue(NAME, Messages.message("changeAction.nextUnitOnTile.name"));
                 }
             }
         }
@@ -93,28 +88,10 @@ public class ChangeAction extends MapboardAction {
      * @return <code>false</code> if there is no active unit.
      */
     protected boolean shouldBeEnabled() {    
-        if (!super.shouldBeEnabled()) {
-            return false;
-        }        
-        GUI gui = getFreeColClient().getGUI();
-        if (gui == null) return false;
-        
-        Unit unit = getFreeColClient().getGUI().getActiveUnit();
-        if (unit == null) {
-            return false;
-        } else {
-            return unit.getTile() != null;
-        }
+        return super.shouldBeEnabled()
+            && getFreeColClient().getGUI().getActiveUnit().getTile() != null;
     }
     
-    /**
-    * Returns the id of this <code>Option</code>.
-    * @return "changeAction"
-    */
-    public String getId() {
-        return id;
-    }
-
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

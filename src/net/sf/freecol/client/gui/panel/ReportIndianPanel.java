@@ -45,7 +45,7 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportIndianPanel(Canvas parent) {
-        super(parent, Messages.message("menuBar.report.indian"));
+        super(parent, Messages.message("reportIndianAction.name"));
         Player player = getMyPlayer();
         reportPanel.setLayout(new MigLayout("wrap 1, fillx"));
         for (Player opponent : getGame().getPlayers()) {

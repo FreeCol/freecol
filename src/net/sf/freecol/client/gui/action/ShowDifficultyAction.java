@@ -20,19 +20,17 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.DifficultyDialog;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for displaying the current difficulty level.
  */
-public class ShowDifficultyAction extends MapboardAction {
+public class ShowDifficultyAction extends FreeColAction {
 
-    public static final String id = "difficulty";
+    public static final String id = "difficultyAction";
 
     /**
      * Creates a new <code>ShowDifficultyAction</code>.
@@ -40,26 +38,7 @@ public class ShowDifficultyAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ShowDifficultyAction(FreeColClient freeColClient) {
-        super(freeColClient, "gameOptions.difficultySettings.difficulty.name", null,
-              KeyStroke.getKeyStroke(KeyEvent.VK_F9, KeyEvent.SHIFT_MASK));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "difficulty"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

@@ -71,7 +71,7 @@ public final class ReportTradePanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportTradePanel(Canvas parent) {
-        super(parent, Messages.message("menuBar.report.trade"));
+        super(parent, Messages.message("reportTradeAction.name"));
         setSize(getMinimumSize());
 
         salesLabel = new JLabel(Messages.message("report.trade.unitsSold"), JLabel.TRAILING);

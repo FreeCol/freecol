@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -31,14 +30,8 @@ import net.sf.freecol.client.gui.panel.AboutPanel;
  * An action for displaying an about box with version numbers.
  */
 public class AboutAction extends FreeColAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AboutAction.class.getName());
-
-
-
 
     public static final String id = "aboutAction";
-
 
     /**
      * Creates a new <code>AboutAction</code>.
@@ -46,16 +39,8 @@ public class AboutAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     AboutAction(FreeColClient freeColClient) {
-        super(freeColClient, "FreeCol " + FreeCol.getRevision(), "FreeCol " + FreeCol.getRevision(), 0, null, false);
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "waitAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
+        putValue(NAME, "FreeCol " + FreeCol.getRevision());
     }
 
     /**

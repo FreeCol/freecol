@@ -19,21 +19,15 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
 /**
  * An action for quitting the game.
  */
-public class QuitAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(QuitAction.class.getName());
+public class QuitAction extends FreeColAction {
 
     public static final String id = "quitAction";
 
@@ -44,17 +38,7 @@ public class QuitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     QuitAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.quit", null, KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "quitAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

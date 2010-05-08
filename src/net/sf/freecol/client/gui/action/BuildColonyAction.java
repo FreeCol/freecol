@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,21 +20,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit;
 
 /**
  * An action for using the active unit to build a colony.
  */
-public class BuildColonyAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(BuildColonyAction.class.getName());
+public class BuildColonyAction extends UnitAction {
 
     public static final String id = "buildColonyAction";
 
@@ -45,7 +40,7 @@ public class BuildColonyAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     BuildColonyAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.7", null, KeyStroke.getKeyStroke('B', 0));
+        super(freeColClient, id);
         addImageIcons("build");
     }
 
@@ -65,15 +60,6 @@ public class BuildColonyAction extends MapboardAction {
                 || (selectedOne.getTile().getColony() != null
                     // exclude artillery, ships, etc.
                     && selectedOne.getType().hasSkill()));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "buildColonyAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

@@ -19,12 +19,8 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ViewMode;
@@ -36,11 +32,6 @@ import net.sf.freecol.client.gui.ViewMode;
  * @see ViewMode
  */
 public class ToggleViewModeAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ToggleViewModeAction.class.getName());
-
-
-
 
     public static final String id = "toggleViewModeAction";
 
@@ -51,18 +42,7 @@ public class ToggleViewModeAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ToggleViewModeAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.toggle", null, KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()
-                | InputEvent.SHIFT_MASK));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "toggleViewModeAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

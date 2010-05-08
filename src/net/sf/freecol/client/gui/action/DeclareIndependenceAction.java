@@ -30,11 +30,6 @@ import net.sf.freecol.common.model.Player.PlayerType;
  * An action for declaring independence.
  */
 public class DeclareIndependenceAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DeclareIndependenceAction.class.getName());
-
-
-
 
     public static final String id = "declareIndependenceAction";
 
@@ -45,7 +40,7 @@ public class DeclareIndependenceAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     DeclareIndependenceAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.declareIndependence", null);
+        super(freeColClient, id);
     }
 
     /**
@@ -56,15 +51,6 @@ public class DeclareIndependenceAction extends MapboardAction {
     protected boolean shouldBeEnabled() {
         Player p = getFreeColClient().getMyPlayer();
         return super.shouldBeEnabled() && p != null && p.getPlayerType() == PlayerType.COLONIAL;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "declareIndependenceAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

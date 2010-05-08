@@ -19,23 +19,17 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.FindSettlementDialog;
 
 /**
- * An action for choosing the next unit as the active unit.
+ * An action for finding a settlement on the map.
  */
 public class FindSettlementAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FindSettlementAction.class.getName());
 
     public static final String id = "findSettlementAction";
 
@@ -46,29 +40,9 @@ public class FindSettlementAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     FindSettlementAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.findSettlement", null,
-              KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
+        super(freeColClient, id);
     }
 
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "findSettlementAction"
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled();
-    }    
-    
     /**
      * Applies this action.
      * 

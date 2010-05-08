@@ -29,10 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * An action for disbanding the active unit.
  */
-public class DisbandUnitAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DisbandUnitAction.class.getName());
+public class DisbandUnitAction extends UnitAction {
 
     public static final String id = "disbandUnitAction";
 
@@ -43,26 +40,8 @@ public class DisbandUnitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     DisbandUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.8", null, KeyStroke.getKeyStroke('D', 0));
+        super(freeColClient, id);
         addImageIcons("disband");
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return <code>true</code> if there is an active unit.
-     */
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "disbandUnitAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

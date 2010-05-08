@@ -68,7 +68,7 @@ public final class ReportNavalPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportNavalPanel(Canvas parent) {
-        super(parent, Messages.message("menuBar.report.naval"));
+        super(parent, Messages.message("reportNavalAction.name"));
 
         gatherData();
 

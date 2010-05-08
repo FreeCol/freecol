@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -17,45 +17,32 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 package net.sf.freecol.client.gui.action;
-
-import java.util.logging.Logger;
-
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
 
 /**
-* Super class for all actions that should be disabled when the mapboard is not selected.
+* Super class for all actions that should be disabled when no unit is selected.
 */
-public abstract class MapboardAction extends FreeColAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(MapboardAction.class.getName());
-
+public abstract class UnitAction extends MapboardAction {
 
     /**
-     * Creates a new <code>MapboardAction</code>.
+     * Creates a new <code>UnitAction</code>.
      * @param freeColClient The main controller object for the client
-     * @param id a <code>String</code> value
+     * @param id The id of this action
      */
-    protected MapboardAction(FreeColClient freeColClient, String id) {
+    protected UnitAction(FreeColClient freeColClient, String id) {
         super(freeColClient, id);
     }
 
     /**
      * Checks if this action should be enabled.
      * 
-     * @return <code>true</code> if the mapboard is selected.
+     * @return <code>false</code> if there is no active unit.
      */
-    protected boolean shouldBeEnabled() { 
-        return super.shouldBeEnabled()  
-            && getFreeColClient().getCanvas() != null
-            && getFreeColClient().getCanvas().isMapboardActionsEnabled()
-            && (getFreeColClient().getGame() == null
-                || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer());
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
     }
+
 }

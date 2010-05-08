@@ -58,7 +58,7 @@ public final class ReportColonyPanel extends ReportPanel {
      */
     public ReportColonyPanel(Canvas parent) {
 
-        super(parent, Messages.message("menuBar.report.colony"));
+        super(parent, Messages.message("reportColonyAction.name"));
         Player player = getMyPlayer();
         colonies = player.getColonies();
 

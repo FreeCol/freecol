@@ -20,21 +20,15 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportExplorationPanel;
 
 /**
- * 
+ * An action for displaying an Exploration Report.
  */
-public class ReportExplorationAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportExplorationAction.class.getName());
+public class ReportExplorationAction extends FreeColAction {
 
     public static final String id = "reportExplorationAction";
     
@@ -43,28 +37,9 @@ public class ReportExplorationAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportExplorationAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.exploration", null,
-              KeyStroke.getKeyStroke(KeyEvent.VK_F2, KeyEvent.SHIFT_MASK));
+        super(freeColClient, id);
     }
     
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportExplorationAction"
-     */
-    public String getId() {
-        return id;
-    }
-
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

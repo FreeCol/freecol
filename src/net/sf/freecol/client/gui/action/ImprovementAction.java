@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
@@ -35,21 +34,21 @@ import net.sf.freecol.common.model.Unit.UnitState;
 /**
  * An action for using the active unit to plow/clear a forest.
  */
-public class ImprovementAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ImprovementAction.class.getName());
+public class ImprovementAction extends UnitAction {
 
     public ImprovementActionType iaType;
     
     int actionID;
+
     /**
      * Creates this action.
      * 
      * @param freeColClient The main controller object for the client.
      */
     public ImprovementAction(FreeColClient freeColClient, ImprovementActionType iaType) {
-        super(freeColClient, iaType.getNames().get(0), null, KeyStroke.getKeyStroke(iaType.getAccelerator(), 0));
+        super(freeColClient, iaType.getId());
+        putValue(NAME, iaType.getNames().get(0));
+        setAccelerator(KeyStroke.getKeyStroke(iaType.getAccelerator(), 0));
         this.iaType = iaType;
         actionID = -1;
         updateValues(0);
@@ -132,15 +131,6 @@ public class ImprovementAction extends MapboardAction {
         }
         // Since nothing suitable was found, disable this ImprovementAction.
         return false;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "ImprovementAction"
-     */
-    public String getId() {
-        return iaType.getId();
     }
 
     /**

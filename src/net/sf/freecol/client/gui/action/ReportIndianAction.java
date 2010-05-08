@@ -22,22 +22,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 
 
 /**
- * 
+ * An action for displaying an Indian Relations Report.
  */
-public class ReportIndianAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportIndianAction.class.getName());
-
+public class ReportIndianAction extends FreeColAction {
 
     public static final String id = "reportIndianAction";
     
@@ -46,25 +40,7 @@ public class ReportIndianAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportIndianAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.indian", null, KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportIndianAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

@@ -37,9 +37,6 @@ import net.sf.freecol.client.gui.panel.MapControls;
  */
 public class MapControlsAction extends SelectableAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(MapControlsAction.class.getName());
-
     public static final String id = "mapControlsAction";
 
     private MapControls mapControls;
@@ -51,9 +48,7 @@ public class MapControlsAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     MapControlsAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.mapControls", null, KeyStroke.getKeyStroke('M', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
-
+        super(freeColClient, id);
         setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
     }
 
@@ -64,15 +59,6 @@ public class MapControlsAction extends SelectableAction {
         super.update();
 
         showMapControls(enabled && isSelected());
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "mapControlsAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

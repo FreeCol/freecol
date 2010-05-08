@@ -27,14 +27,9 @@ import javax.swing.KeyStroke;
 import net.sf.freecol.client.FreeColClient;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for executing goto orders immediately.
  */
 public class ExecuteGotoOrdersAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ExecuteGotoOrdersAction.class.getName());
-
-
-
 
     public static final String id = "executeGotoOrdersAction";
 
@@ -45,16 +40,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ExecuteGotoOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, "executeGotoOrders", null, KeyStroke.getKeyStroke('O', 0));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "waitAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

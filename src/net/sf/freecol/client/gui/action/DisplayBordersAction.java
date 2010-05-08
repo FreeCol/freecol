@@ -19,9 +19,8 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.KeyStroke;
@@ -31,12 +30,9 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.option.BooleanOption;
 
 /**
- * 
+ * An action to toggle the display of national borders.
  */
 public class DisplayBordersAction extends SelectableAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DisplayBordersAction.class.getName());
 
     public static final String id = "displayBordersAction";
 
@@ -47,27 +43,8 @@ public class DisplayBordersAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     DisplayBordersAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.displayBorders", null,
-              KeyStroke.getKeyStroke('B', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        super(freeColClient, id);
         setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "displayBordersAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

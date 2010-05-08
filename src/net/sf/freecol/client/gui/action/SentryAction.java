@@ -21,22 +21,15 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
 * An action to set sentry state to the active unit.
 */
-public class SentryAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SentryAction.class.getName());
-
-
+public class SentryAction extends UnitAction {
     
     public static final String id = "sentryAction";
     
@@ -45,29 +38,10 @@ public class SentryAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     public SentryAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.3", null, KeyStroke.getKeyStroke('S', 0));
+        super(freeColClient, id);
         addImageIcons("sentry");
     }
     
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return <code>false</code> if there is no active unit.
-     */
-    protected boolean shouldBeEnabled() { 
-        return super.shouldBeEnabled() 
-                && getFreeColClient().getGUI().getActiveUnit() != null;
-    }
-
-    
-    /**
-    * Returns the id of this <code>Option</code>.
-    * @return "sentryAction"
-    */
-    public String getId() {
-        return id;
-    }
-
     /**
      * Applies this action.
      * @param actionEvent The <code>ActionEvent</code>.

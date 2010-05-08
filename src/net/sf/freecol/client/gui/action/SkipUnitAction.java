@@ -20,9 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -30,10 +28,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 /**
  * An action for skipping the active unit.
  */
-public class SkipUnitAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SkipUnitAction.class.getName());
+public class SkipUnitAction extends UnitAction {
 
     public static final String id = "skipUnitAction";
 
@@ -44,26 +39,8 @@ public class SkipUnitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     SkipUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.1", null, KeyStroke.getKeyStroke(' ', 0));
+        super(freeColClient, id);
         addImageIcons("done");
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return <code>false</code> if there is no active unit.
-     */
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "skipUnitAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**
@@ -72,7 +49,6 @@ public class SkipUnitAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        //getFreeColClient().getInGameController().skipActiveUnit();
         getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), 
                                                              UnitState.SKIPPED);
     }

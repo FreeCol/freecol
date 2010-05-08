@@ -20,21 +20,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Player.PlayerType;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for retiring from the game.
  */
-public class RetireAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(RetireAction.class.getName());
+public class RetireAction extends FreeColAction {
 
     public static final String id = "retireAction";
-
 
     /**
      * Creates a new <code>RetireAction</code>.
@@ -42,16 +37,7 @@ public class RetireAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     RetireAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.retire", null, null);
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "retireAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

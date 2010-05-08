@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -34,9 +33,6 @@ import net.sf.freecol.server.generator.MapGenerator;
  */
 public class NewEmptyMapAction extends MapboardAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(NewEmptyMapAction.class.getName());
-
     public static final String id = "newEmptyMapAction";
 
 
@@ -46,7 +42,7 @@ public class NewEmptyMapAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     NewEmptyMapAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.newEmptyMap", null, null);
+        super(freeColClient, id);
     }
 
     /**
@@ -58,15 +54,6 @@ public class NewEmptyMapAction extends MapboardAction {
      */
     protected boolean shouldBeEnabled() {
         return freeColClient.isMapEditor();
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return The String: "newEmptyMapAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

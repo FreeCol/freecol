@@ -63,7 +63,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      * @param parent The parent of this panel.
      */
     public ReportLabourPanel(Canvas parent) {
-        super(parent, Messages.message("report.labour"));
+        super(parent, Messages.message("reportLabourAction.name"));
         colonies = getMyPlayer().getColonies();
         gatherData();
         displayData();

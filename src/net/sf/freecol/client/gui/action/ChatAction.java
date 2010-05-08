@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
+import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
@@ -33,11 +33,6 @@ import net.sf.freecol.client.FreeColClient;
  * @see net.sf.freecol.client.gui.panel.MapControls
  */
 public class ChatAction extends FreeColAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ChatAction.class.getName());
-
-
-
 
     public static final String id = "chatAction";
 
@@ -48,8 +43,7 @@ public class ChatAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     ChatAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.chat", null, KeyStroke.getKeyStroke('T', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
+        super(freeColClient, id);
     }
 
     /**
@@ -59,19 +53,10 @@ public class ChatAction extends FreeColAction {
      */
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-        		&& !getFreeColClient().isSingleplayer()
-                && getFreeColClient().getCanvas() != null
-                && (!getFreeColClient().getCanvas().isShowingSubPanel() || getFreeColClient().getGame() != null
-                        && getFreeColClient().getGame().getCurrentPlayer() != getFreeColClient().getMyPlayer());
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "chatAction"
-     */
-    public String getId() {
-        return id;
+            && !getFreeColClient().isSingleplayer()
+            && getFreeColClient().getCanvas() != null
+            && (!getFreeColClient().getCanvas().isShowingSubPanel() || getFreeColClient().getGame() != null
+                && getFreeColClient().getGame().getCurrentPlayer() != getFreeColClient().getMyPlayer());
     }
 
     /**

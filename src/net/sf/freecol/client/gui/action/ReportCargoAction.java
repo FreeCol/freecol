@@ -20,22 +20,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportCargoPanel;
 
 
 /**
- * Request1705771 Cargo Report
+ * An action for displaying a Cargo Report.
  */
-public class ReportCargoAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportCargoAction.class.getName());
-
+public class ReportCargoAction extends FreeColAction {
 
     public static final String id = "reportCargoAction";
     
@@ -44,28 +38,9 @@ public class ReportCargoAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportCargoAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.cargo", null, 
-              KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.SHIFT_MASK));
+        super(freeColClient, id);
     }
     
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportCargoAction"
-     */
-    public String getId() {
-        return id;
-    }
-
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

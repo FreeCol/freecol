@@ -1680,7 +1680,7 @@ public final class InGameController implements NetworkConstants {
                 m = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                      "tutorial.buildColony", player)
                     .addName("%build_colony_key%", key)
-                    .add("%build_colony_menu_item%", "unit.state.7")
+                    .add("%build_colony_menu_item%", "buildColonyAction.name")
                     .add("%orders_menu_item%", "menuBar.orders");
                 player.addModelMessage(m);
             }

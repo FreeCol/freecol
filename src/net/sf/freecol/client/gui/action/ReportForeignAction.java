@@ -20,10 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
@@ -31,12 +28,7 @@ import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 /**
  * 
  */
-public class ReportForeignAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportForeignAction.class.getName());
-
-
-
+public class ReportForeignAction extends FreeColAction {
 
     public static final String id = "reportForeignAction";
 
@@ -47,25 +39,7 @@ public class ReportForeignAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportForeignAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.foreign", null, KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportForeignAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

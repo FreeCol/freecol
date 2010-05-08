@@ -20,21 +20,15 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * An action for fortifying the active unit.
  */
-public class FortifyAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FortifyAction.class.getName());
+public class FortifyAction extends UnitAction {
 
     public static final String id = "fortifyAction";
 
@@ -45,7 +39,7 @@ public class FortifyAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     FortifyAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.2", null, KeyStroke.getKeyStroke('F', 0));
+        super(freeColClient, id);
         addImageIcons("fortify");
     }
 
@@ -55,17 +49,8 @@ public class FortifyAction extends MapboardAction {
      * @return <code>true</code> if there is an active unit.
      */
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null
-                && getFreeColClient().getGUI().getActiveUnit().checkSetState(UnitState.FORTIFYING);
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "fortifyAction"
-     */
-    public String getId() {
-        return id;
+        return super.shouldBeEnabled()
+            && getFreeColClient().getGUI().getActiveUnit().checkSetState(UnitState.FORTIFYING);
     }
 
     /**

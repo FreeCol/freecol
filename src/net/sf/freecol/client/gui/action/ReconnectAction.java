@@ -19,28 +19,17 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
- * An action for declaring independence.
+ * An action for reconnecting to the server.
  */
-public class ReconnectAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReconnectAction.class.getName());
-
-
-
+public class ReconnectAction extends FreeColAction {
 
     public static final String id = "reconnectAction";
-
 
     /**
      * Creates a new <code>DeclareIndependenceAction</code>.
@@ -48,30 +37,7 @@ public class ReconnectAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReconnectAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.reconnect", null, KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit
-                .getDefaultToolkit().getMenuShortcutKeyMask()));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "declareIndependenceAction"
-     */
-    public String getId() {
-        return id;
-    }
-
-    public String getMenuItemText() {
-        return Messages.message("menuBar.game.reconnect");
+        super(freeColClient, id);
     }
 
     /**

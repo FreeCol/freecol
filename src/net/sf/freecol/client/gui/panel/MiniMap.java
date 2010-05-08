@@ -38,7 +38,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.action.MiniMapChangeBackgroundAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.common.model.Map;
@@ -214,7 +213,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         Image skin = ResourceManager.getImage("MiniMap.skin");
         
     	int colorIndex = freeColClient.getClientOptions().getInteger(ClientOptions.MINIMAP_BACKGROUND_COLOR);
-    	Color newBackground = MiniMapChangeBackgroundAction.interpretIndex(colorIndex);
+    	Color newBackground = ResourceManager.getColor("miniMapBackground.color");
     	this.setBackgroundColor(newBackground);
         
         scaledFactorX = 1;

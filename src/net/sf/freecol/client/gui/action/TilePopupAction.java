@@ -20,14 +20,12 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for displaying a Tile Popup.
  */
 public class TilePopupAction extends MapboardAction {
 
@@ -39,17 +37,7 @@ public class TilePopupAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     TilePopupAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.showTile", null,
-              KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.SHIFT_MASK));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "tilePopupAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

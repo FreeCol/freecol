@@ -20,22 +20,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
 /**
  * An action for renameing the active unit.
  */
-public class RenameAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(RenameAction.class.getName());
+public class RenameAction extends UnitAction {
 
     public static final String id = "renameAction";
-
 
     /**
      * Creates this action.
@@ -43,25 +37,7 @@ public class RenameAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     RenameAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.rename", null, KeyStroke.getKeyStroke('N', 0));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return <code>true</code> if there is an active unit.
-     */
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "renameAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

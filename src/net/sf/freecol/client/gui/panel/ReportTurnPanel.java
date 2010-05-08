@@ -71,7 +71,7 @@ public final class ReportTurnPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
-        super(parent, Messages.message("menuBar.report.turn"));
+        super(parent, Messages.message("reportTurnAction.name"));
 
         this._messages = messages;
 

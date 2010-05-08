@@ -19,11 +19,8 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -31,12 +28,9 @@ import net.sf.freecol.client.gui.Canvas;
 /**
  * An action for prompting the user to save before quitting the game.
  */
-public class SaveAndQuitAction extends MapboardAction {
+public class SaveAndQuitAction extends FreeColAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SaveAndQuitAction.class.getName());
-
-    public static final String id = "SaveAndQuitAction";
+    public static final String id = "saveAndQuitAction";
 
 
     /**
@@ -45,17 +39,7 @@ public class SaveAndQuitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     SaveAndQuitAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.quit", null,
-              KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit() .getMenuShortcutKeyMask()));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "SaveAndQuitAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

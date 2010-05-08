@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,12 +31,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * An action for assigning a trade route to the currently selected unit.
  */
-public class AssignTradeRouteAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AssignTradeRouteAction.class.getName());
-
-
-
+public class AssignTradeRouteAction extends UnitAction {
 
     public static final String id = "assignTradeRouteAction";
 
@@ -47,16 +42,7 @@ public class AssignTradeRouteAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     AssignTradeRouteAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.assignTradeRoute", null, KeyStroke.getKeyStroke('A', 0));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "assignTradeRouteAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

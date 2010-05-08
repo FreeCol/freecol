@@ -37,7 +37,7 @@ public class MessagesTest extends FreeColTestCase {
     public void testMessageString() {
 
     	assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));	
-        assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
+        assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
 
         // With parameters
         assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", 
@@ -61,7 +61,7 @@ public class MessagesTest extends FreeColTestCase {
             // Expected
         }
 
-        assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
+        assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
 
         // With parameters for "Gold: %gold% | Tax: %tax%% | Year: %year%"
         assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%", 
@@ -90,11 +90,11 @@ public class MessagesTest extends FreeColTestCase {
     public void testChangeLocaleSettings() {
         Messages.setMessageBundle(Locale.US);
 
-        assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
+        assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
 
         Messages.setMessageBundle(Locale.GERMANY);
 
-        assertEquals("Handelsberater", Messages.message("menuBar.report.trade"));
+        assertEquals("Handelsberater", Messages.message("reportTradeAction.name"));
     }
     
     // Tests if messages with special chars (like $) are well processed

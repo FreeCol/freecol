@@ -42,7 +42,7 @@ public final class ReportHistoryPanel extends ReportPanel {
      */
     public ReportHistoryPanel(Canvas parent) {
 
-        super(parent, Messages.message("menuBar.report.history"));
+        super(parent, Messages.message("reportHistoryAction.name"));
 
         List<HistoryEvent> history = getMyPlayer().getHistory();
 

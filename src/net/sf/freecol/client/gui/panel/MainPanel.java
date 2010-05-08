@@ -63,13 +63,13 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     public MainPanel(Canvas parent) {
         super(parent, new BorderLayout());
 
-        JButton openButton = new JButton( Messages.message("menuBar.game.open") );
+        JButton openButton = new JButton( Messages.message("openAction.name") );
         JButton mapEditorButton = new JButton( Messages.message("mainPanel.editor") );
         JButton optionsButton = new JButton( Messages.message("mainPanel.options") );
-        JButton quitButton = new JButton( Messages.message("menuBar.game.quit") );
+        JButton quitButton = new JButton( Messages.message("quitAction.name") );
         
         setCancelComponent(quitButton);
-        newButton = new JButton( Messages.message("menuBar.game.new") );
+        newButton = new JButton( Messages.message("newAction.name") );
 
         newButton.setActionCommand(String.valueOf(NEW));
         mapEditorButton.setActionCommand(String.valueOf(MAP_EDITOR));

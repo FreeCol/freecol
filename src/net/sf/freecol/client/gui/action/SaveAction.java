@@ -19,21 +19,15 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
 /**
  * An action for saving the game.
  */
-public class SaveAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SaveAction.class.getName());
+public class SaveAction extends FreeColAction {
 
     public static final String id = "saveAction";
 
@@ -44,8 +38,7 @@ public class SaveAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     SaveAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.save", null, KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
+        super(freeColClient, id);
     }
 
     /**
@@ -63,15 +56,6 @@ public class SaveAction extends MapboardAction {
             return false;
         }
         return !freeColClient.getCanvas().isShowingSubPanel();
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "declareIndependenceAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

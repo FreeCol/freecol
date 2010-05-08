@@ -24,12 +24,11 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ViewMode;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for centering the view on the active unit.
  */
-public class CenterAction extends MapboardAction {
+public class CenterAction extends UnitAction {
 
     public static final String id = "centerAction";
 
@@ -39,16 +38,7 @@ public class CenterAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     CenterAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.center", null, KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "centerAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

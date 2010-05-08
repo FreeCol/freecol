@@ -22,10 +22,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
@@ -33,10 +30,7 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * Show turn messages in report panel.
  */
-public class ReportTurnAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportTurnAction.class.getName());
-
+public class ReportTurnAction extends FreeColAction {
 
     public static final String id = "reportTurnAction";
     
@@ -45,25 +39,7 @@ public class ReportTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.turn", null, KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportTurnAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

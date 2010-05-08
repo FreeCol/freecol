@@ -20,10 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportHistoryPanel;
@@ -32,10 +29,7 @@ import net.sf.freecol.client.gui.panel.ReportHistoryPanel;
 /**
  * Show history messages in report panel.
  */
-public class ReportHistoryAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportHistoryAction.class.getName());
+public class ReportHistoryAction extends FreeColAction {
 
     public static final String id = "reportHistoryAction";
     
@@ -44,26 +38,7 @@ public class ReportHistoryAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportHistoryAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.history", null,
-              KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_MASK));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportHistoryAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

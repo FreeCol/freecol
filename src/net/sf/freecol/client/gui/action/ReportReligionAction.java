@@ -22,22 +22,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 
 
 /**
- * 
+ * An action for displaying the Religion Report.
  */
-public class ReportReligionAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportReligionAction.class.getName());
-
+public class ReportReligionAction extends FreeColAction {
 
     public static final String id = "reportReligionAction";
     
@@ -46,25 +40,7 @@ public class ReportReligionAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportReligionAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.religion", null, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportReligionAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

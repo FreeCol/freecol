@@ -20,9 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit;
@@ -32,12 +30,7 @@ import net.sf.freecol.common.model.Unit;
  * displays a panel from which the player can choose a location the unit should
  * move towards.
  */
-public class GotoAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(GotoAction.class.getName());
-
-
-
+public class GotoAction extends UnitAction {
 
     public static final String id = "gotoAction";
 
@@ -48,7 +41,7 @@ public class GotoAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     GotoAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.goto", null, KeyStroke.getKeyStroke('H', 0));
+        super(freeColClient, id);
     }
 
     /**
@@ -57,17 +50,8 @@ public class GotoAction extends MapboardAction {
      * @return <code>true</code> if the mapboard is selected.
      */
     protected boolean shouldBeEnabled() {
-        // super.shouldBeEnabled();
-        return getFreeColClient().getCanvas() != null && !getFreeColClient().getCanvas().isShowingSubPanel();
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "gotoAction"
-     */
-    public String getId() {
-        return id;
+        return super.shouldBeEnabled()
+            && !getFreeColClient().getCanvas().isShowingSubPanel();
     }
 
     /**

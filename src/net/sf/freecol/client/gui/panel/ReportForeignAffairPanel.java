@@ -47,7 +47,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
      */
     public ReportForeignAffairPanel(Canvas parent) {
 
-        super(parent, Messages.message("menuBar.report.foreign"));
+        super(parent, Messages.message("reportForeignAction.name"));
 
         // Display Panel
         reportPanel.removeAll();

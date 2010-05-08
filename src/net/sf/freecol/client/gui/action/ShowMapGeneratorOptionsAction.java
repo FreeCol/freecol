@@ -20,19 +20,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for displaying the Map Generator Options.
  */
-public class ShowMapGeneratorOptionsAction extends MapboardAction {
+public class ShowMapGeneratorOptionsAction extends FreeColAction {
 
-    public static final String id = "mapGeneratorOptions";
+    public static final String id = "mapGeneratorOptionsAction";
 
     /**
      * Creates a new <code>ShowMapGeneratorOptionsAction</code>.
@@ -40,25 +37,7 @@ public class ShowMapGeneratorOptionsAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ShowMapGeneratorOptionsAction(FreeColClient freeColClient) {
-        super(freeColClient, id, null, KeyStroke.getKeyStroke(KeyEvent.VK_F12, KeyEvent.SHIFT_MASK));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "MapGeneratorOptions"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

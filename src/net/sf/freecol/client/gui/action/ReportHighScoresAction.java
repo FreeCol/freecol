@@ -20,19 +20,15 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
 
 
 /**
- * Show turn messages in report panel.
+ * An action for displaying a High Score Report.
  */
-public class ReportHighScoresAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportHighScoresAction.class.getName());
+public class ReportHighScoresAction extends FreeColAction {
 
     public static final String id = "reportHighScoresAction";
 
@@ -42,27 +38,9 @@ public class ReportHighScoresAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     public ReportHighScoresAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.highScores", null, null);
+        super(freeColClient, id);
     }
     
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled();
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportHighScoresAction"
-     */
-    public String getId() {
-        return id;
-    }
-
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

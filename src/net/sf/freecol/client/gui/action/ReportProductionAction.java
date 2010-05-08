@@ -20,23 +20,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportProductionPanel;
 
 
 /**
- * 
+ * An action for displaying a Production Report.
  */
-public class ReportProductionAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportProductionAction.class.getName());
-
+public class ReportProductionAction extends FreeColAction {
 
     public static final String id = "reportProductionAction";
     
@@ -45,26 +38,7 @@ public class ReportProductionAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportProductionAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.production", null,
-              KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.SHIFT_MASK));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportProductionAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

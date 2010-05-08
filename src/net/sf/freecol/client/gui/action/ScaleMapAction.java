@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -43,11 +42,6 @@ import net.sf.freecol.common.model.Map.Position;
  * An action for scaling a map. This action is a part of the map editor.
  */
 public class ScaleMapAction extends FreeColAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ScaleMapAction.class.getName());
-
-
-
 
     public static final String id = "scaleMapAction";
 
@@ -58,18 +52,9 @@ public class ScaleMapAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     ScaleMapAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.tools.scaleMap", null, 0, null);
+        super(freeColClient, id);
     }
 
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "scaleMapAction"
-     */
-    public String getId() {
-        return id;
-    }
-    
     /**
      * Checks if this action should be enabled.
      * 
@@ -78,9 +63,9 @@ public class ScaleMapAction extends FreeColAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-                && freeColClient.isMapEditor()
-                && freeColClient.getGame() != null
-                && freeColClient.getGame().getMap() != null; 
+            && freeColClient.isMapEditor()
+            && freeColClient.getGame() != null
+            && freeColClient.getGame().getMap() != null; 
     }
     
     /**

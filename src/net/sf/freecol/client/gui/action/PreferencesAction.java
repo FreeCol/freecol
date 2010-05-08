@@ -19,24 +19,15 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
- * An action for declaring independence.
+ * An action for editing user preferences.
  */
-public class PreferencesAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(PreferencesAction.class.getName());
-
-
-
+public class PreferencesAction extends FreeColAction {
 
     public static final String id = "preferencesAction";
 
@@ -47,30 +38,7 @@ public class PreferencesAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     PreferencesAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.preferences", null, KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "declareIndependenceAction"
-     */
-    public String getId() {
-        return id;
-    }
-
-    public String getMenuItemText() {
-        return Messages.message("menuBar.game.preferences");
+        super(freeColClient, id);
     }
 
     /**

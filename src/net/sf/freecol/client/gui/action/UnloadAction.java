@@ -21,13 +21,9 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -35,10 +31,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * An action for unloading the currently selected unit.
  */
-public class UnloadAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(UnloadAction.class.getName());
+public class UnloadAction extends UnitAction {
 
     public static final String id = "unloadAction";
 
@@ -47,15 +40,7 @@ public class UnloadAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     public UnloadAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.unload", null, KeyStroke.getKeyStroke('U', 0));
-    }
-
-    /**
-    * Returns the id of this <code>Option</code>.
-    * @return "unloadAction"
-    */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**
@@ -64,14 +49,9 @@ public class UnloadAction extends MapboardAction {
      * @return <code>true</code> if there is a carrier active
      */
     protected boolean shouldBeEnabled() {
-        if (super.shouldBeEnabled()) {
-            GUI gui = getFreeColClient().getGUI();
-            if (gui != null) {
-                Unit unit = getFreeColClient().getGUI().getActiveUnit();
-                return (unit != null && unit.isCarrier() && unit.getGoodsCount() > 0);
-            }
-        }
-        return false;
+        return super.shouldBeEnabled()
+            && getFreeColClient().getGUI().getActiveUnit().isCarrier()
+            && getFreeColClient().getGUI().getActiveUnit().getGoodsCount() > 0;
     }    
     
     /**
@@ -84,7 +64,8 @@ public class UnloadAction extends MapboardAction {
             if (!unit.isInEurope() && unit.getColony() == null) {
                 if (getFreeColClient().getCanvas().showConfirmDialog(unit.getTile(), "dumpAllCargo", "yes", "no")) {
                     unloadAllCargo(unit);
-                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
+                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager()
+                                            .getFreeColAction(MapControlsAction.id)).getMapControls();
                     if (controls != null) {
                         controls.update();
                     }
@@ -92,7 +73,8 @@ public class UnloadAction extends MapboardAction {
             } else {
                 unloadAllCargo(unit);
                 unloadAllUnits(unit);
-                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
+                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager()
+                                        .getFreeColAction(MapControlsAction.id)).getMapControls();
                 if (controls != null) {
                     controls.update();
                 }

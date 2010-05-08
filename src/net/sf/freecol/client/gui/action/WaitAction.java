@@ -20,19 +20,14 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for ordering the active unit to wait for further orders.
  */
-public class WaitAction extends MapboardAction {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(WaitAction.class.getName());
+public class WaitAction extends UnitAction {
 
     public static final String id = "waitAction";
 
@@ -43,17 +38,8 @@ public class WaitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     WaitAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.0", null, KeyStroke.getKeyStroke('W', 0));
+        super(freeColClient, id);
         addImageIcons("wait");
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "waitAction"
-     */
-    public String getId() {
-        return id;
     }
 
     /**

@@ -22,10 +22,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -34,12 +31,9 @@ import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 
 
 /**
- * 
+ * An action for displaying a Labour Report.
  */
-public class ReportLabourAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportLabourAction.class.getName());
-
+public class ReportLabourAction extends FreeColAction {
 
     public static final String id = "reportLabourAction";
     
@@ -48,25 +42,7 @@ public class ReportLabourAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportLabourAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.labour", null, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));        
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportLabourAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

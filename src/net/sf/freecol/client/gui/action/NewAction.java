@@ -19,23 +19,15 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
 /**
- * 
+ * An action for starting a new game.
  */
-public class NewAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(NewAction.class.getName());
-
-
-
+public class NewAction extends FreeColAction {
 
     public static final String id = "newAction";
 
@@ -46,26 +38,7 @@ public class NewAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     NewAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.new", null, KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "newAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

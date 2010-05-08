@@ -22,22 +22,16 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 
 
 /**
- * 
+ * An action for displaying a Requirements Report.
  */
-public class ReportRequirementsAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportRequirementsAction.class.getName());
-
+public class ReportRequirementsAction extends FreeColAction {
 
     public static final String id = "reportRequirementsAction";
     
@@ -46,25 +40,7 @@ public class ReportRequirementsAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportRequirementsAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.requirements", null, KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportRequirementsAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**

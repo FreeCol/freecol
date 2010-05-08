@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
@@ -33,11 +32,6 @@ import net.sf.freecol.client.FreeColClient;
  * @see net.sf.freecol.client.gui.panel.MapControls
  */
 public class EndTurnAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(EndTurnAction.class.getName());
-
-
-
 
     public static final String id = "endTurnAction";
 
@@ -48,16 +42,8 @@ public class EndTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     EndTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.endTurn", null, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "endTurnAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
+        setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
     /**

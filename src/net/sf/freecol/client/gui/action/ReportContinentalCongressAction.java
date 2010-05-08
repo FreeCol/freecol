@@ -22,49 +22,25 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 
 
 /**
- * 
+ * An action for display a Congress Report.
  */
-public class ReportContinentalCongressAction extends MapboardAction {
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportContinentalCongressAction.class.getName());
+public class ReportContinentalCongressAction extends FreeColAction {
 
-
-    public static final String id = "reportContinentalCongressAction";
+    public static final String id = "reportCongressAction";
     
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     ReportContinentalCongressAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.congress", null, KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
-    }
-    
-    /**
-     * Checks if this action should be enabled.
-     * 
-     * @return true if this action should be enabled.
-     */
-    protected boolean shouldBeEnabled() {
-        return true;
-    }    
-    
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "reportContinentalCongressAction"
-     */
-    public String getId() {
-        return id;
+        super(freeColClient, id);
     }
 
     /**
