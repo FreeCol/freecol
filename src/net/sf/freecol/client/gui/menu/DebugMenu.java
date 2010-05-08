@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.ai.AIUnit;
 
 public class DebugMenu extends JMenu {
@@ -503,6 +505,21 @@ public class DebugMenu extends JMenu {
             });
 
         this.addSeparator();
+
+        JMenuItem showResourceKeys = new JMenuItem("Show resource keys");
+        showResourceKeys.setOpaque(false);
+        add(showResourceKeys);
+        showResourceKeys.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    List<String> keys = new ArrayList<String>(ResourceManager.getResources().keySet());
+                    Collections.sort(keys);
+                    StringBuilder builder = new StringBuilder();
+                    for (String key : keys) {
+                        builder.append(key + "\n");
+                    }
+                    canvas.showInformationMessage(builder.toString());
+                }
+            });
 
         /*
           TODO: how do we force the ResourceManager to reload images?

@@ -231,25 +231,36 @@ public final class PreGameController {
      }    
 
     /**
+     * Add player-specific resources to the resource manager.
+     *
+     * @param nationId The player nation identifier.
+     * @param color The player color.
+     */
+    private void addPlayerResources(String nationId, Color color) {
+        logger.finest("Add resources for " + nationId + " color: " + color);
+        ResourceMapping gameMapping = new ResourceMapping();
+        gameMapping.add(nationId + ".color", new ColorResource(color));
+        gameMapping.add(nationId + ".chip", ChipResource.colorChip(color));
+        gameMapping.add(nationId + ".mission.chip",
+                        ChipResource.missionChip(color, false));
+        gameMapping.add(nationId + ".mission.expert.chip",
+                        ChipResource.missionChip(color, true));
+        ResourceManager.addGameMapping(gameMapping);
+    }
+
+    /**
      * Starts the game.
      */
     public void startGame() {
         Canvas canvas = freeColClient.getCanvas();
         GUI gui = freeColClient.getGUI();
 
-        ResourceMapping gameMapping = new ResourceMapping();
         for (Player player : freeColClient.getGame().getPlayers()) {
-            gameMapping.add(player.getNationID() + ".color",
-                            new ColorResource(player.getColor()));
-            gameMapping.add(player.getNationID() + ".chip",
-                            ChipResource.colorChip(player.getColor()));
-            logger.finest("Added color chip with ID " + player.getNationID() + ".chip");
-            gameMapping.add(player.getNationID() + ".mission.chip",
-                            ChipResource.missionChip(player.getColor(), false));
-            gameMapping.add(player.getNationID() + ".mission.expert.chip",
-                            ChipResource.missionChip(player.getColor(), true));
-            ResourceManager.setGameMapping(gameMapping);
+            addPlayerResources(player.getNationID(), player.getColor());
         }
+        // Unknown nation is not in getPlayers() list.
+        addPlayerResources(Nation.UNKNOWN_NATION_ID,
+            ResourceManager.getColor(Nation.UNKNOWN_NATION_ID + ".color"));
 
         if (!freeColClient.isHeadless()) {
             canvas.closeMainPanel();

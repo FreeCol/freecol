@@ -2698,7 +2698,7 @@ public final class GUI {
         g.drawImage(chip, 0, 0, null);
         g.setColor(foregroundColor);
         g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
-        ResourceManager.getGameMapping().add(key, new ImageResource(img));
+        ResourceManager.addGameMapping(key, new ImageResource(img));
         return img;
     }
 

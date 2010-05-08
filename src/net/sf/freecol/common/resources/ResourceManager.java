@@ -25,6 +25,7 @@ import java.awt.Image;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -116,7 +117,17 @@ public class ResourceManager {
     }
 
     /**
+     * Get the current game mapping.
+     *
+     * @return The current game mapping.
+     */
+    public static ResourceMapping getGameMapping() {
+        return gameMapping;
+    }
+
+    /**
      * Sets the mappings specified in a game, such as the player colors.
+     *
      * @param _gameMapping The mapping between IDs and resources. 
      */
     public static void setGameMapping(final ResourceMapping _gameMapping) {
@@ -124,8 +135,27 @@ public class ResourceManager {
         dirty = true;
     }
 
-    public static ResourceMapping getGameMapping() {
-        return gameMapping;
+    /**
+     * Add more mappings to the game mapping.
+     *
+     * @param mapping The <code>ResourceMapping</code> to add.
+     */
+    public static void addGameMapping(final ResourceMapping mapping) {
+        if (gameMapping == null) gameMapping = new ResourceMapping();
+        gameMapping.addAll(mapping);
+        dirty = true;
+    }
+
+    /**
+     * Add a single mappings to the game mapping.
+     *
+     * @param key The key.
+     * @param resource The resource to add.
+     */
+    public static void addGameMapping(String key, Resource resource) {
+        if (gameMapping == null) gameMapping = new ResourceMapping();
+        gameMapping.add(key, resource);
+        dirty = true;
     }
 
     /**
@@ -226,6 +256,11 @@ public class ResourceManager {
             return null;
         }
     }
+
+    public static Map<String, Resource> getResources() {
+        return mergedContainer.getResources();
+    }
+
 
     /**
      * Returns the animation specified by the given name.
