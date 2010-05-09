@@ -2686,7 +2686,8 @@ public final class GUI {
                 foregroundColor = Color.GRAY;
         }
         // Lookup in the cache if the image has been generated already
-        String key = backgroundColor.getRGB() + foregroundColor.getRGB() + occupationString;
+        String key = Integer.toString(backgroundColor.getRGB())
+            + Integer.toString(foregroundColor.getRGB()) + occupationString;
         BufferedImage img = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img!=null)
             return img;
