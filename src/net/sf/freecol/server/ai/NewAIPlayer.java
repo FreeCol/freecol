@@ -49,6 +49,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.UnitWanderMission;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -141,30 +142,19 @@ public abstract class NewAIPlayer extends AIObject {
 
     /**
      * Determines the stances towards each player.
-     *
-     * That is: should we declare war?
      */
     protected void determineStances() {
         logger.finest("Entering method determineStances");
         Player player = getPlayer();
         for (Player p : getGame().getPlayers()) {
             if (p != player) {
-                Stance stance = getPlayer().getStance(p);
-                Tension tension = getPlayer().getTension(p);
-                if (stance != Stance.UNCONTACTED && tension != null) {
-                    if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
-                        tension.modify(1000);
-                    }
-                    if (stance != Stance.WAR &&
-                        tension.getLevel() == Tension.Level.HATEFUL) {
-                        getPlayer().changeRelationWithPlayer(p, Stance.WAR);
-                    } else if (stance == Stance.WAR
-                               && tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                        getPlayer().changeRelationWithPlayer(p, Stance.CEASE_FIRE);
-                    } else if (stance == Stance.CEASE_FIRE
-                               && tension.getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
-                        getPlayer().changeRelationWithPlayer(p, Stance.PEACE);
-                    }
+                Stance newStance = (p.getREFPlayer() == player
+                                    && p.getPlayerType() == PlayerType.REBEL)
+                    ? Stance.WAR
+                    : player.getStance(p).getStanceFromTension(player.getTension(p));
+                if (newStance != player.getStance(p)) {
+                    getAIMain().getFreeColServer().getInGameController()
+                        .sendChangeStance(player, newStance, p);
                 }
             }
         }

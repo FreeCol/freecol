@@ -688,46 +688,7 @@ public class ColonialAIPlayer extends AIPlayer {
         logger.finest("Entering method determineStances");
         Player player = getPlayer();
         for (Player p : getGame().getPlayers()) {
-            if(p == player){
-                continue;
-            }
-            
-            Stance stance = player.getStance(p);
-            Tension tension = player.getTension(p);
-            // not contacted yet
-            if (stance == Stance.UNCONTACTED || tension == null) {
-                continue;
-            }
-
-            // REF is always at war with rebel player
-            if (p.getREFPlayer() == player && p.getPlayerType() == PlayerType.REBEL) {
-                tension.modify(1000);
-                if(stance != Stance.WAR){
-                    player.changeRelationWithPlayer(p, Stance.WAR);
-                }
-                continue;
-            }
-            
-            // Ready to go to war
-            if (stance != Stance.WAR 
-                    && tension.getLevel() == Tension.Level.HATEFUL) {
-                player.changeRelationWithPlayer(p, Stance.WAR);
-                continue;
-            }
-            
-            // Ready to back down
-            if (stance == Stance.WAR
-                    && tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                player.changeRelationWithPlayer(p, Stance.CEASE_FIRE);
-                continue;
-            }
-            
-            // all friends now
-            if (stance == Stance.CEASE_FIRE
-                    && tension.getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
-                player.changeRelationWithPlayer(p, Stance.PEACE);
-                continue;
-            }
+            if (p != player) determineStance(p);
         }
     }
 

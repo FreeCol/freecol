@@ -712,48 +712,78 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Stance change broadcast to all but the originating player.
+     * Change stance and Collect objects that need updating.
+     *
+     * @param player The originating <code>Player</code>.
+     * @param stance The new <code>Stance</code>.
+     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @param playerObjects A list of objects the player sees change.
+     * @param otherObjects A list of objects the other player sees change.
+     * @param restObjects A list of objects the rest of the players see change.
+     * @return True if there was a change in stance at all.  If not,
+     *           none of the lists will be changed, if so, they will.
+     */
+    private boolean changeStance(Player player, Stance stance,
+                                 Player otherPlayer,
+                                 List<Object> playerObjects,
+                                 List<Object> otherObjects,
+                                 List<Object> restObjects) {
+        Stance oldStance = player.getStance(otherPlayer);
+        if (oldStance == stance) return false;
+
+        int pmodifier, omodifier;
+        try {
+            pmodifier = oldStance.getTensionModifier(stance);
+            omodifier = otherPlayer.getStance(player).getTensionModifier(stance);
+        } catch (IllegalStateException e) { // Catch illegal transitions
+            logger.warning(e.getMessage());
+            return false;
+        }
+
+        player.setStance(otherPlayer, stance);
+        otherPlayer.setStance(player, stance);
+
+        // Players not involved may see the stance change if it
+        // meets the visibility criteria.
+        addStance(restObjects, stance, player, otherPlayer);
+
+        // The other player certainly sees the stance change, and
+        // possibly some settlement alarm if player.isNative().
+        addStance(otherObjects, stance, player, otherPlayer);
+        if (pmodifier != 0) {
+            otherObjects.addAll(player.modifyTension(otherPlayer, pmodifier));
+        }
+
+        // Player sees the stance change and similarly, possibly
+        // some settlement alarm.
+        addStance(playerObjects, stance, player, otherPlayer);
+        if (omodifier != 0) {
+            playerObjects.addAll(otherPlayer.modifyTension(player, omodifier));
+        }
+        return true;
+    }
+
+    /**
+     * Change stance and inform all but the originating player.
      *
      * @param player The originating <code>Player</code>.
      * @param stance The new <code>Stance</code>.
      * @param otherPlayer The <code>Player</code> wrt which the stance changes.
      * @return A list of objects to update.
      */
-    public List<Object> changeStance(Player player, Stance stance,
-                                     Player otherPlayer) {
-        List<Object> objects = new ArrayList<Object>();
-
-        if (player.getStance(otherPlayer) != stance) {
-            int pmodifier = ((ServerPlayer) player)
-                .getTensionModifier(otherPlayer, stance);
-            int omodifier = ((ServerPlayer) otherPlayer)
-                .getTensionModifier(player, stance);
-            player.setStance(otherPlayer, stance);
-            otherPlayer.setStance(player, stance);
-
-            // Players not involved may see the stance change if it
-            // meets the visibility criteria.
-            addStance(objects, stance, player, otherPlayer);
+    public List<Object> sendChangeStance(Player player, Stance stance,
+                                         Player otherPlayer) {
+        List<Object> playerObjects = new ArrayList<Object>();
+        List<Object> otherObjects = new ArrayList<Object>();
+        List<Object> restObjects = new ArrayList<Object>();
+        if (changeStance(player, stance, otherPlayer,
+                         playerObjects, otherObjects, restObjects)) {
             sendToList(getOtherPlayers((ServerPlayer) player,
                                        (ServerPlayer) otherPlayer),
-                       objects);
-
-            // The other player certainly sees the stance change, and
-            // possibly some settlement alarm if player.isNative().
-            List<Object> otherObjects = new ArrayList<Object>();
-            otherObjects.addAll(objects);
-            if (pmodifier != 0) {
-                otherObjects.addAll(player.modifyTension(otherPlayer, pmodifier));
-            }
+                       restObjects);
             sendElement((ServerPlayer) otherPlayer, otherObjects);
-
-            // Player sees the stance change and similarly, possibly
-            // some settlement alarm.
-            if (omodifier != 0) {
-                objects.addAll(otherPlayer.modifyTension(player, omodifier));
-            }
         }
-        return objects;
+        return playerObjects;
     }
 
 
@@ -1332,7 +1362,7 @@ public final class InGameController extends Controller {
                                 return;
                             }
                             monarchActionElement.setAttribute("enemy", enemy.getId());
-                            List<Object> objects = changeStance(nextPlayer, Stance.WAR, enemy);
+                            List<Object> objects = sendChangeStance(nextPlayer, Stance.WAR, enemy);
                             objects.add(0, monarchActionElement);
                             sendElement(nextPlayer, objects);
                             break;
@@ -3347,8 +3377,7 @@ public final class InGameController extends Controller {
             // Success.  Raise the tension for the native player with respect
             // to the european player.  Let resulting stance changes happen
             // naturally in the AI player turn/s.
-            nativePlayer.modifyTension(enemyPlayer,
-                Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+            nativePlayer.modifyTension(enemyPlayer, Tension.WAR_MODIFIER);
             enemyPlayer.modifyTension(serverPlayer,
                 Tension.TENSION_ADD_WAR_INCITER);
 

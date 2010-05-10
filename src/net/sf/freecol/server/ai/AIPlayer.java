@@ -35,6 +35,8 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -44,6 +46,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -349,6 +352,25 @@ public abstract class AIPlayer extends AIObject {
     }
 
 
+    /**
+     * Standard stance change determination.  If a change occurs,
+     * contact the server and propagate.
+     *
+     * @param other The <code>Player</code> wrt consider stance.
+     * @return The stance, which may have been updated.
+     */
+    protected Stance determineStance(Player other) {
+        Player player = getPlayer();
+        Stance newStance = (other.getREFPlayer() == player
+                            && other.getPlayerType() == PlayerType.REBEL)
+            ? Stance.WAR
+            : player.getStance(other).getStanceFromTension(player.getTension(other));
+        if (newStance != player.getStance(other)) {
+            getAIMain().getFreeColServer().getInGameController()
+                .sendChangeStance(player, newStance, other);
+        }
+        return player.getStance(other);
+    }
 
 /* INTERFACE ******************************************************************/
 

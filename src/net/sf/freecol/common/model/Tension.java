@@ -22,9 +22,12 @@ package net.sf.freecol.common.model;
 
 public class Tension {
 
-    /**
-    * Constants for adding to the tension levels.
-    */
+    // Minimum possible tension value.
+    public static final int TENSION_MIN = 0;
+    // Maximum possible tension value.
+    public static final int TENSION_MAX = Level.HATEFUL.limit + 100;
+    // Hysteresis value
+    public static final int DELTA = 10;
     // Unit destroyed, etc
     public static final int TENSION_ADD_MINOR = 100;
     // Unit destroyed in a Settlement, etc
@@ -41,20 +44,19 @@ public class Tension {
     public static final int TENSION_ADD_CAPITAL_ATTACKED = 600;
     // War inciter
     public static final int TENSION_ADD_WAR_INCITER = 250;
-    /** Tension modification to be used when war is declared from a peaceful state. */
-    public static final int TENSION_ADD_DECLARE_WAR_FROM_PEACE = 1000;
 
-    /** Tension modification to be used when war is declared from a cease fire. */
-    public static final int TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE = 750;
-    
-    /** Tension modification to be used when a peace treaty is signed. */
-    public static final int PEACE_TREATY_MODIFIER = -250;
-
-    /** Tension modification to be used when a cease-fire treaty is signed. */
-    public static final int CEASE_FIRE_MODIFIER = -250;
-    
-    /** Tension modification to be used when an alliance treaty is signed. */
+    // Tension modifiers
+    public static final int CONTACT_MODIFIER = 0;
     public static final int ALLIANCE_MODIFIER = -500;
+    public static final int DROP_ALLIANCE_MODIFIER = 200;
+    public static final int PEACE_TREATY_MODIFIER = -250;
+    public static final int CEASE_FIRE_MODIFIER = -250;
+    public static final int WAR_MODIFIER = Level.HATEFUL.limit;
+    public static final int RESUME_WAR_MODIFIER = 750; // War from cease fire
+
+    /** Tension level to set when surrendering. */
+    public static final int SURRENDED
+        = (Level.CONTENT.limit + Level.HAPPY.limit) / 2;
     
     /** 
      * Constants for describing alarm levels.
@@ -77,8 +79,8 @@ public class Tension {
         }
     }
     
-    static int SURRENDED = (Level.CONTENT.limit + Level.HAPPY.limit) / 2;
     private int value;
+
 
     /**
      * Constructor.
@@ -92,7 +94,8 @@ public class Tension {
     }
 
     /**
-     * Returns the current tension value.
+     * Get the current tension value.
+     *
      * @return The value of this <code>Tension</code>.
      */
     public int getValue() {
@@ -101,38 +104,33 @@ public class Tension {
 
     /**
      * Sets the current tension value.
+     *
      * @param newValue The new value of the tension.
      */
     public void setValue(int newValue) {
-        if (newValue < 0) {
-            value = 0;
-        } else if (newValue > Level.HATEFUL.getLimit()) {
-            value = Level.HATEFUL.getLimit();
+        if (newValue < TENSION_MIN) {
+            value = TENSION_MIN;
+        } else if (newValue > TENSION_MAX) {
+            value = TENSION_MAX;
         } else {
             value = newValue;
         }
     }
 
     /** 
-     * Returns the current tension level.
+     * Get the current tension level.
+     *
      * @return The current level.
      */
     public Level getLevel() {
         for (Level level : Level.values()) {
-            if (value <= level.getLimit())
-                return level;
+            if (value <= level.getLimit()) return level;
         }
         return Level.HATEFUL;
-   }
-
-    public void setLevel(Level level) {
-        if (level != getLevel()) {
-            setValue(level.getLimit());
-        }
     }
 
     /**
-     * Modifies the tension by the given amount.
+     * Modify the tension by the given amount.
      *
      * @param newTension The amount to modify tension by.
      */
@@ -140,8 +138,9 @@ public class Tension {
         setValue(value + newTension);
     }
 
-    /** 
+    /**
      * Returns the current tension level as a string.
+     *
      * @return A <code>String</code>-representation of the
      *      current tension level.
      */
@@ -150,6 +149,3 @@ public class Tension {
     }    
 
 }
-
-
-

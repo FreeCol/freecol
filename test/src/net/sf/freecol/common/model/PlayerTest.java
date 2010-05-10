@@ -216,7 +216,8 @@ public class PlayerTest extends FreeColTestCase {
         int currDutchTension = dutch.getTension(french).getValue();
         int currFrenchTension = french.getTension(dutch).getValue();
         
-        int expectedDutchTension = Math.min(1000,initialDutchTension + Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+        int expectedDutchTension = Math.min(Tension.TENSION_MAX,
+            initialDutchTension + Tension.WAR_MODIFIER);
         int expectedFrenchTension = initialFrenchTension;
         
         errMsg = "Wrong dutch tension";
