@@ -87,6 +87,7 @@ import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
@@ -361,10 +362,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return endTurn(connection, element);
             }
         });
-        register("disbandUnit", new CurrentPlayerNetworkRequestHandler() {
+        register(DisbandUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return disbandUnit(connection, element);
+                return new DisbandUnitMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(CashInTreasureTrainMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -1411,29 +1412,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
-    /**
-     * Handles a "disbandUnit"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element disbandUnit(Connection connection, Element element) {
-        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Location oldLocation = unit.getLocation();
-        unit.dispose();
-        InGameController igc = getFreeColServer().getInGameController();
-        igc.sendToOthers(serverPlayer, unit, oldLocation);
-        return igc.buildUpdate(serverPlayer, unit, oldLocation);
-    }
 
     /**
      * Handles a "foreignAffairs"-message.

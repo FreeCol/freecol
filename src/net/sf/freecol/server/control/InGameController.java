@@ -3784,6 +3784,29 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Disband a unit.
+     * 
+     * @param serverPlayer The owner of the unit.
+     * @param unit The <code>Unit</code> to disband.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element disbandUnit(ServerPlayer serverPlayer, Unit unit) {
+        List<Object> objects = new ArrayList<Object>();
+        Location loc = unit.getLocation();
+
+        // Dispose of the unit, send its old location but disable visibility
+        // check as it may be a now-invisible tile.
+        objects.addAll(unit.disposeList());
+        objects.add(UpdateType.PRIVATE);
+        objects.add(loc);
+
+        // Others can see the unit removal and the space it leaves.
+        sendToOthers(serverPlayer, loc, unit);
+        return buildUpdate(serverPlayer, objects);
+    }
+
+
+    /**
      * Generates a skill that could be taught from a settlement on the
      * given Tile.
      *

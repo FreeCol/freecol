@@ -119,6 +119,7 @@ import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
+import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
@@ -3691,6 +3692,50 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Disbands the active unit.
+     */
+    public void disbandActiveUnit() {
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        GUI gui = freeColClient.getGUI();
+        Unit unit = gui.getActiveUnit();
+        if (unit == null) return;
+        Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
+        if (!canvas.showConfirmDialog(tile, "disbandUnit.text",
+                                      "disbandUnit.yes", "disbandUnit.no")) {
+            return;
+        }
+
+        // Try to disband
+        if (askDisbandUnit(unit)) {
+            nextActiveUnit();
+        }
+    }
+
+    /**
+     * Server query-response for disbanding a unit.
+     *
+     * @param unit The <code>Unit</code> to operate on.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askDisbandUnit(Unit unit) {
+        Client client = freeColClient.getClient();
+        DisbandUnitMessage message = new DisbandUnitMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+
+    /**
      * Sets the export settings of the custom house.
      *
      * @param colony The colony with the custom house.
@@ -4447,39 +4492,6 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    /**
-     * Disbands the active unit.
-     */
-    public void disbandActiveUnit() {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        GUI gui = freeColClient.getGUI();
-        Unit unit = gui.getActiveUnit();
-        Client client = freeColClient.getClient();
-
-        if (unit == null) {
-            return;
-        }
-
-        Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
-        if (!canvas.showConfirmDialog(tile, "disbandUnit.text",
-                                      "disbandUnit.yes", "disbandUnit.no")) {
-            return;
-        }
-
-        Element disbandUnit = Message.createNewRootElement("disbandUnit");
-        disbandUnit.setAttribute("unit", unit.getId());
-
-        unit.dispose();
-
-        client.sendAndWait(disbandUnit);
-
-        nextActiveUnit();
-    }
 
     /**
      * Centers the map on the selected tile.
