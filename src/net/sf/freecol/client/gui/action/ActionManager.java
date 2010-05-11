@@ -98,6 +98,7 @@ public class ActionManager extends OptionGroup {
         add(new MiniMapZoomOutAction(freeColClient));
         for (Direction d : Direction.values()) {
             add(new MoveAction(freeColClient, d));
+            add(new MoveAction(freeColClient, d, true));
         }
         add(new NewAction(freeColClient));
         add(new NewEmptyMapAction(freeColClient));

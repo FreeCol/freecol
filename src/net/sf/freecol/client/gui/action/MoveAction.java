@@ -38,9 +38,22 @@ public class MoveAction extends MapboardAction {
      * Creates a new <code>MoveAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
+     * @param direction a <code>Direction</code> value
      */
     MoveAction(FreeColClient freeColClient, Direction direction) {
         super(freeColClient, id + direction);
+        this.direction = direction;
+    }
+
+    /**
+     * Creates a new <code>MoveAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param direction a <code>Direction</code> value
+     * @param secondary a <code>boolean</code> value
+     */
+    MoveAction(FreeColClient freeColClient, Direction direction, boolean secondary) {
+        super(freeColClient, id + direction + ".secondary");
         this.direction = direction;
     }
 

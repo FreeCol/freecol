@@ -55,13 +55,16 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.DebugAction;
+import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.action.MoveAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
@@ -69,7 +72,6 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationDialog;
@@ -98,7 +100,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -107,6 +108,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -315,6 +317,8 @@ public final class Canvas extends JDesktopPane {
             }
         });
 
+        createKeyBindings();
+
         logger.info("Canvas created.");
     }
 
@@ -380,6 +384,26 @@ public final class Canvas extends JDesktopPane {
             gui.forceReposition();
             oldSize = getSize();
         }
+    }
+
+
+    /**
+     * Create key bindings for all actions that are not represented by
+     * a menu item.
+     */
+    private void createKeyBindings() {
+        ActionManager am = freeColClient.getActionManager();
+        addKeyBinding(am.getFreeColAction(DebugAction.id));
+
+        for (Direction d : Direction.values()) {
+            addKeyBinding(am.getFreeColAction(MoveAction.id + d));
+            addKeyBinding(am.getFreeColAction(MoveAction.id + d + ".secondary"));
+        }
+    }
+
+    private void addKeyBinding(FreeColAction action) {
+        getInputMap().put(action.getAccelerator(), action.getId());
+        getActionMap().put(action.getId(), action);
     }
 
     /**

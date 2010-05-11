@@ -35,7 +35,6 @@ import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.StringTemplate;
 
 /**
@@ -118,7 +117,6 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(PreferencesAction.id));
         menu.add(getMenuItem(ReconnectAction.id));
-        menu.add(getMenuItem(DebugAction.id));
 
         menu.addSeparator();
 
@@ -211,12 +209,6 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ClearOrdersAction.id));
         menu.add(getMenuItem(RenameAction.id));
         menu.add(getMenuItem(DisbandUnitAction.id));
-
-        menu.addSeparator();
-
-        for (Direction d : Direction.values()) {
-            menu.add(getMenuItem(MoveAction.id + d));
-        }
 
         add(menu);
     }

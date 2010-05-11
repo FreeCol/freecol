@@ -39,14 +39,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.Canvas.BuyAction;
-import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.EventType;
-import net.sf.freecol.client.gui.Canvas.MissionaryAction;
-import net.sf.freecol.client.gui.Canvas.ScoutColonyAction;
-import net.sf.freecol.client.gui.Canvas.ScoutIndianSettlementAction;
-import net.sf.freecol.client.gui.Canvas.SellAction;
-import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
@@ -70,7 +63,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
@@ -148,7 +140,6 @@ import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -267,6 +258,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
+        logger.info("Debug mode set to " + debug);
         freeColClient.updateMenuBar();
     }
 
