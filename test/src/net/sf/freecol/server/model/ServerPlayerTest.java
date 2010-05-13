@@ -262,7 +262,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source moving to America, target in Europe
         cotton.setLocation(privateer1);
-        privateer1.moveToEurope();
+        igc.moveToEurope(dutch, privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
@@ -290,7 +290,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source moving from America, target moving to America
         cotton.setLocation(privateer1);
-        privateer1.moveToEurope();
+        igc.moveToEurope(dutch, privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
@@ -299,7 +299,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source in Europe, target moving from America
         privateer1.setLocation(europe);
-        privateer2.moveToEurope();
+        igc.moveToEurope(dutch, privateer2);
 
         cotton.setLocation(privateer1);
         try {
@@ -319,7 +319,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source moving from America, target moving from America
         cotton.setLocation(privateer1);
-        privateer1.moveToEurope();
+        igc.moveToEurope(dutch, privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
@@ -389,7 +389,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Unit colonist = new Unit(game, galleon, dutch, colonistType, UnitState.SENTRY);
         assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
         assertEquals("Galleon should have a colonist onboard",1,galleon.getUnitCount());
-        galleon.moveToEurope();
+        InGameController igc = (InGameController) server.getController();
+        igc.moveToEurope(dutch, galleon);
 
         assertFalse("Should not be game over, units between new world and europe",
                     dutch.checkForDeath());

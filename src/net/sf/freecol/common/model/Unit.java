@@ -2928,29 +2928,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Moves this unit to Europe.
-     * 
-     * @exception IllegalStateException If the move is illegal.
-     */
-    public void moveToEurope() {
-        // Check if this move is illegal or not:
-        if (!canMoveToEurope()) {
-            throw new IllegalStateException("It is not allowed to move units to europe from the tile where this unit is located.");
-        } else if (getLocation() instanceof Tile) {
-            // Don't set entry location if location isn't Tile
-            setEntryLocation(getLocation());
-        }
-
-        setState(UnitState.TO_EUROPE);
-        setLocation(getOwner().getEurope());
-
-        logger.info(toString() + " moving to Europe");
-        
-        // Clear the alreadyOnHighSea flag:
-        alreadyOnHighSea = false;
-    }
-
-    /**
      * Moves this unit to america.
      * 
      * @exception IllegalStateException If the move is illegal.

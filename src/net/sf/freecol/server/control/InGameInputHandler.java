@@ -101,6 +101,7 @@ import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
+import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -249,10 +250,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new SellGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("moveToEurope", new CurrentPlayerNetworkRequestHandler() {
+        register(MoveToEuropeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return moveToEurope(connection, element);
+                return new MoveToEuropeMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("moveToAmerica", new CurrentPlayerNetworkRequestHandler() {
@@ -984,34 +985,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(update);
         }
         return reply;
-    }
-
-    /**
-     * Handles a "moveToEurope"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param moveToEuropeElement The element containing the request.
-     */
-    private Element moveToEurope(Connection connection, Element moveToEuropeElement) {
-        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(moveToEuropeElement.getAttribute("unit"));
-        if (unit.getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not your unit!");
-        }
-
-        // Move it off
-        Tile oldTile = unit.getTile();
-        unit.moveToEurope();
-
-        // Inform other players the unit is moving off the map
-        // TODO: Add animation?
-        InGameController igc = getFreeColServer().getInGameController();
-        List<Object> objects = new ArrayList<Object>();
-        igc.addRemove(objects, unit); // TODO: cleanup on encapsulate
-        objects.add(oldTile);
-        igc.sendToOthers(serverPlayer, objects);
-
-        return null;
     }
 
     /**

@@ -2924,6 +2924,32 @@ public final class InGameController extends Controller {
         return buildUpdate(serverPlayer, objects);
     }
 
+    /**
+     * Move a unit to Europe.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to move to Europe.
+     */
+    public Element moveToEurope(ServerPlayer serverPlayer, Unit unit) {
+
+        if (unit.getLocation() instanceof Europe) {
+            // Unit already in Europe, nothing to see for the others.
+            unit.setState(UnitState.TO_EUROPE);
+            return buildUpdate(serverPlayer, unit);
+        }
+
+        List<Object> objects = new ArrayList<Object>();
+        Tile tile = unit.getTile();
+        // Set entry location before setState (satisfy its check), then
+        // location.
+        unit.setEntryLocation(tile);
+        unit.setState(UnitState.TO_EUROPE);
+        unit.setLocation(serverPlayer.getEurope());
+        addRemove(objects, unit);
+        objects.add(tile);
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, unit, tile);
+    }
 
     /**
      * Embark a unit onto a carrier.

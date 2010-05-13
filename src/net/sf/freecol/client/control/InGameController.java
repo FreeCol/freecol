@@ -125,6 +125,7 @@ import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
+import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -1826,6 +1827,45 @@ public final class InGameController implements NetworkConstants {
         } else {
             moveMove(unit, direction);
         }
+    }
+
+    /**
+     * Moves the specified unit to Europe.
+     *
+     * @param unit The <code>Unit</code> to be moved to Europe.
+     */
+    public void moveToEurope(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+
+        if (!unit.canMoveToEurope()) {
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            return;
+        }
+
+        if (askMoveToEurope(unit)) {
+            nextActiveUnit();
+        }
+    }
+
+    /**
+     * Server query-response for moving to Europe.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askMoveToEurope(Unit unit) {
+        Client client = freeColClient.getClient();
+        MoveToEuropeMessage message = new MoveToEuropeMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**
@@ -4132,27 +4172,6 @@ public final class InGameController implements NetworkConstants {
          */
         if (unit.getDestination() != null)
             setDestination(unit, null);
-    }
-
-    /**
-     * Moves the specified unit to Europe.
-     * 
-     * @param unit The unit to be moved to Europe.
-     */
-    public void moveToEurope(Unit unit) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        Client client = freeColClient.getClient();
-
-        unit.moveToEurope();
-
-        Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
-        moveToEuropeElement.setAttribute("unit", unit.getId());
-
-        client.sendAndWait(moveToEuropeElement);
     }
 
     /**
