@@ -230,9 +230,8 @@ public final class InGameController extends Controller {
      *
      * @param objects The list of objects to add to.
      * @param fcgo The object to be removed.
-     * TODO: public until clean up use in InGameInputHandler.
      */
-    public static void addRemove(List<Object> objects,
+    private static void addRemove(List<Object> objects,
                                  FreeColGameObject fcgo) {
         addMore(objects, UpdateType.REMOVE, fcgo);
     }
