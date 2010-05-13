@@ -1808,7 +1808,6 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move.
-     * TODO: Perhaps can throw away the AlreadyOnHighSeas flag?
      */
     private void moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile

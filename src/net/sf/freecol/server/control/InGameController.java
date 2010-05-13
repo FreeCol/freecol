@@ -2683,8 +2683,6 @@ public final class InGameController extends Controller {
         }
         unit.setLocation(newTile);
         unit.activeAdjacentSentryUnits(newTile);
-        // Clear the alreadyOnHighSea flag if we move onto a non-highsea tile.
-        unit.setAlreadyOnHighSea(newTile.canMoveToEurope());
 
         // Always update old location and new tile.
         objects.add((FreeColGameObject) oldLocation);

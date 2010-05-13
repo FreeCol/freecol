@@ -232,14 +232,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     private int visibleGoodsCount;
 
     /**
-     * Describes if the unit has been moved onto high sea but not to europe.
-     * This happens if the user moves a ship onto high sea but doesn't want to
-     * send it to europe and selects to keep the ship in this waters.
-     * 
-     */
-    private boolean alreadyOnHighSea = false;
-
-    /**
      * The student of this Unit, if it has one.
      */
     private Unit student;
@@ -1621,47 +1613,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Moves this unit in the specified direction.
-     * 
-     * @param direction The direction
-     * @see #getMoveType(Map.Direction)
-     * @exception IllegalStateException If the move is illegal.
-     */
-    public void move(Direction direction) {
-        MoveType moveType = getMoveType(direction);
-
-        // For debugging:
-        if (!moveType.isProgress()) {
-            throw new IllegalStateException("Illegal move requested: " + moveType
-                                            + " while trying to move a " + toString()
-                                            + " located at " + getTile().getPosition().toString()
-                                            + ". Direction: " + direction
-                                            + " Moves Left: " + getMovesLeft());
-        }
-
-        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
-        if (newTile != null) {
-            setState(UnitState.ACTIVE);
-            setStateToAllChildren(UnitState.SENTRY);
-            int moveCost = getMoveCost(newTile);
-            setMovesLeft(getMovesLeft() - moveCost);
-            setLocation(newTile);
-            activeAdjacentSentryUnits(newTile);
-
-            // Clear the alreadyOnHighSea flag if we move onto a non-highsea
-            // tile.
-            if (newTile.canMoveToEurope()) {
-                setAlreadyOnHighSea(true);
-            } else {
-                setAlreadyOnHighSea(false);
-            }
-
-        } else {
-            throw new IllegalStateException("Illegal move requested - no target tile!");
-        }
-    }
-
-    /**
      * Active units with sentry state wich are adjacent to a specified tile
      * 
      * @param tile The tile to iterate over adjacent tiles.
@@ -1694,8 +1645,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void setStateToAllChildren(UnitState state) {
         if (canCarryUnits()) {
-            for (Unit u : getUnitList())
-                u.setState(state);
+            for (Unit u : getUnitList()) u.setState(state);
         }
     }
 
@@ -2941,8 +2891,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         logger.info(toString() + " moving to America");
         
-        // Clear the alreadyOnHighSea flag:
-        alreadyOnHighSea = false;
     }
 
     /**
@@ -3564,26 +3512,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.warning("Unknown type of Location: " + locationString);
             return new Tile(game, locationString);
         }
-    }
-
-    /**
-     * Returns true if this unit has already been moved onto high seas but not
-     * to europe.
-     *
-     * @return true if the unit has already been moved onto high seas
-     */
-    public boolean isAlreadyOnHighSea() {
-        return alreadyOnHighSea;
-    }
-
-    /**
-     * Tells unit that it has just entered the high seas but instead of going to
-     * europe, it stays on the current side of the atlantic.
-     *
-     * @param alreadyOnHighSea
-     */
-    public void setAlreadyOnHighSea(boolean alreadyOnHighSea) {
-        this.alreadyOnHighSea = alreadyOnHighSea;
     }
 
     /**
