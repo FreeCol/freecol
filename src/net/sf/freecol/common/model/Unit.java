@@ -1613,25 +1613,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Active units with sentry state wich are adjacent to a specified tile
-     * 
-     * @param tile The tile to iterate over adjacent tiles.
-     */
-    public void activeAdjacentSentryUnits(Tile tile) {
-        Map map = getGame().getMap();
-        Iterator<Position> it = map.getAdjacentIterator(tile.getPosition());
-        while (it.hasNext()) {
-            Iterator<Unit> unitIt = map.getTile(it.next()).getUnitIterator();
-            while (unitIt.hasNext()) {
-                Unit unit = unitIt.next();
-                if (unit.getState() == UnitState.SENTRY && unit.getOwner() != getOwner()) {
-                    unit.setState(UnitState.ACTIVE);
-                }
-            }
-        }
-    }
-
-    /**
      * Verifies if the unit is aboard a carrier
      */
     public boolean isOnCarrier(){

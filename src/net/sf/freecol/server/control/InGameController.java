@@ -2652,6 +2652,30 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Activate units with sentry state which are adjacent to a tile
+     * and not owned by the specified player.
+     *
+     * @param serverPlayer The player to exclude.
+     * @param tile The center <code>Tile</code> to check from.
+     * @return A list of <code>Unit</code>s now activated.
+     */
+    private List<Unit> activateSentries(ServerPlayer serverPlayer,
+                                        Tile tile) {
+        List<Unit> objects = new ArrayList<Unit>();
+        Map map = getGame().getMap();
+        for (Tile t : map.getSurroundingTiles(tile, 1, 1)) {
+            for (Unit u : t.getUnitList()) {
+                if (u.getState() == UnitState.SENTRY
+                    && u.getOwner() != (Player) serverPlayer) {
+                    u.setState(UnitState.ACTIVE);
+                    objects.add(u);
+                }
+            }
+        }
+        return objects;
+    }
+
+    /**
      * Move a unit.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is moving.
@@ -2682,7 +2706,7 @@ public final class InGameController extends Controller {
             unit.setMovesLeft(unit.getMovesLeft() - unit.getMoveCost(newTile));
         }
         unit.setLocation(newTile);
-        unit.activeAdjacentSentryUnits(newTile);
+        objects.addAll(activateSentries(serverPlayer, newTile));
 
         // Always update old location and new tile.
         objects.add((FreeColGameObject) oldLocation);
