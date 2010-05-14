@@ -122,7 +122,12 @@ public final class FreeCol {
 
     private static boolean standAloneServer = false;
     private static boolean publicServer = true;
-    private static boolean inDebugMode = false;
+
+    private static final int DEBUG_OFF = 0;
+    private static final int DEBUG_LIMITED = 1;
+    private static final int DEBUG_FULL = 2;
+    private static int debugLevel = DEBUG_OFF;
+
     private static boolean usesExperimentalAI = false;
 
     private static int serverPort;
@@ -782,6 +787,8 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("debug")
                           .withDescription(Messages.message("cli.debug"))
+                          .withArgName(Messages.message("cli.arg.debuglevel"))
+                          .hasOptionalArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("private")
                           .withDescription(Messages.message("cli.private"))
@@ -911,7 +918,14 @@ public final class FreeCol {
                 System.exit(0);
             }
             if (line.hasOption("debug")) {
-                inDebugMode = true;
+                // If the optional argument is supplied use limited mode.
+                try {
+                    debugLevel = Integer.parseInt(line.getOptionValue("debug"));
+                    debugLevel = Math.min(Math.max(debugLevel, DEBUG_OFF),
+                                          DEBUG_FULL);
+                } catch (NumberFormatException e) {
+                    debugLevel = DEBUG_FULL;
+                }
                 // user set log level has precedence
                 if(!line.hasOption("log-level")){
                     logLevel = Level.FINEST;
@@ -985,10 +999,20 @@ public final class FreeCol {
      *       mode and <code>false</code> otherwise.
      */
     public static boolean isInDebugMode() {
-        return inDebugMode;
+        return debugLevel > DEBUG_OFF;
     }
 
-    
+    /**
+     * Checks if the program is in the full debug mode, rather than
+     * the limited version which does not initialize a player colony.
+     *
+     * @return <code>true</code> if the program is in the higher level
+     *       mode and <code>false</code> otherwise.
+     */
+    public static boolean isInFullDebugMode() {
+        return debugLevel > DEBUG_LIMITED;
+    }
+
     /**
      * Sets the "debug mode" to be active or not.
      * @param debug Should be <code>true</code> in order
@@ -996,7 +1020,7 @@ public final class FreeCol {
      *       otherwise.
      */
     public static void setInDebugMode(boolean debug) {
-        inDebugMode = debug;
+        debugLevel = (debug) ? DEBUG_FULL : DEBUG_OFF;
     }
 
     /**

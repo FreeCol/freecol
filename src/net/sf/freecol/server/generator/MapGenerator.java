@@ -724,7 +724,7 @@ public class MapGenerator implements IMapGenerator {
             }
             
             // START DEBUG:
-            if (FreeCol.isInDebugMode()) {
+            if (FreeCol.isInFullDebugMode()) {
                 // in debug mode give each player a few more units and a colony
                 UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
                 Unit unit4 = new Unit(game, startTile, player, unitType, UnitState.ACTIVE);

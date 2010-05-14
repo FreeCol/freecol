@@ -1018,7 +1018,7 @@ public final class Specification {
         }
 
         // TODO: find a better place for this!
-        if (FreeCol.isInDebugMode()) {
+        if (FreeCol.isInFullDebugMode()) {
             getIntegerOption(GameOptions.STARTING_MONEY).setValue(10000);
         }
     }
