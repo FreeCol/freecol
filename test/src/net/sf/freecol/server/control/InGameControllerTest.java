@@ -63,43 +63,97 @@ public class InGameControllerTest extends FreeColTestCase {
 	
     FreeColServer server = null;
     
-	public void tearDown() throws Exception {
-		if(server != null){
-			// must make sure that the server is stopped
+    public void tearDown() throws Exception {
+        if(server != null) {
+            // must make sure that the server is stopped
             ServerTestHelper.stopServer(server);
             server = null;
-		}
-		super.tearDown();
-	}
+        }
+        super.tearDown();
+    }
 
-    public void testCreateMissionFailed() {
-		// start a server
-        server = ServerTestHelper.startServer(false, true);
-                
-        server.setMapGenerator(new MockMapGenerator(getTestMap()));
-        
+    private Game start(Map map) {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        server.setMapGenerator(new MockMapGenerator(map));
         PreGameController pgc = (PreGameController) server.getController();
-        
         try {
             pgc.startGame();
         } catch (FreeColException e) {
             fail("Failed to start game");
         }
-        
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
+        return game;
+    }
+
+    public void testDeclarationOfWarFromPeace() {
+        String errMsg = "";
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+
+        int initialTensionValue = 500;
+
+        // setup
+        dutch.setStance(french, Stance.PEACE);
+        french.setStance(dutch, Stance.PEACE);
+        dutch.setTension(french, new Tension(initialTensionValue));
+        french.setTension(dutch, new Tension(initialTensionValue));
+
+        // verify initial conditions
+        int initialDutchTension = dutch.getTension(french).getValue();
+        int initialFrenchTension = french.getTension(dutch).getValue();
+
+        errMsg ="The Dutch must be at peace with the French";
+        assertEquals(errMsg,Stance.PEACE,dutch.getStance(french));
+        errMsg ="The French must be at peace with the Dutch";
+        assertEquals(errMsg,Stance.PEACE,french.getStance(dutch));
+        errMsg = "Wrong initial dutch tension";
+        assertEquals(errMsg, initialTensionValue, initialDutchTension);
+        errMsg = "Wrong initial french tension";
+        assertEquals(errMsg, initialTensionValue, initialFrenchTension);
+
+        // French declare war
+        igc.sendChangeStance(french, Stance.WAR, dutch);
+
+        // verify results
+        errMsg ="The Dutch should be at war with the French";
+        assertTrue(errMsg,dutch.getStance(french) == Stance.WAR);
+        errMsg ="The French should be at war with the Dutch";
+        assertTrue(errMsg,french.getStance(dutch) == Stance.WAR);
+
+        int currDutchTension = dutch.getTension(french).getValue();
+        int currFrenchTension = french.getTension(dutch).getValue();
+
+        int expectedDutchTension = Math.min(Tension.TENSION_MAX,
+            initialDutchTension + Tension.WAR_MODIFIER);
+        int expectedFrenchTension = Math.min(Tension.TENSION_MAX,
+            initialFrenchTension + Tension.WAR_MODIFIER);
+
+        errMsg = "Wrong dutch tension";
+        assertEquals(errMsg, expectedDutchTension, currDutchTension);
+        errMsg = "Wrong french tension";
+        assertEquals(errMsg, expectedFrenchTension, currFrenchTension);
+    }
+
+    public void testCreateMissionFailed() {
+        Game game = start(getTestMap());
         Map map = game.getMap();
-        
+
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
-        
+
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Player indianPlayer = camp.getOwner();
-        
+
         Tile tile = map.getNeighbourOrNull(Map.Direction.N, camp.getTile());
-        
+
         Unit jesuit = new Unit(game, tile, dutchPlayer, missionaryType, UnitState.ACTIVE);
-        
+
         // set tension to hateful
         Tension tension = new Tension(Level.HATEFUL.getLimit());
         camp.setAlarm(dutchPlayer, tension);
@@ -111,29 +165,14 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse("Mission creation should have failed",result);
         assertNull("Indian settlement should not have a mission",camp.getMissionary());
     }
-    
+
     public void testDumpGoods() {
-    	final TileType ocean = spec().getTileType("model.tile.ocean");
-    	final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+        final TileType ocean = spec().getTileType("model.tile.ocean");
+        final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
         final UnitType privateerType = spec().getUnitType("model.unit.privateer");
-    	
-		// start a server
-        server = ServerTestHelper.startServer(false, true);
-                
-        server.setMapGenerator(new MockMapGenerator(getTestMap(ocean)));
-        
-        PreGameController pgc = (PreGameController) server.getController();
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = start(getTestMap(ocean));
         Map map = game.getMap();
-        
+
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(1, 1);
         Unit privateer = new Unit(game, tile, dutchPlayer, privateerType, UnitState.ACTIVE);
@@ -142,11 +181,11 @@ public class InGameControllerTest extends FreeColTestCase {
         privateer.add(cotton);
         assertEquals("Setup Error, privateer should carry cotton", 1, privateer.getGoodsCount());
         assertTrue("Setup Error, cotton should be aboard privateer",cotton.getLocation() == privateer);
-        
+
         InGameController controller = (InGameController) server.getController();
         // moving a good to a null location means dumping the good
         controller.moveGoods(cotton, null);
-        
+
         assertEquals("Privateer should no longer carry cotton", 0, privateer.getGoodsCount());
         assertNull("Cotton should have no location",cotton.getLocation());
     }
@@ -155,22 +194,8 @@ public class InGameControllerTest extends FreeColTestCase {
      * Tests worker allocation regarding building tasks
      */
     public void testCashInTreasure() {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-        Map map = getCoastTestMap(plains, true);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-        // we need to update the reference
-        map = game.getMap();
+        Game game = start(getCoastTestMap(plains, true));
+        Map map = game.getMap();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(10, 4);
@@ -215,21 +240,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testEmbark() {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-        Map map = getCoastTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        PreGameController pgc = (PreGameController) server.getController();
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-        // we need to update the reference
-        map = game.getMap();
+        Game game = start(getCoastTestMap(plains));
+        Map map = game.getMap();
 
         //Game game = getStandardGame();
         //Map map = getTestMap();
@@ -272,19 +284,7 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testClearSpecialty() {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-
-        server.setMapGenerator(new MockMapGenerator(getTestMap()));
-        PreGameController pgc = (PreGameController) server.getController();
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = start(getTestMap());
         Map map = game.getMap();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
