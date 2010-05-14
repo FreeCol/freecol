@@ -46,6 +46,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class AboutPanel extends FreeColPanel {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
     /**

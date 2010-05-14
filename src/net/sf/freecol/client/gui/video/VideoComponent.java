@@ -19,19 +19,16 @@
 
 package net.sf.freecol.client.gui.video;
 
-import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
-import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
-import net.sf.freecol.common.resources.ResourceManager;
 
 import com.fluendo.player.Cortado;
 import com.fluendo.player.StopListener;

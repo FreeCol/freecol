@@ -202,7 +202,7 @@ public final class FreeColClient {
         // TODO: Move this to a more suitable place:
         final List<ModInfo> mods = new ArrayList<ModInfo>();
         final List<ResourceMapping> modResources = new ArrayList<ResourceMapping>(mods.size());
-        for (Object object : ((ListOption) getClientOptions()
+        for (Object object : ((ListOption<?>) getClientOptions()
                               .getObject(ClientOptions.USER_MODS)).getValue()) {
             mods.add((ModInfo) object);
             modResources.add(new FreeColModFile((ModInfo) object).getResourceMapping());

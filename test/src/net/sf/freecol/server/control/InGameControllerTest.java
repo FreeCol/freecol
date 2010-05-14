@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import java.io.File;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
@@ -42,10 +40,6 @@ import net.sf.freecol.common.model.Tension.Level;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
-import net.sf.freecol.server.generator.IMapGenerator;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;

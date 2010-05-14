@@ -136,7 +136,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
-            } else if (o instanceof ListOption) {
+            } else if (o instanceof ListOption<?>) {
                 @SuppressWarnings("unchecked")
                 ListOptionUI c = new ListOptionUI((ListOption) o, editable);
                 northPanel.add(c);

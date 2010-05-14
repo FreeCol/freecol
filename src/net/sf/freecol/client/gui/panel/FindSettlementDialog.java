@@ -57,7 +57,7 @@ import net.miginfocom.swing.MigLayout;
  * Centers the map on a known settlement or colony. Pressing ENTER
  * opens a panel if appropriate.
  */
-public final class FindSettlementDialog extends FreeColDialog implements ListSelectionListener {
+public final class FindSettlementDialog<T> extends FreeColDialog<T> implements ListSelectionListener {
 
     private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
 

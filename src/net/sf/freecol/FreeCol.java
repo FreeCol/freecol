@@ -310,7 +310,7 @@ public final class FreeCol {
             }
 
             Font default_font = ((Font)UIManager.get("NormalFont")).deriveFont(Font.ITALIC, 13);
-            java.util.Enumeration keys = UIManager.getDefaults().keys();
+            java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
             while (keys.hasMoreElements()) {
                 Object key = keys.nextElement();
                 Object value = UIManager.get (key);

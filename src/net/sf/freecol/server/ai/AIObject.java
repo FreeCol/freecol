@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Game;
 */
 public abstract class AIObject extends FreeColObject {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
     
     private final AIMain aiMain;

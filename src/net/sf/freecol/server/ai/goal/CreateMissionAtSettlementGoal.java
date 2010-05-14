@@ -20,26 +20,22 @@
 package net.sf.freecol.server.ai.goal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.ai.AIUnit;
-
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
 

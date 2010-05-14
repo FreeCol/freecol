@@ -1211,7 +1211,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void add(Component comp, Integer i, boolean update) {
 
-        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)
+        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog<?>)
                 && statusPanel.isVisible()) {
             remove(statusPanel, false);
         }

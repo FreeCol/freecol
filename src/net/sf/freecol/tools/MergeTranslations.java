@@ -73,8 +73,8 @@ public class MergeTranslations {
 
                 Map<String, String> targetProperties = readFile(targetFile);
 
-                List<Entry> missingProperties = new ArrayList<Entry>();
-                for (Entry entry : sourceProperties.entrySet()) {
+                List<Entry<?,?>> missingProperties = new ArrayList<Entry<?,?>>();
+                for (Entry<?,?> entry : sourceProperties.entrySet()) {
                     if (!targetProperties.containsKey(entry.getKey())) {
                         missingProperties.add(entry);
                     }
@@ -85,7 +85,7 @@ public class MergeTranslations {
                     out.write("### Merged from trunk on "
                               + DateFormat.getDateTimeInstance().format(new Date())
                               + " ###\n");
-                    for (Entry entry : missingProperties) {
+                    for (Entry<?,?> entry : missingProperties) {
                         out.write((String) entry.getKey());
                         out.write("=");
                         out.write((String) entry.getValue());

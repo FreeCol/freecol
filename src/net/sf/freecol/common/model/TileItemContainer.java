@@ -419,7 +419,7 @@ public class TileItemContainer extends FreeColGameObject {
         return (tileItems.remove(item) ? item : null);
     }
 
-    public void removeAll(Class c) {
+    public void removeAll(Class<?> c) {
         Iterator<TileItem> iterator = tileItems.iterator();
         while (iterator.hasNext()) {
             if (c.isInstance(iterator.next())) {

@@ -20,7 +20,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,13 +27,12 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
@@ -48,9 +46,8 @@ import org.w3c.dom.Element;
 * around. 
 */
 public class UnitWanderHostileMission extends Mission {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
-
-
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.

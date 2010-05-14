@@ -19,29 +19,19 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.FreeCol;
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
@@ -54,8 +44,6 @@ import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.StringOption;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This class provides visualization for an {@link OptionGroup}. In order to
@@ -115,7 +103,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             if (!o.getId().equals(Option.NO_ID)) {
                 optionUIs.put(o.getId(), soi);
             }
-        } else if (o instanceof ListOption) {
+        } else if (o instanceof ListOption<?>) {
             @SuppressWarnings("unchecked")
             final ListOptionUI soi = new ListOptionUI((ListOption) o, editable);
             add(soi);
@@ -264,101 +252,101 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         }
     }
 
-    /**
-     * A button for displaying an <code>OptionGroupUI</code>. The 
-     * <code>OptionGroupUI</code> is displayed inside a panel when
-     * the button is clicked.
-     */
-    private class OptionGroupButton extends JButton implements OptionUpdater {
-        
-        private final OptionGroupUI groupUI;
-        private final OptionGroupButton optionGroupButton;
-        private final OptionGroupPanel optionGroupPanel;
-        
-        /**
-         * Creates a new button.
-         * 
-         * @param name The title on the button.
-         * @param groupUI The <code>OptionGroupUI</code> to be displayed when
-         *      the button is clicked.
-         */
-        OptionGroupButton(final String name, final OptionGroupUI groupUI) {
-            super(name);
-            
-            this.groupUI = groupUI;
-            optionGroupButton = this;
-            optionGroupPanel = new OptionGroupPanel();
-            
-            addActionListener(new ActionListener() {
-               public void actionPerformed(ActionEvent e) {
-                   optionGroupButton.setEnabled(false);
-                   FreeCol.getFreeColClient().getCanvas().addAsFrame(optionGroupPanel);
-               }                
-            });
-        }
-        
-        /**
-         * Rollback to the original value.
-         * 
-         * This method gets called so that changes made to options with
-         * {@link Option#isPreviewEnabled()} is rolled back
-         * when an option dialoag has been cancelled.
-         */
-        public void rollback() {
-            groupUI.rollback();
-        }
-        
-        /**
-         * Delegates the call to <code>groupUI</code>.
-         */
-        public void updateOption() {
-            groupUI.updateOption();
-        }
-        
-        /**
-         * Reset with the value from the option.
-         */
-        public void reset() {
-            groupUI.reset();
-        }
-        
-        /**
-         * Unregister <code>PropertyChangeListener</code>s and closes
-         * the subpanel.
-         */
-        public void unregister() {
-            groupUI.unregister();
-            FreeCol.getFreeColClient().getCanvas().remove(optionGroupPanel);
-        }
-        
-        /**
-         * Panel for displaying the <code>groupUI</code>.
-         */        
-        private class OptionGroupPanel extends FreeColPanel {
-            public OptionGroupPanel() {
-                super(FreeCol.getFreeColClient().getCanvas(), new BorderLayout());
-                
-                JButton button = new JButton(Messages.message("ok"));
-                button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        FreeCol.getFreeColClient().getCanvas().remove(optionGroupPanel);
-                        optionGroupButton.setEnabled(true);
-                    }
-                });
-                
-                add(groupUI, BorderLayout.CENTER);
-                add(button, BorderLayout.SOUTH);
-            }
-            
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(400, 200);
-            }
-            
-            @Override
-            public Dimension getMinimumSize() {
-                return getPreferredSize();
-            }
-        }
-    }
+//    /**
+//     * A button for displaying an <code>OptionGroupUI</code>. The 
+//     * <code>OptionGroupUI</code> is displayed inside a panel when
+//     * the button is clicked.
+//     */
+//    private class OptionGroupButton extends JButton implements OptionUpdater {
+//        
+//        private final OptionGroupUI groupUI;
+//        private final OptionGroupButton optionGroupButton;
+//        private final OptionGroupPanel optionGroupPanel;
+//        
+//        /**
+//         * Creates a new button.
+//         * 
+//         * @param name The title on the button.
+//         * @param groupUI The <code>OptionGroupUI</code> to be displayed when
+//         *      the button is clicked.
+//         */
+//        OptionGroupButton(final String name, final OptionGroupUI groupUI) {
+//            super(name);
+//            
+//            this.groupUI = groupUI;
+//            optionGroupButton = this;
+//            optionGroupPanel = new OptionGroupPanel();
+//            
+//            addActionListener(new ActionListener() {
+//               public void actionPerformed(ActionEvent e) {
+//                   optionGroupButton.setEnabled(false);
+//                   FreeCol.getFreeColClient().getCanvas().addAsFrame(optionGroupPanel);
+//               }                
+//            });
+//        }
+//        
+//        /**
+//         * Rollback to the original value.
+//         * 
+//         * This method gets called so that changes made to options with
+//         * {@link Option#isPreviewEnabled()} is rolled back
+//         * when an option dialoag has been cancelled.
+//         */
+//        public void rollback() {
+//            groupUI.rollback();
+//        }
+//        
+//        /**
+//         * Delegates the call to <code>groupUI</code>.
+//         */
+//        public void updateOption() {
+//            groupUI.updateOption();
+//        }
+//        
+//        /**
+//         * Reset with the value from the option.
+//         */
+//        public void reset() {
+//            groupUI.reset();
+//        }
+//        
+//        /**
+//         * Unregister <code>PropertyChangeListener</code>s and closes
+//         * the subpanel.
+//         */
+//        public void unregister() {
+//            groupUI.unregister();
+//            FreeCol.getFreeColClient().getCanvas().remove(optionGroupPanel);
+//        }
+//        
+//        /**
+//         * Panel for displaying the <code>groupUI</code>.
+//         */        
+//        private class OptionGroupPanel extends FreeColPanel {
+//            public OptionGroupPanel() {
+//                super(FreeCol.getFreeColClient().getCanvas(), new BorderLayout());
+//                
+//                JButton button = new JButton(Messages.message("ok"));
+//                button.addActionListener(new ActionListener() {
+//                    public void actionPerformed(ActionEvent e) {
+//                        FreeCol.getFreeColClient().getCanvas().remove(optionGroupPanel);
+//                        optionGroupButton.setEnabled(true);
+//                    }
+//                });
+//                
+//                add(groupUI, BorderLayout.CENTER);
+//                add(button, BorderLayout.SOUTH);
+//            }
+//            
+//            @Override
+//            public Dimension getPreferredSize() {
+//                return new Dimension(400, 200);
+//            }
+//            
+//            @Override
+//            public Dimension getMinimumSize() {
+//                return getPreferredSize();
+//            }
+//        }
+//    }
 }

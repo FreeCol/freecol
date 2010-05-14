@@ -44,6 +44,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class ChoiceDialog<T> extends FreeColDialog<T> {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ChoiceDialog.class.getName());
 
     private JList choiceList;

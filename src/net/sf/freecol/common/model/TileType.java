@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

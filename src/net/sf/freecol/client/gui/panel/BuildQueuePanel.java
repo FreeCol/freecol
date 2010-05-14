@@ -637,11 +637,11 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 targetModel = (DefaultListModel) target.getModel();
                 Object transferData = data.getTransferData(buildQueueFlavor);
                 
-                if (!(transferData instanceof List)) {
+                if (!(transferData instanceof List<?>)) {
                 	return false;
                 }
                 
-                for (Object object : (List) transferData) {
+                for (Object object : (List<?>) transferData) {
                     // first we need to make sure all items are compatible
                     //with the drop zone
                 	if (!(object instanceof BuildableType)) {

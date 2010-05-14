@@ -22,18 +22,11 @@ package net.sf.freecol.tools;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.io.FilenameFilter;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 
 public class InstallerTranslations {

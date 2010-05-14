@@ -35,6 +35,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
 
     public static final String NO_ID = "NO_ID";
 
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
     private String optionGroup = "";

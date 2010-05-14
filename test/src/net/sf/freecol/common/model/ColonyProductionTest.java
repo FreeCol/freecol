@@ -19,10 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
-
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 

@@ -80,6 +80,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
 
     // -- Constructors --
 
+    @SuppressWarnings("unused")
     private Modifier() {
         // empty constructor
     }

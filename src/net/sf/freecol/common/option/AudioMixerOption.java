@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class AudioMixerOption extends AbstractOption {
 
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AudioMixerOption.class.getName());
 
     private static final Map<String, MixerWrapper> audioMixers = new HashMap<String, MixerWrapper>();

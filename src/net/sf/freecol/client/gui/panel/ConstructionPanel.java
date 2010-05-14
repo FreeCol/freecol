@@ -147,7 +147,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        List buildQueue = (List) event.getNewValue();
+        List<?> buildQueue = (List<?>) event.getNewValue();
         if (buildQueue == null || buildQueue.isEmpty()) {
             initialize(null);
         } else {

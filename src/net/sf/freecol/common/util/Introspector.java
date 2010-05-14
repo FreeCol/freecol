@@ -86,7 +86,7 @@ public class Introspector {
      * @return A <code>Method</code> representing setField().
      * @throws IllegalArgumentException
      */
-    private Method getSetMethod(Class argType)
+    private Method getSetMethod(Class<?> argType)
         throws IllegalArgumentException {
         String methodName = "set" + field.substring(0, 1).toUpperCase()
             + field.substring(1);
