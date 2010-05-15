@@ -2963,13 +2963,14 @@ public final class InGameController extends Controller {
         Tile tile = unit.getTile();
         // Set entry location before setState (satisfy its check), then
         // location.
+        Europe europe = serverPlayer.getEurope();
         unit.setEntryLocation(tile);
         unit.setState(UnitState.TO_EUROPE);
-        unit.setLocation(serverPlayer.getEurope());
+        unit.setLocation(europe);
         addRemove(objects, unit);
         objects.add(tile);
         sendToOthers(serverPlayer, objects);
-        return buildUpdate(serverPlayer, unit, tile);
+        return buildUpdate(serverPlayer, unit, tile, europe);
     }
 
     /**
