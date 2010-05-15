@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.video.Video;
  * @see Video
  */
 public class VideoResource extends Resource {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(VideoResource.class.getName());
 
     private final Video video;

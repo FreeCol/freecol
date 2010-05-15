@@ -19,14 +19,10 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -34,7 +30,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
@@ -76,11 +71,9 @@ public class ScoutingMissionTest extends FreeColTestCase {
             // Create players, settlement and unit
             ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.inca");
             ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-            AIPlayer aiPlayer= (AIPlayer)aiMain.getAIObject(player2.getId());
-
             Tile settlementTile = map.getTile(2, 1);
             FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-            Settlement settlement = builder.player(player1).settlementTile(settlementTile).build();
+            builder.player(player1).settlementTile(settlementTile).build();
 
             Tile unitTile = map.getTile(2, 2);
             Unit scout = new Unit(game, unitTile, player2, scoutType, UnitState.ACTIVE);

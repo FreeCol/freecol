@@ -51,6 +51,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFather> implements ActionListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());
 
     private final JTabbedPane tb;

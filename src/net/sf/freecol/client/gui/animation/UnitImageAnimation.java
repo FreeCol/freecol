@@ -23,7 +23,6 @@ import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -44,9 +43,6 @@ public final class UnitImageAnimation {
     private final Unit unit;
     private final SimpleZippedAnimation animation;
     private final Location currentLocation;
-    
-    private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
-    
     
     /**
      * Constructor

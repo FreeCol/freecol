@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.StringReader;
 import java.io.StringWriter;
 

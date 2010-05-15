@@ -38,8 +38,6 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public class IndianNationType extends NationType {
 
-    private static final IndianNationType defaultType = new IndianNationType();
-
     public static enum SettlementNumber { LOW, AVERAGE, HIGH }
     public static enum AggressionLevel { LOW, AVERAGE, HIGH }
 

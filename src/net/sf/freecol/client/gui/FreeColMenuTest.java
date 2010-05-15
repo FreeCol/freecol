@@ -37,7 +37,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.FreeColException;
 
 public class FreeColMenuTest implements ActionListener, ItemListener {
     JTextArea output;

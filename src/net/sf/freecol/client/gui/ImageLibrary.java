@@ -27,12 +27,10 @@ import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -58,6 +56,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ImageLibrary {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());    
     
     public static final String UNIT_SELECT = "unitSelect.image",

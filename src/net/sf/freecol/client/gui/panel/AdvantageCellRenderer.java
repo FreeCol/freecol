@@ -22,15 +22,12 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -41,9 +38,6 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 * It is being used in the players table (StartGamePanel).
 */
 public final class AdvantageCellRenderer implements TableCellRenderer {
-
-    private static Vector<EuropeanNationType> europeans = 
-        new Vector<EuropeanNationType>(Specification.getSpecification().getEuropeanNationTypes());
 
     private Advantages advantages;
 

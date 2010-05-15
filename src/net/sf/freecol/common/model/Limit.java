@@ -26,8 +26,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Operand.OperandType;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The <code>Limit</code> class encapsulates a limit on the

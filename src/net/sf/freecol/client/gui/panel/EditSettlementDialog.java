@@ -59,6 +59,7 @@ import net.miginfocom.swing.MigLayout;
 public final class EditSettlementDialog extends FreeColDialog<IndianSettlement> 
     implements ItemListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EditSettlementDialog.class.getName());
 
     private static final UnitType BRAVE = Specification.getSpecification().getUnitType("model.unit.brave");

@@ -95,6 +95,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
 
+        @SuppressWarnings("unused")
         Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
         Unit soldier = new Unit(game, tile3, french, colonistType, UnitState.ACTIVE);
         InGameController igc = (InGameController) server.getController();
@@ -313,6 +314,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(apache.hasContacted(iroquois));
 
         Unit brave1 = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
+        @SuppressWarnings("unused")
         Unit brave2 = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
         InGameController igc = (InGameController) server.getController();
         igc.move(apache, brave1, tile2);

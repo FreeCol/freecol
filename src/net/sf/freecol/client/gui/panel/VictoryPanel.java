@@ -39,6 +39,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class VictoryPanel extends FreeColPanel {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
 
     private static final String CONTINUE = "CONTINUE";

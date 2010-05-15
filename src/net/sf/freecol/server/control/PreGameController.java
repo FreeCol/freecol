@@ -19,10 +19,8 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +29,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -39,11 +36,12 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.IMapGenerator;

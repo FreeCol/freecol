@@ -59,6 +59,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class FindSettlementDialog<T> extends FreeColDialog<T> implements ListSelectionListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
 
     private List<Settlement> knownSettlements = new ArrayList<Settlement>();

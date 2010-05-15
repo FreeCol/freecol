@@ -702,16 +702,12 @@ public final class EuropePanel extends FreeColPanel {
      */
     public final class DocksPanel extends JPanel implements PropertyChangeListener {
 
-        private final EuropePanel europePanel;
-
-
         /**
          * Creates this DocksPanel.
          * 
          * @param europePanel The panel that holds this DocksPanel.
          */
         public DocksPanel(EuropePanel europePanel) {
-            this.europePanel = europePanel;
         }
         
         public void initialize() {

@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -180,8 +179,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     private Player owner;
 
-    private String nationality = null;
-
     private List<Unit> units = Collections.emptyList();
 
     private GoodsContainer goodsContainer;
@@ -307,7 +304,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             unitType = newType;
         }
         this.owner = owner;
-        this.nationality = owner.getNationID();
+        owner.getNationID();
         naval = unitType.hasAbility("model.ability.navalUnit");
         setLocation(location);
 

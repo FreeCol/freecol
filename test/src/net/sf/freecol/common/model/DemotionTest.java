@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.lang.reflect.Method;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;

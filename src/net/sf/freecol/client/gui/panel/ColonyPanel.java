@@ -24,7 +24,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -69,7 +68,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -82,6 +80,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -162,8 +161,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
 
     private JButton buildQueueButton = new JButton(Messages.message("colonyPanel.buildQueue"));
-
-    private static final Font hugeFont = new Font("Dialog", Font.BOLD, 24);
 
     /**
      * The saved size of this panel.
@@ -933,7 +930,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * @return The component argument.
              */
             public Component add(Component comp, boolean editState) {
-                Component c;
                 Container oldParent = comp.getParent();
 
                 if (editState) {

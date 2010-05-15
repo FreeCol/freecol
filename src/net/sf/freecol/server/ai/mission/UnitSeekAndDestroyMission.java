@@ -20,7 +20,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -43,7 +42,6 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;

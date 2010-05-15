@@ -24,7 +24,6 @@ import java.util.List;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.PseudoRandom;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -623,6 +622,7 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(indianConvert.canBuildColony());
         
         UnitType braveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+        @SuppressWarnings("unused")
         Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
         //assertFalse(brave.canBuildColony());
     }

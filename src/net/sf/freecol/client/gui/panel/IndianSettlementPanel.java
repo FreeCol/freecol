@@ -40,6 +40,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class IndianSettlementPanel extends FreeColPanel {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(IndianSettlementPanel.class.getName());
 
     /**

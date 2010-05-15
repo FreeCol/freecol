@@ -36,7 +36,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private static int nextIndex = 0;
 
     private boolean natural;
-    private String typeId;
     private int magnitude;
     private int addWorkTurns;
 

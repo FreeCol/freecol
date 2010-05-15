@@ -43,6 +43,7 @@ import org.w3c.dom.Element;
 */
 public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownable {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";

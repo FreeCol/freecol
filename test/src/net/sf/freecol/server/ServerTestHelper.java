@@ -31,7 +31,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 
 public final class ServerTestHelper {

@@ -19,21 +19,17 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

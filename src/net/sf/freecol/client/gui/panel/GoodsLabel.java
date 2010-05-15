@@ -48,8 +48,6 @@ public final class GoodsLabel extends JLabel {
     
     private final Canvas parent;
     
-    private boolean selected;
-    
     private boolean partialChosen;
     
     private boolean toEquip;
@@ -66,7 +64,6 @@ public final class GoodsLabel extends JLabel {
         this.goods = goods;
         setToolTipText(Messages.message(goods.getNameKey()));
         this.parent = parent;
-        selected = false;
         partialChosen = false;
         toEquip = false;
         initializeDisplay();
@@ -166,7 +163,6 @@ public final class GoodsLabel extends JLabel {
      * @param b Whether or not this goods should be selected.
      */
     public void setSelected(boolean b) {
-        selected = b;
     }
     
     /**

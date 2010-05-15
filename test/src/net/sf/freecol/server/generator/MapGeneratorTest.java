@@ -25,14 +25,13 @@ import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Map.Position;

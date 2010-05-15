@@ -22,14 +22,13 @@ package net.sf.freecol.common.model;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,11 +38,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.RandomChoice;
@@ -315,10 +312,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     private int immigrationRequired = 12;
-
-    // No need for a persistent storage of these variables:
-    private int settlementNameIndex = 0;
-    private EnumMap<RegionType, Integer> regionNameIndex = new EnumMap<RegionType, Integer>(RegionType.class);
 
     private Location entryLocation;
 

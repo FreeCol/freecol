@@ -40,6 +40,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class DumpCargoDialog extends FreeColPanel {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());
 
     private static final String CANCEL = "CANCEL";

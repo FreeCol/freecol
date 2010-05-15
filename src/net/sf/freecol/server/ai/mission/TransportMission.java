@@ -47,16 +47,13 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -1583,7 +1580,6 @@ public class TransportMission extends Mission {
      *         is lost.
      */
     public String getDebuggingInfo() {
-        Unit carrier = getUnit();
         return this.toString();
     }
 

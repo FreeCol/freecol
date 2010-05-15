@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -31,7 +30,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;

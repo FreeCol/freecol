@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
 * Mission for wandering in random directions.
 */
 public class UnitWanderMission extends Mission {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderMission.class.getName());
 
 

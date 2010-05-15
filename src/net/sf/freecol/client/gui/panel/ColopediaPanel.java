@@ -98,8 +98,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     private static final DecimalFormat modifierFormat = 
         new DecimalFormat("0.##");
 
-    private static final String ROOT = "ROOT";
-
     private final String none;
 
     // layout of production modifier panel

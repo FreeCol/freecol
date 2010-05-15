@@ -20,7 +20,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -42,9 +41,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;

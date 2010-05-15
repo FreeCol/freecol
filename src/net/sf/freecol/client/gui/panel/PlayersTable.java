@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -46,25 +47,24 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.resources.ResourceManager;
-import javax.swing.ImageIcon;
 
 
 public final class PlayersTable extends JTable {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(PlayersTable.class.getName());
 
     public static final int NATION_COLUMN = 0, AVAILABILITY_COLUMN = 1, ADVANTAGE_COLUMN = 2,
@@ -78,9 +78,6 @@ public final class PlayersTable extends JTable {
         Messages.message("player")
     };
 
-
-    private static final EuropeanNationType[] europeans = 
-        FreeCol.getSpecification().getEuropeanNationTypes().toArray(new EuropeanNationType[0]);
 
     private static final NationState[] allStates = new NationState[] {
         NationState.AVAILABLE,

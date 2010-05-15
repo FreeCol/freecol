@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
  */
 public final class UnitLabel extends JLabel implements ActionListener, PropertyChangeListener {
 
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
     public static enum UnitAction { ASSIGN,

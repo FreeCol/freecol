@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.Canvas;
  */
 public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
 
     private static final int lineWidth = 320;

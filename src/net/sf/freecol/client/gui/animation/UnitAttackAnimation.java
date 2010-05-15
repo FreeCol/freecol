@@ -20,13 +20,11 @@
 package net.sf.freecol.client.gui.animation;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
 

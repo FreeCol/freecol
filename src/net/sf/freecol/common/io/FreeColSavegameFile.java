@@ -28,6 +28,7 @@ import java.util.logging.Logger;
  * Represents a FreeCol savegame.
  */
 public class FreeColSavegameFile extends FreeColDataFile {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
     
     public static final String SAVEGAME_FILE = "savegame.xml";

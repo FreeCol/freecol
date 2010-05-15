@@ -51,6 +51,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements ActionListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
     
     private static enum Action { OK, CANCEL, DEASSIGN, DELETE }

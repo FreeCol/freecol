@@ -20,8 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
-import java.awt.Font;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -36,14 +35,10 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.resources.ResourceManager;
 
-import net.miginfocom.swing.MigLayout;
-
 /**
  * This panel represents a single building in a Colony.
  */
 public class BuildingSiteToolTip extends JToolTip {
-
-    private static final Font arrowFont = new Font("Dialog", Font.BOLD, 24);
 
     /**
      * Creates this BuildingSiteToolTip.

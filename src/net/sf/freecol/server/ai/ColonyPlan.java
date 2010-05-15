@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -36,13 +35,12 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-
 import net.sf.freecol.server.ai.ColonyProfile.ProfileType;
 
 import org.w3c.dom.Document;

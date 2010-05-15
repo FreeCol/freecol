@@ -23,12 +23,11 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;

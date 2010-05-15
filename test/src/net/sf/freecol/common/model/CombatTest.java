@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.common.PseudoRandom;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Player.Stance;

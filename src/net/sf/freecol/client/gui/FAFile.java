@@ -159,7 +159,6 @@ public class FAFile {
             }   
 
             FAName newLetter = new FAName();
-            newLetter.name = name;
             newLetter.width = width;
             newLetter.height = height;
             newLetter.points = new Point[numberOfPoints];
@@ -191,7 +190,6 @@ public class FAFile {
             }   
 
             FALetter newLetter = new FALetter();
-            newLetter.letter = letter;
             newLetter.advance = advance;
             newLetter.points = new Point[numberOfPoints];
             for (int i=0; i<numberOfPoints; i++) {
@@ -212,13 +210,11 @@ public class FAFile {
     }
 
     private static class FALetter {
-        public char letter;
         public Point[] points;
         public int advance;
     }
 
     private static class FAName {
-        public String name;
         public Point[] points;
         public int width;
         public int height;

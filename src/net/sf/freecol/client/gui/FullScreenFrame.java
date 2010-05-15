@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 
 import net.sf.freecol.FreeCol;
 

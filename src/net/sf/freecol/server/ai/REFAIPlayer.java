@@ -26,18 +26,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -46,8 +44,6 @@ import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
-
-import org.w3c.dom.Element;
 
 /**
  *

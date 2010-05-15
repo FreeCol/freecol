@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Limit.Operator;
 import net.sf.freecol.common.model.Operand.OperandType;
 import net.sf.freecol.common.model.Operand.ScopeLevel;
 import net.sf.freecol.util.test.FreeColTestCase;

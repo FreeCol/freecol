@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.model;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;

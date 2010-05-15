@@ -43,7 +43,6 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;

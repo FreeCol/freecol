@@ -35,7 +35,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -43,9 +42,9 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -53,9 +52,8 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
-import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -71,9 +69,6 @@ import org.w3c.dom.Element;
 public class AIColony extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
-
-    private static final EquipmentType toolsType = FreeCol.getSpecification()
-        .getEquipmentType("model.equipment.tools");
 
     private static enum ExperienceUpgrade { NONE, SOME, EXPERT }
 

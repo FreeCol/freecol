@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.FileInputStream;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;

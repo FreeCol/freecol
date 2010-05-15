@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyTest extends FreeColTestCase {
@@ -226,7 +225,6 @@ public class ColonyTest extends FreeColTestCase {
         int population = 3;
         GoodsType food = spec().getGoodsType("model.goods.food");
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-        GoodsType cloth = spec().getGoodsType("model.goods.cloth");
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
         UnitType cottonPlanter = spec().getUnitType("model.unit.masterCottonPlanter");
         UnitType statesman = spec().getUnitType("model.unit.elderStatesman");

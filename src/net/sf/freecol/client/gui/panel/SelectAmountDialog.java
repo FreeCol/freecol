@@ -39,6 +39,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class SelectAmountDialog extends FreeColDialog<Integer> implements ActionListener {
 
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectAmountDialog.class.getName());
 
     private static final int SELECT_CANCEL = -1;

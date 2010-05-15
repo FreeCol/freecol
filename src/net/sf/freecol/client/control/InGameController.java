@@ -2379,7 +2379,6 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void moveScoutIndianSettlement(Unit unit, Direction direction) {
-        Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         Tile unitTile = unit.getTile();
@@ -2462,9 +2461,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void moveUseMissionary(Unit unit, Direction direction) {
-        Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
-        Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         Unit missionary = settlement.getMissionary();
@@ -3006,7 +3003,6 @@ public final class InGameController implements NetworkConstants {
      */
     private void attemptSellToSettlement(Unit unit, Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
-        Client client = freeColClient.getClient();
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
@@ -4080,9 +4076,6 @@ public final class InGameController implements NetworkConstants {
         }
 
         Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
-        Canvas canvas = freeColClient.getCanvas();
-
         if (!(unit.checkSetState(state))) {
             return; // Don't bother (and don't log, this is not exceptional)
         }

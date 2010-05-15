@@ -71,6 +71,7 @@ import net.miginfocom.swing.MigLayout;
 public final class SelectDestinationDialog extends FreeColDialog<Location> 
     implements ActionListener, ChangeListener, ItemListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectDestinationDialog.class.getName());
 
     private static boolean showOnlyMyColonies = true;

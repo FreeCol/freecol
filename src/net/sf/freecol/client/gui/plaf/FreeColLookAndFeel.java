@@ -58,9 +58,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     private final static Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
     private File dataDirectory;
     
-    private final Dimension windowSize;
-
-
     /**
      * Initiates a new "FreeCol Look and Feel".
      *
@@ -81,8 +78,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     */
     public FreeColLookAndFeel(String dataFolder, Dimension windowSize) throws FreeColException {
         super();
-        
-        this.windowSize = windowSize;
         
         if(dataFolder.equals("")) { // lookup is necessary
             dataDirectory = new File("data");// + System.getProperty("file.separator"));            

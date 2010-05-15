@@ -55,7 +55,6 @@ public class LandGenerator {
 
     private int preferredDistanceToEdge;
     private int numberOfLandTiles;
-    private int minLandMass;
     private int minimumNumberOfTiles;
 
     private int genType;
@@ -103,7 +102,7 @@ public class LandGenerator {
         width = mapGeneratorOptions.getWidth();
         height = mapGeneratorOptions.getHeight();         
         preferredDistanceToEdge = mapGeneratorOptions.getPrefDistToEdge();
-        minLandMass = mapGeneratorOptions.getLandMass();
+        mapGeneratorOptions.getLandMass();
         minimumNumberOfTiles = mapGeneratorOptions.getLand();
         genType = mapGeneratorOptions.getLandGeneratorType();
 

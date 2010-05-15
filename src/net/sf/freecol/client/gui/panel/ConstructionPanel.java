@@ -47,8 +47,6 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
 
     private Colony colony;
 
-    private BuildableType buildable;
-
     public static final String EVENT = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
 
     /**

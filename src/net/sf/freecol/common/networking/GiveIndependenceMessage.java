@@ -21,17 +21,15 @@ package net.sf.freecol.common.networking;
 
 import java.util.List;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

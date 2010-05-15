@@ -22,11 +22,8 @@ package net.sf.freecol.server.model;
 
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -34,34 +31,23 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

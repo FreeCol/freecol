@@ -19,27 +19,23 @@
 
 package net.sf.freecol.server.ai.goal;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.ai.AIUnit;
-
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.ai.AIUnit;
 
 /**
  * This {@link Goal} deals with all missionaries of one {@link AIPlayer}.

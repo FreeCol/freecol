@@ -27,7 +27,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.FreeColTestUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

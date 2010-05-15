@@ -50,8 +50,6 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class CompactLabourReport extends ReportPanel {
 
-    private static final int HEADER_ROWS = 1;
-
     private int COLONY_COLUMN = 0;
     private int UNIT_TYPE_COLUMN = 1;
     private int WORKING_COLUMN = 2;

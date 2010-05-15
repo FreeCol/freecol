@@ -39,6 +39,7 @@ import net.miginfocom.swing.MigLayout;
 
 public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConfirmDeclarationDialog.class.getName());
 
     /**

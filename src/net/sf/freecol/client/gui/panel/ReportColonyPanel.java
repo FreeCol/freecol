@@ -49,8 +49,6 @@ public final class ReportColonyPanel extends ReportPanel {
 
     private List<Colony> colonies;
 
-    private final int ROWS_PER_COLONY = 4;
-
     /**
      * The constructor that will add the items to this panel.
      * 

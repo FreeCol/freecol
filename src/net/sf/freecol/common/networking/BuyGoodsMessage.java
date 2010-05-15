@@ -21,7 +21,6 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;

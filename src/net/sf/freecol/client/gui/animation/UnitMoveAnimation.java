@@ -29,7 +29,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map.Direction;
 
 
 /**

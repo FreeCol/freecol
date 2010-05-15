@@ -26,10 +26,8 @@ package net.sf.freecol.server.ai.goal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -37,7 +35,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.UnitType;
 
-import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -63,7 +60,6 @@ public abstract class Goal extends AIObject implements GoalConstants {
     private static final Logger logger = Logger.getLogger(Goal.class.getName());
 
     private float relativeWeight;
-    private int turnCreated;
     private int turnLastUnitAdded;
     protected boolean needsPlanning;
     protected boolean isFinished;
@@ -84,7 +80,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
         player = p;
         parentGoal = g;
         relativeWeight = w;
-        turnCreated = getGame().getTurn().getNumber();
+        getGame().getTurn().getNumber();
         needsPlanning = true; //a newly created Goal always needs planning
         isFinished = false; //only plan() should set this to true!
         availableUnitsList = new ArrayList<AIUnit>();

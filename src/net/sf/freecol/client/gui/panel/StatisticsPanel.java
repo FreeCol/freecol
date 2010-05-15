@@ -44,6 +44,7 @@ import net.sf.freecol.common.networking.StatisticsMessage;
  */
 public final class StatisticsPanel extends FreeColPanel implements ActionListener {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatisticsPanel.class.getName());
 
     class StatisticsModel extends AbstractTableModel {

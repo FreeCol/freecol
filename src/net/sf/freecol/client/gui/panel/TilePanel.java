@@ -53,6 +53,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class TilePanel extends FreeColPanel {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TilePanel.class.getName());
 
     private static final String COLOPEDIA = "COLOPEDIA";
