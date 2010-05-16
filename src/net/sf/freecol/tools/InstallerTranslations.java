@@ -195,7 +195,7 @@ public class InstallerTranslations {
         }
         return result;
     }
-
+    /*
     private static Map<String, String> readLanguageMappings(File file) {
         Map<String, String> result = new HashMap<String, String>();
         try {
@@ -215,6 +215,6 @@ public class InstallerTranslations {
         }
         return result;
     }
-
+    */
 }
 

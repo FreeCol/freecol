@@ -280,8 +280,6 @@ public class BuildingTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(6);
-        List<Unit> units = colony.getUnitList();
-
         for (Building building : colony.getBuildings()) {
             try {
                 StringWriter sw = new StringWriter();
@@ -361,7 +359,6 @@ public class BuildingTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
-        List<Unit> units = colony.getUnitList();
         GoodsType foodType = spec().getGoodsType("model.goods.food");
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 

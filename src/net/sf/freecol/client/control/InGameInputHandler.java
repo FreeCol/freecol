@@ -81,6 +81,7 @@ public final class InGameInputHandler extends InputHandler {
 
     private Unit lastAnimatedUnit = null;
 
+
     /**
      * The constructor to use.
      * 
@@ -197,15 +198,16 @@ public final class InGameInputHandler extends InputHandler {
      * @return The reply.
      */
     public Element update(Element updateElement) {
-        
+
         updateGameObjects(updateElement.getChildNodes());
-        
+
         new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
 
     /**
      * Updates all FreeColGameObjects from the childNodes of the message
+     * 
      * @param nodeList The list of nodes from the message
      */
     private void updateGameObjects(NodeList nodeList) {
@@ -222,7 +224,7 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
     }
-    
+
     /**
      * Handles a "remove"-message.
      * 
@@ -248,14 +250,14 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "animateMove"-message.
-     * This only performs animation, if required.  It does not actually
-     * change unit positions, which happens in an "update".
+     * Handles an "animateMove"-message. This only performs animation, if
+     * required. It does not actually change unit positions, which happens in an
+     * "update".
      * 
-     * @param element An element (root element in a DOM-parsed XML tree)
-     *                that holds attributes for the old and new tiles and
-     *                an element for the unit that is moving (which are
-     *                used solely to operate the animation).
+     * @param element An element (root element in a DOM-parsed XML tree) that
+     *            holds attributes for the old and new tiles and an element for
+     *            the unit that is moving (which are used solely to operate the
+     *            animation).
      */
     private Element animateMove(Element element) {
         FreeColClient client = getFreeColClient();
@@ -264,42 +266,32 @@ public final class InGameInputHandler extends InputHandler {
         Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
         if (unit == null) {
             if (element.getFirstChild() == null) {
-                logger.warning("Animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " incorrectly omitted unit: " + unitId
-                    + " from: " + element.getAttribute("oldTile")
-                    + " to: " + element.getAttribute("newTile")
-                    );
+                logger.warning("Animation" + " for: " + client.getMyPlayer().getId() + " incorrectly omitted unit: "
+                        + unitId + " from: " + element.getAttribute("oldTile") + " to: "
+                        + element.getAttribute("newTile"));
                 return null;
             }
             unit = new Unit(game, (Element) element.getFirstChild());
         }
         ClientOptions options = client.getClientOptions();
         boolean ourUnit = unit.getOwner() == client.getMyPlayer();
-        String key = (ourUnit) ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        String key = (ourUnit) ? ClientOptions.MOVE_ANIMATION_SPEED : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         if (!client.isHeadless() && options.getInteger(key) > 0) {
             String oldTileId = element.getAttribute("oldTile");
             Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
             String newTileId = element.getAttribute("newTile");
             Tile newTile = (Tile) game.getFreeColGameObjectSafely(newTileId);
             if (newTile == null || oldTile == null || unit == null) {
-                throw new IllegalStateException("animateMove"
-                                                + ((unit == null) ? ": null unit" : "")
-                                                + ((oldTile == null) ? ": null oldTile" : "")
-                                                + ((newTile == null) ? ": null newTile" : "")
-                                                );
+                throw new IllegalStateException("animateMove" + ((unit == null) ? ": null unit" : "")
+                        + ((oldTile == null) ? ": null oldTile" : "") + ((newTile == null) ? ": null newTile" : ""));
             }
 
             // All is well, queue the animation.
             // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
             try {
-                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
-                                                     unit != lastAnimatedUnit)
-                    .invokeSpecial();
+                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile, unit != lastAnimatedUnit).invokeSpecial();
             } catch (Exception exception) {
-                logger.warning("UnitMoveAnimationCanvasSwingTask raised "
-                               + exception.toString());
+                logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
             }
             lastAnimatedUnit = unit;
         }
@@ -307,43 +299,33 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "animateAttack"-message.
-     * This only performs animation, if required.  It does not actually
-     * perform any attacks.
-     *
-     * @param element An element (root element in a DOM-parsed XML tree)
-     *                that holds attributes for the old and new tiles and
-     *                an element for the unit that is moving (which are
-     *                used solely to operate the animation).
+     * Handles an "animateAttack"-message. This only performs animation, if
+     * required. It does not actually perform any attacks.
+     * 
+     * @param element An element (root element in a DOM-parsed XML tree) that
+     *            holds attributes for the old and new tiles and an element for
+     *            the unit that is moving (which are used solely to operate the
+     *            animation).
      */
-    private Element animateAttack(Element element) {
-        FreeColClient client = getFreeColClient();
-        if (client.isHeadless()) return null;
-        Game game = getGame();
-        Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
-        Unit defender = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("defender"));
-        CombatResultType result = Enum.valueOf(CombatResultType.class, element.getAttribute("result"));
-        if (unit == null || defender == null) {
-            throw new IllegalStateException("animateAttack"
-                                            + ((unit == null) ? ": null unit" : "")
-                                            + ((defender == null) ? ": null defender" : "")
-                                            );
-        }
-
-        // All is well, queue the animation.
-        // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
-        try {
-            new UnitAttackAnimationCanvasSwingTask(unit, defender, result,
-                                                   unit != lastAnimatedUnit)
-                .invokeSpecial();
-        } catch (Exception exception) {
-            logger.warning("UnitAttackAnimationCanvasSwingTask raised "
-                           + exception.toString());
-        }
-        lastAnimatedUnit = unit;
-        return null;
-    }
-
+    /*
+     * private Element animateAttack(Element element) { FreeColClient client =
+     * getFreeColClient(); if (client.isHeadless()) return null; Game game =
+     * getGame(); Unit unit = (Unit)
+     * game.getFreeColGameObjectSafely(element.getAttribute("unit")); Unit
+     * defender = (Unit)
+     * game.getFreeColGameObjectSafely(element.getAttribute("defender"));
+     * CombatResultType result = Enum.valueOf(CombatResultType.class,
+     * element.getAttribute("result")); if (unit == null || defender == null) {
+     * throw new IllegalStateException("animateAttack" + ((unit == null) ?
+     * ": null unit" : "") + ((defender == null) ? ": null defender" : "") ); }
+     * 
+     * // All is well, queue the animation. // Use lastAnimatedUnit as a filter
+     * to avoid excessive refocussing. try { new
+     * UnitAttackAnimationCanvasSwingTask(unit, defender, result, unit !=
+     * lastAnimatedUnit) .invokeSpecial(); } catch (Exception exception) {
+     * logger.warning("UnitAttackAnimationCanvasSwingTask raised " +
+     * exception.toString()); } lastAnimatedUnit = unit; return null; }
+     */
 
     /**
      * Handles an "opponentAttack"-message.
@@ -356,18 +338,23 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("unit"));
-                    Colony colony = (Colony) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
-                    Unit defender = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
+                    Colony colony = (Colony) getGame().getFreeColGameObjectSafely(
+                            opponentAttackElement.getAttribute("colony"));
+                    Unit defender = (Unit) getGame().getFreeColGameObjectSafely(
+                            opponentAttackElement.getAttribute("defender"));
 
-                    CombatResultType result = Enum.valueOf(CombatResultType.class, opponentAttackElement.getAttribute("result"));
+                    CombatResultType result = Enum.valueOf(CombatResultType.class, opponentAttackElement
+                            .getAttribute("result"));
                     int damage = Integer.parseInt(opponentAttackElement.getAttribute("damage"));
                     int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
-                    Location repairLocation = (Location) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("repairIn"));
+                    Location repairLocation = (Location) getGame().getFreeColGameObjectSafely(
+                            opponentAttackElement.getAttribute("repairIn"));
 
                     if (opponentAttackElement.hasAttribute("update")) {
                         String updateAttribute = opponentAttackElement.getAttribute("update");
                         if (updateAttribute.equals("unit")) {
-                            Element unitElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
+                            Element unitElement = Message.getChildElement(opponentAttackElement, Unit
+                                    .getXMLElementTagName());
                             unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                             if (unit == null) {
                                 unit = new Unit(getGame(), unitElement);
@@ -379,17 +366,21 @@ public final class InGameInputHandler extends InputHandler {
                             }
                             unit.setLocation(unit.getTile());
                         } else if (updateAttribute.equals("defender")) {
-                            final Tile defenderTile = (Tile) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defenderTile"));
+                            final Tile defenderTile = (Tile) getGame().getFreeColGameObjectSafely(
+                                    opponentAttackElement.getAttribute("defenderTile"));
                             final Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile
                                     .getXMLElementTagName());
                             if (defenderTileElement != null) {
-                                final Tile checkTile = (Tile) getGame().getFreeColGameObject(defenderTileElement.getAttribute("ID"));
+                                final Tile checkTile = (Tile) getGame().getFreeColGameObject(
+                                        defenderTileElement.getAttribute("ID"));
                                 if (checkTile != defenderTile) {
-                                    throw new IllegalStateException("Trying to update another tile than the defending unit's tile.");
+                                    throw new IllegalStateException(
+                                            "Trying to update another tile than the defending unit's tile.");
                                 }
                                 defenderTile.readFromXMLElement(defenderTileElement);
                             }
-                            Element defenderElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
+                            Element defenderElement = Message.getChildElement(opponentAttackElement, Unit
+                                    .getXMLElementTagName());
                             defender = (Unit) getGame().getFreeColGameObject(defenderElement.getAttribute("ID"));
                             if (defender == null) {
                                 defender = new Unit(getGame(), defenderElement);
@@ -419,21 +410,23 @@ public final class InGameInputHandler extends InputHandler {
                     if (defender == null) {
                         throw new NullPointerException("defender == null");
                     }
-                    
+
                     if (colony != null) {
-                        getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage), repairLocation);
+                        getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage),
+                                repairLocation);
                     } else {
-                    	Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result);
-                        unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);
-                        if (!unit.isDisposed() &&
-                                (unit.getLocation() == null ||
-                                        !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
+                        Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result);
+                        unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage),
+                                plunderGold, repairLocation);
+                        if (!unit.isDisposed()
+                                && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
                             unit.dispose();
                         }
                     }
 
                     if (!defender.isDisposed()
-                            && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient().getMyPlayer()))) {
+                            && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient()
+                                    .getMyPlayer()))) {
                         if (result == CombatResultType.DONE_SETTLEMENT && defender.getColony() != null
                                 && !defender.getColony().isDisposed()) {
                             defender.getColony().setUnitCount(defender.getColony().getUnitCount());
@@ -456,7 +449,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setCurrentPlayer(Element setCurrentPlayerElement) {
         Game game = getGame();
-        // Is it our player whose move is ending?  If so we should close
+        // Is it our player whose move is ending? If so we should close
         // any outstanding popups.
         final boolean popDown = getFreeColClient().getMyPlayer().equals(game.getCurrentPlayer());
 
@@ -491,16 +484,15 @@ public final class InGameInputHandler extends InputHandler {
      *            that holds all the information.
      */
     private Element newTurn(Element newTurnElement) {
-        //getGame().newTurn();
+        // getGame().newTurn();
         getGame().getTurn().increase();
         getFreeColClient().getMyPlayer().newTurn();
         new UpdateMenuBarSwingTask().invokeLater();
-        
+
         // Show info message for change to two turns per year
-        Turn currTurn = getGame().getTurn(); 
-        if(currTurn.getYear() == 1600 &&
-        		Turn.getYear(currTurn.getNumber()-1) == 1599 ){
-        	new ShowInformationMessageSwingTask("twoTurnsPerYear").invokeLater(); 
+        Turn currTurn = getGame().getTurn();
+        if (currTurn.getYear() == 1600 && Turn.getYear(currTurn.getNumber() - 1) == 1599) {
+            new ShowInformationMessageSwingTask("twoTurnsPerYear").invokeLater();
         }
         return null;
     }
@@ -562,9 +554,7 @@ public final class InGameInputHandler extends InputHandler {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 Canvas canvas = getFreeColClient().getCanvas();
-                canvas.displayChatMessage(chatMessage.getPlayer(),
-                                          chatMessage.getMessage(),
-                                          chatMessage.isPrivate());
+                canvas.displayChatMessage(chatMessage.getPlayer(), chatMessage.getMessage(), chatMessage.isPrivate());
             }
         });
         return null;
@@ -578,9 +568,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element error(Element element) {
         try {
-            new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
-                                          element.getAttribute("message"))
-                .invokeSpecial();
+            new ShowErrorMessageSwingTask(element.getAttribute("messageID"), element.getAttribute("message"))
+                    .invokeSpecial();
         } catch (Exception exception) {
             logger.warning("error() raised " + exception.toString());
         }
@@ -627,34 +616,32 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handles a "newConvert"-request.
      * 
-     * @param element The element (root element in a DOM-parsed XML
-     * tree) that holds all the information.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
      */
     private Element newConvert(Element element) {
         Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colonyTile"));
         Colony colony = tile.getColony();
         Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
-        
+
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);
         tile.add(convert);
-        ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                                "model.colony.newConvert", convert)
-            .add("%nation%", nation.getNameKey())
-            .addName("%colony%", colony.getName());
+        ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED, "model.colony.newConvert", convert)
+                .add("%nation%", nation.getNameKey()).addName("%colony%", colony.getName());
 
         getFreeColClient().getMyPlayer().addModelMessage(message);
         return null;
     }
 
     /**
-     * Handles a "diplomacy"-request.  If the message informs of an
-     * acceptance or rejection then display the result and return
-     * null.  If the message is a proposal, then ask the user about
-     * it and return the response with appropriate response set.
-     *
+     * Handles a "diplomacy"-request. If the message informs of an acceptance or
+     * rejection then display the result and return null. If the message is a
+     * proposal, then ask the user about it and return the response with
+     * appropriate response set.
+     * 
      * @param element The element (root element in a DOM-parsed XML tree)
-     *        containing a "diplomacy"-message.
+     *            containing a "diplomacy"-message.
      * @return A diplomacy response, or null if none required.
      */
     private Element diplomacy(Element element) {
@@ -663,31 +650,25 @@ public final class InGameInputHandler extends InputHandler {
         DiplomacyMessage message = new DiplomacyMessage(game, element);
         Unit unit = message.getUnit(game);
         Settlement settlement = message.getSettlement(game);
-        Player other = (unit.getOwner() == player) ? settlement.getOwner()
-            : unit.getOwner();
+        Player other = (unit.getOwner() == player) ? settlement.getOwner() : unit.getOwner();
         String nation = Messages.message(other.getNationName());
         DiplomaticTrade ourAgreement;
         DiplomaticTrade theirAgreement = message.getAgreement();
 
         switch (theirAgreement.getStatus()) {
         case ACCEPT_TRADE:
-            new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
-                                                "%nation%", nation).show();
+            new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted", "%nation%", nation).show();
             break;
         case REJECT_TRADE:
-            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
-                                                "%nation%", nation).show();
+            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected", "%nation%", nation).show();
             break;
         case PROPOSE_TRADE:
-            ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement,
-                                                              theirAgreement)
-                .select();
+            ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement, theirAgreement).select();
             if (ourAgreement == null) {
                 ourAgreement = theirAgreement;
                 ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
             }
-            return new DiplomacyMessage(unit, settlement,
-                                        ourAgreement).toXMLElement();
+            return new DiplomacyMessage(unit, settlement, ourAgreement).toXMLElement();
         default:
             logger.warning("Bogus trade status");
             break;
@@ -724,27 +705,21 @@ public final class InGameInputHandler extends InputHandler {
             gold = Integer.parseInt(element.getAttribute("gold"));
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                          "indianDemand.gold.text", "indianDemand.gold.yes",
-                                                          "indianDemand.gold.no",
-                                                          "%nation%", Messages.message(unit.getOwner().getNationName()),
-                                                          "%colony%", colony.getName(),
-                                                          "%amount%", String.valueOf(gold)).confirm();
+                accepted = new ShowConfirmDialogSwingTask(colony.getTile(), "indianDemand.gold.text",
+                        "indianDemand.gold.yes", "indianDemand.gold.no", "%nation%", Messages.message(unit.getOwner()
+                                .getNationName()), "%colony%", colony.getName(), "%amount%", String.valueOf(gold))
+                        .confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
-                                     "indianDemand.gold.text", colony, unit)
-                    .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                    .addName("%colony%", colony.getName())
-                    .addName("%amount%", String.valueOf(gold));
+                m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS, "indianDemand.gold.text", colony, unit)
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
+                                colony.getName()).addName("%amount%", String.valueOf(gold));
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
-                                     "indianDemand.gold.text", colony, unit)
-                    .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                    .addName("%colony%", colony.getName())
-                    .addName("%amount%", String.valueOf(gold));
+                m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS, "indianDemand.gold.text", colony, unit)
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
+                                colony.getName()).addName("%amount%", String.valueOf(gold));
                 accepted = false;
                 break;
             default:
@@ -759,54 +734,41 @@ public final class InGameInputHandler extends InputHandler {
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (goods.getType().isFoodType()) {
-                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                              "indianDemand.food.text", "indianDemand.food.yes",
-                                                              "indianDemand.food.no",
-                                                              "%nation%", Messages.message(unit.getOwner().getNationName()),
-                                                              "%colony%", colony.getName(),
-                                                              "%amount%", String.valueOf(goods.getAmount())).confirm();
+                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(), "indianDemand.food.text",
+                            "indianDemand.food.yes", "indianDemand.food.no", "%nation%", Messages.message(unit
+                                    .getOwner().getNationName()), "%colony%", colony.getName(), "%amount%", String
+                                    .valueOf(goods.getAmount())).confirm();
                 } else {
-                    accepted =
-                        new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                       Messages.message(StringTemplate.template("indianDemand.other.no")
-                                                                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                                                                        .addName("%colony%", colony.getName())
-                                                                        .addAmount("%amount%", goods.getAmount())
-                                                                        .add("%goods%", goods.getNameKey())),
-                                                       "indianDemand.other.text", "indianDemand.other.yes").confirm();
+                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(), Messages.message(StringTemplate
+                            .template("indianDemand.other.no").addStringTemplate("%nation%",
+                                    unit.getOwner().getNationName()).addName("%colony%", colony.getName()).addAmount(
+                                    "%amount%", goods.getAmount()).add("%goods%", goods.getNameKey())),
+                            "indianDemand.other.text", "indianDemand.other.yes").confirm();
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
-                                         "indianDemand.food.text", colony, unit)
-                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                        .addName("%colony%", colony.getName())
-                        .addName("%amount%", String.valueOf(goods.getAmount()));
+                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS, "indianDemand.food.text", colony,
+                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
+                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
-                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
-                                         "indianDemand.other.text", colony, unit)
-                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                        .addName("%colony%", colony.getName())
-                        .addName("%amount%", String.valueOf(goods.getAmount()))
-                        .add("%goods%", goods.getNameKey());
+                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS, "indianDemand.other.text", colony,
+                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
+                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add("%goods%",
+                            goods.getNameKey());
                 }
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
-                                         "indianDemand.food.text", colony, unit)
-                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                        .addName("%colony%", colony.getName())
-                        .addName("%amount%", String.valueOf(goods.getAmount()));
+                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS, "indianDemand.food.text", colony,
+                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
+                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
-                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
-                                         "indianDemand.other.text", colony, unit)
-                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                        .addName("%colony%", colony.getName())
-                        .addName("%amount%", String.valueOf(goods.getAmount()))
-                        .add("%goods%", goods.getNameKey());
+                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS, "indianDemand.other.text", colony,
+                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
+                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add("%goods%",
+                            goods.getNameKey());
                 }
                 accepted = false;
                 break;
@@ -846,14 +808,12 @@ public final class InGameInputHandler extends InputHandler {
             if (force) {
                 freeColClient.getMyPlayer().setTax(amount);
                 player.addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                        "model.monarch.forceTaxRaise", player)
-                                       .addName("%replace%", String.valueOf(amount)));
+                        "model.monarch.forceTaxRaise", player).addName("%replace%", String.valueOf(amount)));
                 reply = null;
             } else {
                 reply = Message.createNewRootElement("acceptTax");
-                if (new ShowMonarchPanelSwingTask(action,
-                                                  "%replace%", element.getAttribute("amount"),
-                                                  "%goods%", element.getAttribute("goods")).confirm()) {
+                if (new ShowMonarchPanelSwingTask(action, "%replace%", element.getAttribute("amount"), "%goods%",
+                        element.getAttribute("goods")).confirm()) {
                     freeColClient.getMyPlayer().setTax(amount);
                     reply.setAttribute("accepted", String.valueOf(true));
                     new UpdateMenuBarSwingTask().invokeLater();
@@ -863,14 +823,13 @@ public final class InGameInputHandler extends InputHandler {
             }
             return reply;
         case LOWER_TAX:
-	
+
             final int newTax = new Integer(element.getAttribute("amount")).intValue();
             final int difference = freeColClient.getMyPlayer().getTax() - newTax;
-                    
+
             freeColClient.getMyPlayer().setTax(newTax);
-            new ShowMonarchPanelSwingTask(action,
-                                          "%difference%", String.valueOf(difference),
-                                          "%newTax%", String.valueOf(newTax)).confirm();
+            new ShowMonarchPanelSwingTask(action, "%difference%", String.valueOf(difference), "%newTax%", String
+                    .valueOf(newTax)).confirm();
             break;
         case ADD_TO_REF:
             Element additionElement = Message.getChildElement(element, "addition");
@@ -882,18 +841,15 @@ public final class InGameInputHandler extends InputHandler {
                 unit.readFromXMLElement((Element) childElements.item(index));
                 units.add(unit);
                 unitNames.add(unit.getNumber() + " "
-                              + Messages.message(Messages.getLabel(unit.getUnitType(), unit.getRole())));
+                        + Messages.message(Messages.getLabel(unit.getUnitType(), unit.getRole())));
             }
             monarch.addToREF(units);
-            new ShowMonarchPanelSwingTask(action,
-                                          "%addition%", Utils.join(" " + Messages.message("and") + " ",
-                                                                   unitNames)).confirm();
+            new ShowMonarchPanelSwingTask(action, "%addition%", Utils.join(" " + Messages.message("and") + " ",
+                    unitNames)).confirm();
             break;
         case DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
-            new ShowMonarchPanelSwingTask(action,
-                                          "%nation%", Messages.message(enemy.getNationName()))
-                .confirm();
+            new ShowMonarchPanelSwingTask(action, "%nation%", Messages.message(enemy.getNationName())).confirm();
             break;
         case SUPPORT_LAND:
         case SUPPORT_SEA:
@@ -910,15 +866,15 @@ public final class InGameInputHandler extends InputHandler {
                 player.getEurope().add(newUnit);
             }
             SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        Canvas canvas = getFreeColClient().getCanvas();
-                        if (!canvas.isShowingSubPanel()
-                            && (action == MonarchAction.ADD_UNITS ||
-                                !canvas.showFreeColDialog(new MonarchPanel(canvas, action)))) {
-                            canvas.showEuropePanel();
-                        }
+                public void run() {
+                    Canvas canvas = getFreeColClient().getCanvas();
+                    if (!canvas.isShowingSubPanel()
+                            && (action == MonarchAction.ADD_UNITS || !canvas.showFreeColDialog(new MonarchPanel(canvas,
+                                    action)))) {
+                        canvas.showEuropePanel();
                     }
-                });
+                }
+            });
             break;
         case OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
@@ -929,19 +885,17 @@ public final class InGameInputHandler extends InputHandler {
                 AbstractUnit unit = new AbstractUnit();
                 unit.readFromXMLElement((Element) childElements.item(index));
                 mercenaries.add(unit.getNumber() + " "
-                                + Messages.message(Messages.getLabel(unit.getUnitType(), unit.getRole())));
+                        + Messages.message(Messages.getLabel(unit.getUnitType(), unit.getRole())));
             }
-            if (new ShowMonarchPanelSwingTask(action,
-                                              "%gold%", element.getAttribute("price"),
-                                              "%mercenaries%", Utils.join(" " + Messages.message("and") + " ",
-                                                                          mercenaries)).confirm()) {
+            if (new ShowMonarchPanelSwingTask(action, "%gold%", element.getAttribute("price"), "%mercenaries%", Utils
+                    .join(" " + Messages.message("and") + " ", mercenaries)).confirm()) {
                 int price = new Integer(element.getAttribute("price")).intValue();
                 freeColClient.getMyPlayer().modifyGold(-price);
                 SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            freeColClient.getCanvas().updateGoldLabel();
-                        }
-                    });
+                    public void run() {
+                        freeColClient.getCanvas().updateGoldLabel();
+                    }
+                });
                 reply.setAttribute("accepted", String.valueOf(true));
             } else {
                 reply.setAttribute("accepted", String.valueOf(false));
@@ -968,30 +922,27 @@ public final class InGameInputHandler extends InputHandler {
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
 
-        Stance oldStance = first.getStance(second);
         /*
          * Diplomacy messages were sometimes not shown because opponentAttack
          * messages arrive before setStance messages, so when the setStance
-         * message arrived the player already had the new stance.
-         * So, do not filter like this:
-         *   if (first.getStance(second) == stance) { return null; }
-         * TODO: fix opponentAttack.
+         * message arrived the player already had the new stance. So, do not
+         * filter like this: if (first.getStance(second) == stance) { return
+         * null; } TODO: fix opponentAttack.
          */
 
         // Does this message involve this player and an other?
-        Player other = (player.equals(first)) ? second
-            : (player.equals(second)) ? first
-            : null;
+        Player other = (player.equals(first)) ? second : (player.equals(second)) ? first : null;
         // Prepare to ignore initial peaceful contacts as these are covered
         // by `You meet the <nation> nation' message.
-        boolean firstContact = other != null && stance == Stance.PEACE
-            && player.getStance(other) == Stance.UNCONTACTED;
+        boolean firstContact = other != null && stance == Stance.PEACE && player.getStance(other) == Stance.UNCONTACTED;
 
         first.setStance(second, stance);
-        if (second.getStance(first) != stance) second.setStance(first, stance);
+        if (second.getStance(first) != stance)
+            second.setStance(first, stance);
 
-        // Message processing follows.  The AI is not interested.
-        if (player.isAI()) return null;
+        // Message processing follows. The AI is not interested.
+        if (player.isAI())
+            return null;
 
         ModelMessage m = null;
         String sta = stance.toString().toLowerCase();
@@ -999,33 +950,29 @@ public final class InGameInputHandler extends InputHandler {
             // If not, always inform about wars, always inform
             // post-deWitt, generally inform if have met one of the
             // nations involved.
-            if (stance == Stance.WAR
-                   || player.hasAbility("model.ability.betterForeignAffairsReport")
-                   || player.hasContacted(first)
-                   || player.hasContacted(second)) {
-                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                     "model.diplomacy." + sta + ".others",
-                                     first)
-                    .addStringTemplate("%attacker%", first.getNationName())
-                    .addStringTemplate("%defender%", second.getNationName());
+            if (stance == Stance.WAR || player.hasAbility("model.ability.betterForeignAffairsReport")
+                    || player.hasContacted(first) || player.hasContacted(second)) {
+                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY, "model.diplomacy." + sta + ".others",
+                        first).addStringTemplate("%attacker%", first.getNationName()).addStringTemplate("%defender%",
+                        second.getNationName());
             }
         } else {
             if (!firstContact) {
                 m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                     "model.diplomacy." + sta + ".declared",
-                                     first)
-                    .addStringTemplate("%nation%", other.getNationName());
+                        "model.diplomacy." + sta + ".declared", first).addStringTemplate("%nation%", other
+                        .getNationName());
             }
         }
-        if (m != null) player.addModelMessage(m);
+        if (m != null)
+            player.addModelMessage(m);
         return null;
     }
 
     /**
      * Handles an "addPlayer"-message.
-     *
+     * 
      * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     *            holds all the information.
      */
     private Element addPlayer(Element element) {
 
@@ -1039,7 +986,6 @@ public final class InGameInputHandler extends InputHandler {
 
         return null;
     }
-
 
     /**
      * Handles a "removeGoods"-request.
@@ -1072,13 +1018,10 @@ public final class InGameInputHandler extends InputHandler {
                     messageID = "model.monarch.colonyGoodsParty.harbour";
                 }
             }
-            colony.getFeatureContainer().addModifier(Modifier
-               .createTeaPartyModifier(getGame().getTurn()));
-            new ShowModelMessageSwingTask(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                           messageID, colony)
-                                          .addName("%colony%", colony.getName())
-                                          .addName("%amount%", String.valueOf(goods.getAmount()))
-                                          .add("%goods%", goods.getNameKey())).invokeLater();
+            colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(getGame().getTurn()));
+            new ShowModelMessageSwingTask(new ModelMessage(ModelMessage.MessageType.WARNING, messageID, colony)
+                    .addName("%colony%", colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add(
+                            "%goods%", goods.getNameKey())).invokeLater();
         }
 
         return null;
@@ -1095,25 +1038,24 @@ public final class InGameInputHandler extends InputHandler {
         final Player loser = (Player) getGame().getFreeColGameObject(element.getAttribute("loser"));
         final Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
         player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                "model.diplomacy.spanishSuccession", winner)
-                               .addStringTemplate("%loserNation%", loser.getNationName())
-                               .addStringTemplate("%nation%", winner.getNationName()));
+                "model.diplomacy.spanishSuccession", winner).addStringTemplate("%loserNation%", loser.getNationName())
+                .addStringTemplate("%nation%", winner.getNationName()));
         loser.setDead(true);
         update(element);
-        player.getHistory().add(new HistoryEvent(player.getGame().getTurn().getNumber(),
-                                                 HistoryEvent.EventType.SPANISH_SUCCESSION)
-                                .addStringTemplate("%nation%", winner.getNationName())
-                                .addStringTemplate("%loserNation%", loser.getNationName()));
+        player.getHistory().add(
+                new HistoryEvent(player.getGame().getTurn().getNumber(), HistoryEvent.EventType.SPANISH_SUCCESSION)
+                        .addStringTemplate("%nation%", winner.getNationName()).addStringTemplate("%loserNation%",
+                                loser.getNationName()));
 
         return null;
     }
 
     /**
-     * Disposes of the <code>Unit</code>s which are the children of
-     * this Element.
-     *
+     * Disposes of the <code>Unit</code>s which are the children of this
+     * Element.
+     * 
      * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     *            holds all the information.
      */
     public Element disposeUnits(Element element) {
         Game game = getGame();
@@ -1130,8 +1072,7 @@ public final class InGameInputHandler extends InputHandler {
             if (fcgo instanceof Unit) {
                 ((Unit) fcgo).dispose();
             } else {
-                logger.warning("Object is not a unit: "
-                               + ((fcgo == null) ? "null" : fcgo.getId()));
+                logger.warning("Object is not a unit: " + ((fcgo == null) ? "null" : fcgo.getId()));
             }
         }
         return null;
@@ -1139,9 +1080,9 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Add the ModelMessages which are the children of this Element.
-     *
+     * 
      * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     *            holds all the information.
      */
     public Element addMessages(Element element) {
         Game game = getGame();
@@ -1157,8 +1098,7 @@ public final class InGameInputHandler extends InputHandler {
             if (fcgo instanceof Player) {
                 ((Player) fcgo).addModelMessage(m);
             } else {
-                logger.warning("addMessages with broken owner: "
-                               + ((owner == null) ? "(null)" : owner));
+                logger.warning("addMessages with broken owner: " + ((owner == null) ? "(null)" : owner));
             }
         }
         return null;
@@ -1166,9 +1106,9 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Add the HistoryEvents which are the children of this Element.
-     *
+     * 
      * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     *            holds all the information.
      */
     public Element addHistory(Element element) {
         Game game = getGame();
@@ -1185,8 +1125,7 @@ public final class InGameInputHandler extends InputHandler {
             if (fcgo instanceof Player) {
                 ((Player) fcgo).getHistory().add(h);
             } else {
-                logger.warning("addHistory with broken owner: "
-                               + ((owner == null) ? "(null)" : owner));
+                logger.warning("addHistory with broken owner: " + ((owner == null) ? "(null)" : owner));
             }
         }
         return null;
@@ -1194,9 +1133,9 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handle all the children of this element.
-     *
+     * 
      * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     *            holds all the information.
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
@@ -1210,11 +1149,10 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
-     *
-     *    Handler methods end here.
-     *
+     * 
+     * Handler methods end here.
+     * 
      */
-
 
     /**
      * This utility class is the base class for tasks that need to run in the
@@ -1253,15 +1191,13 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         /*
-         * Some calls can be required from both within the
-         * EventDispatchThread (when the client controller calls
-         * InGameInputHandler.handle() with replies to its requests to
-         * the server), and from outside of the thread when handling
-         * other player moves.  The former case must be done right
-         * now, the latter needs to be queued and waited for.
+         * Some calls can be required from both within the EventDispatchThread
+         * (when the client controller calls InGameInputHandler.handle() with
+         * replies to its requests to the server), and from outside of the
+         * thread when handling other player moves. The former case must be done
+         * right now, the latter needs to be queued and waited for.
          */
-        public void invokeSpecial()
-            throws InvocationTargetException {
+        public void invokeSpecial() throws InvocationTargetException {
             if (SwingUtilities.isEventDispatchThread()) {
                 doWork();
             } else {
@@ -1401,7 +1337,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doWork(Canvas canvas) {
             canvas.refresh();
-            
+
             if (_requestFocus && !canvas.isShowingSubPanel()) {
                 canvas.requestFocusInWindow();
             }
@@ -1410,60 +1346,63 @@ public final class InGameInputHandler extends InputHandler {
 
         private final boolean _requestFocus;
     }
-    
+
     class RefreshTilesSwingTask extends NoResultCanvasSwingTask {
-        
+
         public RefreshTilesSwingTask(Tile oldTile, Tile newTile) {
             super();
             _oldTile = oldTile;
             _newTile = newTile;
         }
-        
+
         void doWork(Canvas canvas) {
             canvas.refreshTile(_oldTile);
             canvas.refreshTile(_newTile);
         }
-        
+
+
         private final Tile _oldTile;
+
         private final Tile _newTile;
-        
+
     }
-    
+
     /**
      * This task plays an unit movement animation in the Canvas.
      */
     class UnitMoveAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
-                
+
         private final Unit unit;
+
         private final Tile destinationTile;
+
         private final Tile sourceTile;
+
         private boolean focus;
 
+
         /**
-         * Constructor - Play the unit movement animation, always
-         * focusing on the source tile.
-         *
+         * Constructor - Play the unit movement animation, always focusing on
+         * the source tile.
+         * 
          * @param unit The unit that is moving.
          * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
          */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
-                                                Tile destinationTile) {
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile, Tile destinationTile) {
             this(unit, sourceTile, destinationTile, true);
         }
 
         /**
-         * Constructor - Play the unit movement animation, optionally
-         * focusing on the source tile.
-         *
+         * Constructor - Play the unit movement animation, optionally focusing
+         * on the source tile.
+         * 
          * @param unit The unit that is moving.
          * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
          * @param focus Focus on the source tile before the animation.
          */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
-                                                Tile destinationTile,
-                                                boolean focus) {
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile, Tile destinationTile, boolean focus) {
             this.unit = unit;
             this.sourceTile = sourceTile;
             this.destinationTile = destinationTile;
@@ -1486,35 +1425,36 @@ public final class InGameInputHandler extends InputHandler {
     class UnitAttackAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
 
         private final Unit unit;
+
         private final Unit defender;
+
         private final CombatResultType result;
+
         private boolean focus;
 
+
         /**
-         * Constructor - Play the unit attack animation, always
-         * focusing on the source tile.
-         *
+         * Constructor - Play the unit attack animation, always focusing on the
+         * source tile.
+         * 
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
          * @param result The result of the attack.
          */
-        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
-                                                  CombatResultType result) {
+        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender, CombatResultType result) {
             this(unit, defender, result, true);
         }
 
         /**
-         * Constructor - Play the unit attack animation, optionally
-         * focusing on the source tile.
-         *
+         * Constructor - Play the unit attack animation, optionally focusing on
+         * the source tile.
+         * 
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
          * @param result The result of the attack.
          * @param focus Focus on the source tile before the animation.
          */
-        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
-                                                  CombatResultType result,
-                                                  boolean focus) {
+        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender, CombatResultType result, boolean focus) {
             this.unit = unit;
             this.defender = defender;
             this.result = result;
@@ -1530,7 +1470,7 @@ public final class InGameInputHandler extends InputHandler {
             canvas.refresh();
         }
     }
-    
+
     /**
      * This task reconnects to the server.
      */
@@ -1565,10 +1505,15 @@ public final class InGameInputHandler extends InputHandler {
     class ShowConfirmDialogSwingTask extends SwingTask {
 
         private Tile tile;
+
         private String text;
+
         private String okText;
+
         private String cancelText;
+
         private String[] replace;
+
 
         /**
          * Constructor.
@@ -1579,9 +1524,7 @@ public final class InGameInputHandler extends InputHandler {
          * @param cancelText The key for the Cancel button.
          * @param replace The replacement values.
          */
-        public ShowConfirmDialogSwingTask(Tile tile, String text,
-                                          String okText, String cancelText,
-                                          String... replace) {
+        public ShowConfirmDialogSwingTask(Tile tile, String text, String okText, String cancelText, String... replace) {
             this.tile = tile;
             this.text = text;
             this.okText = okText;
@@ -1609,9 +1552,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected Object doWork() {
             Canvas canvas = getFreeColClient().getCanvas();
-            boolean choice = canvas.showConfirmDialog(tile, text,
-                                                      okText, cancelText,
-                                                      replace);
+            boolean choice = canvas.showConfirmDialog(tile, text, okText, cancelText, replace);
             return Boolean.valueOf(choice);
         }
     }
@@ -1665,7 +1606,9 @@ public final class InGameInputHandler extends InputHandler {
     class ShowInformationMessageSwingTask extends ShowMessageSwingTask {
 
         private String messageId;
+
         private String[] replace;
+
 
         /**
          * Constructor.
@@ -1743,6 +1686,7 @@ public final class InGameInputHandler extends InputHandler {
 
         private List<FoundingFather> choices;
 
+
         /**
          * Constructor.
          * 
@@ -1815,9 +1759,12 @@ public final class InGameInputHandler extends InputHandler {
         protected Object doWork() {
             return getFreeColClient().getCanvas().showNegotiationDialog(unit, settlement, proposal);
         }
-        
+
+
         private Unit unit;
+
         private Settlement settlement;
+
         private DiplomaticTrade proposal;
     }
 
@@ -1862,7 +1809,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
 
-        private MonarchAction  _action;
+        private MonarchAction _action;
 
         private String[] _replace;
     }

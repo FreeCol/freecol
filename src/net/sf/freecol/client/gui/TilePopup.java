@@ -267,7 +267,6 @@ public final class TilePopup extends JPopupMenu {
                     public void actionPerformed(ActionEvent event) {
                         // Server:
                         final Game serverGame = freeColClient.getFreeColServer().getGame();
-                        final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
                         final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
                         final AIColony ac = (AIColony) freeColClient.getFreeColServer().getAIMain().getAIObject(serverTile.getSettlement());
                         StringBuilder info = new StringBuilder(ac.getColonyPlan().toString());

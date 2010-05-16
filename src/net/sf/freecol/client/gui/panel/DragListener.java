@@ -255,7 +255,6 @@ public final class DragListener extends MouseAdapter {
             ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, false, goodsType);
             if (bestTile != null) {
                 int maxpotential = bestTile.getProductionOf(tempUnit, goodsType);
-                UnitType expert = Specification.getSpecification().getExpertForProducing(goodsType);
                 JMenuItem menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs",
                                                                     "%amount%",
                                                                     Integer.toString(maxpotential)),

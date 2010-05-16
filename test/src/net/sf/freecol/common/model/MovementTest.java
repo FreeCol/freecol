@@ -213,7 +213,7 @@ public class MovementTest extends FreeColTestCase {
 
         // Build settlement
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(inca).settlementTile(tile1).skillToTeach(null).build();
+        builder.player(inca).settlementTile(tile1).skillToTeach(null).build();
 
         Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST, colonist.getMoveType(tile1));

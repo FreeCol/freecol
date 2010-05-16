@@ -165,8 +165,6 @@ public class AudioMixerOption extends AbstractOption {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         findAudioMixers();
-        final MixerWrapper oldValue = this.value;
-        
         MixerWrapper newValue = audioMixers.get(in.getAttributeValue(null, "value"));
         if (newValue == null) {
             newValue = audioMixers.get(AUTO);

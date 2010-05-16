@@ -279,7 +279,7 @@ public class MapTest extends FreeColTestCase {
         // set obstructing indian camp
         Tile settlementTile = map.getTile(2,10);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.settlementTile(settlementTile).build();
+        builder.settlementTile(settlementTile).build();
 
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
@@ -304,7 +304,7 @@ public class MapTest extends FreeColTestCase {
         // set obstructing french colony
         Player frenchPlayer = game.getPlayer("model.nation.french");
         Tile settlementTile = map.getTile(2,10);
-        Colony frenchColony = FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
+        FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
                                                                  .colonyTile(settlementTile)
                                                                  .build();
         assertTrue("French colony was not set properly on the map",settlementTile.getSettlement() != null);
@@ -405,7 +405,7 @@ public class MapTest extends FreeColTestCase {
         Unit galleon = new Unit(game, unitTile, dutchPlayer, galleonType,
                                 UnitState.ACTIVE);
         Unit artillery = new Unit(game, galleon, dutchPlayer, artilleryType, UnitState.ACTIVE);
-        Colony frenchColony = FreeColTestUtils.getColonyBuilder()
+        FreeColTestUtils.getColonyBuilder()
             .player(frenchPlayer)
             .colonyTile(colonyTile)
             .build();
@@ -454,7 +454,7 @@ public class MapTest extends FreeColTestCase {
 
         // Add another colony
         Tile colonyTile2 = map.getTile(5, 5); // should score less
-        Colony frenchColony2 = FreeColTestUtils.getColonyBuilder()
+        FreeColTestUtils.getColonyBuilder()
             .player(frenchPlayer)
             .colonyTile(colonyTile2)
             .build();

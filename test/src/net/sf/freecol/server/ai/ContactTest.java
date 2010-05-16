@@ -139,6 +139,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(iroquois));
 
         Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
+        @SuppressWarnings("unused")
         Unit soldier = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
 
         InGameController igc = (InGameController) server.getController();
@@ -183,6 +184,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
 
+        @SuppressWarnings("unused")
         Colony colony = getStandardColony(1, 5, 8);
         Unit soldier = new Unit(game, tile3, french, colonistType, UnitState.ACTIVE);
         InGameController igc = (InGameController) server.getController();
@@ -272,6 +274,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(apache.hasContacted(french));
 
         Unit brave = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
+        @SuppressWarnings("unused")
         Unit colonist = new Unit(game, tile3, french, colonistType, UnitState.ACTIVE);
         InGameController igc = (InGameController) server.getController();
         igc.move(apache, brave, tile2);
@@ -359,6 +362,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(apache));
         assertFalse(apache.hasContacted(dutch));
 
+        @SuppressWarnings("unused")
         Colony colony = getStandardColony(1, 5, 8);
         Unit brave = new Unit(game, tile3, apache, braveType, UnitState.ACTIVE);
         InGameController igc = (InGameController) server.getController();
@@ -403,7 +407,7 @@ public class ContactTest extends FreeColTestCase {
 
         // build settlement
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(iroquois).settlementTile(tile3).skillToTeach(null).build();
+        builder.player(iroquois).settlementTile(tile3).skillToTeach(null).build();
         Unit brave = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
         InGameController igc = (InGameController) server.getController();
         igc.move(apache, brave, tile2);
@@ -451,6 +455,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(french));
 
         Unit ship1 = new Unit(game, tile1, dutch, galleonType, UnitState.FORTIFIED);
+        @SuppressWarnings("unused")
         Unit ship2 = new Unit(game, tile3, french, galleonType, UnitState.ACTIVE);
         InGameController igc = (InGameController) server.getController();
         igc.move(dutch, ship1, tile2);

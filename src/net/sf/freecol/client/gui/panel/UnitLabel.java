@@ -241,15 +241,6 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
      */
     public void paintComponent(Graphics g) {
 
-        String name = getToolTipText();
-        /*
-        StringTemplate equipmentLabel = unit.getEquipmentLabel();
-        if (equipmentLabel != null) {
-            name = name + " (" + Messages.message(equipmentLabel) + ")";
-        }
-        setToolTipText(name);
-        */
-
         if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);
         } else if (unit.getOwner() != parent.getClient().getMyPlayer() && unit.getColony() == null) {

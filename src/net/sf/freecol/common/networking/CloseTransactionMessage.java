@@ -79,8 +79,6 @@ public class CloseTransactionMessage extends Message {
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = player.getGame();
-
         Unit unit;
         Settlement settlement;
         try {

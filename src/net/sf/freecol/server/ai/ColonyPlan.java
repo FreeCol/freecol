@@ -510,7 +510,6 @@ public class ColonyPlan {
         GoodsType buildingRawMat = null;
         Building buildingReqProducer = null;
         final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType toolsType = Specification.getSpecification().getGoodsType("model.goods.tools");
         final GoodsType lumberType = Specification.getSpecification().getGoodsType("model.goods.lumber");
         final GoodsType oreType = Specification.getSpecification().getGoodsType("model.goods.ore");
         
@@ -915,7 +914,6 @@ public class ColonyPlan {
         List<GoodsType> rawMatList = new ArrayList<GoodsType>(); 
 
         final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType toolsType = Specification.getSpecification().getGoodsType("model.goods.tools");
         final GoodsType lumberType = Specification.getSpecification().getGoodsType("model.goods.lumber");
         final GoodsType oreType = Specification.getSpecification().getGoodsType("model.goods.ore");
     

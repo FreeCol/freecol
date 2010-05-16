@@ -142,8 +142,6 @@ public class InGameControllerTest extends FreeColTestCase {
         IndianSettlement camp = builder.build();
 
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
-        Player indianPlayer = camp.getOwner();
-
         Tile tile = map.getNeighbourOrNull(Map.Direction.N, camp.getTile());
 
         Unit jesuit = new Unit(game, tile, dutchPlayer, missionaryType, UnitState.ACTIVE);

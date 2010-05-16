@@ -304,7 +304,7 @@ public class SimpleCombatModel implements CombatModel {
         Specification spec = Specification.getSpecification();
         Set<Modifier> result = new LinkedHashSet<Modifier>();
 
-        result.add(new Modifier(Modifier.OFFENCE, spec.BASE_OFFENCE_SOURCE,
+        result.add(new Modifier(Modifier.OFFENCE, Specification.BASE_OFFENCE_SOURCE,
                                 attacker.getType().getOffence(),
                                 Modifier.Type.ADDITIVE));
 
@@ -319,7 +319,7 @@ public class SimpleCombatModel implements CombatModel {
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.OFFENCE, spec.CARGO_PENALTY_SOURCE,
+                result.add(new Modifier(Modifier.OFFENCE, Specification.CARGO_PENALTY_SOURCE,
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
@@ -351,7 +351,7 @@ public class SimpleCombatModel implements CombatModel {
                         for (Modifier modifier : ambushModifiers) {
                             Modifier ambushModifier = new Modifier(modifier);
                             ambushModifier.setId(Modifier.OFFENCE);
-                            ambushModifier.setSource(spec.AMBUSH_BONUS_SOURCE);
+                            ambushModifier.setSource(Specification.AMBUSH_BONUS_SOURCE);
                             result.add(ambushModifier);
                         }
                     }
@@ -403,7 +403,7 @@ public class SimpleCombatModel implements CombatModel {
             return result;
         }
 
-        result.add(new Modifier(Modifier.DEFENCE, spec.BASE_DEFENCE_SOURCE,
+        result.add(new Modifier(Modifier.DEFENCE, Specification.BASE_DEFENCE_SOURCE,
                                 defender.getType().getDefence(),
                                 Modifier.Type.ADDITIVE));
         result.addAll(defender.getType().getFeatureContainer()
@@ -415,7 +415,7 @@ public class SimpleCombatModel implements CombatModel {
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.DEFENCE, spec.CARGO_PENALTY_SOURCE,
+                result.add(new Modifier(Modifier.DEFENCE, Specification.CARGO_PENALTY_SOURCE,
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }

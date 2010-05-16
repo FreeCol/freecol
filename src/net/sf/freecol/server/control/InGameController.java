@@ -158,19 +158,6 @@ public final class InGameController extends Controller {
     };
 
     /**
-     * Helper function to add objects for an attack animation to a list.
-     *
-     * @param objects The list of objects to add to.
-     * @param unit The <code>Unit</code> that is attacking.
-     * @param defender The <code>Unit</code> that is defending.
-     * @param result The result of the combat.
-     */
-    private static void addAttack(List<Object> objects, Unit unit,
-                                  Unit defender, CombatResult result) {
-        addMore(objects, UpdateType.ATTACK, unit, defender, result);
-    }
-
-    /**
      * Helper function to add attributes to a list.
      *
      * @param objects The list of objects to add to.
@@ -920,8 +907,6 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Remove settlements
-        Map map = getGame().getMap();
         for (Settlement settlement : serverPlayer.getSettlements()) {
             for (Tile tile : settlement.getOwnedTiles()) {
                 if (!tiles.contains(tile)) tiles.add(tile);
@@ -952,8 +937,6 @@ public final class InGameController extends Controller {
      * @return The new current player.
      */
     private Player nextPlayer() {
-        final FreeColServer freeColServer = getFreeColServer();
-        
         if (!isHumanPlayersLeft()) {
             getGame().setCurrentPlayer(null);
             return null;
@@ -3500,8 +3483,6 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element updateCurrentStop(ServerPlayer serverPlayer, Unit unit) {
-        List<Object> objects = new ArrayList<Object>();
-
         // Check if there is a valid current stop?
         int current = unit.validateCurrentStop();
         if (current < 0) return null; // No valid stop.

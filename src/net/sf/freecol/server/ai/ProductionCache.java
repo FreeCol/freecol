@@ -234,6 +234,7 @@ public class ProductionCache {
         unitCount--;
     }
 
+    /*
     private void removeEntries(Unit unit, WorkLocation workLocation) {
         units.remove(unit);
         if (workLocation instanceof ColonyTile) {
@@ -244,7 +245,7 @@ public class ProductionCache {
         }
         removeEntries(unit, null, reserved);
     }
-
+    */
 
     public static List<Entry> removeEntries(Unit unit, WorkLocation workLocation, List<Entry> entryList) {
         Iterator<Entry> entryIterator = entryList.iterator();

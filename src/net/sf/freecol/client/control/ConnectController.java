@@ -225,8 +225,6 @@ public final class ConnectController {
     public boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
-        NationOptions nationOptions = new NationOptions();
-
         freeColClient.setMapEditor(false);
         
         if (client != null) {

@@ -56,7 +56,6 @@ import org.w3c.dom.Element;
 * The controller that will be used before the game starts.
 */
 public final class PreGameController {
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
 
 

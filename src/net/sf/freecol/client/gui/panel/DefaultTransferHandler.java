@@ -428,7 +428,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                     UnitLabel unitLabel = (UnitLabel) comp;
                     Unit unit = unitLabel.getUnit();
                     if (unit.hasAbility("model.ability.canBeEquipped")) {
-                        GoodsType goodsType = label.getType();
                         for (EquipmentType equipment : Specification.getSpecification()
                                  .getEquipmentTypeList()) {
                             if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {

@@ -33,7 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -529,7 +528,6 @@ public class TransportMission extends Mission {
             }
             
             public boolean check(final Unit unit, final PathNode pathNode) {
-                final CombatModel combatModel = getGame().getCombatModel();
                 final Tile newTile = pathNode.getTile();
                 final Unit defender = newTile.getDefendingUnit(unit);
                 if (newTile.isLand()

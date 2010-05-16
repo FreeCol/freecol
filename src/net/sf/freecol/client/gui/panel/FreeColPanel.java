@@ -141,7 +141,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
     protected static StyleContext styleContext = new StyleContext();
 
     static {
-        Style defaultStyle = styleContext.getDefaultStyleContext()
+        Style defaultStyle = StyleContext.getDefaultStyleContext()
             .getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = styleContext.addStyle("regular", defaultStyle);

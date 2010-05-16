@@ -127,7 +127,6 @@ public class InciteMessage extends Message {
                                        + tile.getId());
         }
         IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        Player settlementPlayer = indianSettlement.getOwner();
         Player enemy;
         if (enemyId == null || enemyId.length() == 0) {
             return Message.clientError("Empty enemyId.");

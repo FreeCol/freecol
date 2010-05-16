@@ -171,7 +171,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param newSavedSize The new SavedSize value.
      */
     public final void setSavedSize(final Dimension newSavedSize) {
-        this.savedSize = newSavedSize;
+        ColopediaPanel.savedSize = newSavedSize;
     }
 
     /**

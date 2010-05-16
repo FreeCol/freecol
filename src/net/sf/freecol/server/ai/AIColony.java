@@ -776,7 +776,7 @@ public class AIColony extends AIObject {
                 connection.sendAndWait(message.toXMLElement());
             } catch (IOException e) {
                 logger.warning("Could not send \""
-                               + message.getXMLElementTagName()
+                               + ClaimLandMessage.getXMLElementTagName()
                                + "\"-message:" + e.getMessage());
             }
             if (tile.getOwningSettlement() != colony) {

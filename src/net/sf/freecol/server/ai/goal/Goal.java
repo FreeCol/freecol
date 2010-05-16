@@ -60,7 +60,6 @@ public abstract class Goal extends AIObject implements GoalConstants {
     private static final Logger logger = Logger.getLogger(Goal.class.getName());
 
     private float relativeWeight;
-    private int turnLastUnitAdded;
     protected boolean needsPlanning;
     protected boolean isFinished;
     protected List<AIUnit> availableUnitsList;
@@ -332,9 +331,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * unit is supposed to be replaced.     
      */
     protected void requestWorker(GoodsType gt, int minProduction) {
-        int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
         
         //TODO: Uncomment after AIPlayer.addWorkerWish() has been written.
+        //int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
         //player.addWorkerWish(this, gt, minProduction, getAbsoluteWeight(), turnsWithoutUnit);
     }
 
@@ -352,7 +351,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      */
     public void addUnit(AIUnit u) {
         logger.finest("Entering method addUnit() for "+getDebugDescription()+" with unit: "+u.getId());
-        turnLastUnitAdded = getGame().getTurn().getNumber();
+        getGame().getTurn().getNumber();
         availableUnitsList.add(u);
         u.setGoal(this);
         needsPlanning = true; //adding a unit to the Goal means it might need planning

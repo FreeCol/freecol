@@ -181,19 +181,12 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
 
     private class DifficultyOptionMap extends OptionMap {
 
-        private DifficultyLevel level;
-
         public DifficultyOptionMap(DifficultyLevel level) {
             super("difficultySettings");
-            this.level = level;
             for (AbstractOption option: level.getOptions().values()) {
                 option.setGroup("difficultySettings");
                 add(option);
             }
-        }
-
-        public DifficultyLevel getLevel() {
-            return level;
         }
 
         protected void addDefaultOptions() {

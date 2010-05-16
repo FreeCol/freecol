@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -76,11 +75,6 @@ public class FreeColTcFile extends FreeColModFile {
     @Override
     protected String[] getFileEndings() {
         return new String[] {".ftc", ".zip"};
-    }
-
-
-    private String getShortId(FreeColObject object) {
-        return object.getId().substring(object.getId().lastIndexOf('.') + 1);
     }
 
 
@@ -152,7 +146,7 @@ public class FreeColTcFile extends FreeColModFile {
     public ResourceMapping createBeachMapping() {
         ResourceMapping map = new ResourceMapping();
         String pathPrefix = "resources/images/terrain/beach/";
-        String key, path;
+        String path;
         // beach0 is never used
         for (int index = 1; index < ResourceManager.BEACH_STYLES; index++) {
             path = pathPrefix +"beach" + index + ".png";

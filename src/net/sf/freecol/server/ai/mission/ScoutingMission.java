@@ -131,9 +131,8 @@ public class ScoutingMission extends Mission {
             if (getUnit().getColony() != null) {
                 AIColony colony = (AIColony) getAIMain().getAIObject(getUnit().getColony());
                 for (EquipmentType equipment : FreeCol.getSpecification().getEquipmentTypeList()) {
-                    if (equipment.getRole() == Unit.Role.SCOUT &&
-                        getUnit().canBeEquippedWith(equipment) && 
-                        colony.canBuildEquipment(equipment)) {
+                    if (equipment.getRole() == Unit.Role.SCOUT && getUnit().canBeEquippedWith(equipment)
+                            && colony.canBuildEquipment(equipment)) {
                         Element equipUnitElement = Message.createNewRootElement("equipUnit");
                         equipUnitElement.setAttribute("unit", getUnit().getId());
                         equipUnitElement.setAttribute("type", equipment.getId());
@@ -176,22 +175,21 @@ public class ScoutingMission extends Mission {
                     return target;
                 }
             };
-            PathNode bestPath = map.search(getUnit(), getUnit().getTile(),
-                    destinationDecider, CostDeciders.avoidIllegal(),
-                    Integer.MAX_VALUE);
+            PathNode bestPath = map.search(getUnit(), getUnit().getTile(), destinationDecider, CostDeciders
+                    .avoidIllegal(), Integer.MAX_VALUE);
 
             if (bestPath != null) {
                 transportDestination = null;
                 Direction direction = moveTowards(connection, bestPath);
                 if (direction != null) {
-                    final MoveType mt = getUnit().getMoveType(direction);             
+                    final MoveType mt = getUnit().getMoveType(direction);
                     if (mt == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-                        ScoutIndianSettlementMessage message
-                            = new ScoutIndianSettlementMessage(getUnit(), direction);
+                        ScoutIndianSettlementMessage message = new ScoutIndianSettlementMessage(getUnit(), direction);
                         try {
                             connection.ask(message.toXMLElement());
                         } catch (IOException e) {
-                            logger.warning("Could not send \"" + message.getXMLElementTagName() + "\"-message!");
+                            logger.warning("Could not send \"" + ScoutIndianSettlementMessage.getXMLElementTagName()
+                                    + "\"-message!");
                             return;
                         }
                         if (getUnit().isDisposed()) {
@@ -216,8 +214,7 @@ public class ScoutingMission extends Mission {
             return;
         }
 
-        if (isTarget(getUnit().getTile(), getUnit(), scoutEquipment) &&
-            getUnit().getColony() != null) {
+        if (isTarget(getUnit().getTile(), getUnit(), scoutEquipment) && getUnit().getColony() != null) {
             if (scoutEquipment != null) {
                 Element equipUnitElement = Message.createNewRootElement("equipUnit");
                 equipUnitElement.setAttribute("unit", getUnit().getId());
@@ -234,7 +231,7 @@ public class ScoutingMission extends Mission {
             }
         }
     }
-        
+
     private void updateTransportDestination() {
         if (getUnit().getTile() == null) {
             transportDestination = (Tile) getUnit().getOwner().getEntryLocation();
@@ -262,12 +259,11 @@ public class ScoutingMission extends Mission {
                 }
             };
             Unit carrier = (Unit) getUnit().getLocation();
-            PathNode bestPath = getGame().getMap().search(getUnit(),
-                    carrier.getTile(), destinationDecider,
+            PathNode bestPath = getGame().getMap().search(getUnit(), carrier.getTile(), destinationDecider,
                     CostDeciders.avoidIllegal(), Integer.MAX_VALUE, carrier);
             if (bestPath != null) {
                 transportDestination = bestPath.getLastNode().getTile();
-                debugAction = "Transport to: " + transportDestination.getPosition();                
+                debugAction = "Transport to: " + transportDestination.getPosition();
             } else {
                 transportDestination = null;
                 valid = false;
@@ -290,13 +286,11 @@ public class ScoutingMission extends Mission {
     private static boolean isTarget(Tile t, Unit u, EquipmentType scoutEquipment) {
         if (t.hasLostCityRumour()) {
             return true;
-        } else if (scoutEquipment != null && t.getColony() != null &&
-                   t.getColony().getOwner() == u.getOwner()) {
+        } else if (scoutEquipment != null && t.getColony() != null && t.getColony().getOwner() == u.getOwner()) {
             for (AbstractGoods goods : scoutEquipment.getGoodsRequired()) {
-                if (goods.getType().isBreedable() &&
-                    !t.getColony().canBreed(goods.getType()) &&
-                    // TODO: remove assumptions about auto-production implementation
-                    t.getColony().getProductionNetOf(goods.getType()) > 1) {
+                if (goods.getType().isBreedable() && !t.getColony().canBreed(goods.getType()) &&
+                // TODO: remove assumptions about auto-production implementation
+                        t.getColony().getProductionNetOf(goods.getType()) > 1) {
                     return true;
                 }
             }
@@ -312,16 +306,14 @@ public class ScoutingMission extends Mission {
     /**
      * Returns the destination for this <code>Transportable</code>. This can
      * either be the target {@link Tile} of the transport or the target for the
-     * entire <code>Transportable</code>'s mission. The target for the
-     * tansport is determined by {@link TransportMission} in the latter case.
+     * entire <code>Transportable</code>'s mission. The target for the tansport
+     * is determined by {@link TransportMission} in the latter case.
      * 
      * @return The destination for this <code>Transportable</code>.
      */
     public Tile getTransportDestination() {
-        if (getUnit().isOnCarrier()
-                || getUnit().getTile() == null) {
-            if (transportDestination == null
-                    || !transportDestination.isLand()) {
+        if (getUnit().isOnCarrier() || getUnit().getTile() == null) {
+            if (transportDestination == null || !transportDestination.isLand()) {
                 updateTransportDestination();
             }
             return transportDestination;
@@ -356,7 +348,7 @@ public class ScoutingMission extends Mission {
         Unit unit = getUnit();
         // unit no longer has horses and not in a colony where it may get some
         // cannot fulfill role of scout anymore
-        if(!unit.isMounted() && unit.getTile().getColony() == null){
+        if (!unit.isMounted() && unit.getTile().getColony() == null) {
             return false;
         }
         return valid && super.isValid();
@@ -384,8 +376,8 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
+     * Writes all of the <code>AIObject</code>s and other AI-related information
+     * to an XML-stream.
      * 
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the

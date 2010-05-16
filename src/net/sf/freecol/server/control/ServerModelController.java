@@ -532,10 +532,6 @@ public class ServerModelController implements ModelController,PropertyChangeList
             this.entry = entry;
         }
 
-        synchronized void setSecure(boolean secure) {
-            this.secure = secure;
-        }
-
         synchronized boolean isSecure() {
             return this.secure;
         }

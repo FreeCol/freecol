@@ -95,7 +95,6 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         tb = new JTabbedPane(JTabbedPane.TOP);
         tb.setOpaque(false);
 
-        ArrayList<JComponent> ou = new ArrayList<JComponent>();
         Iterator<Option> it = option.iterator();
         while (it.hasNext()) {
             Option o = it.next();

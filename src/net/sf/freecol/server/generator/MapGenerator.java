@@ -65,7 +65,6 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.XMLStream;
@@ -224,16 +223,6 @@ public class MapGenerator implements IMapGenerator {
         return mapGeneratorOptions;
     }
 
-    /**
-     * Creates lost city rumours on the given map.
-     * The number of rumours depends on the map size.
-     *
-     * @param map The map to use.
-     */
-    private void createLostCityRumours(Map map) {
-        createLostCityRumours(map, null);
-    }
-    
     /**
      * Creates lost city rumours on the given map.
      * The number of rumours depends on the map size.
@@ -540,7 +529,6 @@ public class MapGenerator implements IMapGenerator {
                                  Messages.getDefaultSettlementName(player, capital), capital,
                                  generateSkillForLocation(map, tile, player.getNationType()),
                                  new HashSet<Player>(), null);
-        SettlementType kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill());
 
         int unitCount = settlement.getGeneratedUnitCount();

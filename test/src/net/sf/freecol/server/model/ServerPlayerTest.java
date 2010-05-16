@@ -98,7 +98,6 @@ public class ServerPlayerTest extends FreeColTestCase {
         Market frenchMarket = french.getMarket();
         Market englishMarket = english.getMarket();
         int frenchGold = french.getGold();
-        int englishGold = english.getGold();
         Specification s = spec();
         GoodsType silver = s.getGoodsType("model.goods.silver");
         int silverPrice = silver.getInitialSellPrice();

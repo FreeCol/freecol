@@ -65,7 +65,6 @@ public class WorkProductionPanel extends FreeColPanel {
         Colony colony = unit.getColony();
         UnitType unitType = unit.getType();
 
-        JLabel headline = new JLabel();
         List<Modifier> modifiers = new ArrayList<Modifier>();
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();

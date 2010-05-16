@@ -114,10 +114,12 @@ public class PlayerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
         Player english = game.getPlayer("model.nation.english");
         Player spanish = game.getPlayer("model.nation.spanish");
+        /* Commented out as long as they are not used
         Player portuguese = game.getPlayer("model.nation.portuguese");
         Player swedish = game.getPlayer("model.nation.swedish");
         Player danish = game.getPlayer("model.nation.danish");
         Player russian = game.getPlayer("model.nation.russian");
+        */
         testEuropeanPlayer(dutch);
         testEuropeanPlayer(french);
         testEuropeanPlayer(english);

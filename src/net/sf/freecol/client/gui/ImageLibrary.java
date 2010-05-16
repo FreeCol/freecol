@@ -24,9 +24,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Transparency;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -204,6 +202,7 @@ public final class ImageLibrary {
      * @param image Source image to convert
      * @return The image in grayscale
      */
+    /*
     private ImageIcon convertToGrayscale(Image image) {
         int width = image.getWidth(null);
         int height = image.getHeight(null);
@@ -213,7 +212,7 @@ public final class ImageLibrary {
         srcImage.createGraphics().drawImage(image, 0, 0, null);
         return new ImageIcon(filter.filter(srcImage, null));
     }
-
+    */
 
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).

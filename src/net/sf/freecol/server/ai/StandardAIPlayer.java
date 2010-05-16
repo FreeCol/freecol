@@ -1238,6 +1238,7 @@ public class StandardAIPlayer extends AIPlayer {
     /**
      * Takes the necessary actions to secure a european colony
      */
+    /*
     private void secureColony(Colony colony) {
         GoodsType musketType = Specification.getSpecification().getGoodsType("model.goods.muskets");
         GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
@@ -1457,6 +1458,7 @@ public class StandardAIPlayer extends AIPlayer {
             }
         }
     }
+    */
 
     /**
      * Gives a mission to non-naval units.

@@ -289,8 +289,6 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         drawBox(component, startPoint, oldPoint);
         oldPoint = e.getPoint();
         drawBox(component, startPoint, oldPoint);
-        Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-
         if (e.getComponent().isEnabled() &&
             canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
             drag_scroll(e.getX(), e.getY());

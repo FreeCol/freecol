@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
@@ -90,7 +89,6 @@ public class UnitWanderMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     public void doMission(Connection connection) {
-        Tile thisTile = getUnit().getTile();
         Unit unit = getUnit();
         
         while(unit.getMovesLeft() > 0) {

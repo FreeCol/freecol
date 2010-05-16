@@ -86,7 +86,6 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         this.option = option;
         this.originalValue = createElementList(option.getValue());
         this.listModel = new DefaultListModel();
-        final ListOptionSelector<T> los = option.getListOptionSelector();
         for (ListOptionElement<T> e : createElementList(option.getValue())) {  
             this.listModel.addElement(e);
         }
@@ -261,7 +260,6 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     /**
      * Updates the value of the {@link Option} this object keeps.
      */
-    @SuppressWarnings("unchecked")
     public void updateOption() {
         option.setValue(getValue());
     }

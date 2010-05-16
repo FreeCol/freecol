@@ -72,8 +72,6 @@ public class MoveToEuropeMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
-
         if (!serverPlayer.canMoveToEurope()) {
             return Message.clientError("Player " + player.getId()
                                        + " can not move units to Europe.");

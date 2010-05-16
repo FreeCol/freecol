@@ -81,7 +81,6 @@ public class BuildColonyMessage extends Message {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;

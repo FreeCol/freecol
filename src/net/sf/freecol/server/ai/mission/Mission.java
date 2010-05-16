@@ -406,7 +406,7 @@ public abstract class Mission extends AIObject {
         try {
             connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"" + message.getXMLElementTagName()
+            logger.warning("Could not send \"" + UnloadCargoMessage.getXMLElementTagName()
                            + "\"-message!");
             return false;
         }
@@ -425,7 +425,7 @@ public abstract class Mission extends AIObject {
         try {
             connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"" + message.getXMLElementTagName()
+            logger.warning("Could not send \"" + SellGoodsMessage.getXMLElementTagName()
                            + "\"-message!");
             return false;
         }
@@ -526,7 +526,7 @@ public abstract class Mission extends AIObject {
         try {
             connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"" + message.getXMLElementTagName()
+            logger.warning("Could not send \"" + DisembarkMessage.getXMLElementTagName()
                            + "\"-message to the server!");
             return false;
         }
@@ -540,7 +540,7 @@ public abstract class Mission extends AIObject {
         try {
             connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"" + message.getXMLElementTagName()
+            logger.warning("Could not send \"" + BuyGoodsMessage.getXMLElementTagName()
                            + "\"-message to the server.");
             return false;
         }

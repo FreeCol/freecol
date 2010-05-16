@@ -188,16 +188,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             unitOffer = new UnitTradeItemPanel(this, player);
         */
 
-        int numberOfTradeItems = 4;
-        int extraRows = 2; // headline and buttons
-
         setLayout(new MigLayout("wrap 3", "[200, fill][300, fill][200, fill]", ""));
 
-        int demandColumn = 1;
-        int summaryColumn = 3;
-        int offerColumn = 5;
-
-        int row = 1;
         add(new JLabel(Messages.message("negotiationDialog.demand")), "center");
         add(new JLabel(Messages.message("negotiationDialog.offer")), "skip, center");
 

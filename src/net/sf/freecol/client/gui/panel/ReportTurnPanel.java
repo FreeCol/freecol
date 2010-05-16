@@ -111,7 +111,6 @@ public final class ReportTurnPanel extends ReportPanel {
         source = this;
         type = null;
 
-        int row = 1;
         for (final ModelMessage message : messages) {
             // add headline if necessary
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {

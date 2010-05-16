@@ -39,6 +39,7 @@ import javax.swing.JToggleButton;
 
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.IndianNationType;
@@ -148,7 +149,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getLibrary().getBonusImage(Specification.getSpecification()
                                                              .getResourceTypeList().get(0), 0.8),
                                   Messages.message("editor.resource"), new ResourceTransform()));
-        listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR, 0.66),
+        listPanel.add(buildButton(getLibrary().getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();

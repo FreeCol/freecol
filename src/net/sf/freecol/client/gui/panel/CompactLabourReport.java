@@ -184,9 +184,6 @@ public final class CompactLabourReport extends ReportPanel {
 
         row = addLocationData(labourData.getSummary().getTotal(), null, row);
 
-        int minHeight = allColonistsButton.getPreferredSize().height;
-        //HIGLayout higLayout = (HIGLayout) reportPanel.getLayout();
-        
         for (UnitType unitType : LabourData.getLabourTypes(getMyPlayer())) {
             LabourData.UnitData unitData = labourData.getUnitData(unitType);
 
@@ -234,6 +231,7 @@ public final class CompactLabourReport extends ReportPanel {
      * @param pocketCount
      * @return distribution of {@code value}
      */
+    /*
     private int[] distribute(int value, int pocketCount) {
         int[] pockets = new int[pocketCount];
 
@@ -246,7 +244,8 @@ public final class CompactLabourReport extends ReportPanel {
         }
         return pockets;
     }
-
+     */
+    
     private JLabel createEmptyLabel() {
         JLabel empty = new JLabel("");
         empty.setBorder(CELLBORDER);

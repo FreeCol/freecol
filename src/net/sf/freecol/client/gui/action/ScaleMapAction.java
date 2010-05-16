@@ -74,12 +74,6 @@ public class ScaleMapAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        final Game game = freeColClient.getGame();
-        final Map oldMap = game.getMap();
-
-        final int oldWidth = oldMap.getWidth();
-        final int oldHeight = oldMap.getHeight();
-
         MapSize ms = showMapSizeDialog();
         if (ms != null) {
             scaleMapTo(ms.width, ms.height);

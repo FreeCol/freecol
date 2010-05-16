@@ -80,7 +80,6 @@ public class JoinColonyMessage extends Message {
      *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
-        Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;

@@ -123,7 +123,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param newSavedSize The new SavedSize value.
      */
     public final void setSavedSize(final Dimension newSavedSize) {
-        this.savedSize = newSavedSize;
+        ReportPanel.savedSize = newSavedSize;
     }
 
     /**

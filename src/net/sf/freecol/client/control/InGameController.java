@@ -804,7 +804,6 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
-        final Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
         Canvas canvas = freeColClient.getCanvas();
         Location destination = canvas.showSelectDestinationDialog(unit);
@@ -2936,7 +2935,7 @@ public final class InGameController implements NetworkConstants {
         GoodsForSaleMessage message
             = new GoodsForSaleMessage(unit, settlement, null);
         Element reply = askExpecting(client, message.toXMLElement(),
-                                     message.getXMLElementTagName());
+                GoodsForSaleMessage.getXMLElementTagName());
         if (reply == null) return null;
 
         Game game = freeColClient.getGame();

@@ -53,7 +53,6 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
 
 
-    @SuppressWarnings("unused") 
     private JButton allButton;
     private JButton noneButton;
     private JButton acceptButton;

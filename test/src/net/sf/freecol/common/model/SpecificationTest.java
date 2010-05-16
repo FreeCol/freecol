@@ -204,7 +204,8 @@ public final class SpecificationTest extends TestCase {
     public void testReqAbilitiesForEquipmentTypes() {
     	String equipmentTypeStr;
     	Map<String,Boolean> abilitiesReq, expectAbilities;
-    	Specification spec = Specification.getSpecification();
+    	@SuppressWarnings("unused")
+        Specification spec = Specification.getSpecification();
 
         Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();
         

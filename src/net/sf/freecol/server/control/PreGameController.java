@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -118,8 +117,6 @@ public final class PreGameController extends Controller {
         
         // Make the map:
         mapGenerator.createMap(game);
-        Map map = game.getMap();
-        
         // Restore the GameOptions that may have been overwritten by loadGame in createMap
         game.getGameOptions().readFromXMLElement(oldGameOptions);
         

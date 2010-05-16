@@ -54,12 +54,7 @@ public class MergeTranslations {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
             });
-        String[] targetFiles = targetDirectory.list(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
-                }
-            });
-
+        
         for (String name : sourceFiles) {
 
             System.out.println("Processing source file: " + name);

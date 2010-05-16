@@ -55,7 +55,6 @@ public class ModelMessageTest extends FreeColTestCase {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
     	
-        Player player = game.getPlayer("model.nation.dutch");
         Colony colony = getStandardColony(1);
         GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
         

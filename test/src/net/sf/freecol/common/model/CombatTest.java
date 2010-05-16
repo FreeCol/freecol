@@ -72,6 +72,7 @@ public class CombatTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
         game.setMap(map);
+        FreeColTestCase.spec();
         Tile tile1 = map.getTile(5, 8);
         tile1.setType(hills);
         assertEquals(hills, tile1.getType());
@@ -118,7 +119,7 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(offenceModifiers.contains(attackBonus));
         offenceModifiers.remove(attackBonus);
         // this was also added by the combat model
-        assertEquals(spec().BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
 
         Set<Modifier> hillsModifierSet = hills.getDefenceBonus();
         assertFalse(soldier.hasAbility("model.ability.ambushBonus"));
@@ -133,7 +134,7 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(defenceModifiers.contains(fortified));
         defenceModifiers.remove(fortified);
         // this was also added by the combat model
-        assertEquals(spec().BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
 
     }
 
@@ -145,6 +146,7 @@ public class CombatTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(ocean);
         game.setMap(map);
+        FreeColTestCase.spec();
         Tile tile1 = map.getTile(5, 8);
         tile1.setExploredBy(dutch, true);
         tile1.setExploredBy(french, true);
@@ -160,11 +162,11 @@ public class CombatTest extends FreeColTestCase {
          */
         Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         assertEquals(1, offenceModifiers.size());
-        assertEquals(spec().BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
-        assertEquals(spec().BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
 
         /**
          * Fortification should have no effect.
@@ -173,7 +175,7 @@ public class CombatTest extends FreeColTestCase {
         galleon.setState(UnitState.FORTIFIED);
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
-        assertEquals(spec().BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
 
         /**
          * Penalties due to cargo.
@@ -184,9 +186,9 @@ public class CombatTest extends FreeColTestCase {
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         Iterator<Modifier> privIt = offenceModifiers.iterator();
         assertEquals(2, offenceModifiers.size());
-        assertEquals(spec().BASE_OFFENCE_SOURCE, privIt.next().getSource());
+        assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier goodsPenalty1 = privIt.next();
-        assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
+        assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
         Goods goods2 = new Goods(game, null, lumberType, 150);
@@ -195,9 +197,9 @@ public class CombatTest extends FreeColTestCase {
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         Iterator<Modifier> gallIt = defenceModifiers.iterator();
         assertEquals(2, defenceModifiers.size());
-        assertEquals(spec().BASE_DEFENCE_SOURCE, gallIt.next().getSource());
+        assertEquals(Specification.BASE_DEFENCE_SOURCE, gallIt.next().getSource());
         Modifier goodsPenalty2 = gallIt.next();
-        assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty2.getSource());
+        assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty2.getSource());
         assertEquals(-25f, goodsPenalty2.getValue());
 
         /**
@@ -218,11 +220,11 @@ public class CombatTest extends FreeColTestCase {
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         privIt = offenceModifiers.iterator();
         assertEquals(3, offenceModifiers.size());
-        assertEquals(spec().BASE_OFFENCE_SOURCE, privIt.next().getSource());
+        assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier newDrakeModifier = privIt.next();
         assertEquals(drakeModifier, newDrakeModifier);
         goodsPenalty1 = privIt.next();
-        assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
+        assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
         // Verify that the move is correctly interpreted
@@ -470,6 +472,7 @@ public class CombatTest extends FreeColTestCase {
     	
         Colony colony = getStandardColony();
 
+        @SuppressWarnings("unused")
         SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
@@ -676,7 +679,6 @@ public class CombatTest extends FreeColTestCase {
     public void testAttackIgnoresMovementPoints() throws Exception {
 
         Game game = getStandardGame();
-        CombatModel combatModel = game.getCombatModel();
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains, true);

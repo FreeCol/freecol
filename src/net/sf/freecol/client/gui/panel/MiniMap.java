@@ -212,7 +212,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }        
         Image skin = ResourceManager.getImage("MiniMap.skin");
         
-    	int colorIndex = freeColClient.getClientOptions().getInteger(ClientOptions.MINIMAP_BACKGROUND_COLOR);
     	Color newBackground = ResourceManager.getColor("miniMapBackground.color");
     	this.setBackgroundColor(newBackground);
         

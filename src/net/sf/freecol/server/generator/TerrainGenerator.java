@@ -229,8 +229,6 @@ public class TerrainGenerator {
             }
         } else {
             int adjacentLand = 0;
-            int riverBonus = 0;
-            int fishBonus = 0;
             boolean adjacentRiver = false;
             for (Direction direction : Direction.values()) {
                 Tile otherTile = t.getMap().getNeighbourOrNull(direction, t);
@@ -1133,14 +1131,6 @@ public class TerrainGenerator {
                 }
             }
         }
-    }
-    
-    private boolean isNorth(int height, int y) {
-        return y<(height/2);
-    }
-
-    private boolean isWest(int width, int x) {
-        return x<(width/2);
     }
     
     /**

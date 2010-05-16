@@ -657,7 +657,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                    + " in " + getName());
                     newUnit.putOutsideColony();
                 } else {
-                    int oldPopulation = getUnitCount();
                     newUnit.work(occupation.workLocation);
                     if (occupation.workType != null) {
                         newUnit.setWorkType(occupation.workType);
@@ -754,7 +753,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (locatable instanceof Unit) {
             for (WorkLocation w : getWorkLocations()) {
                 if (w.contains(locatable)) {
-                    int oldPopulation = getUnitCount();
                     w.remove(locatable);
                     updatePopulation(-1);
                     return;

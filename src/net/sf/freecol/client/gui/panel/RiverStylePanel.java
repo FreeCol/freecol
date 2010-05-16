@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -58,7 +59,7 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
         setLayout(new BorderLayout());
         
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));
-        JButton deleteButton = new JButton(new ImageIcon(getLibrary().getMiscImage(getLibrary().DELETE, 0.5)));
+        JButton deleteButton = new JButton(new ImageIcon(getLibrary().getMiscImage(ImageLibrary.DELETE, 0.5)));
         deleteButton.setActionCommand(String.valueOf(DELETE));
         deleteButton.addActionListener(this);
         stylesPanel.add(deleteButton);

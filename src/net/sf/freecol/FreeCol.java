@@ -698,6 +698,7 @@ public final class FreeCol {
      *
      * @param args The command-line arguments.
      */
+    @SuppressWarnings("static-access")
     private static void handleArgs(String[] args) {
         // create the command line parser
         CommandLineParser parser = new PosixParser();

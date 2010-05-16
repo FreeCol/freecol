@@ -354,7 +354,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * @param newSavedSize The new SavedSize value.
      */
     public final void setSavedSize(final Dimension newSavedSize) {
-        this.savedSize = newSavedSize;
+        ColonyPanel.savedSize = newSavedSize;
     }
 
     /**
@@ -511,7 +511,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         int food = 0;
 
         List<AbstractGoods> foodProduction = new ArrayList<AbstractGoods>();
-        List<AbstractGoods> surplusProduction = new ArrayList<AbstractGoods>();
         for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
             int production = colony.getProductionOf(goodsType);
             if (production != 0) {
@@ -1372,16 +1371,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             public void removePropertyChangeListeners() {
                 colonyTile.removePropertyChangeListener(this);
-            }
-
-            /**
-             * Updates the description label The description label is a tooltip
-             * with the terrain type, road and plow indicator if any
-             * 
-             * If a unit is on it update the tooltip of it instead
-             */
-            private void updateDescriptionLabel() {
-                updateDescriptionLabel(null, false);
             }
 
             /**

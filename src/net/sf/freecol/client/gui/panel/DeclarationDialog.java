@@ -228,15 +228,6 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
             }
         }
 
-        /**
-         * Removes an <code>ActionListener</code>.
-         * 
-         * @param al The <code>ActionListener</code>.
-         */
-        public void removeActionListener(ActionListener al) {
-            actionListeners.remove(al);
-        }
-
         private void notifyStopped() {
             for (int i = 0; i < actionListeners.size(); i++) {
                 actionListeners.get(i).actionPerformed(

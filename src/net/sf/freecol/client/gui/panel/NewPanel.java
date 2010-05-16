@@ -96,8 +96,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JComboBox specificationBox =
         new JComboBox(new String[] { "FreeCol", "Colonization" });
 
-    private final String[] filenames = new String[] {"freecol", "classic" };
-
     private final Component[] joinComponents = new Component[] {
         ipLabel, server, port1Label, port1
     };
@@ -189,10 +187,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         enableComponents();
 
         setSize(getPreferredSize());
-    }
-
-    private String getFilename() {
-        return filenames[specificationBox.getSelectedIndex()];
     }
 
     private void enableComponents(Component[] components, boolean enable) {

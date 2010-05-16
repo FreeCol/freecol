@@ -394,7 +394,6 @@ public class SoundPlayer {
 
                 // Playing audio:
                 int read = 0;
-                int written = 0;
                 try {
                     while (read != -1 && !soundStopped && !shouldStopThread()) {
                         try {
@@ -404,7 +403,6 @@ public class SoundPlayer {
                         } catch (InterruptedException e) {}
                         read = din.read(data, 0, data.length);
                         if (read != -1) {
-                            written = line.write(data, 0, read);
                         }
                     }
                 } finally {
@@ -420,7 +418,6 @@ public class SoundPlayer {
                             && System.currentTimeMillis() < fadeStop) {
                         read = din.read(data, 0, data.length);
                         if (read != -1) {
-                            written = line.write(data, 0, read);
                         }
                         if (System.currentTimeMillis() > ms) {
                             // decrease the gain toward minimum (-80dB) by 1dB

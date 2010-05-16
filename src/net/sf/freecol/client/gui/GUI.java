@@ -34,12 +34,9 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -1741,6 +1738,7 @@ public final class GUI {
      *       the <code>text</code>.
      * @return The image that was created.
      */
+    /*
     private BufferedImage createStringImage(JComponent c, Graphics g, String text, Font font, Color color) {
         if (color == null) {
             logger.warning("createStringImage called with color null");
@@ -1783,7 +1781,8 @@ public final class GUI {
         ResourceManager.getGameMapping().add(key, new ImageResource(bi));
         return bi;
     }
-
+    */
+    
     private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement) {        
         Font oldFont = g.getFont();
         g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
@@ -2644,13 +2643,11 @@ public final class GUI {
     *         are none.
     */
     public int getBreakingPoint(String string) {
-        int index = 0;
         int center = string.length() / 2;
         for (int offset = 0; offset < center; offset++) {
             if (string.charAt(center + offset) == ' ') {
                 return center + offset;
             } else if (string.charAt(center - offset) == ' ') {
-                index = center - offset;
                 return center - offset;
             }
         }

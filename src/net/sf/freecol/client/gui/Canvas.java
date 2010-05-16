@@ -2125,7 +2125,6 @@ public final class Canvas extends JDesktopPane {
                                                     IndianSettlement settlement,
                                                     boolean canEstablish,
                                                     boolean canDenounce) {
-        Player player = unit.getOwner();
         List<ChoiceItem<MissionaryAction>> choices
             = new ArrayList<ChoiceItem<MissionaryAction>>();
         choices.add(new ChoiceItem<MissionaryAction>(
