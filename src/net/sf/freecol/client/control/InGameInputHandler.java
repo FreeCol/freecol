@@ -266,32 +266,42 @@ public final class InGameInputHandler extends InputHandler {
         Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
         if (unit == null) {
             if (element.getFirstChild() == null) {
-                logger.warning("Animation" + " for: " + client.getMyPlayer().getId() + " incorrectly omitted unit: "
-                        + unitId + " from: " + element.getAttribute("oldTile") + " to: "
-                        + element.getAttribute("newTile"));
+                logger.warning("Animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " incorrectly omitted unit: " + unitId
+                    + " from: " + element.getAttribute("oldTile")
+                    + " to: " + element.getAttribute("newTile")
+                    );
                 return null;
             }
             unit = new Unit(game, (Element) element.getFirstChild());
         }
         ClientOptions options = client.getClientOptions();
         boolean ourUnit = unit.getOwner() == client.getMyPlayer();
-        String key = (ourUnit) ? ClientOptions.MOVE_ANIMATION_SPEED : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        String key = (ourUnit) ? ClientOptions.MOVE_ANIMATION_SPEED
+            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         if (!client.isHeadless() && options.getInteger(key) > 0) {
             String oldTileId = element.getAttribute("oldTile");
             Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
             String newTileId = element.getAttribute("newTile");
             Tile newTile = (Tile) game.getFreeColGameObjectSafely(newTileId);
             if (newTile == null || oldTile == null || unit == null) {
-                throw new IllegalStateException("animateMove" + ((unit == null) ? ": null unit" : "")
-                        + ((oldTile == null) ? ": null oldTile" : "") + ((newTile == null) ? ": null newTile" : ""));
+                throw new IllegalStateException("animateMove"
+                                                + ((unit == null) ? ": null unit" : "")
+                                                + ((oldTile == null) ? ": null oldTile" : "")
+                                                + ((newTile == null) ? ": null newTile" : "")
+                                                );
             }
 
             // All is well, queue the animation.
             // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
             try {
-                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile, unit != lastAnimatedUnit).invokeSpecial();
+                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
+                                                     unit != lastAnimatedUnit)
+                    .invokeSpecial();
             } catch (Exception exception) {
-                logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
+                logger.warning("UnitMoveAnimationCanvasSwingTask raised "
+                               + exception.toString());
             }
             lastAnimatedUnit = unit;
         }
@@ -307,25 +317,34 @@ public final class InGameInputHandler extends InputHandler {
      *            the unit that is moving (which are used solely to operate the
      *            animation).
      */
-    /*
-     * private Element animateAttack(Element element) { FreeColClient client =
-     * getFreeColClient(); if (client.isHeadless()) return null; Game game =
-     * getGame(); Unit unit = (Unit)
-     * game.getFreeColGameObjectSafely(element.getAttribute("unit")); Unit
-     * defender = (Unit)
-     * game.getFreeColGameObjectSafely(element.getAttribute("defender"));
-     * CombatResultType result = Enum.valueOf(CombatResultType.class,
-     * element.getAttribute("result")); if (unit == null || defender == null) {
-     * throw new IllegalStateException("animateAttack" + ((unit == null) ?
-     * ": null unit" : "") + ((defender == null) ? ": null defender" : "") ); }
-     * 
-     * // All is well, queue the animation. // Use lastAnimatedUnit as a filter
-     * to avoid excessive refocussing. try { new
-     * UnitAttackAnimationCanvasSwingTask(unit, defender, result, unit !=
-     * lastAnimatedUnit) .invokeSpecial(); } catch (Exception exception) {
-     * logger.warning("UnitAttackAnimationCanvasSwingTask raised " +
-     * exception.toString()); } lastAnimatedUnit = unit; return null; }
-     */
+    private Element animateAttack(Element element) {
+        FreeColClient client = getFreeColClient();
+        if (client.isHeadless()) return null;
+        Game game = getGame();
+        Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
+        Unit defender = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("defender"));
+        CombatResultType result = Enum.valueOf(CombatResultType.class, element.getAttribute("result"));
+        if (unit == null || defender == null) {
+            throw new IllegalStateException("animateAttack"
+                                            + ((unit == null) ? ": null unit" : "")
+                                            + ((defender == null) ? ": null defender" : "")
+                                            );
+        }
+
+        // All is well, queue the animation.
+        // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
+        try {
+            new UnitAttackAnimationCanvasSwingTask(unit, defender, result,
+                                                   unit != lastAnimatedUnit)
+                .invokeSpecial();
+        } catch (Exception exception) {
+            logger.warning("UnitAttackAnimationCanvasSwingTask raised "
+                           + exception.toString());
+        }
+        lastAnimatedUnit = unit;
+        return null;
+    }
+
 
     /**
      * Handles an "opponentAttack"-message.
@@ -554,7 +573,9 @@ public final class InGameInputHandler extends InputHandler {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 Canvas canvas = getFreeColClient().getCanvas();
-                canvas.displayChatMessage(chatMessage.getPlayer(), chatMessage.getMessage(), chatMessage.isPrivate());
+                canvas.displayChatMessage(chatMessage.getPlayer(),
+                                          chatMessage.getMessage(),
+                                          chatMessage.isPrivate());
             }
         });
         return null;
@@ -568,8 +589,9 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element error(Element element) {
         try {
-            new ShowErrorMessageSwingTask(element.getAttribute("messageID"), element.getAttribute("message"))
-                    .invokeSpecial();
+            new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
+                                          element.getAttribute("message"))
+                .invokeSpecial();
         } catch (Exception exception) {
             logger.warning("error() raised " + exception.toString());
         }
@@ -627,19 +649,21 @@ public final class InGameInputHandler extends InputHandler {
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);
         tile.add(convert);
-        ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED, "model.colony.newConvert", convert)
-                .add("%nation%", nation.getNameKey()).addName("%colony%", colony.getName());
+        ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                                "model.colony.newConvert", convert)
+            .add("%nation%", nation.getNameKey())
+            .addName("%colony%", colony.getName());
 
         getFreeColClient().getMyPlayer().addModelMessage(message);
         return null;
     }
 
     /**
-     * Handles a "diplomacy"-request. If the message informs of an acceptance or
-     * rejection then display the result and return null. If the message is a
-     * proposal, then ask the user about it and return the response with
-     * appropriate response set.
-     * 
+     * Handles a "diplomacy"-request.  If the message informs of an
+     * acceptance or rejection then display the result and return
+     * null.  If the message is a proposal, then ask the user about
+     * it and return the response with appropriate response set.
+     *
      * @param element The element (root element in a DOM-parsed XML tree)
      *            containing a "diplomacy"-message.
      * @return A diplomacy response, or null if none required.
@@ -650,25 +674,31 @@ public final class InGameInputHandler extends InputHandler {
         DiplomacyMessage message = new DiplomacyMessage(game, element);
         Unit unit = message.getUnit(game);
         Settlement settlement = message.getSettlement(game);
-        Player other = (unit.getOwner() == player) ? settlement.getOwner() : unit.getOwner();
+        Player other = (unit.getOwner() == player) ? settlement.getOwner()
+            : unit.getOwner();
         String nation = Messages.message(other.getNationName());
         DiplomaticTrade ourAgreement;
         DiplomaticTrade theirAgreement = message.getAgreement();
 
         switch (theirAgreement.getStatus()) {
         case ACCEPT_TRADE:
-            new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted", "%nation%", nation).show();
+            new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
+                                                "%nation%", nation).show();
             break;
         case REJECT_TRADE:
-            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected", "%nation%", nation).show();
+            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
+                                                "%nation%", nation).show();
             break;
         case PROPOSE_TRADE:
-            ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement, theirAgreement).select();
+            ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement,
+                                                              theirAgreement)
+                .select();
             if (ourAgreement == null) {
                 ourAgreement = theirAgreement;
                 ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
             }
-            return new DiplomacyMessage(unit, settlement, ourAgreement).toXMLElement();
+            return new DiplomacyMessage(unit, settlement,
+                                        ourAgreement).toXMLElement();
         default:
             logger.warning("Bogus trade status");
             break;
@@ -925,24 +955,26 @@ public final class InGameInputHandler extends InputHandler {
         /*
          * Diplomacy messages were sometimes not shown because opponentAttack
          * messages arrive before setStance messages, so when the setStance
-         * message arrived the player already had the new stance. So, do not
-         * filter like this: if (first.getStance(second) == stance) { return
-         * null; } TODO: fix opponentAttack.
+         * message arrived the player already had the new stance.
+         * So, do not filter like this:
+         *   if (first.getStance(second) == stance) { return null; }
+         * TODO: fix opponentAttack.
          */
 
         // Does this message involve this player and an other?
-        Player other = (player.equals(first)) ? second : (player.equals(second)) ? first : null;
+        Player other = (player.equals(first)) ? second
+            : (player.equals(second)) ? first
+            : null;
         // Prepare to ignore initial peaceful contacts as these are covered
         // by `You meet the <nation> nation' message.
-        boolean firstContact = other != null && stance == Stance.PEACE && player.getStance(other) == Stance.UNCONTACTED;
+        boolean firstContact = other != null && stance == Stance.PEACE
+            && player.getStance(other) == Stance.UNCONTACTED;
 
         first.setStance(second, stance);
-        if (second.getStance(first) != stance)
-            second.setStance(first, stance);
+        if (second.getStance(first) != stance) second.setStance(first, stance);
 
-        // Message processing follows. The AI is not interested.
-        if (player.isAI())
-            return null;
+        // Message processing follows.  The AI is not interested.
+        if (player.isAI()) return null;
 
         ModelMessage m = null;
         String sta = stance.toString().toLowerCase();
@@ -950,21 +982,25 @@ public final class InGameInputHandler extends InputHandler {
             // If not, always inform about wars, always inform
             // post-deWitt, generally inform if have met one of the
             // nations involved.
-            if (stance == Stance.WAR || player.hasAbility("model.ability.betterForeignAffairsReport")
-                    || player.hasContacted(first) || player.hasContacted(second)) {
-                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY, "model.diplomacy." + sta + ".others",
-                        first).addStringTemplate("%attacker%", first.getNationName()).addStringTemplate("%defender%",
-                        second.getNationName());
+            if (stance == Stance.WAR
+                   || player.hasAbility("model.ability.betterForeignAffairsReport")
+                   || player.hasContacted(first)
+                   || player.hasContacted(second)) {
+                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "model.diplomacy." + sta + ".others",
+                                     first)
+                    .addStringTemplate("%attacker%", first.getNationName())
+                    .addStringTemplate("%defender%", second.getNationName());
             }
         } else {
             if (!firstContact) {
                 m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        "model.diplomacy." + sta + ".declared", first).addStringTemplate("%nation%", other
-                        .getNationName());
+                                     "model.diplomacy." + sta + ".declared",
+                                     first)
+                    .addStringTemplate("%nation%", other.getNationName());
             }
         }
-        if (m != null)
-            player.addModelMessage(m);
+        if (m != null) player.addModelMessage(m);
         return null;
     }
 
@@ -1098,7 +1134,8 @@ public final class InGameInputHandler extends InputHandler {
             if (fcgo instanceof Player) {
                 ((Player) fcgo).addModelMessage(m);
             } else {
-                logger.warning("addMessages with broken owner: " + ((owner == null) ? "(null)" : owner));
+                logger.warning("addMessages with broken owner: "
+                               + ((owner == null) ? "(null)" : owner));
             }
         }
         return null;
@@ -1125,7 +1162,8 @@ public final class InGameInputHandler extends InputHandler {
             if (fcgo instanceof Player) {
                 ((Player) fcgo).getHistory().add(h);
             } else {
-                logger.warning("addHistory with broken owner: " + ((owner == null) ? "(null)" : owner));
+                logger.warning("addHistory with broken owner: "
+                               + ((owner == null) ? "(null)" : owner));
             }
         }
         return null;
