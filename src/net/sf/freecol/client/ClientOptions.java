@@ -504,10 +504,7 @@ public class ClientOptions extends OptionMap {
         add(guiGroup);
         
         add(spec.getOptionGroup("clientOptions.messages"));
-
-        OptionGroup audioGroup = spec.getOptionGroup("clientOptions.audio");
-        add(audioGroup);
-
+        add(spec.getOptionGroup("clientOptions.audio"));
         add(spec.getOptionGroup("clientOptions.savegames"));
         add(spec.getOptionGroup("clientOptions.warehouse"));
         add(spec.getOptionGroup("clientOptions.other"));
