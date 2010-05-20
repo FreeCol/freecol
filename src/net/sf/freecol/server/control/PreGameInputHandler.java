@@ -85,11 +85,6 @@ public final class PreGameInputHandler extends InputHandler {
                 return nationType(connection, element);
             }
         });
-        register("setColor", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return color(connection, element);
-            }
-        });
         register("setAvailable", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return available(connection, element);
@@ -219,27 +214,6 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "setColor"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element color(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        if (player != null) {
-            String color = element.getAttribute("value");
-            player.setColor(new Color(Integer.decode(color)));
-            Element updateColor = Message.createNewRootElement("updateColor");
-            updateColor.setAttribute("player", player.getId());
-            updateColor.setAttribute("value", color);
-            getFreeColServer().getServer().sendToAll(updateColor, player.getConnection());
-        } else {
-            logger.warning("Color from unknown connection.");
-        }
-        return null;
-    }
-
-    /**
      * Handles a "setAvailable"-message from a client.
      * 
      * @param connection The connection the message came from.
@@ -277,11 +251,9 @@ public final class PreGameInputHandler extends InputHandler {
         // Check that no two players have the same color or nation
         Iterator<Player> playerIterator = freeColServer.getGame().getPlayerIterator();
         LinkedList<Nation> nations = new LinkedList<Nation>();
-        LinkedList<Color> colors = new LinkedList<Color>();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             final Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
-            final Color color = player.getColor();
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {
                 if (nations.get(i) == nation) {
@@ -294,16 +266,6 @@ public final class PreGameInputHandler extends InputHandler {
                 }
             }
             nations.add(nation);
-            // Check the color.
-            for (int i = 0; i < colors.size(); i++) {
-                if (colors.get(i).equals(color)) {
-                    Element reply = Message.createNewRootElement("error");
-                    reply.setAttribute("message", "All players need to pick a unique color before the game can start.");
-                    reply.setAttribute("messageID", "server.invalidPlayerColors");
-                    return reply;
-                }
-            }
-            colors.add(color);
         }
         // Check if all players are ready.
         if (!freeColServer.getGame().isAllPlayersReadyToLaunch()) {

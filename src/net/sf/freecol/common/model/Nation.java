@@ -35,12 +35,6 @@ public class Nation extends FreeColGameObjectType {
     private static int nextIndex = 0;
 
     /**
-     * The default color to use for this nation. Can be changed by the
-     * Player.
-     */
-    private Color color;
-
-    /**
      * Describe type here.
      */
     private NationType type;
@@ -65,24 +59,6 @@ public class Nation extends FreeColGameObjectType {
      */
     public Nation() {
         setIndex(nextIndex++);
-    }
-
-    /**
-     * Get the <code>Color</code> value.
-     *
-     * @return a <code>Color</code> value
-     */
-    public final Color getColor() {
-        return color;
-    }
-
-    /**
-     * Set the <code>Color</code> value.
-     *
-     * @param newColor The new Color value.
-     */
-    public final void setColor(final Color newColor) {
-        this.color = newColor;
     }
 
     /**
@@ -168,7 +144,6 @@ public class Nation extends FreeColGameObjectType {
 
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
         type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         String refId = getAttribute(in, "ref", null);

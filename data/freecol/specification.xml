@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.38 -->
+<!-- specification version 0.39 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1478,57 +1478,57 @@
   </indian-nation-types>
 
   <nations>
-    <nation id="model.nation.dutch" color="#ff9d3c" anthem="anthem_dutch"
+    <nation id="model.nation.dutch" anthem="anthem_dutch"
             nation-type="model.nationType.trade" selectable="true"
             ref="model.nation.dutchREF"/>
-    <nation id="model.nation.french" color="#0000ff" anthem="anthem_french"
+    <nation id="model.nation.french" anthem="anthem_french"
             nation-type="model.nationType.cooperation" selectable="true"
             ref="model.nation.frenchREF"/>
-    <nation id="model.nation.english" color="#ff0000" anthem="anthem_english"
+    <nation id="model.nation.english" anthem="anthem_english"
             nation-type="model.nationType.immigration" selectable="true"
             ref="model.nation.englishREF"/>
-    <nation id="model.nation.spanish" color="#ffff00" anthem="anthem_spanish"
+    <nation id="model.nation.spanish" anthem="anthem_spanish"
             nation-type="model.nationType.conquest" selectable="true"
             ref="model.nation.spanishREF"/>
-    <nation id="model.nation.portuguese" color="#00ff00"
+    <nation id="model.nation.portuguese"
             nation-type="model.nationType.naval" selectable="true" ref="model.nation.portugueseREF"/>
-    <nation id="model.nation.swedish" color="#ff00ff"
+    <nation id="model.nation.swedish"
             nation-type="model.nationType.building" selectable="true" ref="model.nation.swedishREF"/>
-    <nation id="model.nation.danish" color="#00ffff"
+    <nation id="model.nation.danish"
             nation-type="model.nationType.agriculture" selectable="true" ref="model.nation.danishREF"/>
-    <nation id="model.nation.russian" color="#ffffff"
+    <nation id="model.nation.russian"
             nation-type="model.nationType.furTrapping" selectable="true" ref="model.nation.russianREF"/>
-    <nation id="model.nation.inca" color="#f4f0c4"
+    <nation id="model.nation.inca"
             nation-type="model.nationType.inca"/>
-    <nation id="model.nation.aztec" color="#c4a020"
+    <nation id="model.nation.aztec"
             nation-type="model.nationType.aztec"/>
-    <nation id="model.nation.arawak" color="#6888c0"
+    <nation id="model.nation.arawak"
             nation-type="model.nationType.arawak"/>
-    <nation id="model.nation.cherokee" color="#6c3c18"
+    <nation id="model.nation.cherokee"
             nation-type="model.nationType.cherokee"/>
-    <nation id="model.nation.iroquois" color="#74a44c"
+    <nation id="model.nation.iroquois"
             nation-type="model.nationType.iroquois"/>
-    <nation id="model.nation.sioux" color="#c0ac84"
+    <nation id="model.nation.sioux"
             nation-type="model.nationType.sioux"/>
-    <nation id="model.nation.apache" color="#900000"
+    <nation id="model.nation.apache"
             nation-type="model.nationType.apache"/>
-    <nation id="model.nation.tupi" color="#045c04"
+    <nation id="model.nation.tupi"
             nation-type="model.nationType.tupi"/>
-    <nation id="model.nation.dutchREF" color="#ff9d3c"
+    <nation id="model.nation.dutchREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.frenchREF" color="#0000ff"
+    <nation id="model.nation.frenchREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.englishREF" color="#ff0000"
+    <nation id="model.nation.englishREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.spanishREF" color="#ffff00"
+    <nation id="model.nation.spanishREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.portugueseREF" color="#00ff00"
+    <nation id="model.nation.portugueseREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.swedishREF" color="#ff00ff"
+    <nation id="model.nation.swedishREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.danishREF" color="#00ffff"
+    <nation id="model.nation.danishREF"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.russianREF" color="#ffffff"
+    <nation id="model.nation.russianREF"
             nation-type="model.nationType.ref"/>
   </nations>
 

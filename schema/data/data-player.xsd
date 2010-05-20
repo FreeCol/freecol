@@ -79,7 +79,6 @@
       <xs:attribute name="username" type="xs:string" use="required"/>
       <xs:attribute name="nationID" type="NationId" use="required"/>
       <xs:attribute name="nationType" type="NationTypeId" use="optional"/>
-      <xs:attribute name="color" type="xs:int" use="required"/>
 
       <xs:attribute name="admin" type="xs:boolean" use="optional"
 		    default="false"/>

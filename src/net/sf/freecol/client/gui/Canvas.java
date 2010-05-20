@@ -546,7 +546,7 @@ public final class Canvas extends JDesktopPane {
      * @return The appropriate ImageIcon.
      */
     public ImageIcon getImageIcon(Object display, boolean small) {
-        ImageLibrary imageLibrary = freeColClient.getImageLibrary();
+        ImageLibrary imageLibrary = getImageLibrary();
         Image image = null;
         if (display == null) {
             return new ImageIcon();
@@ -1544,7 +1544,8 @@ public final class Canvas extends JDesktopPane {
      * @see GUIMessage
      */
     public void displayChatMessage(Player sender, String message, boolean privateChat) {
-        gui.addMessage(new GUIMessage(sender.getName() + ": " + message, sender.getColor()));
+        gui.addMessage(new GUIMessage(sender.getName() + ": " + message,
+                                      getImageLibrary().getColor(sender)));
     }
 
     /**

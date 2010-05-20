@@ -48,11 +48,6 @@ public class NationOptions extends FreeColObject{
     public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE }
 
     /**
-     * Describe selectColors here.
-     */
-    private boolean selectColors;
-
-    /**
      * Describe nationalAdvantages here.
      */
     private Advantages nationalAdvantages;
@@ -99,24 +94,6 @@ public class NationOptions extends FreeColObject{
     }
 
     /**
-     * Get the <code>SelectColors</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean canSelectColors() {
-        return selectColors;
-    }
-
-    /**
-     * Set the <code>SelectColors</code> value.
-     *
-     * @param newSelectColors The new SelectColors value.
-     */
-    public final void setSelectColors(final boolean newSelectColors) {
-        this.selectColors = newSelectColors;
-    }
-
-    /**
      * Get the <code>NationState</code> value of a particular Nation.
      *
      * @param nation a <code>Nation</code> value
@@ -143,7 +120,6 @@ public class NationOptions extends FreeColObject{
      */
     public static final NationOptions getDefaults() {
         NationOptions result = new NationOptions();
-        result.setSelectColors(true);
         result.setNationalAdvantages(Advantages.SELECTABLE);
         int counter = 0;
         Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
@@ -176,7 +152,6 @@ public class NationOptions extends FreeColObject{
     public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         //setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
 
-        selectColors = getAttribute(in, "selectColors", true);
         String advantages = getAttribute(in, "nationalAdvantages", "selectable").toUpperCase();
         nationalAdvantages = Enum.valueOf(Advantages.class, advantages);
 
@@ -209,7 +184,6 @@ public class NationOptions extends FreeColObject{
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         //out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("selectColors", Boolean.toString(selectColors));
         out.writeAttribute("nationalAdvantages", nationalAdvantages.toString());
         out.writeStartElement("Nations");
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
@@ -230,7 +204,6 @@ public class NationOptions extends FreeColObject{
     // debugging only
     public String toString() {
         StringBuilder result = new StringBuilder(); 
-        result.append("selectColors: " + selectColors + "\n");
         result.append("nationalAdvantages: " + nationalAdvantages.toString() + "\n");
         result.append("Nations:\n");
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {

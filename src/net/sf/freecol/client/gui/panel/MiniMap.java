@@ -367,10 +367,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                     g.drawLine(x+extra+1+4*tileX, y+1+tileY, x+extra+1+4*tileX, y+1+tileY);
 
                     if (settlement != null) {
-                        g.setColor(settlement.getOwner().getColor());
+                        g.setColor(freeColClient.getImageLibrary().getColor(settlement.getOwner()));
                         g.drawLine(x+extra+4*tileX+1, y+tileY, x+extra+4*tileX+1, y+tileY);
                     } else if (units > 0) {
-                        g.setColor(tile.getFirstUnit().getOwner().getColor());
+                        g.setColor(freeColClient.getImageLibrary().getColor(tile.getFirstUnit().getOwner()));
                         g.drawLine(x+extra+4*tileX+1, y+tileY, x+extra+4*tileX+1, y+tileY);
                     }
                 } else {
@@ -401,7 +401,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                         xPoints[2] -= tileSize / 8;
                         yPoints[1] += tileSize / 16;
                         yPoints[3] -= tileSize / 16;
-                        g.setColor(settlement.getOwner().getColor());
+                        g.setColor(freeColClient.getImageLibrary().getColor(settlement.getOwner()));
                         g.fillPolygon(xPoints, yPoints, 4);
                         g.setColor(Color.BLACK);
                         g.drawPolygon(xPoints, yPoints, 4);
@@ -410,7 +410,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                         xPoints[2] -= tileSize / 4;
                         yPoints[1] += tileSize / 8;
                         yPoints[3] -= tileSize / 8;
-                        g.setColor(tile.getFirstUnit().getOwner().getColor());
+                        g.setColor(freeColClient.getImageLibrary().getColor(tile.getFirstUnit().getOwner()));
                         g.fillPolygon(xPoints, yPoints, 4);
                         g.setColor(Color.BLACK);
                         g.drawPolygon(xPoints, yPoints, 4);

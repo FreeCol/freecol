@@ -218,8 +218,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private java.util.Map<String, Stance> stance = new HashMap<String, Stance>();
 
-    private static final Color noNationColor = Color.BLACK;
-
     /**
      * Nation/NationType related variables.
      */
@@ -246,9 +244,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * The name this player uses for the New World.
      */
     private String newLandName = null;
-
-    // Represented on the network as "color.getRGB()":
-    private Color color = Color.BLACK;
 
     private boolean admin;
 
@@ -455,7 +450,6 @@ public class Player extends FreeColGameObject implements Nameable {
         this.admin = admin;
         if (newNation != null && newNation.getType() != null) {
             this.nationType = newNation.getType();
-            this.color = newNation.getColor();
             this.nationID = newNation.getId();
             try {
                 featureContainer.add(nationType.getFeatureContainer());
@@ -489,7 +483,6 @@ public class Player extends FreeColGameObject implements Nameable {
             // virtual "enemy privateer" player
             // or undead ?
             this.nationID = Nation.UNKNOWN_NATION_ID;
-            this.color = noNationColor;
             this.playerType = PlayerType.COLONIAL;
         }
         market = new Market(getGame(), this);
@@ -1895,24 +1888,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public final String getRulerNameKey() {
         return nationID + ".ruler";
-    }
-
-    /**
-     * Returns the color of this player.
-     *
-     * @return The color of this player.
-     */
-    public Color getColor() {
-        return color;
-    }
-
-    /**
-     * Sets the color for this player.
-     *
-     * @param c The new color for this player.
-     */
-    public void setColor(Color c) {
-        color = c;
     }
 
     /**
@@ -3383,7 +3358,6 @@ public class Player extends FreeColGameObject implements Nameable {
         if (nationType != null) {
             out.writeAttribute("nationType", nationType.getId());
         }
-        out.writeAttribute("color", Integer.toString(color.getRGB()));
         out.writeAttribute("admin", Boolean.toString(admin));
         out.writeAttribute("ready", Boolean.toString(ready));
         out.writeAttribute("dead", Boolean.toString(dead));
@@ -3487,7 +3461,6 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!name.equals(UNKNOWN_ENEMY)) {
             nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
         }
-        color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
         admin = getAttribute(in, "admin", false);
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         immigration = getAttribute(in, "immigration", 0);

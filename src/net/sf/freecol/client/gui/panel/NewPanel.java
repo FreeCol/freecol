@@ -81,10 +81,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JRadioButton start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
     private final JRadioButton meta = new JRadioButton( Messages.message("getServerList")
                                                         + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
-
-    // TODO: enable this option
-    private final JCheckBox selectColors = new JCheckBox(Messages.message("playerOptions.selectColors"));
-
     private final Advantages[] choices = new Advantages[] {
         Advantages.SELECTABLE,
         Advantages.FIXED,
@@ -107,7 +103,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final Component[] gameComponents = new Component[] {
         advantageLabel, nationalAdvantages,
         rulesLabel, specificationBox
-        //, selectColors
     };
 
     private final ButtonGroup group = new ButtonGroup();
@@ -129,9 +124,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         setCancelComponent(cancel);
 
-        selectColors.setSelected(true);
-        selectColors.setEnabled(false);
-
         nationalAdvantages.setRenderer(new AdvantageRenderer());
 
         group.add(single);
@@ -152,11 +144,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         add(port2Label, "newline, skip");
         add(port2, "width 60:");
-        add(selectColors);
-
-        add(publicServer, "newline, skip, span 2");
         add(rulesLabel);
         add(specificationBox, "growx");
+
+        add(publicServer, "newline, skip, span 2");
 
         add(meta, "newline, span 3");
 
@@ -238,7 +229,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case SINGLE:
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
-                    nationOptions.setSelectColors(selectColors.isSelected());
                     DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
                     connectController.startSingleplayerGame(name.getText(), nationOptions, level);
                     // getFilename(), getDifficulty());
@@ -257,7 +247,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         int port = Integer.valueOf(port2.getText()).intValue();
                         nationOptions = NationOptions.getDefaults();
                         nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
-                        nationOptions.setSelectColors(selectColors.isSelected());
                         level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(),
                                                                port, nationOptions, level);

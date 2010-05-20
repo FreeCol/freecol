@@ -188,7 +188,7 @@ public final class GUI {
             if (textBounds.intersects(clipArea)) {
                 // show message
                 g.setFont(nameFont);
-                g.setColor(player.getColor());
+                g.setColor(imageLibrary.getColor(player));
                 g.drawString(message, textBounds.x, textBounds.y
                         + textBounds.height);
             }
@@ -1787,8 +1787,8 @@ public final class GUI {
         Font oldFont = g.getFont();
         g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
         Image result = createStringImage((Graphics2D) g,
-                Messages.message(settlement.getNameFor(freeColClient.getMyPlayer())),
-                settlement.getOwner().getColor(),
+                                         Messages.message(settlement.getNameFor(freeColClient.getMyPlayer())),
+                                         lib.getColor(settlement.getOwner()),
                 -1,
                 18);
         //      BufferedImage result = createStringImage(null, (Graphics2D) g,
@@ -2100,9 +2100,9 @@ public final class GUI {
             Color oldColor = g.getColor();
             Color newColor = Color.WHITE;
             if (type == BorderType.COUNTRY) {
-                newColor = new Color(owner.getColor().getRed(),
-                                     owner.getColor().getGreen(),
-                                     owner.getColor().getBlue(),
+                newColor = new Color(lib.getColor(owner).getRed(),
+                                     lib.getColor(owner).getGreen(),
+                                     lib.getColor(owner).getBlue(),
                                      opaque ? 255 : 100);
             }
             g.setColor(newColor);
@@ -2655,8 +2655,8 @@ public final class GUI {
     }
     
     private Image getOccupationIndicatorImage(Unit unit) {
-        Color backgroundColor = unit.getOwner().getColor();
-        Color foregroundColor = getForegroundColor(unit.getOwner().getColor());
+        Color backgroundColor = lib.getColor(unit.getOwner());
+        Color foregroundColor = getForegroundColor(backgroundColor);
         String occupationString;
         if (unit.getOwner() != freeColClient.getMyPlayer()
                 && unit.isNaval()) {

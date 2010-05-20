@@ -355,7 +355,6 @@ public final class FreeColServer {
                 }
                 p.setDead(false);
                 p.setPlayerType(PlayerType.UNDEAD);
-                p.setColor(Color.BLACK);
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
                         .getOwnerDocument()));

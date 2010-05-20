@@ -145,24 +145,6 @@ public final class PreGameController {
     }
 
 
-    /**
-    * Sets this client's player's color.
-    * @param color Which color this player wishes to set.
-    */
-    public void setColor(Color color) {
-        // Make the change:
-        freeColClient.getMyPlayer().setColor(color);
-
-        // Inform the server:
-        Element colorElement = Message.createNewRootElement("setColor");
-        // the substring hack is necessary to prevent an integer
-        // overflow, as the hex string will be unsigned, and
-        // Integer.decode() expects a signed int
-        colorElement.setAttribute("value", "#" + Integer.toHexString(color.getRGB()).substring(2));
-
-        freeColClient.getClient().sendAndWait(colorElement);
-    }
-
     public void setAvailable(Nation nation, NationState state) {
         freeColClient.getGame().getNationOptions().getNations().put(nation, state);
         Element availableElement = Message.createNewRootElement("setAvailable");
@@ -233,12 +215,11 @@ public final class PreGameController {
      * Add player-specific resources to the resource manager.
      *
      * @param nationId The player nation identifier.
-     * @param color The player color.
      */
-    private void addPlayerResources(String nationId, Color color) {
+    private void addPlayerResources(String nationId) {
+        Color color = ResourceManager.getColor(nationId + ".color");
         logger.finest("Add resources for " + nationId + " color: " + color);
         ResourceMapping gameMapping = new ResourceMapping();
-        gameMapping.add(nationId + ".color", new ColorResource(color));
         gameMapping.add(nationId + ".chip", ChipResource.colorChip(color));
         gameMapping.add(nationId + ".mission.chip",
                         ChipResource.missionChip(color, false));
@@ -255,11 +236,10 @@ public final class PreGameController {
         GUI gui = freeColClient.getGUI();
 
         for (Player player : freeColClient.getGame().getPlayers()) {
-            addPlayerResources(player.getNationID(), player.getColor());
+            addPlayerResources(player.getNationID());
         }
         // Unknown nation is not in getPlayers() list.
-        addPlayerResources(Nation.UNKNOWN_NATION_ID,
-            ResourceManager.getColor(Nation.UNKNOWN_NATION_ID + ".color"));
+        addPlayerResources(Nation.UNKNOWN_NATION_ID);
 
         if (!freeColClient.isHeadless()) {
             canvas.closeMainPanel();
