@@ -42,7 +42,6 @@ import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
-import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.SelectOption;
 
 import org.w3c.dom.Element;
@@ -174,9 +173,9 @@ public class ClientOptions extends OptionMap {
 
     public static final String AUDIO_MIXER = "model.option.audioMixer";
 
-    public static final String MUSIC_VOLUME = "musicVolume";
+    public static final String MUSIC_VOLUME = "model.option.musicVolume";
 
-    public static final String SFX_VOLUME = "sfxVolume";
+    public static final String SFX_VOLUME = "model.option.sfxVolume";
 
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
@@ -507,8 +506,6 @@ public class ClientOptions extends OptionMap {
         add(spec.getOptionGroup("clientOptions.messages"));
 
         OptionGroup audioGroup = spec.getOptionGroup("clientOptions.audio");
-        new PercentageOption(MUSIC_VOLUME, audioGroup, 100).setPreviewEnabled(true);
-        new PercentageOption(SFX_VOLUME, audioGroup, 100).setPreviewEnabled(true);
         add(audioGroup);
 
         add(spec.getOptionGroup("clientOptions.savegames"));

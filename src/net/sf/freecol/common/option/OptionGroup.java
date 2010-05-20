@@ -139,6 +139,8 @@ public class OptionGroup extends AbstractOption {
                 option = new LanguageOption(in);
             } else if (FileOption.getXMLElementTagName().equals(optionType) || "file-option".equals(optionType)) {
                 option = new FileOption(in);
+            } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
+                option = new PercentageOption(in);
             } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
                 option = new AudioMixerOption(in);
             } else {

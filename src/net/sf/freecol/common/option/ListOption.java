@@ -54,7 +54,8 @@ public class ListOption<T> extends AbstractOption {
      * @param defaultValues The default values of this option.
      */
     public ListOption(ListOptionSelector<T> selector, String id, OptionGroup optionGroup, T... defaultValues) {
-        super(id, optionGroup);
+        super(id);
+        optionGroup.add(this);
         value = new ArrayList<T>();
         this.selector = selector;
         for (T s : defaultValues) {

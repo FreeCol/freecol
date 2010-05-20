@@ -38,27 +38,6 @@ public class IntegerOption extends AbstractOption {
     private int minimumValue;
     private int maximumValue;
 
-    
-    //TODO remove when all options come from specification.xml
-    /**
-    * Creates a new <code>IntegerOption</code>.
-    *
-    * @deprecated
-    * @param id The identifier for this option. This is used when the object should be
-    *           found in an {@link OptionGroup}.
-    * @param optionGroup The OptionGroup this option belongs to. 
-    * @param minimumValue The minimum allowed value.
-    * @param maximumValue The maximum allowed value.
-    * @param defaultValue The default value of this option.
-    */
-    public IntegerOption(String id, OptionGroup optionGroup, int minimumValue, int maximumValue, int defaultValue) {
-        super(id, optionGroup);
-
-        this.value = defaultValue;
-        this.minimumValue = minimumValue;
-        this.maximumValue = maximumValue;
-    }
-
     /**
      * Creates a new  <code>IntegerOption</code>.
      * @param in The <code>XMLStreamReader</code> containing the data. 
@@ -77,7 +56,14 @@ public class IntegerOption extends AbstractOption {
         return minimumValue;
     }
     
-    
+    /**
+     * Sets the minimum allowed value.
+     * @param minimumValue The minimum value to set
+     */
+    public void setMinimumValue(int minimumValue) {
+        this.minimumValue = minimumValue;
+    }
+
     /**
     * Returns the maximum allowed value.
     * @return The maximum value allowed by this option.
@@ -86,6 +72,14 @@ public class IntegerOption extends AbstractOption {
         return maximumValue;
     }
 
+
+    /**
+     * Sets the maximum allowed value.
+     * @param maximumValue the maximum value to set
+     */
+    public void setMaximumValue(int maximumValue) {
+        this.maximumValue = maximumValue;
+    }
 
     /**
     * Gets the current value of this <code>IntegerOption</code>.

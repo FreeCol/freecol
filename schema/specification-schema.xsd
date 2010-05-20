@@ -629,6 +629,7 @@
         <xs:element ref="languageOption"/>
         <xs:element ref="fileOption"/>
         <xs:element ref="audioMixerOption"/>
+        <xs:element ref="percentageOption"/>
         <xs:element ref="optionGroup"/>
       </xs:choice>
     </xs:complexType>
@@ -645,6 +646,7 @@
         <xs:element ref="languageOption"/>
         <xs:element ref="fileOption"/>
         <xs:element ref="audioMixerOption"/>
+        <xs:element ref="percentageOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
@@ -714,6 +716,14 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="percentageOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" use="required" type="xs:string"/>
+      <xs:attribute name="previewEnabled" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  
   <xs:element name="rangeValue">
     <xs:complexType>
       <xs:attribute name="label" use="required" type="xs:string"/>

@@ -32,6 +32,7 @@ public class PercentageOption extends IntegerOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(PercentageOption.class.getName());
 
+
     /**
      * Creates a new <code>RangeOption</code>.
      * 
@@ -39,72 +40,71 @@ public class PercentageOption extends IntegerOption {
      */
     public PercentageOption(XMLStreamReader in) throws XMLStreamException {
         super(in);
+        this.setMinimumValue(0);
+        this.setMaximumValue(100);
     }
 
     /**
-     * Creates a new <code>RangeOption</code>.
+     * This method writes an XML-representation of this object to the given
+     * stream.
      * 
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
-     * @param optionGroup The OptionGroup this Option belongs to.
-     * @param defaultOption The default value.
-     */
-    public PercentageOption(String id, OptionGroup optionGroup, int defaultOption) {
-        super(id, optionGroup, 0, 100, defaultOption);
-    }
-
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("id", getId());
         out.writeAttribute("value", Integer.toString(getValue()));
+        out.writeAttribute("previewEnabled", Boolean.toString(isPreviewEnabled()));
 
         out.writeEndElement();
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     * 
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, "id");
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String value = in.getAttributeValue(null, "value");
-        
-        if (id == null && getId().equals("NO_ID")){
+        final String previewEnabled = in.getAttributeValue(null, "previewEnabled");
+
+        if (id == null && getId().equals("NO_ID")) {
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
         if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                    + "> tag : no value nor default value found.");
         }
- 
-        if(getId() == NO_ID) {
+        if (previewEnabled != null && !previewEnabled.equals("true") && !previewEnabled.equals("false")) {
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                    + "> tag : previewEnabled should be true or false.");
+        }
+
+        if (getId() == NO_ID) {
             setId(id);
         }
-        if(value != null) {
+        if (value != null) {
             setValue(Integer.parseInt(value));
         } else {
             setValue(Integer.parseInt(defaultValue));
+        }
+        if(previewEnabled != null) {
+            this.setPreviewEnabled(Boolean.parseBoolean(previewEnabled));
         }
         in.nextTag();
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "percentageOption".
-    */
+     * Gets the tag name of the root element representing this object.
+     * 
+     * @return "percentageOption".
+     */
     public static String getXMLElementTagName() {
         return "percentageOption";
     }

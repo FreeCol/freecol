@@ -95,25 +95,6 @@ public class LanguageOption extends AbstractOption {
          readFromXML(in);
      }   
 
-    /**
-     * Creates a new <code>LanguageOption</code>.
-     *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     */
-    public LanguageOption(String id) {
-        this(id, null);
-    }
-
-    public LanguageOption(String id, OptionGroup optionGroup) {
-        super(id, optionGroup);
-        if (languages.size() == 0) {
-            prepareLanguages();
-        }
-        value = DEFAULT;
-    }
-
-
     private void prepareLanguages() {
         for (String[] pair : languageNamesHelper) {
             languageNames.put(pair[0], pair[1]);

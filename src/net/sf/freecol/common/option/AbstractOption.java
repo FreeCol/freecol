@@ -55,25 +55,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      *            should be found in an {@link OptionGroup}.
      */
     public AbstractOption(String id) {
-        this(id, null);
-    }
-
-    // TODO : remove this constructor when all AbstractOption come from
-    // specification.xml
-    /**
-     * Creates a new <code>AbstractOption</code>.
-     * 
-     * @deprecated
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
-     * @param optionGroup The OptionGroup this Option belongs to.
-     */
-    public AbstractOption(String id, OptionGroup optionGroup) {
         setId(id);
-        if (optionGroup != null) {
-            setGroup(optionGroup.getId());
-            optionGroup.add(this);
-        }
     }
 
     /**

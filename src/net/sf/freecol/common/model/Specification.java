@@ -45,6 +45,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.StringOption;
@@ -414,6 +415,8 @@ public final class Specification {
                 } else if (FileOption.getXMLElementTagName().equals(optionType)
                            || "file-option".equals(optionType)) {
                     option = new FileOption(xsr);
+                } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
+                    option = new PercentageOption(xsr);
                 } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
                     option = new AudioMixerOption(xsr);
                 } else {
