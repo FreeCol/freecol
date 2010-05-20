@@ -60,6 +60,8 @@ import net.sf.freecol.client.gui.action.DebugAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.MoveAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
+import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
+import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -399,6 +401,8 @@ public final class Canvas extends JDesktopPane {
             addKeyBinding(am.getFreeColAction(MoveAction.id + d));
             addKeyBinding(am.getFreeColAction(MoveAction.id + d + ".secondary"));
         }
+        addKeyBinding(am.getFreeColAction(MiniMapZoomInAction.id));
+        addKeyBinding(am.getFreeColAction(MiniMapZoomOutAction.id));
     }
 
     private void addKeyBinding(FreeColAction action) {
