@@ -628,6 +628,7 @@
         <xs:element ref="selectOption"/>
         <xs:element ref="languageOption"/>
         <xs:element ref="fileOption"/>
+        <xs:element ref="audioMixerOption"/>
         <xs:element ref="optionGroup"/>
       </xs:choice>
     </xs:complexType>
@@ -643,6 +644,7 @@
         <xs:element ref="selectOption"/>
         <xs:element ref="languageOption"/>
         <xs:element ref="fileOption"/>
+        <xs:element ref="audioMixerOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
@@ -702,6 +704,13 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="defaultValue" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="audioMixerOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

@@ -1856,6 +1856,9 @@
       <!-- Generate warning of stock exceeds this percentage of capacity. -->
       <integerOption id="model.option.highLevel" defaultValue="90" minimumValue="0" maximumValue="100"/>
     </optionGroup>
+    <optionGroup id="clientOptions.audio">
+      <audioMixerOption id="model.option.audioMixer"/>
+    </optionGroup>
     <optionGroup id="clientOptions.other" >
       <!-- Option for autoload emigrants on saling to america. -->
       <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>

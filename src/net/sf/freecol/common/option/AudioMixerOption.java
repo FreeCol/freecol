@@ -83,19 +83,14 @@ public class AudioMixerOption extends AbstractOption {
     /**
      * Creates a new <code>AudioMixerOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
+     * @param in The <code>XMSStreamReader</code> to read the data from
      */
-    public AudioMixerOption(String id) {
-        this(id, null);
+    public AudioMixerOption(XMLStreamReader in) throws XMLStreamException {
+        super(NO_ID);
+        readFromXML(in);
     }
 
-    public AudioMixerOption(String id, OptionGroup optionGroup) {
-        super(id, optionGroup);
-        value = DEFAULT;
-    }
-
-    
+   
     /**
      * Get the <code>Value</code> value.
      *
@@ -149,9 +144,9 @@ public class AudioMixerOption extends AbstractOption {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         out.writeAttribute("value", getValue().getKey());
 
         out.writeEndElement();
@@ -164,12 +159,23 @@ public class AudioMixerOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final String id = in.getAttributeValue(null, "id");
+        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+        final String value = in.getAttributeValue(null, "value");
+
         findAudioMixers();
-        MixerWrapper newValue = audioMixers.get(in.getAttributeValue(null, "value"));
-        if (newValue == null) {
-            newValue = audioMixers.get(AUTO);
+
+        if (getId() == NO_ID) {
+            setId(id);
         }
-        setValue(newValue);
+
+        if (value != null) {
+            setValue(audioMixers.get(value));
+        } else if (defaultValue != null) {
+            setValue(audioMixers.get(value));
+        } else {
+            setValue(audioMixers.get(AUTO));
+        }
         in.nextTag();
     }
 

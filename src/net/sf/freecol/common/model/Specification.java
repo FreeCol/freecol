@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.option.AbstractOption;
+import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -413,6 +414,8 @@ public final class Specification {
                 } else if (FileOption.getXMLElementTagName().equals(optionType)
                            || "file-option".equals(optionType)) {
                     option = new FileOption(xsr);
+                } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
+                    option = new AudioMixerOption(xsr);
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");
                     xsr.nextTag();

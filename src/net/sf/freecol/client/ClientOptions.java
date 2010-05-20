@@ -37,7 +37,6 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
@@ -173,7 +172,7 @@ public class ClientOptions extends OptionMap {
 
     public static final int MESSAGES_GROUP_BY_SOURCE = 2;
 
-    public static final String AUDIO_MIXER = "audioMixer";
+    public static final String AUDIO_MIXER = "model.option.audioMixer";
 
     public static final String MUSIC_VOLUME = "musicVolume";
 
@@ -507,8 +506,7 @@ public class ClientOptions extends OptionMap {
         
         add(spec.getOptionGroup("clientOptions.messages"));
 
-        OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
-        new AudioMixerOption(AUDIO_MIXER, audioGroup);
+        OptionGroup audioGroup = spec.getOptionGroup("clientOptions.audio");
         new PercentageOption(MUSIC_VOLUME, audioGroup, 100).setPreviewEnabled(true);
         new PercentageOption(SFX_VOLUME, audioGroup, 100).setPreviewEnabled(true);
         add(audioGroup);
