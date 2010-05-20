@@ -348,6 +348,10 @@ public class River {
                             nextRiver.grow(lastSection, px);
                             // if the other river is connected, so is this one
                             connected = nextRiver.connected;
+                            // add this region to other river if too small
+                            if (getLength() < 10) {
+                                region = nextRiver.region;
+                            }
                             drawToMap();
                         } else {
                             // flow into the sea (or a lake)
