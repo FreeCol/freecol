@@ -2683,13 +2683,11 @@ public final class GUI {
                 foregroundColor = Color.GRAY;
         }
         // Lookup in the cache if the image has been generated already
-        String key = Integer.toString(backgroundColor.getRGB())
-            + Integer.toString(foregroundColor.getRGB()) + occupationString;
+        String key = backgroundColor.toString() + occupationString;
         Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img == null) {
             // Draw it and put it in the cache
             Image chip = lib.getColorChip(unit, lib.getScalingFactor());
-            logger.finest("Retrieved color chip for unit " + unit + ": " + chip);
             img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
             Graphics g = img.getGraphics();
             g.drawImage(chip, 0, 0, null);
