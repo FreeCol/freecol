@@ -194,6 +194,10 @@ public final class FreeColClient {
         mapEditor = false;
         
         clientOptions = new ClientOptions();
+        actionManager = new ActionManager(this);
+        if (!headless) {
+            actionManager.initializeActions();
+        }
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
             clientOptions.load(FreeCol.getClientOptionsFile());
@@ -210,10 +214,6 @@ public final class FreeColClient {
         ResourceManager.setModMappings(modResources);
         ResourceManager.preload(innerWindowSize);
         
-        actionManager = new ActionManager(this);
-        if (!headless) {
-            actionManager.initializeActions();
-        }
         // Control:
         connectController = new ConnectController(this);
         preGameController = new PreGameController(this);
