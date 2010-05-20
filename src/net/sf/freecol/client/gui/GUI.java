@@ -1254,8 +1254,8 @@ public final class GUI {
                         g.drawOval(p.x + halfWidth, p.y + halfHeight, 10, 10);
                     }                
                     if (temp.getTurns() > 0) {
-                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
-                                                                      textColor, tileWidth, 12);
+                        Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
+                                                              textColor, tileWidth, 12);
                         centerImage(g, stringImage, p.x, p.y);
                     }
                 }                    
@@ -1477,10 +1477,9 @@ public final class GUI {
                 Tile tile = map.getTile(tileX, tileY);
                 if (tile != null && tile.getSettlement() != null) {
                     Settlement settlement = tile.getSettlement();
-                    BufferedImage stringImage
-                        = createSettlementNameImage(g, settlement);
+                    Image stringImage = createSettlementNameImage(g, settlement);
                     g.drawImage(stringImage,
-                                xx + (tileWidth - stringImage.getWidth())/2 + 1,
+                                xx + (tileWidth - stringImage.getWidth(null))/2 + 1,
                                 yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
                 }
                 xx += tileWidth;
@@ -1535,16 +1534,16 @@ public final class GUI {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             synchronized (this) {
-                BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
+                Image si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
 
-                yy = size.height - 300 - getMessageCount() * si.getHeight();// 200 ;
+                yy = size.height - 300 - getMessageCount() * si.getHeight(null);// 200 ;
                 xx = 40;
 
                 for (int i = 0; i < getMessageCount(); i++) {
                     GUIMessage message = getMessage(i);
                     g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12),
                                 xx, yy, null);
-                    yy += si.getHeight();
+                    yy += si.getHeight(null);
                 }
             }
         }
@@ -1623,7 +1622,7 @@ public final class GUI {
     * @param preferredFontSize The preferred font size.
     * @return The image that was created.
     */
-    public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
+    public Image createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
         return createStringImage(null, g, nameString, color, maxWidth, preferredFontSize);
     }
     
@@ -1642,7 +1641,7 @@ public final class GUI {
      * @param preferredFontSize The preferred font size.
      * @return The image that was created.
      */
-    public BufferedImage createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
+    public Image createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
         return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
     }
     
@@ -1664,7 +1663,7 @@ public final class GUI {
      * @param preferredFontSize The preferred font size.
      * @return The image that was created.
      */
-    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {
+    private Image createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {
         if (color == null) {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
@@ -1673,12 +1672,13 @@ public final class GUI {
         // Lookup in the cache if the image has been generated already
         Font nameFont = (c != null) ? c.getFont() : g.getFont();
         String key = nameString + nameFont.getFontName() + color.getRGB();
-        BufferedImage bi = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
-        if (bi != null) {
-            return bi;
+        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        if (image != null) {
+            return image;
         }
 
         // create an image of the appropriate size
+        BufferedImage bi;
         FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
         int fontSize = preferredFontSize;
         do {
@@ -1783,10 +1783,10 @@ public final class GUI {
     }
     */
     
-    private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement) {        
+    private Image createSettlementNameImage(Graphics g, Settlement settlement) {        
         Font oldFont = g.getFont();
         g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
-        BufferedImage result = createStringImage((Graphics2D) g,
+        Image result = createStringImage((Graphics2D) g,
                 Messages.message(settlement.getNameFor(freeColClient.getMyPlayer())),
                 settlement.getOwner().getColor(),
                 -1,
@@ -2352,7 +2352,7 @@ public final class GUI {
                                       + ".color");
 
                         g.setFont(new Font("Dialog", Font.BOLD, 12));
-                        BufferedImage stringImage = createStringImage(g, populationString, theColor, tileWidth, 12);
+                        Image stringImage = createStringImage(g, populationString, theColor, tileWidth, 12);
                         centerImage(g, stringImage, x, y);
                     }
                     g.setColor(Color.BLACK);
@@ -2685,18 +2685,18 @@ public final class GUI {
         // Lookup in the cache if the image has been generated already
         String key = Integer.toString(backgroundColor.getRGB())
             + Integer.toString(foregroundColor.getRGB()) + occupationString;
-        BufferedImage img = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
-        if (img!=null)
-            return img;
-        // Draw it and put it in the cache
-        Image chip = lib.getColorChip(unit, lib.getScalingFactor());
-        logger.finest("Retrieved color chip for unit " + unit + ": " + chip);
-        img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = img.getGraphics();
-        g.drawImage(chip, 0, 0, null);
-        g.setColor(foregroundColor);
-        g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
-        ResourceManager.addGameMapping(key, new ImageResource(img));
+        Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        if (img == null) {
+            // Draw it and put it in the cache
+            Image chip = lib.getColorChip(unit, lib.getScalingFactor());
+            logger.finest("Retrieved color chip for unit " + unit + ": " + chip);
+            img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+            Graphics g = img.getGraphics();
+            g.drawImage(chip, 0, 0, null);
+            g.setColor(foregroundColor);
+            g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
         return img;
     }
 

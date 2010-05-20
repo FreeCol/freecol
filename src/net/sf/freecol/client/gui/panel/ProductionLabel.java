@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import java.awt.Image;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -422,7 +422,7 @@ public final class ProductionLabel extends JComponent {
             return;
         }
 
-        BufferedImage stringImage = null;
+        Image stringImage = null;
         int stringWidth = 0;
         if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
             || (maximumProduction > production && production > 0)) {
@@ -484,7 +484,7 @@ public final class ProductionLabel extends JComponent {
             int textOffset = width > stringWidth ? (width - stringWidth)/2 : 0;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
-                        goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
+                        goodsIcon.getIconHeight()/2 - stringImage.getHeight(null)/2, null);
         }
     }
 

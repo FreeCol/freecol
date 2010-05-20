@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import java.awt.Image;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -511,12 +511,12 @@ public final class ProductionMultiplesLabel extends JComponent {
             if (maximumProduction > totalProduction && totalProduction > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
-            int textOffset = leftOffset + (coverage - stringImage.getWidth())/2;
+            Image stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
+            int textOffset = leftOffset + (coverage - stringImage.getWidth(null))/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
 //                    goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
-                    getMaximumIconHeight()/2 - stringImage.getHeight()/2, null);
+                    getMaximumIconHeight()/2 - stringImage.getHeight(null)/2, null);
         }
     }
 
