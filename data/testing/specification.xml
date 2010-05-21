@@ -2159,6 +2159,8 @@
       <integerOption id="model.option.autosavePeriod" defaultValue="0" minimumValue="0" maximumValue="100"/>
       <!-- Option for setting the number of autosaves to keep. If set to 0, all autosaves are kept. -->
       <integerOption id="model.option.autosaveGenerations" defaultValue="10" minimumValue="0" maximumValue="100"/>
+      <!-- Option to delete old save games when a new game is started -->
+      <booleanOption id="model.option.autosaveDelete" defaultValue="false"/>
     </optionGroup>
     <optionGroup id="clientOptions.warehouse" >
       <!-- The Stock the custom house should keep when selling goods. -->

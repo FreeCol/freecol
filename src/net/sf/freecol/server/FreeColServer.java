@@ -777,6 +777,19 @@ public final class FreeColServer {
 		    throw new FreeColException("incompatibleVersions");
 		}
 	}
+	
+	/**
+	 * Removes automatically created save games.
+	 * Call this function to delete the automatically created save games from
+	 * a previous game.
+	 */
+	public static void removeAutosaves(final String prefix) {
+		for (File autosaveFile : FreeCol.getAutosaveDirectory().listFiles()) {
+		    if (autosaveFile.getName().startsWith(prefix)) {
+		        autosaveFile.delete();
+		    }
+		}
+	}
 
     /**
      * Sets the mode of the game: singleplayer/multiplayer.

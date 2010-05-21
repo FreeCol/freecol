@@ -158,6 +158,9 @@ public final class ConnectController {
 
         try {
             FreeColServer freeColServer = new FreeColServer(false, true, port, null, nationOptions, level);
+            if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
+                freeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
+            }
             FreeCol.getSpecification().applyDifficultyLevel(level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {

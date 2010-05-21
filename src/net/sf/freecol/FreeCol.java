@@ -137,6 +137,13 @@ public final class FreeCol {
     private static File mainUserDirectory = null;
 
     private static File saveDirectory;
+    /** Directory containing automatically created save games.
+     *  At program start, the path of this directory is based on the path
+     *  where to store regular save games. If the value of saveGame is
+     *  changed by the user during the game, then the value of 
+     *  autoSaveDirectory will not be effected. 
+     */
+    private static File autoSaveDirectory;
     
     private static File tcUserDirectory;
     
@@ -566,6 +573,19 @@ public final class FreeCol {
         } else {
             saveDirectory.mkdir();
         }
+        
+        autoSaveDirectory = new File(saveDirectory, "autosave");
+        if (autoSaveDirectory.exists()) {
+            if (autoSaveDirectory.isFile()) {
+                System.out.println("Could not create freecol/save/autosave under "
+                                   + System.getProperty("user.home") + " because there "
+                                   + "already exists a regular file with the same name.");
+                return null;
+            }
+        } else {
+            autoSaveDirectory.mkdir();
+        }
+        
         tcUserDirectory = new File(mainUserDirectory, tc);
         if (tcUserDirectory.exists()) {
             if (tcUserDirectory.isFile()) {
@@ -646,7 +666,7 @@ public final class FreeCol {
      * @return The directory.
      */
     public static File getAutosaveDirectory() {
-        return saveDirectory;
+        return autoSaveDirectory;
     }
 
     public static InputStream getSpecificationInputStream() throws IOException {

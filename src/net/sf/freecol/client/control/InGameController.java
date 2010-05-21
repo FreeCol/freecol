@@ -354,8 +354,13 @@ public final class InGameController implements NetworkConstants {
             int turnNumber = game.getTurn().getNumber();
             if (savegamePeriod <= 1
                 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+                String playernation= "";
+                if (player != null) {
+                    playernation = player.getName() + "_"
+                        + Messages.message(player.getNation().getNameKey()) + "_";
+                }
                 String filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                    + '-' + getSaveGameString(game.getTurn()) + ".fsg";
+                    + '-' + playernation + getSaveGameString(game.getTurn()) + ".fsg";
                 File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
                                              filename);
                 saveGame(saveGameFile);

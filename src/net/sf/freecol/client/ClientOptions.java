@@ -256,7 +256,15 @@ public class ClientOptions extends OptionMap {
      * autosaves are kept.
      */
     public static final String AUTOSAVE_GENERATIONS = "model.option.autosaveGenerations";
-
+    
+    
+    
+    /**
+     * Option for deleting autosaves when a new game is started. If set to 
+     * true, old autosaves will be deleted if a new game is started.
+     */
+    public static final String AUTOSAVE_DELETE = "model.option.autosaveDelete";
+    
     /**
      * Option for setting wether or not the fog of war should be displayed.
      */
