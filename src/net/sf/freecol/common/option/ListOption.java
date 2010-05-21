@@ -56,6 +56,7 @@ public class ListOption<T> extends AbstractOption {
     public ListOption(ListOptionSelector<T> selector, String id, OptionGroup optionGroup, T... defaultValues) {
         super(id);
         optionGroup.add(this);
+        setGroup(optionGroup.getId());
         value = new ArrayList<T>();
         this.selector = selector;
         for (T s : defaultValues) {

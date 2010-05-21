@@ -32,12 +32,8 @@ import net.sf.freecol.common.io.FreeColModFile.ModInfo;
  */
 public class Mods {
 
-    /**
-     * Gets all available mods.
-     * @return A list of mods.
-     */
-    public static List<FreeColModFile> getMods() {
-        final File[] fmods = FreeCol.getModsDirectory().listFiles(new FileFilter() {
+    public static final FileFilter MOD_FILTER =
+        new FileFilter() {
             public boolean accept(File f) {
                 final String name = f.getName();
                 if (f.isDirectory()) {
@@ -50,7 +46,14 @@ public class Mods {
                 }
                 return false;
             }
-        });
+        };
+
+    /**
+     * Gets all available mods.
+     * @return A list of mods.
+     */
+    public static List<FreeColModFile> getMods() {
+        final File[] fmods = FreeCol.getModsDirectory().listFiles(MOD_FILTER);
         final List<FreeColModFile> list = new ArrayList<FreeColModFile>(fmods.length);
         for (File f : fmods) {
             list.add(new FreeColModFile(f.getName()));

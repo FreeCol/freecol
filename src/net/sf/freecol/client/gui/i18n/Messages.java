@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -82,9 +84,19 @@ public class Messages {
 
         messageBundle = new Properties();
 
-        for (String fileName : getFileNames(language, country, variant)) {
-            File resourceFile = new File(getI18nDirectory(), fileName);
-            loadResources(resourceFile);
+        List<File> directories = new LinkedList<File>();
+        directories.add(getI18nDirectory());
+        for (File dir : FreeCol.getModsDirectory().listFiles()) {
+            if (dir.isDirectory()) {
+                directories.add(dir);
+            }
+        }        
+
+        for (File directory : directories) {
+            for (String fileName : getFileNames(language, country, variant)) {
+                File resourceFile = new File(directory, fileName);
+                loadResources(resourceFile);
+            }
         }
     }
 
