@@ -179,9 +179,8 @@ final class ReceivingThread extends Thread {
             }
         }
 
-        BufferedInputStream bis = new BufferedInputStream(in);
-
-        final int LOOK_AHEAD = 500;
+        final int LOOK_AHEAD = (FreeCol.isInDebugMode()) ? 50000 : 500;
+        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD*2);
         in.enable();
         bis.mark(LOOK_AHEAD);
 
