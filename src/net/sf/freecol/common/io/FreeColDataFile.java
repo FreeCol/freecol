@@ -135,8 +135,7 @@ public class FreeColDataFile {
             } else if (file.isDirectory()) {
                 return new File(file, filename).toURI();
             } else {
-                return new URI("jar:file:" + file.toURI().getSchemeSpecificPart()
-                               + "!/" + jarDirectory + filename);
+                return new URI("jar:file", file + "!/" + jarDirectory + filename, null);
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
