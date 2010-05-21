@@ -14,7 +14,7 @@
      0.36: change image-id of improvement action to string
      0.37: remove art element from tile-type
      0.38: remove overlay attribute from tileimprovement-type
-     0.39: remove color from nation
+     0.39: remove color from nation and add audio options
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
