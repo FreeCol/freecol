@@ -105,8 +105,11 @@ public class AudioMixerOption extends AbstractOption {
      *
      * @param newValue The new Value value.
      */
-    public final void setValue(final MixerWrapper newValue) {
+    public final void setValue(MixerWrapper newValue) {
         final MixerWrapper oldValue = this.value;
+        if (newValue == null) {
+            newValue = audioMixers.get(AUTO);
+        }
         this.value = newValue;
         if (!newValue.equals(oldValue)) {
             firePropertyChange("value", oldValue, value);
@@ -172,7 +175,7 @@ public class AudioMixerOption extends AbstractOption {
         if (value != null) {
             setValue(audioMixers.get(value));
         } else if (defaultValue != null) {
-            setValue(audioMixers.get(value));
+            setValue(audioMixers.get(defaultValue));
         } else {
             setValue(audioMixers.get(AUTO));
         }
