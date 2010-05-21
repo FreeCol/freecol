@@ -2024,6 +2024,11 @@
       <!-- Generate warning of stock exceeds this percentage of capacity. -->
       <integerOption id="model.option.highLevel" defaultValue="90" minimumValue="0" maximumValue="100"/>
     </optionGroup>
+    <optionGroup id="clientOptions.audio">
+      <audioMixerOption id="model.option.audioMixer"/>
+      <percentageOption id="model.option.musicVolume" defaultValue="100" previewEnabled="true"/>
+      <percentageOption id="model.option.sfxVolume" defaultValue="100" previewEnabled="true"/>
+    </optionGroup>
     <optionGroup id="clientOptions.other" >
       <!-- Option for autoload emigrants on saling to america. -->
       <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
