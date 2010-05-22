@@ -2127,6 +2127,7 @@
       <booleanOption id="model.option.guiShowColonyWarnings" defaultValue="true"/>
       <booleanOption id="model.option.guiShowPreCombat" defaultValue="true"/>
       <booleanOption id="model.option.guiShowTutorial" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowNotBestTile" defaultValue="true"/>
     </optionGroup>
     <optionGroup id="clientOptions.minimap" >
       <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->

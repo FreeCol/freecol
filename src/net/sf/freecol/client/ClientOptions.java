@@ -212,6 +212,8 @@ public class ClientOptions extends OptionMap {
 
     public static final String SHOW_PRECOMBAT = "model.option.guiShowPreCombat";
 
+    public static final String SHOW_NOT_BEST_TILE = "model.option.guiShowNotBestTile";
+
     /**
      * Use default values for savegames instead of displaying a dialog. <br>
      * <br>
@@ -306,21 +308,6 @@ public class ClientOptions extends OptionMap {
 
     public static final String USER_MODS ="userMods";
     
-    /** 
-    public static final String COLOR_BLACK = "black";
-
-    public static final String COLOR_VERY_DARK_GRAY = "gray.dark.very";
-
-    public static final String COLOR_DARK_GRAY = "gray.dark";
-
-    public static final String COLOR_GRAY = "gray";
-
-    public static final String COLOR_LIGHT_GRAY = "gray.light";
-
-    public static final String COLOR_VERY_LIGHT_GRAY = "gray.light.very";
-
-    public static final String COLOR_LIGHT_BLUE = "blue.light";
-
     /**
      * The Stock the custom house should keep when selling goods.
      */

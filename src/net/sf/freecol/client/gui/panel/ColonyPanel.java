@@ -1430,7 +1430,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             oldParent.remove(comp);
 
                             GoodsType workType = colonyTile.getWorkType(unit);
-                            ColonyTile bestTile = colony.getVacantColonyTileFor(unit, false, workType);
 
                             getController().work(unit, colonyTile);
                             // check whether worktype is suitable
@@ -1440,14 +1439,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                             ((UnitLabel) comp).setSmall(false);
 
-                            if (colonyTile != bestTile
-                                && (colonyTile.getProductionOf(unit, workType)
-                                    < bestTile.getProductionOf(unit, workType))) {
-                                StringTemplate template = StringTemplate.template("colonyPanel.notBestTile")
-                                    .addStringTemplate("%unit%", Messages.getLabel(unit))
-                                    .add("%goods%", workType.getNameKey())
-                                    .addStringTemplate("%tile%", bestTile.getLabel());
-                                getCanvas() .showInformationMessage(template);
+                            if (getClient().getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
+                                ColonyTile bestTile = colony.getVacantColonyTileFor(unit, false, workType);
+                                if (colonyTile != bestTile
+                                    && (colonyTile.getProductionOf(unit, workType)
+                                        < bestTile.getProductionOf(unit, workType))) {
+                                    StringTemplate template = StringTemplate.template("colonyPanel.notBestTile")
+                                        .addStringTemplate("%unit%", Messages.getLabel(unit))
+                                        .add("%goods%", workType.getNameKey())
+                                        .addStringTemplate("%tile%", bestTile.getLabel());
+                                    getCanvas().showInformationMessage(template);
+                                }
                             }
                         } else {
                             // could not add the unit on the tile
