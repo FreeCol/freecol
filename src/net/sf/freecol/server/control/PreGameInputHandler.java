@@ -46,10 +46,10 @@ import org.w3c.dom.Element;
  * @see PreGameController
  */
 public final class PreGameInputHandler extends InputHandler {
+
     private static Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
-
-
+    private boolean launching = false;
 
 
     /**
@@ -92,7 +92,11 @@ public final class PreGameInputHandler extends InputHandler {
         });
         register("requestLaunch", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
-                return requestLaunch(connection, element);
+            	Element reply = requestLaunch(connection, element);
+            	if (reply != null) {
+                    launching = false;
+            	}
+                return reply;
             }
         });
     }
@@ -248,6 +252,10 @@ public final class PreGameInputHandler extends InputHandler {
             reply.setAttribute("messageID", "server.onlyAdminCanLaunch");
             return reply;
         }
+        if (launching) {
+            return null;
+        }
+        launching = true;
         // Check that no two players have the same color or nation
         Iterator<Player> playerIterator = freeColServer.getGame().getPlayerIterator();
         LinkedList<Nation> nations = new LinkedList<Nation>();
