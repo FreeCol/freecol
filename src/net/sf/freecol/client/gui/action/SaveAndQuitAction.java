@@ -49,16 +49,12 @@ public class SaveAndQuitAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = getFreeColClient().getCanvas();
-        if (canvas.showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
-            if (canvas.showConfirmDialog("quitDialog.save.text", "yes", "no")) {
-                if (!freeColClient.isMapEditor()) {
-                    freeColClient.getInGameController().saveGame();
-                } else {
-                    freeColClient.getMapEditorController().saveGame();
-                }
-            }
-            freeColClient.quit();
+        if (!freeColClient.isMapEditor()) {
+            freeColClient.getInGameController().saveGame();
+        } else {
+            freeColClient.getMapEditorController().saveGame();
         }
+        freeColClient.quit();
     }
 }
 

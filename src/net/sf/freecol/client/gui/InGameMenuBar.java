@@ -130,7 +130,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ReportHighScoresAction.id));
         menu.add(getMenuItem(RetireAction.id));
         menu.add(getMenuItem(SaveAndQuitAction.id));
-//        menu.add(getMenuItem(QuitAction.id));
+        menu.add(getMenuItem(QuitAction.id));
 
         add(menu);
     }
