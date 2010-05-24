@@ -20,8 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
@@ -47,10 +48,10 @@ public final class ReportIndianPanel extends ReportPanel {
     public ReportIndianPanel(Canvas parent) {
         super(parent, Messages.message("reportIndianAction.name"));
         Player player = getMyPlayer();
-        reportPanel.setLayout(new MigLayout("wrap 1, fillx"));
+        reportPanel.setLayout(new MigLayout("wrap 5, fillx", "[]20px[center]", ""));
         for (Player opponent : getGame().getPlayers()) {
             if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
-                reportPanel.add(buildIndianAdvisorPanel(player, opponent));
+                buildIndianAdvisorPanel(player, opponent);
             }
         }
         scrollPane.getViewport().setOpaque(false);
@@ -64,54 +65,55 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param player a <code>Player</code> value
      * @param opponent a <code>Player</code> value
      */
-    private JPanel buildIndianAdvisorPanel(Player player, Player opponent) {
+    private void buildIndianAdvisorPanel(Player player, Player opponent) {
 
-        JPanel result = new JPanel(new MigLayout("wrap 4, fillx", "[]20px[]", ""));
-        result.setOpaque(false);
+        reportPanel.add(localizedLabel("report.indian.nameOfTribe"));
+        reportPanel.add(localizedLabel(opponent.getNationName()), "span 2, wrap");
+        reportPanel.add(localizedLabel("report.indian.chieftain"));
+        reportPanel.add(new JLabel(Messages.message(opponent.getName())), "span 2, wrap");
+        reportPanel.add(localizedLabel("report.indian.typeOfSettlements"));
+        reportPanel.add(localizedLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeKey()),
+                        "span 2, wrap");
+        reportPanel.add(localizedLabel("report.indian.numberOfSettlements"));
+        reportPanel.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "span 2, wrap");
+        reportPanel.add(new JLabel(Messages.message("report.indian.tension")+":"));
+        reportPanel.add(localizedLabel(opponent.getTension(player).toString()), "span 2, wrap");
 
-        result.add(localizedLabel("report.indian.nameOfTribe"));
-        result.add(localizedLabel(opponent.getNationName()), "span");
-        result.add(localizedLabel("report.indian.chieftain"));
-        result.add(new JLabel(Messages.message(opponent.getName())), "span");
-        result.add(localizedLabel("report.indian.typeOfSettlements"));
-        result.add(localizedLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeKey()), "span");
-        result.add(localizedLabel("report.indian.numberOfSettlements"));
-        result.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "span");
-        result.add(new JLabel(Messages.message("report.indian.tension")+":"));
-        result.add(localizedLabel(opponent.getTension(player).toString()), "span");
-
-        result.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
+        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
 
         boolean anyKnownSettlements = false;
-        if(opponent.getIndianSettlements().size() > 0) {
-                anyKnownSettlements = true;
-        }
-        
-        if(anyKnownSettlements) {
-            result.add(localizedLabel("Settlement"), "newline 10");
-            result.add(localizedLabel("report.indian.tension"));
-            result.add(localizedLabel("report.indian.skillTaught"));
-            result.add(localizedLabel("report.indian.tradeInterests"));
+        if (opponent.getIndianSettlements().size() > 0) {
+            reportPanel.add(localizedLabel("Settlement"), "newline 10");
+            reportPanel.add(localizedLabel("mission"));
+            reportPanel.add(localizedLabel("report.indian.tension"));
+            reportPanel.add(localizedLabel("report.indian.skillTaught"));
+            reportPanel.add(localizedLabel("report.indian.tradeInterests"));
 
-            
             for (IndianSettlement settlement : opponent.getIndianSettlements()) {
                 boolean known = settlement.getTile().isExplored();
                 boolean visited = settlement.hasBeenVisited(player);
                 String locationName = Messages.message(settlement.getNameFor(player));
                 if (known) {
-                    locationName += ((settlement.isCapital()) ? "*" : "")
-                        + ((settlement.getMissionary() != null) ? "+" : "")
-                        + " (" + settlement.getTile().getX()
-                        + ", " + settlement.getTile().getY() + ")";
+                    locationName += ((settlement.isCapital()) ? "*" : "");
                 }
-                result.add(new JLabel(locationName), "newline 15");
+                JButton settlementButton = getLinkButton(locationName, null, settlement.getTile().getId());
+                settlementButton.addActionListener(this);
+                reportPanel.add(settlementButton, "newline 15");
+
+                Unit missionary = settlement.getMissionary();
+                ImageIcon missionChip = null;
+                if (missionary != null) {
+                    boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                    missionChip = new ImageIcon(getLibrary().getMissionChip(missionary, expert, 1));
+                }
+                reportPanel.add(new JLabel(missionChip));
 
                 Tension tension = settlement.getAlarm(player);
                 String tensionString
                     = (!player.hasContacted(opponent)) ? "notContacted"
                     : (known && tension != null) ? tension.toString()
                     : "indianSettlement.tensionUnknown";
-                result.add(localizedLabel(tensionString));
+                reportPanel.add(localizedLabel(tensionString));
 
                 JLabel skillLabel = new JLabel();
                 UnitType skillType = settlement.getLearnableSkill();
@@ -128,29 +130,28 @@ public final class ReportIndianPanel extends ReportPanel {
                     skillString = "indianSettlement.skillUnknown";
                 }
                 skillLabel.setText(Messages.message(skillString));
-                result.add(skillLabel);
+                reportPanel.add(skillLabel);
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
                 if (visited && wantedGoods[0] != null) {
                     JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
                     goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
                     String split = "split " + String.valueOf(wantedGoods.length);
-                    result.add(goodsLabel, split);
+                    reportPanel.add(goodsLabel, split);
                     for (int i = 1; i < wantedGoods.length; i++) {
                         if (wantedGoods[i] != null) {
                             goodsLabel = localizedLabel(wantedGoods[i].getNameKey());
                             goodsLabel.setIcon(getLibrary().getScaledGoodsImageIcon(wantedGoods[i], 0.5));
-                            result.add(goodsLabel);
+                            reportPanel.add(goodsLabel);
                         }
                     }
                 } else {
-                    result.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
                 }
             }
         } else {
-            result.add(localizedLabel("report.indian.noKnownSettlements"));
+            reportPanel.add(localizedLabel("report.indian.noKnownSettlements"));
         }
-        result.add(new JSeparator(JSeparator.HORIZONTAL), "newline 10, span, growx");
-        return result;
+        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline 10, span, growx");
     }
 }
