@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -30,6 +33,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -81,32 +85,43 @@ public final class ReportIndianPanel extends ReportPanel {
 
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
 
-        boolean anyKnownSettlements = false;
-        if (opponent.getIndianSettlements().size() > 0) {
+        int numberOfSettlements = opponent.getIndianSettlements().size();
+        if (numberOfSettlements > 0) {
             reportPanel.add(localizedLabel("Settlement"), "newline 10");
             reportPanel.add(localizedLabel("mission"));
             reportPanel.add(localizedLabel("report.indian.tension"));
             reportPanel.add(localizedLabel("report.indian.skillTaught"));
             reportPanel.add(localizedLabel("report.indian.tradeInterests"));
-
+            List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(numberOfSettlements);
             for (IndianSettlement settlement : opponent.getIndianSettlements()) {
+                if (settlement.isCapital()) {
+                    settlements.add(0, settlement);
+                } else {
+                    settlements.add(settlement);
+                }
+            }
+            for (IndianSettlement settlement : settlements) {
                 boolean known = settlement.getTile().isExplored();
                 boolean visited = settlement.hasBeenVisited(player);
                 String locationName = Messages.message(settlement.getNameFor(player));
-                if (known) {
-                    locationName += ((settlement.isCapital()) ? "*" : "");
+                if (known && settlement.isCapital()) {
+                    locationName += "*";
                 }
                 JButton settlementButton = getLinkButton(locationName, null, settlement.getTile().getId());
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 
+                JLabel missionLabel = new JLabel();
                 Unit missionary = settlement.getMissionary();
-                ImageIcon missionChip = null;
                 if (missionary != null) {
                     boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                    missionChip = new ImageIcon(getLibrary().getMissionChip(missionary, expert, 1));
+                    missionLabel.setIcon(new ImageIcon(getLibrary().getMissionChip(missionary, expert, 1)));
+                    String text = Messages.message(StringTemplate.template("model.unit.nationUnit")
+                                                   .addStringTemplate("%nation%", missionary.getOwner().getNationName())
+                                                   .addStringTemplate("%unit%", Messages.getLabel(missionary)));
+                    missionLabel.setToolTipText(text);
                 }
-                reportPanel.add(new JLabel(missionChip));
+                reportPanel.add(missionLabel);
 
                 Tension tension = settlement.getAlarm(player);
                 String tensionString
