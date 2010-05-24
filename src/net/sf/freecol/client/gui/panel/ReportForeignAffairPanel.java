@@ -88,7 +88,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             enemyPanel.add(new JLabel(enemyElement.getAttribute("gold")));
 
             if (enemyElement.hasAttribute("tax")) {
-                enemyPanel.add(new JLabel(Messages.message("menuBar.colopedia.father")), "newline 8");
+                enemyPanel.add(new JLabel(Messages.message("report.continentalCongress.title")), "newline 8");
                 enemyPanel.add(new JLabel(enemyElement.getAttribute("foundingFathers")));
 
                 enemyPanel.add(new JLabel(Messages.message("tax")), "newline");
