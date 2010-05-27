@@ -45,7 +45,7 @@ public class MessagesTest extends FreeColTestCase {
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                + "A new colonist is born whenever a colony has 200 units of food or more.",
+                     + "A new colonist is born whenever a colony has 200 units of food or more.",
                      Messages.message("model.goods.food.description"));
 
         // Message not found
@@ -69,8 +69,8 @@ public class MessagesTest extends FreeColTestCase {
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                + "A new colonist is born whenever a colony has 200 units of food or more.", Messages.message(
-                "model.goods.food.description"));
+                     + "A new colonist is born whenever a colony has 200 units of food or more.", Messages.message(
+                                                                                                                   "model.goods.food.description"));
 
         try {
             Messages.message("menuBar.statusLine", "%tax%");
@@ -84,7 +84,7 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals(noSuchKey, Messages.message(noSuchKey));
         
         assertEquals(noSuchKey, Messages.message(noSuchKey, 
-                                            "%gold%", "silver", "%tax%", "13"));
+                                                 "%gold%", "silver", "%tax%", "13"));
     }
 
     public void testChangeLocaleSettings() {
@@ -104,17 +104,17 @@ public class MessagesTest extends FreeColTestCase {
         String message = Messages.message("model.history.FOUND_COLONY");
     	assertEquals(errMsg, expected, message);
         
-        String colNameWithSpecialChars="$specialColName";
+        String colNameWithSpecialChars="$specialColName\\";
         errMsg = "Wrong message";
-        expected = "You establish the colony of $specialColName.";
+        expected = "You establish the colony of $specialColName\\.";
         try{
-        	message = Messages.message("model.history.FOUND_COLONY","%colony%",colNameWithSpecialChars);
+            message = Messages.message("model.history.FOUND_COLONY","%colony%",colNameWithSpecialChars);
         }
         catch(IllegalArgumentException e){
-        	if(e.getMessage().contains("Illegal group reference")){
-        		fail("Does not process messages with special chars");
-        	}
-        	throw e;
+            if(e.getMessage().contains("Illegal group reference")){
+                fail("Does not process messages with special chars");
+            }
+            throw e;
         }
         assertEquals(errMsg, expected, message);
     }
