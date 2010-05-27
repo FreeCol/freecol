@@ -53,6 +53,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String BUILD_QUEUE_TAG = "buildQueueItem";
+    public static final String REARRANGE_WORKERS = "rearrangeWorkers";
     public static final int LIBERTY_PER_REBEL = 200;
     public static final int FOOD_PER_COLONIST = 200;
 
@@ -320,6 +321,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             updateProductionBonus();
         }
         if (difference != 0) {
+            firePropertyChange(REARRANGE_WORKERS, true, false);
             firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
                                population - difference, population);
         }
@@ -1993,6 +1995,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 int waste = (goods.getAmount() + getProductionNetOf(goodsType) -
                              getWarehouseCapacity());
                 if (waste > 0) {
+                    firePropertyChange(REARRANGE_WORKERS, false, true);
                     getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
                                                                 "model.building.warehouseSoonFull",
                                                                 this, goodsType)
@@ -2198,6 +2201,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                                                     "model.colony.cannotBuild",
                                                                     this)
                                         .addName("%colony%", getName()));
+                        firePropertyChange(REARRANGE_WORKERS, false, true);
                     }
                 }
             } else if (currentlyBuilding.getPopulationRequired() > getUnitCount()) {
@@ -2207,6 +2211,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                                             this)
                                 .addName("%colony%", getName())
                                 .add("%building%", currentlyBuilding.getNameKey()));
+                firePropertyChange(REARRANGE_WORKERS, false, true);
             }
         }
         

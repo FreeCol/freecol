@@ -122,7 +122,8 @@ public class AIColonyTest extends FreeColTestCase {
        
         AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
         ServerPlayer player = (ServerPlayer) colony.getOwner();
-        
+
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         
         assertTrue("Colony should have been assigned a lumberjack",colony.getProductionOf(lumberType) > 0);
@@ -131,6 +132,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Simulate that enough hammers have been gathered, re-arrange and re-check
         colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
         
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         assertFalse("Colony does not need a carpenter",carpenterHouse.getUnitCount() > 0);
         assertTrue("Colony should have been assigned a ore miner",colony.getProductionOf(oreType) > 0);
@@ -192,6 +194,7 @@ public class AIColonyTest extends FreeColTestCase {
         AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
         ServerPlayer player = (ServerPlayer) colony.getOwner();
         
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         
         assertFalse("Colony couldnt have been assigned a lumberjack, no lumber",colony.getProductionOf(lumberType) > 0);
@@ -199,6 +202,7 @@ public class AIColonyTest extends FreeColTestCase {
         
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, fullStock);
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         
         assertFalse("Colony couldnt have been assigned a lumberjack, no lumber",colony.getProductionOf(lumberType) > 0);
@@ -207,6 +211,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Simulate that enough hammers have been gathered, re-arrange and re-check
         colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
         
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         assertFalse("Colony does not need a carpenter",carpenterHouse.getUnitCount() > 0);
         assertFalse("Colony couldnt have been assigned a ore miner, no ore",colony.getProductionOf(oreType) > 0);
@@ -214,6 +219,7 @@ public class AIColonyTest extends FreeColTestCase {
                
         // Add ore to stock, re-arrange and re-check
         colony.addGoods(oreType, fullStock);
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         
         assertFalse("Colony couldnt have been assigned a ore miner, no ore",colony.getProductionOf(oreType) > 0);
@@ -258,6 +264,7 @@ public class AIColonyTest extends FreeColTestCase {
                        
         AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
 
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
                 
         final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
@@ -266,6 +273,7 @@ public class AIColonyTest extends FreeColTestCase {
                 
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, fullStock);
+        aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         
         String errMsg = "Lumberjack should not have been assigned to collect lumber, enough lumber in the colony";

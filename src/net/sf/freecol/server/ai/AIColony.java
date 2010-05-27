@@ -19,6 +19,9 @@
 
 package net.sf.freecol.server.ai;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +69,7 @@ import org.w3c.dom.Element;
 /**
  * Objects of this class contains AI-information for a single {@link Colony}.
  */
-public class AIColony extends AIObject {
+public class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
 
@@ -85,6 +88,12 @@ public class AIColony extends AIObject {
 
     private ArrayList<TileImprovementPlan> tileImprovementPlans = new ArrayList<TileImprovementPlan>();
 
+    /**
+     * Records whether the workers in this Colony need to be
+     * rearranged.
+     */
+    private boolean rearrangeWorkers = false;
+
 
     /**
      * Creates a new <code>AIColony</code>.
@@ -96,7 +105,8 @@ public class AIColony extends AIObject {
         super(aiMain, colony.getId());
 
         this.colony = colony;
-        colonyPlan = new ColonyPlan(aiMain, colony);        
+        colonyPlan = new ColonyPlan(aiMain, colony);
+        colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
     }
 
     /**
@@ -797,6 +807,11 @@ public class AIColony extends AIObject {
      */
     public void rearrangeWorkers(Connection connection) {
         colonyPlan.create();
+
+        if (!rearrangeWorkers) {
+            logger.fine("No need to rearrange workers in " + colony.getName() + ".");
+            return;
+        }
         
         // TODO: Detect a siege and move the workers temporarily around.
 
@@ -1130,6 +1145,9 @@ public class AIColony extends AIObject {
             // something bad happened, there is no remaining unit working in the colony
             throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
         }
+
+        // no need to rearrange workers again immediately
+        rearrangeWorkers = false;
     }
 
     private void checkForUnequippedExpertPioneer() {
@@ -1415,6 +1433,12 @@ public class AIColony extends AIObject {
                         + " will build " + buildable.getId());
         }
     }
+
+    public void propertyChange(PropertyChangeEvent event) {
+        logger.finest("Property change REARRANGE_WORKERS fired.");
+        rearrangeWorkers = true;
+    }
+
 
     /**
      * Writes this object to an XML stream.
