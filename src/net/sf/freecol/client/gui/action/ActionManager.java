@@ -177,10 +177,6 @@ public class ActionManager extends OptionGroup {
      * @see FreeColAction
      */
     public void update() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("update() should only be called from the " + 
-                    "event dispatcher thread.");
-        }
         Iterator<Option> it = iterator();
         while (it.hasNext()) {
             FreeColAction fa = (FreeColAction) it.next();
