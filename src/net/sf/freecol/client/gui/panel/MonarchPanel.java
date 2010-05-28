@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -40,12 +39,6 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
     private static final Logger logger = Logger.getLogger(MonarchPanel.class.getName());
 
-    private static final int OK = 0;
-
-    private static final int CANCEL = 1;
-
-    private final JButton okButton;
-
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -55,15 +48,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
         super(parent);
 
-        okButton = new JButton(Messages.message("ok"));
-        okButton.setActionCommand(String.valueOf(OK));
-        okButton.addActionListener(this);
-
-        JButton cancelButton = new JButton();
-        cancelButton.setActionCommand(String.valueOf(CANCEL));
-        cancelButton.addActionListener(this);
-
-        setLayout(new MigLayout("wrap 2", "", ""));
+        setLayout(new MigLayout("wrap 2"));
 
         JLabel header = new JLabel(Messages.message("aMessageFromTheCrown"));
         header.setFont(mediumHeaderFont);
@@ -124,31 +109,21 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         setSize(getPreferredSize());
     }
 
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      * 
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                setResponse(new Boolean(true));
-                break;
-            case CANCEL:
-                setResponse(new Boolean(false));
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+        if (OK.equals(command)) {
+            setResponse(new Boolean(true));
+        } else if (CANCEL.equals(command)) {
+            setResponse(new Boolean(false));
+        } else {
+            logger.warning("Invalid action command: " + command);
         }
     }
 
