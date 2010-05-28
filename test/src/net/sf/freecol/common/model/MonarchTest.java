@@ -62,12 +62,13 @@ public class MonarchTest extends FreeColTestCase {
         assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));
         assertFalse(choicesContain(choices, MonarchAction.LOWER_TAX));
 
-        dutch.setTax(Monarch.MAXIMUM_TAX_RATE / 2);
+        int maximumTax = spec().getIntegerOption("model.option.maximumTax").getValue();
+        dutch.setTax(maximumTax / 2);
         choices = dutch.getMonarch().getActionChoices();
         assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));
         assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX));
 
-        dutch.setTax(Monarch.MAXIMUM_TAX_RATE + 2);
+        dutch.setTax(maximumTax + 2);
         choices = dutch.getMonarch().getActionChoices();
         assertFalse(choicesContain(choices, MonarchAction.RAISE_TAX));
         assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX));

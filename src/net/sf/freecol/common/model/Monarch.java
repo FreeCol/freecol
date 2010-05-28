@@ -81,12 +81,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     private List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
 
     /** The minimum price for mercenaries. */
-    public static final int MINIMUM_PRICE = 100;
-
-    /**
-     * The maximum possible tax rate (given in percentage).
-     */
-    public static final int MAXIMUM_TAX_RATE = 75;
+    public static final int MINIMUM_PRICE = 300;
 
     /**
      * The minimum tax rate (given in percentage) from where it
@@ -255,7 +250,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         // do nothing
         choices.add(new RandomChoice<MonarchAction>(MonarchAction.NO_ACTION, Math.max(200 - turn, 100)));
 
-        if (player.getTax() < MAXIMUM_TAX_RATE) {
+        if (player.getTax() < Specification.getSpecification()
+            .getIntegerOption("model.option.maximumTax").getValue()) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.RAISE_TAX, 10 + dx));
         }
 
@@ -335,7 +331,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             // later in the game, the taxes will increase by more
             int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
             newTax = player.getTax() + increase;
-            newTax = Math.min(newTax, MAXIMUM_TAX_RATE);
+            newTax = Math.min(newTax, Specification.getSpecification()
+                              .getIntegerOption("model.option.maximumTax").getValue());
             break;
         case LOWER_TAX:
             adjustment = Math.max(1, 10 - taxAdjustment); // 5-10
@@ -482,7 +479,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
     }
 
-    public int getPrice(UnitType unitType, Role role) {
+    private int getPrice(UnitType unitType, Role role) {
         if (unitType.hasPrice()) {
             int price = player.getEurope().getUnitPrice(unitType);
             if (Role.SOLDIER.equals(role)) {
@@ -491,10 +488,10 @@ public final class Monarch extends FreeColGameObject implements Named {
                 price += getEquipmentPrice(muskets);
                 price += getEquipmentPrice(horses);
             }
-            return price / 10 + Specification.getSpecification()
-                .getIntegerOption("model.option.mercenaryPrice").getValue();
+            return price * Specification.getSpecification()
+                .getIntegerOption("model.option.mercenaryPrice").getValue() / 100;
         } else {
-            return 1000000;
+            return Integer.MAX_VALUE;
         }
     }
 

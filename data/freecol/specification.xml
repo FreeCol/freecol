@@ -1561,7 +1561,8 @@
       <integerOption id="model.option.monarchMeddling" value="0"/>
       <integerOption id="model.option.refStrength" value="0"/>
       <integerOption id="model.option.taxAdjustment" value="0"/>
-      <integerOption id="model.option.mercenaryPrice" value="25"/>
+      <integerOption id="model.option.mercenaryPrice" value="50"/>
+      <integerOption id="model.option.maximumTax" value="50"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="veryHigh" />
@@ -1587,7 +1588,8 @@
       <integerOption id="model.option.refStrength" value="2"/>
       <integerOption id="model.option.monarchMeddling" value="1"/>
       <integerOption id="model.option.taxAdjustment" value="1"/>
-      <integerOption id="model.option.mercenaryPrice" value="50"/>
+      <integerOption id="model.option.mercenaryPrice" value="60"/>
+      <integerOption id="model.option.maximumTax" value="60"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="high" />
@@ -1612,7 +1614,8 @@
       <integerOption id="model.option.refStrength" value="4"/>
       <integerOption id="model.option.monarchMeddling" value="2"/>
       <integerOption id="model.option.taxAdjustment" value="2"/>
-      <integerOption id="model.option.mercenaryPrice" value="75"/>
+      <integerOption id="model.option.mercenaryPrice" value="65"/>
+      <integerOption id="model.option.maximumTax" value="65"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="medium" />
@@ -1636,7 +1639,8 @@
       <integerOption id="model.option.refStrength" value="6"/>
       <integerOption id="model.option.monarchMeddling" value="3"/>
       <integerOption id="model.option.taxAdjustment" value="3"/>
-      <integerOption id="model.option.mercenaryPrice" value="100"/>
+      <integerOption id="model.option.mercenaryPrice" value="70"/>
+      <integerOption id="model.option.maximumTax" value="70"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="low" />
@@ -1659,7 +1663,8 @@
       <integerOption id="model.option.refStrength" value="8"/>
       <integerOption id="model.option.monarchMeddling" value="4"/>
       <integerOption id="model.option.taxAdjustment" value="4"/>
-      <integerOption id="model.option.mercenaryPrice" value="125"/>
+      <integerOption id="model.option.mercenaryPrice" value="75"/>
+      <integerOption id="model.option.maximumTax" value="75"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <stringOption  id="model.option.tileProduction" value="veryLow" />
@@ -1682,7 +1687,8 @@
       <integerOption id="model.option.refStrength" value="8" minimumValue="0" maximumValue="100"/>
       <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
       <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
-      <integerOption id="model.option.mercenaryPrice" value="125" minimumValue="0" maximumValue="1000"/>
+      <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
+      <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="veryLow">
