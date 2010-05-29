@@ -1942,6 +1942,11 @@
         <!-- Whether to display the tile regions. -->
         <selectValue label="clientOptions.gui.displayTileText.regions" value="3"/>
       </selectOption>
+      <selectOption id="model.option.displayColonyLabels" defaultValue="1" localizedLabels="true">
+        <selectValue label="clientOptions.gui.displayColonyLabels.none" value="0"/>
+        <selectValue label="clientOptions.gui.displayColonyLabels.classic" value="1"/>
+        <selectValue label="clientOptions.gui.displayColonyLabels.modern" value="2"/>
+      </selectOption>
       <!-- Used by GUI to sort colonies. -->
       <selectOption id="model.option.colonyComparator" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.colonyComparator.byName" value="0"/>

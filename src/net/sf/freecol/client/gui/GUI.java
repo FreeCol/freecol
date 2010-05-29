@@ -41,6 +41,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1290,6 +1291,8 @@ public final class GUI {
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
 
+        int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
+
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -1410,7 +1413,8 @@ public final class GUI {
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
-                displayTileOverlays(g, map, tile, xx, yy, true, true);
+                displayTileOverlays(g, map, tile, xx, yy, true,
+                                    (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC));
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
@@ -1466,25 +1470,66 @@ public final class GUI {
         ======
         Display the colony names.
         */
-        //xx = 0;
-        yy = clipTopY;
-        // Row per row; start with the top modified row
-        for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = getXOffset(clipLeftX, tileY);
+        if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
+            //xx = 0;
+            yy = clipTopY;
+            // Row per row; start with the top modified row
+            for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
+                xx = getXOffset(clipLeftX, tileY);
 
-            // Column per column; start at the left side
-            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                Tile tile = map.getTile(tileX, tileY);
-                if (tile != null && tile.getSettlement() != null) {
-                    Settlement settlement = tile.getSettlement();
-                    Image stringImage = createSettlementNameImage(g, settlement);
-                    g.drawImage(stringImage,
-                                xx + (tileWidth - stringImage.getWidth(null))/2 + 1,
-                                yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
+                // Column per column; start at the left side
+                for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
+                    Tile tile = map.getTile(tileX, tileY);
+                    if (tile != null && tile.getSettlement() != null) {
+                        Settlement settlement = tile.getSettlement();
+                        String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
+                        Color backgroundColor = lib.getColor(settlement.getOwner());
+                        Font font = ((Font)UIManager.get("NormalFont")).deriveFont(18.0f);
+                        int yOffset = yy + lib.getSettlementImage(settlement).getHeight(null) + 1;
+                        switch(colonyLabels) {
+                        case ClientOptions.COLONY_LABELS_CLASSIC:
+                            Font oldFont = g.getFont();
+                            g.setFont(font);
+                            Image stringImage = createStringImage((Graphics2D) g, name,
+                                                             backgroundColor, -1, 18);
+                            g.setFont(oldFont);
+                            g.drawImage(stringImage,
+                                        xx + (tileWidth - stringImage.getWidth(null))/2 + 1,
+                                        yOffset, null);
+                            break;
+                        case ClientOptions.COLONY_LABELS_MODERN:
+                            backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
+                                                        backgroundColor.getBlue(), 128);
+
+                            Image nameImage = createLabel(g, name, font, backgroundColor);
+
+                            int spacing = 2;
+                            if (settlement instanceof Colony) {
+                                String size = Integer.toString(((Colony) settlement).getUnitCount());
+                                int bonusProduction = ((Colony) settlement).getProductionBonus();
+                                String bonus = bonusProduction > 0 ? "+" + bonusProduction
+                                    : Integer.toString(bonusProduction);
+                                Image sizeImage = createLabel(g, size, font, backgroundColor);
+                                Image bonusImage = createLabel(g, bonus, font, backgroundColor);
+                                int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
+                                    + bonusImage.getWidth(null) + 2 * spacing;
+                                int labelOffset = xx + (tileWidth - width)/2;
+                                g.drawImage(sizeImage, labelOffset, yOffset, null);
+                                labelOffset += sizeImage.getWidth(null) + spacing;
+                                g.drawImage(nameImage, labelOffset, yOffset, null);
+                                labelOffset += nameImage.getWidth(null) + spacing;
+                                g.drawImage(bonusImage, labelOffset, yOffset, null);
+                            } else {
+                                int labelOffset = xx + (tileWidth - nameImage.getWidth(null))/2;
+                                g.drawImage(nameImage, labelOffset, yOffset, null);
+                            }
+                            break;
+                        }
+                    }
+                    xx += tileWidth;
                 }
-                xx += tileWidth;
+                yy += halfHeight;
             }
-            yy += halfHeight;
         }
 
         /*
@@ -1783,21 +1828,31 @@ public final class GUI {
     }
     */
     
-    private Image createSettlementNameImage(Graphics g, Settlement settlement) {        
-        Font oldFont = g.getFont();
-        g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
-        Image result = createStringImage((Graphics2D) g,
-                                         Messages.message(settlement.getNameFor(freeColClient.getMyPlayer())),
-                                         lib.getColor(settlement.getOwner()),
-                -1,
-                18);
-        //      BufferedImage result = createStringImage(null, (Graphics2D) g,
-        //        settlement.getNameFor(freeColClient.getMyPlayer()),
-        //        ((Font)UIManager.get("BoldFont")).deriveFont(18.0f),
-        //        settlement.getOwner().getColor());
-        g.setFont(oldFont);
-        return result;
+    private Image createLabel(Graphics2D g, String text, Font font, Color backgroundColor) {
+        String key = text + font.getName() + backgroundColor.getRGB();
+        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        if (image != null) {
+            return image;
+        }
+        TextLayout label = new TextLayout(text, font, g.getFontRenderContext());
+        int padding = 10;
+        int width = (int) label.getBounds().getWidth() + padding;
+        int height = (int) (label.getAscent() + label.getDescent()) + padding;
+
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+
+        g2.setColor(backgroundColor);
+        g2.fill(new RoundRectangle2D.Float(0, 0, width, height, padding, padding));
+        g2.setColor(getForegroundColor(backgroundColor));
+        label.draw(g2, padding/2, label.getAscent() + padding/2);
+        ResourceManager.getGameMapping().add(key, new ImageResource(bi));
+        return bi;
     }
+
 
     /**
     * Draws a road, between the given points, on the provided <code>Graphics</code>.

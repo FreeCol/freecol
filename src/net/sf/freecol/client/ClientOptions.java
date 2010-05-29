@@ -360,6 +360,15 @@ public class ClientOptions extends OptionMap {
     public static final int UNLOAD_OVERFLOW_RESPONSE_ALWAYS = 2;
 
     /**
+     * Style of colony labels.
+     */
+    public static final String COLONY_LABELS = "model.option.displayColonyLabels";
+    public static final int COLONY_LABELS_NONE = 0;
+    public static final int COLONY_LABELS_CLASSIC = 1;
+    public static final int COLONY_LABELS_MODERN = 2;
+
+
+    /**
      * Comparators for sorting colonies.
      */
     private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {
