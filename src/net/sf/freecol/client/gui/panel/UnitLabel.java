@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
@@ -275,10 +277,11 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
                                                       "%turns%", Integer.toString(unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
+                Font font = ((Font) UIManager.get("NormalFont")).deriveFont(14f);
                 Image repairImage1 = parent.getGUI()
-                    .createStringImage((Graphics2D)g, underRepair1, Color.RED, getWidth(), 14);
+                    .createStringImage((Graphics2D)g, underRepair1, Color.RED, font);
                 Image repairImage2 = parent.getGUI()
-                    .createStringImage((Graphics2D)g, underRepair2, Color.RED, getWidth(), 14);
+                    .createStringImage((Graphics2D)g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
                 int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(null),
                                                       getWidth() - repairImage2.getWidth(null)));

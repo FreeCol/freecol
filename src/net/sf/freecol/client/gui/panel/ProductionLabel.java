@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
@@ -439,7 +440,8 @@ public final class ProductionLabel extends JComponent {
             if (maximumProduction > production && production > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            stringImage = parent.getGUI().createStringImage(this, number, getForeground(), -1, 12);
+            Font font = ((Font) UIManager.get("NormalFont")).deriveFont(Font.BOLD, 12.0f);
+            stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
             stringWidth = stringImage.getWidth(null);
         }
 

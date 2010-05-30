@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
@@ -511,7 +512,8 @@ public final class ProductionMultiplesLabel extends JComponent {
             if (maximumProduction > totalProduction && totalProduction > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            Image stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
+            Font font = ((Font) UIManager.get("NormalFont")).deriveFont(Font.BOLD, 12.0f);
+            Image stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
             int textOffset = leftOffset + (coverage - stringImage.getWidth(null))/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,

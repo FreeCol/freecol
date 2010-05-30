@@ -1218,6 +1218,7 @@ public final class GUI {
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
         if (gotoPath != null) {
             PathNode temp = gotoPath;
+            Font font = ((Font) UIManager.get("NormalFont")).deriveFont(12.0f);
             while (temp != null) {
                 Point p = getTilePosition(temp.getTile());
                 if (p != null) {
@@ -1256,7 +1257,7 @@ public final class GUI {
                     }                
                     if (temp.getTurns() > 0) {
                         Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
-                                                              textColor, tileWidth, 12);
+                                                              textColor, font);
                         centerImage(g, stringImage, p.x, p.y);
                     }
                 }                    
@@ -1488,11 +1489,7 @@ public final class GUI {
                         int yOffset = yy + lib.getSettlementImage(settlement).getHeight(null) + 1;
                         switch(colonyLabels) {
                         case ClientOptions.COLONY_LABELS_CLASSIC:
-                            Font oldFont = g.getFont();
-                            g.setFont(font);
-                            Image stringImage = createStringImage((Graphics2D) g, name,
-                                                             backgroundColor, -1, 18);
-                            g.setFont(oldFont);
+                            Image stringImage = createStringImage(g, name, backgroundColor, font);
                             g.drawImage(stringImage,
                                         xx + (tileWidth - stringImage.getWidth(null))/2 + 1,
                                         yOffset, null);
@@ -1579,14 +1576,16 @@ public final class GUI {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             synchronized (this) {
-                Image si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
+                Font font = ((Font) UIManager.get("NormalFont")).deriveFont(12.0f);
+                GUIMessage message = getMessage(0);
+                Image si = createStringImage(g, message.getMessage(), message.getColor(), font);
 
-                yy = size.height - 300 - getMessageCount() * si.getHeight(null);// 200 ;
+                yy = size.height - 300 - getMessageCount() * si.getHeight(null);
                 xx = 40;
 
-                for (int i = 0; i < getMessageCount(); i++) {
-                    GUIMessage message = getMessage(i);
-                    g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12),
+                for (int i = 1; i < getMessageCount(); i++) {
+                    message = getMessage(i);
+                    g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), font),
                                 xx, yy, null);
                     yy += si.getHeight(null);
                 }
@@ -1653,94 +1652,40 @@ public final class GUI {
     }
 
     /**
-    * Creates an image with a string of a given color and with 
-    * a black border around the glyphs.
-    *
-    * @param g A <code>Graphics</code>-object for getting a
-    *       <code>Font</code>.
-    * @param nameString The <code>String</code> to make an image of.
-    * @param color The <code>Color</code> to use when displaying 
-    *       the <code>nameString</code>.
-    * @param maxWidth The maximum width of the image. The size of 
-    *       the <code>Font</code> will be adjusted if the image gets 
-    *       larger than this value.
-    * @param preferredFontSize The preferred font size.
-    * @return The image that was created.
-    */
-    public Image createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
-        return createStringImage(null, g, nameString, color, maxWidth, preferredFontSize);
-    }
-    
-    /**
      * Creates an image with a string of a given color and with 
      * a black border around the glyphs.
      *
-     * @param c A <code>JComponent</code>-object for getting a
-     *       <code>Font</code>.
-     * @param nameString The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use when displaying 
-     *       the <code>nameString</code>.
-     * @param maxWidth The maximum width of the image. The size of 
-     *       the <code>Font</code> will be adjusted if the image gets 
-     *       larger than this value.
-     * @param preferredFontSize The preferred font size.
-     * @return The image that was created.
-     */
-    public Image createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
-        return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
-    }
-    
-    
-    /**
-     * Creates an image with a string of a given color and with 
-     * a black border around the glyphs.
-     *
-     * @param c A <code>JComponent</code>-object for getting a
-     *       <code>Font</code>.
      * @param g A <code>Graphics</code>-object for getting a
      *       <code>Font</code>.
      * @param nameString The <code>String</code> to make an image of.
      * @param color The <code>Color</code> to use when displaying 
      *       the <code>nameString</code>.
-     * @param maxWidth The maximum width of the image. The size of 
-     *       the <code>Font</code> will be adjusted if the image gets 
-     *       larger than this value.
-     * @param preferredFontSize The preferred font size.
+     * @param font a <code>Font</code> value
      * @return The image that was created.
      */
-    private Image createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {
+    public Image createStringImage(Graphics g, String nameString, Color color, Font font) {
         if (color == null) {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
         }
 
         // Lookup in the cache if the image has been generated already
-        Font nameFont = (c != null) ? c.getFont() : g.getFont();
-        String key = nameString + nameFont.getFontName() + color.getRGB();
+        String key = nameString + font.getFontName() + color.getRGB();
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
             return image;
         }
 
         // create an image of the appropriate size
-        BufferedImage bi;
-        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-        int fontSize = preferredFontSize;
-        do {
-            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);
-            nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, 
-                                   nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(),
-                                   BufferedImage.TYPE_INT_ARGB);
-            fontSize -= 2;
-        } while (maxWidth > 0 && bi.getWidth() > maxWidth);
-
-
+        FontMetrics fontMetrics = g.getFontMetrics(font);
+        BufferedImage bi = new BufferedImage(fontMetrics.stringWidth(nameString) + 4, 
+                                             fontMetrics.getMaxAscent() + fontMetrics.getMaxDescent(),
+                                             BufferedImage.TYPE_INT_ARGB);
         // draw the string with selected color
         Graphics2D big = bi.createGraphics();
         big.setColor(color);
-        big.setFont(nameFont);
-        big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
+        big.setFont(font);
+        big.drawString(nameString, 2, fontMetrics.getMaxAscent());
 
         // draw the border around letters
         int textColor = color.getRGB();
@@ -2405,9 +2350,8 @@ public final class GUI {
                         Color theColor = ResourceManager
                             .getColor("productionBonus." + ((Colony) settlement).getProductionBonus()
                                       + ".color");
-
-                        g.setFont(new Font("Dialog", Font.BOLD, 12));
-                        Image stringImage = createStringImage(g, populationString, theColor, tileWidth, 12);
+                        Font font = new Font("Dialog", Font.BOLD, 12);
+                        Image stringImage = createStringImage(g, populationString, theColor, font);
                         centerImage(g, stringImage, x, y);
                     }
                     g.setColor(Color.BLACK);
