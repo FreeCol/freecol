@@ -2355,7 +2355,7 @@ public final class GUI {
                         Image stringImage = createStringImage(g, populationString, theColor, font);
                         centerImage(g, stringImage, x, y);
                     }
-                    g.setColor(Color.BLACK);
+                    //g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
                     IndianSettlement indianSettlement = (IndianSettlement) settlement;
                     Image settlementImage = lib.getSettlementImage(settlement);
@@ -2364,43 +2364,34 @@ public final class GUI {
                     centerImage(g, settlementImage, x, y);
 
                     // Draw the color chip for the settlement.
-                    g.drawImage(lib.getColorChip(settlement, lib.getScalingFactor()),
-                                x + (int) (STATE_OFFSET_X * lib.getScalingFactor()),
-                                y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);
+                    String text = indianSettlement.isCapital() ? "*" : "-";
+                    Color background = lib.getColor(indianSettlement.getOwner());
+                    Color foreground = getForegroundColor(background);
+                    Image chip = createChip(text, Color.BLACK, background, foreground);
+                    float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
+                    float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
+                    g.drawImage(chip, (int) (x + xOffset), (int) (y + yOffset), null);
+                    xOffset += chip.getWidth(null) + 2;
 
                     // Draw the mission chip if needed.
                     Unit missionary = indianSettlement.getMissionary();
                     if (missionary != null) {
                         boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                        g.drawImage(lib.getMissionChip(missionary, expert, lib.getScalingFactor()),
-                                    x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
-                                    (MISSION_OFFSET_X - STATE_OFFSET_X),
-                                    y + (int) (MISSION_OFFSET_Y * lib.getScalingFactor()), null);
+                        Color mission = (expert ? Color.BLACK : Color.GRAY);
+                        Color cross = lib.getColor(missionary.getOwner());
+                        chip = createChip("\u271D", Color.BLACK, mission, cross);
+                        g.drawImage(chip, (int) (x + xOffset), (int) (y + yOffset), null);
+                        xOffset += chip.getWidth(null) + 2;
                     }
 
                     // Draw the alarm chip if needed.
                     if (freeColClient.getMyPlayer() != null) {
                         Tension alarm = indianSettlement.getAlarm(freeColClient.getMyPlayer());
                         if (alarm != null) {
-                            // TODO: make it work
                             final boolean visited = indianSettlement.hasBeenVisited(freeColClient.getMyPlayer());
-                            g.drawImage(lib.getAlarmChip(alarm.getLevel(), visited, lib.getScalingFactor()),
-                                        x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
-                                        (ALARM_OFFSET_X - STATE_OFFSET_X),
-                                        y + (int) (ALARM_OFFSET_Y  * lib.getScalingFactor()), null);
+                            chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
+                            g.drawImage(chip, (int) (x + xOffset), (int) (y + yOffset), null);
                         }
-                    }
-
-                    g.setColor(Color.BLACK);
-                    if (indianSettlement.isCapital()) {
-                        // TODO: make this look nicer
-                        g.drawString("*",
-                                     x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X + 1,
-                                     y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y + 2);
-                    } else {
-                        g.drawString("-", 
-                                     x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X,
-                                     y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
                     }
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
@@ -2703,7 +2694,7 @@ public final class GUI {
      */
     public Image createChip(String text, Color border, Color background, Color foreground) {
         // Draw it and put it in the cache
-        Font font = ((Font) UIManager.get("NormalFont")).deriveFont(12f * lib.getScalingFactor());
+        Font font = new Font("Default", Font.BOLD, (int) (12 * lib.getScalingFactor()));
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
@@ -2719,7 +2710,7 @@ public final class GUI {
         g2.setColor(background);
         g2.fillRect(1, 1, width - 2, height - 2);
         g2.setColor(foreground);
-        label.draw(g2, padding/2, label.getAscent() + padding/2);
+        label.draw(g2, (float) (padding/2 - label.getBounds().getX()), label.getAscent() + padding/2);
         return bi.getSubimage(0, 0, width, height);
     }
 
