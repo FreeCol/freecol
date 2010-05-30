@@ -268,9 +268,7 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
                    getParent() instanceof EuropePanel.InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
-            int x = (getWidth() - getIcon().getIconWidth()) / 2;
-            int y = (getHeight() - getIcon().getIconHeight()) / 2;
-            parent.getGUI().displayOccupationIndicator(g, unit, x, y);
+            g.drawImage(parent.getGUI().getOccupationIndicatorImage(g, unit), 0, 0, null);
 
             if (unit.isUnderRepair()) {
                 String underRepair = Messages.message("underRepair",

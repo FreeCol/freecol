@@ -1936,7 +1936,8 @@ public final class GUI {
             g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
                     (y + halfHeight) - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
-            displayOccupationIndicator(g, occupyingUnit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
+            g.drawImage(getOccupationIndicatorImage(g, occupyingUnit),
+                        x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y, null);
         }
     }
 
@@ -2653,7 +2654,7 @@ public final class GUI {
         return -1;
     }
     
-    private Image getOccupationIndicatorImage(Unit unit) {
+    public Image getOccupationIndicatorImage(Graphics g, Unit unit) {
         Color backgroundColor = lib.getColor(unit.getOwner());
         Color foregroundColor = getForegroundColor(backgroundColor);
         String occupationString;
@@ -2685,17 +2686,43 @@ public final class GUI {
         String key = backgroundColor.toString() + occupationString;
         Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img == null) {
-            // Draw it and put it in the cache
-            Image chip = lib.getColorChip(unit, lib.getScalingFactor());
-            img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-            Graphics g = img.getGraphics();
-            g.drawImage(chip, 0, 0, null);
-            g.setColor(foregroundColor);
-            g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
+            img = createChip(occupationString, Color.BLACK, backgroundColor, foregroundColor);
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;
     }
+
+    /**
+     * Create a "chip" with the given text and colors.
+     *
+     * @param text a <code>String</code> value
+     * @param border a <code>Color</code> value
+     * @param background a <code>Color</code> value
+     * @param foreground a <code>Color</code> value
+     * @return an <code>Image</code> value
+     */
+    public Image createChip(String text, Color border, Color background, Color foreground) {
+        // Draw it and put it in the cache
+        Font font = ((Font) UIManager.get("NormalFont")).deriveFont(12f * lib.getScalingFactor());
+        // hopefully, this is big enough
+        BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        TextLayout label = new TextLayout(text, font, g2.getFontRenderContext());
+        float padding = 6 * lib.getScalingFactor();
+        int width = (int) (label.getBounds().getWidth() + padding);
+        int height = (int) (label.getAscent() + label.getDescent() + padding);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2.setColor(border);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(background);
+        g2.fillRect(1, 1, width - 2, height - 2);
+        g2.setColor(foreground);
+        label.draw(g2, padding/2, label.getAscent() + padding/2);
+        return bi.getSubimage(0, 0, width, height);
+    }
+
 
 
     private Color getForegroundColor(Color background) {
@@ -2728,10 +2755,6 @@ public final class GUI {
         }
     }
     
-    public void displayOccupationIndicator(Graphics g, Unit unit, int x, int y) {
-        g.drawImage(getOccupationIndicatorImage(unit), x, y, null);
-    }
-
     /**
      * Displays the given Unit onto the given Graphics2D object at the
      * location specified by the coordinates.
@@ -2759,7 +2782,8 @@ public final class GUI {
             g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
-            displayOccupationIndicator(g, unit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
+            g.drawImage(getOccupationIndicatorImage(g, unit),
+                        x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y, null);
 
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = 0;
