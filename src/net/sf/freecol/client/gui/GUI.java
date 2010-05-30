@@ -1710,7 +1710,7 @@ public final class GUI {
                 }
             }
         }
-        ResourceManager.getGameMapping().add(key, new ImageResource(bi));
+        ResourceManager.addGameMapping(key, new ImageResource(bi));
         return bi;
     }
 
@@ -1794,8 +1794,8 @@ public final class GUI {
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, padding, padding));
         g2.setColor(getForegroundColor(backgroundColor));
         label.draw(g2, padding/2, label.getAscent() + padding/2);
-        ResourceManager.getGameMapping().add(key, new ImageResource(bi));
-        return bi;
+        ResourceManager.addGameMapping(key, new ImageResource(bi));
+        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
 
 
