@@ -117,15 +117,6 @@ public class ResourceManager {
     }
 
     /**
-     * Get the current game mapping.
-     *
-     * @return The current game mapping.
-     */
-    public static ResourceMapping getGameMapping() {
-        return gameMapping;
-    }
-
-    /**
      * Sets the mappings specified in a game, such as the player colors.
      *
      * @param _gameMapping The mapping between IDs and resources. 

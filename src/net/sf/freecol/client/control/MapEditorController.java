@@ -93,10 +93,6 @@ public final class MapEditorController {
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);
 
-            if (ResourceManager.getGameMapping() == null) {
-                ResourceManager.setGameMapping(new ResourceMapping());
-            }
-            
             final Canvas canvas = freeColClient.getCanvas();
             final GUI gui = freeColClient.getGUI();
 
