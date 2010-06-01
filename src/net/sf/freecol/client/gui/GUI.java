@@ -31,7 +31,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -286,6 +285,7 @@ public final class GUI {
 
     private int displayTileText = 0;
     private GeneralPath gridPath = null;
+    private GeneralPath fog = new GeneralPath();
 
     // Debug variables:
     public boolean displayCoordinates = false;
@@ -392,6 +392,13 @@ public final class GUI {
 
         borderStroke = new BasicStroke(dy);
         roadStroke = new BasicStroke(dy/2);
+
+        fog.reset();
+        fog.moveTo(halfWidth, 0);
+        fog.lineTo(tileWidth, halfHeight);
+        fog.lineTo(halfWidth, tileHeight);
+        fog.lineTo(0, halfHeight);
+        fog.closePath();
 
         updateMapDisplayVariables();
     }
@@ -2356,21 +2363,16 @@ public final class GUI {
      * (in pixels).
      */
     private void displayFogOfWar(Graphics2D g, Map map, Tile tile, int x, int y) {  
-        if (tile.isExplored()) {
-            final boolean displayFogOfWar = freeColClient.getGame().getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)
-                    && freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
-            if (displayFogOfWar
-                    && freeColClient.getMyPlayer() != null
-                    && !freeColClient.getMyPlayer().canSee(tile)) {
-                g.setColor(Color.BLACK);
-                Composite oldComposite = g.getComposite();
-                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
-                Polygon pol = new Polygon(new int[] {x + halfWidth, x + tileWidth, x + halfWidth, x},
-                                          new int[] {y, y + halfHeight, y + tileHeight, y + halfHeight},
-                                          4);
-                g.fill(pol);
-                g.setComposite(oldComposite);
-            }
+        if (tile.isExplored()
+            && freeColClient.getGame().getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)
+            && freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR)
+            && freeColClient.getMyPlayer() != null
+            && !freeColClient.getMyPlayer().canSee(tile)) {
+            g.setColor(Color.BLACK);
+            Composite oldComposite = g.getComposite();
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+            g.fill(AffineTransform.getTranslateInstance(x, y).createTransformedShape(fog));
+            g.setComposite(oldComposite);
         }
     }
 
