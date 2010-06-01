@@ -320,10 +320,10 @@ public final class GUI {
     private Stroke roadStroke = new BasicStroke(2);
 
     // borders
-    private EnumMap<Direction, Dimension> borderPoints =
-        new EnumMap<Direction, Dimension>(Direction.class);
-    private EnumMap<Direction, Dimension> controlPoints =
-        new EnumMap<Direction, Dimension>(Direction.class);
+    private EnumMap<Direction, Point2D.Float> borderPoints =
+        new EnumMap<Direction, Point2D.Float>(Direction.class);
+    private EnumMap<Direction, Point2D.Float> controlPoints =
+        new EnumMap<Direction, Point2D.Float>(Direction.class);
     private Stroke borderStroke = new BasicStroke(4);
 
 
@@ -381,24 +381,24 @@ public final class GUI {
         corners.put(Direction.NW, new Point2D.Float(0.25f * tileWidth, 0.25f * tileHeight));
 
         // small corners
-        controlPoints.put(Direction.N, new Dimension(halfWidth, dy));
-        controlPoints.put(Direction.E, new Dimension(tileWidth - dx, halfHeight));
-        controlPoints.put(Direction.S, new Dimension(halfWidth, tileHeight - dy));
-        controlPoints.put(Direction.W, new Dimension(dx, halfHeight));
+        controlPoints.put(Direction.N, new Point2D.Float(halfWidth, dy));
+        controlPoints.put(Direction.E, new Point2D.Float(tileWidth - dx, halfHeight));
+        controlPoints.put(Direction.S, new Point2D.Float(halfWidth, tileHeight - dy));
+        controlPoints.put(Direction.W, new Point2D.Float(dx, halfHeight));
         // big corners
-        controlPoints.put(Direction.SE, new Dimension(halfWidth, tileHeight));
-        controlPoints.put(Direction.NE, new Dimension(tileWidth, halfHeight));
-        controlPoints.put(Direction.SW, new Dimension(0, halfHeight));
-        controlPoints.put(Direction.NW, new Dimension(halfWidth, 0));
+        controlPoints.put(Direction.SE, new Point2D.Float(halfWidth, tileHeight));
+        controlPoints.put(Direction.NE, new Point2D.Float(tileWidth, halfHeight));
+        controlPoints.put(Direction.SW, new Point2D.Float(0, halfHeight));
+        controlPoints.put(Direction.NW, new Point2D.Float(halfWidth, 0));
         // small corners
-        borderPoints.put(Direction.NW, new Dimension(dx + ddx, halfHeight - ddy));
-        borderPoints.put(Direction.N, new Dimension(halfWidth - ddx, dy + ddy));
-        borderPoints.put(Direction.NE, new Dimension(halfWidth + ddx, dy + ddy));
-        borderPoints.put(Direction.E, new Dimension(tileWidth - dx - ddx, halfHeight - ddy));
-        borderPoints.put(Direction.SE, new Dimension(tileWidth - dx - ddx, halfHeight + ddy));
-        borderPoints.put(Direction.S, new Dimension(halfWidth + ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.SW, new Dimension(halfWidth - ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.W, new Dimension(dx + ddx, halfHeight + ddy));
+        borderPoints.put(Direction.NW, new Point2D.Float(dx + ddx, halfHeight - ddy));
+        borderPoints.put(Direction.N, new Point2D.Float(halfWidth - ddx, dy + ddy));
+        borderPoints.put(Direction.NE, new Point2D.Float(halfWidth + ddx, dy + ddy));
+        borderPoints.put(Direction.E, new Point2D.Float(tileWidth - dx - ddx, halfHeight - ddy));
+        borderPoints.put(Direction.SE, new Point2D.Float(tileWidth - dx - ddx, halfHeight + ddy));
+        borderPoints.put(Direction.S, new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.SW, new Point2D.Float(halfWidth - ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.W, new Point2D.Float(dx + ddx, halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
         roadStroke = new BasicStroke(dy/2);
@@ -2094,8 +2094,8 @@ public final class GUI {
             }
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            path.moveTo(borderPoints.get(Direction.longSides[0]).width,
-                        borderPoints.get(Direction.longSides[0]).height);
+            path.moveTo(borderPoints.get(Direction.longSides[0]).x,
+                        borderPoints.get(Direction.longSides[0]).y);
             for (Direction d : Direction.longSides) {
                 Tile otherTile = tile.getNeighbourOrNull(d);
                 Direction next = d.getNextDirection();
@@ -2109,12 +2109,12 @@ public final class GUI {
                         || (type == BorderType.COUNTRY && tile2.getOwner() != owner)
                         || (type == BorderType.REGION && tile2.getRegion() != region)) {
                         // small corner
-                        path.lineTo(borderPoints.get(next).width,
-                                    borderPoints.get(next).height);
-                        path.quadTo(controlPoints.get(next).width,
-                                    controlPoints.get(next).height,
-                                    borderPoints.get(next2).width,
-                                    borderPoints.get(next2).height);
+                        path.lineTo(borderPoints.get(next).x,
+                                    borderPoints.get(next).y);
+                        path.quadTo(controlPoints.get(next).x,
+                                    controlPoints.get(next).y,
+                                    borderPoints.get(next2).x,
+                                    borderPoints.get(next2).y);
                     } else {
                         int dx = 0, dy = 0;
                         switch(d) {
@@ -2127,8 +2127,8 @@ public final class GUI {
                             && ((type == BorderType.COUNTRY && tile1.getOwner() == owner)
                                 || (type == BorderType.REGION && tile1.getRegion() == region))) {
                             // short straight line
-                            path.lineTo(borderPoints.get(next).width,
-                                        borderPoints.get(next).height);
+                            path.lineTo(borderPoints.get(next).x,
+                                        borderPoints.get(next).y);
                             // big corner
                             Direction previous = d.getPreviousDirection();
                             Direction previous2 = previous.getPreviousDirection();
@@ -2139,19 +2139,19 @@ public final class GUI {
                             case SE: ddy = tileHeight; break;
                             case SW: ddx = -tileWidth; break;
                             }
-                            path.quadTo(controlPoints.get(previous).width + dx,
-                                        controlPoints.get(previous).height + dy,
-                                        borderPoints.get(previous2).width + ddx,
-                                        borderPoints.get(previous2).height + ddy);
+                            path.quadTo(controlPoints.get(previous).x + dx,
+                                        controlPoints.get(previous).y + dy,
+                                        borderPoints.get(previous2).x + ddx,
+                                        borderPoints.get(previous2).y + ddy);
                         } else {
                             // straight line
-                            path.lineTo(borderPoints.get(d).width + dx,
-                                        borderPoints.get(d).height + dy);
+                            path.lineTo(borderPoints.get(d).x + dx,
+                                        borderPoints.get(d).y + dy);
                         }
                     }
                 } else {
-                    path.moveTo(borderPoints.get(next2).width,
-                                borderPoints.get(next2).height);
+                    path.moveTo(borderPoints.get(next2).x,
+                                borderPoints.get(next2).y);
                 }
             }
             path.transform(AffineTransform.getTranslateInstance(x, y));
