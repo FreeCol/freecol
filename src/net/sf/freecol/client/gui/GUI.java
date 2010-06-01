@@ -1832,8 +1832,6 @@ public final class GUI {
         g.setStroke(roadStroke);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GeneralPath path = new GeneralPath();
-        int nx = x + halfWidth;
-        int ny = y + halfHeight;
         List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
@@ -1844,33 +1842,34 @@ public final class GUI {
 
         switch(points.size()) {
         case 0:
-            path.moveTo(x + 0.35f * tileWidth, y + 0.35f * tileHeight);
-            path.lineTo(x + 0.65f * tileWidth, y + 0.65f * tileHeight);
-            path.moveTo(x + 0.35f * tileWidth, y + 0.65f * tileHeight);
-            path.lineTo(x + 0.65f * tileWidth, y + 0.35f * tileHeight);
+            path.moveTo(0.35f * tileWidth, 0.35f * tileHeight);
+            path.lineTo(0.65f * tileWidth, 0.65f * tileHeight);
+            path.moveTo(0.35f * tileWidth, 0.65f * tileHeight);
+            path.lineTo(0.65f * tileWidth, 0.35f * tileHeight);
             break;
         case 1:
-            path.moveTo(nx, ny);
-            path.lineTo(points.get(0).getX() + x, points.get(0).getY() + y);
+            path.moveTo(halfWidth, halfHeight);
+            path.lineTo(points.get(0).getX(), points.get(0).getY());
             break;
         case 2:
-            path.moveTo(x + points.get(0).getX(), y + points.get(0).getY());
-            path.quadTo(nx, ny, x + points.get(1).getX(), y + points.get(1).getY());
+            path.moveTo(points.get(0).getX(), points.get(0).getY());
+            path.quadTo(halfWidth, halfHeight, points.get(1).getX(), points.get(1).getY());
             break;
         case 3:
         case 4:
             Point2D p0 = points.get(points.size() - 1);
-            path.moveTo(x + p0.getX(), y + p0.getY());
+            path.moveTo(p0.getX(), p0.getY());
             for (Point2D p : points) {
-                path.quadTo(nx, ny, x + p.getX(), y + p.getY());
+                path.quadTo(halfWidth, halfHeight, p.getX(), p.getY());
             }
             break;
         default:
             for (Point2D p : points) {
-                path.moveTo(nx, ny);
-                path.lineTo(x + p.getX(), y + p.getY());
+                path.moveTo(halfWidth, halfHeight);
+                path.lineTo(p.getX(), p.getY());
             }
         }
+        path.transform(AffineTransform.getTranslateInstance(x, y));
         g.draw(path);
         g.setColor(oldColor);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
