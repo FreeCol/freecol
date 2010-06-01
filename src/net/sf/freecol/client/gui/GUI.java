@@ -34,12 +34,14 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -49,7 +51,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -313,6 +314,11 @@ public final class GUI {
     private java.util.Map<Unit, Integer> unitsOutForAnimation;
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
+    // roads
+    private EnumMap<Direction, Point2D.Float> corners =
+        new EnumMap<Direction, Point2D.Float>(Direction.class);
+    private Stroke roadStroke = new BasicStroke(2);
+
     // borders
     private EnumMap<Direction, Dimension> borderPoints =
         new EnumMap<Direction, Dimension>(Direction.class);
@@ -364,6 +370,16 @@ public final class GUI {
         int ddx = dx + dx/2;
         int ddy = dy + dy/2;
 
+        // corners
+        corners.put(Direction.N, new Point2D.Float(halfWidth, 0));
+        corners.put(Direction.NE, new Point2D.Float(0.75f * tileWidth, 0.25f * tileHeight));
+        corners.put(Direction.E, new Point2D.Float(tileWidth, halfHeight));
+        corners.put(Direction.SE, new Point2D.Float(0.75f * tileWidth, 0.75f * tileHeight));
+        corners.put(Direction.S, new Point2D.Float(halfWidth, tileHeight));
+        corners.put(Direction.SW, new Point2D.Float(0.25f * tileWidth, 0.75f * tileHeight));
+        corners.put(Direction.W, new Point2D.Float(0, halfHeight));
+        corners.put(Direction.NW, new Point2D.Float(0.25f * tileWidth, 0.25f * tileHeight));
+
         // small corners
         controlPoints.put(Direction.N, new Dimension(halfWidth, dy));
         controlPoints.put(Direction.E, new Dimension(tileWidth - dx, halfHeight));
@@ -385,6 +401,7 @@ public final class GUI {
         borderPoints.put(Direction.W, new Dimension(dx + ddx, halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
+        roadStroke = new BasicStroke(dy/2);
 
         updateMapDisplayVariables();
     }
@@ -536,7 +553,7 @@ public final class GUI {
     }
 
 
-    /*
+    /**
      * Selects a tile, without clearing the orders of the first unit
      * contained.
      *
@@ -1393,6 +1410,7 @@ public final class GUI {
         
         yy = clipTopY;
 
+        boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
             xx = getXOffset(clipLeftX, tileY);
@@ -1414,8 +1432,7 @@ public final class GUI {
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
-                displayTileOverlays(g, map, tile, xx, yy, true,
-                                    (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC));
+                displayTileOverlays(g, map, tile, xx, yy, true, withNumbers);
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
@@ -1546,8 +1563,8 @@ public final class GUI {
         Canvas canvas = freeColClient.getCanvas();
         
         if (!freeColClient.isMapEditor()
-                && freeColClient.getGame() != null
-                && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
+            && freeColClient.getGame() != null
+            && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             
             if (greyLayer == null) {
                 greyLayer = new GrayLayer(lib);
@@ -1800,94 +1817,63 @@ public final class GUI {
 
 
     /**
-    * Draws a road, between the given points, on the provided <code>Graphics</code>.
-    * When you provide the same <code>seed</code> you will get the same road.
-    *
-    * @param g The <code>Graphics</code> to draw the road upon.
-    * @param seed The seed of the random generator that is creating the road.
-    * @param x1 The x-component of the first coordinate.
-    * @param y1 The y-component of the first coordinate.
-    * @param x2 The x-component of the second coordinate.
-    * @param y2 The y-component of the second coordinate.
-    */
-    public void drawRoad(Graphics2D g, long seed, int x1, int y1, int x2, int y2) {
-        final int MAX_CORR = 4;
+     * Draws a road, between the given points, on the provided <code>Graphics</code>.
+     * When you provide the same <code>seed</code> you will get the same road.
+     *
+     * @param g The <code>Graphics</code> to draw the road upon.
+     * @param tile a <code>Tile</code> value
+     * @param x an <code>int</code> value
+     * @param y an <code>int</code> value
+     */
+    public void drawRoad(Graphics2D g, Tile tile, int x, int y) {
+
         Color oldColor = g.getColor();
-        Random roadRandom = new Random(seed);
-
-        int i = Math.max(Math.abs(x2-x1), Math.abs(y2-y1));
-        int baseX = x1;
-        int baseY = y1;
-        double addX = (x2-x1)/((double) i);
-        double addY = (y2-y1)/((double) i);
-        int corr = 0;
-        int xCorr = 0;
-        int yCorr = 0;
-        int lastDiff = 1;
-
-        g.setColor(new Color(128, 64, 0));
-        g.drawLine(baseX, baseY, baseX, baseY);
-
-        for (int j=1; j<=i; j++) {
-            int oldCorr = corr;
-            //if (roadRandom.nextInt(3) == 0) {
-                corr = corr + roadRandom.nextInt(3)-1;
-                if (oldCorr != corr) {
-                    lastDiff = oldCorr - corr;
-                }
-            //}
-
-            if (Math.abs(corr) > MAX_CORR || Math.abs(corr) >= i-j) {
-                if (corr > 0) {
-                    corr--;
-                } else {
-                    corr++;
-                }
+        g.setColor(ResourceManager.getColor("road.color"));
+        g.setStroke(roadStroke);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        GeneralPath path = new GeneralPath();
+        int nx = x + halfWidth;
+        int ny = y + halfHeight;
+        List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
+        for (Direction direction : Direction.values()) {
+            Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
+            if (borderingTile != null && borderingTile.hasRoad()) {
+                points.add(corners.get(direction));
             }
-
-            if (corr != oldCorr) {
-                g.setColor(new Color(128, 128, 0));
-                g.drawLine(baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr, baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr);
-            } else {
-                int oldXCorr = 0;
-                int oldYCorr = 0;
-
-                if (x2-x1 == 0) {
-                    oldXCorr = corr+lastDiff;
-                    oldYCorr = 0;
-                } else if (y2-y1 == 0) {
-                    oldXCorr = 0;
-                    oldYCorr = corr+lastDiff;
-                } else {
-                    if (corr > 0) {
-                        oldXCorr = corr+lastDiff;
-                    } else {
-                        oldYCorr = corr+lastDiff;
-                    }
-                }
-
-                g.setColor(new Color(128, 128, 0));
-                g.drawLine(baseX+(int) (j*addX)+oldXCorr, baseY+(int) (j*addY)+oldYCorr, baseX+(int) (j*addX)+oldXCorr, baseY+(int) (j*addY)+oldYCorr);
-            }
-
-            if (x2-x1 == 0) {
-                xCorr = corr;
-                yCorr = 0;
-            } else if (y2-y1 == 0) {
-                xCorr = 0;
-                yCorr = corr;
-            } else {
-                if (corr > 0) {
-                    xCorr = corr;
-                } else {
-                    yCorr = corr;
-                }
-            }
-
-            g.setColor(new Color(128, 64, 0));
-            g.drawLine(baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr, baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr);
         }
+
+        switch(points.size()) {
+        case 0:
+            path.moveTo(x + 0.35f * tileWidth, y + 0.35f * tileHeight);
+            path.lineTo(x + 0.65f * tileWidth, y + 0.65f * tileHeight);
+            path.moveTo(x + 0.35f * tileWidth, y + 0.65f * tileHeight);
+            path.lineTo(x + 0.65f * tileWidth, y + 0.35f * tileHeight);
+            break;
+        case 1:
+            path.moveTo(nx, ny);
+            path.lineTo(points.get(0).getX() + x, points.get(0).getY() + y);
+            break;
+        case 2:
+            path.moveTo(x + points.get(0).getX(), y + points.get(0).getY());
+            path.quadTo(nx, ny, x + points.get(1).getX(), y + points.get(1).getY());
+            break;
+        case 3:
+        case 4:
+            Point2D p0 = points.get(points.size() - 1);
+            path.moveTo(x + p0.getX(), y + p0.getY());
+            for (Point2D p : points) {
+                path.quadTo(nx, ny, x + p.getX(), y + p.getY());
+            }
+            break;
+        default:
+            for (Point2D p : points) {
+                path.moveTo(nx, ny);
+                path.lineTo(x + p.getX(), y + p.getY());
+            }
+        }
+        g.draw(path);
         g.setColor(oldColor);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
 
@@ -2266,6 +2252,7 @@ public final class GUI {
         }
     }
 
+
     private void drawItem(Graphics2D g, Tile tile, TileItem item, int x, int y) {
 
         if (item instanceof Resource) {
@@ -2274,10 +2261,9 @@ public final class GUI {
                 centerImage(g, bonusImage, x, y);
             }
         } else if (item instanceof LostCityRumour) {
-            g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
-                        x + (int) (RUMOUR_OFFSET_X * lib.getScalingFactor()),
-                        y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
-        } else if (item instanceof TileImprovement) {
+            centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR), x, y);
+        } else {
+
             TileImprovement improvement = (TileImprovement) item;
             if (improvement.isComplete()) {
                 Image overlay = ResourceManager.getImage(improvement.getType().getId() + ".image", 
@@ -2288,38 +2274,7 @@ public final class GUI {
                 } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
                     g.drawImage(lib.getRiverImage(improvement.getStyle()), x, y, null);
                 } else if (improvement.isRoad()) {
-                    long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
-                    boolean connectedRoad = false;
-                    for (Direction direction : Direction.values()) {
-                        Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
-                        if (borderingTile!=null) {
-                            if (borderingTile.hasRoad()) {
-                                connectedRoad =  true;
-                                int nx = x + halfWidth;
-                                int ny = y + halfHeight;
-
-                                switch (direction) {
-                                case N : nx = x + halfWidth; ny = y; break;
-                                case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
-                                case E : nx = x + tileWidth; ny = y + halfHeight; break;
-                                case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
-                                case S : nx = x + halfWidth; ny = y + tileHeight; break;
-                                case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
-                                case W : nx = x; ny = y + halfHeight; break;
-                                case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
-                                }
-
-                                drawRoad(g, seed, x + halfWidth, y + halfHeight, nx, ny);
-                            }
-                        }
-                    }
-
-                    if (!connectedRoad) {
-                        drawRoad(g, seed, x + halfWidth - 10, y + halfHeight,
-                                 x + halfWidth + 10, y + halfHeight);
-                        drawRoad(g, seed, x + halfWidth, y + halfHeight - 10,
-                                 x + halfWidth, y + halfHeight + 10);
-                    }
+                    drawRoad(g, tile, x, y);
                 }
             }
         }
