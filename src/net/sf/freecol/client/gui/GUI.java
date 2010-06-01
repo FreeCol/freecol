@@ -34,7 +34,6 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,7 +54,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.UIManager;
@@ -271,23 +269,15 @@ public final class GUI {
     private int leftColumnX;
 
     // The height offset to paint a Unit at (in pixels).
-    public static final int UNIT_OFFSET = 20,
-    TEXT_OFFSET_X = 2, // Relative to the state indicator.
-    TEXT_OFFSET_Y = 13, // Relative to the state indicator.
-    STATE_OFFSET_X = 25,
-    STATE_OFFSET_Y = 10,
-    ALARM_OFFSET_X = 37,
-    ALARM_OFFSET_Y = 10,
-    RUMOUR_OFFSET_X = 40,
-    RUMOUR_OFFSET_Y = 5,
-    MISSION_OFFSET_X = 49,
-    MISSION_OFFSET_Y = 10,
-    OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
-    OTHER_UNITS_OFFSET_Y = 1,
-    OTHER_UNITS_WIDTH = 3,
-    MAX_OTHER_UNITS = 10,
-    MESSAGE_COUNT = 3,
-    MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
+    private static final int UNIT_OFFSET = 20,
+        STATE_OFFSET_X = 25,
+        STATE_OFFSET_Y = 10,
+        OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
+        OTHER_UNITS_OFFSET_Y = 1,
+        OTHER_UNITS_WIDTH = 3,
+        MAX_OTHER_UNITS = 10,
+        MESSAGE_COUNT = 3,
+        MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
 
     public static final int OVERLAY_INDEX = 100;
     public static final int FOREST_INDEX = 200;
