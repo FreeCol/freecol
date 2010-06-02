@@ -316,6 +316,7 @@ public final class GUI {
         new EnumMap<Direction, Point2D.Float>(Direction.class);
     private Stroke borderStroke = new BasicStroke(4);
 
+    private Stroke gridStroke = new BasicStroke(1);
 
     /**
     * The constructor to use.
@@ -392,6 +393,7 @@ public final class GUI {
 
         borderStroke = new BasicStroke(dy);
         roadStroke = new BasicStroke(dy/2);
+        gridStroke = new BasicStroke(lib.getScalingFactor());
 
         fog.reset();
         fog.moveTo(halfWidth, 0);
@@ -1349,17 +1351,12 @@ public final class GUI {
             gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
             int nextX = halfWidth;
-            int nextY = - (halfHeight);
+            int nextY = -halfHeight;
 
             for (int i = 0; i <= ((clipRightCol - clipLeftCol) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
                 nextX += halfWidth;
-                if (nextY == - (halfHeight)) {
-                    nextY = 0;
-                }
-                else {
-                    nextY = - (halfHeight);
-                }
+                nextY = (nextY == 0 ? -halfHeight : 0);
             }
         }
 
@@ -1415,6 +1412,7 @@ public final class GUI {
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
                 // Display the grid.
                 g.translate(xx, yy + (halfHeight));
+                g.setStroke(gridStroke);
                 g.setColor(Color.BLACK);
                 g.draw(gridPath);
                 g.translate(- xx, - (yy + (halfHeight)));
