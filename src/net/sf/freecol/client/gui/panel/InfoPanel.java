@@ -273,7 +273,7 @@ public final class InfoPanel extends FreeColPanel {
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 getClient().getGUI().displayTerrain(image.createGraphics(), 
                                                       getClient().getGame().getMap(),
-                                                      tile, 0, 0);
+                                                      tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.add(tile.getNameKey());

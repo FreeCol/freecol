@@ -1269,13 +1269,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     for (int y = 0; y < 3; y++) {
                         TileType tileType = getColony().getTile().getType();
                         Tile tile = getColony().getTile(x, y);
-                        if (tile==null)
-                            continue;
-                        colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tile, ((2 - x) + y)
-                                                        * getLibrary().getTerrainImageWidth(tileType) / 2,
-                                                        (x + y) * getLibrary().getTerrainImageHeight(tileType) / 2,
-                                                        getColony());
-
+                        if (tile != null) {
+                            int xx = ((2 - x) + y) * getLibrary().getTerrainImageWidth(tileType) / 2;
+                            int yy = (x + y) * getLibrary().getTerrainImageHeight(tileType) / 2;
+                            g.translate(xx, yy);
+                            colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tile, getColony());
+                            g.translate(-xx, -yy);
+                        }
                     }
                 }
             }

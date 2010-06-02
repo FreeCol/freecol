@@ -1264,28 +1264,30 @@ public final class GUI {
                         }
                         textColor = Color.WHITE;
                     }                
+                    g.translate(p.x, p.y);
                     if (image != null) {
-                        centerImage(g, image, p.x, p.y);
+                        centerImage(g, image);
                     } else {
-                        g.fillOval(p.x + halfWidth, p.y + halfHeight, 10, 10);
+                        g.fillOval(halfWidth, halfHeight, 10, 10);
                         g.setColor(Color.BLACK);
-                        g.drawOval(p.x + halfWidth, p.y + halfHeight, 10, 10);
+                        g.drawOval(halfWidth, halfHeight, 10, 10);
                     }                
                     if (temp.getTurns() > 0) {
                         Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
                                                               textColor, font);
-                        centerImage(g, stringImage, p.x, p.y);
+                        centerImage(g, stringImage);
                     }
+                    g.translate(-p.x, -p.y);
                 }                    
                 temp = temp.next;
             }
         }
     }
 
-    private void centerImage(Graphics2D g, Image image, int x, int y) {
+    private void centerImage(Graphics2D g, Image image) {
         g.drawImage(image,
-                    x + (tileWidth - image.getWidth(null))/2,
-                    y + (tileHeight - image.getHeight(null))/2,
+                    (tileWidth - image.getWidth(null))/2,
+                    (tileHeight - image.getHeight(null))/2,
                     null);
     }
 
@@ -1385,7 +1387,9 @@ public final class GUI {
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
-                displayBaseTile(g, map, tile, xx, yy, true);
+                g.translate(xx, yy);
+                displayBaseTile(g, map, tile, true);
+                g.translate(-xx, -yy);
                 xx += tileWidth;
             }
 
@@ -1423,19 +1427,21 @@ public final class GUI {
                 Tile tile = map.getTile(tileX, tileY);
                     
                 // paint full borders
-                paintBorders(g, tile, xx, yy, BorderType.COUNTRY, true);
+                g.translate(xx, yy);
+                paintBorders(g, tile, BorderType.COUNTRY, true);
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
-                displayTileOverlays(g, map, tile, xx, yy, true, withNumbers);
+                displayTileOverlays(g, map, tile, true, withNumbers);
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
-                paintBorders(g, tile, xx, yy, BorderType.COUNTRY, false);
+                paintBorders(g, tile, BorderType.COUNTRY, false);
 
-                if (viewMode.displayTileCursor(tile,xx,yy)) {
-                    drawCursor(g, xx, yy);
+                if (viewMode.displayTileCursor(tile)) {
+                    drawCursor(g);
                 }
+                g.translate(-xx, -yy);
                 xx += tileWidth;
             }
 
@@ -1447,13 +1453,15 @@ public final class GUI {
 
                 Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
                 if (unitInFront != null && !isOutForAnimation(unitInFront)) {
-                    displayUnit(g, unitInFront, xx, yy);
+                    g.translate(xx, yy);
+                    displayUnit(g, unitInFront);
                         
                     if (unitInFront.isUndead()) {
                         darkUnits.add(unitInFront);
                         darkUnitsX.add(xx);
                         darkUnitsY.add(yy);
                     }
+                    g.translate(-xx, -yy);
                 }
                 xx += tileWidth;
             }
@@ -1472,9 +1480,11 @@ public final class GUI {
             for (int index=0; index<darkUnits.size(); index++) {
                 final Unit u = darkUnits.get(index);
                 final int x = darkUnitsX.get(index);
-                final int y = darkUnitsY.get(index);            
-                centerImage(g, im, x, y);
-                displayUnit(g, u, x, y);
+                final int y = darkUnitsY.get(index);
+                g.translate(x, y);
+                centerImage(g, im);
+                displayUnit(g, u);
+                g.translate(-x, -y);
             }
         }
 
@@ -1820,7 +1830,7 @@ public final class GUI {
      * @param x an <code>int</code> value
      * @param y an <code>int</code> value
      */
-    public void drawRoad(Graphics2D g, Tile tile, int x, int y) {
+    public void drawRoad(Graphics2D g, Tile tile) {
 
         Color oldColor = g.getColor();
         g.setColor(ResourceManager.getColor("road.color"));
@@ -1864,7 +1874,6 @@ public final class GUI {
                 path.lineTo(p.getX(), p.getY());
             }
         }
-        path.transform(AffineTransform.getTranslateInstance(x, y));
         g.draw(path);
         g.setColor(oldColor);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -1890,8 +1899,8 @@ public final class GUI {
      *      of the <code>Tile</code> for. This object is also used to
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      */
-    public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
-        displayBaseTile(g, map, tile, x, y, false);        
+    public void displayColonyTile(Graphics2D g, Map map, Tile tile, Colony colony) {
+        displayBaseTile(g, map, tile, false);
 
         Unit occupyingUnit = null;
         int price = 0;
@@ -1900,24 +1909,24 @@ public final class GUI {
             occupyingUnit = colonyTile.getOccupyingUnit();
             price = colony.getOwner().getLandPrice(tile);
             if (!colonyTile.canBeWorked()) {
-                g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
+                g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
             }
         }
-        displayTileOverlays(g, map, tile, x, y, false, false);
+        displayTileOverlays(g, map, tile, false, false);
         
         if (price > 0 && tile.getSettlement() == null) {
             // tile is owned by an IndianSettlement
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            centerImage(g, image, x, y);
+            centerImage(g, image);
         }
         
         if (occupyingUnit != null) {
             ImageIcon image = lib.getUnitImageIcon(occupyingUnit, 0.5);
-            g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
-                    (y + halfHeight) - image.getIconHeight() / 2, null);
+            g.drawImage(image.getImage(), tileWidth/4 - image.getIconWidth() / 2,
+                        halfHeight - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
             g.drawImage(getOccupationIndicatorImage(g, occupyingUnit),
-                        x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y, null);
+                        (int) (STATE_OFFSET_X * lib.getScalingFactor()), 0, null);
         }
     }
 
@@ -1937,10 +1946,9 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    public void displayTerrain(Graphics2D g, Map map, Tile tile, int x, int y) {
-        displayBaseTile(g, map, tile, x, y, true);
-        displayTileItems(g, map, tile, x, y);
-        //displayUnexploredBorders(g, map, tile, x, y);
+    public void displayTerrain(Graphics2D g, Map map, Tile tile) {
+        displayBaseTile(g, map, tile, true);
+        displayTileItems(g, map, tile);
     }
 
     /**
@@ -1958,8 +1966,8 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y) {
-        displayTile(g, map, tile, x, y, true);
+    public void displayTile(Graphics2D g, Map map, Tile tile) {
+        displayTile(g, map, tile, true);
     }
 
     /**
@@ -1977,9 +1985,9 @@ public final class GUI {
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
-    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
-        displayBaseTile(g, map, tile, x, y, drawUnexploredBorders);
-        displayTileOverlays(g, map, tile, x, y, drawUnexploredBorders, true);
+    public void displayTile(Graphics2D g, Map map, Tile tile, boolean drawUnexploredBorders) {
+        displayBaseTile(g, map, tile, drawUnexploredBorders);
+        displayTileOverlays(g, map, tile, drawUnexploredBorders, true);
     }
 
     /**
@@ -1995,17 +2003,17 @@ public final class GUI {
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
-    private void displayBaseTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
+    private void displayBaseTile(Graphics2D g, Map map, Tile tile, boolean drawUnexploredBorders) {
         if (tile == null) {
             return;
         }
         // ATTENTION: we assume that all base tiles have the same size
-        g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
+        g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         if (!tile.isLand() && tile.getStyle() > 0) {
-            g.drawImage(lib.getBeachImage(tile.getStyle()), x, y, null);
+            g.drawImage(lib.getBeachImage(tile.getStyle()), 0, 0, null);
         }
 
         for (Direction direction : Direction.values()) {
@@ -2037,8 +2045,8 @@ public final class GUI {
                     */
                     // Draw the grass from the neighboring tile, spilling over on the side of this tile
                     g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                    tile.getX(), tile.getY()),
-                                                    x, y, null);
+                                                   tile.getX(), tile.getY()),
+                                0, 0, null);
                     TileImprovement river = borderingTile.getRiver();
                     if (river != null &&
                         (direction == Direction.SE || direction == Direction.SW ||
@@ -2047,7 +2055,7 @@ public final class GUI {
                         if (branches[direction.getReverseDirection().ordinal()] > 0) {
                             g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(),
                                                                tile.getX(), tile.getY()),
-                                        x, y, null);
+                                        0, 0, null);
                         }
                     }
                } else if (tile.isExplored() && borderingTile.isExplored()) {
@@ -2058,7 +2066,7 @@ public final class GUI {
                     } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                         // Draw land terrain with bordering land type, or ocean/high seas limit
                         g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                        tile.getX(), tile.getY()), x, y, null);
+                                                       tile.getX(), tile.getY()), 0, 0, null);
                     }
                 }
             }
@@ -2066,7 +2074,7 @@ public final class GUI {
     }    
 
 
-    private void paintBorders(Graphics2D g, Tile tile, int x, int y, BorderType type, boolean opaque) {
+    private void paintBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
         if (tile == null ||
             (type == BorderType.COUNTRY
              && !freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS))) {
@@ -2148,7 +2156,6 @@ public final class GUI {
                                 borderPoints.get(next2).y);
                 }
             }
-            path.transform(AffineTransform.getTranslateInstance(x, y));
             g.draw(path);
             g.setColor(oldColor);
             g.setStroke(oldStroke);
@@ -2173,16 +2180,16 @@ public final class GUI {
      *        unexplored terrain.
      * @param withNumber indicates if the number of inhabitants should be drawn too.
      */
-    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y,
+    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, 
                                      boolean drawUnexploredBorders, boolean withNumber) {
         if (tile != null) {
             if (drawUnexploredBorders) {
-                displayUnexploredBorders(g, map, tile, x, y);
+                displayUnexploredBorders(g, map, tile);
             }
-            displayTileItems(g, map, tile, x, y);
-            displaySettlement(g, map, tile, x, y, withNumber);
-            displayFogOfWar(g, map, tile, x, y);
-            displayOptionalValues(g, map, tile, x, y);
+            displayTileItems(g, map, tile);
+            displaySettlement(g, map, tile, withNumber);
+            displayFogOfWar(g, map, tile);
+            displayOptionalValues(g, map, tile);
         }
     }
 
@@ -2198,11 +2205,11 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displayTileItems(Graphics2D g, Map map, Tile tile, int x, int y) {  
+    private void displayTileItems(Graphics2D g, Map map, Tile tile) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
         if (!tile.isExplored()) {
-            g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), x, y, null);
+            g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), 0, 0, null);
         } else {
             // layer additions and improvements according to zIndex
             List<TileItem> tileItems = new ArrayList<TileItem>();
@@ -2212,7 +2219,7 @@ public final class GUI {
             int startIndex = 0;
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
-                    drawItem(g, tile, tileItems.get(index), x, y);
+                    drawItem(g, tile, tileItems.get(index));
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2222,11 +2229,11 @@ public final class GUI {
             // Tile Overlays (eg. hills and mountains)
             Image overlayImage = lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY());
             if (overlayImage != null) {
-                g.drawImage(overlayImage, x, y + tileHeight - overlayImage.getHeight(null), null);
+                g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
             }
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
-                    drawItem(g, tile, tileItems.get(index), x, y);
+                    drawItem(g, tile, tileItems.get(index));
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2236,26 +2243,26 @@ public final class GUI {
             // Forest
             if (tile.isForested()) {
                 Image forestImage = lib.getForestImage(tile.getType());
-                g.drawImage(forestImage, x, y + tileHeight - forestImage.getHeight(null), null);
+                g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
             }
 
             // draw all remaining items
             for (int index = startIndex; index < tileItems.size(); index++) {
-                drawItem(g, tile, tileItems.get(index), x, y);
+                drawItem(g, tile, tileItems.get(index));
             }
         }
     }
 
 
-    private void drawItem(Graphics2D g, Tile tile, TileItem item, int x, int y) {
+    private void drawItem(Graphics2D g, Tile tile, TileItem item) {
 
         if (item instanceof Resource) {
             Image bonusImage = lib.getBonusImage(((Resource) item).getType());
             if (bonusImage != null) {
-                centerImage(g, bonusImage, x, y);
+                centerImage(g, bonusImage);
             }
         } else if (item instanceof LostCityRumour) {
-            centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR), x, y);
+            centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
         } else {
 
             TileImprovement improvement = (TileImprovement) item;
@@ -2264,11 +2271,11 @@ public final class GUI {
                                                          lib.getScalingFactor());
                 if (overlay != null) {
                     // Has its own Overlay Image in Misc, use it
-                    g.drawImage(overlay, x, y, null);
+                    g.drawImage(overlay, 0, 0, null);
                 } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                    g.drawImage(lib.getRiverImage(improvement.getStyle()), x, y, null);
+                    g.drawImage(lib.getRiverImage(improvement.getStyle()), 0, 0, null);
                 } else if (improvement.isRoad()) {
-                    drawRoad(g, tile, x, y);
+                    drawRoad(g, tile);
                 }
             }
         }
@@ -2286,7 +2293,7 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displaySettlement(Graphics2D g, Map map, Tile tile, int x, int y, boolean withNumber) {  
+    private void displaySettlement(Graphics2D g, Map map, Tile tile, boolean withNumber) {  
         if (tile.isExplored()) {
             Settlement settlement = tile.getSettlement();
 
@@ -2294,7 +2301,7 @@ public final class GUI {
                 if (settlement instanceof Colony) {
                     Image colonyImage = lib.getSettlementImage(settlement);
                     // Draw image of colony in center of the tile.
-                    centerImage(g, colonyImage, x, y);
+                    centerImage(g, colonyImage);
                     if (withNumber) {
                         String populationString = Integer.toString(((Colony)settlement).getUnitCount());
                         Color theColor = ResourceManager
@@ -2302,7 +2309,7 @@ public final class GUI {
                                       + ".color");
                         Font font = new Font("Dialog", Font.BOLD, 12);
                         Image stringImage = createStringImage(g, populationString, theColor, font);
-                        centerImage(g, stringImage, x, y);
+                        centerImage(g, stringImage);
                     }
                     //g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
@@ -2310,7 +2317,7 @@ public final class GUI {
                     Image settlementImage = lib.getSettlementImage(settlement);
 
                     // Draw image of indian settlement in center of the tile.
-                    centerImage(g, settlementImage, x, y);
+                    centerImage(g, settlementImage);
 
                     // Draw the color chip for the settlement.
                     String text = indianSettlement.isCapital() ? "*" : "-";
@@ -2319,7 +2326,7 @@ public final class GUI {
                     Image chip = createChip(text, Color.BLACK, background, foreground);
                     float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                     float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
-                    g.drawImage(chip, (int) (x + xOffset), (int) (y + yOffset), null);
+                    g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                     xOffset += chip.getWidth(null) + 2;
 
                     // Draw the mission chip if needed.
@@ -2329,7 +2336,7 @@ public final class GUI {
                         Color mission = (expert ? Color.BLACK : Color.GRAY);
                         Color cross = lib.getColor(missionary.getOwner());
                         chip = createChip("\u271D", Color.BLACK, mission, cross);
-                        g.drawImage(chip, (int) (x + xOffset), (int) (y + yOffset), null);
+                        g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
                     }
 
@@ -2339,7 +2346,7 @@ public final class GUI {
                         if (alarm != null) {
                             final boolean visited = indianSettlement.hasBeenVisited(freeColClient.getMyPlayer());
                             chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
-                            g.drawImage(chip, (int) (x + xOffset), (int) (y + yOffset), null);
+                            g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                         }
                     }
                 } else {
@@ -2360,7 +2367,7 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displayFogOfWar(Graphics2D g, Map map, Tile tile, int x, int y) {  
+    private void displayFogOfWar(Graphics2D g, Map map, Tile tile) {  
         if (tile.isExplored()
             && freeColClient.getGame().getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)
             && freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR)
@@ -2369,7 +2376,7 @@ public final class GUI {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
-            g.fill(AffineTransform.getTranslateInstance(x, y).createTransformedShape(fog));
+            g.fill(fog);
             g.setComposite(oldComposite);
         }
     }
@@ -2386,7 +2393,7 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile, int x, int y) {  
+    private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile) {  
         if (tile.isExplored()) {
             Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
@@ -2398,7 +2405,7 @@ public final class GUI {
                         continue;
                     }
 
-                    g.drawImage(lib.getBorderImage(null, direction, tile.getX(), tile.getY()), x, y, null);
+                    g.drawImage(lib.getBorderImage(null, direction, tile.getX(), tile.getY()), 0, 0, null);
                 }
             }
         }
@@ -2417,7 +2424,7 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displayOptionalValues(Graphics2D g, Map map, Tile tile, int x, int y) {
+    private void displayOptionalValues(Graphics2D g, Map map, Tile tile) {
         String text = null;
         switch (displayTileText) {
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
@@ -2434,7 +2441,7 @@ public final class GUI {
             if (tile.getRegion() != null) {
                 text = Messages.message(tile.getRegion().getLabel());
             }
-            paintBorders(g, tile, x, y, BorderType.REGION, true);
+            paintBorders(g, tile, BorderType.REGION, true);
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
@@ -2446,18 +2453,18 @@ public final class GUI {
         if (text != null) {
             int b = getBreakingPoint(text);
             if (b == -1) {
-                centerString(g, text, x, y);
+                centerString(g, text);
             } else {
                 g.setColor(Color.BLACK);
                 g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(12.0f));
                 g.drawString(text.substring(0, b),
-                             x + (tileWidth -
-                                  g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
-                             y + halfHeight - (g.getFontMetrics().getAscent()*2)/3);
+                             (tileWidth -
+                              g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
+                             halfHeight - (g.getFontMetrics().getAscent()*2)/3);
                 g.drawString(text.substring(b+1),
-                             x + (tileWidth -
-                                  g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
-                             y + halfHeight + (g.getFontMetrics().getAscent()*2)/3);
+                             (tileWidth -
+                              g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
+                             halfHeight + (g.getFontMetrics().getAscent()*2)/3);
             }
         }
 
@@ -2466,7 +2473,7 @@ public final class GUI {
             if (tile.isConnected()) {
                 posString += "C";
             }
-            centerString(g, posString, x, y);
+            centerString(g, posString);
         }
         if (displayColonyValue && tile.isExplored() && tile.isLand()) {
             String valueString;
@@ -2475,18 +2482,16 @@ public final class GUI {
             } else {
                 valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
             }
-            centerString(g, valueString, x, y);
+            centerString(g, valueString);
         }
     }
 
-    private void centerString(Graphics2D g, String text, int x, int y) {
+    private void centerString(Graphics2D g, String text) {
         g.setColor(Color.BLACK);
         g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(12.0f));
         g.drawString(text,
-                     x + (tileWidth
-                          - g.getFontMetrics().stringWidth(text))/2,
-                     y + (tileHeight
-                          - g.getFontMetrics().getAscent())/2);
+                     (tileWidth - g.getFontMetrics().stringWidth(text))/2,
+                     (tileHeight - g.getFontMetrics().getAscent())/2);
     }
 
     /**
@@ -2702,23 +2707,23 @@ public final class GUI {
      * (in pixels). These are the coordinates of the Tile on which
      * the Unit is located.
      */
-    private void displayUnit(Graphics2D g, Unit unit, int x, int y) {
+    private void displayUnit(Graphics2D g, Unit unit) {
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
-            if (viewMode.displayUnitCursor(unit,x,y)) {
-                drawCursor(g,x,y);
+            if (viewMode.displayUnitCursor(unit)) {
+                drawCursor(g);
             }
 
             // Draw the unit.
             // If unit is sentry, draw in grayscale
             Image image = lib.getUnitImageIcon(unit, unit.getState() == UnitState.SENTRY).getImage();
-            Point p = getUnitImagePositionInTile(image, x, y);
+            Point p = getUnitImagePositionInTile(image);
             g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
             g.drawImage(getOccupationIndicatorImage(g, unit),
-                        x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y, null);
+                        (int) (STATE_OFFSET_X * lib.getScalingFactor()), 0, null);
 
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = 0;
@@ -2730,9 +2735,11 @@ public final class GUI {
             }
             if (unitsOnTile > 1) {
                 g.setColor(Color.WHITE);
-                int unitLinesY = y + OTHER_UNITS_OFFSET_Y;
+                int unitLinesY = OTHER_UNITS_OFFSET_Y;
+                int x1 = (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X) * lib.getScalingFactor());
+                int x2 = (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH) * lib.getScalingFactor());
                 for (int i = 0; (i < unitsOnTile) && (i < MAX_OTHER_UNITS); i++) {
-                    g.drawLine(x + (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X) * lib.getScalingFactor()), unitLinesY, x + (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH) * lib.getScalingFactor()), unitLinesY);
+                    g.drawLine(x1, unitLinesY, x2, unitLinesY);
                     unitLinesY += 2;
                 }
             }
@@ -2742,9 +2749,11 @@ public final class GUI {
         
         // FOR DEBUGGING:
         if (debugShowMission 
-                && freeColClient.getFreeColServer() != null
-                && (unit.getOwner().isAI() || unit.hasAbility("model.ability.piracy"))) {
-            net.sf.freecol.server.ai.AIUnit au = (net.sf.freecol.server.ai.AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(unit);
+            && freeColClient.getFreeColServer() != null
+            && (unit.getOwner().isAI()
+                || unit.hasAbility("model.ability.piracy"))) {
+            net.sf.freecol.server.ai.AIUnit au = (net.sf.freecol.server.ai.AIUnit)
+                freeColClient.getFreeColServer().getAIMain().getAIObject(unit);
             if (au != null) {
                 g.setColor(Color.WHITE);
                 String text = (unit.getOwner().isAI()) ? "" : "(";
@@ -2767,8 +2776,8 @@ public final class GUI {
                     text += "No mission";
                 }                
                 text += (unit.getOwner().isAI()) ? "" : ")";
-                g.drawString(text, x , y);
-                g.drawString(debuggingInfo, x , y+25);
+                g.drawString(text, 0 , 0);
+                g.drawString(debuggingInfo, 0 , 25);
             }
         }
     }
@@ -2780,8 +2789,8 @@ public final class GUI {
      * @param tileY The Y coordinate of the tile
      * @return The coordinates where the unit should be drawn onscreen
      */
-    private Point getUnitImagePositionInTile(Image unitImage, int tileX, int tileY) {
-        return getUnitImagePositionInTile(unitImage.getWidth(null), unitImage.getHeight(null), tileX, tileY);
+    private Point getUnitImagePositionInTile(Image unitImage) {
+        return getUnitImagePositionInTile(unitImage.getWidth(null), unitImage.getHeight(null));
     }
     
     /**
@@ -2792,9 +2801,9 @@ public final class GUI {
      * @param tileY The Y coordinate of the tile
      * @return The coordinates where the unit should be drawn onscreen
      */
-    private Point getUnitImagePositionInTile(int unitImageWidth, int unitImageHeight, int tileX, int tileY) {
-        int unitX = ((tileX + getTileWidth() / 2) - unitImageWidth / 2);
-        int unitY = (tileY + getTileHeight() / 2) - unitImageHeight / 2 -
+    private Point getUnitImagePositionInTile(int unitImageWidth, int unitImageHeight) {
+        int unitX = (tileWidth - unitImageWidth) / 2;
+        int unitY = (tileHeight - unitImageHeight) / 2 -
                     (int) (UNIT_OFFSET * lib.getScalingFactor());
         
         return new Point(unitX, unitY);
@@ -2828,8 +2837,8 @@ public final class GUI {
         }
     }
     
-    private void drawCursor(Graphics2D g, int x, int y) {
-        g.drawImage(cursorImage, x, y, null);
+    private void drawCursor(Graphics2D g) {
+        g.drawImage(cursorImage, 0, 0, null);
     }
 
 

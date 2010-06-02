@@ -80,7 +80,7 @@ public class ViewMode {
         return currentMode;
     }
 
-    public boolean displayTileCursor(Tile tile, int canvasX, int canvasY) {
+    public boolean displayTileCursor(Tile tile) {
         if (currentMode == ViewMode.VIEW_TERRAIN_MODE) {
 
             Position selectedTilePos = gui.getSelectedTile();
@@ -89,7 +89,6 @@ public class ViewMode {
             } else if (selectedTilePos.getX() == tile.getX() && selectedTilePos.getY() == tile.getY()) {
                 TerrainCursor cursor = gui.getCursor();
                 cursor.setTile(tile);
-                cursor.setCanvasPos(canvasX, canvasY);
                 return true;
             }
         }
@@ -97,14 +96,13 @@ public class ViewMode {
         return false;
     }
 
-    public boolean displayUnitCursor(Unit unit, int canvasX, int canvasY) {
+    public boolean displayUnitCursor(Unit unit) {
         if (currentMode == ViewMode.MOVE_UNITS_MODE) {
 
             TerrainCursor cursor = gui.getCursor();
 
             if ((unit == gui.getActiveUnit()) && (cursor.isActive() || (unit.getMovesLeft() == 0))) {
                 cursor.setTile(unit.getTile());
-                cursor.setCanvasPos(canvasX, canvasY);
                 return true;
             }
         }

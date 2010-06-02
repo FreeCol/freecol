@@ -85,7 +85,7 @@ public class WorkProductionPanel extends FreeColPanel {
             int height = canvas.getClient().getImageLibrary().getTerrainImageHeight(tileType);
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), colonyTile.getWorkTile().getMap(),
-                                              colonyTile.getWorkTile(), 0, 0, colony);
+                                              colonyTile.getWorkTile(), colony);
             add(new JLabel(new ImageIcon(image)));
 
         } else {
