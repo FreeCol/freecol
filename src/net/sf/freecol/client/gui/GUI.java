@@ -1307,10 +1307,9 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Map.
      */
     private void displayMap(Graphics2D g) {
+        AffineTransform originTransform = g.getTransform();
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
-
-        int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
@@ -1370,31 +1369,33 @@ public final class GUI {
 
         g.setColor(Color.black);
         g.fillRect(clipBounds.x, clipBounds.y, clipBounds.width, clipBounds.height);
-        int xx;
 
         /*
         PART 2a
         =======
         Display the base Tiles
         */
-        
-        int yy = clipTopY;
+        g.translate(clipLeftX, clipTopY);
+        AffineTransform baseTransform = g.getTransform();
+        AffineTransform rowTransform = null;
 
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = getXOffset(clipLeftX, tileY);
+            rowTransform = g.getTransform();
+            if (tileY % 2 == 1) {
+                g.translate(halfWidth, 0);
+            }
 
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
-                g.translate(xx, yy);
                 displayBaseTile(g, map, tile, true);
-                g.translate(-xx, -yy);
-                xx += tileWidth;
+                g.translate(tileWidth, 0);
             }
-
-            yy += halfHeight;
+            g.setTransform(rowTransform);
+            g.translate(0, halfHeight);
         }
+        g.setTransform(baseTransform);
 
         /*
         PART 2b
@@ -1403,23 +1404,24 @@ public final class GUI {
         */
 
         List<Unit> darkUnits = new ArrayList<Unit>();
-        List<Integer> darkUnitsX = new ArrayList<Integer>();
-        List<Integer> darkUnitsY = new ArrayList<Integer>();
+        List<AffineTransform> transforms = new ArrayList<AffineTransform>();
         
-        yy = clipTopY;
-
+        int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = getXOffset(clipLeftX, tileY);
+            rowTransform = g.getTransform();
+            if (tileY % 2 == 1) {
+                g.translate(halfWidth, 0);
+            }
 
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
                 // Display the grid.
-                g.translate(xx, yy + (halfHeight));
+                g.translate(0, halfHeight);
                 g.setStroke(gridStroke);
                 g.setColor(Color.BLACK);
                 g.draw(gridPath);
-                g.translate(- xx, - (yy + (halfHeight)));
+                g.translate(0, -halfHeight);
             }
 
             // Column per column; start at the left side to display the tiles.
@@ -1427,7 +1429,6 @@ public final class GUI {
                 Tile tile = map.getTile(tileX, tileY);
                     
                 // paint full borders
-                g.translate(xx, yy);
                 paintBorders(g, tile, BorderType.COUNTRY, true);
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -1441,11 +1442,13 @@ public final class GUI {
                 if (viewMode.displayTileCursor(tile)) {
                     drawCursor(g);
                 }
-                g.translate(-xx, -yy);
-                xx += tileWidth;
+                g.translate(tileWidth, 0);
             }
 
-            xx = getXOffset(clipLeftX, tileY);
+            g.setTransform(rowTransform);
+            if (tileY % 2 == 1) {
+                g.translate(halfWidth, 0);
+            }
 
             // Again, column per column starting at the left side. Now display the units
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
@@ -1453,21 +1456,19 @@ public final class GUI {
 
                 Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
                 if (unitInFront != null && !isOutForAnimation(unitInFront)) {
-                    g.translate(xx, yy);
-                    displayUnit(g, unitInFront);
-                        
                     if (unitInFront.isUndead()) {
                         darkUnits.add(unitInFront);
-                        darkUnitsX.add(xx);
-                        darkUnitsY.add(yy);
+                        transforms.add(g.getTransform());
+                    } else {
+                        displayUnit(g, unitInFront);
                     }
-                    g.translate(-xx, -yy);
                 }
-                xx += tileWidth;
+                g.translate(tileWidth, 0);
             }
-
-            yy += halfHeight;
+            g.setTransform(rowTransform);
+            g.translate(0, halfHeight);
         }
+        g.setTransform(baseTransform);
 
         /*
         PART 2c
@@ -1477,15 +1478,13 @@ public final class GUI {
         if (darkUnits.size() > 0) {
             g.setColor(Color.BLACK);
             final Image im = lib.getMiscImage(ImageLibrary.DARKNESS);
-            for (int index=0; index<darkUnits.size(); index++) {
+            for (int index = 0; index < darkUnits.size(); index++) {
                 final Unit u = darkUnits.get(index);
-                final int x = darkUnitsX.get(index);
-                final int y = darkUnitsY.get(index);
-                g.translate(x, y);
+                g.setTransform(transforms.get(index));
                 centerImage(g, im);
                 displayUnit(g, u);
-                g.translate(-x, -y);
             }
+            g.setTransform(baseTransform);
         }
 
         /*
@@ -1494,11 +1493,12 @@ public final class GUI {
         Display the colony names.
         */
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            //xx = 0;
-            yy = clipTopY;
             // Row per row; start with the top modified row
             for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-                xx = getXOffset(clipLeftX, tileY);
+                rowTransform = g.getTransform();
+                if (tileY % 2 == 1) {
+                    g.translate(halfWidth, 0);
+                }
 
                 // Column per column; start at the left side
                 for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
@@ -1508,12 +1508,12 @@ public final class GUI {
                         String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
                         Color backgroundColor = lib.getColor(settlement.getOwner());
                         Font font = ((Font)UIManager.get("NormalFont")).deriveFont(18.0f);
-                        int yOffset = yy + lib.getSettlementImage(settlement).getHeight(null) + 1;
+                        int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                         switch(colonyLabels) {
                         case ClientOptions.COLONY_LABELS_CLASSIC:
                             Image stringImage = createStringImage(g, name, backgroundColor, font);
                             g.drawImage(stringImage,
-                                        xx + (tileWidth - stringImage.getWidth(null))/2 + 1,
+                                        (tileWidth - stringImage.getWidth(null))/2 + 1,
                                         yOffset, null);
                             break;
                         case ClientOptions.COLONY_LABELS_MODERN:
@@ -1532,24 +1532,26 @@ public final class GUI {
                                 Image bonusImage = createLabel(g, bonus, font, backgroundColor);
                                 int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
                                     + bonusImage.getWidth(null) + 2 * spacing;
-                                int labelOffset = xx + (tileWidth - width)/2;
+                                int labelOffset = (tileWidth - width)/2;
                                 g.drawImage(sizeImage, labelOffset, yOffset, null);
                                 labelOffset += sizeImage.getWidth(null) + spacing;
                                 g.drawImage(nameImage, labelOffset, yOffset, null);
                                 labelOffset += nameImage.getWidth(null) + spacing;
                                 g.drawImage(bonusImage, labelOffset, yOffset, null);
                             } else {
-                                int labelOffset = xx + (tileWidth - nameImage.getWidth(null))/2;
+                                int labelOffset = (tileWidth - nameImage.getWidth(null))/2;
                                 g.drawImage(nameImage, labelOffset, yOffset, null);
                             }
                             break;
                         }
                     }
-                    xx += tileWidth;
+                    g.translate(tileWidth, 0);
                 }
-                yy += halfHeight;
+                g.setTransform(rowTransform);
+                g.translate(0, halfHeight);
             }
         }
+        g.setTransform(originTransform);
 
         /*
         PART 4
@@ -1602,8 +1604,8 @@ public final class GUI {
                 GUIMessage message = getMessage(0);
                 Image si = createStringImage(g, message.getMessage(), message.getColor(), font);
 
-                yy = size.height - 300 - getMessageCount() * si.getHeight(null);
-                xx = 40;
+                int yy = size.height - 300 - getMessageCount() * si.getHeight(null);
+                int xx = 40;
 
                 for (int i = 1; i < getMessageCount(); i++) {
                     message = getMessage(i);
