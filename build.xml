@@ -428,7 +428,7 @@
                             name="FreeCol"
                             mainclass="net.sf.freecol.FreeCol"
                             version="${freecol.version}"
-                            vmoptions="-Xmx256M"
+                            vmoptions="-Xmx256M -Dapple.awt.fakefullscreen=true"
                             jvmversion="1.6+"
                             arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                             stubfile="${freecol.build.dir}/skeletons/FreeCol"
