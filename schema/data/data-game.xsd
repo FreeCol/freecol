@@ -43,6 +43,7 @@
 	<xs:element ref="player" />
 	<xs:element ref="map" />
 	<xs:element ref="modelMessage" />
+        <xs:element ref="cibola" />
       </xs:choice>
 
       <xs:attribute name="ID" type="GameId" use="required" />
@@ -62,5 +63,10 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="cibola">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>
