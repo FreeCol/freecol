@@ -809,22 +809,25 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Initialize the list of cities of Cibola.
+     * Pull them out of the message file and randomize the order.
+     */
+    private void initializeCitiesOfCibola() {
+        citiesOfCibola = new ArrayList<String>();
+        for (int index = 0; index < 7; index++) {
+            citiesOfCibola.add("lostCityRumour.cityName." + index);
+        }
+        Collections.shuffle(citiesOfCibola);
+    }
+
+    /**
      * Get the next name for a city of Cibola.
      *
      * @return The next name for a city of Cibola, or null if none available.
      */
     public String getCityOfCibola() {
-        if (citiesOfCibola == null) {
-            // First time we have been asked for a City of Gold.
-            // Pull them out of the messages file and randomize the order.
-            citiesOfCibola = new ArrayList<String>();
-            for (int index = 0; index < 7; index++) {
-                citiesOfCibola.add("lostCityRumour.cityName." + index);
-            }
-            Collections.shuffle(citiesOfCibola);
-        }
-        return (citiesOfCibola == null || citiesOfCibola.size() == 0) ? null
-            : citiesOfCibola.remove(0);
+        if (citiesOfCibola == null) initializeCitiesOfCibola();
+        return (citiesOfCibola.size() == 0) ? null : citiesOfCibola.remove(0);
     }
 
     /**
@@ -901,12 +904,11 @@ public class Game extends FreeColGameObject {
             out.writeAttribute("nextID", Integer.toString(nextId));
         }
 
-        if (citiesOfCibola != null) {
-            for (String cityName : citiesOfCibola) {
-                out.writeStartElement(CIBOLA_TAG);
-                out.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
-                out.writeEndElement();
-            }
+        if (citiesOfCibola == null) initializeCitiesOfCibola();
+        for (String cityName : citiesOfCibola) {
+            out.writeStartElement(CIBOLA_TAG);
+            out.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
+            out.writeEndElement();
         }
         gameOptions.toXML(out);
         nationOptions.toXML(out);
