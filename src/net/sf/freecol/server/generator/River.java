@@ -212,7 +212,7 @@ public class River {
         drawToMap();
         if (nextRiver != null) {
             RiverSection section = sections.get(sections.size() - 1);
-            Position neighbor = Map.getAdjacent(section.getPosition(), section.direction);
+            Position neighbor = section.getPosition().getAdjacent(section.direction);
             nextRiver.grow(section, neighbor);
         }
     }
@@ -225,7 +225,7 @@ public class River {
      */
     public boolean isNextToSelf(Map.Position p) {
         for (Direction direction : Direction.longSides) {
-            Map.Position px = Map.getAdjacent(p, direction);
+            Map.Position px = p.getAdjacent(direction);
             if (this.contains(px)) {
                 return true;
             }
@@ -241,7 +241,7 @@ public class River {
      */
     public boolean isNextToWater(Map.Position p) {
         for (Direction direction : Direction.longSides) {
-            Map.Position px = Map.getAdjacent(p, direction);
+            Map.Position px = p.getAdjacent(direction);
             final Tile tile = map.getTile(px);
             if (tile == null) {
                 continue;
@@ -311,7 +311,7 @@ public class River {
         
         for (DirectionChange change : DirectionChange.values()) {
             Direction dir = change.getNewDirection(direction);
-            Map.Position newPosition = Map.getAdjacent(source, dir);
+            Map.Position newPosition = source.getAdjacent(dir);
             Tile nextTile = map.getTile(newPosition);
             
             if (nextTile == null) {
@@ -333,7 +333,7 @@ public class River {
                 // find out if an adjacent tile is next to water
                 for (DirectionChange change2 : DirectionChange.values()) {
                     Direction lastDir = change2.getNewDirection(dir);
-                    Map.Position px = Map.getAdjacent(newPosition, lastDir);
+                    Map.Position px = newPosition.getAdjacent(lastDir);
                     Tile tile = map.getTile(px);
                     if (tile != null && (!tile.isLand() || tile.hasRiver())) {
                         

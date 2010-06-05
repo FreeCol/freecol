@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -226,7 +225,7 @@ public class PrivateerMission extends Mission {
         
         if(unit.getMoveType(direction) == MoveType.MOVE){
         	Position unitPos = unit.getTile().getPosition();
-        	Position ColPos = Map.getAdjacent(unitPos, direction);
+        	Position ColPos = unitPos.getAdjacent(direction);
         	Colony colony = getGame().getMap().getTile(ColPos).getColony();
         	if(colony == nearestPort){
         		move(connection, direction);

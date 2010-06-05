@@ -206,7 +206,7 @@ public class LandGenerator {
         //add all valid neighbour positions to list
         p = new Position(x, y);  
         for (Direction direction : Direction.longSides) {
-            Position n = Map.getAdjacent(p, direction);
+            Position n = p.getAdjacent(direction);
             if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
                 l.add(n);
             }
@@ -225,7 +225,7 @@ public class LandGenerator {
                 
                 //add all valid neighbour positions to list    
                 for (Direction direction : Direction.longSides) {
-                    Position n = Map.getAdjacent(p, direction);
+                    Position n = p.getAdjacent(direction);
                     if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
                         l.add(n);
                     }
@@ -294,7 +294,7 @@ public class LandGenerator {
         Position p = new Position(x, y);
 
         for (Direction direction : Direction.values()) {
-            Position n = Map.getAdjacent(p, direction);
+            Position n = p.getAdjacent(direction);
             if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
                 return false;
             }
@@ -321,7 +321,7 @@ public class LandGenerator {
         Position p = new Position(x, y);
 
         for (Direction direction : Direction.longSides) {
-            Position n = Map.getAdjacent(p, direction);
+            Position n = p.getAdjacent(direction);
             if (Map.isValid(n, width, height)) {
                 growLand(n.getX(), n.getY());
             }
@@ -357,7 +357,7 @@ public class LandGenerator {
         Position p = new Position(i, j);
 
         for (Direction direction : Direction.values()) {
-            Position n = Map.getAdjacent(p, direction);
+            Position n = p.getAdjacent(direction);
             if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
                 sum++;
             }

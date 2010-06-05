@@ -1545,7 +1545,7 @@ public final class InGameController extends Controller {
             logger.fine("Colony " + colony.getName() + " can bombard enemy ships.");
             Position colonyPosition = colony.getTile().getPosition();
             for (Direction direction : Direction.values()) {
-            	Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
+            	Tile tile = map.getTile(colonyPosition.getAdjacent(direction));
 
             	// ignore land tiles and borders
             	if(tile == null || tile.isLand()){

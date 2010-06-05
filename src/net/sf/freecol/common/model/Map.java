@@ -1275,7 +1275,7 @@ public class Map extends FreeColGameObject {
      */
     public Tile getNeighbourOrNull(Direction direction, int x, int y) {
         if (isValid(x, y)) {
-            Position pos = getAdjacent(new Position(x, y), direction);
+            Position pos = (new Position(x, y)).getAdjacent(direction);
             return getTile(pos.getX(), pos.getY());
         } else {
             return null;
@@ -1389,22 +1389,8 @@ public class Map extends FreeColGameObject {
         return new WholeMapIterator();
     }
     
-    /**
-     * Gets the position adjacent to a given position, in a given
-     * direction.
-     *
-     * @param position The position
-     * @param direction The direction (N, NE, E, etc.)
-     * @return Adjacent position
-     */
-     public static Position getAdjacent(Position position, Direction direction) {
-         int x = position.x + ((position.y & 1) != 0 ?
-                               direction.getOddDX() : direction.getEvenDX());
-         int y = position.y + ((position.y & 1) != 0 ?
-                               direction.getOddDY() : direction.getEvenDY());
-         return new Position(x, y);
-     }
      
+
      /**
       * Gets the position adjacent Tile to a given Tile, in a given
       * direction.
@@ -1665,6 +1651,24 @@ public class Map extends FreeColGameObject {
         public String toString() {
             return "(" + x + ", " + y + ")";
         }
+
+        /**
+         * Gets the position adjacent to a given position, in a given
+         * direction.
+         *
+         * @param position The position
+         * @param direction The direction (N, NE, E, etc.)
+         * @return Adjacent position
+         */
+         public Position getAdjacent(Direction direction) {
+             int x = this.x + ((this.y & 1) != 0 ?
+                                   direction.getOddDX() : direction.getEvenDX());
+             int y = this.y + ((this.y & 1) != 0 ?
+                                   direction.getOddDY() : direction.getEvenDY());
+             return new Position(x, y);
+    }
+
+
     }
 
     /**
@@ -1772,7 +1776,7 @@ public class Map extends FreeColGameObject {
          */
         public boolean hasNext() {
             for (int i = x; i < 8; i++) {
-                Position newPosition = getAdjacent(basePosition, directions[i]);
+                Position newPosition = basePosition.getAdjacent(directions[i]);
                 if (isValid(newPosition))
                     return true;
             }
@@ -1789,7 +1793,7 @@ public class Map extends FreeColGameObject {
         @Override
         public Position nextPosition() throws NoSuchElementException {
             for (int i = x; i < 8; i++) {
-                Position newPosition = getAdjacent(basePosition, directions[i]);
+                Position newPosition = basePosition.getAdjacent(directions[i]);
                 if (isValid(newPosition)) {
                     x = i + 1;
                     return newPosition;
@@ -1833,15 +1837,15 @@ public class Map extends FreeColGameObject {
             n = 0;
 
             if (isFilled || radius == 1) {
-                nextPosition = getAdjacent(center, Direction.NE);
+                nextPosition = center.getAdjacent(Direction.NE);
                 currentRadius = 1;
             } else {
                 currentRadius = radius;
                 nextPosition = center;
                 for (int i = 1; i < radius; i++) {
-                    nextPosition = getAdjacent(nextPosition, Direction.N);
+                    nextPosition = nextPosition.getAdjacent(Direction.N);
                 }
-                nextPosition = getAdjacent(nextPosition, Direction.NE);
+                nextPosition = nextPosition.getAdjacent(Direction.NE);
             }
             if (!isValid(nextPosition)) {
                 determineNextPosition();
@@ -1875,7 +1879,7 @@ public class Map extends FreeColGameObject {
                     } else {
                         n = 0;
                         positionReturned = false;
-                        nextPosition = getAdjacent(nextPosition, Direction.NE);
+                        nextPosition = nextPosition.getAdjacent(Direction.NE);
                     }
                 } else {
                     int i = n / width;
@@ -1897,7 +1901,7 @@ public class Map extends FreeColGameObject {
                         throw new IllegalStateException("i=" + i + ", n=" + n
                                 + ", width=" + width);
                     }
-                    nextPosition = getAdjacent(nextPosition, direction);
+                    nextPosition = nextPosition.getAdjacent(direction);
                 }
             } while (nextPosition != null && !isValid(nextPosition));
         }
@@ -1954,7 +1958,7 @@ public class Map extends FreeColGameObject {
          */
         public boolean hasNext() {
             for (int i = index; i < 8; i += 2) {
-                Position newPosition = getAdjacent(basePosition, directions[i]);
+                Position newPosition = basePosition.getAdjacent(directions[i]);
                 if (isValid(newPosition))
                     return true;
             }
@@ -1971,7 +1975,7 @@ public class Map extends FreeColGameObject {
         @Override
         public Position nextPosition() throws NoSuchElementException {
             for (int i = index; i < 8; i += 2) {
-                Position newPosition = getAdjacent(basePosition, directions[i]);
+                Position newPosition = basePosition.getAdjacent(directions[i]);
                 if (isValid(newPosition)) {
                     index = i + 2;
                     return newPosition;

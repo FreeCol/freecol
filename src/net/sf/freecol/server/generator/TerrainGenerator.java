@@ -512,7 +512,7 @@ public class TerrainGenerator {
             tile.setRegion(region);
 
             for (Direction direction : Direction.values()) {
-                Position n = Map.getAdjacent(p, direction);
+                Position n = p.getAdjacent(direction);
                 if (map.isValid(n)
                     && !visited[n.getX()][n.getY()]
                     && bounds.contains(n.getX(), n.getY())) {
@@ -939,7 +939,7 @@ public class TerrainGenerator {
                 Direction direction = map.getRandomDirection();
                 int length = maximumLength - random.nextInt(maximumLength/2);
                 for (int index = 0; index < length; index++) {
-                    p = Map.getAdjacent(p, direction);
+                    p = p.getAdjacent(direction);
                     Tile nextTile = map.getTile(p);
                     if (nextTile == null || !nextTile.isLand()) 
                         continue;
@@ -1152,7 +1152,7 @@ public class TerrainGenerator {
         limit--;
         do {
             for (Direction direction : Direction.values()) {
-                Position n = Map.getAdjacent(p, direction);
+                Position n = p.getAdjacent(direction);
                 if (Map.isValid(n,boolmap.length,boolmap[0].length) && boolmap[n.getX()][n.getY()] && !visited[n.getX()][n.getY()] && limit > 0) {
                     visited[n.getX()][n.getY()] = true;
                     limit--;
