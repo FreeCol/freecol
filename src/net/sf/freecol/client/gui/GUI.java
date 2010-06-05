@@ -132,6 +132,7 @@ public final class GUI {
         /**
          * Executes painting. The method shadows the background image, and
          * paints the message with icon (if available) and text.
+         * @param g a <code>Graphics</code> value
          */
         public void paint(Graphics g) {
             Rectangle clipArea = g.getClipBounds();
@@ -346,6 +347,12 @@ public final class GUI {
 
     }
     
+    /**
+     * Sets the ImageLibrary and calculates various items that depend
+     * on tile size.
+     *
+     * @param lib an <code>ImageLibrary</code> value
+     */
     private void setImageLibrary(ImageLibrary lib) {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
@@ -405,6 +412,12 @@ public final class GUI {
         updateMapDisplayVariables();
     }
     
+    /**
+     * Returns true if the given Unit is being animated.
+     *
+     * @param unit an <code>Unit</code> value
+     * @return a <code>boolean</code> value
+     */
     private boolean isOutForAnimation(final Unit unit) {
         return unitsOutForAnimation.containsKey(unit);
     }
@@ -416,6 +429,7 @@ public final class GUI {
      * related to nested calls with the same unit.
      * 
      * @param unit The unit to be hidden.
+     * @param sourceTile a <code>Tile</code> value
      * @param r The code to be executed.
      */
     public void executeWithUnitOutForAnimation(final Unit unit,
@@ -429,6 +443,13 @@ public final class GUI {
         }
     }
     
+    /**
+     * Describe <code>enterUnitOutForAnimation</code> method here.
+     *
+     * @param unit an <code>Unit</code> value
+     * @param sourceTile a <code>Tile</code> value
+     * @return a <code>JLabel</code> value
+     */
     private JLabel enterUnitOutForAnimation(final Unit unit, final Tile sourceTile) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
@@ -447,6 +468,11 @@ public final class GUI {
         return unitsOutForAnimationLabels.get(unit);
     }
     
+    /**
+     * Describe <code>releaseUnitOutForAnimation</code> method here.
+     *
+     * @param unit an <code>Unit</code> value
+     */
     private void releaseUnitOutForAnimation(final Unit unit) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
@@ -488,6 +514,10 @@ public final class GUI {
         return label;
     }
 
+    /**
+     * Describe <code>updateMapDisplayVariables</code> method here.
+     *
+     */
     private void updateMapDisplayVariables() {
         // Calculate the amount of rows that will be drawn above the central Tile
         topSpace = (size.height - tileHeight) / 2;
@@ -530,15 +560,30 @@ public final class GUI {
         cursor.startBlinking();
     }
     
+    /**
+     * Describe <code>getCursor</code> method here.
+     *
+     * @return a <code>TerrainCursor</code> value
+     */
     public TerrainCursor getCursor(){
         return cursor;
     }
     
+    /**
+     * Describe <code>setSize</code> method here.
+     *
+     * @param size a <code>Dimension</code> value
+     */
     public void setSize(Dimension size) {
         this.size = size;
         updateMapDisplayVariables();
     }
     
+    /**
+     * Describe <code>moveTileCursor</code> method here.
+     *
+     * @param direction a <code>Direction</code> value
+     */
     public void moveTileCursor(Direction direction){
         Tile selectedTile = freeColClient.getGame().getMap().getTile(getSelectedTile());
         if(selectedTile != null){   
@@ -681,6 +726,11 @@ public final class GUI {
         }
     }
 
+    /**
+     * Describe <code>showColonyPanel</code> method here.
+     *
+     * @param selectedTile a <code>Position</code> value
+     */
     public void showColonyPanel(Position selectedTile) {
         Game gameData = freeColClient.getGame();
 
@@ -700,10 +750,18 @@ public final class GUI {
         }
     }
     
+    /**
+     * Describe <code>restartBlinking</code> method here.
+     *
+     */
     public void restartBlinking() {
         blinkingMarqueeEnabled = true;
     }
     
+    /**
+     * Describe <code>stopBlinking</code> method here.
+     *
+     */
     public void stopBlinking() {
         blinkingMarqueeEnabled = false;
     }
@@ -1231,6 +1289,12 @@ public final class GUI {
     }
 
     
+    /**
+     * Describe <code>displayGotoPath</code> method here.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param gotoPath a <code>PathNode</code> value
+     */
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
         if (gotoPath != null) {
             PathNode temp = gotoPath;
@@ -1284,22 +1348,18 @@ public final class GUI {
         }
     }
 
+    /**
+     * Centers the given Image on the tile.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param image an <code>Image</code> value
+     */
     private void centerImage(Graphics2D g, Image image) {
         g.drawImage(image,
                     (tileWidth - image.getWidth(null))/2,
                     (tileHeight - image.getHeight(null))/2,
                     null);
     }
-
-    private int getXOffset(int clipLeftX, int tileY) {
-        int xx = clipLeftX;
-        if ((tileY % 2) != 0) {
-            xx += halfWidth;
-        }
-        return xx;
-    }
-
-
 
     /**
      * Displays the Map onto the given Graphics2D object. The Tile at
@@ -1781,6 +1841,16 @@ public final class GUI {
     }
     */
     
+    /**
+     * Creates an Image that shows the given text centred on a
+     * translucent rounded rectangle with the given color.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param text a <code>String</code> value
+     * @param font a <code>Font</code> value
+     * @param backgroundColor a <code>Color</code> value
+     * @return an <code>Image</code> value
+     */
     private Image createLabel(Graphics2D g, String text, Font font, Color backgroundColor) {
         String key = text + font.getName() + backgroundColor.getRGB();
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
@@ -1808,13 +1878,10 @@ public final class GUI {
 
 
     /**
-     * Draws a road, between the given points, on the provided <code>Graphics</code>.
-     * When you provide the same <code>seed</code> you will get the same road.
+     * Draws all roads on the given Tile.
      *
      * @param g The <code>Graphics</code> to draw the road upon.
      * @param tile a <code>Tile</code> value
-     * @param x an <code>int</code> value
-     * @param y an <code>int</code> value
      */
     public void drawRoad(Graphics2D g, Tile tile) {
 
@@ -1877,10 +1944,6 @@ public final class GUI {
      *      the <code>Tile</code>.
      * @param map The <code>Map</code>.
      * @param tile The <code>Tile</code> to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     *      (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     *      (in pixels).
      * @param colony The <code>Colony</code> to create the visualization
      *      of the <code>Tile</code> for. This object is also used to
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
@@ -1927,10 +1990,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      */
     public void displayTerrain(Graphics2D g, Map map, Tile tile) {
         displayBaseTile(g, map, tile, true);
@@ -1947,10 +2006,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      */
     public void displayTile(Graphics2D g, Map map, Tile tile) {
         displayTile(g, map, tile, true);
@@ -1964,10 +2019,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
@@ -1982,10 +2033,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
@@ -2060,6 +2107,15 @@ public final class GUI {
     }    
 
 
+    /**
+     * Draws the borders of a territory on the given Tile. The
+     * territory is either a country or a region.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param tile a <code>Tile</code> value
+     * @param type a <code>BorderType</code> value
+     * @param opaque a <code>boolean</code> value
+     */
     private void paintBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
         if (tile == null ||
             (type == BorderType.COUNTRY
@@ -2158,10 +2214,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      * @param withNumber indicates if the number of inhabitants should be drawn too.
@@ -2186,10 +2238,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      */
     private void displayTileItems(Graphics2D g, Map map, Tile tile) {
         // ATTENTION: we assume that only overlays and forests
@@ -2240,6 +2288,13 @@ public final class GUI {
     }
 
 
+    /**
+     * Draws the given TileItem on the given Tile.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param tile a <code>Tile</code> value
+     * @param item a <code>TileItem</code> value
+     */
     private void drawItem(Graphics2D g, Tile tile, TileItem item) {
 
         if (item instanceof Resource) {
@@ -2274,10 +2329,7 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
+     * @param withNumber a <code>boolean</code> value
      */
     private void displaySettlement(Graphics2D g, Map map, Tile tile, boolean withNumber) {  
         if (tile.isExplored()) {
@@ -2348,10 +2400,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      */
     private void displayFogOfWar(Graphics2D g, Map map, Tile tile) {  
         if (tile.isExplored()
@@ -2374,10 +2422,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      */
     private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile) {  
         if (tile.isExplored()) {
@@ -2405,10 +2449,6 @@ public final class GUI {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
-     * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
-     * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
      */
     private void displayOptionalValues(Graphics2D g, Map map, Tile tile) {
         String text = null;
@@ -2472,6 +2512,12 @@ public final class GUI {
         }
     }
 
+    /**
+     * Center the given String on the current Tile.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param text a <code>String</code> value
+     */
     private void centerString(Graphics2D g, String text) {
         g.setColor(Color.BLACK);
         g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(12.0f));
@@ -2481,8 +2527,8 @@ public final class GUI {
     }
 
     /**
-    * Stops any ongoing goto operation on the mapboard.
-    */
+     * Stops any ongoing goto operation on the mapboard.
+     */
     public void stopGoto() {
         freeColClient.getCanvas().setCursor(null);
         setGotoPath(null);
@@ -2580,6 +2626,14 @@ public final class GUI {
         return -1;
     }
     
+    /**
+     * Returns an occupation indicator, i.e. a small image with a
+     * single letter or symbol that indicates the Unit's state.
+     *
+     * @param g a <code>Graphics</code> value
+     * @param unit an <code>Unit</code> value
+     * @return an <code>Image</code> value
+     */
     public Image getOccupationIndicatorImage(Graphics g, Unit unit) {
         Color backgroundColor = lib.getColor(unit.getOwner());
         Color foregroundColor = getForegroundColor(backgroundColor);
@@ -2651,6 +2705,12 @@ public final class GUI {
 
 
 
+    /**
+     * Describe <code>getForegroundColor</code> method here.
+     *
+     * @param background a <code>Color</code> value
+     * @return a <code>Color</code> value
+     */
     private Color getForegroundColor(Color background) {
         /*
          * Our eyes have different sensitivity towards
@@ -2666,6 +2726,12 @@ public final class GUI {
         }
     }
     
+    /**
+     * Describe <code>getStringBorderColor</code> method here.
+     *
+     * @param color a <code>Color</code> value
+     * @return a <code>Color</code> value
+     */
     private Color getStringBorderColor(Color color) {
         /*
          * I think string border colors should be black
@@ -2686,12 +2752,6 @@ public final class GUI {
      * location specified by the coordinates.
      * @param g The Graphics2D object on which to draw the Unit.
      * @param unit The Unit to draw.
-     * @param x The x-coordinate of the location where to draw the Unit
-     * (in pixels). These are the coordinates of the Tile on which
-     * the Unit is located.
-     * @param y The y-coordinate of the location where to draw the Unit
-     * (in pixels). These are the coordinates of the Tile on which
-     * the Unit is located.
      */
     private void displayUnit(Graphics2D g, Unit unit) {
         try {
@@ -2771,8 +2831,6 @@ public final class GUI {
     /**
      * Gets the coordinates to draw a unit in a given tile.
      * @param unitImage The unit's image
-     * @param tileX The X coordinate of the tile
-     * @param tileY The Y coordinate of the tile
      * @return The coordinates where the unit should be drawn onscreen
      */
     private Point getUnitImagePositionInTile(Image unitImage) {
@@ -2783,8 +2841,6 @@ public final class GUI {
      * Gets the coordinates to draw a unit in a given tile.
      * @param unitImageWidth The unit image's width
      * @param unitImageHeight The unit image's height
-     * @param tileX The X coordinate of the tile
-     * @param tileY The Y coordinate of the tile
      * @return The coordinates where the unit should be drawn onscreen
      */
     private Point getUnitImagePositionInTile(int unitImageWidth, int unitImageHeight) {
@@ -2823,6 +2879,11 @@ public final class GUI {
         }
     }
     
+    /**
+     * Describe <code>drawCursor</code> method here.
+     *
+     * @param g a <code>Graphics2D</code> value
+     */
     private void drawCursor(Graphics2D g) {
         g.drawImage(cursorImage, 0, 0, null);
     }
@@ -3531,10 +3592,20 @@ public final class GUI {
         bottomRow = -1;
     }
 
+    /**
+     * Describe <code>getTileHeight</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int getTileHeight() {
         return tileHeight;
     }
 
+    /**
+     * Describe <code>getTileWidth</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int getTileWidth() {
         return tileWidth;
     }
