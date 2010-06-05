@@ -1505,16 +1505,18 @@ public final class GUI {
                     drawCursor(g);
                 }
                 // check for units
-                Unit unitInFront = getUnitInFront(tile);
-                if (unitInFront != null && !isOutForAnimation(unitInFront)) {
-                    units.add(unitInFront);
-                    unitTransforms.add(g.getTransform());
-                }
-                // check for settlements
-                Settlement settlement = tile.getSettlement();
-                if (settlement != null) {
-                    settlements.add(settlement);
-                    settlementTransforms.add(g.getTransform());
+                if (tile != null) {
+                    Unit unitInFront = getUnitInFront(tile);
+                    if (unitInFront != null && !isOutForAnimation(unitInFront)) {
+                        units.add(unitInFront);
+                        unitTransforms.add(g.getTransform());
+                    }
+                    // check for settlements
+                    Settlement settlement = tile.getSettlement();
+                    if (settlement != null) {
+                        settlements.add(settlement);
+                        settlementTransforms.add(g.getTransform());
+                    }
                 }
                 g.translate(tileWidth, 0);
             }

@@ -593,7 +593,8 @@ public final class ImageLibrary {
             }
 
         } else { // IndianSettlement
-            return getSettlementImage(((IndianSettlement) settlement).getTypeOfSettlement());
+            String key = settlement.getOwner().getNationID() + ".settlement.image";
+            return ResourceManager.getImage(key);
         }
     }
 
