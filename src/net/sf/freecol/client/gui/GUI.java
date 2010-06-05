@@ -1329,19 +1329,19 @@ public final class GUI {
         =======
         Determine which tiles need to be redrawn.
         */
-        int clipTopRow = (clipBounds.y - topRowY) / (halfHeight) - 1;
-        int clipTopY = topRowY + clipTopRow * (halfHeight);
-        clipTopRow = topRow + clipTopRow;
+        int firstRow = (clipBounds.y - topRowY) / (halfHeight) - 1;
+        int clipTopY = topRowY + firstRow * (halfHeight);
+        firstRow = topRow + firstRow;
 
-        int clipLeftCol = (clipBounds.x - leftColumnX) / tileWidth - 1;
-        int clipLeftX = leftColumnX + clipLeftCol * tileWidth;
-        clipLeftCol = leftColumn + clipLeftCol;
+        int firstColumn = (clipBounds.x - leftColumnX) / tileWidth - 1;
+        int clipLeftX = leftColumnX + firstColumn * tileWidth;
+        firstColumn = leftColumn + firstColumn;
 
-        int clipBottomRow = (clipBounds.y + clipBounds.height - topRowY) / (halfHeight);
-        clipBottomRow = topRow + clipBottomRow;
+        int lastRow = (clipBounds.y + clipBounds.height - topRowY) / (halfHeight);
+        lastRow = topRow + lastRow;
 
-        int clipRightCol = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
-        clipRightCol = leftColumn + clipRightCol;
+        int lastColumn = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
+        lastColumn = leftColumn + lastColumn;
 
         /*
         PART 1b
@@ -1354,7 +1354,7 @@ public final class GUI {
             int nextX = halfWidth;
             int nextY = -halfHeight;
 
-            for (int i = 0; i <= ((clipRightCol - clipLeftCol) * 2 + 1); i++) {
+            for (int i = 0; i <= ((lastColumn - firstColumn) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
                 nextX += halfWidth;
                 nextY = (nextY == 0 ? -halfHeight : 0);
@@ -1380,15 +1380,15 @@ public final class GUI {
         AffineTransform rowTransform = null;
 
         // Row per row; start with the top modified row
-        for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
+        for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
-            if (tileY % 2 == 1) {
+            if (row % 2 == 1) {
                 g.translate(halfWidth, 0);
             }
 
             // Column per column; start at the left side to display the tiles.
-            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                Tile tile = map.getTile(tileX, tileY);
+            for (int column = firstColumn; column <= lastColumn; column++) {
+                Tile tile = map.getTile(column, row);
                 displayBaseTile(g, map, tile, true);
                 g.translate(tileWidth, 0);
             }
@@ -1403,15 +1403,17 @@ public final class GUI {
         Display the Tile overlays and Units
         */
 
-        List<Unit> darkUnits = new ArrayList<Unit>();
-        List<AffineTransform> transforms = new ArrayList<AffineTransform>();
+        List<Unit> units = new ArrayList<Unit>();
+        List<AffineTransform> unitTransforms = new ArrayList<AffineTransform>();
+        List<Settlement> settlements = new ArrayList<Settlement>();
+        List<AffineTransform> settlementTransforms = new ArrayList<AffineTransform>();
         
         int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
         // Row per row; start with the top modified row
-        for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
+        for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
-            if (tileY % 2 == 1) {
+            if (row % 2 == 1) {
                 g.translate(halfWidth, 0);
             }
 
@@ -1425,8 +1427,8 @@ public final class GUI {
             }
 
             // Column per column; start at the left side to display the tiles.
-            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                Tile tile = map.getTile(tileX, tileY);
+            for (int column = firstColumn; column <= lastColumn; column++) {
+                Tile tile = map.getTile(column, row);
                     
                 // paint full borders
                 paintBorders(g, tile, BorderType.COUNTRY, true);
@@ -1442,29 +1444,21 @@ public final class GUI {
                 if (viewMode.displayTileCursor(tile)) {
                     drawCursor(g);
                 }
-                g.translate(tileWidth, 0);
-            }
-
-            g.setTransform(rowTransform);
-            if (tileY % 2 == 1) {
-                g.translate(halfWidth, 0);
-            }
-
-            // Again, column per column starting at the left side. Now display the units
-            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                // Display any units on that Tile:
-
-                Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
+                // check for units
+                Unit unitInFront = getUnitInFront(tile);
                 if (unitInFront != null && !isOutForAnimation(unitInFront)) {
-                    if (unitInFront.isUndead()) {
-                        darkUnits.add(unitInFront);
-                        transforms.add(g.getTransform());
-                    } else {
-                        displayUnit(g, unitInFront);
-                    }
+                    units.add(unitInFront);
+                    unitTransforms.add(g.getTransform());
+                }
+                // check for settlements
+                Settlement settlement = tile.getSettlement();
+                if (settlement != null) {
+                    settlements.add(settlement);
+                    settlementTransforms.add(g.getTransform());
                 }
                 g.translate(tileWidth, 0);
             }
+
             g.setTransform(rowTransform);
             g.translate(0, halfHeight);
         }
@@ -1473,16 +1467,19 @@ public final class GUI {
         /*
         PART 2c
         =======
-        Display darkness (revenge mode)
+        Display units
         */
-        if (darkUnits.size() > 0) {
+        if (units.size() > 0) {
             g.setColor(Color.BLACK);
             final Image im = lib.getMiscImage(ImageLibrary.DARKNESS);
-            for (int index = 0; index < darkUnits.size(); index++) {
-                final Unit u = darkUnits.get(index);
-                g.setTransform(transforms.get(index));
-                centerImage(g, im);
-                displayUnit(g, u);
+            for (int index = 0; index < units.size(); index++) {
+                final Unit unit = units.get(index);
+                g.setTransform(unitTransforms.get(index));
+                if (unit.isUndead()) {
+                    // display darkness
+                    centerImage(g, im);
+                }
+                displayUnit(g, unit);
             }
             g.setTransform(baseTransform);
         }
@@ -1492,65 +1489,52 @@ public final class GUI {
         ======
         Display the colony names.
         */
-        if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            // Row per row; start with the top modified row
-            for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-                rowTransform = g.getTransform();
-                if (tileY % 2 == 1) {
-                    g.translate(halfWidth, 0);
-                }
+        if (settlements.size() > 0 && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
+            for (int index = 0; index < settlements.size(); index++) {
+                final Settlement settlement = settlements.get(index);
+                String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
+                Color backgroundColor = lib.getColor(settlement.getOwner());
+                Font font = ((Font)UIManager.get("NormalFont")).deriveFont(18.0f);
+                int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+                g.setTransform(settlementTransforms.get(index));
+                switch(colonyLabels) {
+                case ClientOptions.COLONY_LABELS_CLASSIC:
+                    Image stringImage = createStringImage(g, name, backgroundColor, font);
+                    g.drawImage(stringImage,
+                                (tileWidth - stringImage.getWidth(null))/2 + 1,
+                                yOffset, null);
+                    break;
+                case ClientOptions.COLONY_LABELS_MODERN:
+                    backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
+                                                backgroundColor.getBlue(), 128);
 
-                // Column per column; start at the left side
-                for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                    Tile tile = map.getTile(tileX, tileY);
-                    if (tile != null && tile.getSettlement() != null) {
-                        Settlement settlement = tile.getSettlement();
-                        String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
-                        Color backgroundColor = lib.getColor(settlement.getOwner());
-                        Font font = ((Font)UIManager.get("NormalFont")).deriveFont(18.0f);
-                        int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
-                        switch(colonyLabels) {
-                        case ClientOptions.COLONY_LABELS_CLASSIC:
-                            Image stringImage = createStringImage(g, name, backgroundColor, font);
-                            g.drawImage(stringImage,
-                                        (tileWidth - stringImage.getWidth(null))/2 + 1,
-                                        yOffset, null);
-                            break;
-                        case ClientOptions.COLONY_LABELS_MODERN:
-                            backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
-                                                        backgroundColor.getBlue(), 128);
+                    Image nameImage = createLabel(g, name, font, backgroundColor);
 
-                            Image nameImage = createLabel(g, name, font, backgroundColor);
-
-                            int spacing = 2;
-                            if (settlement instanceof Colony) {
-                                String size = Integer.toString(((Colony) settlement).getUnitCount());
-                                int bonusProduction = ((Colony) settlement).getProductionBonus();
-                                String bonus = bonusProduction > 0 ? "+" + bonusProduction
-                                    : Integer.toString(bonusProduction);
-                                Image sizeImage = createLabel(g, size, font, backgroundColor);
-                                Image bonusImage = createLabel(g, bonus, font, backgroundColor);
-                                int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
-                                    + bonusImage.getWidth(null) + 2 * spacing;
-                                int labelOffset = (tileWidth - width)/2;
-                                g.drawImage(sizeImage, labelOffset, yOffset, null);
-                                labelOffset += sizeImage.getWidth(null) + spacing;
-                                g.drawImage(nameImage, labelOffset, yOffset, null);
-                                labelOffset += nameImage.getWidth(null) + spacing;
-                                g.drawImage(bonusImage, labelOffset, yOffset, null);
-                            } else {
-                                int labelOffset = (tileWidth - nameImage.getWidth(null))/2;
-                                g.drawImage(nameImage, labelOffset, yOffset, null);
-                            }
-                            break;
-                        }
+                    int spacing = 2;
+                    if (settlement instanceof Colony) {
+                        String size = Integer.toString(((Colony) settlement).getUnitCount());
+                        int bonusProduction = ((Colony) settlement).getProductionBonus();
+                        String bonus = bonusProduction > 0 ? "+" + bonusProduction
+                            : Integer.toString(bonusProduction);
+                        Image sizeImage = createLabel(g, size, font, backgroundColor);
+                        Image bonusImage = createLabel(g, bonus, font, backgroundColor);
+                        int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
+                            + bonusImage.getWidth(null) + 2 * spacing;
+                        int labelOffset = (tileWidth - width)/2;
+                        g.drawImage(sizeImage, labelOffset, yOffset, null);
+                        labelOffset += sizeImage.getWidth(null) + spacing;
+                        g.drawImage(nameImage, labelOffset, yOffset, null);
+                        labelOffset += nameImage.getWidth(null) + spacing;
+                        g.drawImage(bonusImage, labelOffset, yOffset, null);
+                    } else {
+                        int labelOffset = (tileWidth - nameImage.getWidth(null))/2;
+                        g.drawImage(nameImage, labelOffset, yOffset, null);
                     }
-                    g.translate(tileWidth, 0);
+                    break;
                 }
-                g.setTransform(rowTransform);
-                g.translate(0, halfHeight);
             }
         }
+
         g.setTransform(originTransform);
 
         /*
