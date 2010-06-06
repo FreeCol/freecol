@@ -25,6 +25,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -67,12 +68,15 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private static final int MAP_WIDTH = 220;
     private static final int MAP_HEIGHT = 128;
 
-    private int mapX;
-    private int mapY;
-    
+    /**
+     * The part of the panel that is used for the map. If a skin is
+     * used, this is smaller than the whole panel.
+     */
+    private final Rectangle mapWindow;
+
     private FreeColClient freeColClient;
-    private final JButton          miniMapZoomOutButton;
-    private final JButton          miniMapZoomInButton;
+    private final JButton miniMapZoomOutButton;
+    private final JButton miniMapZoomInButton;
     private Color backgroundColor;
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
@@ -81,7 +85,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * The top left tile on the mini map represents the tile.
      * (firstColumn, firstRow) in the world map
      */
-    private int firstColumn, firstRow;
+    private int firstColumn, firstRow, lastColumn, lastRow;
 
     /**
      * Used for adjusting the position of the mapboard image.
@@ -104,7 +108,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
         setLayout(null);
 
-        //boolean usingSkin;
         Image skin = ResourceManager.getImage("MiniMap.skin");
         if (skin == null) {
             try {
@@ -113,17 +116,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             } catch (Exception e) {}
             setSize(MAP_WIDTH, MAP_HEIGHT);
             setOpaque(true);
-            //usingSkin = false;
-            mapX = 0;
-            mapY = 0;
+            mapWindow = new Rectangle(MAP_WIDTH, MAP_HEIGHT);
         } else {
             setBorder(null);
             setSize(skin.getWidth(null), skin.getHeight(null));
             setOpaque(false);
-            //usingSkin = true;
             // TODO-LATER: The values below should be specified by a skin-configuration-file:
-            mapX = 38;
-            mapY = 75;
+            mapWindow = new Rectangle(38, 75, MAP_WIDTH, MAP_HEIGHT);
         }
 
         // Add buttons:
@@ -133,8 +132,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomOutButton.setFocusable(false);
         miniMapZoomInButton.setFocusable(false);
 
-        int bh = mapY + MAP_HEIGHT - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());
-        int bw = mapX;
+        int bh = mapWindow.y + MAP_HEIGHT - Math.max(miniMapZoomOutButton.getHeight(),
+                                                     miniMapZoomInButton.getHeight());
+        int bw = mapWindow.x;
         if (getBorder() != null) {
             Insets insets = getBorder().getBorderInsets(this);
             bh -= insets.bottom;
@@ -199,21 +199,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (skin == null) {
             paintMap(graphics, getWidth(), getHeight());
         } else {
-            graphics.translate(mapX, mapY);
+            graphics.translate(mapWindow.x, mapWindow.y);
             paintMap(graphics, MAP_WIDTH, MAP_HEIGHT);
-            graphics.translate(-mapX, -mapY);
-            paintSkin(graphics, skin);
+            graphics.translate(-mapWindow.x, -mapWindow.y);
+            graphics.drawImage(skin, 0, 0, null);
         }
-    }
-
-    /**
-     * Paints the skin onto this component.
-     * 
-     * @param graphics The <code>Graphics</code> to draw the skin on.
-     * @param skin The skin.
-     */
-    private void paintSkin(Graphics graphics, Image skin) {
-        graphics.drawImage(skin, 0, 0, null);
     }
 
     private Color getMinimapColor(TileType type) {
@@ -246,6 +236,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (freeColClient.getGUI() == null || freeColClient.getGUI().getFocus() == null) {
             return;
         }
+
         /* xSize and ySize represent how many tiles can be represented on the
            mini map at the current zoom level */
         int xSize = width / tileSize;
@@ -286,13 +277,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             adjustY = 0;
         }
 
+        lastRow = firstRow + ySize;
+        lastColumn = firstColumn + xSize;
+
         int tileWidth = tileSize;
         int tileHeight = tileSize/2;
         int halfWidth = tileSize/2;
         int halfHeight = tileSize/4;
-
-        int lastRow = firstRow + ySize;
-        int lastColumn = firstColumn + xSize;
 
         /* Iterate through all the squares on the mini map and paint the
          * tiles based on terrain */
@@ -392,12 +383,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
 
-    private boolean isInMap(int x, int y) {
-        return x >= mapX && x < mapX + MAP_WIDTH
-            && y >= mapY && y < mapY + MAP_HEIGHT;
-    }
-
-
     private void focus(int x, int y) {
         int tileX = ((x - adjustX) / tileSize) + firstColumn;
         int tileY = ((y - adjustY) / tileSize * 4) + firstRow;
@@ -406,10 +391,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
     private void focus(MouseEvent e) {
-        if (e.getComponent().isEnabled() && isInMap(e.getX(), e.getY())) {
-            int x = (int) ((e.getX() - mapX));
-            int y = (int) ((e.getY() - mapY));
-            focus(x, y);
+        if (e.getComponent().isEnabled() && mapWindow.contains(e.getPoint())) {
+            focus(e.getX() - mapWindow.x, e.getY() - mapWindow.y);
         }
     }
 
