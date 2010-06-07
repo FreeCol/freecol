@@ -334,7 +334,7 @@ public class TileTest extends FreeColTestCase {
         assertFalse(tile2.hasRiver());
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));
-        assertFalse(hasBonusFromSource(tile1.getProductionBonus(lumber, null), river1.getType()));
+        assertTrue(hasBonusFromSource(tile1.getProductionBonus(lumber, null), river1.getType()));
         assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar, null), road2.getType()));
         assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
 
@@ -502,4 +502,32 @@ public class TileTest extends FreeColTestCase {
 
 
     }
+
+    public void testMinerals() {
+        Game game = getGame();
+        Map map = getTestMap(tundra);
+    	game.setMap(map);
+    	
+    	Colony colony = getStandardColony();
+        Tile tile = map.getNeighbourOrNull(Map.Direction.N, colony.getTile());
+        ResourceType minerals = spec().getResourceType("model.resource.minerals");
+        tile.setResource(new Resource(game, tile, minerals));
+        GoodsType silver = spec().getGoodsType("model.goods.silver");
+        UnitType colonist = spec().getUnitType("model.unit.freeColonist");
+
+        Unit unit = colony.getUnitList().get(0);
+        assertEquals(colonist, unit.getType());
+        assertTrue(silver.isFarmed());
+        assertEquals(0, tundra.getProductionOf(silver, colonist));
+        assertEquals(1, tile.potential(silver, colonist));
+
+        ColonyTile colonyTile = colony.getColonyTile(tile);
+
+        Set<Modifier> modifiers = tile.getProductionBonus(silver, unit.getType());
+        assertFalse(modifiers.isEmpty());
+
+        assertEquals(1, colonyTile.getProductionOf(unit, silver));
+        assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, false, silver));
+    }
+
 }
