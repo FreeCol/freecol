@@ -160,8 +160,11 @@ public final class FreeColServer {
     /** The name of this server. */
     private String name;
 
-    /** The provider for random numbers */
-    private final ServerPseudoRandom _pseudoRandom = new ServerPseudoRandom();
+    /** The common provider for random numbers. */
+    private final SharedPseudoRandom random = new SharedPseudoRandom();
+
+    /** The private provider for random numbers. */
+    private final ServerPseudoRandom privateRandom = new ServerPseudoRandom();
 
     /** Did the integrity check succeed */
     private boolean integrity = false;
@@ -217,7 +220,7 @@ public final class FreeColServer {
         game.setNationOptions(nationOptions);
         game.setDifficultyLevel(level);
         FreeCol.getSpecification().applyDifficultyLevel(level);
-        mapGenerator = new MapGenerator(_pseudoRandom);
+        mapGenerator = new MapGenerator(random);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -265,7 +268,7 @@ public final class FreeColServer {
         this.name = name;
         //this.nationOptions = nationOptions;
 
-        mapGenerator = new MapGenerator(_pseudoRandom);
+        mapGenerator = new MapGenerator(random);
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -347,17 +350,17 @@ public final class FreeColServer {
                 }
             }
             if (navalUnits.size() > 0) {
-                UnitType navalType = navalUnits.get(getPseudoRandom().nextInt(navalUnits.size()));
+                UnitType navalType = navalUnits.get(privateRandom.nextInt(navalUnits.size()));
                 Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, navalType, UnitState.ACTIVE);
                 if (landUnits.size() > 0) {
-                    UnitType landType = landUnits.get(getPseudoRandom().nextInt(landUnits.size()));
+                    UnitType landType = landUnits.get(privateRandom.nextInt(landUnits.size()));
                     new Unit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
                 }
                 p.setDead(false);
                 p.setPlayerType(PlayerType.UNDEAD);
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
-                        .getOwnerDocument()));
+                                                                                                  .getOwnerDocument()));
                 updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
                 try {
                     p.getConnection().sendAndWait(updateElement);
@@ -592,7 +595,8 @@ public final class FreeColServer {
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
-            xsw.writeAttribute("randomState", _pseudoRandom.getState());
+            xsw.writeAttribute("randomState", random.getState());
+            xsw.writeAttribute("privateRandomState", privateRandom.getState());
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
             Iterator<FreeColGameObject> fcgoIterator = game.getFreeColGameObjectIterator();
@@ -673,9 +677,17 @@ public final class FreeColServer {
             String randomState = xsr.getAttributeValue(null, "randomState");
             if (randomState != null && randomState.length() > 0) {
                 try {
-                    _pseudoRandom.restoreState(randomState);
+                    random.restoreState(randomState);
                 } catch (IOException e) {
                     logger.warning("Failed to restore random state, ignoring!");
+                }
+            }
+            String privateRandomState = xsr.getAttributeValue(null, "privateRandomState");
+            if (privateRandomState != null && privateRandomState.length() > 0) {
+                try {
+                    privateRandom.restoreState(privateRandomState);
+                } catch (IOException e) {
+                    logger.warning("Failed to restore private random state, ignoring!");
                 }
             }
             final String owner = xsr.getAttributeValue(null, "owner");
@@ -985,7 +997,7 @@ public final class FreeColServer {
      * @return random number generator.
      */
     public PseudoRandom getPseudoRandom() {
-        return _pseudoRandom;
+        return random;
     }
 
     /**
@@ -995,20 +1007,26 @@ public final class FreeColServer {
      * @return array with random numbers.
      */
     public int[] getRandomNumbers(int n) {
-        return _pseudoRandom.getRandomNumbers(n);
+        return random.getRandomNumbers(n);
+    }
+
+    /**
+     * Get the server-private pseudo-random number generator.
+     *
+     * @return The server-private random number generator.
+     */
+    public PseudoRandom getPrivatePseudoRandom() {
+        return privateRandom;
     }
 
 
     /**
-     * This class provides pseudo-random numbers. It is used on the server side.
-     * 
-     * TODO (if others agree): refactor Game into an interface and client-side
-     * and server-side implementations, move this to the server-side class.
+     * This class provides pseudo-random numbers.
      */
     private static class ServerPseudoRandom implements PseudoRandom {
         private static final String HEX_DIGITS = "0123456789ABCDEF";
 
-        private Random random;
+        protected Random random;
 
         /**
          * Create a new random number generator with a random seed.
@@ -1031,35 +1049,6 @@ public final class FreeColServer {
          */
         public synchronized int nextInt(int n) {
             return FreeCol.randomInteger(random.nextInt(), n);
-        }
-
-        /**
-         * Get multiple random numbers. This can be used on the client side in
-         * order to reduce the number of round-trips to the server side.
-         * Bracket generation with set/restoreState to keep the two sides
-         * in step.
-         * 
-         * @param size The size of the returned array.
-         * @return array with random numbers.
-         */
-        public synchronized int[] getRandomNumbers(int size) {
-            int[] numbers;
-            try {
-                String state = getState();
-                numbers = new int[size];
-                for (int i = 0; i < size; i++) {
-                    numbers[i] = random.nextInt();
-                }
-                restoreState(state);
-            } catch (IOException e) {
-                // Can not save/restore the generator state.  This is
-                // very bad news.  Try returning just one int, which
-                // is lame, but should at least keep the client and
-                // server in step.
-                numbers = new int[1];
-                numbers[0] = random.nextInt();
-            }
-            return numbers;
         }
 
         /**
@@ -1111,6 +1100,48 @@ public final class FreeColServer {
             }
         }
     }
+
+    /**
+     * This extension of ServerPseudoRandom provides the bulk random
+     * number supply needed to share with the ClientPseudoRandom to maintain
+     * a synchronized stream of randoms between client and server.
+     * TODO: This is brittle stuff and needs to go away.
+     */
+    private static class SharedPseudoRandom extends ServerPseudoRandom {
+        public SharedPseudoRandom() {
+            super();
+        }
+
+        /**
+         * Get multiple random numbers.  This is called indirectly
+         * from the client side in order to reduce the number of
+         * round-trips to the server side.  Bracket generation with
+         * set/restoreState to keep the two sides in step.
+         *
+         * @param size The size of the returned array.
+         * @return array with random numbers.
+         */
+        public synchronized int[] getRandomNumbers(int size) {
+            int[] numbers;
+            try {
+                String state = getState();
+                numbers = new int[size];
+                for (int i = 0; i < size; i++) {
+                    numbers[i] = random.nextInt();
+                }
+                restoreState(state);
+            } catch (IOException e) {
+                // Can not save/restore the generator state.  This is
+                // very bad news.  Try returning just one int, which
+                // is lame, but should at least keep the client and
+                // server in step.
+                numbers = new int[1];
+                numbers[0] = random.nextInt();
+            }
+            return numbers;
+        }
+    }
+
 
     /**
      * Get a unit by ID, validating the ID as much as possible.  Designed for
