@@ -144,12 +144,12 @@ public class IndianBringGiftMission extends Mission {
                     if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
                         goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
                                                 goodsType,
-                                                getRandom().nextInt(15) + 10));
+                                                getPseudoRandom().nextInt(15) + 10));
                     }
                 }
 
                 if (goodsList.size() > 0) {
-                    Goods goods = goodsList.get(getRandom().nextInt(goodsList.size()));
+                    Goods goods = goodsList.get(getPseudoRandom().nextInt(goodsList.size()));
                     LoadCargoMessage message = new LoadCargoMessage(goods, getUnit());
                     try {
                         connection.sendAndWait(message.toXMLElement());

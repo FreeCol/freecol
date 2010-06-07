@@ -549,7 +549,7 @@ public abstract class NewAIPlayer extends AIObject {
                 if (sessionRegister.containsKey(hagglingKey)) {
                     haggling = sessionRegister.get(hagglingKey).intValue();
                 }
-                if (getRandom().nextInt(3 + haggling) <= 3) {
+                if (getPseudoRandom().nextInt(3 + haggling) <= 3) {
                     sessionRegister.put(goldKey, new Integer(gold));
                     sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                     return gold;

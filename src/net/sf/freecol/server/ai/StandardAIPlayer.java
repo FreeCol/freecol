@@ -548,7 +548,7 @@ public class StandardAIPlayer extends AIPlayer {
                 if (sessionRegister.containsKey(hagglingKey)) {
                     haggling = sessionRegister.get(hagglingKey).intValue();
                 }
-                if (getRandom().nextInt(3 + haggling) <= 3) {
+                if (getPseudoRandom().nextInt(3 + haggling) <= 3) {
                     sessionRegister.put(goldKey, new Integer(gold));
                     sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                     return gold;
@@ -604,7 +604,7 @@ public class StandardAIPlayer extends AIPlayer {
                 if (sessionRegister.containsKey(hagglingKey)) {
                     haggling = sessionRegister.get(hagglingKey).intValue();
                 }
-                if (getRandom().nextInt(3 + haggling) <= 3) {
+                if (getPseudoRandom().nextInt(3 + haggling) <= 3) {
                     sessionRegister.put(goldKey, new Integer(gold));
                     sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                     return gold;
@@ -694,7 +694,7 @@ public class StandardAIPlayer extends AIPlayer {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
 
-            if (getRandom().nextInt(10) == 1) {
+            if (getPseudoRandom().nextInt(10) == 1) {
                 int price = 0;
                 UnitType unitToTrain = null;
                 for (UnitType unitType : unitTypes) {
@@ -733,7 +733,7 @@ public class StandardAIPlayer extends AIPlayer {
                     sendAndWaitSafely(equipHorsesElement);
                 }
             }
-            if (getRandom().nextInt(40) == 21) {
+            if (getPseudoRandom().nextInt(40) == 21) {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
                 for (UnitType unitType : unitTypes) {
@@ -744,7 +744,7 @@ public class StandardAIPlayer extends AIPlayer {
                 }
 
                 UnitType unitToPurchase = null;
-                int random = getRandom().nextInt(total);
+                int random = getPseudoRandom().nextInt(total);
                 total = 0;
                 for (UnitType unitType : navalUnits) {
                     total += unitType.getPrice();
@@ -949,7 +949,7 @@ public class StandardAIPlayer extends AIPlayer {
             for (IndianSettlement is : settlements) {
                 // Spread arms and horses between camps
                 //TODO: maybe make this dependent on difficulty level?
-                int n = getRandom().nextInt(settlements.size());
+                int n = getPseudoRandom().nextInt(settlements.size());
                 IndianSettlement settlement = settlements.get(n);
                 if(settlement != is){
                     is.tradeGoodsWithSetlement(settlement);
@@ -1686,7 +1686,7 @@ public class StandardAIPlayer extends AIPlayer {
         }
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not bring gifts all the time:
-            if (getRandom().nextInt(10) != 1) {
+            if (getPseudoRandom().nextInt(10) != 1) {
                 continue;
             }
             int alreadyAssignedUnits = 0;
@@ -1711,7 +1711,7 @@ public class StandardAIPlayer extends AIPlayer {
                 }
             }
             if (nearbyColonies.size() > 0) {
-                Colony target = nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
+                Colony target = nearbyColonies.get(getPseudoRandom().nextInt(nearbyColonies.size()));
                 Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
@@ -1742,7 +1742,7 @@ public class StandardAIPlayer extends AIPlayer {
         }
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not demand goods all the time:
-            if (getRandom().nextInt(10) != 1) {
+            if (getPseudoRandom().nextInt(10) != 1) {
                 continue;
             }
             int alreadyAssignedUnits = 0;
@@ -1777,7 +1777,7 @@ public class StandardAIPlayer extends AIPlayer {
                     }
                     int tension = 1 + getPlayer().getTension(to).getValue()
                         + indianSettlement.getAlarm(to).getValue();
-                    tension = getRandom().nextInt(tension);
+                    tension = getPseudoRandom().nextInt(tension);
                     if (tension > targetTension) {
                         targetTension = tension;
                         target = t;
@@ -1800,7 +1800,7 @@ public class StandardAIPlayer extends AIPlayer {
                                 Player tp = target.getOwner();
                                 int tension = 1 + getPlayer().getTension(tp).getValue()
                                     + indianSettlement.getAlarm(tp).getValue();
-                                if (getRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
+                                if (getPseudoRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
                                     chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne,
                                                                                  target));
                                     break;

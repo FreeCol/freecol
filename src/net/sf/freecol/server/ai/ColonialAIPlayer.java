@@ -599,7 +599,7 @@ public class ColonialAIPlayer extends AIPlayer {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
             
-            if (getRandom().nextInt(10) == 1) {
+            if (getPseudoRandom().nextInt(10) == 1) {
                 int price = 0;
                 UnitType unitToTrain = null;
                 for (UnitType unitType : unitTypes) {
@@ -636,7 +636,7 @@ public class ColonialAIPlayer extends AIPlayer {
                     sendAndWaitSafely(equipHorsesElement);
                 }
             }
-            if (getRandom().nextInt(40) == 21) {
+            if (getPseudoRandom().nextInt(40) == 21) {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
                 for (UnitType unitType : unitTypes) {
@@ -647,7 +647,7 @@ public class ColonialAIPlayer extends AIPlayer {
                 }
                 
                 UnitType unitToPurchase = null;
-                int random = getRandom().nextInt(total);
+                int random = getPseudoRandom().nextInt(total);
                 total = 0;
                 for (UnitType unitType : navalUnits) {
                     total += unitType.getPrice();
