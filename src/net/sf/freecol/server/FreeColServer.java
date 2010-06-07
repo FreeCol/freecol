@@ -1008,8 +1008,7 @@ public final class FreeColServer {
     private static class ServerPseudoRandom implements PseudoRandom {
         private static final String HEX_DIGITS = "0123456789ABCDEF";
 
-        private Random _random;
-
+        private Random random;
 
         /**
          * Create a new random number generator with a random seed.
@@ -1021,7 +1020,7 @@ public final class FreeColServer {
          * contract established by {@link PseudoRandom}.
          */
         public ServerPseudoRandom() {
-            _random = new Random(new SecureRandom().nextLong());
+            random = new Random(new SecureRandom().nextLong());
         }
 
         /**
@@ -1031,20 +1030,34 @@ public final class FreeColServer {
          * @return random number between 0 and n.
          */
         public synchronized int nextInt(int n) {
-            return _random.nextInt(n);
+            return FreeCol.randomInteger(random.nextInt(), n);
         }
 
         /**
          * Get multiple random numbers. This can be used on the client side in
          * order to reduce the number of round-trips to the server side.
+         * Bracket generation with set/restoreState to keep the two sides
+         * in step.
          * 
          * @param size The size of the returned array.
          * @return array with random numbers.
          */
         public synchronized int[] getRandomNumbers(int size) {
-            int[] numbers = new int[size];
-            for (int i = 0; i < size; i++) {
-                numbers[i] = _random.nextInt();
+            int[] numbers;
+            try {
+                String state = getState();
+                numbers = new int[size];
+                for (int i = 0; i < size; i++) {
+                    numbers[i] = random.nextInt();
+                }
+                restoreState(state);
+            } catch (IOException e) {
+                // Can not save/restore the generator state.  This is
+                // very bad news.  Try returning just one int, which
+                // is lame, but should at least keep the client and
+                // server in step.
+                numbers = new int[1];
+                numbers[0] = random.nextInt();
             }
             return numbers;
         }
@@ -1061,7 +1074,7 @@ public final class FreeColServer {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
                 ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(_random);
+                oos.writeObject(random);
                 oos.flush();
             } catch (IOException e) {
                 throw new IllegalStateException("IO exception in memory!?!", e);
@@ -1092,7 +1105,7 @@ public final class FreeColServer {
             ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
             ObjectInputStream ois = new ObjectInputStream(bis);
             try {
-                _random = (Random) ois.readObject();
+                random = (Random) ois.readObject();
             } catch (ClassNotFoundException e) {
                 throw new IOException("Failed to restore random!");
             }

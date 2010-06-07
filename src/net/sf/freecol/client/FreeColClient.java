@@ -852,14 +852,7 @@ public final class FreeColClient {
          * @return random number between 0 (inclusive) and n (exclusive).
          */
         public int nextInt(int n) {
-            if (n <= 0) {
-                throw new IllegalArgumentException("n must be positive!");
-            }
-            // TODO (Erik): get random int in given range.
-            // This may not be good enough, as the low bits may be less
-            // random than the entire range. See the Random class for a
-            // more advanced implementation.
-            return Math.abs(nextInt() % n);
+            return FreeCol.randomInteger(nextInt(), n);
         }
 
         /**

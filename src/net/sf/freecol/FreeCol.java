@@ -1016,6 +1016,27 @@ public final class FreeCol {
     }
 
     /**
+     * Given a random integer, cut it down to the range [0..n-1].
+     * This is lame because the pseudo-random number generators are
+     * known to produce lower bits with short periods.  Lamer though
+     * for freecol is when the client and server use different
+     * calculation methods and get different results.
+     *
+     * Fortunately, this hack is temporary and goes away when all the
+     * randomness happens on the server side.
+     *
+     * @param random A random integer
+     * @param n An upper bound.
+     * @return An integer in [0..n-1].
+     */
+    public static int randomInteger(int random, int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("n must be positive");
+        }
+        return Math.abs(random) % n;
+    }
+
+    /**
      * Checks if the program is in "Debug mode".
      * @return <code>true</code> if the program is in debug
      *       mode and <code>false</code> otherwise.
