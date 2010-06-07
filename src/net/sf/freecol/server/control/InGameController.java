@@ -109,6 +109,8 @@ public final class InGameController extends Controller {
 
     public static final int SCORE_INDEPENDENCE_DECLARED = 100;
 
+    private final PseudoRandom random;
+
     public int debugOnlyAITurns = 0;
 
     private java.util.Map<String,java.util.Map<String, java.util.Map<String,Object>>> transactionSessions;
@@ -120,7 +122,8 @@ public final class InGameController extends Controller {
      */
     public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
-        
+
+        random = freeColServer.getPrivatePseudoRandom();
         transactionSessions = new HashMap<String,java.util.Map<String, java.util.Map<String,Object>>>();
     }
 
@@ -845,7 +848,7 @@ public final class InGameController extends Controller {
         // Pick a random type of goods to remove an extra amount of.
         GoodsType removeType;
         do {
-            int randomGoods = getPseudoRandom().nextInt(goodsTypes.size());
+            int randomGoods = random.nextInt(goodsTypes.size());
             removeType = goodsTypes.get(randomGoods);
         } while (!removeType.isStorable());
 
@@ -854,7 +857,7 @@ public final class InGameController extends Controller {
             if (type.isStorable() && market.hasBeenTraded(type)) {
                 int amount = getGame().getTurn().getNumber() / 10;
                 if (type == removeType && amount > 0) {
-                    amount += getPseudoRandom().nextInt(2 * amount + 1);
+                    amount += random.nextInt(2 * amount + 1);
                 }
                 if (amount > 0) {
                     market.addGoodsToMarket(type, -amount);
@@ -1182,8 +1185,7 @@ public final class InGameController extends Controller {
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
             if (rc != null) {
-                FoundingFather father
-                    = RandomChoice.getWeightedRandom(getPseudoRandom(), rc);
+                FoundingFather father = RandomChoice.getWeightedRandom(random, rc);
                 randomFathers.add(father);
                 logMessage += ":" + father.getNameKey();
             }
@@ -2083,8 +2085,7 @@ public final class InGameController extends Controller {
         // Propagate 5-30% of the original change.
         final int lowerBound = 5; // TODO: make into game option?
         final int upperBound = 30;// TODO: make into game option?
-        amount *= getPseudoRandom().nextInt(upperBound - lowerBound + 1)
-            + lowerBound;
+        amount *= random.nextInt(upperBound - lowerBound + 1) + lowerBound;
         amount /= 100;
         if (amount == 0) return;
 
@@ -2193,8 +2194,7 @@ public final class InGameController extends Controller {
         // An invalid slot is normal when the player has no control over
         // recruit type.
         boolean validSlot = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
-        int index = (validSlot) ? slot-1
-            : getPseudoRandom().nextInt(Europe.RECRUIT_COUNT);
+        int index = (validSlot) ? slot-1 : random.nextInt(Europe.RECRUIT_COUNT);
 
         // Create the recruit, move it to the docks.
         Europe europe = serverPlayer.getEurope();
@@ -2220,7 +2220,7 @@ public final class InGameController extends Controller {
         String taskId = serverPlayer.getId()
             + ".emigrate." + game.getTurn().toString()
             + ".slot." + Integer.toString(slot)
-            + "." + Integer.toString(getPseudoRandom().nextInt(1000000));
+            + "." + Integer.toString(random.nextInt(1000000));
         europe.setRecruitable(index, serverPlayer.generateRecruitable(taskId));
         objects.add(europe);
 
@@ -2278,8 +2278,7 @@ public final class InGameController extends Controller {
         if (attackPower > 0) {
             float defencePower = combatModel.getDefencePower(attacker, unit);
             float totalProbability = attackPower + defencePower;
-            if (getPseudoRandom().nextInt(Math.round(totalProbability) + 1)
-                < attackPower) {
+            if (random.nextInt(Math.round(totalProbability) + 1) < attackPower) {
                 int diff = Math.max(0, Math.round(attackPower - defencePower));
                 int moves = Math.min(9, 3 + diff / 3);
                 unit.setMovesLeft(unit.getMovesLeft() - moves);
@@ -2452,7 +2451,7 @@ public final class InGameController extends Controller {
         if (eventFountain > 0) {
             choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
         }
-        return RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
+        return RandomChoice.getWeightedRandom(random, choices);
     }
 
     /**
@@ -2499,14 +2498,14 @@ public final class InGameController extends Controller {
         case LEARN:
             List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
             StringTemplate oldName = unit.getLabel();
-            unit.setType(learntUnitTypes.get(getPseudoRandom().nextInt(learntUnitTypes.size())));
+            unit.setType(learntUnitTypes.get(random.nextInt(learntUnitTypes.size())));
             objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Learn", serverPlayer, unit)
                        .addStringTemplate("%unit%", oldName)
                        .add("%type%", unit.getType().getNameKey()));
             break;
         case TRIBAL_CHIEF:
-            int chiefAmount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
+            int chiefAmount = random.nextInt(dx * 10) + dx * 5;
             serverPlayer.modifyGold(chiefAmount);
             addPartial(objects, serverPlayer, "gold", "score");
             objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -2516,7 +2515,7 @@ public final class InGameController extends Controller {
         case COLONIST:
             List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
             newUnit = new Unit(game, tile, serverPlayer,
-                               newUnitTypes.get(getPseudoRandom().nextInt(newUnitTypes.size())),
+                               newUnitTypes.get(random.nextInt(newUnitTypes.size())),
                                UnitState.ACTIVE);
             objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Colonist", serverPlayer, newUnit));
@@ -2524,11 +2523,11 @@ public final class InGameController extends Controller {
         case CIBOLA:
             String cityName = game.getCityOfCibola();
             if (cityName != null) {
-                int treasureAmount = getPseudoRandom().nextInt(dx * 600) + dx * 300;
+                int treasureAmount = random.nextInt(dx * 600) + dx * 300;
                 if (treasureUnitTypes == null) {
                     treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
                 }
-                unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
+                unitType = treasureUnitTypes.get(random.nextInt(treasureUnitTypes.size()));
                 newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
                 newUnit.setTreasureAmount(treasureAmount);
                 objects.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -2544,7 +2543,7 @@ public final class InGameController extends Controller {
             }
             // Fall through, found all the cities of gold.
         case RUINS:
-            int ruinsAmount = getPseudoRandom().nextInt(dx * 2) * 300 + 50;
+            int ruinsAmount = random.nextInt(dx * 2) * 300 + 50;
             if (ruinsAmount < 500) { // TODO remove magic number
                 serverPlayer.modifyGold(ruinsAmount);
                 addPartial(objects, serverPlayer, "gold", "score");
@@ -2552,7 +2551,7 @@ public final class InGameController extends Controller {
                 if (treasureUnitTypes == null) {
                     treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
                 }
-                unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
+                unitType = treasureUnitTypes.get(random.nextInt(treasureUnitTypes.size()));
                 newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
                 newUnit.setTreasureAmount(ruinsAmount);
             }
@@ -3209,13 +3208,13 @@ public final class InGameController extends Controller {
                 // settlement.setLearnableSkill(null);
                 objects.add(unit);
                 result = "expert";
-            } else if (getPseudoRandom().nextInt(3) == 0) {
+            } else if (random.nextInt(3) == 0) {
                 // Otherwise 1/3 of cases are tales...
                 radius = Math.max(radius, IndianSettlement.TALES_RADIUS);
                 result = "tales";
             } else {
                 // ...and the rest are beads.
-                gold = (getPseudoRandom().nextInt(400)
+                gold = (random.nextInt(400)
                             * settlement.getBonusMultiplier()) + 50;
                 if (unit.hasAbility("model.ability.expertScout")) {
                     gold = (gold * 11) / 10;
@@ -3275,16 +3274,16 @@ public final class InGameController extends Controller {
         Location oldLocation = unit.getLocation();
         Unit missionary = settlement.getMissionary();
         ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
-        double random = Math.random();
-        random *= enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
+        double denounce = random.nextInt(1000000) * 1.0e-6
+            * enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
         if (missionary.hasAbility("model.ability.expertMissionary")) {
-            random += 0.2;
+            denounce += 0.2;
         }
         if (unit.hasAbility("model.ability.expertMissionary")) {
-            random -= 0.2;
+            denounce -= 0.2;
         }
 
-        if (random < 0.5) { // Success, remove old mission and establish ours
+        if (denounce < 0.5) { // Success, remove old mission and establish ours
             settlement.setMissionary(null);
 
             // Inform the enemy of loss of mission
@@ -3867,14 +3866,13 @@ public final class InGameController extends Controller {
             scaledSkills.add(new RandomChoice<UnitType>(unitType, skill.getProbability() * scaleValue));
         }
 
-        PseudoRandom prng = getPseudoRandom();
-        UnitType skill = RandomChoice.getWeightedRandom(prng, scaledSkills);
+        UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
         if (skill == null) {
             // Seasoned Scout
             Specification spec = FreeCol.getSpecification();
             List<UnitType> unitList
                 = spec.getUnitTypesWithAbility("model.ability.expertScout");
-            return unitList.get(prng.nextInt(unitList.size()));
+            return unitList.get(random.nextInt(unitList.size()));
         }
         return skill;
     }
