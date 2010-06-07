@@ -277,8 +277,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             adjustY = 0;
         }
 
-        lastRow = firstRow + ySize;
-        lastColumn = firstColumn + xSize;
+        lastRow = Math.min(firstRow + ySize, map.getHeight() - 1);
+        lastColumn = Math.min(firstColumn + xSize, map.getWidth() - 1);
 
         int tileWidth = tileSize;
         int tileHeight = tileSize/2;
@@ -314,7 +314,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             // Column per column; start at the left side to display the tiles.
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
-                if (tile != null && tile.isExplored()) {
+                if (tile.isExplored()) {
                     g.setColor(getMinimapColor(tile.getType()));
                     g.fill(tilePath);
                     if (tile.getSettlement() == null) {
