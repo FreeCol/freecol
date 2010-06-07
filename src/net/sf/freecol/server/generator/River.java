@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -118,6 +119,11 @@ public class River {
     private ServerRegion region;
 
     /**
+     * The random number source.
+     */
+    private final PseudoRandom random;
+
+    /**
      * A hashtable of position-river pairs.
      */
     private java.util.Map<Position, River> riverMap;
@@ -134,12 +140,13 @@ public class River {
      * @param map The map on which the river flows.
      * @param riverMap A hashtable of position-river pairs.
      */
-    public River(Map map, java.util.Map<Position, River> riverMap, ServerRegion region) {
+    public River(Map map, java.util.Map<Position, River> riverMap,
+                 ServerRegion region, PseudoRandom random) {
         this.map = map;
         this.riverMap = riverMap;
         this.region = region;
-        int index = map.getGame().getModelController().getPseudoRandom()
-            .nextInt(Direction.longSides.length);
+        this.random = random;
+        int index = random.nextInt(Direction.longSides.length);
         direction = Direction.longSides[index];
         logger.fine("Starting new river flowing " + direction.toString());
     }
@@ -303,7 +310,7 @@ public class River {
         if (sections.size() % 2 == 0) {
             // get random new direction
             int length = DirectionChange.values().length;
-            int index = map.getGame().getModelController().getPseudoRandom().nextInt(length);
+            int index = random.nextInt(length);
             DirectionChange change = DirectionChange.values()[index];
             this.direction = change.getNewDirection(this.direction);
             logger.fine("Direction is now " + direction);

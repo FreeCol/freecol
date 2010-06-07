@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -42,11 +43,11 @@ import net.sf.freecol.common.model.Map.Position;
  * </ul>
  */
 public class LandGenerator {
-    private final Random random = new Random();
     
     public final static int POLAR_HEIGHT = 2;
 
     private final MapGeneratorOptions mapGeneratorOptions;
+    private final PseudoRandom random;
      
     private boolean[][] map;
      
@@ -64,12 +65,14 @@ public class LandGenerator {
      * 
      * @param mapGeneratorOptions The options to be
      *         used when creating a land map.
+     * @param random A <code>PseudoRandom</code> number source.
      * @see #createLandMap
      */
-    public LandGenerator(MapGeneratorOptions mapGeneratorOptions) {
+    public LandGenerator(MapGeneratorOptions mapGeneratorOptions,
+                         PseudoRandom random) {
         this.mapGeneratorOptions = mapGeneratorOptions;
+        this.random = random;
     }
-
 
 
     /**

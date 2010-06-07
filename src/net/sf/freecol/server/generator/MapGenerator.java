@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -81,7 +82,7 @@ public class MapGenerator implements IMapGenerator {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
     
-    private final Random random;
+    private final PseudoRandom random;
     private final MapGeneratorOptions mapGeneratorOptions;
     
     private final LandGenerator landGenerator;
@@ -96,12 +97,11 @@ public class MapGenerator implements IMapGenerator {
      * Creates a <code>MapGenerator</code>
      * @see #createMap
      */
-    public MapGenerator() {
+    public MapGenerator(PseudoRandom random) {
+        this.random = random;
         this.mapGeneratorOptions = new MapGeneratorOptions();
-        this.random = new Random();
-                
-        landGenerator = new LandGenerator(mapGeneratorOptions);
-        terrainGenerator = new TerrainGenerator(mapGeneratorOptions);
+        landGenerator = new LandGenerator(mapGeneratorOptions, random);
+        terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
     }
 
 
@@ -317,14 +317,14 @@ public class MapGenerator implements IMapGenerator {
             List<String> regionNames = ((IndianNationType) player.getNationType()).getRegionNames();
             Territory territory = null;
             if (regionNames == null || regionNames.isEmpty()) {
-                territory = new Territory(player, map.getRandomLandPosition());
+                territory = new Territory(player, map.getRandomLandPosition(random));
                 territoryMap.put(player.getId(), territory);
             } else {
                 for (String name : regionNames) {
                     if (territoryMap.get(name) == null) {
                         ServerRegion region = (ServerRegion) map.getRegion(name);
                         if (region == null) {
-                            territory = new Territory(player, map.getRandomLandPosition());
+                            territory = new Territory(player, map.getRandomLandPosition(random));
                         } else {
                             territory = new Territory(player, region);
                         }
@@ -354,7 +354,7 @@ public class MapGenerator implements IMapGenerator {
                     }
                     if (territory == null) {
                         logger.warning("Unable to find free region for " + player.getName());
-                        territory = new Territory(player, map.getRandomLandPosition());
+                        territory = new Territory(player, map.getRandomLandPosition(random));
                         territoryMap.put(player.getId(), territory);
                     }
                 }
@@ -382,7 +382,7 @@ public class MapGenerator implements IMapGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                Position position = map.getRandomLandPosition();
+                Position position = map.getRandomLandPosition(random);
                 if (position.getY() <= LandGenerator.POLAR_HEIGHT ||
                     position.getY() >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
                     continue;

@@ -27,9 +27,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -63,8 +63,7 @@ public class TerrainGenerator {
     public static final int LAND_REGION_MAX_SIZE = 75;
 
     private final MapGeneratorOptions mapGeneratorOptions;
-
-    private final Random random = new Random();
+    private final PseudoRandom random;
 
     private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
     private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
@@ -79,11 +78,15 @@ public class TerrainGenerator {
 
     /**
      * Creates a new <code>TerrainGenerator</code>.
-     * 
+     *
+     * @param mapGeneratorOptions The options.
+     * @param random A <code>PseudoRandom</code> number source.
      * @see #createMap
      */
-    public TerrainGenerator(MapGeneratorOptions mapGeneratorOptions) {
+    public TerrainGenerator(MapGeneratorOptions mapGeneratorOptions,
+                            PseudoRandom random) {
         this.mapGeneratorOptions = mapGeneratorOptions;
+        this.random = random;
     }
 
 
@@ -901,7 +904,7 @@ public class TerrainGenerator {
         int counter = 0;
         nextTry: for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
-                Position p = map.getRandomLandPosition();
+                Position p = map.getRandomLandPosition(random);
                 if (p == null) {
                     // this can only happen if the map contains no land
                     return;
@@ -936,7 +939,7 @@ public class TerrainGenerator {
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
                 map.setRegion(mountainRegion);
-                Direction direction = map.getRandomDirection();
+                Direction direction = Direction.getRandomDirection(random);
                 int length = maximumLength - random.nextInt(maximumLength/2);
                 for (int index = 0; index < length; index++) {
                     p = p.getAdjacent(direction);
@@ -976,7 +979,7 @@ public class TerrainGenerator {
         counter = 0;
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
-                Position p = map.getRandomLandPosition();
+                Position p = map.getRandomLandPosition(random);
                 Tile t = map.getTile(p);
                 if (t.getType() == hills || t.getType() == mountains) {
                     // already a high ground
@@ -1029,7 +1032,7 @@ public class TerrainGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                Position position = map.getRandomLandPosition();
+                Position position = map.getRandomLandPosition(random);
                 if (!map.getTile(position).getType().canHaveImprovement(riverType)) {
                     continue;
                 }
@@ -1049,7 +1052,7 @@ public class TerrainGenerator {
                                                                 map.getTile(position).getRegion());
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
-                    River river = new River(map, riverMap, riverRegion);
+                    River river = new River(map, riverMap, riverRegion, random);
                     if (river.flowFromSource(position)) {
                         logger.fine("Created new river with length " + river.getLength());
                         map.setRegion(riverRegion);

@@ -107,6 +107,34 @@ public class Map extends FreeColGameObject {
             return values()[(ordinal() + 4) % 8];
         }
 
+        /**
+         * Returns a random Direction.
+         *
+         * @param random A <code>PseudoRandom</code> number source.
+         * @return a <code>Direction</code> value
+         */
+        public static Direction getRandomDirection(PseudoRandom random) {
+            return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
+        }
+
+        /**
+         * Creates an array of the eight directions in a random order.
+         *
+         * @param random A <code>PseudoRandom</code> number source.
+         * @return The array.
+         */
+        public static Direction[] getRandomDirectionArray(PseudoRandom random) {
+            Direction[] directions = Direction.values();
+            for (int i = 0; i < directions.length; i++) {
+                int i2 = random.nextInt(NUMBER_OF_DIRECTIONS);
+                if (i2 != i) {
+                    Direction temp = directions[i2];
+                    directions[i2] = directions[i];
+                    directions[i] = temp;
+                }
+            }
+            return directions;
+        }
     }
 
     public static final int NUMBER_OF_DIRECTIONS = Direction.values().length;
@@ -1351,36 +1379,6 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Returns a random Direction.
-     *
-     * @return a <code>Direction</code> value
-     */
-    public Direction getRandomDirection() {
-        int random = getGame().getModelController().getPseudoRandom().nextInt(NUMBER_OF_DIRECTIONS);
-        return Direction.values()[random];
-    }
-
-    /**
-     * Creates an array of the eight directions in a random order.
-     * 
-     * @return The array.
-     */
-    public Direction[] getRandomDirectionArray() {
-        Direction[] directions = Direction.values();
-        PseudoRandom random = getGame().getModelController().getPseudoRandom();
-        for (int i = 0; i < directions.length; i++) {
-            int i2 = random.nextInt(NUMBER_OF_DIRECTIONS);
-            if (i2 != i) {
-                Direction temp = directions[i2];
-                directions[i2] = directions[i];
-                directions[i] = temp;
-            }
-        }
-
-        return directions;
-    }
-
-    /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
      * 
      * @return the <code>Iterator</code>.
@@ -1514,13 +1512,15 @@ public class Map extends FreeColGameObject {
      * object unless we have completed restructuring the model
      * (making all model changes at the server). The reason is
      * the use of random numbers in this method.
-     * 
+     *
+     * @param random A <code>PseudoRandom</code> number source.
      * @return Position selected
      */
-    public Position getRandomLandPosition() {
-        PseudoRandom random = getGame().getModelController().getPseudoRandom();
-        int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5 : random.nextInt(getWidth());
-        int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5 : random.nextInt(getHeight());
+    public Position getRandomLandPosition(PseudoRandom random) {
+        int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5
+            : random.nextInt(getWidth());
+        int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5
+            : random.nextInt(getHeight());
         Position centerPosition = new Position(x, y);
         Iterator<Position> it = getFloodFillIterator(centerPosition);
         while (it.hasNext()) {

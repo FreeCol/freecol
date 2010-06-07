@@ -217,7 +217,7 @@ public final class FreeColServer {
         game.setNationOptions(nationOptions);
         game.setDifficultyLevel(level);
         FreeCol.getSpecification().applyDifficultyLevel(level);
-        mapGenerator = new MapGenerator();
+        mapGenerator = new MapGenerator(_pseudoRandom);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -258,14 +258,14 @@ public final class FreeColServer {
      */
     public FreeColServer(final FreeColSavegameFile savegame, boolean publicServer, 
                          boolean singleplayer, int port, String name)
-            throws IOException, FreeColException, NoRouteToServerException {
+        throws IOException, FreeColException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
         //this.nationOptions = nationOptions;
 
-        mapGenerator = new MapGenerator();
+        mapGenerator = new MapGenerator(_pseudoRandom);
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);

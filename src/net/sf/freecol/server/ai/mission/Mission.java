@@ -153,7 +153,7 @@ public abstract class Mission extends AIObject {
     protected void moveRandomly(Connection connection) {
         Tile thisTile = getUnit().getTile();
         Unit unit = getUnit();
-        Direction[] randomDirections = unit.getGame().getMap().getRandomDirectionArray();
+        Direction[] randomDirections = Direction.getRandomDirectionArray(getPseudoRandom());
         while (unit.getMovesLeft() > 0) {
             Direction direction = Direction.N;
             int j;

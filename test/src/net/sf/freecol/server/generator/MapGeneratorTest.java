@@ -51,7 +51,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        IMapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
 
         for (Nation n : s.getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
@@ -76,7 +76,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        IMapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
         RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
@@ -108,7 +108,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        IMapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
 
         // Apply the difficulty level
         Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
@@ -168,7 +168,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         Game g = new ServerGame(new MockModelController());
 
-        IMapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
 
         Vector<Player> players = new Vector<Player>();
 
@@ -215,7 +215,7 @@ public class MapGeneratorTest extends FreeColTestCase {
          * Make sure we can import all distributed maps.
          */
         Game g = new ServerGame(new MockModelController());
-        IMapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
             if (importFile.getName().endsWith(".fsg")) {
@@ -234,7 +234,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         Game game = new ServerGame(new MockModelController());
-        IMapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator(game.getModelController().getPseudoRandom());
         try {
             gen.createMap(game);
         } catch (FreeColException e) {
