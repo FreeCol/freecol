@@ -220,7 +220,7 @@ public final class FreeColServer {
         game.setNationOptions(nationOptions);
         game.setDifficultyLevel(level);
         FreeCol.getSpecification().applyDifficultyLevel(level);
-        mapGenerator = new MapGenerator(random);
+        mapGenerator = new MapGenerator(privateRandom);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -268,7 +268,7 @@ public final class FreeColServer {
         this.name = name;
         //this.nationOptions = nationOptions;
 
-        mapGenerator = new MapGenerator(random);
+        mapGenerator = new MapGenerator(privateRandom);
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
