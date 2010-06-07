@@ -164,7 +164,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
         established.setNumber(game.getTurn().getNumber());
-        final Map map = game.getMap();
         tile.setOwner(owner);
         if (!tile.hasRoad()) {
             TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
@@ -178,7 +177,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         colonyTile.addPropertyChangeListener(this);
         colonyTiles.add(colonyTile);
         for (Direction direction : Direction.values()) {
-            Tile t = map.getNeighbourOrNull(direction, tile);
+            Tile t = tile.getNeighbourOrNull(direction);
             if (t == null) {
                 continue;
             }
@@ -392,10 +391,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      *         to Europe.
      */
     public boolean isConnected() {
-        Map map = getGame().getMap();
         Tile tile = getTile();
         for (Direction direction : Direction.values()) {
-            Tile t = map.getNeighbourOrNull(direction, tile);
+            Tile t = tile.getNeighbourOrNull(direction);
             if (t != null && t.getType().isWater() && t.isConnected()) {
                 return true;
             }

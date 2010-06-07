@@ -770,13 +770,23 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Describe <code>getNeighbourOrNull</code> method here.
+     * Returns the neighbouring Tile of the given Tile in the given direction.
      *
-     * @param d a <code>Direction</code> value
-     * @return a <code>Tile</code> value
+     * @param direction
+     *            The direction in which the neighbour is located given t.
+     * @param t
+     *            The Tile to get a neighbour of.
+     * @return The neighbouring Tile of the given Tile in the given direction.
      */
-    public Tile getNeighbourOrNull(Direction d) {
-        return getMap().getNeighbourOrNull(d, this);
+    public Tile getNeighbourOrNull(Direction direction) {
+
+        Position position = getPosition();
+        if (getMap().isValid(position)) {
+            Position neighbourPosition = position.getAdjacent(direction);
+            return getMap().getTile(neighbourPosition);
+        } else {
+            return null;
+    }
     }
 
     /**
@@ -803,7 +813,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public boolean isCoast() {
         for (Direction direction : Direction.values()) {
-            Tile otherTile = getMap().getNeighbourOrNull(direction, this);
+            Tile otherTile = getNeighbourOrNull(direction);
             if (otherTile != null && otherTile.isLand()!=this.isLand()) {
                 return true;
             }
@@ -968,7 +978,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         for (Direction direction : Direction.values()) {
-            Tile otherTile = getMap().getNeighbourOrNull(direction, this);
+            Tile otherTile = getNeighbourOrNull(direction);
             if (otherTile != null) {
                 Settlement set = otherTile.getSettlement();
                 if ((set != null) && (set.getOwner().isEuropean())) {
@@ -1886,4 +1896,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public static String getXMLElementTagName() {
         return "tile";
     }
+
+    /**
+     * Gets the position adjacent Tile to a given Tile, in a given
+     * direction.
+     *
+     * @param direction The direction (N, NE, E, etc.)
+     * @return Adjacent tile
+     */
+     public Tile getAdjacentTile(Direction direction) {
+         int x = getX() + ((getY() & 1) != 0 ?
+                               direction.getOddDX() : direction.getEvenDX());
+         int y = getY() + ((getY() & 1) != 0 ?
+                               direction.getOddDY() : direction.getEvenDY());
+         return getMap().getTile(x, y);
+}
 }

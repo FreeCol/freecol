@@ -461,10 +461,9 @@ public class TransportMission extends Mission {
     
     private void attackIfEnemyShipIsBlocking(Connection connection, Direction direction) {
         final Unit carrier = getUnit();
-        final Map map = carrier.getGame().getMap();
         if (canAttackEnemyShips()
                 && carrier.getMoveType(direction) == MoveType.ATTACK) {
-            final Tile newTile = map.getNeighbourOrNull(direction, carrier.getTile());
+            final Tile newTile = carrier.getTile().getNeighbourOrNull(direction);
             final Unit defender = newTile.getDefendingUnit(carrier);
             if (!canAttackPlayer(defender.getOwner())) {
                 return;

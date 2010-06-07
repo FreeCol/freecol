@@ -146,7 +146,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null 
                 && unit.getMoveType(direction) == MoveType.ATTACK) {
-                Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+                Tile newTile = unit.getTile().getNeighbourOrNull(direction);
                 Unit defender = newTile.getDefendingUnit(unit);
                 if (defender == null) {
                     logger.warning("MoveType is ATTACK, but no defender is present!");
@@ -178,7 +178,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                 goal = pathNode;
                 if (pathNode.getTile().getSettlement() == null) {
                     for (Direction direction : Direction.values()) {
-                        Tile attackTile = u.getGame().getMap().getNeighbourOrNull(direction, pathNode.getTile());
+                        Tile attackTile = pathNode.getTile().getNeighbourOrNull(direction);
                         if (end == attackTile 
                                 && attackTile.getSettlement() != null 
                                 && pathNode.getTile().isLand()) {

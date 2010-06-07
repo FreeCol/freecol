@@ -248,23 +248,23 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     public Tile getTile(int x, int y) {
         if (x==0 && y==0) {
-            return getGame().getMap().getNeighbourOrNull(Direction.N, tile);
+            return tile.getNeighbourOrNull(Direction.N);
         } else if (x==0 && y== 1) {
-            return getGame().getMap().getNeighbourOrNull(Direction.NE, tile);
+            return tile.getNeighbourOrNull(Direction.NE);
         } else if (x==0 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Direction.E, tile);
+            return tile.getNeighbourOrNull(Direction.E);
         } else if (x==1 && y== 0) {
-            return getGame().getMap().getNeighbourOrNull(Direction.NW, tile);
+            return tile.getNeighbourOrNull(Direction.NW);
         } else if (x==1 && y== 1) {
             return tile;
         } else if (x==1 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Direction.SE, tile);
+            return tile.getNeighbourOrNull(Direction.SE);
         } else if (x==2 && y== 0) {
-            return getGame().getMap().getNeighbourOrNull(Direction.W, tile);
+            return tile.getNeighbourOrNull(Direction.W);
         } else if (x==2 && y== 1) {
-            return getGame().getMap().getNeighbourOrNull(Direction.SW, tile);
+            return tile.getNeighbourOrNull(Direction.SW);
         } else if (x==2 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Direction.S, tile);
+            return tile.getNeighbourOrNull(Direction.S);
         } else {
             return null;
         }

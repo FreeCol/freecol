@@ -159,7 +159,7 @@ public abstract class Mission extends AIObject {
             int j;
             for (j = 0; j < randomDirections.length; j++) {
                 direction = randomDirections[j];
-                if (unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) != null &&
+                if (thisTile.getNeighbourOrNull(direction) != null &&
                     unit.getMoveType(direction) == MoveType.MOVE) {
                     break;
                 }
@@ -168,7 +168,7 @@ public abstract class Mission extends AIObject {
                 unit.setMovesLeft(0);
                 break;
             }
-            thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
+            thisTile = thisTile.getNeighbourOrNull(direction);
 
             move(connection, direction);
         }

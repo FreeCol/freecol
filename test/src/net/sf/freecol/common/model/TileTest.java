@@ -509,7 +509,7 @@ public class TileTest extends FreeColTestCase {
     	game.setMap(map);
     	
     	Colony colony = getStandardColony();
-        Tile tile = map.getNeighbourOrNull(Map.Direction.N, colony.getTile());
+        Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         ResourceType minerals = spec().getResourceType("model.resource.minerals");
         tile.setResource(new Resource(game, tile, minerals));
         GoodsType silver = spec().getGoodsType("model.goods.silver");

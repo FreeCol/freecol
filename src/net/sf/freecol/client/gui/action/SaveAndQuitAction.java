@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 
 /**
  * An action for prompting the user to save before quitting the game.
@@ -48,7 +47,6 @@ public class SaveAndQuitAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = getFreeColClient().getCanvas();
         if (!freeColClient.isMapEditor()) {
             freeColClient.getInGameController().saveGame();
         } else {

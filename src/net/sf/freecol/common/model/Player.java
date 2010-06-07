@@ -2839,7 +2839,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
             tiles.add(tile);
             for (Direction direction : Direction.values()) {
-                Tile addTile = getGame().getMap().getNeighbourOrNull(direction, tile);
+                Tile addTile = tile.getNeighbourOrNull(direction);
                 if (addTile != null) {
                     // Do not send already explored tiles
                     // also avoids sending info that may desynchronize the client

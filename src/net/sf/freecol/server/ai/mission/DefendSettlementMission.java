@@ -134,7 +134,7 @@ public class DefendSettlementMission extends Mission {
             
             Direction[] directions = Direction.getRandomDirectionArray(getPseudoRandom());
             for (Direction direction : directions) {
-                Tile t = map.getNeighbourOrNull(direction, unit.getTile());
+                Tile t = unit.getTile().getNeighbourOrNull(direction);
                 if (t==null)
                     continue;
                 Unit defender = t.getFirstUnit();

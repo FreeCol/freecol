@@ -162,7 +162,7 @@ public class IndianBringGiftMission extends Mission {
             // Move to the target's colony and deliver
             Direction r = moveTowards(connection, target.getTile());
             if (r != null && 
-                getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) {
+                getUnit().getTile().getNeighbourOrNull(r) == target.getTile()) {
                 // We have arrived.
                 DeliverGiftMessage message = new DeliverGiftMessage(getUnit(), target, getUnit().getGoodsIterator().next());
                 try {

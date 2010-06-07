@@ -83,7 +83,6 @@ public class MoveMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
 
         Unit unit;
         try {
@@ -97,7 +96,7 @@ public class MoveMessage extends Message {
         }
         Location oldLocation = unit.getLocation();
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, oldTile);
+        Tile newTile = oldTile.getNeighbourOrNull(direction);
         if (newTile == null) {
             return Message.clientError("Could not find tile"
                                        + " in direction: " + direction

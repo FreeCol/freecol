@@ -587,7 +587,7 @@ public final class GUI {
     public void moveTileCursor(Direction direction){
         Tile selectedTile = freeColClient.getGame().getMap().getTile(getSelectedTile());
         if(selectedTile != null){   
-            Tile newTile = freeColClient.getGame().getMap().getNeighbourOrNull(direction, selectedTile);
+            Tile newTile = selectedTile.getNeighbourOrNull(direction);
             if(newTile != null)
                 setSelectedTile(newTile.getPosition());
         }
@@ -1894,7 +1894,7 @@ public final class GUI {
         GeneralPath path = new GeneralPath();
         List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
         for (Direction direction : Direction.values()) {
-            Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
+            Tile borderingTile = tile.getAdjacentTile(direction);
             if (borderingTile != null && borderingTile.hasRoad()) {
                 points.add(corners.get(direction));
             }
@@ -2045,14 +2045,12 @@ public final class GUI {
         // ATTENTION: we assume that all base tiles have the same size
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
 
-        Map.Position pos = new Map.Position(tile.getX(), tile.getY());
-
         if (!tile.isLand() && tile.getStyle() > 0) {
             g.drawImage(lib.getBeachImage(tile.getStyle()), 0, 0, null);
         }
 
         for (Direction direction : Direction.values()) {
-            Tile borderingTile = map.getAdjacentTile(pos, direction);
+            Tile borderingTile = tile.getAdjacentTile(direction);
             if (borderingTile!=null) {
 
                 if (!drawUnexploredBorders && !borderingTile.isExplored() &&
@@ -2427,10 +2425,9 @@ public final class GUI {
      */
     private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile) {  
         if (tile.isExplored()) {
-            Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
             for (Direction direction : Direction.values()) {
-                Tile borderingTile = map.getAdjacentTile(pos, direction);
+                Tile borderingTile = tile.getAdjacentTile(direction);
                 if (borderingTile!=null) {
 
                     if (borderingTile.isExplored()){

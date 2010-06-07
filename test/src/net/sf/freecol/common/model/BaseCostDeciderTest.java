@@ -60,7 +60,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
                 "model.unit.hardyPioneer"),
                 Unit.UnitState.ACTIVE);
         for (Map.Direction dir : Map.Direction.values()) {
-            Tile end = game.getMap().getNeighbourOrNull(dir, start);
+            Tile end = start.getNeighbourOrNull(dir);
             assertNotNull(end);
             int cost = decider.getCost(unit, start, game.getMap().getTile(5, 6), 100, 0);
             assertEquals(plainsType.getBasicMoveCost(), cost);

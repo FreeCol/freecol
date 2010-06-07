@@ -565,7 +565,7 @@ public class Map extends FreeColGameObject {
             
             // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
-                final Tile newTile = getNeighbourOrNull(direction, currentTile);
+                final Tile newTile = currentTile.getNeighbourOrNull(direction);
                 if (newTile == null) {
                     continue;
                 }
@@ -927,7 +927,7 @@ public class Map extends FreeColGameObject {
 
             // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
-                final Tile newTile = getNeighbourOrNull(direction, currentTile);
+                final Tile newTile = currentTile.getNeighbourOrNull(direction);
                 if (newTile == null) {
                     continue;
                 }
@@ -1015,7 +1015,7 @@ public class Map extends FreeColGameObject {
      */
     public boolean isAdjacentToMapEdge(Tile tile) {
         for (Direction direction : Direction.values()) {
-            if (getNeighbourOrNull(direction, tile) == null) {
+            if (tile.getNeighbourOrNull(direction) == null) {
                 return true;
             }
         }
@@ -1031,7 +1031,7 @@ public class Map extends FreeColGameObject {
      * @return <code>true</code> if the given tile is at the edge of the map.
      */
     public boolean isAdjacentToVerticalMapEdge(Tile tile) {
-        if ((getNeighbourOrNull(Direction.E, tile) == null)||(getNeighbourOrNull(Direction.W, tile) == null)) {
+        if ((tile.getNeighbourOrNull(Direction.E) == null)||(tile.getNeighbourOrNull(Direction.W) == null)) {
             return true;
         }
         return false;
@@ -1268,46 +1268,11 @@ public class Map extends FreeColGameObject {
      */
     public Direction getDirection(Tile t1, Tile t2) {
         for (Direction d : Direction.values()) {
-            if (getNeighbourOrNull(d, t1) == t2) {
+            if (t1.getNeighbourOrNull(d) == t2) {
                 return d;
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the neighbouring Tile of the given Tile in the given direction.
-     * 
-     * @param direction
-     *            The direction in which the neighbour is located given t.
-     * @param t
-     *            The Tile to get a neighbour of.
-     * @return The neighbouring Tile of the given Tile in the given direction.
-     */
-    public Tile getNeighbourOrNull(Direction direction, Tile t) {
-        return getNeighbourOrNull(direction, t.getX(), t.getY());
-    }
-
-    /**
-     * Returns the neighbouring Tile of the given Tile in the given direction.
-     * 
-     * @param direction
-     *            The direction in which the neighbour is located given the base
-     *            tile.
-     * @param x
-     *            The base tile X coordinate.
-     * @param y
-     *            The base tile Y coordinate.
-     * @return The neighbouring Tile of the given coordinate in the given
-     *         direction or null if invalid.
-     */
-    public Tile getNeighbourOrNull(Direction direction, int x, int y) {
-        if (isValid(x, y)) {
-            Position pos = (new Position(x, y)).getAdjacent(direction);
-            return getTile(pos.getX(), pos.getY());
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -1389,21 +1354,7 @@ public class Map extends FreeColGameObject {
     
      
 
-     /**
-      * Gets the position adjacent Tile to a given Tile, in a given
-      * direction.
-      *
-      * @param position The position
-      * @param direction The direction (N, NE, E, etc.)
-      * @return Adjacent tile
-      */
-      public Tile getAdjacentTile(Position position, Direction direction) {
-          int x = position.x + ((position.y & 1) != 0 ?
-                                direction.getOddDX() : direction.getEvenDX());
-          int y = position.y + ((position.y & 1) != 0 ?
-                                direction.getOddDY() : direction.getEvenDY());
-          return this.getTile(x, y);
-      }
+
 
     /**
      * Get an adjacent iterator.

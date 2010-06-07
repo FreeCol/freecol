@@ -100,8 +100,7 @@ public class DemandTributeMessage extends Message {
                                        + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile tile = serverPlayer.getGame().getMap()
-            .getNeighbourOrNull(direction, unit.getTile());
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
             return Message.clientError("Could not find tile"
                                        + " in direction: " + direction

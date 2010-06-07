@@ -1211,7 +1211,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             throw new IllegalStateException("getTile() == null");
         }
 
-        Tile target = getGame().getMap().getNeighbourOrNull(direction, tile);
+        Tile target = tile.getNeighbourOrNull(direction);
         return (target == null) ? MoveType.MOVE_ILLEGAL : getMoveType(target);
     }
 
@@ -1323,7 +1323,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             throw new IllegalStateException("Null tile");
         }
 
-        Tile target = getGame().getMap().getNeighbourOrNull(direction, tile);
+        Tile target = tile.getNeighbourOrNull(direction);
         return getSimpleMoveType(tile, target, false);
     }
 

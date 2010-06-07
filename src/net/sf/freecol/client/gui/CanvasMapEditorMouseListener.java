@@ -451,7 +451,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                                         return;
                                     }
 
-                                    t = map.getNeighbourOrNull(direction, t);
+                                    t = t.getNeighbourOrNull(direction);
                                     if (t == null) {
                                         return;
                                     }

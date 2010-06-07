@@ -941,7 +941,7 @@ public class UnitTest extends FreeColTestCase {
         String errMsg = "Error setting test, colonist should not be an expert";
         assertTrue(errMsg, colonist.getType() == colonistType);
         
-        ColonyTile workTile = colony.getColonyTile(map.getNeighbourOrNull(Direction.N, colony.getTile()));
+        ColonyTile workTile = colony.getColonyTile(colony.getTile().getNeighbourOrNull(Direction.N));
         
         // set colonist as farmer
         colonist.setLocation(workTile);
@@ -1030,7 +1030,7 @@ public class UnitTest extends FreeColTestCase {
         
         Colony colony1 = getStandardColony(1);
         Tile col1Tile = colony1.getTile();
-        Tile otherTile = map.getAdjacentTile(col1Tile.getPosition(), Direction.N);
+        Tile otherTile = col1Tile.getAdjacentTile(Direction.N);
         
         Unit insideUnit1 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, toolsType);
         Unit insideUnit2 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsType, horsesType);

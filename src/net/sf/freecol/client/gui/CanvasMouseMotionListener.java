@@ -288,7 +288,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                                     return;
                                 }
 
-                                t = map.getNeighbourOrNull(direction, t);
+                                t = t.getNeighbourOrNull(direction);
                                 if (t == null) {
                                     return;
                                 }

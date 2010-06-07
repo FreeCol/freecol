@@ -94,8 +94,7 @@ public class SpySettlementMessage extends Message {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Game game = serverPlayer.getGame();
-        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
             return Message.clientError("Could not find tile"
                                        + " in direction: " + direction

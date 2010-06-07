@@ -21,7 +21,6 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -133,8 +132,7 @@ public class EmbarkMessage extends Message {
             if (unit.getMovesLeft() <= 0) {
                 return Message.clientError("Unit has no moves left: " + unitId);
             }
-            Map map = serverPlayer.getGame().getMap();
-            destinationTile = map.getNeighbourOrNull(direction, sourceTile);
+            destinationTile = sourceTile.getNeighbourOrNull(direction);
             if (destinationTile == null) {
                 return Message.clientError("Could not find tile"
                                            + " in direction: " + direction

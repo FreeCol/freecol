@@ -324,7 +324,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         AIMain aiMain = server.getAIMain();
             
         Colony colony = getStandardColony(1);
-        Tile t = map.getAdjacentTile(colony.getTile().getPosition(), Direction.N);
+        Tile t = colony.getTile().getAdjacentTile(Direction.N);
         Unit u = colony.getUnitList().get(0);
         ColonyTile colTile = colony.getColonyTile(t);
 

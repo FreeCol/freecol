@@ -113,7 +113,7 @@ public class LimitTest extends FreeColTestCase {
         colony.updateSoL();
         assertTrue(rebelLimit.evaluate(dutch));
 
-        Tile tile = map.getNeighbourOrNull(Map.Direction.N, colony.getTile());
+        Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         tile.setType(spec().getTileType("model.tile.ocean"));
         tile.setConnected(true);
         assertTrue(colony.isConnected());

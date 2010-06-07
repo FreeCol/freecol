@@ -21,7 +21,6 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -114,8 +113,7 @@ public class InciteMessage extends Message {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Map map = game.getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
             return Message.clientError("Could not find tile"
                                        + " in direction: " + direction

@@ -302,7 +302,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     RiverSection mysection = new RiverSection(river.getStyle());
                     // for each neighboring tile
                     for (Direction direction : Direction.longSides) {
-                        Tile t = tile.getMap().getNeighbourOrNull(direction, tile);
+                        Tile t = tile.getNeighbourOrNull(direction);
                         if (t == null) {
                             continue;
                         }

@@ -1568,8 +1568,7 @@ public final class InGameController implements NetworkConstants {
      * @return A settlement on the adjacent tile if any.
      */
     private Settlement getSettlementAt(Tile tile, Direction direction) {
-        Map map = freeColClient.getGame().getMap();
-        return map.getNeighbourOrNull(direction, tile).getSettlement();
+        return tile.getNeighbourOrNull(direction).getSettlement();
     }
 
     /**
@@ -1584,8 +1583,7 @@ public final class InGameController implements NetworkConstants {
      *         adjacent tile if any.
      */
     private StringTemplate getNationAt(Tile tile, Direction direction) {
-        Map map = freeColClient.getGame().getMap();
-        Tile newTile = map.getNeighbourOrNull(direction, tile);
+        Tile newTile = tile.getNeighbourOrNull(direction);
         Player player = null;
         if (newTile.getSettlement() != null) {
             player = newTile.getSettlement().getOwner();
@@ -1817,9 +1815,8 @@ public final class InGameController implements NetworkConstants {
         // Confirm moving to Europe if told to move to a null tile
         // (TODO: can this still happen?), or if crossing the boundary
         // between coastal and high sea.  Otherwise just move.
-        Map map = freeColClient.getGame().getMap();
         Tile oldTile = unit.getTile();
-        Tile newTile = map.getNeighbourOrNull(direction, oldTile);
+        Tile newTile = oldTile.getNeighbourOrNull(direction);
         Canvas canvas = freeColClient.getCanvas();
         if ((newTile == null
              || (!oldTile.canMoveToEurope() && newTile.canMoveToEurope()))
@@ -1898,11 +1895,10 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveAttack(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
-        Game game = freeColClient.getGame();
 
         // Extra option with native settlement
         Tile tile = unit.getTile();
-        Tile target = game.getMap().getNeighbourOrNull(direction, tile);
+        Tile target = tile.getNeighbourOrNull(direction);
         Settlement settlement = target.getSettlement();
         if (settlement != null
             && settlement instanceof IndianSettlement
@@ -2052,7 +2048,7 @@ public final class InGameController implements NetworkConstants {
     private void attack(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
-        Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile target = unit.getTile().getNeighbourOrNull(direction);
 
         Element attackElement = Message.createNewRootElement("attack");
         attackElement.setAttribute("unit", unit.getId());
@@ -2203,8 +2199,7 @@ public final class InGameController implements NetworkConstants {
         // Choose which carrier to embark upon.
         Canvas canvas = freeColClient.getCanvas();
         Tile sourceTile = unit.getTile();
-        Map map = freeColClient.getGame().getMap();
-        Tile destinationTile = map.getNeighbourOrNull(direction, sourceTile);
+        Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
         ArrayList<Unit> choices = new ArrayList<Unit>();
         for (Unit nextUnit : destinationTile.getUnitList()) {
@@ -2247,8 +2242,7 @@ public final class InGameController implements NetworkConstants {
      *         declined disembarks).
      */
     private boolean moveDisembark(Unit unit, Direction direction) {
-        Map map = freeColClient.getGame().getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile.getFirstUnit() != null
             && tile.getFirstUnit().getOwner() != unit.getOwner()) {
             return false; // Can not disembark onto other nation units.
@@ -2384,9 +2378,8 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveScoutIndianSettlement(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
-        Map map = freeColClient.getGame().getMap();
         Tile unitTile = unit.getTile();
-        Tile tile = map.getNeighbourOrNull(direction, unitTile);
+        Tile tile = unitTile.getNeighbourOrNull(direction);
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
         // Offer the choices.

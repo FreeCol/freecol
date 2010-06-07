@@ -149,7 +149,7 @@ public class IndianDemandMission extends Mission {
             Unit unit = getUnit();
             Direction r = moveTowards(connection, target.getTile());
             if (r != null &&
-                getGame().getMap().getNeighbourOrNull(r, unit.getTile()) == target.getTile()
+                unit.getTile().getNeighbourOrNull(r) == target.getTile()
                 && unit.getMovesLeft() > 0) {
                 // We have arrived.
                 Element demandElement = Message.createNewRootElement("indianDemand");

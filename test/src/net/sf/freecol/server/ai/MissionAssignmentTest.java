@@ -334,7 +334,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile settlementTile = map.getTile(9, 9);
-        Tile adjacentTile = map.getNeighbourOrNull(Direction.N, settlementTile);
+        Tile adjacentTile = settlementTile.getNeighbourOrNull(Direction.N);
         assertTrue("Settlement tile should be land",settlementTile.isLand());
         assertTrue("Adjacent tile should be land", adjacentTile != null && adjacentTile.isLand());
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
