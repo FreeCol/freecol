@@ -78,6 +78,11 @@ public class ClientModelController implements ModelController {
      * @return The generated number.
      */
     public int getRandom(String taskID, int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("n most be positive");
+        } else if (n == 1) {
+            return 0;
+        }
         Client client = freeColClient.getClient();
 
         Element getRandomElement = Message.createNewRootElement("getRandom");

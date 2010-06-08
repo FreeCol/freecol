@@ -89,6 +89,11 @@ public class ServerModelController implements ModelController,PropertyChangeList
      * @return The generated number.
      */
     public synchronized int getRandom(String taskID, int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("n most be positive");
+        } else if (n == 1) {
+            return 0;
+        }
         int turnNumber = freeColServer.getGame().getTurn().getNumber();
         String extendedTaskID = taskID + Integer.toString(turnNumber);
         //logger.info("Entering getRandom with taskID " + taskID);
