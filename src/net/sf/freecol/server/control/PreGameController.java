@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -140,6 +141,7 @@ public final class PreGameController extends Controller {
      */
     public void sendUpdatedGame() {
         Game game = getFreeColServer().getGame();
+        PseudoRandom random = getFreeColServer().getPrivatePseudoRandom();
 
         Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
@@ -163,13 +165,13 @@ public final class PreGameController extends Controller {
                             continue;
                         }
                     }
-                    europe.setRecruitable(index, player.generateRecruitable(getPseudoRandom()));
+                    europe.setRecruitable(index, player.generateRecruitable(random));
                 }
 
                 Market market = player.getMarket();
                 for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                     if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {
-                        int increase = getPseudoRandom().nextInt(3);
+                        int increase = random.nextInt(3);
                         if (increase > 0) {
                             int newPrice = goodsType.getInitialSellPrice() + increase;
                             market.getMarketData(goodsType).setInitialPrice(newPrice);
