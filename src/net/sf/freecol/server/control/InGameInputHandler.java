@@ -570,7 +570,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new NullPointerException();
         }
         Unit unit = getFreeColServer().getModelController()
-                .createUnit(taskID, location, owner, type, false, connection);
+                .createUnit(taskID, location, owner, type, connection);
         Element reply = Message.createNewRootElement("createUnitConfirmed");
         reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));
         return reply;
@@ -591,7 +591,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new NullPointerException();
         }
         Building building = getFreeColServer().getModelController()
-                .createBuilding(taskID, colony, type, false, connection);
+                .createBuilding(taskID, colony, type, connection);
         Element reply = Message.createNewRootElement("createBuildingConfirmed");
         reply.appendChild(building.toXMLElement(colony.getOwner(), reply.getOwnerDocument()));
         return reply;

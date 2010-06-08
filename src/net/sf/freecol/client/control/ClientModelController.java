@@ -83,22 +83,26 @@ public class ClientModelController implements ModelController {
         } else if (n == 1) {
             return 0;
         }
-        Client client = freeColClient.getClient();
 
         Element getRandomElement = Message.createNewRootElement("getRandom");
         getRandomElement.setAttribute("taskID", taskID);
         getRandomElement.setAttribute("n", Integer.toString(n));
 
-        //logger.info("TaskID is " + taskID + " Waiting for the server to reply...");
+        Client client = freeColClient.getClient();
         Element reply = client.ask(getRandomElement);
-        //logger.info("Reply received from server.");
-
-        if (!reply.getTagName().equals("getRandomConfirmed")) {
-            logger.warning("Wrong tag name.");
-            throw new IllegalStateException();
+        if (reply == null || !reply.getTagName().equals("getRandomConfirmed")) {
+            throw new IllegalStateException("Expecting getRandomConfirmed");
         }
 
-        return Integer.parseInt(reply.getAttribute("result"));
+        int value;
+        try {
+            value = Integer.parseInt(reply.getAttribute("result"));
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("Bad result: " + e.getMessage());
+        }
+
+        logger.finest("getRandom(" + taskID + ", " + n + ") -> " + value);
+        return value;
     }
 
     /**
