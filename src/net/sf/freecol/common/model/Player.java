@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -565,8 +566,14 @@ public class Player extends FreeColGameObject implements Nameable {
         this.featureContainer = newFeatureContainer;
     }
 
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
+    /**
+     * Does a player have a particular ability.
+     *
+     * @param ability The ability to test.
+     * @return True if the player has the ability.
+     */
+    public boolean hasAbility(String ability) {
+        return featureContainer.hasAbility(ability);
     }
 
     /**
@@ -1499,6 +1506,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see FoundingFather
      */
     public void addFather(FoundingFather father) {
+        ModelController mc = getGame().getModelController();
 
         allFathers.add(father);
 
@@ -1515,7 +1523,7 @@ public class Player extends FreeColGameObject implements Nameable {
             for (int index = 0; index < units.size(); index++) {
                 AbstractUnit unit = units.get(index);
                 String uniqueID = getId() + "newTurn" + father.getId() + index;
-                getGame().getModelController().createUnit(uniqueID, getEurope(), this, unit.getUnitType());
+                mc.createUnit(uniqueID, getEurope(), this, unit.getUnitType());
             }
         }
 
@@ -1562,7 +1570,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         // Need to use a `special' taskID to avoid collision
                         // with other building tasks that complete this turn.
                         String taskIDplus = colony.getId() + "buildBuilding" + father.getId();
-                        Building building = getGame().getModelController().createBuilding(taskIDplus, colony, type);
+                        Building building = mc.createBuilding(taskIDplus, colony, type);
                         colony.addBuilding(building);
                         colony.getBuildQueue().remove(type);
                     }
@@ -1583,11 +1591,18 @@ public class Player extends FreeColGameObject implements Nameable {
                     colony.addGoods(bells, requiredLiberty - colony.getGoodsCount(bells));
                 }
             } else if (eventId.equals("model.event.newRecruits")) {
-                for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
-                    UnitType recruitable = getEurope().getRecruitable(index);
-                    if (featureContainer.hasAbility("model.ability.canNotRecruitUnit", recruitable)) {
-                        getEurope().setRecruitable(index, generateRecruitable(getId() + "slot."
-                                                                              + Integer.toString(index+1)));
+                // TODO: when this goes into the server, bring
+                // generateRecruitable() et al with it as this is the last
+                // client-side user.
+                Europe europe = getEurope();
+                if (europe != null) {
+                    FeatureContainer fc = getFeatureContainer();
+                    PseudoRandom random = mc.getPseudoRandom();
+                    for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
+                        if (fc.hasAbility("model.ability.canNotRecruitUnit",
+                                          europe.getRecruitable(i))) {
+                            europe.setRecruitable(i, generateRecruitable(random));
+                        }
                     }
                 }
             }
@@ -2008,30 +2023,33 @@ public class Player extends FreeColGameObject implements Nameable {
 
 
     /**
-     * Generates a random unit type. The unit type that is returned represents
-     * the type of a unit that is recruitable in Europe.
+     * Generate a weighted list of unit types recruitable by this player.
      *
-     * @param taskId A taskId for getRandom().
-     * @return A random unit type of a unit that is recruitable in Europe.
-     *
-     * TODO: This is correctly called from server pre and in-game controllers,
-     *       but it is also still called client side when Brewster arrives.
-     *       When fathers get moved server-side, revisit this routine.
-     *
+     * @return A weighted list of recruitable unit types.
      */
-    public UnitType generateRecruitable(String taskId) {
-        ArrayList<RandomChoice<UnitType>> recruitables = new ArrayList<RandomChoice<UnitType>>();
+    public List<RandomChoice<UnitType>> generateRecruitablesList() {
+        ArrayList<RandomChoice<UnitType>> recruitables
+            = new ArrayList<RandomChoice<UnitType>>();
+        FeatureContainer fc = getFeatureContainer();
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
-                && !getFeatureContainer().hasAbility("model.ability.canNotRecruitUnit",
-                                                     unitType)) {
-                int prob = unitType.getRecruitProbability();
-                recruitables.add(new RandomChoice<UnitType>(unitType, prob));
+                && !fc.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
+                recruitables.add(new RandomChoice<UnitType>(unitType,
+                        unitType.getRecruitProbability()));
             }
         }
-        int total = RandomChoice.getTotalProbability(recruitables);
-        int random = getGame().getModelController().getRandom(taskId, total);
-        return RandomChoice.select(recruitables, random);
+        return recruitables;
+    }
+
+    /**
+     * Generates a random unit type recruitable by this player.
+     *
+     * @param random The <code>PseudoRandom</code> number source to use.
+     * @return A random recruitable unit type.
+     */
+    public UnitType generateRecruitable(PseudoRandom random) {
+        List<RandomChoice<UnitType>> recruitables = generateRecruitablesList();
+        return RandomChoice.getWeightedRandom(random, recruitables);
     }
 
     /**

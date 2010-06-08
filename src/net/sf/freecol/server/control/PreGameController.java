@@ -163,8 +163,7 @@ public final class PreGameController extends Controller {
                             continue;
                         }
                     }
-                    europe.setRecruitable(index, player.generateRecruitable(player.getId() + "slot."
-                                                                            + Integer.toString(index+1)));
+                    europe.setRecruitable(index, player.generateRecruitable(getPseudoRandom()));
                 }
 
                 Market market = player.getMarket();

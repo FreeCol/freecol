@@ -115,6 +115,13 @@ public final class InGameController extends Controller {
 
     private java.util.Map<String,java.util.Map<String, java.util.Map<String,Object>>> transactionSessions;
     
+    public static enum MigrationType {
+        NORMAL,     // Unit decided to migrate
+        RECRUIT,    // Player is paying
+        FOUNTAIN    // As a result of a Fountain of Youth discovery
+    }
+
+
     /**
      * The constructor to use.
      * 
@@ -2183,18 +2190,18 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> whose unit it will be.
      * @param slot The slot within <code>Europe</code> to select the unit from.
-     * @param fountain True if this occurs as a result of a Fountain of Youth.
+     * @param type The type of migration occurring.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element emigrate(ServerPlayer serverPlayer, int slot,
-                            boolean fountain) {
+                            MigrationType type) {
         List<Object> objects = new ArrayList<Object>();
 
         // Valid slots are in [1,3], recruitable indices are in [0,2].
         // An invalid slot is normal when the player has no control over
         // recruit type.
-        boolean validSlot = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
-        int index = (validSlot) ? slot-1 : random.nextInt(Europe.RECRUIT_COUNT);
+        boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
+        int index = (selected) ? slot-1 : random.nextInt(Europe.RECRUIT_COUNT);
 
         // Create the recruit, move it to the docks.
         Europe europe = serverPlayer.getEurope();
@@ -2205,29 +2212,33 @@ public final class InGameController extends Controller {
                              recruitType.getDefaultEquipment());
         unit.setLocation(europe);
 
-        // Update immigration counters if this was an ordinary
-        // decision to migrate.
-        if (!fountain) {
+        // Handle migration type specific changes.
+        switch (type) {
+        case FOUNTAIN:
+            serverPlayer.setRemainingEmigrants(serverPlayer.getRemainingEmigrants() - 1);
+            break;
+        case RECRUIT:
+            serverPlayer.modifyGold(-europe.getRecruitPrice());
+            europe.increaseRecruitmentDifficulty();
+            // Fall through
+        case NORMAL:
             serverPlayer.updateImmigrationRequired();
             serverPlayer.reduceImmigration();
             addPartial(objects, (Player) serverPlayer,
                        "immigration", "immigrationRequired");
+            break;
+        default:
+            throw new IllegalArgumentException("Bogus migration type");
         }
 
         // Replace the recruit we used.
-        // This annoying taskId stuff can go away when
-        // addFather/generateRecruitable moves server-side.
-        String taskId = serverPlayer.getId()
-            + ".emigrate." + game.getTurn().toString()
-            + ".slot." + Integer.toString(slot)
-            + "." + Integer.toString(random.nextInt(1000000));
-        europe.setRecruitable(index, serverPlayer.generateRecruitable(taskId));
+        europe.setRecruitable(index, serverPlayer.generateRecruitable(random));
         objects.add(europe);
 
-        // Return an informative message only if this was an ordinary migration
-        // where we did not select the unit type.
-        // Fountain of Youth migrants have already been announced in bulk.
-        if (!fountain && !validSlot) {
+        // Return an informative message only if this was an ordinary
+        // migration where we did not select the unit type.
+        // Other cases were selected.
+        if (!selected) {
             objects.add(new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                          "model.europe.emigrate",
                                          serverPlayer, unit)
@@ -2573,8 +2584,11 @@ public final class InGameController extends Controller {
                     serverPlayer.setRemainingEmigrants(dx);
                     addAttribute(objects, "fountainOfYouth", Integer.toString(dx));
                 } else {
+                    List<RandomChoice<UnitType>> recruitables
+                        = serverPlayer.generateRecruitablesList();
                     for (int k = 0; k < dx; k++) {
-                        new Unit(game, europe, serverPlayer, serverPlayer.generateRecruitable(serverPlayer.getId() + "fountain." + Integer.toString(k)),
+                        new Unit(game, europe, serverPlayer,
+                                 RandomChoice.getWeightedRandom(random, recruitables),
                                  UnitState.ACTIVE);
                     }
                     objects.add(europe);

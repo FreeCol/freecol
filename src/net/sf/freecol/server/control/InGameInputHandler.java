@@ -265,12 +265,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new JoinColonyMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("recruitUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return recruitUnitInEurope(connection, element);
-            }
-        });
         register(EmigrateUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -987,29 +981,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.moveToAmerica();
         return null;
-    }
-
-    /**
-     * Handles a "recruitUnitInEurope"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param recruitUnitInEuropeElement The element containing the request.
-     */
-    private Element recruitUnitInEurope(Connection connection, Element recruitUnitInEuropeElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Europe europe = player.getEurope();
-        int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
-        UnitType recruitable = europe.getRecruitable(slot);
-        String taskId = player.getId()
-            + ".slot." + Integer.toString(slot)
-            + "." + Integer.toString(getPseudoRandom().nextInt(1000000));
-        UnitType newRecruitable = player.generateRecruitable(taskId);
-        Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
-        Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
-        reply.setAttribute("newRecruitable", newRecruitable.getId());
-        reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
-        europe.recruit(slot, unit, newRecruitable);
-        return reply;
     }
 
     /**

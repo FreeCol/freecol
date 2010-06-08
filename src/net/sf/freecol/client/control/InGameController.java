@@ -396,9 +396,9 @@ public final class InGameController implements NetworkConstants {
                     && player.getEurope().recruitablesDiffer()) {
                     Canvas canvas = freeColClient.getCanvas();
                     int index = canvas.showEmigrationPanel(false);
-                    askEmigrate(index + 1);
+                    emigrate(player, index + 1);
                 } else {
-                    askEmigrate(0);
+                    emigrate(player, 0);
                 }
             }
 
@@ -423,22 +423,6 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
-    }
-
-    /**
-     * Handle server query-response for emigration.
-     *
-     * @param slot The slot from which the unit migrates, 1-3 selects
-     *             a specific one, otherwise the server will choose one.
-     */
-    private void askEmigrate(int slot) {
-        Client client = freeColClient.getClient();
-        EmigrateUnitMessage message = new EmigrateUnitMessage(slot);
-        Element reply = askExpecting(client, message.toXMLElement(), null);
-        if (reply == null) return;
-
-        Connection conn = client.getConnection();
-        freeColClient.getInGameInputHandler().handle(conn, reply);
     }
 
     /**
@@ -1447,6 +1431,41 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Emigrate a unit from Europe.
+     *
+     * @param player The <code>Player</code> that owns the unit.
+     * @param slot The slot to emigrate from.
+     */
+    private void emigrate(Player player, int slot) {
+        Europe europe = player.getEurope();
+        int count = europe.getUnitCount();
+        if (askEmigrate(slot) && europe.getUnitCount() > count) {
+            freeColClient.getCanvas().updateGoldLabel();
+            europe.firePropertyChange(Europe.UNIT_CHANGE, count,
+                                      europe.getUnitCount());
+        }
+    }
+
+    /**
+     * Handle server query-response for emigration.
+     *
+     * @param slot The slot from which the unit migrates, 1-3 selects
+     *             a specific one, otherwise the server will choose one.
+     * @return True if the client-server interaction succeeded.
+     */
+    private boolean askEmigrate(int slot) {
+        Client client = freeColClient.getClient();
+        EmigrateUnitMessage message = new EmigrateUnitMessage(slot);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+
+    /**
      * Moves the specified unit in a specified direction. This may
      * result in many different types of action.
      *
@@ -1701,13 +1720,13 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (reply.hasAttribute("fountainOfYouth")) {
-            // Without Brewster, the emigrants have already been selected
+            // Without Brewster, the migrants have already been selected
             // and were updated to the European docks by the server.
-            final int emigrants = Integer.parseInt(reply.getAttribute("fountainOfYouth"));
+            final int migrants = Integer.parseInt(reply.getAttribute("fountainOfYouth"));
             freeColClient.playMusicOnce("fountain");
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        for (int i = 0; i < emigrants; i++) {
+                        for (int i = 0; i < migrants; i++) {
                             int index = canvas.showEmigrationPanel(true);
                             askEmigrate(index + 1);
                         }
@@ -3760,6 +3779,26 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Recruit a unit from a specified index in Europe.
+     *
+     * @param index The index in Europe to recruit from ([0..2]).
+     */
+    public void recruitUnitInEurope(int index) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        } else if (player.getGold() < player.getRecruitPrice()) {
+            canvas.errorMessage("notEnoughGold");
+            return;
+        }
+
+        emigrate(player, index + 1);
+    }
+
+
+    /**
      * Sets the export settings of the custom house.
      *
      * @param colony The colony with the custom house.
@@ -4280,49 +4319,6 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getClient().sendAndWait(payForBuildingElement);
     }
 
-    /**
-     * Recruit a unit from a specified "slot" in Europe.
-     * 
-     * @param slot The slot to recruit the unit from. Either 1, 2 or 3.
-     */
-    public void recruitUnitInEurope(int slot) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
-        Player myPlayer = freeColClient.getMyPlayer();
-        Europe europe = myPlayer.getEurope();
-
-        if (myPlayer.getGold() < myPlayer.getRecruitPrice()) {
-            canvas.errorMessage("notEnoughGold");
-            return;
-        }
-
-        Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
-        recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
-
-        Element reply = client.ask(recruitUnitInEuropeElement);
-        if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-            Element unitElement = (Element) reply.getFirstChild();
-            Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-            if (unit == null) {
-                unit = new Unit(game, unitElement);
-            } else {
-                unit.readFromXMLElement(unitElement);
-            }
-            String unitId = reply.getAttribute("newRecruitable");
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitId);
-            europe.recruit(slot, unit, unitType);
-        } else {
-            logger.warning("Could not recruit the specified unit in europe.");
-            return;
-        }
-        canvas.updateGoldLabel();
-    }
 
     /**
      * Updates a trade route.

@@ -196,34 +196,6 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
-     * Recruits a unit from Europe.
-     * 
-     * @param slot The slot the recruited unit(type) came from. This is needed
-     *            for setting a new recruitable to this slot.
-     * @param unit The recruited unit.
-     * @param newRecruitable The recruitable that will fill the now empty slot.
-     * @exception IllegalArgumentException if <code>unit == null</code>.
-     * @exception IllegalStateException if the player recruiting the unit cannot
-     *                afford the price.
-     */
-    public void recruit(int slot, Unit unit, UnitType newRecruitable) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        } else if (getRecruitPrice() > unit.getOwner().getGold()) {
-            throw new IllegalStateException("Not enough gold to recruit " + unit.toString() + ".");
-        }
-
-        unit.getOwner().modifyGold(-getRecruitPrice());
-        incrementRecruitPrice();
-        unit.setLocation(this);
-        firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
-        unit.getOwner().updateImmigrationRequired();
-        unit.getOwner().reduceImmigration();
-
-        setRecruitable(slot, newRecruitable);
-    }
-
-    /**
      * Returns <i>null</i>.
      * 
      * @return <i>null</i>.
@@ -466,10 +438,14 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         return Math.max((recruitPrice * difference) / required, recruitLowerCap);
     }
 
-    private void incrementRecruitPrice() {
-        recruitPrice += Specification.getSpecification().getIntegerOption("model.option.recruitPriceIncrease").getValue();
-        recruitLowerCap += Specification.getSpecification().getIntegerOption("model.option.lowerCapIncrease")
-                .getValue();
+    /**
+     * Increases the base price and lower cap for recruits.
+     * Only called from the server side.
+     */
+    public void increaseRecruitmentDifficulty() {
+        Specification spec = Specification.getSpecification();
+        recruitPrice += spec.getIntegerOption("model.option.recruitPriceIncrease").getValue();
+        recruitLowerCap += spec.getIntegerOption("model.option.lowerCapIncrease").getValue();
     }
 
     /**

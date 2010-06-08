@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.control.InGameController.MigrationType;
 
 import org.w3c.dom.Element;
 
@@ -32,10 +33,11 @@ import org.w3c.dom.Element;
  * The message sent when a unit is to emigrate.
  */
 public class EmigrateUnitMessage extends Message {
+
     /**
      * The slot from which to select the unit.
      */
-    private int slot;
+    private String slotString;
 
     /**
      * Create a new <code>EmigrateUnitMessage</code> with the supplied slot.
@@ -43,7 +45,7 @@ public class EmigrateUnitMessage extends Message {
      * @param slot The slot to select the migrant from.
      */
     public EmigrateUnitMessage(int slot) {
-        this.slot = slot;
+        this.slotString = Integer.toString(slot);
     }
 
     /**
@@ -53,43 +55,62 @@ public class EmigrateUnitMessage extends Message {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EmigrateUnitMessage(Game game, Element element) {
-        this.slot = Integer.parseInt(element.getAttribute("slot"));
+        this.slotString = element.getAttribute("slot");
     }
 
     /**
      * Handle a "emigrateUnit"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was received on.
-     *
-     * @return A multiple element containing the updated <code>Europe</code>
-     *         and any required <code>ModelMessages</code>,
+     * @param connection The <code>Connection</code> message was received on.
+     * @return An <code>Element</code> encapsulating the change,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Europe europe = player.getEurope();
         if (europe == null) {
-            return Message.clientError("No Europe for a unit to migrate from.");
+            return Message.clientError("No Europe to migrate from.");
         }
-        boolean fountain;
+        int slot;
+        try {
+            slot = Integer.parseInt(slotString);
+        } catch (NumberFormatException e) {
+            return Message.clientError("Bad slot: " + slotString);
+        }
+
+        boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
+        MigrationType type;
         int remaining = serverPlayer.getRemainingEmigrants();
         if (remaining > 0) {
-            // Check fountain-of-Youth emigrants first because the client side
-            // is making the right number of emigrant-selection-requests.
-            fountain = true;
-            serverPlayer.setRemainingEmigrants(remaining - 1);
+            if (!selected) {
+                return Message.clientError("Invalid slot for FoY migration.");
+            }
+            type = MigrationType.FOUNTAIN;
         } else if (player.checkEmigrate()) {
-            fountain = false;
+            if (selected) {
+                if (!player.hasAbility("model.ability.selectRecruit")) {
+                    return Message.clientError("selectRecruit ability absent.");
+                }
+            } else if (slot != 0) {
+                return Message.clientError("Invalid slot for normal migration.");
+            }
+            type = MigrationType.NORMAL;
+        } else if (europe.getRecruitPrice() <= player.getGold()) {
+            if (!selected) {
+                return Message.clientError("Invalid slot for recruitment.");
+            }
+            type = MigrationType.RECRUIT;
         } else {
-            return Message.clientError("No emigrants available.");
+            return Message.clientError("No migrants available.");
         }
 
         // Proceed to emigrate.
         return server.getInGameController()
-            .emigrate(serverPlayer, slot, fountain);
+            .emigrate(serverPlayer, slot, type);
     }
 
     /**
@@ -99,7 +120,7 @@ public class EmigrateUnitMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("slot", Integer.toString(slot));
+        result.setAttribute("slot", slotString);
         return result;
     }
 
