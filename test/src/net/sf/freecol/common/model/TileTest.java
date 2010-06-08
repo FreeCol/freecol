@@ -334,7 +334,7 @@ public class TileTest extends FreeColTestCase {
         assertFalse(tile2.hasRiver());
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));
-        assertTrue(hasBonusFromSource(tile1.getProductionBonus(lumber, null), river1.getType()));
+        assertFalse(hasBonusFromSource(tile1.getProductionBonus(lumber, null), river1.getType()));
         assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar, null), road2.getType()));
         assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
 

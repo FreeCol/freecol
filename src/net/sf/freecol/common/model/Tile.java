@@ -1243,7 +1243,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         Set<Modifier> result = new HashSet<Modifier>();
         result.addAll(type.getProductionBonus(goodsType));
         if (tileItemContainer != null) {
-            result.addAll(tileItemContainer.getProductionBonus(goodsType, unitType));
+            Resource resource = tileItemContainer.getResource();
+            if (resource != null) {
+                result.addAll(resource.getType().getProductionModifier(goodsType, unitType));
+            }
+            if (!result.isEmpty()) {
+                result.addAll(tileItemContainer.getProductionBonus(goodsType, unitType));
+            }
         }
         return result;
     }
