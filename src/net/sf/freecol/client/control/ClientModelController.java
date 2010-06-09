@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -64,7 +63,7 @@ public class ClientModelController implements ModelController {
     }
 
     /**
-     * Returns a pseudorandom int, uniformly distributed between 0 (inclusive)
+     * Returns a pseudo-random int, uniformly distributed between 0 (inclusive)
      * and the specified value (exclusive).
      * 
      * @param taskID The <code>taskID</code> should be a unique identifier.
@@ -256,15 +255,6 @@ public class ClientModelController implements ModelController {
             tile.add(improvement);
             // FIXME: how should we compute the style better?
         }
-    }
-
-    /**
-     * Get the pseudo-random number generator provided by the client.
-     * 
-     * @return random number generator.
-     */
-    public PseudoRandom getPseudoRandom() {
-        return freeColClient.getPseudoRandom();
     }
 
     /**

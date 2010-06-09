@@ -49,7 +49,6 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Map;
@@ -82,23 +81,6 @@ public class DebugMenu extends JMenu {
         canvas = freeColClient.getCanvas();
 
         buildDebugMenu();
-    }
-
-    private void stepRNG() {
-        PseudoRandom clientRnd = freeColClient
-            .getGame().getModelController().getPseudoRandom();
-        PseudoRandom serverRnd = freeColClient.getFreeColServer()
-            .getGame().getModelController().getPseudoRandom();
-        boolean more = false;
-        do {
-            int cVal = clientRnd.nextInt(100);
-            int sVal = serverRnd.nextInt(100);
-            String value = Integer.toString(cVal) + ":" + Integer.toString(sVal);
-            more = canvas.showConfirmDialog(null,
-                                            "menuBar.debug.stepRandomNumberGenerator",
-                                            "more", "ok",
-                                            "%value%", value);
-        } while (more);
     }
 
     private void buildDebugMenu() {
@@ -302,7 +284,17 @@ public class DebugMenu extends JMenu {
         this.add(rng);
         rng.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    stepRNG();
+                    boolean more = true;
+                    int n = 0;
+                    while (more) {
+                        int val = freeColClient.getGame().getModelController()
+                            .getRandom("step" + n++, 100);
+                        more = freeColClient.getCanvas()
+                            .showConfirmDialog(null,
+                                "menuBar.debug.stepRandomNumberGenerator",
+                                "more", "ok",
+                                "%value%", Integer.toString(val));
+                    }
                 }
             });
 

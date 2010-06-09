@@ -132,7 +132,7 @@ public class DefendSettlementMission extends Mission {
             float bestDifference = Float.MIN_VALUE;
             Direction bestDirection = null;
             
-            Direction[] directions = Direction.getRandomDirectionArray(getPseudoRandom());
+            Direction[] directions = Direction.getRandomDirectionArray(getAIRandom());
             for (Direction direction : directions) {
                 Tile t = unit.getTile().getNeighbourOrNull(direction);
                 if (t==null)

@@ -218,7 +218,7 @@ public class IndianAIPlayer extends NewAIPlayer {
         }
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not bring gifts all the time:
-            if (getPseudoRandom().nextInt(10) != 1) {
+            if (getAIRandom().nextInt(10) != 1) {
                 continue;
             }
             int alreadyAssignedUnits = 0;
@@ -243,7 +243,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                 }
             }
             if (nearbyColonies.size() > 0) {
-                Colony target = nearbyColonies.get(getPseudoRandom().nextInt(nearbyColonies.size()));
+                Colony target = nearbyColonies.get(getAIRandom().nextInt(nearbyColonies.size()));
                 Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
@@ -276,7 +276,7 @@ public class IndianAIPlayer extends NewAIPlayer {
         }
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not demand goods all the time:
-            if (getPseudoRandom().nextInt(10) != 1) {
+            if (getAIRandom().nextInt(10) != 1) {
                 continue;
             }
             int alreadyAssignedUnits = 0;
@@ -310,7 +310,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                         continue;
                     }
                     int tension = 1 + getPlayer().getTension(to).getValue() + indianSettlement.getAlarm(to).getValue();
-                    tension = getPseudoRandom().nextInt(tension);
+                    tension = getAIRandom().nextInt(tension);
                     if (tension > targetTension) {
                         targetTension = tension;
                         target = t;
@@ -336,7 +336,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                         Player tp = target.getOwner();
                         int tension = 1 + getPlayer().getTension(tp).getValue()
                             + indianSettlement.getAlarm(tp).getValue();
-                        if (getPseudoRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
+                        if (getAIRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
                             chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne, target));
                         }
                     }
@@ -389,7 +389,7 @@ public class IndianAIPlayer extends NewAIPlayer {
             if (sessionRegister.containsKey(hagglingKey)) {
                 haggling = sessionRegister.get(hagglingKey).intValue();
             }
-            if (getPseudoRandom().nextInt(3 + haggling) <= 3) {
+            if (getAIRandom().nextInt(3 + haggling) <= 3) {
                 sessionRegister.put(goldKey, new Integer(gold));
                 sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                 return gold;

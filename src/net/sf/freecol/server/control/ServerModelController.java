@@ -75,7 +75,7 @@ public class ServerModelController implements ModelController,PropertyChangeList
     }
 
     /**
-     * Returns a pseudorandom int, uniformly distributed between 0 (inclusive)
+     * Returns a pseudo-random int, uniformly distributed between 0 (inclusive)
      * and the specified value (exclusive).
      * 
      * @param taskID The <code>taskID</code> should be a unique identifier.
@@ -106,15 +106,6 @@ public class ServerModelController implements ModelController,PropertyChangeList
         }
         logger.finest("getRandom(" + taskID + ", " + n + ") -> " + value);
         return value;
-    }
-
-    /**
-     * Get random number generator.
-     * 
-     * @return random number generator.
-     */
-    public PseudoRandom getPseudoRandom() {
-        return this.freeColServer.getPseudoRandom();
     }
 
     /**

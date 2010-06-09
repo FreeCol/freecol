@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Player.Stance;
 
 /**
@@ -132,18 +131,6 @@ public interface ModelController {
     * @return The generated number.
     */
     public int getRandom(String taskID, int n);
-
-    /**
-     * Get a pseudo-random number generator.
-     * <p> 
-     * Use {@link #getRandom(String, int)} in order to get the
-     * same value for a specific token on multiple calls, use
-     * the generator directly if this is not important if
-     * performance is a factor.
-     * 
-     * @return random number generator.
-     */
-    PseudoRandom getPseudoRandom();
 
     /**
      * Get a new <code>TradeRoute</code> object.

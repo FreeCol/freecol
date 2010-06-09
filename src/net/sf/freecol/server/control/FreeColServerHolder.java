@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
 
@@ -55,15 +54,5 @@ public class FreeColServerHolder {
      */
     protected ServerGame getGame() {
         return freeColServer.getGame();
-    }
-
-    /**
-     * Get a random number generator.
-     * 
-     * @return shared random number generator.
-     * @throws NullPointerException if the server reference is null.
-     */
-    protected PseudoRandom getPseudoRandom() {        
-        return getFreeColServer().getPseudoRandom();
     }
 }

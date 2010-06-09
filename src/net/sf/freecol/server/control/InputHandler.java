@@ -76,7 +76,6 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
                                            element).handle(freeColServer, connection);
                 }
             });
-        register("getRandomNumbers", new GetRandomNumbersHandler());
     }
 
     /**
@@ -230,23 +229,6 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
          * @return answer element, may be null.
          */
         protected abstract Element handle(Player player, Connection conn, Element element);
-    }
-
-    private class GetRandomNumbersHandler implements NetworkRequestHandler {
-        public Element handle(Connection conn, Element element) {
-            int numRandomNumbers = Integer.parseInt(element.getAttribute("n"));
-            StringBuffer sb = new StringBuffer();
-            int[] numbers = getFreeColServer().getRandomNumbers(numRandomNumbers);
-            for (int i = 0; i < numbers.length; i++) {
-                if (i > 0) {
-                    sb.append(",");
-                }
-                sb.append(String.valueOf(numbers[i]));
-            }
-            Element reply = Message.createNewRootElement("getRandomNumbersConfirmed");
-            reply.setAttribute("result", sb.toString());
-            return reply;
-        }
     }
 
     private class DisconnectHandler implements NetworkRequestHandler {

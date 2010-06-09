@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;

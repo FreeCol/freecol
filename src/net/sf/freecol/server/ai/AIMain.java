@@ -171,11 +171,11 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
 
 
     /**
-    * Returns an instance of <code>PseudoRandom</code>. It that can be
-    * used to generate random numbers.
-    * @return The instance of <code>PseudoRandom</code>.
-    */
-    public PseudoRandom getPseudoRandom() {
+     * Returns an instance of <code>PseudoRandom</code>. It that can be
+     * used to generate random numbers.
+     * @return The instance of <code>PseudoRandom</code>.
+     */
+    public PseudoRandom getAIRandom() {
         return freeColServer.getPrivatePseudoRandom();
     }
 

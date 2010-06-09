@@ -103,8 +103,8 @@ public abstract class AIObject extends FreeColObject {
     * 
     * @return An instance of <code>PseudoRandom</code>.
     */
-    protected PseudoRandom getPseudoRandom() {
-        return aiMain.getPseudoRandom();
+    protected PseudoRandom getAIRandom() {
+        return aiMain.getAIRandom();
     }
 
     

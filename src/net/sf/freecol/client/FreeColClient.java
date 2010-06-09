@@ -59,7 +59,6 @@ import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.gui.sound.SoundLibrary;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.model.Game;
@@ -130,8 +129,6 @@ public final class FreeColClient {
 
     // Model:
     private Game game;
-
-    private final PseudoRandom _random = new ClientPseudoRandom();
 
     /** The player "owning" this client. */
     private Player player;
@@ -822,101 +819,6 @@ public final class FreeColClient {
      */
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
-    }
-
-    /**
-     * Get the pseudo-random number generator for the client.
-     * 
-     * @return random number generator.
-     */
-    public PseudoRandom getPseudoRandom() {
-        return _random;
-    }
-
-
-    /**
-     * This class provides server-generated random numbers for client-side use.
-     * It requires a server connection. If the connection is unavailable it will
-     * generate random numbers on the client side rather than failing.
-     */
-    private class ClientPseudoRandom implements PseudoRandom {
-        ClientPseudoRandom() {
-            values = new LinkedList<Integer>();
-            offlineRandom = new Random();
-        }
-
-        /**
-         * Get the next pseudo-random integer between 0 and n.
-         * 
-         * @param n The upper bound (exclusive).
-         * @return random number between 0 (inclusive) and n (exclusive).
-         */
-        public int nextInt(int n) {
-            return FreeCol.randomInteger(nextInt(), n);
-        }
-
-        /**
-         * Get the next pseudo-random integer.
-         * <p>
-         * The method requires one network call per {@link #VALUES_PER_CALL}
-         * requests. If multiple threads are active a single thread may
-         * theoretically have to wait indefinitely, but in practice this is not
-         * very likely.
-         * 
-         * @return next random integer.
-         */
-        private int nextInt() {
-            Integer i = pop();
-            while (i == null) {
-                getNewNumbers();
-                i = pop();
-            }
-            return i.intValue();
-        }
-
-        /**
-         * Get new numbers to the queue from the server, generate on client side
-         * if not connected. The method is guaranteed to generate at least one
-         * new number.
-         */
-        private void getNewNumbers() {
-            int valuesAdded = 0;
-            if (isLoggedIn()) {
-                Element query = Message.createNewRootElement("getRandomNumbers");
-                query.setAttribute("n", String.valueOf(VALUES_PER_CALL));
-                // We expect client != null when logged in
-                Element answer = getClient().ask(query);
-                if (answer != null && "getRandomNumbersConfirmed".equals(answer.getTagName())) {
-                    for (String s : answer.getAttribute("result").split(",")) {
-                        push(new Integer(s));
-                        ++valuesAdded;
-                    }
-                } else {
-                    logger.warning("Expected getRandomNumbersConfirmed, got "
-                            + (answer != null ? answer.getTagName() : "null"));
-                }
-            }
-            // Fallback solution on errors (we don't want to crash the game)
-            if (valuesAdded < 1) {
-                logger.fine("Generating random number on client side");
-                push(Integer.valueOf(offlineRandom.nextInt()));
-            }
-        }
-
-        private synchronized void push(Integer i) {
-            values.offer(i);
-        }
-
-        private synchronized Integer pop() {
-            return values.poll();
-        }
-
-
-        private final Random offlineRandom;
-
-        private final Queue<Integer> values;
-
-        private static final int VALUES_PER_CALL = 100;
     }
 }
 

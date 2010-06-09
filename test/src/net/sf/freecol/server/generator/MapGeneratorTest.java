@@ -44,14 +44,14 @@ import net.sf.freecol.util.test.MockModelController;
 public class MapGeneratorTest extends FreeColTestCase {
 
     public void testWithNoIndians() {
-
-        Game g = new ServerGame(new MockModelController());
+        MockModelController mmc = new MockModelController();
+        Game g = new ServerGame(mmc);
         Specification s = FreeCol.getSpecification();
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
+        IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom());
 
         for (Nation n : s.getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
@@ -70,13 +70,13 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testSinglePlayerOnSmallMap() {
-
-        Game g = new ServerGame(new MockModelController());
+        MockModelController mmc = new MockModelController();
+        Game g = new ServerGame(mmc);
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
+        IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom());
         RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
@@ -102,13 +102,13 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testMapGenerator() {
-
-        Game g = new ServerGame(new MockModelController());
+        MockModelController mmc = new MockModelController();
+        Game g = new ServerGame(mmc);
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
+        IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom());
 
         // Apply the difficulty level
         Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
@@ -165,10 +165,10 @@ public class MapGeneratorTest extends FreeColTestCase {
      * 
      */
     public void testIndianCapital() {
+        MockModelController mmc = new MockModelController();
+        Game g = new ServerGame(mmc);
 
-        Game g = new ServerGame(new MockModelController());
-
-        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
+        IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom());
 
         Vector<Player> players = new Vector<Player>();
 
@@ -214,8 +214,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         /**
          * Make sure we can import all distributed maps.
          */
-        Game g = new ServerGame(new MockModelController());
-        IMapGenerator gen = new MapGenerator(g.getModelController().getPseudoRandom());
+        MockModelController mmc = new MockModelController();
+        Game g = new ServerGame(mmc);
+        IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom());
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
             if (importFile.getName().endsWith(".fsg")) {
@@ -233,8 +234,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Reset import file option value (set by previous tests)
         ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        Game game = new ServerGame(new MockModelController());
-        IMapGenerator gen = new MapGenerator(game.getModelController().getPseudoRandom());
+        MockModelController mmc = new MockModelController();
+        Game game = new ServerGame(mmc);
+        IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom());
         try {
             gen.createMap(game);
         } catch (FreeColException e) {
