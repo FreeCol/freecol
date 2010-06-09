@@ -165,7 +165,7 @@ public final class PreGameController extends Controller {
                             continue;
                         }
                     }
-                    europe.setRecruitable(index, player.generateRecruitable(random));
+                    europe.setRecruitable(index, player.generateRecruitable());
                 }
 
                 Market market = player.getMarket();

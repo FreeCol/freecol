@@ -40,7 +40,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -1660,11 +1659,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 Europe europe = getEurope();
                 if (europe != null) {
                     FeatureContainer fc = getFeatureContainer();
-                    PseudoRandom random = mc.getPseudoRandom();
                     for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
                         if (fc.hasAbility("model.ability.canNotRecruitUnit",
                                           europe.getRecruitable(i))) {
-                            europe.setRecruitable(i, generateRecruitable(random));
+                            europe.setRecruitable(i, generateRecruitable());
                         }
                     }
                 }
@@ -2107,12 +2105,13 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Generates a random unit type recruitable by this player.
      *
-     * @param random The <code>PseudoRandom</code> number source to use.
      * @return A random recruitable unit type.
      */
-    public UnitType generateRecruitable(PseudoRandom random) {
+    public UnitType generateRecruitable() {
         List<RandomChoice<UnitType>> recruitables = generateRecruitablesList();
-        return RandomChoice.getWeightedRandom(random, recruitables);
+        ModelController mc = getGame().getModelController();
+        int totalProbability = RandomChoice.getTotalProbability(recruitables);
+        return RandomChoice.select(recruitables, mc.getRandom("recruit." + getId(), totalProbability));
     }
 
     /**

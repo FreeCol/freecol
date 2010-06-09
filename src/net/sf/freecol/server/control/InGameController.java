@@ -2231,7 +2231,7 @@ public final class InGameController extends Controller {
         }
 
         // Replace the recruit we used.
-        europe.setRecruitable(index, serverPlayer.generateRecruitable(random));
+        europe.setRecruitable(index, serverPlayer.generateRecruitable());
         objects.add(europe);
 
         // Return an informative message only if this was an ordinary
