@@ -178,7 +178,7 @@ public class Game extends FreeColGameObject {
         super(null, in);
 
         this.modelController = modelController;
-        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
+        this.combatModel = new SimpleCombatModel();
         readFromXML(in);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
     }

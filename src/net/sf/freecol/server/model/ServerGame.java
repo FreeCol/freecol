@@ -57,7 +57,7 @@ public class ServerGame extends Game {
         super(null);
 
         this.modelController = modelController;
-        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
+        this.combatModel = new SimpleCombatModel();
         //this.viewOwner = null;
 
         gameOptions = new GameOptions();
@@ -88,7 +88,7 @@ public class ServerGame extends Game {
         this.modelController = modelController;
         if (modelController != null) {
             // no model controller when using the map editor
-            this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
+            this.combatModel = new SimpleCombatModel();
         }
         this.viewOwner = null;
 

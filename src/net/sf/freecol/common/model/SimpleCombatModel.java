@@ -61,11 +61,7 @@ public class SimpleCombatModel implements CombatModel {
         = "model.modifier.artilleryAgainstRaid";
 
 
-    private PseudoRandom random;
-
-    public SimpleCombatModel(PseudoRandom pseudoRandom) {
-        this.random = pseudoRandom;
-    }
+    public SimpleCombatModel() {}
 
     /**
      * Check some special case attack results.
@@ -164,8 +160,10 @@ public class SimpleCombatModel implements CombatModel {
      * @return The result of the combat.
      */
     public CombatResult generateAttackResult(Unit attacker, Unit defender) {
+        ModelController mc = attacker.getGame().getModelController();
         CombatOdds odds = calculateCombatOdds(attacker, defender);
-        float r = 0.001f * random.nextInt(1000);
+        int magic = 1000000;
+        float r = (1.0f/magic) * mc.getRandom(attacker.getId() + ".attack." + defender.getId(), magic);
 
         // Generate a random float 0 <= r < 1.0.
         // Partition this range into wins < odds.win and losses above.
@@ -205,14 +203,16 @@ public class SimpleCombatModel implements CombatModel {
      * @return The result of the combat.
      */
     public CombatResult generateAttackResult(Colony attacker, Unit defender) {
+        ModelController mc = attacker.getGame().getModelController();
         CombatOdds odds = calculateCombatOdds(attacker, defender);
-        float r = 0.001f * random.nextInt(1000);
+        int magic = 1000000;
+        float r = (1.0f/magic) * mc.getRandom(attacker.getId() + ".bombard." + defender.getId(), magic);
         CombatResultType type;
         if (r <= odds.win) {
             float offencePower = getOffencePower(attacker, defender);
             float defencePower = getDefencePower(attacker, defender);
             int diff = Math.round(defencePower * 2 - offencePower);
-            int r2 = random.nextInt(Math.max(diff, 3));
+            int r2 = mc.getRandom(attacker.getId() + ".damage." + defender.getId(), Math.max(diff, 3));
             type = (r2 == 0) ? CombatResultType.GREAT_WIN
                 : CombatResultType.WIN;
             type = checkResult(type, null, defender);
@@ -824,10 +824,10 @@ public class SimpleCombatModel implements CombatModel {
         String colonyName = colony.getName();
         Player owner = colony.getOwner();
         int limit = buildingList.size() + goodsList.size() + shipList.size() + 1;
-        int random = attacker.getGame().getModelController().getRandom(attacker.getId() + "pillageColony", limit);
+        int pillage = attacker.getGame().getModelController().getRandom(attacker.getId() + "pillageColony", limit);
                                                                        
-        if (random < buildingList.size()) {
-            Building building = buildingList.get(random);
+        if (pillage < buildingList.size()) {
+            Building building = buildingList.get(pillage);
             owner.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                    "model.unit.buildingDamaged",
                                                    colony)
@@ -836,8 +836,8 @@ public class SimpleCombatModel implements CombatModel {
                                    .addStringTemplate("%enemyNation%", nation)
                                    .addStringTemplate("%enemyUnit%", unitName));
             building.damage();
-        } else if (random < buildingList.size() + goodsList.size()) {
-            Goods goods = goodsList.get(random - buildingList.size());
+        } else if (pillage < buildingList.size() + goodsList.size()) {
+            Goods goods = goodsList.get(pillage - buildingList.size());
             goods.setAmount(Math.min(goods.getAmount() / 2, 50));
             colony.removeGoods(goods);
             if (attacker.getSpaceLeft() > 0) {
@@ -851,8 +851,8 @@ public class SimpleCombatModel implements CombatModel {
                                    .addName("%colony%", colonyName)
                                    .addStringTemplate("%enemyNation%", nation)
                                    .addStringTemplate("%enemyUnit%", unitName));
-        } else if (random < buildingList.size() + goodsList.size() + shipList.size()) {
-            Unit ship = shipList.get(random - buildingList.size() - goodsList.size());
+        } else if (pillage < buildingList.size() + goodsList.size() + shipList.size()) {
+            Unit ship = shipList.get(pillage - buildingList.size() - goodsList.size());
             damageShip(ship, null, attacker, repairLocation);
         } else { // steal gold
             int gold = colony.getOwner().getGold() / 10;
@@ -879,7 +879,7 @@ public class SimpleCombatModel implements CombatModel {
         Player enemy = settlement.getOwner();
         boolean wasCapital = settlement.isCapital();
         Tile newTile = settlement.getTile();
-        ModelController modelController = attacker.getGame().getModelController();
+        ModelController mc = attacker.getGame().getModelController();
         SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
         String settlementName = settlement.getName();
         settlement.dispose();
@@ -889,23 +889,21 @@ public class SimpleCombatModel implements CombatModel {
         List<UnitType> treasureUnitTypes = FreeCol.getSpecification()
             .getUnitTypesWithAbility("model.ability.carryTreasure");
         if (treasureUnitTypes.size() > 0) {
-            int randomTreasure = modelController.getRandom(attacker.getId() + "indianTreasureRandom" + 
-                                                           attacker.getId(), 11);
-            int random = modelController.getRandom(attacker.getId() + "newUnitForTreasure" +
-                                                   attacker.getId(), treasureUnitTypes.size());
-            Unit tTrain = modelController.createUnit(attacker.getId() + "indianTreasure" +
-                                                     attacker.getId(), newTile, attacker.getOwner(),
-                                                     treasureUnitTypes.get(random));
+            int treasure = mc.getRandom(attacker.getId() + "indianTreasureRandom" + attacker.getId(), 11);
+            UnitType type = treasureUnitTypes.get(mc.getRandom(attacker.getId() + "newUnitForTreasure" + attacker.getId(),
+                                                               treasureUnitTypes.size()));
+            Unit tTrain = mc.createUnit(attacker.getId() + "indianTreasure" + attacker.getId(),
+                                        newTile, attacker.getOwner(), type);
 
             // Larger treasure if Hernan Cortes is present in the congress:
             Set<Modifier> modifierSet = attacker.getModifierSet("model.modifier.nativeTreasureModifier");
-            randomTreasure = (int) FeatureContainer.applyModifierSet(randomTreasure, attacker.getGame().getTurn(),
-                                                                     modifierSet);
+            treasure = (int) FeatureContainer.applyModifierSet(treasure, attacker.getGame().getTurn(),
+                                                               modifierSet);
             if (settlementType == SettlementType.INCA_CITY ||
                 settlementType == SettlementType.AZTEC_CITY) {
-                tTrain.setTreasureAmount(randomTreasure * 500 + 1000);
+                tTrain.setTreasureAmount(treasure * 500 + 1000);
             } else {
-                tTrain.setTreasureAmount(randomTreasure * 50  + 300);
+                tTrain.setTreasureAmount(treasure * 50  + 300);
             }
 
             // capitals give more gold
@@ -948,8 +946,8 @@ public class SimpleCombatModel implements CombatModel {
      * @param indianSettlement The attacked indian settlement
      */
     private void getConvert(Unit attacker, IndianSettlement indianSettlement) {
-        ModelController modelController = attacker.getGame().getModelController();
-        int random = modelController.getRandom(attacker.getId() + "getConvert", 100);
+        ModelController mc = attacker.getGame().getModelController();
+        int convert = mc.getRandom(attacker.getId() + "getConvert", 100);
         int convertProbability = (int) FeatureContainer.applyModifierSet(Specification.getSpecification()
                 .getIntegerOption("model.option.nativeConvertProbability").getValue(), attacker.getGame().getTurn(),
                 attacker.getModifierSet("model.modifier.nativeConvertBonus"));
@@ -957,19 +955,19 @@ public class SimpleCombatModel implements CombatModel {
         int burnProbability = Specification.getSpecification().getIntegerOption("model.option.burnProbability")
                 .getValue();
         
-        if (random < convertProbability) {
+        if (convert < convertProbability) {
             Unit missionary = indianSettlement.getMissionary();
             if (missionary != null && missionary.getOwner() == attacker.getOwner() &&
                 attacker.getGame().getViewOwner() == null && indianSettlement.getUnitCount() > 1) {
                 List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
                 if (converts.size() > 0) {
                     indianSettlement.getFirstUnit().dispose();
-                    random = modelController.getRandom(attacker.getId() + "getConvertType", converts.size());
-                    modelController.createUnit(attacker.getId() + "indianConvert", attacker.getLocation(),
-                                               attacker.getOwner(), converts.get(random));
+                    convert = mc.getRandom(attacker.getId() + "getConvertType", converts.size());
+                    mc.createUnit(attacker.getId() + "indianConvert", attacker.getLocation(),
+                                               attacker.getOwner(), converts.get(convert));
                 }
             }
-        } else if (random >= 100 - burnProbability) {
+        } else if (convert >= 100 - burnProbability) {
             boolean burn = false;
             List<Settlement> settlements = indianSettlement.getOwner().getSettlements();
             for (Settlement settlement : settlements) {
