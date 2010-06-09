@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -346,6 +348,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * Describe history here.
      */
     protected List<HistoryEvent> history = new ArrayList<HistoryEvent>();
+
+    /**
+     * A cache of settlement names.  Does not need to be serialized.
+     */
+    private List<String> settlementNames = null;
 
     public static final Comparator<Player> playerComparator = new Comparator<Player>() {
         public int compare(Player player1, Player player2) {
@@ -860,6 +867,62 @@ public class Player extends FreeColGameObject implements Nameable {
      **/
     public Settlement getSettlement(String name) {
         return (isIndian()) ? getIndianSettlement(name) : getColony(name);
+    }
+
+    /**
+     * Gets the name of this players capital.  Only meaningful to natives.
+     *
+     * @return The name of this players capital.
+     */
+    public String getCapitalName() {
+        return Messages.message(getId() + ".settlementName.0");
+    }
+
+    /**
+     * Gets a unique settlement name.
+     *
+     * @param capital True if the name should be the national capital.
+     * @return A <code>String</code> new unused name.
+     */
+    public String getDefaultSettlementName(boolean capital) {
+        if (capital) return getCapitalName();
+
+        // Build the cache of names if it is not initialized.
+        Game game = getGame();
+        String name;
+        int i;
+        if (settlementNames == null) {
+            final String prefix = nationID + ".settlementName.";
+            settlementNames = new ArrayList<String>();
+
+            i = (isIndian()) ? 1 : 0;
+            while (Messages.containsKey(prefix + Integer.toString(i))) {
+                name = Messages.message(prefix + Integer.toString(i));
+                if (game.getSettlement(name) == null) {
+                    // Insist that the name be game-unique.  Do not reuse
+                    // the names of settlements that have been captured!
+                    settlementNames.add(name);
+                }
+                i++;
+            }
+            if (isIndian()) {
+                // TODO: The European names are believed to be in a
+                // sensible order, but the native ones are not.  Hence
+                // the randomization.  Remove this if they are ever
+                // ordered by someone who actually knows something
+                // about native settlements.
+                Collections.shuffle(settlementNames);
+            }
+        }
+
+        if (!settlementNames.isEmpty()) return settlementNames.remove(0);
+
+        // Fallback method
+        String base = Messages.message((isIndian()) ? "Settlement" : "Colony")
+            + "-";
+        i = getNumberOfSettlements()+1;
+        while (game.getSettlement(name = base + Integer.toString(i)) != null) i++;
+        return name;
     }
 
     /**

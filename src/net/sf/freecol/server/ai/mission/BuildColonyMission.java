@@ -196,7 +196,7 @@ public class BuildColonyMission extends Mission {
             }
             if (getUnit().canBuildColony() && target == getUnit().getTile()
                 && getUnit().getMovesLeft() > 0) {
-                String name = Messages.getDefaultSettlementName(unit.getOwner(), false);
+                String name = unit.getOwner().getDefaultSettlementName(false);
                 Element reply = null;
 
                 try {

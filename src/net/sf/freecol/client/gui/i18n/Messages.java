@@ -340,69 +340,6 @@ public class Messages {
 
 
     /**
-     * Creates a unique settlement name. This is done by fetching a new default
-     * settlement name from the list of default names.
-     *
-     * @param capital True if the name should be the national capital.
-     *
-     * @return A <code>String</code> containing a new unused name from
-     *         the list, if any is available, and otherwise an automatically
-     *         generated name.
-     */
-    public static String getDefaultSettlementName(Player player, boolean capital) {
-        int settlementNameIndex = 0;
-        String prefix = player.getNationID() + ".settlementName.";
-        String name;
-
-        if (capital) return message(prefix + "0");
-
-        if (player.isIndian()) {
-            // TODO: Until the native names are in some sensible order, choose
-            // at random.  When they are fixed, remove this and use the European
-            // method below.
-            PseudoRandom random = player.getGame().getModelController().getPseudoRandom();
-            int upper = 100;
-            int lower = 1;
-            int i, n = 0;
-
-            for (i = 0; i < 5; i++) { // try at random five times
-                n = random.nextInt(upper - lower) + lower;
-                if (!containsKey(prefix + Integer.toString(n))) {
-                    if (n == lower) break;
-                    upper = n;
-                    continue;
-                }
-                name = message(prefix + Integer.toString(n));
-                if (player.getSettlement(name) == null) return name;
-            }
-            for (i = n+1; i < upper; i++) { // search up from last try
-                if (!containsKey(prefix + Integer.toString(i))) break;
-                name = message(prefix + Integer.toString(i));
-                if (player.getSettlement(name) == null) return name;
-            }
-            for (i = n-1; i > 0; i--) { // search down from last try
-                if (!containsKey(prefix + Integer.toString(i))) continue;
-                name = message(prefix + Integer.toString(i));
-                if (player.getSettlement(name) == null) return name;
-            }
-        } else {
-            while (containsKey(prefix + Integer.toString(settlementNameIndex))) {
-                name = message(prefix + Integer.toString(settlementNameIndex));
-                settlementNameIndex++;
-                if (player.getGame().getSettlement(name) == null) return name;
-            }
-        }
-
-        // Fallback method
-        String fallback = (player.isIndian()) ? "Settlement" : "Colony";
-        do {
-            name = message(fallback) + settlementNameIndex;
-            settlementNameIndex++;
-        } while (player.getGame().getSettlement(name) != null);
-        return name;
-    }
-
-    /**
      * Creates a unique region name by fetching a new default name
      * from the list of default names if possible.
      *

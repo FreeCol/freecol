@@ -415,7 +415,8 @@ public class FreeColTestCase extends TestCase {
     	private String skillTaught;
     	private int initialBravesInCamp;
     	private Tile settlementTile;
-    	
+      private static int settlementNumber = 1;
+
     	private boolean isCapital;
         private Set<Player> isVisited;
         private Unit residentMissionary;
@@ -495,7 +496,12 @@ public class FreeColTestCase extends TestCase {
     		
     		return this;
     	}
-    	
+
+      private String getSimpleName(Player player, boolean isCapital) {
+          return (isCapital) ? player.getName() + "-capital"
+              : "Settlement-" + settlementNumber++;
+      }
+
     	public IndianSettlement build(){
     		UnitType skillToTeach = null;
     		
@@ -523,7 +529,7 @@ public class FreeColTestCase extends TestCase {
     		
     		IndianSettlement camp =
                     new IndianSettlement(game, indianPlayer, settlementTile,
-                                         Messages.getDefaultSettlementName(indianPlayer, isCapital),
+                                         getSimpleName(indianPlayer, isCapital),
                                          isCapital, skillToTeach, isVisited, residentMissionary);
             
     		// Add braves

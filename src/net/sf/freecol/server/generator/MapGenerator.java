@@ -526,7 +526,7 @@ public class MapGenerator implements IMapGenerator {
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = 
             new IndianSettlement(map.getGame(), player, tile,
-                                 Messages.getDefaultSettlementName(player, capital), capital,
+                                 player.getDefaultSettlementName(capital), capital,
                                  generateSkillForLocation(map, tile, player.getNationType()),
                                  new HashSet<Player>(), null);
         logger.fine("Generated skill: " + settlement.getLearnableSkill());

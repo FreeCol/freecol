@@ -1165,7 +1165,7 @@ public final class InGameController implements NetworkConstants {
 
         // Get and check the name.
         String name = canvas.showInputDialog(tile, "nameColony.text",
-                                             Messages.getDefaultSettlementName(player, false),
+                                             player.getDefaultSettlementName(false),
                                              "nameColony.yes", "nameColony.no",
                                              true);
         if (name == null) return; // User cancelled, 0-length invalid.
@@ -2191,7 +2191,7 @@ public final class InGameController implements NetworkConstants {
             	//show message
             	ModelMessage message = new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                         "indianSettlement.capitalBurned", indianPlayer)
-                    .addName("%name%", Messages.getDefaultSettlementName(indianPlayer, true))
+                    .addName("%name%", indianPlayer.getCapitalName())
                     .addStringTemplate("%nation%", indianPlayer.getNationName());
             	freeColClient.getMyPlayer().addModelMessage(message);
             	nextModelMessage();
