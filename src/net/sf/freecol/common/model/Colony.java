@@ -163,7 +163,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         goodsContainer.addPropertyChangeListener(this);
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
-        established.setNumber(game.getTurn().getNumber());
+        established = game.getTurn();
         tile.setOwner(owner);
         if (!tile.hasRoad()) {
             TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
@@ -2458,7 +2458,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
-        established.setNumber(getAttribute(in, "established", 0));
+        established = new Turn(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
         tories = getAttribute(in, "tories", 0);

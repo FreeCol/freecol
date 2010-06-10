@@ -504,7 +504,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element newTurn(Element newTurnElement) {
         // getGame().newTurn();
-        getGame().getTurn().increase();
+        getGame().setTurn(getGame().getTurn().next());
         getFreeColClient().getMyPlayer().newTurn();
         new UpdateMenuBarSwingTask().invokeLater();
 
@@ -1079,7 +1079,7 @@ public final class InGameInputHandler extends InputHandler {
         loser.setDead(true);
         update(element);
         player.getHistory().add(
-                new HistoryEvent(player.getGame().getTurn().getNumber(), HistoryEvent.EventType.SPANISH_SUCCESSION)
+                new HistoryEvent(player.getGame().getTurn(), HistoryEvent.EventType.SPANISH_SUCCESSION)
                         .addStringTemplate("%nation%", winner.getNationName()).addStringTemplate("%loserNation%",
                                 loser.getNationName()));
 

@@ -154,7 +154,7 @@ public class ServerGame extends Game {
      * @see #setFreeColGameObject
      */
     public void newTurn() {
-        getTurn().increase();
+        setTurn(getTurn().next());
         logger.info("Turn is now " + getTurn().toString());
 
         for (Player player : players) {

@@ -1703,7 +1703,7 @@ public final class InGameController extends Controller {
         serverPlayer.setPlayerType(PlayerType.REBEL);
         serverPlayer.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
         serverPlayer.modifyScore(SCORE_INDEPENDENCE_DECLARED);
-        HistoryEvent h = new HistoryEvent(getGame().getTurn().getNumber(),
+        HistoryEvent h = new HistoryEvent(getGame().getTurn(),
                                           HistoryEvent.EventType.DECLARE_INDEPENDENCE);
         serverPlayer.addHistory(h);
         objects.add(h);
@@ -2544,7 +2544,7 @@ public final class InGameController extends Controller {
                                             "lostCityRumour.Cibola", serverPlayer, newUnit)
                            .add("%city%", cityName)
                            .addAmount("%money%", treasureAmount));
-                HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
+                HistoryEvent h = new HistoryEvent(game.getTurn(), HistoryEvent.EventType.CITY_OF_GOLD)
                     .add("%city%", cityName)
                     .addAmount("%treasure%", treasureAmount);
                 serverPlayer.addHistory(h);
@@ -2759,7 +2759,7 @@ public final class InGameController extends Controller {
 
                 // History event for European players.
                 if (serverPlayer.isEuropean()) {
-                    HistoryEvent h = new HistoryEvent(turn.getNumber(),
+                    HistoryEvent h = new HistoryEvent(turn,
                             HistoryEvent.EventType.MEET_NATION)
                         .addStringTemplate("%nation%", other.getNationName());
                     serverPlayer.addHistory(h);
@@ -2898,7 +2898,7 @@ public final class InGameController extends Controller {
 
         // Update the name and note the history.
         addPartial(objects, serverPlayer, "newLandName");
-        int turn = serverPlayer.getGame().getTurn().getNumber();
+        Turn turn = serverPlayer.getGame().getTurn();
         HistoryEvent h = new HistoryEvent(turn,
                     HistoryEvent.EventType.DISCOVER_NEW_WORLD)
             .addName("%name%", name);
@@ -3932,7 +3932,7 @@ public final class InGameController extends Controller {
 
         // History is private.
         objects.add(UpdateType.PRIVATE);
-        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
+        HistoryEvent h = new HistoryEvent(game.getTurn(),
                                           HistoryEvent.EventType.FOUND_COLONY)
             .addName("%colony%", settlement.getName());
         serverPlayer.addHistory(h);
@@ -4000,7 +4000,7 @@ public final class InGameController extends Controller {
         HistoryEvent h = null;
         // Create history event before disposing.
         if (settlement instanceof Colony) {
-            h = new HistoryEvent(getGame().getTurn().getNumber(),
+            h = new HistoryEvent(getGame().getTurn(),
                                  HistoryEvent.EventType.ABANDON_COLONY)
                 .addName("%colony%", settlement.getName());
         }

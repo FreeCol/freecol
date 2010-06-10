@@ -125,7 +125,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Pretend time is passing.
         // Have to advance time as yearly goods removal is initially low.
         InGameController igc = server.getInGameController();
-        game.getTurn().setNumber(200);
+        game.setTurn(new Turn(200));
         for (int i = 0; i < 100; i++) {
             igc.yearlyGoodsRemoval((ServerPlayer) french);
             igc.yearlyGoodsRemoval((ServerPlayer) english);

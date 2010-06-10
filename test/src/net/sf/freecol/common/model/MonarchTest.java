@@ -56,7 +56,7 @@ public class MonarchTest extends FreeColTestCase {
         List<RandomChoice<MonarchAction>> choices = dutch.getMonarch().getActionChoices();
         assertNull(choices);
 
-        game.getTurn().setNumber(100);
+        game.setTurn(new Turn(100));
         dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
         choices = dutch.getMonarch().getActionChoices();
         assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));

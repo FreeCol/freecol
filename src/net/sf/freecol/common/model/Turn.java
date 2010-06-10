@@ -45,8 +45,8 @@ public class Turn {
     /**
      * Increases the turn number by one.
      */
-    public void increase() {
-        turn++;
+    public Turn next() {
+        return new Turn(turn++);
     }
 
 
@@ -56,15 +56,6 @@ public class Turn {
      */
     public int getNumber() {
         return turn;
-    }
-
-    
-    /**
-     * Sets the turn number.
-     * @param turn The number of turns.
-     */
-    public void setNumber(int turn) {
-        this.turn = turn;
     }
 
     

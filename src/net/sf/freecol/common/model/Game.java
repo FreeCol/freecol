@@ -279,6 +279,11 @@ public class Game extends FreeColGameObject {
         turn = newTurn;
     }
     
+    public void increaseTurn() {
+        setTurn(getTurn().next());
+    }
+
+
     /**
      * Get the <code>CombatModel</code> value.
      *
@@ -956,7 +961,8 @@ public class Game extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
-        getTurn().setNumber(getAttribute(in, "turn", 1));
+
+        turn = new Turn(getAttribute(in, "turn", 1));
         setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
 
         final String nextIDStr = in.getAttributeValue(null, "nextID");

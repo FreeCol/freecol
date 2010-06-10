@@ -662,12 +662,12 @@ public class SimpleCombatModel implements CombatModel {
         defendingPlayer.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
         if (attackingPlayer.isEuropean()) {
             attackingPlayer.getHistory()
-                .add(new HistoryEvent(attackingPlayer.getGame().getTurn().getNumber(),
+                .add(new HistoryEvent(attackingPlayer.getGame().getTurn(),
                                       HistoryEvent.EventType.CONQUER_COLONY)
                      .addStringTemplate("%nation%", defendingPlayer.getNationName())
                      .addName("%colony%", colony.getName()));
             defendingPlayer.getHistory()
-                .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
+                .add(new HistoryEvent(defendingPlayer.getGame().getTurn(),
                                       HistoryEvent.EventType.COLONY_CONQUERED)
                      .addName("%colony%", colony.getName())
                      .addStringTemplate("%nation%", attackingPlayer.getNationName()));
@@ -731,7 +731,7 @@ public class SimpleCombatModel implements CombatModel {
             // only messages directed to the losing player need to be sent
             if (colony.getUnitCount() <= 1) {
                 defendingPlayer.getHistory()
-                    .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
+                    .add(new HistoryEvent(defendingPlayer.getGame().getTurn(),
                                           HistoryEvent.EventType.COLONY_DESTROYED)
                          .addStringTemplate("%nation%", attackingPlayer.getNationName())
                          .addName("%colony%", colony.getName()));
@@ -927,13 +927,13 @@ public class SimpleCombatModel implements CombatModel {
         attacker.getOwner().modifyScore(atrocities);
         attacker.setLocation(newTile);
         attacker.getOwner().getHistory()
-            .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
+            .add(new HistoryEvent(attacker.getGame().getTurn(),
                                   HistoryEvent.EventType.DESTROY_SETTLEMENT)
                  .addStringTemplate("%nation%", enemy.getNationName())
                  .addName("%settlement%", settlementName));
         if (enemy.getSettlements().isEmpty()) {
             attacker.getOwner().getHistory()
-                .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
+                .add(new HistoryEvent(attacker.getGame().getTurn(),
                                       HistoryEvent.EventType.DESTROY_NATION)
                      .addStringTemplate("%nation%", enemy.getNationName()));
         }

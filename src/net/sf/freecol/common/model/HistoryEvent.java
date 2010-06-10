@@ -50,7 +50,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * The turn in which the event took place
      */
-    private int turn;
+    private Turn turn;
 
     /**
      * The type of event.
@@ -61,7 +61,7 @@ public class HistoryEvent extends StringTemplate {
         // empty constructor
     }
 
-    public HistoryEvent(int turn, EventType eventType) {
+    public HistoryEvent(Turn turn, EventType eventType) {
         super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
@@ -72,7 +72,7 @@ public class HistoryEvent extends StringTemplate {
      *
      * @return a <code>int</code> value
      */
-    public final int getTurn() {
+    public final Turn getTurn() {
         return turn;
     }
 
@@ -81,7 +81,7 @@ public class HistoryEvent extends StringTemplate {
      *
      * @param newInt The new int value.
      */
-    public final void setTurn(final int newInt) {
+    public final void setTurn(final Turn newInt) {
         this.turn = newInt;
     }
 
@@ -158,7 +158,7 @@ public class HistoryEvent extends StringTemplate {
 
 
     public String toString() {
-        return eventType.toString() + " (" + Turn.getYear(turn) + ") ["
+        return eventType.toString() + " (" + turn.getYear() + ") ["
             + super.toString() + "]";
     }
 
@@ -185,7 +185,7 @@ public class HistoryEvent extends StringTemplate {
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("turn", Integer.toString(turn));
+        out.writeAttribute("turn", turn.toString());
         out.writeAttribute("eventType", eventType.toString());
     }
 
@@ -195,7 +195,7 @@ public class HistoryEvent extends StringTemplate {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        turn = Integer.parseInt(in.getAttributeValue(null, "turn"));
+        turn = new Turn(Integer.parseInt(in.getAttributeValue(null, "turn")));
         String eventString = in.getAttributeValue(null, "eventType");
         // TODO: remove compatibility code
         if (eventString == null) {

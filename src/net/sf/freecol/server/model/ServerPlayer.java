@@ -408,7 +408,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         modifyScore(SCORE_INDEPENDENCE_GRANTED - getGame().getTurn().getNumber());
         setTax(0);
         reinitialiseMarket();
-        getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
+        getHistory().add(new HistoryEvent(getGame().getTurn(),
                                           HistoryEvent.EventType.INDEPENDENCE));
         messages.add(new ModelMessage("model.player.independence", this));
         ArrayList<Unit> surrenderUnits = new ArrayList<Unit>();
