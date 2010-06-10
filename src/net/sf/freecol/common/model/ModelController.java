@@ -116,7 +116,7 @@ public interface ModelController {
     
     
     /**
-    * Returns a pseudorandom int, uniformly distributed between 0
+    * Returns a pseudo-random int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
     * 
     * @param taskID The <code>taskID</code> should be a unique identifier.

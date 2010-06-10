@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -565,7 +564,7 @@ public class CombatTest extends FreeColTestCase {
         // We need a deterministic random
         //List<Integer> setValues = new ArrayList<Integer>();
         //setValues.add(1);
-        //PseudoRandom mockRandom = new MockPseudoRandom(setValues,false);
+        //MockPseudoRandom mockRandom = new MockPseudoRandom(setValues,false);
         //SimpleCombatModel combatModel = new SimpleCombatModel(mockRandom);
         //CombatResult result = combatModel.generateAttackResult(attacker, colonist);
         //String errMsg = "Wrong combat result, cannot be DONE_SETTLEMENT";

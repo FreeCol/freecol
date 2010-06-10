@@ -39,7 +39,6 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -82,7 +81,7 @@ public class MapGenerator implements IMapGenerator {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
     
-    private final PseudoRandom random;
+    private final Random random;
     private final MapGeneratorOptions mapGeneratorOptions;
     
     private final LandGenerator landGenerator;
@@ -95,9 +94,11 @@ public class MapGenerator implements IMapGenerator {
     
     /**
      * Creates a <code>MapGenerator</code>
+     *
+     * @param random The <code>Random</code> number source to use.
      * @see #createMap
      */
-    public MapGenerator(PseudoRandom random) {
+    public MapGenerator(Random random) {
         this.random = random;
         this.mapGeneratorOptions = new MapGeneratorOptions();
         landGenerator = new LandGenerator(mapGeneratorOptions, random);

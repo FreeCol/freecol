@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -32,7 +33,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
@@ -171,12 +171,12 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
 
 
     /**
-     * Returns an instance of <code>PseudoRandom</code>. It that can be
-     * used to generate random numbers.
-     * @return The instance of <code>PseudoRandom</code>.
+     * Gets the random number generator to be used in the AI.
+     *
+     * @return The AI random number generator.
      */
-    public PseudoRandom getAIRandom() {
-        return freeColServer.getPrivatePseudoRandom();
+    public Random getAIRandom() {
+        return freeColServer.getServerRandom();
     }
 
 

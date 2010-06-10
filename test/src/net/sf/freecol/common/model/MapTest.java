@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -35,6 +34,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.util.test.MockModelController;
+import net.sf.freecol.util.test.MockPseudoRandom;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -265,9 +265,7 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         MapBuilder builder = new MapBuilder(game);
         Map map = builder.setDimensions(10, 15).build();
-        PseudoRandom random = ((MockModelController) game.getModelController())
-            .getPseudoRandom();
-        Direction[] dirs = Direction.getRandomDirectionArray(random);
+        Direction[] dirs = Direction.getRandomDirectionArray(((MockModelController) game.getModelController()).getPseudoRandom());
         assertNotNull(dirs);
     }
     

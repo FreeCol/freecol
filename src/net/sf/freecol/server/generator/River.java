@@ -22,10 +22,10 @@ package net.sf.freecol.server.generator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -121,7 +121,7 @@ public class River {
     /**
      * The random number source.
      */
-    private final PseudoRandom random;
+    private final Random random;
 
     /**
      * A hashtable of position-river pairs.
@@ -139,9 +139,11 @@ public class River {
      *
      * @param map The map on which the river flows.
      * @param riverMap A hashtable of position-river pairs.
+     * @param region The region for this river.
+     * @param random The <code>Random</code> number source to use.
      */
     public River(Map map, java.util.Map<Position, River> riverMap,
-                 ServerRegion region, PseudoRandom random) {
+                 ServerRegion region, Random random) {
         this.map = map;
         this.riverMap = riverMap;
         this.region = region;

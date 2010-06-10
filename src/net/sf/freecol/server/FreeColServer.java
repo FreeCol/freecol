@@ -54,7 +54,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -161,7 +160,7 @@ public final class FreeColServer {
     private String name;
 
     /** The private provider for random numbers. */
-    private final ServerPseudoRandom random = new ServerPseudoRandom();
+    private Random random = new Random(new SecureRandom().nextLong());
 
     /** Did the integrity check succeed */
     private boolean integrity = false;
@@ -592,7 +591,7 @@ public final class FreeColServer {
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
-            xsw.writeAttribute("randomState", random.getState());
+            xsw.writeAttribute("randomState", getRandomState(random));
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
             Iterator<FreeColGameObject> fcgoIterator = game.getFreeColGameObjectIterator();
@@ -673,7 +672,7 @@ public final class FreeColServer {
             String randomState = xsr.getAttributeValue(null, "randomState");
             if (randomState != null && randomState.length() > 0) {
                 try {
-                    random.restoreState(randomState);
+                    random = restoreRandomState(randomState);
                 } catch (IOException e) {
                     logger.warning("Failed to restore random state, ignoring!");
                 }
@@ -980,96 +979,12 @@ public final class FreeColServer {
     }
 
     /**
-     * Get the server-private pseudo-random number generator.
+     * Get the server-private random number generator.
      *
      * @return The server-private random number generator.
      */
-    public PseudoRandom getPrivatePseudoRandom() {
+    public Random getServerRandom() {
         return random;
-    }
-
-
-    /**
-     * This class provides pseudo-random numbers.
-     */
-    private static class ServerPseudoRandom implements PseudoRandom {
-        private static final String HEX_DIGITS = "0123456789ABCDEF";
-
-        private Random random;
-
-        /**
-         * Create a new random number generator with a random seed.
-         *
-         * The initial seed is calculated using {@link SecureRandom},
-         * which is slower but better than the normal {@link Random}
-         * class. Note, however, that {@link SecureRandom} cannot be
-         * used for all numbers, as it will return different numbers
-         * given the same seed, which breaks the contract established
-         * by {@link PseudoRandom}.
-         */
-        public ServerPseudoRandom() {
-            random = new Random(new SecureRandom().nextLong());
-        }
-
-        /**
-         * Get the next integer between 0 and n.
-         * 
-         * @param n The upper bound (exclusive).
-         * @return random number between 0 and n.
-         */
-        public int nextInt(int n) {
-            return random.nextInt(n);
-        }
-
-        /**
-         * Get the internal state of the random provider as a string.
-         *
-         * It would have been more convenient to simply return the
-         * current seed, but unfortunately it is private.
-         * 
-         * @return state.
-         */
-        public synchronized String getState() {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(random);
-                oos.flush();
-            } catch (IOException e) {
-                throw new IllegalStateException("IO exception in memory!?", e);
-            }
-            byte[] bytes = bos.toByteArray();
-            StringBuffer sb = new StringBuffer(bytes.length * 2);
-            for (byte b : bytes) {
-                sb.append(HEX_DIGITS.charAt((b >> 4) & 0x0F));
-                sb.append(HEX_DIGITS.charAt(b & 0x0F));
-            }
-            return sb.toString();
-        }
-
-        /**
-         * Restore a previously saved state.
-         * 
-         * @param state The saved state (@see #getState()).
-         * @throws IOException if unable to restore state.
-         */
-        public synchronized void restoreState(String state)
-            throws IOException {
-            byte[] bytes = new byte[state.length() / 2];
-            int pos = 0;
-            for (int i = 0; i < bytes.length; i++) {
-                bytes[i] = (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
-                bytes[i] <<= 4;
-                bytes[i] |= (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
-            }
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            try {
-                random = (Random) ois.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new IOException("Failed to restore random!");
-            }
-        }
     }
 
 
@@ -1338,6 +1253,61 @@ public final class FreeColServer {
             if (fis != null) {
                 fis.close();
             }
+        }
+    }
+
+
+    /** Hex constant digits for get/restoreRandomState. */
+    private static final String HEX_DIGITS = "0123456789ABCDEF";
+
+    /**
+     * Get the internal state of a random number generator as a
+     * string.  It would have been more convenient to simply return
+     * the current seed, but unfortunately it is private.
+     *
+     * @param random The <code>Random</code> to use.
+     * @return A <code>String</code> encapsulating the object state.
+     */
+    public synchronized String getRandomState(Random random) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(random);
+            oos.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException("IO exception in memory!?", e);
+        }
+        byte[] bytes = bos.toByteArray();
+        StringBuffer sb = new StringBuffer(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(HEX_DIGITS.charAt((b >> 4) & 0x0F));
+            sb.append(HEX_DIGITS.charAt(b & 0x0F));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Restore a previously saved state.
+     *
+     * @param state The saved state (@see #getRandomState()).
+     * @return The restored <code>Random</code>.
+     * @throws IOException if unable to restore state.
+     */
+    public synchronized Random restoreRandomState(String state)
+        throws IOException {
+        byte[] bytes = new byte[state.length() / 2];
+        int pos = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
+            bytes[i] <<= 4;
+            bytes[i] |= (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
+        }
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        try {
+            return (Random) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Failed to restore ServerRandom!");
         }
     }
 

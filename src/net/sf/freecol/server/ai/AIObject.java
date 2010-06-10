@@ -20,12 +20,12 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 
@@ -98,12 +98,11 @@ public abstract class AIObject extends FreeColObject {
     }
     
     /**
-    * Returns an instance of <code>PseudoRandom</code>. It that can be
-    * used to generate random numbers.
-    * 
-    * @return An instance of <code>PseudoRandom</code>.
-    */
-    protected PseudoRandom getAIRandom() {
+     * Gets the random number generator to use in the AI.
+     *
+     * @return The AI random number generator.
+     */
+    protected Random getAIRandom() {
         return aiMain.getAIRandom();
     }
 

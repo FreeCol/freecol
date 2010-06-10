@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -956,7 +955,7 @@ public class UnitTest extends FreeColTestCase {
         // We need a deterministic random
         List<Integer> setValues = new ArrayList<Integer>();
         setValues.add(1);
-        PseudoRandom mockRandom = new MockPseudoRandom(setValues,true);
+        MockPseudoRandom mockRandom = new MockPseudoRandom(setValues,true);
         MockModelController controller = (MockModelController) game.getModelController();
         controller.setPseudoRandom(mockRandom);
         

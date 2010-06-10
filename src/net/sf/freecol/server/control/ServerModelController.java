@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -100,7 +99,7 @@ public class ServerModelController implements ModelController,PropertyChangeList
         if (taskRegister.containsKey(extendedTaskID)) {
             value = ((Integer) taskRegister.get(extendedTaskID).entry).intValue();
         } else {
-            value = freeColServer.getPrivatePseudoRandom().nextInt(n);
+            value = freeColServer.getServerRandom().nextInt(n);
             taskRegister.put(extendedTaskID,
                 new TaskEntry(extendedTaskID, turn+1, new Integer(value)));
         }

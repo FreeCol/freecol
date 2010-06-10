@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -34,7 +35,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -110,20 +110,20 @@ public class Map extends FreeColGameObject {
         /**
          * Returns a random Direction.
          *
-         * @param random A <code>PseudoRandom</code> number source.
+         * @param random A <code>Random</code> number source.
          * @return a <code>Direction</code> value
          */
-        public static Direction getRandomDirection(PseudoRandom random) {
+        public static Direction getRandomDirection(Random random) {
             return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
         }
 
         /**
          * Creates an array of the eight directions in a random order.
          *
-         * @param random A <code>PseudoRandom</code> number source.
+         * @param random A <code>Random</code> number source.
          * @return The array.
          */
-        public static Direction[] getRandomDirectionArray(PseudoRandom random) {
+        public static Direction[] getRandomDirectionArray(Random random) {
             Direction[] directions = Direction.values();
             for (int i = 0; i < directions.length; i++) {
                 int i2 = random.nextInt(NUMBER_OF_DIRECTIONS);
@@ -1464,10 +1464,10 @@ public class Map extends FreeColGameObject {
      * (making all model changes at the server). The reason is
      * the use of random numbers in this method.
      *
-     * @param random A <code>PseudoRandom</code> number source.
+     * @param random A <code>Random</code> number source.
      * @return Position selected
      */
-    public Position getRandomLandPosition(PseudoRandom random) {
+    public Position getRandomLandPosition(Random random) {
         int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5
             : random.nextInt(getWidth());
         int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5

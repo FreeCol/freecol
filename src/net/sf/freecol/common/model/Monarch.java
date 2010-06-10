@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -30,7 +31,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Specification;
@@ -302,10 +302,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Calculates a tax raise.
      *
-     * @param random The <code>PseudoRandom</code> source to use.
+     * @param random The <code>Random</code> number source to use.
      * @return The new tax rate.
      */
-    public int raiseTax(PseudoRandom random) {
+    public int raiseTax(Random random) {
         Specification spec = Specification.getSpecification();
         int taxAdjustment = spec.getIntegerOption("model.option.taxAdjustment")
             .getValue();
@@ -322,10 +322,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Calculates a tax reduction.
      *
-     * @param random The <code>PseudoRandom</code> source to use.
+     * @param random The <code>Random</code> number source to use.
      * @return The new tax rate.
      */
-    public int lowerTax(PseudoRandom random) {
+    public int lowerTax(Random random) {
         Specification spec = Specification.getSpecification();
         int taxAdjustment = spec.getIntegerOption("model.option.taxAdjustment")
             .getValue();
@@ -340,10 +340,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Returns units to be added to the Royal Expeditionary Force.
      *
-     * @param random The <code>PseudoRandom</code> source to use.
+     * @param random The <code>Random</code> number source to use.
      * @return An addition to the Royal Expeditionary Force.
      */
-    public List<AbstractUnit> addToREF(PseudoRandom random) {
+    public List<AbstractUnit> addToREF(Random random) {
         ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
         if (capacity < spaceRequired) {
             AbstractUnit unit = navalUnits.get(random.nextInt(navalUnits.size()));
@@ -389,10 +389,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Returns the nation of another player to declare war on.
      *
-     * @param random The <code>PseudoRandom</code> source to use.
+     * @param random The <code>Random</code> number source to use.
      * @return The enemy nation.
      */
-    public Player declareWar(PseudoRandom random) {
+    public Player declareWar(Random random) {
         ArrayList<Player> europeanPlayers = new ArrayList<Player>();
         for (Player enemy : getGame().getPlayers()) {
             if (enemy == player) {
@@ -419,10 +419,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Returns units available as mercenaries.
      *
-     * @param random The <code>PseudoRandom</code> source to use.
+     * @param random The <code>Random</code> number source to use.
      * @return A troop of mercenaries.
      */
-    public List<AbstractUnit> getMercenaries(PseudoRandom random) {
+    public List<AbstractUnit> getMercenaries(Random random) {
         List<AbstractUnit> mercenaries = new ArrayList<AbstractUnit>();
         List<UnitType> unitTypes = new ArrayList<UnitType>();
 

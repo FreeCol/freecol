@@ -27,9 +27,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -63,7 +63,7 @@ public class TerrainGenerator {
     public static final int LAND_REGION_MAX_SIZE = 75;
 
     private final MapGeneratorOptions mapGeneratorOptions;
-    private final PseudoRandom random;
+    private final Random random;
 
     private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
     private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
@@ -80,11 +80,11 @@ public class TerrainGenerator {
      * Creates a new <code>TerrainGenerator</code>.
      *
      * @param mapGeneratorOptions The options.
-     * @param random A <code>PseudoRandom</code> number source.
+     * @param random A <code>Random</code> number source.
      * @see #createMap
      */
     public TerrainGenerator(MapGeneratorOptions mapGeneratorOptions,
-                            PseudoRandom random) {
+                            Random random) {
         this.mapGeneratorOptions = mapGeneratorOptions;
         this.random = random;
     }

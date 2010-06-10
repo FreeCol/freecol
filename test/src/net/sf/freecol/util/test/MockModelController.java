@@ -22,7 +22,6 @@ package net.sf.freecol.util.test;
 import java.util.ArrayList;
 import java.util.Random;
 
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -38,7 +37,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.Stance;
 
 public class MockModelController implements ModelController {
-    private PseudoRandom setPseudoRandom = null;
+    private MockPseudoRandom setPseudoRandom = null;
     
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
         // TODO Auto-generated method stub
@@ -55,23 +54,11 @@ public class MockModelController implements ModelController {
         return null;
     }
 
-    public PseudoRandom getPseudoRandom() {
-        if(setPseudoRandom != null){
-            return setPseudoRandom;
-        }
-        
-        return new PseudoRandom(){
-
-            Random r = new Random(0);
-			
-            public int nextInt(int n) {
-                return r.nextInt(n);
-            }
-			
-        };
+    public Random getPseudoRandom() {
+        return (setPseudoRandom != null) ? setPseudoRandom : new Random(0);
     }
     
-    public void setPseudoRandom(PseudoRandom newPseudoRandom){
+    public void setPseudoRandom(MockPseudoRandom newPseudoRandom){
         setPseudoRandom = newPseudoRandom;
     }
 

@@ -21,6 +21,7 @@ package net.sf.freecol.server.control;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -141,7 +141,7 @@ public final class PreGameController extends Controller {
      */
     public void sendUpdatedGame() {
         Game game = getFreeColServer().getGame();
-        PseudoRandom random = getFreeColServer().getPrivatePseudoRandom();
+        Random random = getFreeColServer().getServerRandom();
 
         Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {

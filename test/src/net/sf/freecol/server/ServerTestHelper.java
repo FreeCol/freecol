@@ -100,7 +100,7 @@ public final class ServerTestHelper {
     try {
       server.saveGame(file, "user");
     } catch (IOException e) {
-      fail(e.getMessage());
+      fail(e.toString());
     }
     assertTrue(file.exists());
 
@@ -109,10 +109,12 @@ public final class ServerTestHelper {
     return file;
   }
 
-  public static void stopServer(FreeColServer server) {
-    // stop the server
-    Controller c = server.getController();
-    assertNotNull(c);
-    c.shutdown();
-  }
+    public static void stopServer(FreeColServer server) {
+        // stop the server
+        if (server != null) {
+            Controller c = server.getController();
+            assertNotNull(c);
+            c.shutdown();
+        }
+    }
 }

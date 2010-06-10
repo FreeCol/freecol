@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.sf.freecol.common.PseudoRandom;
 
-public class MockPseudoRandom implements PseudoRandom {
+public class MockPseudoRandom extends Random {
     int pos;
     private List<Integer> setNumberList;
     private boolean cycleNumbers;

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
@@ -34,7 +35,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -109,7 +109,7 @@ public final class InGameController extends Controller {
 
     public static final int SCORE_INDEPENDENCE_DECLARED = 100;
 
-    private final PseudoRandom random;
+    private final Random random;
 
     public int debugOnlyAITurns = 0;
 
@@ -130,7 +130,7 @@ public final class InGameController extends Controller {
     public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
 
-        random = freeColServer.getPrivatePseudoRandom();
+        random = freeColServer.getServerRandom();
         transactionSessions = new HashMap<String,java.util.Map<String, java.util.Map<String,Object>>>();
     }
 
