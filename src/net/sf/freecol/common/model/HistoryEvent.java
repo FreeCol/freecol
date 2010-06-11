@@ -185,7 +185,7 @@ public class HistoryEvent extends StringTemplate {
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("turn", turn.toString());
+        out.writeAttribute("turn", Integer.toString(turn.getNumber()));
         out.writeAttribute("eventType", eventType.toString());
     }
 

@@ -46,7 +46,7 @@ public class Turn {
      * Increases the turn number by one.
      */
     public Turn next() {
-        return new Turn(turn++);
+        return new Turn(turn + 1);
     }
 
 
