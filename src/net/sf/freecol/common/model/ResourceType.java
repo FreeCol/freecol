@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 
 public final class ResourceType extends FreeColGameObjectType {
@@ -77,6 +78,33 @@ public final class ResourceType extends FreeColGameObjectType {
             maxValue = -1;
             minValue = -1;
         }
+    }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        if (maxValue > -1) {
+            out.writeAttribute("maximum-value", Integer.toString(maxValue));
+            out.writeAttribute("minimum-value", Integer.toString(minValue));
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "resource-type";
     }
 
 }

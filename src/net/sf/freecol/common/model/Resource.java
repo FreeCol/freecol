@@ -222,7 +222,7 @@ public class Resource extends TileItem {
      *             stream.
      */
     @Override
-        protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
@@ -244,7 +244,7 @@ public class Resource extends TileItem {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);

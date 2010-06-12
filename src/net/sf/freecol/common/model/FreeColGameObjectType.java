@@ -191,6 +191,15 @@ public class FreeColGameObjectType extends FreeColObject {
         // currently, FreeColGameObjectTypes are not serialized
     }
 
+    protected void writeFeatures(XMLStreamWriter out) throws XMLStreamException {
+        for (Ability ability: featureContainer.getAbilities()) {
+            ability.toXMLImpl(out);
+        }
+        for (Modifier modifier: featureContainer.getModifiers()) {
+            modifier.toXMLImpl(out);
+        }
+    }
+
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
