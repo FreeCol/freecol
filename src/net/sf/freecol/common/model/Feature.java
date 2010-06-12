@@ -276,6 +276,7 @@ public abstract class Feature extends FreeColObject {
 
 
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         if (getSource() != null) {
             out.writeAttribute("source", getSource().getId());
         }

@@ -34,6 +34,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.action.ImprovementActionType;
@@ -1073,6 +1074,48 @@ public final class Specification {
         } else {
             return defaultValue;
         }
+    }
+
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        // TODO: use ID to identify different specifications, e.g. "classic"
+        // out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+
+        // copy the order of section in specification.xml
+        writeSection(out, "goods-types", goodsTypeList);
+        writeSection(out, "resource-types", resourceTypeList);
+
+        writeSection(out, "european-nation-types", europeanNationTypes);
+        writeSection(out, "indian-nation-types", indianNationTypes);
+        writeSection(out, "nations", nations);
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    private <T extends FreeColObject> void writeSection(XMLStreamWriter out, String section, List<T> items)
+        throws XMLStreamException {
+        out.writeStartElement(section);
+        for (FreeColObject item : items) {
+            item.toXMLImpl(out);
+        }
+        out.writeEndElement();
+    }
+
+    public static String getXMLElementTagName() {
+        return "freecol-specification";
     }
 
 }

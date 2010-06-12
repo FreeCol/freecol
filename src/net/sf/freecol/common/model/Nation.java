@@ -166,9 +166,11 @@ public class Nation extends FreeColGameObjectType {
 
         // Add attributes:
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("type", type.getId());
+        out.writeAttribute("nation-type", type.getId());
         out.writeAttribute("selectable", Boolean.toString(selectable));
-        out.writeAttribute("anthem", anthem);
+        if (anthem != null) {
+            out.writeAttribute("anthem", anthem);
+        }
         if (refNation != null) {
             out.writeAttribute("ref", refNation.getId());
         }

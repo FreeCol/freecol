@@ -393,7 +393,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
 	super.writeAttributes(out);
 	out.writeAttribute("value", String.valueOf(value));
-	out.writeAttribute("type", type.toString());
+	out.writeAttribute("type", type.toString().toLowerCase());
         if (incrementType != null) {
             out.writeAttribute("incrementType", incrementType.toString());
             out.writeAttribute("increment", String.valueOf(increment));

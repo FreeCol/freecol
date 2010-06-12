@@ -140,4 +140,24 @@ public class SerializationTest extends FreeColTestCase {
 
     }
 
+
+    public void testSpecification() throws Exception {
+
+        try {
+            Validator validator = buildValidator("schema/specification-schema.xsd");
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xif = XMLOutputFactory.newInstance();
+            XMLStreamWriter out = xif.createXMLStreamWriter(sw);
+            spec().toXMLImpl(out);
+            out.close();
+            validator.validate(new StreamSource(new StringReader(sw.toString())));
+        } catch(SAXParseException e){
+            String errMsg = e.getMessage() 
+                + " at line=" + e.getLineNumber() 
+                + " column=" + e.getColumnNumber();
+            fail(errMsg);
+        }
+
+    }
+
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 
 public final class GoodsType extends FreeColGameObjectType {
@@ -391,5 +392,55 @@ public final class GoodsType extends FreeColGameObjectType {
             }
         }
     }
+
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("is-farmed", Boolean.toString(isFarmed));
+        out.writeAttribute("is-food", Boolean.toString(isFood));
+        out.writeAttribute("ignore-limit", Boolean.toString(ignoreLimit));
+        out.writeAttribute("new-world-goods", Boolean.toString(newWorldGoods));
+        out.writeAttribute("storable", Boolean.toString(storable));
+        if (breedingNumber != NO_BREEDING) {
+            out.writeAttribute("breeding-number", Integer.toString(breedingNumber));
+        }
+        if (price != NO_PRICE) {
+            out.writeAttribute("price", Integer.toString(price));
+        }
+        if (madeFrom != null) {
+            out.writeAttribute("made-from", madeFrom.getId());
+        }
+        if (storedAs != null) {
+            out.writeAttribute("stored-as", storedAs.getId());
+        }
+
+        if (initialAmount > 0) {
+            out.writeStartElement("market");
+            out.writeAttribute("initial-amount", Integer.toString(initialAmount));
+            out.writeAttribute("initial-price", Integer.toString(initialPrice));
+            out.writeAttribute("price-difference", Integer.toString(priceDiff));
+            out.writeEndElement();
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "goods-type";
+    }
+
 
 }

@@ -208,7 +208,7 @@ public class EuropeanNationType extends NationType {
         out.writeAttribute(ID_ATTRIBUTE_TAG, id);
         out.writeAttribute("type", unit.getId());
         out.writeAttribute("role", unit.getRole().toString().toLowerCase());
-        out.writeAttribute("number", String.valueOf(unit.getNumber()));
+        //out.writeAttribute("number", String.valueOf(unit.getNumber()));
         if (expert) {
             out.writeAttribute("expert-starting-units", "true");
         }

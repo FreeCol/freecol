@@ -262,9 +262,9 @@ public class IndianNationType extends NationType {
 
         // Add attributes:
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("number-of-settlements", numberOfSettlements.toString());
-        out.writeAttribute("aggression", aggression.toString());
-        out.writeAttribute("type-of-settlement", getTypeOfSettlement().toString());
+        out.writeAttribute("number-of-settlements", numberOfSettlements.toString().toLowerCase());
+        out.writeAttribute("aggression", aggression.toString().toLowerCase());
+        out.writeAttribute("type-of-settlement", getTypeOfSettlement().toString().toLowerCase());
         out.writeAttribute("settlementRadius", Integer.toString(getSettlementRadius()));
         out.writeAttribute("capitalRadius", Integer.toString(getCapitalRadius()));
 
@@ -287,5 +287,10 @@ public class IndianNationType extends NationType {
         out.writeEndElement();
 
     }
+
+    public static String getXMLElementTagName() {
+        return "indian-nation-type";
+    }
+
 
 }

@@ -768,6 +768,7 @@
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="value" type="xs:boolean"/>
+      <xs:attribute name="source" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
