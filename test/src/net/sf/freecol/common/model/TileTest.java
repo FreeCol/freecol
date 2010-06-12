@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -528,6 +529,18 @@ public class TileTest extends FreeColTestCase {
 
         assertEquals(1, colonyTile.getProductionOf(unit, silver));
         assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, false, silver));
+    }
+
+    public void testZIndex() {
+
+        assertTrue(GUI.OVERLAY_INDEX < GUI.FOREST_INDEX);
+        assertTrue(GUI.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);
+        assertTrue(TileItem.RESOURCE_ZINDEX < TileItem.RUMOUR_ZINDEX);
+        assertTrue(plow.getZIndex() < river.getZIndex());
+        assertTrue(river.getZIndex() < road.getZIndex());
+        assertTrue(GUI.FOREST_INDEX < road.getZIndex());
+        assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
+
     }
 
 }
