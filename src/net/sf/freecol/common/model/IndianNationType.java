@@ -28,6 +28,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.util.RandomChoice;
@@ -226,12 +227,12 @@ public class IndianNationType extends NationType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("skill".equals(childName)) {
-                UnitType unitType = specification.getUnitType(in.getAttributeValue(null, "id"));
+                UnitType unitType = specification.getUnitType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 int probability = getAttribute(in, "probability", 0);
                 skills.add(new RandomChoice<UnitType>(unitType, probability));
                 in.nextTag(); // close this element
             } else if (Region.getXMLElementTagName().equals(childName)) {
-                regions.add(in.getAttributeValue(null, "id"));
+                regions.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag(); // close this element
             } else {
                 super.readChild(in, specification);
@@ -245,6 +246,45 @@ public class IndianNationType extends NationType {
                 }
             });
 
+
+    }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("number-of-settlements", numberOfSettlements.toString());
+        out.writeAttribute("aggression", aggression.toString());
+        out.writeAttribute("type-of-settlement", getTypeOfSettlement().toString());
+        out.writeAttribute("settlementRadius", Integer.toString(getSettlementRadius()));
+        out.writeAttribute("capitalRadius", Integer.toString(getCapitalRadius()));
+
+        writeFeatures(out);
+
+        for (RandomChoice<UnitType> choice : skills) {
+            out.writeStartElement("skill");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());
+            out.writeAttribute("probability", Integer.toString(choice.getProbability()));
+            out.writeEndElement();
+        }
+
+        for (String region : regions) {
+            out.writeStartElement(Region.getXMLElementTagName());
+            out.writeAttribute(ID_ATTRIBUTE_TAG, region);
+            out.writeEndElement();
+        }
+
+        // End element:
+        out.writeEndElement();
 
     }
 

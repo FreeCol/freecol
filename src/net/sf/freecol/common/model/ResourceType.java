@@ -98,6 +98,8 @@ public final class ResourceType extends FreeColGameObjectType {
             out.writeAttribute("minimum-value", Integer.toString(minValue));
         }
 
+        writeFeatures(out);
+
         // End element:
         out.writeEndElement();
 

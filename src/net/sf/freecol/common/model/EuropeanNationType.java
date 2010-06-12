@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
@@ -169,5 +170,55 @@ public class EuropeanNationType extends NationType {
             }
         }
     }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("ref", Boolean.toString(ref));
+
+        writeFeatures(out);
+
+        // default map
+        for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get(null).entrySet()) {
+            writeUnit(out, entry.getKey(), entry.getValue(), false);
+        }
+        // expert map
+        for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get("true").entrySet()) {
+            writeUnit(out, entry.getKey(), entry.getValue(), true);
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    protected void writeUnit(XMLStreamWriter out, String id, AbstractUnit unit, boolean expert)
+        throws XMLStreamException {
+        out.writeStartElement("unit");
+        out.writeAttribute(ID_ATTRIBUTE_TAG, id);
+        out.writeAttribute("type", unit.getId());
+        out.writeAttribute("role", unit.getRole().toString().toLowerCase());
+        out.writeAttribute("number", String.valueOf(unit.getNumber()));
+        if (expert) {
+            out.writeAttribute("expert-starting-units", "true");
+        }
+        out.writeEndElement();
+    }
+
+
+    public static String getXMLElementTagName() {
+        return "european-nation-type";
+    }
+
 
 }

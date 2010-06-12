@@ -19,10 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 
 /**
@@ -30,7 +29,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class Nation extends FreeColGameObjectType {
 	
-	static public String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
+    public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
     private static int nextIndex = 0;
 
@@ -45,7 +44,8 @@ public class Nation extends FreeColGameObjectType {
     private boolean selectable;
 
     /**
-     * Describe anthem here.
+     * TODO: create audio resource and move all audio resources into
+     * ResourceManager.
      */
     private String anthem;
 
@@ -152,6 +152,35 @@ public class Nation extends FreeColGameObjectType {
         }
         anthem = in.getAttributeValue(null, "anthem");
    }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("type", type.getId());
+        out.writeAttribute("selectable", Boolean.toString(selectable));
+        out.writeAttribute("anthem", anthem);
+        if (refNation != null) {
+            out.writeAttribute("ref", refNation.getId());
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "nation";
+    }
 
 
 }
