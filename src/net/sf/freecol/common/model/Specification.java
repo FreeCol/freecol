@@ -1102,6 +1102,7 @@ public final class Specification {
         writeSection(out, "resource-types", resourceTypeList);
         writeSection(out, "tile-types", tileTypeList);
         writeSection(out, "equipment-types", equipmentTypes);
+        writeSection(out, "tileimprovement-types", tileImprovementTypeList);
 
         writeSection(out, "founding-fathers", foundingFathers);
         writeSection(out, "european-nation-types", europeanNationTypes);

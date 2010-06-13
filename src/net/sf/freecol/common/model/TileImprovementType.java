@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 
 public final class TileImprovementType extends FreeColGameObjectType {
@@ -276,7 +277,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
         throws XMLStreamException {
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
-        movementCost = getAttribute(in, "movement-cost", -1);
+        movementCost = getAttribute(in, "movement-cost", 0);
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 
@@ -303,7 +304,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
             if ("scope".equals(childName)) {
                 scopes.add(new Scope(in));
             } else if ("worker".equals(childName)) {
-                allowedWorkers.add(in.getAttributeValue(null, "id"));
+                allowedWorkers.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag(); // close this element
             } else if ("change".equals(childName)) {
                 tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
@@ -314,4 +315,68 @@ public final class TileImprovementType extends FreeColGameObjectType {
             }
         }
     }
+
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("natural", Boolean.toString(natural));
+        out.writeAttribute("add-work-turns", Integer.toString(addWorkTurns));
+        out.writeAttribute("movement-cost", Integer.toString(movementCost));
+        out.writeAttribute("magnitude", Integer.toString(magnitude));
+        out.writeAttribute("zIndex", Integer.toString(zIndex));
+        if (requiredImprovementType != null) {
+            out.writeAttribute("required-improvement", requiredImprovementType.getId());
+        }
+        if (expendedEquipmentType != null) {
+            out.writeAttribute("expended-equipment-type", expendedEquipmentType.getId());
+            out.writeAttribute("expended-amount", Integer.toString(expendedAmount));
+        }
+        if (deliverGoodsType != null) {
+            out.writeAttribute("deliver-goods-type", deliverGoodsType.getId());
+            out.writeAttribute("deliver-amount", Integer.toString(deliverAmount));
+        }
+
+        writeFeatures(out);
+        if (scopes != null) {
+            for (Scope scope : scopes) {
+                scope.toXMLImpl(out);
+            }
+        }
+        if (allowedWorkers != null) {
+            for (String id : allowedWorkers) {
+                out.writeStartElement("worker");
+                out.writeAttribute(ID_ATTRIBUTE_TAG, id);
+                out.writeEndElement();
+            }
+        }
+        if (tileTypeChange != null) {
+            for (Map.Entry<TileType, TileType> entry : tileTypeChange.entrySet()) {
+                out.writeStartElement("change");
+                out.writeAttribute("from", entry.getKey().getId());
+                out.writeAttribute("to", entry.getValue().getId());
+                out.writeEndElement();
+            }
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "tileimprovement-type";
+    }
+
+
 }
