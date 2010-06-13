@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
@@ -406,5 +407,83 @@ public final class TileType extends FreeColGameObjectType {
             }
         }
     }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("basic-move-cost", Integer.toString(basicMoveCost));
+        out.writeAttribute("basic-work-turns", Integer.toString(basicWorkTurns));
+        out.writeAttribute("is-forest", Boolean.toString(forest));
+        out.writeAttribute("is-water", Boolean.toString(water));
+        out.writeAttribute("is-connected", Boolean.toString(connected));
+        out.writeAttribute("can-settle", Boolean.toString(canSettle));
+
+        out.writeStartElement("gen");
+        out.writeAttribute("humidityMin", Integer.toString(humidity[0]));
+        out.writeAttribute("humidityMax", Integer.toString(humidity[1]));
+        out.writeAttribute("temperatureMin", Integer.toString(temperature[0]));
+        out.writeAttribute("temperatureMax", Integer.toString(temperature[1]));
+        out.writeAttribute("altitudeMin", Integer.toString(altitude[0]));
+        out.writeAttribute("altitudeMax", Integer.toString(altitude[1]));
+        out.writeEndElement();
+
+        for (Map.Entry<String, AbstractGoods> entry : primaryGoodsMap.entrySet()) {
+            out.writeStartElement("primary-production");
+            out.writeAttribute("goods-type", entry.getValue().getType().getId());
+            out.writeAttribute("value", Integer.toString(entry.getValue().getAmount()));
+            if (entry.getKey() != null) {
+                out.writeAttribute("tile-production", entry.getKey());
+            }
+            out.writeEndElement();
+        }
+
+        for (Map.Entry<String, AbstractGoods> entry : secondaryGoodsMap.entrySet()) {
+            out.writeStartElement("secondary-production");
+            out.writeAttribute("goods-type", entry.getValue().getType().getId());
+            out.writeAttribute("value", Integer.toString(entry.getValue().getAmount()));
+            if (entry.getKey() != null) {
+                out.writeAttribute("tile-production", entry.getKey());
+            }
+            out.writeEndElement();
+        }
+
+        for (Map.Entry<String, Map<GoodsType, AbstractGoods>> entry : productionMap.entrySet()) {
+            for (AbstractGoods goods : entry.getValue().values()) {
+                out.writeStartElement("production");
+                out.writeAttribute("goods-type", goods.getType().getId());
+                out.writeAttribute("value", Integer.toString(goods.getAmount()));
+                if (entry.getKey() != null) {
+                    out.writeAttribute("tile-production", entry.getKey());
+                }
+                out.writeEndElement();
+            }
+        }
+
+        for (RandomChoice<ResourceType> choice : resourceType) {
+            out.writeStartElement("resource");
+            out.writeAttribute("type", choice.getObject().getId());
+            out.writeAttribute("probability", Integer.toString(choice.getProbability()));
+            out.writeEndElement();
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "tile-type";
+    }
+
 
 }

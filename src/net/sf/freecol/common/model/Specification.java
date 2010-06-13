@@ -1100,6 +1100,7 @@ public final class Specification {
         writeSection(out, "events", events);
         writeSection(out, "goods-types", goodsTypeList);
         writeSection(out, "resource-types", resourceTypeList);
+        writeSection(out, "tile-types", tileTypeList);
 
         writeSection(out, "founding-fathers", foundingFathers);
         writeSection(out, "european-nation-types", europeanNationTypes);
