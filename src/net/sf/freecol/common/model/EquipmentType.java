@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.Role;
@@ -227,17 +228,17 @@ public class EquipmentType extends BuildableType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if ("required-location-ability".equals(nodeName)) {
-                String abilityId = in.getAttributeValue(null, "id");
+                String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 boolean value = getAttribute(in, "value", true);
                 getLocationAbilitiesRequired().put(abilityId, value);
                 specification.addAbility(abilityId);
                 in.nextTag(); // close this element
             } else if ("compatible-equipment".equals(nodeName)) {
-                String equipmentId = in.getAttributeValue(null, "id");
+                String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 compatibleEquipment.add(equipmentId);
                 in.nextTag(); // close this element
             } else if ("capture-equipment".equals(nodeName)) {
-                captureEquipmentId = in.getAttributeValue(null, "id");
+                captureEquipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 captureEquipmentByIndians = getAttribute(in, "by-indians", false);
                 in.nextTag();
             } else {
@@ -259,4 +260,51 @@ public class EquipmentType extends BuildableType {
         }
 
     }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("maximum-count", Integer.toString(maximumCount));
+        out.writeAttribute("combat-loss-priority", Integer.toString(combatLossPriority));
+        out.writeAttribute("role", role.toString().toLowerCase());
+
+        for (Map.Entry<String, Boolean> entry : getLocationAbilitiesRequired().entrySet()) {
+            out.writeStartElement("required-location-ability");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
+            out.writeAttribute("value", Boolean.toString(entry.getValue()));
+            out.writeEndElement();
+        }
+
+        for (String compatible : compatibleEquipment) {
+            out.writeStartElement("compatible-equipment");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, compatible);
+            out.writeEndElement();
+        }
+
+        if (captureEquipmentId != null) {
+            out.writeStartElement("capture-equipment");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, captureEquipmentId);
+            out.writeAttribute("by-indians", Boolean.toString(captureEquipmentByIndians));
+            out.writeEndElement();
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "equipment-type";
+    }
+
 }

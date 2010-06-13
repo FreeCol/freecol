@@ -422,7 +422,7 @@
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
-	  <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
+      <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
@@ -446,7 +446,7 @@
       <ability id="model.ability.improveTerrain" value="true"/>
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
     </equipment-type>
     <equipment-type id="model.equipment.missionary" role="missionary">
