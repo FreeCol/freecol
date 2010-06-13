@@ -196,11 +196,10 @@ public class BuildColonyMission extends Mission {
             }
             if (getUnit().canBuildColony() && target == getUnit().getTile()
                 && getUnit().getMovesLeft() > 0) {
-                String name = unit.getOwner().getDefaultSettlementName(false);
                 Element reply = null;
 
                 try {
-                    reply = connection.ask(new BuildColonyMessage(name, unit).toXMLElement());
+                    reply = connection.ask(new BuildColonyMessage("", unit).toXMLElement());
                 } catch (IOException e) {
                     logger.warning("Could not send BuildColony message.");
                 }

@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.i18n;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.LinkedList;
 import java.util.List;
@@ -366,6 +367,30 @@ public class Messages {
             } while (player.getGame().getMap().getRegionByName(name) != null);
         }
         return name;
+    }
+
+    /**
+     * Gets a list of settlement names and a fallback prefix for a player.
+     *
+     * @param player The <code>Player</code> to get names for.
+     * @return A list of settlement names, with the first being the
+     *     fallback prefix.
+     */
+    public static List<String> getSettlementNames(Player player) {
+        final String prefix = player.getNationID() + ".settlementName.";
+        List<String> names = new ArrayList<String>();
+
+        // Fallback prefix first
+        names.add(message((player.isEuropean()) ? "Colony" : "Settlement"));
+
+        // Collect all the names
+        int i = 0;
+        while (Messages.containsKey(prefix + Integer.toString(i))) {
+            names.add(Messages.message(prefix + Integer.toString(i)));
+            i++;
+        }
+
+        return names;
     }
 
 

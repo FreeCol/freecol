@@ -1164,11 +1164,17 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Get and check the name.
-        String name = canvas.showInputDialog(tile, "nameColony.text",
-                                             player.getDefaultSettlementName(false),
-                                             "nameColony.yes", "nameColony.no",
-                                             true);
+        String name = player.getSettlementName();
+        if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
+            player.installSettlementNames(Messages.getSettlementNames(player),
+                                          null);
+            name = player.getSettlementName();
+        }
+        name = canvas.showInputDialog(tile, "nameColony.text", name,
+                                      "nameColony.yes", "nameColony.no",
+                                      true);
         if (name == null) return; // User cancelled, 0-length invalid.
+
         if (player.getSettlement(name) != null) {
             // Colony name must be unique.
             canvas.showInformationMessage("nameColony.notUnique",
@@ -2185,13 +2191,14 @@ public final class InGameController implements NetworkConstants {
             }
             
             // settlement was indian capital, indians surrender
-            if(attackResultElement.getAttribute("indianCapitalBurned") != ""){
+            String burned = attackResultElement.getAttribute("indianCapitalBurned");
+            if (burned != null) {
             	Player indianPlayer = defender.getOwner();
             	indianPlayer.surrenderTo(freeColClient.getMyPlayer());
             	//show message
             	ModelMessage message = new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                         "indianSettlement.capitalBurned", indianPlayer)
-                    .addName("%name%", indianPlayer.getCapitalName())
+                    .addName("%name%", burned)
                     .addStringTemplate("%nation%", indianPlayer.getNationName());
             	freeColClient.getMyPlayer().addModelMessage(message);
             	nextModelMessage();

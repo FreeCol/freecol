@@ -89,13 +89,16 @@ public class BuildColonyMessage extends Message {
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        if (colonyName == null || colonyName.length() == 0) {
+        if (colonyName == null) {
             return Message.createError("server.buildColony.badName",
-                                       "Empty colony name");
+                                       "Null colony name");
+        } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
+            ; // ok
         } else if (player.getColony(colonyName) != null) {
             return Message.createError("server.buildColony.badName",
                                        "Non-unique colony name " + colonyName);
-        } else if (!unit.canBuildColony()) {
+        }
+        if (!unit.canBuildColony()) {
             return Message.createError("server.buildColony.badUnit",
                                        "Unit " + builderId
                                        + " can not build colony " + colonyName);

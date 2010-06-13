@@ -916,7 +916,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         		newTile.getSettlement() instanceof IndianSettlement &&
         		((IndianSettlement) newTile.getSettlement()).isCapital()) {
         	isIndianCapitalBurned = true;
-        	reply.setAttribute("indianCapitalBurned", Boolean.toString(isIndianCapitalBurned));
+        	reply.setAttribute("indianCapitalBurned", newTile.getSettlement().getName());
         }
         
         int oldUnits = unit.getTile().getUnitCount();

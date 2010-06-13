@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -64,6 +65,8 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
     public static final int SCORE_SETTLEMENT_DESTROYED = -40;
+
+    public static final String ASSIGN_SETTLEMENT_NAME = "";
 
     /**
      * The XML tag name for the set of founding fathers.
@@ -349,9 +352,14 @@ public class Player extends FreeColGameObject implements Nameable {
     protected List<HistoryEvent> history = new ArrayList<HistoryEvent>();
 
     /**
-     * A cache of settlement names.  Does not need to be serialized.
+     * A cache of settlement names, a capital for natives, and a fallback
+     * settlement name prefix.
+     * Does not need to be serialized.
      */
     private List<String> settlementNames = null;
+    private String capitalName = null;
+    private String settlementFallback = null;
+
 
     public static final Comparator<Player> playerComparator = new Comparator<Player>() {
         public int compare(Player player1, Player player2) {
@@ -869,58 +877,60 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Installs suitable settlement names (and the capital if native)
+     * into the player name cache.
+     *
+     * @param names A list of settlement names with the fallback prefix first.
+     * @param random A <code>Random</code> number source.
+     */
+    public void installSettlementNames(List<String> names, Random random) {
+        if (settlementNames == null) {
+            settlementNames = new ArrayList<String>();
+            settlementNames.addAll(names);
+            settlementFallback = settlementNames.remove(0);
+            if (isIndian()) {
+                capitalName = settlementNames.remove(0);
+                if (random != null) {
+                    Collections.shuffle(settlementNames, random);
+                }
+            }
+        }
+        logger.info("Installed " + names.size()
+                    + " settlement names for player " + this.toString());
+    }
+
+    /**
      * Gets the name of this players capital.  Only meaningful to natives.
      *
      * @return The name of this players capital.
      */
     public String getCapitalName() {
-        return Messages.message(getId() + ".settlementName.0");
+        return (capitalName == null) ? ASSIGN_SETTLEMENT_NAME : capitalName;
     }
 
     /**
-     * Gets a unique settlement name.
+     * Gets a settlement name suitable for this player.
      *
-     * @param capital True if the name should be the national capital.
-     * @return A <code>String</code> new unused name.
+     * @return A new settlement name.
      */
-    public String getDefaultSettlementName(boolean capital) {
-        if (capital) return getCapitalName();
-
-        // Build the cache of names if it is not initialized.
+    public String getSettlementName() {
         Game game = getGame();
-        String name;
-        int i;
-        if (settlementNames == null) {
-            final String prefix = nationID + ".settlementName.";
-            settlementNames = new ArrayList<String>();
 
-            i = (isIndian()) ? 1 : 0;
-            while (Messages.containsKey(prefix + Integer.toString(i))) {
-                name = Messages.message(prefix + Integer.toString(i));
-                if (game.getSettlement(name) == null) {
-                    // Insist that the name be game-unique.  Do not reuse
-                    // the names of settlements that have been captured!
-                    settlementNames.add(name);
-                }
-                i++;
-            }
-            if (isIndian()) {
-                // TODO: The European names are believed to be in a
-                // sensible order, but the native ones are not.  Hence
-                // the randomization.  Remove this if they are ever
-                // ordered by someone who actually knows something
-                // about native settlements.
-                Collections.shuffle(settlementNames);
-            }
+        // ASSIGN_SETTLEMENT_NAME can be sent with buildColony and a
+        // default name will be filled in.
+        if (settlementNames == null) return ASSIGN_SETTLEMENT_NAME;
+
+        if (!settlementNames.isEmpty()) {
+            return settlementNames.remove(0);
         }
 
-        if (!settlementNames.isEmpty()) return settlementNames.remove(0);
-
         // Fallback method
-        String base = Messages.message((isIndian()) ? "Settlement" : "Colony")
-            + "-";
-        i = getNumberOfSettlements()+1;
-        while (game.getSettlement(name = base + Integer.toString(i)) != null) i++;
+        final String base = settlementFallback + "-";
+        String name;
+        int i = getNumberOfSettlements()+1;
+        while (game.getSettlement(name = base + Integer.toString(i)) != null) {
+            i++;
+        }
         return name;
     }
 

@@ -122,7 +122,7 @@ public class MapGenerator implements IMapGenerator {
         } else {
             importGame = null;
         }
-        
+
         // Create land map:
         boolean[][] landMap;
         if (importGame != null) {
@@ -525,9 +525,16 @@ public class MapGenerator implements IMapGenerator {
     private IndianSettlement placeIndianSettlement(Player player, boolean capital,
                                        Position position, Map map) {
         final Tile tile = map.getTile(position);
+        String name = (capital) ? player.getCapitalName()
+            : player.getSettlementName();
+        if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
+            player.installSettlementNames(Messages.getSettlementNames(player),
+                                          random);
+            name = (capital) ? player.getCapitalName()
+                : player.getSettlementName();
+        }
         IndianSettlement settlement = 
-            new IndianSettlement(map.getGame(), player, tile,
-                                 player.getDefaultSettlementName(capital), capital,
+            new IndianSettlement(map.getGame(), player, tile, name, capital,
                                  generateSkillForLocation(map, tile, player.getNationType()),
                                  new HashSet<Player>(), null);
         logger.fine("Generated skill: " + settlement.getLearnableSkill());
