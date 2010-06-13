@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.39
+<!-- XSD for specification version 0.40
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -15,6 +15,7 @@
      0.37: remove art element from tile-type
      0.38: remove overlay attribute from tileimprovement-type
      0.39: remove color from nation and add audio options
+     0.40: change tile(s) children of tile improvement to scope
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -239,8 +240,7 @@
   <xs:element name="tileimprovement-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="tiles"/>
-        <xs:element ref="tile"/>
+        <xs:element ref="scope"/>
         <xs:choice>
           <xs:element ref="modifier"/>
           <xs:element ref="change"/>
@@ -257,20 +257,6 @@
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="tiles">
-    <xs:complexType>
-      <xs:attribute name="all-land-tiles" type="xs:boolean"/>
-      <xs:attribute name="all-forest-tiles" type="xs:boolean"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="tile">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
-      <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 

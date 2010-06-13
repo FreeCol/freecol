@@ -39,7 +39,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private int magnitude;
     private int addWorkTurns;
 
-    private List<TileType> allowedTileTypes;
     private TileImprovementType requiredImprovementType;
 
     private Set<String> allowedWorkers;
@@ -59,6 +58,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * LostCityRumour will be displayed above the Plow improvement.
      */
     private int zIndex;
+
+    /**
+     * The scopes define which TileTypes support this improvement. An
+     * eligible TileType must match all scopes.
+     */
+    private List<Scope> scopes = new ArrayList<Scope>();
 
     // ------------------------------------------------------------ constructors
 
@@ -119,6 +124,15 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return deliverAmount;
     }
 
+    /**
+     * Get the <code>Scopes</code> value.
+     *
+     * @return a <code>List<Scope></code> value
+     */
+    public List<Scope> getScopes() {
+        return scopes;
+    }
+
     public boolean isWorkerTypeAllowed(UnitType unitType) {
         return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getId());
     }
@@ -145,7 +159,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return true if improvement is possible
      */
     public boolean isTileTypeAllowed(TileType tileType) {
-        return (allowedTileTypes.indexOf(tileType) >= 0);
+        for (Scope scope : scopes) {
+            if (!scope.appliesTo(tileType)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -277,43 +296,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
         throws XMLStreamException {
 
         allowedWorkers = new HashSet<String>();
-        allowedTileTypes = new ArrayList<TileType>();
         tileTypeChange = new HashMap<TileType, TileType>();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("tiles".equals(childName)) {
-                boolean allLand = getAttribute(in, "all-land-tiles", false);
-                boolean allForestUndefined = in.getAttributeValue(null, "all-forest-tiles") == null;
-                boolean allForest = getAttribute(in, "all-forest-tiles", false);
-                boolean allWater = getAttribute(in, "all-water-tiles", false);
-
-                for (TileType t : specification.getTileTypeList()) {
-                    if (t.isWater()){
-                        if (allWater)
-                            allowedTileTypes.add(t);
-                    } else {
-                        if (t.isForested()){
-                            if ((allLand && allForestUndefined) || allForest){
-                                allowedTileTypes.add(t);
-                            }
-                        } else {
-                            if (allLand){
-                                allowedTileTypes.add(t);
-                            }
-                        }
-                                
-                    }
-                }
-                in.nextTag(); // close this element
-            } else if ("tile".equals(childName)) {
-                String tileId = in.getAttributeValue(null, "id");
-                if (getAttribute(in, "value", true)) {
-                    allowedTileTypes.add(specification.getTileType(tileId));
-                } else {
-                    allowedTileTypes.remove(specification.getTileType(tileId));
-                }
-                in.nextTag(); // close this element
+            if ("scope".equals(childName)) {
+                scopes.add(new Scope(in));
             } else if ("worker".equals(childName)) {
                 allowedWorkers.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element

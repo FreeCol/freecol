@@ -515,10 +515,10 @@
   <tileimprovement-types>
     <tileimprovement-type id="model.improvement.river" natural="true" add-work-turns="0" magnitude="1"
                           movement-cost="1" zIndex="150">
-      <tiles all-land-tiles="true"/>
-      <tile id="model.tile.arctic" value="false"/>
-      <tile id="model.tile.hills" value="false"/>
-      <tile id="model.tile.mountains" value="false"/>
+      <scope method-name="isWater" method-value="false" />
+      <scope type="model.tile.arctic" matchNegated="true" />
+      <scope type="model.tile.hills" matchNegated="true" />
+      <scope type="model.tile.mountains" matchNegated="true" />
       <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
@@ -531,7 +531,7 @@
     <tileimprovement-type id="model.improvement.road" add-work-turns="0"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
                           movement-cost="1" zIndex="350">
-      <tiles all-land-tiles="true"/>
+      <scope method-name="isWater" method-value="false" />
       <modifier id="model.goods.furs" type="additive" value="1"/>
       <modifier id="model.goods.lumber" type="additive" value="1"/>
       <modifier id="model.goods.ore" type="additive" value="1"/>
@@ -539,10 +539,11 @@
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.plow" add-work-turns="2" zIndex="120"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
-      <tiles all-land-tiles="true" all-forest-tiles="false"/>
-      <tile id="model.tile.arctic" value="false"/>
-      <tile id="model.tile.hills" value="false"/>
-      <tile id="model.tile.mountains" value="false"/>
+      <scope method-name="isWater" method-value="false" />
+      <scope method-name="isForested" method-value="false" />
+      <scope type="model.tile.arctic" matchNegated="true" />
+      <scope type="model.tile.hills" matchNegated="true" />
+      <scope type="model.tile.mountains" matchNegated="true" />
       <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
@@ -551,7 +552,7 @@
     <tileimprovement-type id="model.improvement.clearForest" add-work-turns="2"
                           expended-equipment-type="model.equipment.tools" expended-amount="1"
                           deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1">
-      <tiles all-forest-tiles="true"/>
+      <scope method-name="isForested" method-value="true" />
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
       <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
       <change from="model.tile.broadleafForest" to="model.tile.prairie"/>
@@ -562,15 +563,13 @@
       <change from="model.tile.borealForest"    to="model.tile.tundra"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.fishBonusLand" natural="true" zIndex="250">
-      <tile id="model.tile.ocean" value="true"/>
-      <tile id="model.tile.lake" value="true"/>
-      <tile id="model.tile.greatRiver" value="true"/>
+      <scope method-name="isWater" method-value="true" />
+      <scope type="model.tile.highSeas" matchNegated="true" />
       <modifier id="model.goods.fish" type="additive" value="2"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.fishBonusRiver" natural="true" zIndex="250">
-      <tile id="model.tile.ocean" value="true"/>
-      <tile id="model.tile.lake" value="true"/>
-      <tile id="model.tile.greatRiver" value="true"/>
+      <scope method-name="isWater" method-value="true" />
+      <scope type="model.tile.highSeas" matchNegated="true" />
       <modifier id="model.goods.fish" type="additive" value="1"/>
     </tileimprovement-type>
   </tileimprovement-types>
