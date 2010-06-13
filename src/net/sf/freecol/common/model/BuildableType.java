@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 
 /**
@@ -151,14 +152,14 @@ public abstract class BuildableType extends FreeColGameObjectType {
             limits.add(limit);
             return limit;
         } else if ("required-ability".equals(childName)) {
-            String abilityId = in.getAttributeValue(null, "id");
+            String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             boolean value = getAttribute(in, "value", true);
             getAbilitiesRequired().put(abilityId, value);
             specification.addAbility(abilityId);
             in.nextTag(); // close this element
             return new Ability(abilityId, value);
         } else if ("required-goods".equals(childName)) {
-            GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
+            GoodsType type = specification.getGoodsType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
             int amount = getAttribute(in, "value", 0);
             AbstractGoods requiredGoods = new AbstractGoods(type, amount);
             if (amount > 0) {
@@ -173,6 +174,29 @@ public abstract class BuildableType extends FreeColGameObjectType {
         } else {
             return super.readChild(in, specification);
         }
+    }
+
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        if (limits != null) {
+            for (Limit limit : limits) {
+                limit.toXMLImpl(out);
+            }
+        }
+        for (Map.Entry<String, Boolean> entry : getAbilitiesRequired().entrySet()) {
+            out.writeStartElement("required-ability");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
+            out.writeAttribute("value", Boolean.toString(entry.getValue()));
+            out.writeEndElement();
+        }
+        if (getGoodsRequired() != null) {
+            for (AbstractGoods goods : getGoodsRequired()) {
+                out.writeStartElement("required-goods");
+                out.writeAttribute(ID_ATTRIBUTE_TAG, goods.getType().getId());
+                out.writeAttribute("value", Integer.toString(goods.getAmount()));
+                out.writeEndElement();
+            }
+        }
+        writeFeatures(out);
     }
 
 }

@@ -278,6 +278,7 @@ public class EquipmentType extends BuildableType {
         out.writeAttribute("combat-loss-priority", Integer.toString(combatLossPriority));
         out.writeAttribute("role", role.toString().toLowerCase());
 
+        super.writeChildren(out);
         for (Map.Entry<String, Boolean> entry : getLocationAbilitiesRequired().entrySet()) {
             out.writeStartElement("required-location-ability");
             out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
