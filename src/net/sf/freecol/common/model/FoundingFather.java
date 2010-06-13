@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 
 /**
@@ -242,5 +243,65 @@ public class FoundingFather extends FreeColGameObjectType {
         }
 
     }
+
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("type", type.toString().toLowerCase());
+        for (int index = 1; index <= 3; index++) {
+            out.writeAttribute("weight" + index, Integer.toString(weight[index]));
+        }
+
+        writeFeatures(out);
+        if (events != null) {
+            for (Event event : events) {
+                event.toXMLImpl(out);
+            }
+        }
+        if (availableTo != null) {
+            for (String id : availableTo) {
+                out.writeStartElement("nation");
+                out.writeAttribute(ID_ATTRIBUTE_TAG, id);
+                out.writeEndElement();
+            }
+        }
+        if (units != null) {
+            for (AbstractUnit unit : units) {
+                 out.writeStartElement("unit");
+                 out.writeAttribute("id", unit.getId());
+                 //out.writeAttribute("role", unit.getRole().toString().toLowerCase());
+                 //out.writeAttribute("number", String.valueOf(unit.getNumber()));
+                 out.writeEndElement();
+            }
+        }
+        if (upgrades != null) {
+            for (Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
+                out.writeStartElement("upgrade");
+                out.writeAttribute("from-id", entry.getKey().getId());
+                out.writeAttribute("to-id", entry.getValue().getId());
+                out.writeEndElement();
+            }
+        }
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "founding-father";
+    }
+
 
 }
