@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.39 -->
+<!-- specification version 0.40 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1281,8 +1281,8 @@
   <!-- By default, all founding fathers should be available to all
        players. Founding fathers can be restricted to certain
        nations by adding these nations explicitly, like this:
-       <nation id="model.nation.spanish"/> or
-       <nation-type id="model.nationType.trade"/>
+       <scope method-name="getNationID" method-value="model.nation.spanish"/> or
+       <scope method-name="getNationType" method-value="model.nationType.trade"/>
        A founding fathers with these settings would only be available
        to the Spanish nation and nations with the Trade advantage. -->
   <founding-fathers>

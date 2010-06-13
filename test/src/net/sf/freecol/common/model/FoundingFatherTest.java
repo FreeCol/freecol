@@ -394,5 +394,38 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
+    public void testAvailableTo() {
+        // this feature is not used at the moment
+    	Game game = getGame();
+        for (FoundingFather father : spec().getFoundingFathers()) {
+            for (Player player : game.getPlayers()) {
+                assertEquals(player.getNationID(), player.isEuropean(), father.isAvailableTo(player));
+            }
+        }
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        FoundingFather newFather = new FoundingFather();
+
+        Scope dutchScope = new Scope();
+        dutchScope.setMethodName("getNationID");
+        dutchScope.setMethodValue("model.nation.dutch");
+        assertTrue(dutchScope.appliesTo(dutch));
+        newFather.getScopes().add(dutchScope);
+
+        Scope frenchScope = new Scope();
+        frenchScope.setMethodName("getNationType");
+        frenchScope.setMethodValue("model.nationType.cooperation");
+        assertTrue(frenchScope.appliesTo(french));
+        newFather.getScopes().add(frenchScope);
+
+        for (Player player : game.getPlayers()) {
+            assertEquals(player.getNationID(), (player == french || player == dutch),
+                         newFather.isAvailableTo(player));
+        }
+
+
+    }
+
 
 }
