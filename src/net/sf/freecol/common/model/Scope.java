@@ -358,11 +358,20 @@ public class Scope extends FreeColObject implements Cloneable {
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         out.writeAttribute("matchNegated", Boolean.toString(matchNegated));
         out.writeAttribute("matchesNull", Boolean.toString(matchesNull));
-        out.writeAttribute("type", type);
-        out.writeAttribute("ability-id", abilityID);
-        out.writeAttribute("ability-value", String.valueOf(abilityValue));
-        out.writeAttribute("method-name", methodName);
-        out.writeAttribute("method-value", methodValue);
+        if (type != null) {
+            out.writeAttribute("type", type);
+        }
+        if (abilityID != null) {
+            out.writeAttribute("ability-id", abilityID);
+            out.writeAttribute("ability-value", Boolean.toString(abilityValue));
+        }
+        if (methodName != null) {
+            out.writeAttribute("method-name", methodName);
+            // method value may be null in the Operand sub-class
+            if (methodValue != null) {
+                out.writeAttribute("method-value", methodValue);
+            }
+        }
     }
     
     public static String getXMLElementTagName() {

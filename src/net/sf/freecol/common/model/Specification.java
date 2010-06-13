@@ -142,6 +142,7 @@ public final class Specification {
 
     private final List<DifficultyLevel> difficultyLevels;
     private final List<Event> events;
+    private final List<Modifier> specialModifiers;
 
     private int storableTypes = 0;
 
@@ -206,6 +207,7 @@ public final class Specification {
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
         events = new ArrayList<Event>();
+        specialModifiers = new ArrayList<Modifier>();
 
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
@@ -360,6 +362,7 @@ public final class Specification {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 Modifier modifier = new Modifier(xsr, specification);
                 specification.addModifier(modifier);
+                specification.specialModifiers.add(modifier);
             }
         }
     }
@@ -1093,9 +1096,12 @@ public final class Specification {
         // out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
         // copy the order of section in specification.xml
+        writeSection(out, "modifiers", specialModifiers);
+        writeSection(out, "events", events);
         writeSection(out, "goods-types", goodsTypeList);
         writeSection(out, "resource-types", resourceTypeList);
 
+        writeSection(out, "founding-fathers", foundingFathers);
         writeSection(out, "european-nation-types", europeanNationTypes);
         writeSection(out, "indian-nation-types", indianNationTypes);
         writeSection(out, "nations", nations);

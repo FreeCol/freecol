@@ -398,7 +398,9 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
             out.writeAttribute("incrementType", incrementType.toString());
             out.writeAttribute("increment", String.valueOf(increment));
         }
-        out.writeAttribute("index", Integer.toString(index));
+        if (index >= 0) {
+            out.writeAttribute("index", Integer.toString(index));
+        }
     }
     
     public String toString() {
