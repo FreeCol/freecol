@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
@@ -660,7 +661,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
                     typeChanges.add(change);
                 }
             } else if ("default-equipment".equals(nodeName)) {
-                String equipmentString = in.getAttributeValue(null, "id");
+                String equipmentString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 if (equipmentString != null) {
                     defaultEquipment = specification.getEquipmentType(equipmentString);
                 }
@@ -669,6 +670,65 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
                 super.readChild(in, specification);
             }
         }
+    }
+
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        super.writeAttributes(out);
+        out.writeAttribute("offence", Integer.toString(offence));
+        out.writeAttribute("defence", Integer.toString(defence));
+        out.writeAttribute("movement", Integer.toString(movement));
+        out.writeAttribute("lineOfSight", Integer.toString(lineOfSight));
+        out.writeAttribute("scoreValue", Integer.toString(scoreValue));
+        out.writeAttribute("space", Integer.toString(space));
+        out.writeAttribute("spaceTaken", Integer.toString(spaceTaken));
+        out.writeAttribute("hitPoints", Integer.toString(hitPoints));
+        if (maximumAttrition < Integer.MAX_VALUE) {
+            out.writeAttribute("maximumAttrition", Integer.toString(maximumAttrition));
+        }
+        out.writeAttribute("recruitProbability", Integer.toString(recruitProbability));
+        if (skill != UNDEFINED) {
+            out.writeAttribute("skill", Integer.toString(skill));
+        }
+        if (price != UNDEFINED) {
+            out.writeAttribute("price", Integer.toString(price));
+        }
+        out.writeAttribute("skillTaught", skillTaught);
+        if (pathImage != null) {
+            out.writeAttribute("pathImage", pathImage);
+        }
+        if (expertProduction != null) {
+            out.writeAttribute("expert-production", expertProduction.getId());
+        }
+
+        for (UnitTypeChange change : typeChanges) {
+            change.toXMLImpl(out);
+        }
+        if (defaultEquipment != null) {
+            out.writeStartElement("default-equipment");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, defaultEquipment.getId());
+            out.writeEndElement();
+        }
+        super.writeChildren(out);
+
+        // End element:
+        out.writeEndElement();
+
+    }
+
+    public static String getXMLElementTagName() {
+        return "unit-type";
     }
 
 

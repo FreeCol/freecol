@@ -23,6 +23,7 @@ import java.awt.Image;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -157,6 +158,41 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         if (parent != this) {
             getFeatureContainer().add(parent.getFeatureContainer());
         }
+    }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        // Add attributes:
+        super.writeAttributes(out);
+        if (upgradesFrom != null) {
+            out.writeAttribute("upgradesFrom", upgradesFrom.getId());
+        }
+        out.writeAttribute("workplaces", Integer.toString(workPlaces));
+        out.writeAttribute("basicProduction", Integer.toString(basicProduction));
+        out.writeAttribute("minSkill", Integer.toString(minSkill));
+        out.writeAttribute("maxSkill", Integer.toString(maxSkill));
+        out.writeAttribute("sequence", Integer.toString(sequence));
+
+        if (consumes != null) {
+            out.writeAttribute("consumes", consumes.getId());
+        }
+        if (produces != null) {
+            out.writeAttribute("produces", produces.getId());
+        }
+        super.writeChildren(out);
+
+        // End element:
+        out.writeEndElement();
+
     }
 
     /**

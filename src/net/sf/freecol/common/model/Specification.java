@@ -1104,6 +1104,10 @@ public final class Specification {
         writeSection(out, "equipment-types", equipmentTypes);
         writeSection(out, "tileimprovement-types", tileImprovementTypeList);
 
+        writeSection(out, "unit-types", unitTypeList);
+
+        writeSection(out, "building-types", buildingTypeList);
+
         writeSection(out, "founding-fathers", foundingFathers);
         writeSection(out, "european-nation-types", europeanNationTypes);
         writeSection(out, "indian-nation-types", indianNationTypes);

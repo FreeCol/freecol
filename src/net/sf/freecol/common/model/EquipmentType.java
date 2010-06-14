@@ -273,7 +273,7 @@ public class EquipmentType extends BuildableType {
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        super.writeAttributes(out);
         out.writeAttribute("maximum-count", Integer.toString(maximumCount));
         out.writeAttribute("combat-loss-priority", Integer.toString(combatLossPriority));
         out.writeAttribute("role", role.toString().toLowerCase());
