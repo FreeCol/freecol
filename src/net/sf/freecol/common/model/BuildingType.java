@@ -19,13 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Image;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Contains information on building types, like the number of upgrade levels a
@@ -59,10 +57,6 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     
     public BuildingType getUpgradesTo() {
         return upgradesTo;
-    }
-    
-    public Image getImage() {
-        return ResourceManager.getImage(getId() + ".image");
     }
     
     public BuildingType getFirstLevel() {
