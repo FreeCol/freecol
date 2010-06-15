@@ -229,7 +229,7 @@ public class EquipmentType extends BuildableType {
             String nodeName = in.getLocalName();
             if ("required-location-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                boolean value = getAttribute(in, "value", true);
+                boolean value = getAttribute(in, VALUE_TAG, true);
                 getLocationAbilitiesRequired().put(abilityId, value);
                 specification.addAbility(abilityId);
                 in.nextTag(); // close this element
@@ -282,7 +282,7 @@ public class EquipmentType extends BuildableType {
         for (Map.Entry<String, Boolean> entry : getLocationAbilitiesRequired().entrySet()) {
             out.writeStartElement("required-location-ability");
             out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
-            out.writeAttribute("value", Boolean.toString(entry.getValue()));
+            out.writeAttribute(VALUE_TAG, Boolean.toString(entry.getValue()));
             out.writeEndElement();
         }
 

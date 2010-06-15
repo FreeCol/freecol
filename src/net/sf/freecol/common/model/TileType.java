@@ -381,7 +381,7 @@ public final class TileType extends FreeColGameObjectType {
                        || "primary-production".equals(childName)
                        || "secondary-production".equals(childName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
-                int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
+                int amount = Integer.parseInt(in.getAttributeValue(null, VALUE_TAG));
                 AbstractGoods goods = new AbstractGoods(type, amount);
                 String tileProduction = in.getAttributeValue(null, "tile-production");
                 if ("primary-production".equals(childName)) {
@@ -440,7 +440,7 @@ public final class TileType extends FreeColGameObjectType {
         for (Map.Entry<String, AbstractGoods> entry : primaryGoodsMap.entrySet()) {
             out.writeStartElement("primary-production");
             out.writeAttribute("goods-type", entry.getValue().getType().getId());
-            out.writeAttribute("value", Integer.toString(entry.getValue().getAmount()));
+            out.writeAttribute(VALUE_TAG, Integer.toString(entry.getValue().getAmount()));
             if (entry.getKey() != null) {
                 out.writeAttribute("tile-production", entry.getKey());
             }
@@ -450,7 +450,7 @@ public final class TileType extends FreeColGameObjectType {
         for (Map.Entry<String, AbstractGoods> entry : secondaryGoodsMap.entrySet()) {
             out.writeStartElement("secondary-production");
             out.writeAttribute("goods-type", entry.getValue().getType().getId());
-            out.writeAttribute("value", Integer.toString(entry.getValue().getAmount()));
+            out.writeAttribute(VALUE_TAG, Integer.toString(entry.getValue().getAmount()));
             if (entry.getKey() != null) {
                 out.writeAttribute("tile-production", entry.getKey());
             }
@@ -461,7 +461,7 @@ public final class TileType extends FreeColGameObjectType {
             for (AbstractGoods goods : entry.getValue().values()) {
                 out.writeStartElement("production");
                 out.writeAttribute("goods-type", goods.getType().getId());
-                out.writeAttribute("value", Integer.toString(goods.getAmount()));
+                out.writeAttribute(VALUE_TAG, Integer.toString(goods.getAmount()));
                 if (entry.getKey() != null) {
                     out.writeAttribute("tile-production", entry.getKey());
                 }

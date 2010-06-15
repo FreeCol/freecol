@@ -1067,7 +1067,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param end The <code>Tile</code> to be reached by this
      *            <code>Unit</code>.
      * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>Integer.MAX_VALUE</code> if no path can be found.
+     *         or <code>INFINITY</code> if no path can be found.
      */
     public int getTurnsToReach(Tile end) {
         return getTurnsToReach(getTile(), end);
@@ -1081,7 +1081,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param end The <code>Tile</code> to be reached by this
      *            <code>Unit</code>.
      * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>Integer.MAX_VALUE</code> if no path can be found.
+     *         or <code>INFINITY</code> if no path can be found.
      */
     public int getTurnsToReach(Tile start, Tile end) {
 
@@ -1103,7 +1103,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return p.getTotalTurns();
         }
 
-        return Integer.MAX_VALUE;
+        return INFINITY;
     }
     
     /**
@@ -1112,7 +1112,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * 
      * @param destination The destination for this unit.
      * @return The number of turns it will take to reach the <code>destination</code>,
-     *         or <code>Integer.MAX_VALUE</code> if no path can be found.
+     *         or <code>INFINITY</code> if no path can be found.
      */
     public int getTurnsToReach(Location destination) {
         if (destination == null) {
@@ -1135,7 +1135,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (p != null) {
                 return p.getTotalTurns();
             } else {
-                return Integer.MAX_VALUE;
+                return INFINITY;
             }
         }
         

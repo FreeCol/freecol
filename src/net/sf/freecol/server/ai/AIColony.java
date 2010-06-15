@@ -746,7 +746,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (getColony().canBuildEquipment(equipmentType)) {
             for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
                 int breedingNumber = goods.getType().getBreedingNumber();
-                if (breedingNumber != GoodsType.NO_BREEDING &&
+                if (breedingNumber != GoodsType.INFINITY &&
                     getColony().getGoodsCount(goods.getType()) < goods.getAmount() + breedingNumber) {
                     return false;
                 }

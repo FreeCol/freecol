@@ -30,9 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class GoodsType extends FreeColGameObjectType {
 
-    public static final int NO_BREEDING = Integer.MAX_VALUE;
-    public static final int NO_PRICE = Integer.MAX_VALUE;
-
     private static int nextIndex = 0;
 
     private boolean isFarmed;
@@ -74,13 +71,13 @@ public final class GoodsType extends FreeColGameObjectType {
      * The number of units required to breed this type of goods. This
      * obviously only applies to animals.
      */
-    private int breedingNumber = NO_BREEDING;
+    private int breedingNumber = INFINITY;
 
     /**
      * The price of this type of goods. This is only used for goods
      * that can not be traded in the market, such as hammers.
      */
-    private int price = NO_PRICE;
+    private int price = INFINITY;
 
 
     // ----------------------------------------------------------- constructors
@@ -336,7 +333,7 @@ public final class GoodsType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean isBreedable() {
-        return breedingNumber != NO_BREEDING;
+        return breedingNumber != INFINITY;
     }
 
     /**
@@ -365,8 +362,8 @@ public final class GoodsType extends FreeColGameObjectType {
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
         newWorldGoods = getAttribute(in, "new-world-goods", false);
-        breedingNumber = getAttribute(in, "breeding-number", NO_BREEDING);
-        price = getAttribute(in, "price", NO_PRICE);
+        breedingNumber = getAttribute(in, "breeding-number", INFINITY);
+        price = getAttribute(in, "price", INFINITY);
 
         madeFrom = specification.getType(in, "made-from", GoodsType.class, null);
         if (madeFrom != null) {
@@ -412,10 +409,10 @@ public final class GoodsType extends FreeColGameObjectType {
         out.writeAttribute("ignore-limit", Boolean.toString(ignoreLimit));
         out.writeAttribute("new-world-goods", Boolean.toString(newWorldGoods));
         out.writeAttribute("storable", Boolean.toString(storable));
-        if (breedingNumber != NO_BREEDING) {
+        if (breedingNumber != INFINITY) {
             out.writeAttribute("breeding-number", Integer.toString(breedingNumber));
         }
-        if (price != NO_PRICE) {
+        if (price != INFINITY) {
             out.writeAttribute("price", Integer.toString(price));
         }
         if (madeFrom != null) {

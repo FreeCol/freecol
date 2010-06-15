@@ -93,7 +93,7 @@ public class ListOption<T> extends AbstractOption {
         this.value = value;
         
         if (value != oldValue && isDefined) {
-            firePropertyChange("value", oldValue, value);
+            firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;
     }
@@ -143,15 +143,15 @@ public class ListOption<T> extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
 
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("value")) {
+            if (in.getLocalName().equals(VALUE_TAG)) {
                 // TODO: remove support for old format
-                setValueIds(readFromListElement("value", in, String.class));
+                setValueIds(readFromListElement(VALUE_TAG, in, String.class));
                 in.nextTag();
             } else if (VALUE_TAG.equals(in.getLocalName())) {
                 String valueId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);

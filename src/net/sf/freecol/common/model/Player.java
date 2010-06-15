@@ -2015,7 +2015,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         Location closestLocation = null;
-        int shortestDistance = Integer.MAX_VALUE;
+        int shortestDistance = INFINITY;
         for (Colony colony : getColonies()) {
             if (colony == null || colony.getTile() == unit.getTile()) {
                 // This happens when is called from damageAllShips because
@@ -3489,14 +3489,14 @@ public class Player extends FreeColGameObject implements Nameable {
         for (Entry<Player, Tension> entry : tension.entrySet()) {
             out.writeStartElement(TENSION_TAG);
             out.writeAttribute("player", entry.getKey().getId());
-            out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+            out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
             out.writeEndElement();
         }
 
         for (Entry<String, Stance> entry : stance.entrySet()) {
             out.writeStartElement(STANCE_TAG);
             out.writeAttribute("player", entry.getKey());
-            out.writeAttribute("value", entry.getValue().toString());
+            out.writeAttribute(VALUE_TAG, entry.getValue().toString());
             out.writeEndElement();
         }
 
@@ -3601,7 +3601,7 @@ public class Player extends FreeColGameObject implements Nameable {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                tension.put(player, new Tension(getAttribute(in, "value", 0)));
+                tension.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
                 int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
@@ -3615,7 +3615,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 in.nextTag();
             } else if (in.getLocalName().equals(STANCE_TAG)) {
                 String playerId = in.getAttributeValue(null, "player");
-                stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
+                stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, VALUE_TAG)));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = updateFreeColGameObject(in, Europe.class);

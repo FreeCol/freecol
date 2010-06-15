@@ -381,7 +381,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
         throws XMLStreamException {
         super.readAttributes(in, specification);
         setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
-        value = Float.parseFloat(in.getAttributeValue(null, "value"));
+        value = Float.parseFloat(in.getAttributeValue(null, VALUE_TAG));
         String incrementString = in.getAttributeValue(null, "incrementType");
         if (incrementString != null) {
             setType(Enum.valueOf(Type.class, incrementString.toUpperCase()));
@@ -392,7 +392,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
 	super.writeAttributes(out);
-	out.writeAttribute("value", String.valueOf(value));
+	out.writeAttribute(VALUE_TAG, String.valueOf(value));
 	out.writeAttribute("type", type.toString().toLowerCase());
         if (incrementType != null) {
             out.writeAttribute("incrementType", incrementType.toString());

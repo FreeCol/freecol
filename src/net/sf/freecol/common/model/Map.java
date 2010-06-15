@@ -1097,7 +1097,7 @@ public class Map extends FreeColGameObject {
                 return false;
             }
         };
-        return search(unit, start, gd, costDecider, Integer.MAX_VALUE);
+        return search(unit, start, gd, costDecider, INFINITY);
     }
     
     /**
@@ -1157,7 +1157,7 @@ public class Map extends FreeColGameObject {
                 return false;
             }
         };
-        return search(start, gd, cd, Integer.MAX_VALUE);
+        return search(start, gd, cd, INFINITY);
     }
 
     /**
@@ -1386,7 +1386,7 @@ public class Map extends FreeColGameObject {
      * @return Iterator
      */
     public Iterator<Position> getFloodFillIterator(Position centerPosition) {
-        return new CircleIterator(centerPosition, true, Integer.MAX_VALUE);
+        return new CircleIterator(centerPosition, true, INFINITY);
     }
 
     /**

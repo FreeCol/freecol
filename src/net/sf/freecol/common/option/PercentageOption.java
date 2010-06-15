@@ -55,8 +55,8 @@ public class PercentageOption extends IntegerOption {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("value", Integer.toString(getValue()));
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute(VALUE_TAG, Integer.toString(getValue()));
         out.writeAttribute("previewEnabled", Boolean.toString(isPreviewEnabled()));
 
         out.writeEndElement();
@@ -69,9 +69,9 @@ public class PercentageOption extends IntegerOption {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, "value");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
         final String previewEnabled = in.getAttributeValue(null, "previewEnabled");
 
         if (id == null && getId().equals("NO_ID")) {

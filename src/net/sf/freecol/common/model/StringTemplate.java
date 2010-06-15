@@ -418,7 +418,7 @@ public class StringTemplate extends FreeColObject {
         if (keys != null) {
             for (String key : keys) {
                 out.writeStartElement("key");
-                out.writeAttribute("value", key);
+                out.writeAttribute(VALUE_TAG, key);
                 out.writeEndElement();
             }
         }
@@ -456,7 +456,7 @@ public class StringTemplate extends FreeColObject {
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if ("key".equals(in.getLocalName())) {
-                keys.add(in.getAttributeValue(null, "value"));
+                keys.add(in.getAttributeValue(null, VALUE_TAG));
                 in.nextTag();
             } else if (getXMLElementTagName().equals(in.getLocalName())) {
                 StringTemplate replacement = new StringTemplate();

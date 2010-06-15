@@ -120,7 +120,7 @@ public class OptionGroup extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if(id != null){
             setId(id);
         }

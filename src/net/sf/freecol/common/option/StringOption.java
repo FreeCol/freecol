@@ -89,7 +89,7 @@ public class StringOption extends AbstractOption {
         this.value = value;
         
         if (value != oldValue && isDefined) {
-            firePropertyChange("value", oldValue, value);
+            firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;
     }
@@ -160,8 +160,8 @@ public class StringOption extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("value", value);
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute(VALUE_TAG, value);
         if (generateChoices != null) {
             out.writeAttribute("generate", generateChoices.toString());
         }
@@ -171,7 +171,7 @@ public class StringOption extends AbstractOption {
         if (choices != null && !choices.isEmpty()) {
             for (String choice : choices) {
                 out.writeStartElement("choice");
-                out.writeAttribute("value", choice);
+                out.writeAttribute(VALUE_TAG, choice);
                 out.writeEndElement();
             }
         }
@@ -186,9 +186,9 @@ public class StringOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, "value");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
 
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName()
@@ -217,7 +217,7 @@ public class StringOption extends AbstractOption {
         choices = new ArrayList<String>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if ("choice".equals(in.getLocalName())) {
-                choices.add(in.getAttributeValue(null, "value"));
+                choices.add(in.getAttributeValue(null, VALUE_TAG));
                 in.nextTag();
             }
         }

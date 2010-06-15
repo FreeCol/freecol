@@ -154,7 +154,7 @@ public class UnitTypeChange extends FreeColObject {
             newUnitType = null;
         } else {
             newUnitType = specification.getType(newTypeId, UnitType.class);
-            turnsToLearn = getAttribute(in, "turnsToLearn", UnitType.UNDEFINED);
+            turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
             if (getAttribute(in, "learnInSchool", false) || turnsToLearn > 0) {
                 changeTypes.add(ChangeType.EDUCATION);
             }

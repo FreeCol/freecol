@@ -112,7 +112,7 @@ public class AudioMixerOption extends AbstractOption {
         }
         this.value = newValue;
         if (!newValue.equals(oldValue)) {
-            firePropertyChange("value", oldValue, value);
+            firePropertyChange(VALUE_TAG, oldValue, value);
         }
     }
 
@@ -149,8 +149,8 @@ public class AudioMixerOption extends AbstractOption {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("value", getValue().getKey());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute(VALUE_TAG, getValue().getKey());
 
         out.writeEndElement();
     }
@@ -162,9 +162,9 @@ public class AudioMixerOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, "value");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
 
         findAudioMixers();
 

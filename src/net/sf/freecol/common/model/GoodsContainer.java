@@ -198,7 +198,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     public Goods removeGoods(GoodsType type) {
-        return removeGoods(type, Integer.MAX_VALUE);
+        return removeGoods(type, INFINITY);
     }
 
     /**

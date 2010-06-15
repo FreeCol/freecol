@@ -37,8 +37,8 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private int level = 1;
     private int workPlaces = 3;
     private int basicProduction = 3;
-    private int minSkill = Integer.MIN_VALUE;
-    private int maxSkill = Integer.MAX_VALUE;
+    private int minSkill = UNDEFINED;
+    private int maxSkill = INFINITY;
     private int sequence = 0;
 
     private GoodsType consumes, produces;

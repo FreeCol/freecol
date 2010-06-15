@@ -162,7 +162,7 @@ public class AbstractUnit extends FreeColObject {
      *      during parsing.
      */
     public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase());
         number = getAttribute(in, "number", 1);
         in.nextTag(); // close this element

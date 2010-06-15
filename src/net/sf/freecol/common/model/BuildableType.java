@@ -34,8 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public abstract class BuildableType extends FreeColGameObjectType {
 
-    public static final int UNDEFINED = Integer.MIN_VALUE;
-
     public static final String NOTHING = "model.buildableType.nothing";
     
     /**
@@ -153,14 +151,14 @@ public abstract class BuildableType extends FreeColGameObjectType {
             return limit;
         } else if ("required-ability".equals(childName)) {
             String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            boolean value = getAttribute(in, "value", true);
+            boolean value = getAttribute(in, VALUE_TAG, true);
             getAbilitiesRequired().put(abilityId, value);
             specification.addAbility(abilityId);
             in.nextTag(); // close this element
             return new Ability(abilityId, value);
         } else if ("required-goods".equals(childName)) {
             GoodsType type = specification.getGoodsType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-            int amount = getAttribute(in, "value", 0);
+            int amount = getAttribute(in, VALUE_TAG, 0);
             AbstractGoods requiredGoods = new AbstractGoods(type, amount);
             if (amount > 0) {
                 type.setBuildingMaterial(true);
@@ -192,14 +190,14 @@ public abstract class BuildableType extends FreeColGameObjectType {
         for (Map.Entry<String, Boolean> entry : getAbilitiesRequired().entrySet()) {
             out.writeStartElement("required-ability");
             out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
-            out.writeAttribute("value", Boolean.toString(entry.getValue()));
+            out.writeAttribute(VALUE_TAG, Boolean.toString(entry.getValue()));
             out.writeEndElement();
         }
         if (getGoodsRequired() != null) {
             for (AbstractGoods goods : getGoodsRequired()) {
                 out.writeStartElement("required-goods");
                 out.writeAttribute(ID_ATTRIBUTE_TAG, goods.getType().getId());
-                out.writeAttribute("value", Integer.toString(goods.getAmount()));
+                out.writeAttribute(VALUE_TAG, Integer.toString(goods.getAmount()));
                 out.writeEndElement();
             }
         }

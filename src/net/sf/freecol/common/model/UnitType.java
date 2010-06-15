@@ -106,7 +106,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     /**
      * Describe maximumAttrition here.
      */
-    private int maximumAttrition = Integer.MAX_VALUE;
+    private int maximumAttrition = INFINITY;
 
     /**
      * The ID of the skill this UnitType teaches, mostly its own.
@@ -694,7 +694,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         out.writeAttribute("space", Integer.toString(space));
         out.writeAttribute("spaceTaken", Integer.toString(spaceTaken));
         out.writeAttribute("hitPoints", Integer.toString(hitPoints));
-        if (maximumAttrition < Integer.MAX_VALUE) {
+        if (maximumAttrition < INFINITY) {
             out.writeAttribute("maximumAttrition", Integer.toString(maximumAttrition));
         }
         out.writeAttribute("recruitProbability", Integer.toString(recruitProbability));

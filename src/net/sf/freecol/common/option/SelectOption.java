@@ -81,7 +81,7 @@ public class SelectOption extends AbstractOption {
         this.value = value;
 
         if (value != oldValue) {
-            firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
+            firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue), Integer.valueOf(value));
         }
         isDefined = true;
     }
@@ -137,8 +137,8 @@ public class SelectOption extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("value", getStringValue());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute(VALUE_TAG, getStringValue());
 
         out.writeEndElement();
     }
@@ -150,10 +150,10 @@ public class SelectOption extends AbstractOption {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String localizedLabels = in.getAttributeValue(null, "localizedLabels");
-        final String value = in.getAttributeValue(null, "value");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
 
         if (localizedLabels != null) {
             this.localizedLabels = localizedLabels.equals("true");
@@ -178,7 +178,7 @@ public class SelectOption extends AbstractOption {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName() == getXMLItemElementTagName()) {
                     String label = in.getAttributeValue(null, "label");
-                    final String itemValue = in.getAttributeValue(null, "value");
+                    final String itemValue = in.getAttributeValue(null, VALUE_TAG);
                     if (this.localizedLabels) {
                         label = Messages.message(label);
                     }

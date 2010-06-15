@@ -65,7 +65,7 @@ public class BooleanOption extends AbstractOption {
         this.value = value;
         
         if (value != oldValue && isDefined) {
-            firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
+            firePropertyChange(VALUE_TAG, Boolean.valueOf(oldValue), Boolean.valueOf(value));
         }
         isDefined = true;
     }
@@ -83,8 +83,8 @@ public class BooleanOption extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("value", Boolean.toString(value));
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute(VALUE_TAG, Boolean.toString(value));
 
         out.writeEndElement();
     }
@@ -96,9 +96,9 @@ public class BooleanOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, "value");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
 
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");

@@ -547,7 +547,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         Unit student = null;
         GoodsType expertProduction = teacher.getType().getExpertProduction();
         boolean leastSkilled = !getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
-        int skill = leastSkilled ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        int skill = leastSkilled ? INFINITY : UNDEFINED;
         for (Unit potentialStudent : getColony().getUnitList()) {
             /**
              * If two potential students have the same skill level,

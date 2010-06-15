@@ -57,11 +57,19 @@ public abstract class FreeColObject {
 
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
+    public static final int INFINITY = Integer.MAX_VALUE;
+    public static final int UNDEFINED = Integer.MIN_VALUE;
+
+    protected static final String ID_ATTRIBUTE = "ID";
+
+    /**
+     * XML tag name for value attribute.
+     */
+    protected static final String VALUE_TAG = "value";
+
     /**
      * XML tag name for ID attribute.
      */
-    protected static final String ID_ATTRIBUTE = "ID";
-
     // this is what we use for the specification
     // TODO: standardize on this spelling
     public static final String ID_ATTRIBUTE_TAG = "id";

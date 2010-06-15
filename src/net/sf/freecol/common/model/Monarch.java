@@ -514,7 +514,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             return price * Specification.getSpecification()
                 .getIntegerOption("model.option.mercenaryPrice").getValue() / 100;
         } else {
-            return Integer.MAX_VALUE;
+            return INFINITY;
         }
     }
 

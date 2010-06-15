@@ -147,12 +147,12 @@ public final class Ability extends Feature {
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         super.readAttributes(in, specification);
-        value = getAttribute(in, "value", true);
+        value = getAttribute(in, VALUE_TAG, true);
     }
     
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("value", String.valueOf(value));
+        out.writeAttribute(VALUE_TAG, String.valueOf(value));
     }
 
     /**

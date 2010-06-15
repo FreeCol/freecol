@@ -72,7 +72,7 @@ public class RangeOption extends SelectOption {
      * @param rank The rank of the value to be set.
      */
     public void setValueRank(int rank) {
-        int curValue = Integer.MIN_VALUE;
+        int curValue = UNDEFINED;
         Iterator<Integer> iterator = getItemValues().keySet().iterator();
 
         while (rank >= 0) {

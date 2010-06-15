@@ -153,7 +153,7 @@ public class EuropeanNationType extends NationType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("unit".equals(childName)) {
-                String id = in.getAttributeValue(null, "id");
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 String type = in.getAttributeValue(null, "type");
                 Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase());
                 String useExperts = in.getAttributeValue(null, "expert-starting-units");

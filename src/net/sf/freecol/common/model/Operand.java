@@ -349,7 +349,7 @@ public class Operand extends Scope {
         if (attribute != null) {
             scopeLevel = Enum.valueOf(ScopeLevel.class, attribute);
         }
-        attribute = in.getAttributeValue(null, "value");
+        attribute = in.getAttributeValue(null, VALUE_TAG);
         if (attribute != null) {
             value = new Integer(attribute);
         }
@@ -360,7 +360,7 @@ public class Operand extends Scope {
         out.writeAttribute("operandType", operandType.toString());
         out.writeAttribute("scopeLevel", scopeLevel.toString());
         if (value != null) {
-            out.writeAttribute("value", value.toString());
+            out.writeAttribute(VALUE_TAG, value.toString());
         }
     }
 

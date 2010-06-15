@@ -364,7 +364,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * 
      * @param unitType The type of unit of which you need the price.
      * @return The price of this unit when trained in Europe.
-     *         'UnitType.UNDEFINED' is returned in case the unit cannot be
+     *         'UNDEFINED' is returned in case the unit cannot be
      *         bought.
      */
     public int getUnitPrice(UnitType unitType) {

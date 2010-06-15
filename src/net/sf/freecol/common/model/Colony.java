@@ -1000,7 +1000,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             return 0;
         }
         if(goodsMissing && !goodsBeingProduced){
-            return Integer.MIN_VALUE;
+            return UNDEFINED;
         }
         if(productionMissing){
             result = result * -1;
@@ -1434,7 +1434,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public boolean canBreed(GoodsType goodsType) {
         int breedingNumber = goodsType.getBreedingNumber();
-        return (breedingNumber != GoodsType.NO_BREEDING &&
+        return (breedingNumber < GoodsType.INFINITY &&
                 breedingNumber <= getGoodsCount(goodsType));
     }
 

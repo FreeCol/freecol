@@ -66,7 +66,7 @@ public class FileOption extends AbstractOption {
         this.value = value;
 
         if (value != oldValue) {
-            firePropertyChange("value", oldValue, value);
+            firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;
     }
@@ -83,9 +83,9 @@ public class FileOption extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         if (value != null) {
-            out.writeAttribute("value", value.getAbsolutePath());
+            out.writeAttribute(VALUE_TAG, value.getAbsolutePath());
         }
 
         out.writeEndElement();
@@ -98,7 +98,7 @@ public class FileOption extends AbstractOption {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
@@ -106,8 +106,8 @@ public class FileOption extends AbstractOption {
         if(getId() == NO_ID) {
             setId(id);
         }
-        if (in.getAttributeValue(null, "value") != null && !in.getAttributeValue(null, "value").equals("")) {
-            setValue(new File(in.getAttributeValue(null, "value")));
+        if (in.getAttributeValue(null, VALUE_TAG) != null && !in.getAttributeValue(null, VALUE_TAG).equals("")) {
+            setValue(new File(in.getAttributeValue(null, VALUE_TAG)));
         }
         in.nextTag();
     }

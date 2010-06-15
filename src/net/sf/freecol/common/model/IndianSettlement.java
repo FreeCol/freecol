@@ -1284,7 +1284,7 @@ public class IndianSettlement extends Settlement {
             for (Entry<Player, Tension> entry : alarm.entrySet()) {
                 out.writeStartElement(ALARM_TAG_NAME);
                 out.writeAttribute("player", entry.getKey().getId());
-                out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+                out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
                 out.writeEndElement();
             }
             if (missionary != null) {
@@ -1314,7 +1314,7 @@ public class IndianSettlement extends Settlement {
             if (getAlarm(player) != null) {
                 out.writeStartElement(ALARM_TAG_NAME);
                 out.writeAttribute("player", player.getId());
-                out.writeAttribute("value", String.valueOf(getAlarm(player).getValue()));
+                out.writeAttribute(VALUE_TAG, String.valueOf(getAlarm(player).getValue()));
                 out.writeEndElement();
             }
             if (pet.getMissionary() != null) {
@@ -1379,7 +1379,7 @@ public class IndianSettlement extends Settlement {
                 in.nextTag(); // close tag is always generated.
             } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                alarm.put(player, new Tension(getAttribute(in, "value", 0)));
+                alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
                 in.nextTag(); // close element
             } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
                 String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME, in, new String[0]);

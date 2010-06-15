@@ -293,7 +293,7 @@ public class FoundingFather extends FreeColGameObjectType {
         if (units != null) {
             for (AbstractUnit unit : units) {
                  out.writeStartElement("unit");
-                 out.writeAttribute("id", unit.getId());
+                 out.writeAttribute(ID_ATTRIBUTE_TAG, unit.getId());
                  //out.writeAttribute("role", unit.getRole().toString().toLowerCase());
                  //out.writeAttribute("number", String.valueOf(unit.getNumber()));
                  out.writeEndElement();

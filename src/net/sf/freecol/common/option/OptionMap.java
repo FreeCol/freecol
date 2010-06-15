@@ -339,7 +339,7 @@ public abstract class OptionMap extends OptionGroup {
             if (in.getLocalName().equals(OptionGroup.getXMLElementTagName())) {
                 updateFromXML(in);
             } else {
-                final String idStr = in.getAttributeValue(null, "id");
+                final String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 if (idStr != null) {
                     // old protocols:
                     Option o = getObject(idStr);

@@ -120,7 +120,7 @@ public class LanguageOption extends AbstractOption {
         this.value = newValue;
 
         if (!newValue.equals(oldValue)) {
-            firePropertyChange("value", oldValue, value);
+            firePropertyChange(VALUE_TAG, oldValue, value);
         }
     }
 
@@ -219,8 +219,8 @@ public class LanguageOption extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("value", getValue().getKey());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute(VALUE_TAG, getValue().getKey());
 
         out.writeEndElement();
      }
@@ -232,7 +232,7 @@ public class LanguageOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, "id");
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         findLanguages();
         
         if (id == null && getId().equals("NO_ID")){
@@ -241,7 +241,7 @@ public class LanguageOption extends AbstractOption {
             setId(id);
         }
 
-        Language newValue = languages.get(in.getAttributeValue(null, "value"));
+        Language newValue = languages.get(in.getAttributeValue(null, VALUE_TAG));
         if (newValue == null) {
             newValue = languages.get(AUTO);
         }
