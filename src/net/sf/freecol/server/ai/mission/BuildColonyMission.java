@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -199,7 +200,7 @@ public class BuildColonyMission extends Mission {
                 Element reply = null;
 
                 try {
-                    reply = connection.ask(new BuildColonyMessage("", unit).toXMLElement());
+                    reply = connection.ask(new BuildColonyMessage(Player.ASSIGN_SETTLEMENT_NAME, unit).toXMLElement());
                 } catch (IOException e) {
                     logger.warning("Could not send BuildColony message.");
                 }
