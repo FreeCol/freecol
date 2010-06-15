@@ -1143,7 +1143,22 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony
-            throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+
+            // Throwing an exception stalls the AI and wrecks the
+            // colony in a weird way.  Try to recover by hopefully
+            // finding a unit outside the colony and stuffing it into
+            // the town hall.
+            if (colony.getTile().getUnitCount() > 0) {
+                logger.warning("Colony " + colony.getName() + " autodestruct averted.");
+                Unit u = colony.getTile().getFirstUnit();
+                Building th = colony.getBuildingForProducing(Specification.getSpecification()
+                                                             .getGoodsType("model.goods.bells"));
+                u.work(th);
+                ((AIUnit) getAIMain().getAIObject(u)).setMission(null);
+            } else {
+                throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+            }
+
         }
 
         // no need to rearrange workers again immediately
