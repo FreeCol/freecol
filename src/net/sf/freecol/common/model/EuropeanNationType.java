@@ -188,13 +188,15 @@ public class EuropeanNationType extends NationType {
 
         writeFeatures(out);
 
-        // default map
-        for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get(null).entrySet()) {
-            writeUnit(out, entry.getKey(), entry.getValue(), false);
-        }
-        // expert map
-        for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get("true").entrySet()) {
-            writeUnit(out, entry.getKey(), entry.getValue(), true);
+        if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
+            // default map
+            for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get(null).entrySet()) {
+                writeUnit(out, entry.getKey(), entry.getValue(), false);
+            }
+            // expert map
+            for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get("true").entrySet()) {
+                writeUnit(out, entry.getKey(), entry.getValue(), true);
+            }
         }
 
         // End element:

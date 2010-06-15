@@ -1108,6 +1108,7 @@ public final class Specification {
         writeSection(out, "building-types", buildingTypeList);
         writeSection(out, "founding-fathers", foundingFathers);
         writeSection(out, "european-nation-types", europeanNationTypes);
+        writeSection(out, "european-nation-types", REFNationTypes);
         writeSection(out, "indian-nation-types", indianNationTypes);
         writeSection(out, "nations", nations);
 
