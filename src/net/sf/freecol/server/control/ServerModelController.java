@@ -101,26 +101,29 @@ public class ServerModelController implements ModelController,PropertyChangeList
         } else {
             value = freeColServer.getServerRandom().nextInt(n);
             taskRegister.put(extendedTaskID,
-                new TaskEntry(extendedTaskID, turn+1, new Integer(value)));
+                             new TaskEntry(extendedTaskID, turn, true, new Integer(value)));
         }
         logger.finest("getRandom(" + taskID + ", " + n + ") -> " + value);
         return value;
     }
 
     /**
-     * Removes any expired entries.
+     * Removes any entries older than {@link TaskEntry#TASK_ENTRY_TIME_OUT}.
      */
     public synchronized void clearTaskRegister() {
         int currentTurn = freeColServer.getGame().getTurn().getNumber();
         List<String> idsToRemove = new ArrayList<String>();
         for (TaskEntry te : taskRegister.values()) {
             if (te.hasExpired(currentTurn)) {
+                if (!te.isSecure()) {
+                    logger.warning("Possibly a cheating attempt.");
+                }
                 idsToRemove.add(te.taskID);
             }
         }
         if (!idsToRemove.isEmpty()) {
             StringBuffer sb = new StringBuffer();
-            sb.append("Clearing the task register:");
+            sb.append("Clearing the task register. Removing the following items:");
             for (String id : idsToRemove) {
                 taskRegister.remove(id);
                 sb.append(" ");
@@ -131,30 +134,9 @@ public class ServerModelController implements ModelController,PropertyChangeList
     }
 
     /**
-     * A single entry in the task register.
-     */
-    private static class TaskEntry {
-        final String taskID;
-
-        final int endTurn;
-
-        final Object entry;
-
-        TaskEntry(String taskID, int endTurn, Object entry) {
-            this.taskID = taskID;
-            this.endTurn = endTurn;
-            this.entry = entry;
-        }
-
-        boolean hasExpired(int currentTurn) {
-            return endTurn < currentTurn;
-        }
-    }
-
-    /**
      * Creates a new unit. This method is the same as running
-     * {@link #createUnit(String, Location, Player, UnitType, Connection)}
-     * <code>connection = null</code>.
+     * {@link #createUnit(String, Location, Player, UnitType, boolean, Connection)}
+     * with <code>secure = true</code> and <code>connection = null</code>.
      * 
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
@@ -169,7 +151,7 @@ public class ServerModelController implements ModelController,PropertyChangeList
      * @return A reference to the <code>Unit</code> which has been created.
      */
     public synchronized Unit createUnit(String taskID, Location location, Player owner, UnitType type) {
-        return createUnit(taskID, location, owner, type, null);
+        return createUnit(taskID, location, owner, type, true, null);
     }
 
     /**
@@ -185,11 +167,16 @@ public class ServerModelController implements ModelController,PropertyChangeList
      *            will be created.
      * @param owner The <code>Player</code> owning the <code>Unit</code>.
      * @param type The type of unit (Unit.FREE_COLONIST...).
+     * @param secure This variable should be set to <code>false</code> in case
+     *            this method is called when serving a client. Setting this
+     *            variable to <code>false</code> signals that the request
+     *            might be illegal.
      * @param connection The connection that has requested to create the unit,
      *            or null if this request is internal to the server.
      * @return A reference to the <code>Unit</code> which has been created.
      */
-    public synchronized Unit createUnit(String taskID, Location location, Player owner, UnitType type, Connection connection) {
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, UnitType type, boolean secure,
+            Connection connection) {
         String extendedTaskID = taskID + owner.getId()
                 + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         Unit unit;
@@ -215,9 +202,12 @@ public class ServerModelController implements ModelController,PropertyChangeList
                 return null;
             }
 
+            if (secure) {
+                taskEntry.secure = true;
+            }
         } else {
             unit = new Unit(freeColServer.getGame(), location, owner, type, UnitState.ACTIVE);
-            taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber()+5, unit);
+            taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, unit);
             taskRegister.put(extendedTaskID, taskEntry);
         }
 
@@ -232,7 +222,7 @@ public class ServerModelController implements ModelController,PropertyChangeList
     /**
      * Creates a new building. This method is the same as running
      * {@link #createBuilding(String, Colony, BuildingType, boolean, Connection)}
-     * with <code>connection = null</code>.
+     * with <code>secure = true</code> and <code>connection = null</code>.
      * 
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
@@ -246,7 +236,7 @@ public class ServerModelController implements ModelController,PropertyChangeList
      * @return A reference to the <code>Building</code> which has been created.
      */
     public synchronized Building createBuilding(String taskID, Colony colony, BuildingType type) {
-        return createBuilding(taskID, colony, type, null);
+        return createBuilding(taskID, colony, type, true, null);
     }
 
     /**
@@ -261,11 +251,16 @@ public class ServerModelController implements ModelController,PropertyChangeList
      * @param colony The <code>Colony</code> where the <code>Building</code>
      *            will be created.
      * @param type The type of building.
+     * @param secure This variable should be set to <code>false</code> in case
+     *            this method is called when serving a client. Setting this
+     *            variable to <code>false</code> signals that the request
+     *            might be illegal.
      * @param connection The connection that has requested to create the building,
      *            or null if this request is internal to the server.
      * @return A reference to the <code>Building</code> which has been created.
      */
-    public synchronized Building createBuilding(String taskID, Colony colony, BuildingType type, Connection connection) {
+    public synchronized Building createBuilding(String taskID, Colony colony, BuildingType type, boolean secure,
+                                                Connection connection) {
         String extendedTaskID = taskID + colony.getOwner().getId()
                 + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         Building building;
@@ -292,9 +287,12 @@ public class ServerModelController implements ModelController,PropertyChangeList
                 return null;
             }
 
+            if (secure) {
+                taskEntry.secure = true;
+            }
         } else {
             building = new Building(freeColServer.getGame(), colony,type);
-            taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber()+5, building);
+            taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, building);
             taskRegister.put(extendedTaskID, taskEntry);
         }
 
@@ -325,7 +323,8 @@ public class ServerModelController implements ModelController,PropertyChangeList
             // taskRegister.remove(taskID);
         } else {
             entryLocation = unit.getVacantEntryLocation();
-            taskRegister.put(taskID, new TaskEntry(taskID, freeColServer.getGame().getTurn().getNumber()+5, entryLocation));
+            taskRegister.put(taskID, new TaskEntry(taskID, freeColServer.getGame().getTurn().getNumber(), true,
+                    entryLocation));
         }
 
         unit.setLocation(entryLocation);
@@ -510,7 +509,39 @@ public class ServerModelController implements ModelController,PropertyChangeList
         return new TradeRoute(game, name, player);
     }
 
+    /**
+     * A single entry in the task register.
+     */
+    private static class TaskEntry {
+        final String taskID;
 
+        final int createdTurn;
+
+        final Object entry;
+
+        private boolean secure;
+
+
+        TaskEntry(String taskID, int createdTurn, boolean secure, Object entry) {
+            this.taskID = taskID;
+            this.createdTurn = createdTurn;
+            this.secure = secure;
+            this.entry = entry;
+        }
+
+        synchronized boolean isSecure() {
+            return this.secure;
+        }
+
+        boolean hasExpired(int currentTurn) {
+            return createdTurn + TASK_ENTRY_TIME_OUT < currentTurn;
+        }
+
+
+        /** The number of turns before a <code>TaskEntry</code> has expired. */
+        private static final int TASK_ENTRY_TIME_OUT = 5;
+    }
+    
     public void updateModelListening(){
         for(Player player : freeColServer.getGame().getPlayers()){
             if(!player.isIndian()){

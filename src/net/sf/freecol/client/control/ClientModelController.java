@@ -99,7 +99,7 @@ public class ClientModelController implements ModelController {
         } catch (NumberFormatException e) {
             throw new IllegalStateException("Bad result: " + e.getMessage());
         }
-
+ 
         logger.finest("getRandom(" + taskID + ", " + n + ") -> " + value);
         return value;
     }
