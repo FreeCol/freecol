@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +39,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -1217,10 +1215,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 return 0; // Claim abandoned or only by tile improvement
             }
         } // Else, native ownership
-        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType type : getGame().getSpecification().getGoodsTypeList()) {
             price += tile.potential(type, null);
         }
-        price *= Specification.getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
+        price *= getGame().getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
         price += 100;
         return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier",
                                                     null, getGame().getTurn());
@@ -1561,7 +1559,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #incrementLiberty
      */
     public int getTotalFoundingFatherCost() {
-        int base = Specification.getSpecification()
+        int base = getGame().getSpecification()
             .getIntegerOption("model.option.foundingFatherFactor").getValue();
         int count = getFatherCount();
         int previous = 1;
@@ -1632,11 +1630,11 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
             } else if (eventId.equals("model.event.boycottsLifted")) {
-                for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
                     resetArrears(goodsType);
                 }
             } else if (eventId.equals("model.event.freeBuilding")) {
-                BuildingType type = FreeCol.getSpecification().getBuildingType(event.getValue());
+                BuildingType type = getGame().getSpecification().getBuildingType(event.getValue());
                 for (Colony colony : getColonies()) {
                     if (colony.canBuild(type)) {
                         // Need to use a `special' taskID to avoid collision
@@ -1651,7 +1649,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 exploreAllColonies();
             } else if (eventId.equals("model.event.increaseSonsOfLiberty")) {
                 int value = Integer.parseInt(event.getValue());
-                GoodsType bells = Specification.getSpecification().getLibertyGoodsTypeList().get(0);
+                GoodsType bells = getGame().getSpecification().getLibertyGoodsTypeList().get(0);
                 for (Colony colony : getColonies()) {
                     /*
                      * The number of liberty to be generated in order to get the
@@ -1931,7 +1929,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return a <code>String</code> value
      */
     public Nation getNation() {
-        return FreeCol.getSpecification().getNation(nationID);
+        return getGame().getSpecification().getNation(nationID);
     }
 
     /**
@@ -2102,7 +2100,7 @@ public class Player extends FreeColGameObject implements Nameable {
         ArrayList<RandomChoice<UnitType>> recruitables
             = new ArrayList<RandomChoice<UnitType>>();
         FeatureContainer fc = getFeatureContainer();
-        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getGame().getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
                 && !fc.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
                 recruitables.add(new RandomChoice<UnitType>(unitType,
@@ -2207,7 +2205,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return;
         }
         immigrationRequired += (int) featureContainer
-            .applyModifier(Specification.getSpecification()
+            .applyModifier(getGame().getSpecification()
                            .getIntegerOption("model.option.crossesIncrement").getValue(),
                            "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
@@ -2506,7 +2504,7 @@ public class Player extends FreeColGameObject implements Nameable {
         //set up maps for all foods and building materials
         TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
         TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
-        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType type : getGame().getSpecification().getGoodsTypeList()) {
             if (type.isRawBuildingMaterial()) {
                 buildingMaterialMap.incrementCount(type, 0);
             } else if (type.isFoodType()) {
@@ -2818,7 +2816,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getLibertyProductionNextTurn() {
         int libertyNextTurn = 0;
         for (Colony colony : getColonies()) {
-            for (GoodsType libertyGoods : Specification.getSpecification()
+            for (GoodsType libertyGoods : getGame().getSpecification()
                      .getLibertyGoodsTypeList()) {
                 libertyNextTurn += colony.getProductionOf(libertyGoods);
             }
@@ -2975,7 +2973,7 @@ public class Player extends FreeColGameObject implements Nameable {
             data = new MarketData(goodsType);
             getMarket().putMarketData(goodsType, data);
         }
-        Specification spec = Specification.getSpecification();
+        Specification spec = getGame().getSpecification();
         data.setArrears(spec.getIntegerOption("model.option.arrearsFactor").getValue()
                         * data.getPaidForSale());
     }
@@ -3549,7 +3547,7 @@ public class Player extends FreeColGameObject implements Nameable {
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
         if (!name.equals(UNKNOWN_ENEMY)) {
-            nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
+            nationType = getGame().getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
         }
         admin = getAttribute(in, "admin", false);
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
@@ -3562,7 +3560,7 @@ public class Player extends FreeColGameObject implements Nameable {
         dead = getAttribute(in, "dead", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
-        currentFather = FreeCol.getSpecification().getType(in, "currentFather", FoundingFather.class, null);
+        currentFather = getGame().getSpecification().getType(in, "currentFather", FoundingFather.class, null);
         immigrationRequired = getAttribute(in, "immigrationRequired", 12);
         newLandName = getAttribute(in, "newLandName", null);
         independentNationName = getAttribute(in, "independentNationName", null);
@@ -3607,7 +3605,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
                 for (int index = 0; index < length; index++) {
                     String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                    FoundingFather father = FreeCol.getSpecification().getFoundingFather(fatherId);
+                    FoundingFather father = getGame().getSpecification().getFoundingFather(fatherId);
                     allFathers.add(father);
                     // add only features, no other effects
                     featureContainer.add(father.getFeatureContainer());

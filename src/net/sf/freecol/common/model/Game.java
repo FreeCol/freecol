@@ -329,7 +329,7 @@ public class Game extends FreeColGameObject {
     public void addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
-            Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
+            Nation nation = getSpecification().getNation(player.getNationID());
             nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
             if (currentPlayer == null) {
                 currentPlayer = player;
@@ -349,7 +349,7 @@ public class Game extends FreeColGameObject {
         boolean updateCurrentPlayer = (currentPlayer == player);
 
         players.remove(players.indexOf(player));
-        Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
+        Nation nation = getSpecification().getNation(player.getNationID());
         nationOptions.getNations().put(nation, NationState.AVAILABLE);
         player.dispose();
 
@@ -858,12 +858,22 @@ public class Game extends FreeColGameObject {
         FreeColObject o = getFreeColGameObjectSafely(id);
         if (o == null) {
             try {
-                o = FreeCol.getSpecification().getType(id);
+                o = getSpecification().getType(id);
             } catch (Exception e) {
                 o = null; // Ignore
             }
         }
         return o;
+    }
+
+
+    /**
+     * Return the specification for this Game.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public Specification getSpecification() {
+        return Specification.getSpecification();
     }
 
 

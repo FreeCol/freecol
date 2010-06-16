@@ -248,7 +248,7 @@ public class Resource extends TileItem {
         setId(in.getAttributeValue(null, "ID"));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
-        type = FreeCol.getSpecification().getResourceType(in.getAttributeValue(null, "type"));
+        type = getGame().getSpecification().getResourceType(in.getAttributeValue(null, "type"));
         quantity = Integer.parseInt(in.getAttributeValue(null, "quantity"));
 
         in.nextTag();

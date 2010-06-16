@@ -67,14 +67,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     private static final String UNITS_TAG_NAME = "units";
 
-    /**
-     * The number of turns required to sail between Europe and the New
-     * World. TODO: In the future, this should be replaced by an
-     * advanced sailing model taking prevailing winds into account.
-     */
-    public static final int TURNS_TO_SAIL = Specification.getSpecification().getIntegerOption(
-            "model.option.turnsToSail").getValue();
-
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String EQUIPMENT_CHANGE = "EQUIPMENT_CHANGE";
     
@@ -309,7 +301,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setLocation(location);
 
         workLeft = -1;
-        workType = Specification.getSpecification().getGoodsFood().get(0);
+        workType = getGame().getSpecification().getGoodsFood().get(0);
 
         this.movesLeft = getInitialMovesLeft();
         hitpoints = unitType.getHitPoints();
@@ -647,7 +639,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param typeStudent the unit type of the student
      * @return an <code>int</code> value
      */
-    public static int getNeededTurnsOfTraining(UnitType typeTeacher, UnitType typeStudent) {
+    public int getNeededTurnsOfTraining(UnitType typeTeacher, UnitType typeStudent) {
         UnitType teaching = getUnitTypeTeaching(typeTeacher, typeStudent);
         if (teaching != null) {
             return typeStudent.getEducationTurns(teaching);
@@ -668,7 +660,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      */
     public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        UnitType skillTaught = Specification.getSpecification().getUnitType(typeTeacher.getSkillTaught());
+        UnitType skillTaught = typeTeacher.getSkillTaught();
         if (typeStudent.canBeUpgraded(skillTaught, ChangeType.EDUCATION)) {
             return skillTaught;
         } else {
@@ -839,7 +831,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param typeTeacher the unit type of the teacher which is trying to teach it
      * @return a <code>boolean</code> value
      */
-    public static boolean canBeStudent(UnitType typeStudent, UnitType typeTeacher) {
+    public boolean canBeStudent(UnitType typeStudent, UnitType typeTeacher) {
         return getUnitTypeTeaching(typeTeacher, typeStudent) != null;
     }
 
@@ -907,7 +899,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         		oldTeacher.setStudent(null);
         	}
         } else {
-            UnitType skillTaught = FreeCol.getSpecification().getUnitType(newTeacher.getType().getSkillTaught());
+            UnitType skillTaught = newTeacher.getType().getSkillTaught();
             if (newTeacher.getColony() != null &&
                 newTeacher.getColony() == getColony() &&
                 getColony().canTrain(skillTaught)) {
@@ -1481,6 +1473,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (settlement instanceof Colony) {
             return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
         } else if (settlement instanceof IndianSettlement) {
+            UnitType scoutSkill = getGame().getSpecification()
+                .getUnitType("model.unit.seasonedScout");
             if (getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)) {
                 return (allowMoveFrom(from))
                     ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST
@@ -1492,8 +1486,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return MoveType.MOVE_ILLEGAL; // should not happen
         }
     }
-    private static UnitType scoutSkill
-        = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");
 
     /**
      * Get the <code>MoveType</code> when moving a missionary to a settlement.
@@ -2468,16 +2460,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     // TODO: make these go away, if possible, private if not
     public boolean isArmed() {
     	if(getOwner().isIndian()){
-            return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets"));
+            return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.indian.muskets"));
     	}
-        return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+        return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.muskets"));
     }
 
     public boolean isMounted() {
     	if(getOwner().isIndian()){
-            return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses"));
+            return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.indian.horses"));
     	}
-        return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+        return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.horses"));
     }
 
     /**
@@ -2801,17 +2793,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             doAssignedWork();
             return;
         case TO_EUROPE:
-            workLeft = (state == UnitState.TO_AMERICA) 
-                ? TURNS_TO_SAIL + 1 - workLeft
-                : TURNS_TO_SAIL;
+            workLeft = getGame().getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
+            if (state == UnitState.TO_AMERICA) {
+                workLeft += 1 - workLeft;
+            }
             workLeft = (int) getOwner().getFeatureContainer().applyModifier(workLeft,
                 "model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
         case TO_AMERICA:
-            workLeft = (state == UnitState.TO_EUROPE) 
-                ? TURNS_TO_SAIL + 1 - workLeft
-                : TURNS_TO_SAIL;
+            workLeft = getGame().getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
+            if (state == UnitState.TO_EUROPE) {
+                workLeft += 1 - workLeft;
+            }
             workLeft = (int) getOwner().getFeatureContainer().applyModifier(workLeft,
                 "model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
@@ -3097,7 +3091,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         equipment.incrementCount(type, -amount);
         setRole();
         // TODO: make this more generic
-        EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+        EquipmentType tools = getGame().getSpecification().getEquipmentType("model.equipment.tools");
         if (!equipment.containsKey(tools)) {
             String messageId = (getType().getDefaultEquipmentType() == type)
                 ? getType() + ".noMoreTools" : "model.unit.noMoreTools";
@@ -3210,7 +3204,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void train() {
         StringTemplate oldName = getLabel();
-        UnitType skillTaught = FreeCol.getSpecification().getUnitType(getTeacher().getType().getSkillTaught());
+        UnitType skillTaught = getTeacher().getType().getSkillTaught();
         UnitType learning = getUnitTypeTeaching(skillTaught, unitType);
 
         if (learning != null) {
@@ -3414,7 +3408,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return;
         }
         
-        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(produce);
+        UnitType learnType = getGame().getSpecification().getExpertForProducing(produce);
         if (learnType == null || 
             learnType == unitType ||
             !unitType.canBeUpgraded(learnType, ChangeType.EXPERIENCE)) {
@@ -3547,7 +3541,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Check for necessary equipment in the settlement
         Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
 
-        for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
+        for (EquipmentType equipment : getGame().getSpecification().getEquipmentTypeList()) {
                 for (Ability ability : autoDefence) {
                     if (!ability.appliesTo(equipment)){
                         continue;
@@ -3707,7 +3701,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
         UnitType oldUnitType = unitType;
-        unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+        unitType = getGame().getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
 
         naval = unitType.hasAbility("model.ability.navalUnit");
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
@@ -3771,7 +3765,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
 
-        workType = FreeCol.getSpecification().getType(in, "workType", GoodsType.class, null);
+        workType = getGame().getSpecification().getType(in, "workType", GoodsType.class, null);
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
@@ -3825,13 +3819,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 if (xLength == null) {
                     String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                     int count = Integer.parseInt(in.getAttributeValue(null, "count"));
-                    equipment.incrementCount(Specification.getSpecification().getEquipmentType(equipmentId), count);
+                    equipment.incrementCount(getGame().getSpecification().getEquipmentType(equipmentId), count);
                 } else {
                     // TODO: remove support for old format
                     int length = Integer.parseInt(xLength);
                     for (int index = 0; index < length; index++) {
                         String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                        equipment.incrementCount(Specification.getSpecification().getEquipmentType(equipmentId), 1);
+                        equipment.incrementCount(getGame().getSpecification().getEquipmentType(equipmentId), 1);
                     }
                 }
                 in.nextTag();

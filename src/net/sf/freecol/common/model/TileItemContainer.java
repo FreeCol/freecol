@@ -531,7 +531,7 @@ public class TileItemContainer extends FreeColGameObject {
         if (magnitude == TileImprovement.NO_RIVER) {
             return null;
         }
-        TileImprovement river = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
+        TileImprovement river = new TileImprovement(getGame(), tile, getGame().getSpecification()
                                                     .getTileImprovementType("model.improvement.river"));
         river = (TileImprovement) addTileItem(river);
         river.setMagnitude(magnitude);

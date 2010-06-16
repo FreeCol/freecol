@@ -487,7 +487,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         GoodsType workType = unit.getWorkType();
         int amount = getProductionOf(unit, workType);
         if (amount == 0) {
-            List<GoodsType> farmedGoodsTypes = FreeCol.getSpecification().getFarmedGoodsTypeList();
+            List<GoodsType> farmedGoodsTypes = getGame().getSpecification().getFarmedGoodsTypeList();
             for(GoodsType farmedGoods : farmedGoodsTypes) {
                 int newAmount = getProductionOf(unit, farmedGoods);
                 if (newAmount > amount) {

@@ -166,7 +166,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         established = game.getTurn();
         tile.setOwner(owner);
         if (!tile.hasRoad()) {
-            TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
+            TileImprovement road = new TileImprovement(game, tile, getGame().getSpecification()
                                                        .getTileImprovementType("model.improvement.road"));
             road.setTurnsToComplete(0);
             road.setVirtual(true);
@@ -192,13 +192,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
         if (landLocked) {
-            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.warehouse"));
+            buildQueue.add(getGame().getSpecification().getBuildingType("model.building.warehouse"));
         } else {
-            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.docks"));
+            buildQueue.add(getGame().getSpecification().getBuildingType("model.building.docks"));
             featureContainer.addAbility(HAS_PORT);
         }
         Building building;
-        List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
+        List<BuildingType> buildingTypes = getGame().getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if ((buildingType.getUpgradesFrom() == null
                  && buildingType.getGoodsRequired().isEmpty())
@@ -306,7 +306,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         int population = getUnitCount();
         if (population > 0) {
             // this means we might get a building for free
-            for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+            for (BuildingType buildingType : getGame().getSpecification().getBuildingTypeList()) {
                 if (isFree(buildingType)) {
                     Building b = createFreeBuilding(buildingType);
                     if (b != null) {
@@ -921,7 +921,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public List<UnitType> getBuildableUnits() {
         ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        List<UnitType> unitTypes = getGame().getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
             if (unitType.getGoodsRequired().isEmpty() == false && canBuild(unitType)) {
                 buildableUnits.add(unitType);
@@ -1049,7 +1049,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public void addLiberty(int amount) {
         if (FreeCol.isInDebugMode()) {
             getOwner().incrementLiberty(amount);
-            List<GoodsType> libertyTypeList = FreeCol.getSpecification().getLibertyGoodsTypeList();
+            List<GoodsType> libertyTypeList = getGame().getSpecification().getLibertyGoodsTypeList();
             if (getMembers() <= getUnitCount() + 1
                 && amount > 0
                 && !libertyTypeList.isEmpty()) {
@@ -1078,9 +1078,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public int getConsumption(GoodsType goodsType) {
         // TODO: make this more generic
-        if (Specification.getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
+        if (getGame().getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
             return Math.max(0, getUnitCount() - 2);
-        } else if (Specification.getSpecification().getGoodsType("model.goods.food").equals(goodsType)) {
+        } else if (getGame().getSpecification().getGoodsType("model.goods.food").equals(goodsType)) {
             return getFoodConsumption();
         } else {
             return 0;
@@ -1198,7 +1198,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public int getFoodProduction() {
         int result = 0;
-        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : getGame().getSpecification().getGoodsFood()) {
             result += getProductionOf(foodType);
         }
         return result;
@@ -1273,7 +1273,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         ColonyTile bestTile = null;
         GoodsType bestType = null;
         int bestProduction = 0;
-        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : getGame().getSpecification().getGoodsFood()) {
             ColonyTile colonyTile = getVacantColonyTileFor(unit, false, foodType);
             if (colonyTile != null) {
                 int production = colonyTile.getProductionOf(unit, foodType);
@@ -1920,7 +1920,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
         if (getFoodCount() >= FOOD_PER_COLONIST) {
-            List<UnitType> unitTypes = FreeCol.getSpecification()
+            List<UnitType> unitTypes = getGame().getSpecification()
                 .getUnitTypesWithAbility("model.ability.bornInColony");
             if (!unitTypes.isEmpty()) {
                 int random = getGame().getModelController()
@@ -2013,7 +2013,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                                         ? "model.colony.SoLIncrease"
                                                         : "model.colony.SoLDecrease",
                                                         this,
-                                                        FreeCol.getSpecification().getGoodsType("model.goods.bells"))
+                                                        getGame().getSpecification().getGoodsType("model.goods.bells"))
                             .addAmount("%oldSoL%", oldSonsOfLiberty)
                             .addAmount("%newSoL%", sonsOfLiberty)
                             .addName("%colony%", getName()));
@@ -2036,9 +2036,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return an <code>int</code> value
      */
     public int governmentChange(int units) {
-        final int veryBadGovernment = Specification.getSpecification()
+        final int veryBadGovernment = getGame().getSpecification()
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
-        final int badGovernment = Specification.getSpecification()
+        final int badGovernment = getGame().getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
 
         int rebels = calculateMembership(units);
@@ -2080,9 +2080,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     public ModelMessage checkForGovMgtChangeMessage() {
-        final int veryBadGovernment = Specification.getSpecification()
+        final int veryBadGovernment = getGame().getSpecification()
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
-        final int badGovernment = Specification.getSpecification()
+        final int badGovernment = getGame().getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
         
         String msgId = null;
@@ -2127,7 +2127,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
         
-        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+        GoodsType bells = getGame().getSpecification().getGoodsType("model.goods.bells");
         return (msgId == null) ? null
             : new ModelMessage(msgType, msgId, this, bells)
             .addName("%colony%", getName());
@@ -2138,9 +2138,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Update the colony's production bonus.
      */
     private void updateProductionBonus() {
-        final int veryBadGovernment = Specification.getSpecification()
+        final int veryBadGovernment = getGame().getSpecification()
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
-        final int badGovernment = Specification.getSpecification()
+        final int badGovernment = getGame().getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
         int newBonus = (sonsOfLiberty >= 100) ? 2
             : (sonsOfLiberty >= 50) ? 1
@@ -2190,7 +2190,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             // something is preventing construction
             BuildableType currentlyBuilding = getCurrentlyBuilding();
             if ((currentlyBuilding == null)) {
-                for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+                for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
                     if (goodsType.isBuildingMaterial() &&
                         !goodsType.isStorable() &&
                         getProductionOf(goodsType) > 0) {
@@ -2287,7 +2287,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         // Remove goods consumed by the colonists (except food, which
         // has already been handled). In the future, colonists might
         // consume luxury goods, for example
-        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFoodType()) {
                 removeGoods(goodsType, getConsumption(goodsType));
             }
@@ -2509,7 +2509,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 data.readFromXML(in);
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
-                Modifier modifier = new Modifier(in, Specification.getSpecification());
+                Modifier modifier = new Modifier(in, getGame().getSpecification());
                 featureContainer.addModifier(modifier);
             } else if ("buildQueue".equals(in.getLocalName())) {
                 // TODO: remove support for old format
@@ -2517,13 +2517,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 if (size > 0) {
                     for (int x = 0; x < size; x++) {
                         String typeId = in.getAttributeValue(null, "x" + Integer.toString(x));
-                        buildQueue.add(Specification.getSpecification().getType(typeId, BuildableType.class));
+                        buildQueue.add(getGame().getSpecification().getType(typeId, BuildableType.class));
                     }
                 }
                 in.nextTag();
             } else if (BUILD_QUEUE_TAG.equals(in.getLocalName())) {
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                buildQueue.add(Specification.getSpecification().getType(id, BuildableType.class));
+                buildQueue.add(getGame().getSpecification().getType(id, BuildableType.class));
                 in.nextTag();
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + getName());

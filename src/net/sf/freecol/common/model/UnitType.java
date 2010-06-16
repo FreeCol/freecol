@@ -109,9 +109,9 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     private int maximumAttrition = INFINITY;
 
     /**
-     * The ID of the skill this UnitType teaches, mostly its own.
+     * The skill this UnitType teaches, mostly its own.
      */
-    private String skillTaught;
+    private UnitType skillTaught;
 
     /**
      * Describe defaultEquipment here.
@@ -459,9 +459,9 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     /**
      * Get the <code>SkillTaught</code> value.
      *
-     * @return an <code>String</code> value
+     * @return an <code>UnitType</code> value
      */
-    public String getSkillTaught() {
+    public UnitType getSkillTaught() {
         return skillTaught;
     }
 
@@ -470,7 +470,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      *
      * @param newSkillTaught The new SkillTaught value.
      */
-    public void setSkillTaught(final String newSkillTaught) {
+    public void setSkillTaught(final UnitType newSkillTaught) {
         this.skillTaught = newSkillTaught;
     }
 
@@ -623,7 +623,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         hitPoints = getAttribute(in, "hitPoints", parent.hitPoints);
         spaceTaken = getAttribute(in, "spaceTaken", parent.spaceTaken);
         maximumAttrition = getAttribute(in, "maximumAttrition", parent.maximumAttrition);
-        skillTaught = getAttribute(in, "skillTaught", getId());
+        skillTaught = specification.getUnitType(getAttribute(in, "skillTaught", getId()));
 
         pathImage = getAttribute(in, "pathImage", parent.pathImage);
 
@@ -704,7 +704,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         if (price != UNDEFINED) {
             out.writeAttribute("price", Integer.toString(price));
         }
-        out.writeAttribute("skillTaught", skillTaught);
+        out.writeAttribute("skillTaught", skillTaught.getId());
         if (pathImage != null) {
             out.writeAttribute("pathImage", pathImage);
         }

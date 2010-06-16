@@ -374,7 +374,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The UnitType.
      */
     public UnitType getExpertUnitType() {
-        return FreeCol.getSpecification().getExpertForProducing(getGoodsOutputType());
+        return getGame().getSpecification().getExpertForProducing(getGoodsOutputType());
     }
 
     /**
@@ -1079,7 +1079,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         setId(in.getAttributeValue(null, "ID"));
 
         colony = getFreeColGameObject(in, "colony", Colony.class);
-        buildingType = FreeCol.getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
+        buildingType = getGame().getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
 
         units.clear();
 
