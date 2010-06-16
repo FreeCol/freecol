@@ -623,7 +623,8 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         hitPoints = getAttribute(in, "hitPoints", parent.hitPoints);
         spaceTaken = getAttribute(in, "spaceTaken", parent.spaceTaken);
         maximumAttrition = getAttribute(in, "maximumAttrition", parent.maximumAttrition);
-        skillTaught = specification.getUnitType(getAttribute(in, "skillTaught", getId()));
+        String skillString = in.getAttributeValue(null, "skillTaught");
+        skillTaught = (skillString == null) ? this : specification.getUnitType(skillString);
 
         pathImage = getAttribute(in, "pathImage", parent.pathImage);
 
