@@ -146,7 +146,7 @@ public class ResourceManager {
     public static void addGameMapping(String key, Resource resource) {
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.add(key, resource);
-        dirty = true;
+        mergedContainer.add(key, resource);
     }
 
     /**
@@ -223,11 +223,11 @@ public class ResourceManager {
         _mergedContainer.addAll(tcMapping);
         _mergedContainer.addAll(campaignMapping);
         _mergedContainer.addAll(scenarioMapping);
-        _mergedContainer.addAll(gameMapping);
         ListIterator<ResourceMapping> it = modMappings.listIterator(modMappings.size()); 
         while (it.hasPrevious()) {
             _mergedContainer.addAll(it.previous());
         }
+        _mergedContainer.addAll(gameMapping);
         mergedContainer = _mergedContainer;
     }
     
