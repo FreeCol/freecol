@@ -1764,7 +1764,11 @@ public final class InGameController implements NetworkConstants {
                     || unit.getDestination().getTile() == tile.getTile())) {
                 canvas.showColonyPanel((Colony) tile.getSettlement());
             }
-            if (unit.getMovesLeft() == 0) nextActiveUnit();
+            if (unit.getMovesLeft() == 0) {
+                nextActiveUnit();
+            } else {
+                displayModelMessages(false);
+            }
         }
     }
 
@@ -2528,7 +2532,10 @@ public final class InGameController implements NetworkConstants {
             if (gold < 0) {
                 ; // protocol fail
             } else if (player.getGold() < gold) {
-                canvas.showInformationMessage("notEnoughGold", settlement);
+                canvas.showInformationMessage("missionarySettlement.inciteGoldFail",
+                                              settlement,
+                                              "%player%", Messages.message(enemy.getName()),
+                                              "%amount%", String.valueOf(gold));
             } else {
                 if (canvas.showConfirmDialog(unit.getTile(),
                         "missionarySettlement.inciteConfirm", "yes", "no",
