@@ -68,6 +68,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -231,6 +232,15 @@ public class FreeColPanel extends JPanel implements ActionListener {
      */
     public Game getGame() {
         return canvas.getClient().getGame();
+    }
+
+    /**
+     * Describe <code>getSpecification</code> method here.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public Specification getSpecification() {
+        return getGame().getSpecification();
     }
 
     /**
