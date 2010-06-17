@@ -24,7 +24,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 
 /**
  * Contains a message about a change in the model.
@@ -142,7 +141,7 @@ public class ModelMessage extends StringTemplate {
         switch (messageType) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
-            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+            newDisplay = source.getSpecification().getGoodsType("model.goods.bells");
             break;
         case LOST_CITY_RUMOUR:
         case UNIT_IMPROVED:
@@ -153,7 +152,7 @@ public class ModelMessage extends StringTemplate {
             newDisplay = source;
             break;
         case BUILDING_COMPLETED:
-            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
+            newDisplay = source.getSpecification().getGoodsType("model.goods.hammers");
             break;
         case TUTORIAL:
         case DEFAULT:

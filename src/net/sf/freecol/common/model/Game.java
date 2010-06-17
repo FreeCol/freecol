@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 

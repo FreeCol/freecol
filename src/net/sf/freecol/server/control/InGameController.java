@@ -1438,7 +1438,8 @@ public final class InGameController extends Controller {
         for (AbstractUnit unit : player.getMonarch().getNavalUnits()) {
             for (int index = 0; index < unit.getNumber(); index++) {
                 Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
-                                        unit.getUnitType(), UnitState.TO_AMERICA);
+                                        unit.getUnitType(getGame().getSpecification()),
+                                        UnitState.TO_AMERICA);
                 navalUnits.add(newUnit);
             }
         }
@@ -1458,7 +1459,8 @@ public final class InGameController extends Controller {
             }
             for (int index = 0; index < unit.getNumber(); index++) {
                 landUnits.add(new Unit(getGame(), refPlayer.getEurope(), refPlayer,
-                                        unit.getUnitType(), UnitState.ACTIVE, equipment));
+                                       unit.getUnitType(getGame().getSpecification()),
+                                       UnitState.ACTIVE, equipment));
             }
         }
         unitsList.addAll(landUnits);
@@ -1530,7 +1532,7 @@ public final class InGameController extends Controller {
                 default:
                 }
                 Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
-                                        unit.getUnitType(), UnitState.ACTIVE, equipment);
+                                        unit.getUnitType(getGame().getSpecification()), UnitState.ACTIVE, equipment);
                 //nextPlayer.getEurope().add(newUnit);
                 if (element != null) {
                     element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));

@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
 
 import org.w3c.dom.Element;
@@ -399,7 +398,7 @@ public class TileImprovement extends TileItem implements Named {
      */
     public static TileImprovementType findBestTileImprovementType(Tile tile, GoodsType goodsType) {
         // Get list of TileImprovementTypes from Specification
-        List<TileImprovementType> impTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
+        List<TileImprovementType> impTypeList = tile.getSpecification().getTileImprovementTypeList();
         int bestValue = 0;
         TileImprovementType bestType = null;
         for (TileImprovementType impType : impTypeList) {
@@ -502,7 +501,7 @@ public class TileImprovement extends TileItem implements Named {
         if (tile == null) {
             tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
         }
-        type = FreeCol.getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
+        type = getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
         turnsToComplete = Integer.parseInt(in.getAttributeValue(null, "turns"));
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
         style = Integer.parseInt(in.getAttributeValue(null, "style"));

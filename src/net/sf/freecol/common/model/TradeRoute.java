@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 
@@ -319,12 +318,12 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
                     String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                     if (id == null) {
                         // TODO: remove support for old format
-                        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+                        List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
                         for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
                             addCargo(goodsList.get(cargoIndex));
                         }
                     } else {
-                        addCargo(FreeCol.getSpecification().getGoodsType(id));
+                        addCargo(getSpecification().getGoodsType(id));
                         in.nextTag();
                     }
                 }
@@ -384,7 +383,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         /*
           public void addCargo(int newCargoIndex) {
-          cargo.add(FreeCol.getSpecification().getGoodsType(newCargoIndex));
+          cargo.add(getSpecification().getGoodsType(newCargoIndex));
           }
         */
 

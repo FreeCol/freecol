@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.Role;
 
 /**
@@ -75,8 +74,8 @@ public class AbstractUnit extends FreeColObject {
      *
      * @return an <code>UnitType</code> value
      */
-    public final UnitType getUnitType() {
-        return FreeCol.getSpecification().getUnitType(getId());
+    public final UnitType getUnitType(Specification specification) {
+        return specification.getUnitType(getId());
     }
 
     /**
@@ -121,27 +120,27 @@ public class AbstractUnit extends FreeColObject {
      *
      * @return an <code>EquipmentType[]</code> value
      */
-    public EquipmentType[] getEquipment() {
+    public EquipmentType[] getEquipment(Specification specification) {
         List<EquipmentType> equipment = new ArrayList<EquipmentType>();
         switch(role) {
         case PIONEER:
-            EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+            EquipmentType tools = specification.getEquipmentType("model.equipment.tools");
             for (int count = 0; count < tools.getMaximumCount(); count++) {
                 equipment.add(tools);
             }
             break;
         case MISSIONARY:
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
+            equipment.add(specification.getEquipmentType("model.equipment.missionary"));
             break;
         case SOLDIER:
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+            equipment.add(specification.getEquipmentType("model.equipment.muskets"));
             break;
         case SCOUT:
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+            equipment.add(specification.getEquipmentType("model.equipment.horses"));
             break;
         case DRAGOON:
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+            equipment.add(specification.getEquipmentType("model.equipment.muskets"));
+            equipment.add(specification.getEquipmentType("model.equipment.horses"));
             break;
         case DEFAULT:
         default:

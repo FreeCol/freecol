@@ -83,9 +83,8 @@ public final class ReportNavalPanel extends ReportPanel {
         List<AbstractUnit> refUnits = getController().getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit unit : refUnits) {
-                if (unit.getUnitType().hasAbility("model.ability.navalUnit")) {
-                    reportPanel.add(createUnitTypeLabel(unit.getUnitType(), unit.getRole(), unit.getNumber()),
-                                    "sg");
+                if (unit.getUnitType(getSpecification()).hasAbility("model.ability.navalUnit")) {
+                    reportPanel.add(createUnitTypeLabel(unit), "sg");
                 }
             }
         }

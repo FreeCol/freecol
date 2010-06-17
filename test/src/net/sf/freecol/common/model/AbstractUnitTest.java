@@ -26,7 +26,7 @@ public class AbstractUnitTest extends FreeColTestCase {
     public void testEquipment() {
 
         AbstractUnit newUnit = new AbstractUnit("newUnit", Unit.Role.PIONEER, 1);
-        EquipmentType[] equipment = newUnit.getEquipment();
+        EquipmentType[] equipment = newUnit.getEquipment(spec());
         assertEquals(5, equipment.length);
         assertEquals("model.equipment.tools", equipment[0].getId());
         assertEquals("model.equipment.tools", equipment[1].getId());

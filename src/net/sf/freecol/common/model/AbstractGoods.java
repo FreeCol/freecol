@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 
 /**
  * Represents a certain amount of a GoodsType. It does not correspond
@@ -126,7 +125,7 @@ public class AbstractGoods extends FreeColObject {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
-        type = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
+        type = getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
         amount = Integer.parseInt(in.getAttributeValue(null, "amount"));
         in.nextTag();
     }

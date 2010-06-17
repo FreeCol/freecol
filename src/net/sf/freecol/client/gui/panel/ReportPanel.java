@@ -144,7 +144,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     }
 
     public JLabel createUnitTypeLabel(AbstractUnit unit) {
-        return createUnitTypeLabel(unit.getUnitType(), unit.getRole(), unit.getNumber());
+        return createUnitTypeLabel(unit.getUnitType(getSpecification()),
+                                   unit.getRole(), unit.getNumber());
     }
 
     public JLabel createUnitTypeLabel(UnitType unitType, Role role, int count) {

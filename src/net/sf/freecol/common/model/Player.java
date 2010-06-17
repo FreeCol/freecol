@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -1593,7 +1592,7 @@ public class Player extends FreeColGameObject implements Nameable {
             for (int index = 0; index < units.size(); index++) {
                 AbstractUnit unit = units.get(index);
                 String uniqueID = getId() + "newTurn" + father.getId() + index;
-                mc.createUnit(uniqueID, getEurope(), this, unit.getUnitType());
+                mc.createUnit(uniqueID, getEurope(), this, getSpecification().getUnitType(unit.getId()));
             }
         }
 

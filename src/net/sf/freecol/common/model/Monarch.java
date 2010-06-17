@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Specification;
@@ -347,11 +346,11 @@ public final class Monarch extends FreeColGameObject implements Named {
         ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
         if (capacity < spaceRequired) {
             AbstractUnit unit = navalUnits.get(random.nextInt(navalUnits.size()));
-            result.add(new AbstractUnit(unit.getUnitType(), unit.getRole(), 1));
+            result.add(new AbstractUnit(unit.getId(), unit.getRole(), 1));
         } else {
             int number = random.nextInt(3) + 1;
             AbstractUnit unit = landUnits.get(random.nextInt(landUnits.size()));
-            result.add(new AbstractUnit(unit.getUnitType(), unit.getRole(), number));
+            result.add(new AbstractUnit(unit.getId(), unit.getRole(), number));
         }
         return result;
     }
@@ -363,10 +362,10 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public void addToREF(List<AbstractUnit> units) {
         for (AbstractUnit unitToAdd : units) {
-            UnitType unitType = unitToAdd.getUnitType();
+            UnitType unitType = getSpecification().getUnitType(unitToAdd.getId());
             if (unitType.hasAbility("model.ability.navalUnit")) {
                 for (AbstractUnit refUnit : navalUnits) {
-                    if (refUnit.getUnitType().equals(unitType)) {
+                    if (refUnit.getId().equals(unitToAdd.getId())) {
                         refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
                         if (unitType.canCarryUnits()) {
                             capacity += unitType.getSpace() * unitToAdd.getNumber();
@@ -375,7 +374,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 }
             } else {
                 for (AbstractUnit refUnit : landUnits) {
-                    if (refUnit.getUnitType().equals(unitType) &&
+                    if (refUnit.getId().equals(unitToAdd.getId()) &&
                         refUnit.getRole().equals(unitToAdd.getRole())) {
                         refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
                         spaceRequired += unitType.getSpaceTaken() * unitToAdd.getNumber();
@@ -489,7 +488,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     public int getPrice(List<AbstractUnit> units, boolean rebate) {
         int price = 0;
         for (AbstractUnit unit : units) {
-            int newPrice = getPrice(unit.getUnitType(), unit.getRole());
+            int newPrice = getPrice(unit.getUnitType(getSpecification()), unit.getRole());
             price += newPrice * unit.getNumber();
         }
         if (price > player.getGold() && rebate) {

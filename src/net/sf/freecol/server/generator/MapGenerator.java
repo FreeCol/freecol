@@ -661,8 +661,8 @@ public class MapGenerator implements IMapGenerator {
             List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
-                Unit newUnit = new Unit(game, null, player, startingUnit.getUnitType(),
-                                        UnitState.SENTRY, startingUnit.getEquipment());
+                Unit newUnit = new Unit(game, null, player, startingUnit.getUnitType(player.getSpecification()),
+                                        UnitState.SENTRY, startingUnit.getEquipment(player.getSpecification()));
                 if (newUnit.canCarryUnits() && newUnit.isNaval()) {
                     newUnit.setState(UnitState.ACTIVE);
                     carriers.add(newUnit);

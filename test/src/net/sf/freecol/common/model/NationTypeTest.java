@@ -88,7 +88,7 @@ public class NationTypeTest extends FreeColTestCase {
                 assertEquals("Wrong number of starting units: " + type.toString(),
                              3, startingUnits.size());
                 for (AbstractUnit unit : startingUnits) {
-                    String unitTypeId = unit.getUnitType().getId();
+                    String unitTypeId = unit.getId();
                     switch(unit.getRole()) {
                     case SOLDIER:
                         if (difficulty == 0 || difficulty == 1
@@ -111,7 +111,7 @@ public class NationTypeTest extends FreeColTestCase {
                         break;
                     case DEFAULT:
                         assertTrue("Ship is not naval: " + type.toString(),
-                                   unit.getUnitType().hasAbility("model.ability.navalUnit"));
+                                   unit.getUnitType(spec()).hasAbility("model.ability.navalUnit"));
                         if ("model.nationType.trade".equals(type.getId())
                             || "model.nationType.naval".equals(type.getId())) {
                             assertEquals("Wrong type of ship: " + type.toString(),

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -716,7 +715,7 @@ public class SimpleCombatModel implements CombatModel {
                 capturedUnit.setState(UnitState.ACTIVE);
             }
 
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
                 colony.getExportData(goodsType).setExported(false);
             }                                 
 
@@ -885,7 +884,7 @@ public class SimpleCombatModel implements CombatModel {
 
         enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
 
-        List<UnitType> treasureUnitTypes = FreeCol.getSpecification()
+        List<UnitType> treasureUnitTypes = attacker.getSpecification()
             .getUnitTypesWithAbility("model.ability.carryTreasure");
         if (treasureUnitTypes.size() > 0) {
             int treasure = mc.getRandom(attacker.getId() + "indianTreasureRandom" + attacker.getId(), 11);
@@ -958,7 +957,7 @@ public class SimpleCombatModel implements CombatModel {
             Unit missionary = indianSettlement.getMissionary();
             if (missionary != null && missionary.getOwner() == attacker.getOwner() &&
                 attacker.getGame().getViewOwner() == null && indianSettlement.getUnitCount() > 1) {
-                List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
+                List<UnitType> converts = missionary.getSpecification().getUnitTypesWithAbility("model.ability.convert");
                 if (converts.size() > 0) {
                     indianSettlement.getFirstUnit().dispose();
                     convert = mc.getRandom(attacker.getId() + "getConvertType", converts.size());

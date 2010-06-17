@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
@@ -317,6 +318,27 @@ public class Messages {
         } else {
             return message("model.unit." + key + ".name", "%unit%",
                            Messages.message(someType.getNameKey()));
+        }
+    }
+
+    /**
+     * Returns the name of a unit in a human readable format. The return value
+     * can be used when communicating with the user.
+     * 
+     * @param unit an <code>AbstractUnit</code> value
+     * @return The given unit type as a String
+     */
+    public static String getLabel(AbstractUnit unit) {
+        String key = unit.getRole().toString().toLowerCase();
+        if (unit.getRole() == Unit.Role.DEFAULT) {
+            key = "name";
+        }
+        String messageID = unit.getId() +  "." + key;
+        if (containsKey(messageID)) {
+            return message(messageID);
+        } else {
+            return message("model.unit." + key + ".name", "%unit%",
+                           Messages.message(unit.getId() + ".name"));
         }
     }
 

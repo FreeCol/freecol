@@ -599,6 +599,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         return getButton(goodsType, Integer.toString(amount), getLibrary().getGoodsImageIcon(goodsType));
     }
 
+    private JButton getUnitButton(AbstractUnit unit) {
+        return getUnitButton(unit.getUnitType(getSpecification()), unit.getRole());
+    }
+
     private JButton getUnitButton(final UnitType unitType, Role role) {
         ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, 0.66);
         JButton unitButton = getButton(unitType, null, unitIcon);
@@ -1223,14 +1227,14 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         } else {
             AbstractUnit startingUnit = startingUnits.get(0);
             if (startingUnits.size() > 1) {
-                detailPanel.add(getUnitButton(startingUnit.getUnitType(), startingUnit.getRole()),
+                detailPanel.add(getUnitButton(startingUnit),
                                 "span, split " + startingUnits.size());
                 for (int index = 1; index < startingUnits.size(); index++) {
                     startingUnit = startingUnits.get(index);
-                    detailPanel.add(getUnitButton(startingUnit.getUnitType(), startingUnit.getRole()));
+                    detailPanel.add(getUnitButton(startingUnit));
                 }
             } else {
-                detailPanel.add(getUnitButton(startingUnit.getUnitType(), startingUnit.getRole()));
+                detailPanel.add(getUnitButton(startingUnit));
             }
         }
 
