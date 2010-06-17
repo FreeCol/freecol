@@ -48,6 +48,11 @@ public class FreeColGameObjectType extends FreeColObject {
     private boolean abstractType;
 
     /**
+     * Describe specification here.
+     */
+    private Specification specification = null;
+
+    /**
      * Describe featureContainer here.
      */
     protected FeatureContainer featureContainer = new FeatureContainer();
@@ -58,6 +63,25 @@ public class FreeColGameObjectType extends FreeColObject {
 
     public FreeColGameObjectType(String id) {
         setId(id);
+    }
+
+    /**
+     * Get the <code>Specification</code> value.
+     *
+     * @return a <code>Specification</code> value
+     */
+    @Override
+    public final Specification getSpecification() {
+        return specification;
+    }
+
+    /**
+     * Set the <code>Specification</code> value.
+     *
+     * @param newSpecification The new Specification value.
+     */
+    public final void setSpecification(final Specification newSpecification) {
+        this.specification = newSpecification;
     }
 
     /**
@@ -205,6 +229,7 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        setSpecification(specification);
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         setAbstractType(getAttribute(in, "abstract", false));
         readAttributes(in, specification);

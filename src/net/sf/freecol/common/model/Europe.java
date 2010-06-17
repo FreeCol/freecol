@@ -412,7 +412,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * @param price The current price of the unit
      */
     private void increasePrice(Unit unit, int price) {
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         String baseOption = "model.option.priceIncreasePerType";
         String name = unit.getType().getId().substring(unit.getType().getId().lastIndexOf('.'));
         String option = (spec.getBooleanOption(baseOption).getValue()) 
@@ -443,7 +443,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * Only called from the server side.
      */
     public void increaseRecruitmentDifficulty() {
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         recruitPrice += spec.getIntegerOption("model.option.recruitPriceIncrease").getValue();
         recruitLowerCap += spec.getIntegerOption("model.option.lowerCapIncrease").getValue();
     }
@@ -580,7 +580,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         for (int index = 0; index < recruitables.length; index++) {
             String unitTypeId = in.getAttributeValue(null, "recruit" + index);
             if (unitTypeId != null) {

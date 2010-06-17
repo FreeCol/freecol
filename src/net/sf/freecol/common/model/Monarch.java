@@ -113,10 +113,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.player = player;
         this.name = name;
 
-        int number = getGame().getSpecification().getIntegerOption("model.option.refStrength")
+        int number = getSpecification().getIntegerOption("model.option.refStrength")
             .getValue() + 3;
 
-        for (UnitType unitType : getGame().getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility("model.ability.navalUnit")) {
                     navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
@@ -222,7 +222,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A weighted list of monarch actions.
      */
     public List<RandomChoice<MonarchAction>> getActionChoices() {
-        int dx = getGame().getSpecification().getIntegerOption("model.option.monarchMeddling")
+        int dx = getSpecification().getIntegerOption("model.option.monarchMeddling")
             .getValue() + 1;
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
@@ -264,7 +264,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // do nothing
         choices.add(new RandomChoice<MonarchAction>(MonarchAction.NO_ACTION, Math.max(200 - turn, 100)));
 
-        if (player.getTax() < getGame().getSpecification()
+        if (player.getTax() < getSpecification()
             .getIntegerOption("model.option.maximumTax").getValue()) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.RAISE_TAX, 10 + dx));
         }
@@ -306,7 +306,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The new tax rate.
      */
     public int raiseTax(Random random) {
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         int taxAdjustment = spec.getIntegerOption("model.option.taxAdjustment")
             .getValue();
         int taxMax = spec.getIntegerOption("model.option.maximumTax")
@@ -326,7 +326,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The new tax rate.
      */
     public int lowerTax(Random random) {
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         int taxAdjustment = spec.getIntegerOption("model.option.taxAdjustment")
             .getValue();
         int oldTax = player.getTax();
@@ -426,7 +426,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         List<AbstractUnit> mercenaries = new ArrayList<AbstractUnit>();
         List<UnitType> unitTypes = new ArrayList<UnitType>();
 
-        for (UnitType unitType : getGame().getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.mercenaryUnit")) {
                 unitTypes.add(unitType);
             }
@@ -503,12 +503,12 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (unitType.hasPrice()) {
             int price = player.getEurope().getUnitPrice(unitType);
             if (Role.SOLDIER.equals(role)) {
-                price += getEquipmentPrice(getGame().getSpecification().getEquipmentType("model.equipment.muskets"));
+                price += getEquipmentPrice(getSpecification().getEquipmentType("model.equipment.muskets"));
             } else if (Role.DRAGOON.equals(role)) {
-                price += getEquipmentPrice(getGame().getSpecification().getEquipmentType("model.equipment.muskets"));
-                price += getEquipmentPrice(getGame().getSpecification().getEquipmentType("model.equipment.horses"));
+                price += getEquipmentPrice(getSpecification().getEquipmentType("model.equipment.muskets"));
+                price += getEquipmentPrice(getSpecification().getEquipmentType("model.equipment.horses"));
             }
-            return price * getGame().getSpecification()
+            return price * getSpecification()
                 .getIntegerOption("model.option.mercenaryPrice").getValue() / 100;
         } else {
             return INFINITY;

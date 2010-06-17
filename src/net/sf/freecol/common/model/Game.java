@@ -872,6 +872,7 @@ public class Game extends FreeColGameObject {
      *
      * @return a <code>Specification</code> value
      */
+    @Override
     public Specification getSpecification() {
         return Specification.getSpecification();
     }

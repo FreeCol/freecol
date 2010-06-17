@@ -1203,7 +1203,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         tileTypes.add(getType());
 
         // Add to the list the various possible tile type changes
-        for (TileImprovementType impType : getGame().getSpecification().getTileImprovementTypeList()) {
+        for (TileImprovementType impType : getSpecification().getTileImprovementTypeList()) {
             if (impType.getChange(getType()) != null) {
                 // There is an option to change TileType
                 tileTypes.add(impType.getChange(getType()));
@@ -1221,7 +1221,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                 }
             }
-            for (TileImprovementType impType : getGame().getSpecification().getTileImprovementTypeList()) {
+            for (TileImprovementType impType : getSpecification().getTileImprovementTypeList()) {
                 if (impType.isNatural() || !impType.isTileTypeAllowed(tileType)) {
                     continue;
                 } else if (impType.getBonus(goodsType) > 0) {
@@ -1387,7 +1387,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             // It is necessary to consider all farmed goods, since the
             // tile might have a resource that produces goods not
             // produced by the tile type.
-            for (GoodsType goodsType : getGame().getSpecification().getFarmedGoodsTypeList()) {
+            for (GoodsType goodsType : getSpecification().getFarmedGoodsTypeList()) {
                 int potential = potential(goodsType, unitType);
                 if (potential > 0) {
                     goodsTypeList.add(new AbstractGoods(goodsType, potential));
@@ -1808,7 +1808,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         String typeString = in.getAttributeValue(null, "type");
         if (typeString != null) {
-            type = getGame().getSpecification().getTileType(typeString);
+            type = getSpecification().getTileType(typeString);
         }
 
         // compatibility mode

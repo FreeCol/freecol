@@ -646,10 +646,10 @@ public class IndianSettlement extends Settlement {
     public int getPrice(GoodsType type, int amount) {
         int returnPrice = 0;
 
-    	GoodsType armsType = getGame().getSpecification().getGoodsType("model.goods.muskets");
-    	GoodsType horsesType = getGame().getSpecification().getGoodsType("model.goods.horses");
-    	EquipmentType armsEqType = getGame().getSpecification().getEquipmentType("model.equipment.indian.muskets");
-    	EquipmentType horsesEqType = getGame().getSpecification().getEquipmentType("model.equipment.indian.horses");
+    	GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
+    	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
+    	EquipmentType armsEqType = getSpecification().getEquipmentType("model.equipment.indian.muskets");
+    	EquipmentType horsesEqType = getSpecification().getEquipmentType("model.equipment.indian.horses");
     	
     	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
     	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
@@ -780,7 +780,7 @@ public class IndianSettlement extends Settlement {
     public void updateWantedGoods() {
         /* TODO: Try the different types goods in "random" order 
          * (based on the numbers of units on this tile etc): */
-        List<GoodsType> goodsTypes = new ArrayList<GoodsType>(getGame().getSpecification().getGoodsTypeList());
+        List<GoodsType> goodsTypes = new ArrayList<GoodsType>(getSpecification().getGoodsTypeList());
         Collections.sort(goodsTypes, wantedGoodsComparator);
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
@@ -907,7 +907,7 @@ public class IndianSettlement extends Settlement {
             return;
         }
 
-        List<GoodsType> goodsList = getGame().getSpecification().getGoodsTypeList();
+        List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
         int workers = ownedUnits.size();
         for (GoodsType g : goodsList) {
             /* Determine the maximum possible production for each type of goods: */
@@ -916,7 +916,7 @@ public class IndianSettlement extends Settlement {
 
         /* Use tools (if available) to produce manufactured goods: */
         // TODO: what on Earth is this supposed to simulate?
-        GoodsType tools = getGame().getSpecification().getGoodsType("model.goods.tools");
+        GoodsType tools = getSpecification().getGoodsType("model.goods.tools");
         if (getGoodsCount(tools) > 0) {
             GoodsType typeWithSmallestAmount = null;
             for (GoodsType g : goodsList) {
@@ -940,23 +940,23 @@ public class IndianSettlement extends Settlement {
         }
 
         /* Consume goods: TODO: make this more generic */
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.food"),
+        consumeGoods(getSpecification().getGoodsType("model.goods.food"),
                      getFoodConsumption());
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.rum"),
+        consumeGoods(getSpecification().getGoodsType("model.goods.rum"),
                      2 * workers);
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.tradeGoods"),
+        consumeGoods(getSpecification().getGoodsType("model.goods.tradeGoods"),
                      2 * workers);
         /* TODO: do we need this at all? At the moment, most Indian Settlements
            consume more than they produce.
-        for (GoodsType goodsType : getGame().getSpecification().getNewWorldGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getNewWorldGoodsTypeList()) {
             consumeGoods(goodsType, workers);
         }
         */
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.ore"), workers);
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.silver"), workers);
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.cigars"), workers);
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.coats"), workers);
-        consumeGoods(getGame().getSpecification().getGoodsType("model.goods.cloth"), workers);
+        consumeGoods(getSpecification().getGoodsType("model.goods.ore"), workers);
+        consumeGoods(getSpecification().getGoodsType("model.goods.silver"), workers);
+        consumeGoods(getSpecification().getGoodsType("model.goods.cigars"), workers);
+        consumeGoods(getSpecification().getGoodsType("model.goods.coats"), workers);
+        consumeGoods(getSpecification().getGoodsType("model.goods.cloth"), workers);
         goodsContainer.removeAbove(500);
 
         checkForNewIndian();
@@ -997,7 +997,7 @@ public class IndianSettlement extends Settlement {
     // Create a new colonist if there is enough food:
     private void checkForNewIndian() {
         // Alcohol also contributes to create children. 
-        if (getFoodCount() + 4*getGoodsCount(getGame().getSpecification().getGoodsType("model.goods.rum"))
+        if (getFoodCount() + 4*getGoodsCount(getSpecification().getGoodsType("model.goods.rum"))
                                              > 200+KEEP_RAW_MATERIAL ) {
             /*
              * Allow one more brave than the initially generated number.
@@ -1006,7 +1006,7 @@ public class IndianSettlement extends Settlement {
              */
             if (ownedUnits.size() <= getGeneratedUnitCount()) {
                 // up to a limit. Anyway cities produce more children than camps
-                List<UnitType> unitTypes = getGame().getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
+                List<UnitType> unitTypes = getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
                 if (unitTypes.size() > 0) {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
                     Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
@@ -1017,9 +1017,9 @@ public class IndianSettlement extends Settlement {
                 }
             }
             // Always consume goods in order to avoid stockpiling.
-            consumeGoods(getGame().getSpecification().getGoodsType("model.goods.food"), 200);
+            consumeGoods(getSpecification().getGoodsType("model.goods.food"), 200);
             // All food will be consumed, even if RUM helped
-            consumeGoods(getGame().getSpecification().getGoodsType("model.goods.rum"), 200/4);
+            consumeGoods(getSpecification().getGoodsType("model.goods.rum"), 200/4);
             // Also, some available RUM is consumed
         }
     }
@@ -1105,10 +1105,10 @@ public class IndianSettlement extends Settlement {
      * Keeps some for the settlement defense
      */
     public void equipBraves() {
-    	GoodsType armsType = getGame().getSpecification().getGoodsType("model.goods.muskets");
-    	GoodsType horsesType = getGame().getSpecification().getGoodsType("model.goods.horses");
-    	EquipmentType armsEqType = getGame().getSpecification().getEquipmentType("model.equipment.indian.muskets");
-    	EquipmentType horsesEqType = getGame().getSpecification().getEquipmentType("model.equipment.indian.horses");
+    	GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
+    	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
+    	EquipmentType armsEqType = getSpecification().getEquipmentType("model.equipment.indian.muskets");
+    	EquipmentType horsesEqType = getSpecification().getEquipmentType("model.equipment.indian.horses");
     	
     	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
     	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
@@ -1187,7 +1187,7 @@ public class IndianSettlement extends Settlement {
      * If horses are available and enough food is produced, increase horses
      */
     private void breedHorses() {
-    	GoodsType horsesType = getGame().getSpecification().getGoodsType("model.goods.horses");
+    	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
     	GoodsType reqGoodsType = horsesType.getRawMaterial();
   
     	// Not enough horses to breed
@@ -1362,13 +1362,13 @@ public class IndianSettlement extends Settlement {
             String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
             String wantedGoodsId = getAttribute(in, tag, null);
             if (wantedGoodsId != null) {
-                wantedGoods[i] = getGame().getSpecification().getGoodsType(wantedGoodsId);
+                wantedGoods[i] = getSpecification().getGoodsType(wantedGoodsId);
             }
         }
 
         convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
-        learnableSkill = getGame().getSpecification().getType(in, "learnableSkill", UnitType.class, null);
+        learnableSkill = getSpecification().getType(in, "learnableSkill", UnitType.class, null);
 
         visitedBy.clear();
         alarm = new HashMap<Player, Tension>();
@@ -1386,7 +1386,7 @@ public class IndianSettlement extends Settlement {
                 for (int i = 0; i < wantedGoodsID.length; i++) {
                     if (i == 3)
                         break;
-                    wantedGoods[i] = getGame().getSpecification().getGoodsType(wantedGoodsID[i]);
+                    wantedGoods[i] = getSpecification().getGoodsType(wantedGoodsID[i]);
                 }
             } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
                 in.nextTag();
@@ -1521,8 +1521,8 @@ public class IndianSettlement extends Settlement {
      * @param settlement
      */
     public void tradeGoodsWithSetlement(IndianSettlement settlement) {
-        GoodsType armsType = getGame().getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horsesType = getGame().getSpecification().getGoodsType("model.goods.horses");
+        GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
         
         List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
         goodsToTrade.add(armsType);

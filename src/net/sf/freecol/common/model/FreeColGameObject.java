@@ -143,6 +143,23 @@ abstract public class FreeColGameObject extends FreeColObject {
 
 
     /**
+     * Describe <code>getSpecification</code> method here.
+     *
+     * @return a <code>Specification</code> value
+     */
+    @Override
+    public Specification getSpecification() {
+        if (game == null) {
+            return null;
+        } else {
+            return game.getSpecification();
+        }
+    }
+
+
+
+
+    /**
      * Gets the <code>GameOptions</code> that is associated with the 
      * {@link Game} owning this <code>FreeColGameObject</code>.
      * 

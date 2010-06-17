@@ -341,7 +341,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         settlementVisited = getAttribute(in, "settlementVisited", false);
         if (settlementVisited) {
-            Specification spec = getGame().getSpecification();
+            Specification spec = getSpecification();
             skill = spec.getType(in, "learnableSkill", UnitType.class, null);
             wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class, null);
             wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class, null);

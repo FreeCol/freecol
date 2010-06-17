@@ -301,7 +301,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setLocation(location);
 
         workLeft = -1;
-        workType = getGame().getSpecification().getGoodsFood().get(0);
+        workType = getSpecification().getGoodsFood().get(0);
 
         this.movesLeft = getInitialMovesLeft();
         hitpoints = unitType.getHitPoints();
@@ -1473,7 +1473,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (settlement instanceof Colony) {
             return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
         } else if (settlement instanceof IndianSettlement) {
-            UnitType scoutSkill = getGame().getSpecification()
+            UnitType scoutSkill = getSpecification()
                 .getUnitType("model.unit.seasonedScout");
             if (getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)) {
                 return (allowMoveFrom(from))
@@ -2460,16 +2460,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     // TODO: make these go away, if possible, private if not
     public boolean isArmed() {
     	if(getOwner().isIndian()){
-            return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.indian.muskets"));
+            return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.indian.muskets"));
     	}
-        return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.muskets"));
+        return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.muskets"));
     }
 
     public boolean isMounted() {
     	if(getOwner().isIndian()){
-            return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.indian.horses"));
+            return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.indian.horses"));
     	}
-        return equipment.containsKey(getGame().getSpecification().getEquipmentType("model.equipment.horses"));
+        return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.horses"));
     }
 
     /**
@@ -2793,7 +2793,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             doAssignedWork();
             return;
         case TO_EUROPE:
-            workLeft = getGame().getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
+            workLeft = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
             if (state == UnitState.TO_AMERICA) {
                 workLeft += 1 - workLeft;
             }
@@ -2802,7 +2802,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             movesLeft = 0;
             break;
         case TO_AMERICA:
-            workLeft = getGame().getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
+            workLeft = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
             if (state == UnitState.TO_EUROPE) {
                 workLeft += 1 - workLeft;
             }
@@ -3091,7 +3091,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         equipment.incrementCount(type, -amount);
         setRole();
         // TODO: make this more generic
-        EquipmentType tools = getGame().getSpecification().getEquipmentType("model.equipment.tools");
+        EquipmentType tools = getSpecification().getEquipmentType("model.equipment.tools");
         if (!equipment.containsKey(tools)) {
             String messageId = (getType().getDefaultEquipmentType() == type)
                 ? getType() + ".noMoreTools" : "model.unit.noMoreTools";
@@ -3408,7 +3408,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return;
         }
         
-        UnitType learnType = getGame().getSpecification().getExpertForProducing(produce);
+        UnitType learnType = getSpecification().getExpertForProducing(produce);
         if (learnType == null || 
             learnType == unitType ||
             !unitType.canBeUpgraded(learnType, ChangeType.EXPERIENCE)) {
@@ -3541,7 +3541,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Check for necessary equipment in the settlement
         Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
 
-        for (EquipmentType equipment : getGame().getSpecification().getEquipmentTypeList()) {
+        for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
                 for (Ability ability : autoDefence) {
                     if (!ability.appliesTo(equipment)){
                         continue;
@@ -3701,7 +3701,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
         UnitType oldUnitType = unitType;
-        unitType = getGame().getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+        unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
 
         naval = unitType.hasAbility("model.ability.navalUnit");
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
@@ -3765,7 +3765,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
 
-        workType = getGame().getSpecification().getType(in, "workType", GoodsType.class, null);
+        workType = getSpecification().getType(in, "workType", GoodsType.class, null);
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
@@ -3819,13 +3819,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 if (xLength == null) {
                     String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                     int count = Integer.parseInt(in.getAttributeValue(null, "count"));
-                    equipment.incrementCount(getGame().getSpecification().getEquipmentType(equipmentId), count);
+                    equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), count);
                 } else {
                     // TODO: remove support for old format
                     int length = Integer.parseInt(xLength);
                     for (int index = 0; index < length; index++) {
                         String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                        equipment.incrementCount(getGame().getSpecification().getEquipmentType(equipmentId), 1);
+                        equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), 1);
                     }
                 }
                 in.nextTag();

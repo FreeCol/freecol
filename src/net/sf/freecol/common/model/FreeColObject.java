@@ -110,6 +110,15 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Describe <code>getSpecification</code> method here.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public Specification getSpecification() {
+        return null;
+    }
+
+    /**
      * Describe <code>hasAbility</code> method here.
      *
      * @param id a <code>String</code> value

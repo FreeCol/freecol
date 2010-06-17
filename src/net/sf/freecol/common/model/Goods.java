@@ -266,7 +266,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
-        setType(getGame().getSpecification().getGoodsType(in.getAttributeValue(null, "type")));
+        setType(game.getSpecification().getGoodsType(in.getAttributeValue(null, "type")));
         setAmount(Integer.parseInt(in.getAttributeValue(null, "amount")));
 
         final String locationStr = in.getAttributeValue(null, "location");
