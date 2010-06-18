@@ -89,13 +89,6 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     /**
-     * Make the trade.
-     */
-    public void makeTrade() {
-        colony.changeOwner(getDestination());
-    }
-
-    /**
      * Extract the colony name.  Necessary as the colony may not actually be
      * known by a recipient of an offer.
      *

@@ -76,14 +76,6 @@ public class GoldTradeItem extends TradeItem {
     }
 
     /**
-     * Make the trade.
-     */
-    public void makeTrade() {
-        getSource().modifyGold(-gold);
-        getDestination().modifyGold(gold);
-    }
-
-    /**
      * Get the gold to trade.
      *
      * @return The gold to trade.

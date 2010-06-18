@@ -159,8 +159,9 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
-
-            logger.log(Level.FINEST, "Handled message " + type);
+            logger.log(Level.FINEST, "Handled message " + type
+                       + " replying with "
+                       + ((reply == null) ? "null" : reply.getTagName()));
         } else {
             throw new RuntimeException("Received empty (null) message! - should never happen");
         }
@@ -248,6 +249,21 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Sometimes units appear which the client does not know about,
+     * and are passed in as the first child of the parent element.
+     *
+     * @param game The <code>Game</code> to add the unit to.
+     * @param element The <code>Element</code> to find a unit in.
+     * @return A unit or null if none found.
+     */
+    private static Unit getUnitFromElement(Game game, Element element) {
+        if (element.getFirstChild() != null) {
+            return new Unit(game, (Element) element.getFirstChild());
+        }
+        return null;
+    }
+
+    /**
      * Handles an "animateMove"-message. This only performs animation, if
      * required. It does not actually change unit positions, which happens in an
      * "update".
@@ -262,17 +278,12 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         String unitId = element.getAttribute("unit");
         Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
-        if (unit == null) {
-            if (element.getFirstChild() == null) {
-                logger.warning("Animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " incorrectly omitted unit: " + unitId
-                    + " from: " + element.getAttribute("oldTile")
-                    + " to: " + element.getAttribute("newTile")
-                    );
-                return null;
-            }
-            unit = new Unit(game, (Element) element.getFirstChild());
+        if (unit == null
+            && (unit = getUnitFromElement(game, element)) == null) {
+            logger.warning("Animation"
+                           + " for: " + client.getMyPlayer().getId()
+                           + " incorrectly omitted unit: " + unitId);
+            return null;
         }
         ClientOptions options = client.getClientOptions();
         boolean ourUnit = unit.getOwner() == client.getMyPlayer();
@@ -280,15 +291,13 @@ public final class InGameInputHandler extends InputHandler {
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         if (!client.isHeadless() && options.getInteger(key) > 0) {
             String oldTileId = element.getAttribute("oldTile");
-            Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
             String newTileId = element.getAttribute("newTile");
+            Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
             Tile newTile = (Tile) game.getFreeColGameObjectSafely(newTileId);
-            if (newTile == null || oldTile == null || unit == null) {
-                throw new IllegalStateException("animateMove"
-                                                + ((unit == null) ? ": null unit" : "")
-                                                + ((oldTile == null) ? ": null oldTile" : "")
-                                                + ((newTile == null) ? ": null newTile" : "")
-                                                );
+            if (newTile == null || oldTile == null) {
+                throw new IllegalStateException("animateMove unit: " + unitId
+                    + ((oldTile == null) ? ": null oldTile" : "")
+                    + ((newTile == null) ? ": null newTile" : ""));
             }
 
             // All is well, queue the animation.
@@ -671,6 +680,11 @@ public final class InGameInputHandler extends InputHandler {
         Player player = getFreeColClient().getMyPlayer();
         DiplomacyMessage message = new DiplomacyMessage(game, element);
         Unit unit = message.getUnit(game);
+        if (unit == null
+            && (unit = getUnitFromElement(game, element)) == null) {
+            logger.warning("Unit incorrectly omitted from diplomacy message.");
+            return null;
+        }
         Settlement settlement = message.getSettlement(game);
         Player other = (unit.getOwner() == player) ? settlement.getOwner()
             : unit.getOwner();
@@ -692,11 +706,11 @@ public final class InGameInputHandler extends InputHandler {
                                                               theirAgreement)
                 .select();
             if (ourAgreement == null) {
-                ourAgreement = theirAgreement;
-                ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
+                theirAgreement.setStatus(TradeStatus.REJECT_TRADE);
+            } else {
+                message.setAgreement(ourAgreement);
             }
-            return new DiplomacyMessage(unit, settlement,
-                                        ourAgreement).toXMLElement();
+            return message.toXMLElement();
         default:
             logger.warning("Bogus trade status");
             break;

@@ -76,14 +76,6 @@ public class UnitTradeItem extends TradeItem {
     }
     
     /**
-     * Make the trade.
-     */
-    public void makeTrade() {
-        unit.setOwner(getDestination());
-    }
-
-
-    /**
      * Get the unit to trade.
      *
      * @return The unit to trade.

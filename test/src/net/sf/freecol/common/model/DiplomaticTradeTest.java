@@ -71,15 +71,14 @@ public class DiplomaticTradeTest extends FreeColTestCase {
         Stance initialStance = Stance.WAR; 
         Stance newStance =  Stance.PEACE;
         
-    	//setup
-    	setPlayersAt(initialStance,hateful);
+        //setup
+        setPlayersAt(initialStance,hateful);
     	
         int dutchInitialTension = dutch.getTension(french).getValue();
         int frenchInitialTension = french.getTension(dutch).getValue();
-        StanceTradeItem peaceTreaty = new StanceTradeItem(game, dutch, french, newStance);
                 
         // Execute peace treaty
-        peaceTreaty.makeTrade();
+        dutch.changeRelationWithPlayer(french, newStance);
         
         // Verify results        
         int dutchExpectedTension = Math.max(0,dutchInitialTension + Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER);
@@ -101,17 +100,17 @@ public class DiplomaticTradeTest extends FreeColTestCase {
         Stance initialStance = Stance.CEASE_FIRE; 
         Stance newStance =  Stance.PEACE;
         
-    	//setup
+        //setup
         //Note: the game only allows setting cease fire stance from war stance
         setPlayersAt(Stance.WAR,hateful);
-    	setPlayersAt(initialStance,hateful);
+        setPlayersAt(initialStance,hateful);
     	
         int dutchInitialTension = dutch.getTension(french).getValue();
         int frenchInitialTension = french.getTension(dutch).getValue();
         StanceTradeItem peaceTreaty = new StanceTradeItem(game, dutch, french, newStance);
                 
         // Execute peace treaty
-        peaceTreaty.makeTrade();
+        dutch.changeRelationWithPlayer(french, newStance);
         
         // Verify results
         int dutchExpectedTension = Math.max(0,dutchInitialTension + Tension.PEACE_TREATY_MODIFIER);
@@ -133,15 +132,14 @@ public class DiplomaticTradeTest extends FreeColTestCase {
         Stance newStance =  Stance.CEASE_FIRE;
         
         //setup
-    	setPlayersAt(initialStance,hateful);
+        setPlayersAt(initialStance,hateful);
     	
         int dutchInitialTension = dutch.getTension(french).getValue();
         int frenchInitialTension = french.getTension(dutch).getValue();
-        StanceTradeItem ceaseFire = new StanceTradeItem(game, dutch, french, newStance);
         
         // Execute cease-fire treaty
-        ceaseFire.makeTrade();
-        
+        dutch.changeRelationWithPlayer(french, newStance);
+
         // Verify results
         int dutchExpectedTension = Math.max(0,dutchInitialTension + Tension.CEASE_FIRE_MODIFIER);
         int frenchExpectedTension = Math.max(0,frenchInitialTension + Tension.CEASE_FIRE_MODIFIER);

@@ -78,14 +78,6 @@ public class StanceTradeItem extends TradeItem {
     }
 
     /**
-     * Make the trade.
-     */
-    public void makeTrade() {
-        getSource().changeRelationWithPlayer(getDestination(), stance);
-    }
-
-
-    /**
      * Get the stance to trade.
      *
      * @return The stance to trade.

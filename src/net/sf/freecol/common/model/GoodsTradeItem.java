@@ -115,16 +115,6 @@ public class GoodsTradeItem extends TradeItem {
     }
 
     /**
-     * Make the trade.
-     */
-    public void makeTrade() {
-        Location where = goods.getLocation();
-        where.remove(goods);
-        settlement.add(goods);
-    }
-
-
-    /**
      * Get the goods to trade.
      *
      * @return The goods to trade.

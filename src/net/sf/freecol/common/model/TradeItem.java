@@ -126,11 +126,6 @@ public abstract class TradeItem extends FreeColObject {
     public abstract boolean isUnique();
 
     /**
-     * Make the trade.
-     */
-    public abstract void makeTrade();
-
-    /**
      * Get the colony to trade.
      *
      * @return The colony to trade.
