@@ -1338,17 +1338,17 @@ public final class Canvas extends JDesktopPane {
      * @param messageId The messageId of the message to display.
      */
     public void showInformationMessage(String messageId) {
-        showInformationMessage(messageId, null, new String[0]);
+        showInformationMessage(null, messageId, new String[0]);
     }
 
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param messageId The messageId of the message to display.
      * @param displayObject Optional object for displaying an icon
+     * @param messageId The messageId of the message to display.
      */
-    public void showInformationMessage(String messageId, FreeColObject displayObject) {
-        showInformationMessage(messageId, displayObject, new String[0]);
+    public void showInformationMessage(FreeColObject displayObject, String messageId) {
+        showInformationMessage(displayObject, messageId, new String[0]);
     }
 
 
@@ -1365,7 +1365,7 @@ public final class Canvas extends JDesktopPane {
      *            message gets replaced by <code>replace[2x+1]</code>.
      */
     public void showInformationMessage(String messageId, String... replace) {
-        showInformationMessage(messageId, null, replace);
+        showInformationMessage(null, messageId, replace);
     }
 
     /**
@@ -1379,7 +1379,7 @@ public final class Canvas extends JDesktopPane {
      *            message gets replaced by <code>replace[2x+1]</code>.
      * @param displayObject Optional object for displaying an icon
      */
-    public void showInformationMessage(String messageId, FreeColObject displayObject, String... replace) {
+    public void showInformationMessage(FreeColObject displayObject, String messageId, String... replace) {
         String text;
         try {
             text = Messages.message(messageId, replace);
@@ -1409,21 +1409,21 @@ public final class Canvas extends JDesktopPane {
      * @param template the StringTemplate to display
      */
     public void showInformationMessage(StringTemplate template) {
-        showInformationMessage(template, null);
+        showInformationMessage(null, template);
     }
 
     public void showInformationMessage(ModelMessage message) {
-        showInformationMessage(message,
-            freeColClient.getGame().getMessageDisplay(message));
+        showInformationMessage(freeColClient.getGame().getMessageDisplay(message),
+                               message);
     }
 
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param template the StringTemplate to display
      * @param displayObject Optional object for displaying an icon
+     * @param template the StringTemplate to display
      */
-    public void showInformationMessage(StringTemplate template, FreeColObject displayObject) {
+    public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
         String text = Messages.message(template);
         ImageIcon icon = null;
         if (displayObject != null) {

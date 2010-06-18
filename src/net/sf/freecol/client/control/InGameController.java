@@ -436,7 +436,7 @@ public final class InGameController implements NetworkConstants {
         Stop stop = unit.getStop();
         if (!TradeRoute.isStopValid(unit, stop)) {
             String name = unit.getTradeRoute().getName();
-            canvas.showInformationMessage("traderoute.broken", unit,
+            canvas.showInformationMessage(unit, "traderoute.broken",
                                           "%name%", name);
             return;
         }
@@ -765,9 +765,10 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage(null, "notYourTurn");
             return;
         }
 
@@ -838,7 +839,7 @@ public final class InGameController implements NetworkConstants {
                 logger.warning("Trade unit " + unit.getId()
                                + " in route " + oldTradeRouteName
                                + " cannot continue: stop invalid.");
-                canvas.showInformationMessage("traderoute.broken", unit,
+                canvas.showInformationMessage(unit, "traderoute.broken",
                                               "%name%", oldTradeRouteName);
                 clearOrders(unit);
                 return;
@@ -887,9 +888,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (path == null) {
-            canvas.showInformationMessage(StringTemplate.template("selectDestination.failed")
-                                          .addStringTemplate("%destination%", destination.getLocationName()),
-                                          unit);
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("selectDestination.failed")
+                .addStringTemplate("%destination%", destination.getLocationName()));
             setDestination(unit, null);
             return;
         }
@@ -999,8 +1000,8 @@ public final class InGameController implements NetworkConstants {
         Event event = FreeCol.getSpecification().getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
-                canvas.showInformationMessage(limit.getDescriptionKey(), "%limit%",
-                                              Integer.toString(limit.getRightHandSide().getValue()));
+                canvas.showInformationMessage(limit.getDescriptionKey(),
+                    "%limit%", Integer.toString(limit.getRightHandSide().getValue()));
                 return;
             }
         }
@@ -1086,8 +1087,8 @@ public final class InGameController implements NetworkConstants {
             if (name == null) return; // User cancelled, 0-length invalid.
             if (player.getSettlement(name) != null) {
                 // Colony name must be unique.
-                canvas.showInformationMessage("nameColony.notUnique",
-                                              (Colony) object,
+                canvas.showInformationMessage((Colony) object,
+                                              "nameColony.notUnique",
                                               "%name%", name);
                 return;
             }
@@ -1177,7 +1178,7 @@ public final class InGameController implements NetworkConstants {
 
         if (player.getSettlement(name) != null) {
             // Colony name must be unique.
-            canvas.showInformationMessage("nameColony.notUnique",
+            canvas.showInformationMessage(tile, "nameColony.notUnique",
                                           "%name%", name);
             return;
         }
@@ -1486,7 +1487,6 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
-        StringTemplate template;
 
         // Consider all the move types
         Tile tile = unit.getTile();
@@ -1525,12 +1525,12 @@ public final class InGameController implements NetworkConstants {
 
         case MOVE_NO_ACCESS_BEACHED:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessBeached", unit,
+            canvas.showInformationMessage(unit, "move.noAccessBeached",
                                           "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_CONTACT:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessContact", unit,
+            canvas.showInformationMessage(unit, "move.noAccessContact",
                                           "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_LAND:
@@ -1540,34 +1540,34 @@ public final class InGameController implements NetworkConstants {
             break;
         case MOVE_NO_ACCESS_SETTLEMENT:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            template = StringTemplate.template("move.noAccessSettlement")
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("move.noAccessSettlement")
                 .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%nation%", getNationAt(tile, direction));
-            canvas.showInformationMessage(template, unit);
+                .addStringTemplate("%nation%", getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_SKILL:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            template = StringTemplate.template("move.noAccessSkill")
-                .addStringTemplate("%unit%", Messages.getLabel(unit));
-            canvas.showInformationMessage(template, unit);
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("move.noAccessSkill")
+                .addStringTemplate("%unit%", Messages.getLabel(unit)));
             break;
         case MOVE_NO_ACCESS_TRADE:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage(StringTemplate.template("move.noAccessTrade")
-                                          .addStringTemplate("%nation%", getNationAt(tile, direction)),
-                                          unit);
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("move.noAccessTrade")
+                .addStringTemplate("%nation%", getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_WAR:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage(StringTemplate.template("move.noAccessWar")
-                                          .addStringTemplate("%nation%", getNationAt(tile, direction)),
-                                          unit);
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("move.noAccessWar")
+                .addStringTemplate("%nation%", getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_WATER:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            template = StringTemplate.template("move.noAccessWater")
-                .addStringTemplate("%unit%", Messages.getLabel(unit));
-            canvas.showInformationMessage(template, unit);
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("move.noAccessWater")
+                .addStringTemplate("%unit%", Messages.getLabel(unit)));
             break;
         default:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
@@ -1657,11 +1657,11 @@ public final class InGameController implements NetworkConstants {
         if (reply.hasAttribute("slowedBy")) { // ship slowed
             Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
             StringTemplate enemy = slowedBy.getOwner().getNationName();
-            canvas.showInformationMessage(StringTemplate.template("model.unit.slowed")
-                                          .addStringTemplate("%unit%", Messages.getLabel(unit))
-                                          .addStringTemplate("%enemyUnit%", Messages.getLabel(slowedBy))
-                                          .addStringTemplate("%enemyNation%", enemy),
-                                          slowedBy);
+            canvas.showInformationMessage(slowedBy,
+                StringTemplate.template("model.unit.slowed")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%enemyUnit%", Messages.getLabel(slowedBy))
+                .addStringTemplate("%enemyNation%", enemy));
         }
 
         ModelMessage m = null;
@@ -1864,9 +1864,10 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to be moved to Europe.
      */
     public void moveToEurope(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -2333,27 +2334,25 @@ public final class InGameController implements NetworkConstants {
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
-            canvas.showInformationMessage("indianSettlement.noMoreSkill",
-                                          settlement);
+            canvas.showInformationMessage(settlement,
+                                          "indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            canvas.showInformationMessage(StringTemplate.template("indianSettlement.cantLearnSkill")
-                                          .addStringTemplate("%unit%", Messages.getLabel(unit))
-                                          .add("%skill%", skill.getNameKey()),
-                                          settlement);
+            canvas.showInformationMessage(settlement,
+                StringTemplate.template("indianSettlement.cantLearnSkill")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .add("%skill%", skill.getNameKey()));
         } else if (canvas.showConfirmDialog(unit.getTile(),
                                             StringTemplate.template("learnSkill.text")
                                             .add("%skill%", skill.getNameKey()),
                                             "learnSkill.yes", "learnSkill.no")) {
             if (askLearnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
-                    canvas.showInformationMessage("learnSkill.die",
-                                                  settlement);
+                    canvas.showInformationMessage(settlement, "learnSkill.die");
                     nextActiveUnit(unit.getTile());
                     return;
                 }
                 if (unit.getType() != skill) {
-                    canvas.showInformationMessage("learnSkill.leave",
-                                                  settlement);
+                    canvas.showInformationMessage(settlement, "learnSkill.leave");
                 }
             }
         }
@@ -2428,25 +2427,25 @@ public final class InGameController implements NetworkConstants {
             if (result == null) {
                 logger.warning("Null result from askScoutSpeak");
             } else if ("die".equals(result)) {
-                canvas.showInformationMessage("scoutSettlement.speakDie",
-                                              settlement);
+                canvas.showInformationMessage(settlement,
+                                              "scoutSettlement.speakDie");
                 nextActiveUnit(unitTile);
                 return;
             } else if ("expert".equals(result)) {
-                canvas.showInformationMessage(StringTemplate.template("scoutSettlement.expertScout")
-                                              .add("%unit%", unit.getType().getNameKey()),
-                                              settlement);
+                canvas.showInformationMessage(settlement,
+                    StringTemplate.template("scoutSettlement.expertScout")
+                    .add("%unit%", unit.getType().getNameKey()));
             } else if ("tales".equals(result)) {
-                canvas.showInformationMessage("scoutSettlement.speakTales",
-                                              settlement);
+                canvas.showInformationMessage(settlement,
+                                              "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
                 canvas.updateGoldLabel();
-                canvas.showInformationMessage("scoutSettlement.speakBeads",
-                                              settlement,
+                canvas.showInformationMessage(settlement,
+                                              "scoutSettlement.speakBeads",
                                               "%amount%", Integer.toString(player.getGold() - gold));
             } else if ("nothing".equals(result)) {
-                canvas.showInformationMessage("scoutSettlement.speakNothing",
-                                              settlement);
+                canvas.showInformationMessage(settlement,
+                                              "scoutSettlement.speakNothing");
             } else {
                 logger.warning("Invalid result from askScoutSpeak: " + result);
             }
@@ -2532,10 +2531,10 @@ public final class InGameController implements NetworkConstants {
             if (gold < 0) {
                 ; // protocol fail
             } else if (player.getGold() < gold) {
-                canvas.showInformationMessage("missionarySettlement.inciteGoldFail",
-                                              settlement,
-                                              "%player%", Messages.message(enemy.getName()),
-                                              "%amount%", String.valueOf(gold));
+                canvas.showInformationMessage(settlement,
+                    "missionarySettlement.inciteGoldFail",
+                    "%player%", Messages.message(enemy.getName()),
+                    "%amount%", String.valueOf(gold));
             } else {
                 if (canvas.showConfirmDialog(unit.getTile(),
                         "missionarySettlement.inciteConfirm", "yes", "no",
@@ -2679,15 +2678,17 @@ public final class InGameController implements NetworkConstants {
                 : theirAgreement.getStatus();
             switch (status) {
             case ACCEPT_TRADE:
-                canvas.showInformationMessage("negotiationDialog.offerAccepted",
-                                              settlement, "%nation%", nation);
+                canvas.showInformationMessage(settlement,
+                                              "negotiationDialog.offerAccepted",
+                                              "%nation%", nation);
                 // Colony and unit ownership could change!
                 player.invalidateCanSeeTiles();
                 done = true;
                 break;
             case REJECT_TRADE:
-                canvas.showInformationMessage("negotiationDialog.offerRejected",
-                                              settlement, "%nation%", nation);
+                canvas.showInformationMessage(settlement,
+                                              "negotiationDialog.offerRejected",
+                                              "%nation%", nation);
                 done = true;
                 break;
             case PROPOSE_TRADE:
@@ -2909,8 +2910,7 @@ public final class InGameController implements NetworkConstants {
         for (;;) {
             if (forSale.isEmpty()) {
                 // There is nothing to sell to the player
-                canvas.showInformationMessage("trade.nothingToSell",
-                                              settlement);
+                canvas.showInformationMessage(settlement, "trade.nothingToSell");
                 return;
             }
 
@@ -2925,8 +2925,7 @@ public final class InGameController implements NetworkConstants {
             for (;;) {
                 gold = askBuyPriceFromSettlement(unit, settlement, goods, gold);
                 if (gold == NO_TRADE) { // Proposal was refused
-                    canvas.showInformationMessage("trade.noTrade",
-                                                  settlement);
+                    canvas.showInformationMessage(settlement, "trade.noTrade");
                     return;
                 } else if (gold < NO_TRADE) { // failure
                     return;
@@ -3046,13 +3045,12 @@ public final class InGameController implements NetworkConstants {
             for (;;) {
                 gold = askSellPriceToSettlement(unit, settlement, goods, gold);
                 if (gold == NO_NEED_FOR_THE_GOODS) {
-                    canvas.showInformationMessage(StringTemplate.template("trade.noNeedForTheGoods")
-                                                  .add("%goods%", goods.getNameKey()),
-                                                  settlement);
+                    canvas.showInformationMessage(settlement,
+                        StringTemplate.template("trade.noNeedForTheGoods")
+                        .add("%goods%", goods.getNameKey()));
                     return;
                 } else if (gold == NO_TRADE) {
-                    canvas.showInformationMessage("trade.noTrade",
-                                                  settlement);
+                    canvas.showInformationMessage(settlement, "trade.noTrade");
                     return;
                 } else if (gold < NO_TRADE) { // error
                     return;
@@ -3332,9 +3330,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit boards the carrier.
      */
     public boolean boardShip(Unit unit, Unit carrier) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage(unit, "notYourTurn");
             return false;
         }
 
@@ -3400,9 +3399,10 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> which is to leave the ship.
      */
     public boolean leaveShip(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return false;
         }
 
@@ -3455,9 +3455,10 @@ public final class InGameController implements NetworkConstants {
      * @param carrier The <code>Unit</code> acting as carrier.
      */
     public void loadCargo(Goods goods, Unit carrier) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -3490,9 +3491,10 @@ public final class InGameController implements NetworkConstants {
      * @param dump If true, dump the goods.
      */
     public void unloadCargo(Goods goods, boolean dump) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -3708,9 +3710,9 @@ public final class InGameController implements NetworkConstants {
         UnitType newType = oldType.getUnitTypeChange(ChangeType.CLEAR_SKILL,
                                                      unit.getOwner());
         if (newType == null) {
-            StringTemplate template = StringTemplate.template("clearSpeciality.impossible")
-                .addStringTemplate("%unit%", Messages.getLabel(unit));
-            canvas.showInformationMessage(template, unit);
+            canvas.showInformationMessage(unit,
+                StringTemplate.template("clearSpeciality.impossible")
+                .addStringTemplate("%unit%", Messages.getLabel(unit)));
             return;
         }
 
@@ -3839,8 +3841,9 @@ public final class InGameController implements NetworkConstants {
      * @param amount How many of these goods the unit should have.
      */
     public void equipUnit(Unit unit, EquipmentType type, int amount) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
         if (amount == 0) {

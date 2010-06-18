@@ -1661,7 +1661,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected Object doWork() {
             Canvas canvas = getFreeColClient().getCanvas();
-            canvas.showInformationMessage(messageId, null, replace);
+            canvas.showInformationMessage(null, messageId, replace);
             return null;
         }
     }

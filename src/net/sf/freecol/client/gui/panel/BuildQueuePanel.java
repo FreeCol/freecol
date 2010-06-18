@@ -555,10 +555,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             String command = event.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(buildQueueList);
             if (!buildables.isEmpty() && lockReasons.get(buildables.get(0)) != null) {
-                getCanvas().showInformationMessage(StringTemplate.template("colonyPanel.unbuildable")
-                                                   .addName("%colony%", colony.getName())
-                                                   .add("%object%", buildables.get(0).getNameKey()),
-                                                   buildables.get(0));
+                getCanvas().showInformationMessage(buildables.get(0),
+                    StringTemplate.template("colonyPanel.unbuildable")
+                    .addName("%colony%", colony.getName())
+                    .add("%object%", buildables.get(0).getNameKey()));
                 return;
             }
             getController().setBuildQueue(colony, buildables);
