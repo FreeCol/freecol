@@ -152,10 +152,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = addPlayer(element);
             } else if (type.equals("spanishSuccession")) {
                 reply = spanishSuccession(element);
-            } else if (type.equals("addMessages")) {
-                reply = addMessages(element);
-            } else if (type.equals("addHistory")) {
-                reply = addHistory(element);
+            } else if (type.equals("addObject")) {
+                reply = addObject(element);
             } else if (type.equals("multiple")) {
                 reply = multiple(connection, element);
             } else {
@@ -1115,55 +1113,37 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Add the ModelMessages which are the children of this Element.
+     * Add the objects which are the children of this Element.
      * 
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
-    public Element addMessages(Element element) {
+    public Element addObject(Element element) {
         Game game = getGame();
         NodeList nodes = element.getChildNodes();
-
         for (int i = 0; i < nodes.getLength(); i++) {
-            ModelMessage m = new ModelMessage();
             Element e = (Element) nodes.item(i);
-            m.readFromXMLElement(e);
-
             String owner = e.getAttribute("owner");
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(owner);
-            if (fcgo instanceof Player) {
-                ((Player) fcgo).addModelMessage(m);
-            } else {
-                logger.warning("addMessages with broken owner: "
+            Player player = null;
+            if (!(game.getFreeColGameObjectSafely(owner) instanceof Player)) {
+                logger.warning("addObject with broken owner: "
                                + ((owner == null) ? "(null)" : owner));
+                continue;
             }
-        }
-        return null;
-    }
-
-    /**
-     * Add the HistoryEvents which are the children of this Element.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    public Element addHistory(Element element) {
-        Game game = getGame();
-        NodeList nodes = element.getChildNodes();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            HistoryEvent h = new HistoryEvent();
-            Element e = (Element) nodes.item(i);
-            h.readFromXMLElement(e);
-
-            // Use the owner attribute.
-            String owner = e.getAttribute("owner");
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(owner);
-            if (fcgo instanceof Player) {
-                ((Player) fcgo).getHistory().add(h);
+            player = (Player) game.getFreeColGameObjectSafely(owner);
+            String tag = e.getTagName();
+            if (tag == null) {
+                logger.warning("addObject null tag");
+            } else if (tag == ModelMessage.getXMLElementTagName()) {
+                ModelMessage m = new ModelMessage();
+                m.readFromXMLElement(e);
+                player.addModelMessage(m);
+            } else if (tag == HistoryEvent.getXMLElementTagName()) {
+                HistoryEvent h = new HistoryEvent();
+                h.readFromXMLElement(e);
+                player.getHistory().add(h);
             } else {
-                logger.warning("addHistory with broken owner: "
-                               + ((owner == null) ? "(null)" : owner));
+                logger.warning("addObject unrecognized: " + tag);
             }
         }
         return null;

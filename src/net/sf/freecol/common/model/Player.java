@@ -1708,6 +1708,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Set the europe object for a player.
+     *
+     * @param europe The new <code>Europe</code> object.
+     */
+    public void setEurope(Europe europe) {
+        this.europe = europe;
+    }
+
+    /**
      * Describe <code>getEuropeName</code> method here.
      *
      * @return a <code>String</code> value
@@ -2250,7 +2259,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of objects that may need updating due to the tension
      *     change (such as native settlements).
      */
-    public List<Object> modifyTension(Player player, int addToTension) {
+    public List<FreeColGameObject> modifyTension(Player player,
+                                                 int addToTension) {
         return modifyTension(player, addToTension, null);
     }
 
@@ -2264,8 +2274,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of objects that may need updating due to the tension
      *     change (such as native settlements).
      */
-    public List<Object> modifyTension(Player player, int addToTension,
-                                      IndianSettlement origin) {
+    public List<FreeColGameObject> modifyTension(Player player,
+                                                 int addToTension,
+                                                 IndianSettlement origin) {
         if (player == null) {
             throw new IllegalStateException("Null player");
         } else if (player == this) {
@@ -2275,7 +2286,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                             + origin.getId());
         }
 
-        List<Object> objects = new ArrayList<Object>();
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         getTension(player).modify(addToTension);
 
         // For indian players, we also need to set each settlement
@@ -2703,6 +2714,35 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean hasContacted(Player player) {
         return getStance(player) != Stance.UNCONTACTED;
+    }
+
+    /**
+     * Returns whether this player has met with any Europeans at all.
+     *
+     * @return <code>true</code> if this <code>Player</code> has contacted
+     *         any Europeans.
+     */
+    public boolean hasContactedEuropeans() {
+        for (Player other : getGame().getPlayers()) {
+            if (other != this && other.isEuropean() && hasContacted(other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Returns whether this player has met with any natives at all.
+     *
+     * @return <code>true</code> if this <code>Player</code> has contacted
+     *         any natives.
+     */
+    public boolean hasContactedIndians() {
+        for (Player other : getGame().getPlayers()) {
+            if (other != this && other.isIndian() && hasContacted(other)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -3245,6 +3285,15 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         int oldAmount = data.getIncomeAfterTaxes();
         data.setIncomeAfterTaxes(oldAmount + amount);
+    }
+
+    /**
+     * Add a HistoryEvent to this player.
+     *
+     * @param event The <code>HistoryEvent</code> to add.
+     */
+    public void addHistory(HistoryEvent event) {
+        history.add(event);
     }
 
     /**

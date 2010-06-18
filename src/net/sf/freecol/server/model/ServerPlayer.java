@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -45,7 +46,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
 
@@ -59,8 +59,6 @@ import net.sf.freecol.common.option.BooleanOption;
 public class ServerPlayer extends Player implements ServerModelObject {
     
     private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
-
-    public static final int SCORE_INDEPENDENCE_GRANTED = 1000;
 
     /** The network socket to the player's client. */
     private Socket socket;
@@ -383,52 +381,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     
     public void setRemainingEmigrants(int emigrants) {
         remainingEmigrants = emigrants;
-    }
-
-    /**
-     * Sever ties with the European homeland.
-     *
-     * @return A list of objects disposed.
-     */
-    public List<Object> severEurope() {
-        List<Object> objects = new ArrayList<Object>();
-        objects.addAll(europe.disposeList());
-        europe = null;
-        objects.add(monarch);
-        monarch = null;
-        return objects;
-    }
-
-    /**
-     * Gives independence to this player.
-     */
-    public List<ModelMessage> giveIndependence(ServerPlayer REFplayer) {
-        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
-        setPlayerType(PlayerType.INDEPENDENT);
-        modifyScore(SCORE_INDEPENDENCE_GRANTED - getGame().getTurn().getNumber());
-        setTax(0);
-        reinitialiseMarket();
-        getHistory().add(new HistoryEvent(getGame().getTurn(),
-                                          HistoryEvent.EventType.INDEPENDENCE));
-        messages.add(new ModelMessage("model.player.independence", this));
-        ArrayList<Unit> surrenderUnits = new ArrayList<Unit>();
-        for (Unit u : REFplayer.getUnits()) {
-            if (!u.isNaval()) surrenderUnits.add(u);
-        }
-        StringTemplate surrender = StringTemplate.label(", ");
-        for (Unit u : surrenderUnits) {
-            if (u.getType().hasAbility("model.ability.refUnit")) {
-                // Make sure the independent player does not end up owning
-                // any Kings Regulars!
-                UnitType downgrade = u.getType().getUnitTypeChange(ChangeType.CAPTURE, this);
-                if (downgrade != null) u.setType(downgrade);
-            }
-            u.setOwner(this);
-            surrender.addStringTemplate(u.getLabel());
-        }
-        messages.add(new ModelMessage("model.player.independence.unitsAcquired", this)
-                     .addStringTemplate("%units%", surrender));
-        return messages;
     }
 
     /**
