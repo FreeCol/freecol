@@ -44,8 +44,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.resources.ResourceMapping;
+
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;

@@ -20,7 +20,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.awt.Color;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -36,7 +35,6 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;

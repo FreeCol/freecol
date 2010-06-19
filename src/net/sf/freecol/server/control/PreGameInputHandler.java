@@ -19,13 +19,11 @@
 
 package net.sf.freecol.server.control;
 
-import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;

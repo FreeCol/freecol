@@ -43,7 +43,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.resources.ChipResource;
-import net.sf.freecol.common.resources.ColorResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.generator.MapGeneratorOptions;

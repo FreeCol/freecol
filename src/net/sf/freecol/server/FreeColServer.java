@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server;
 
-import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

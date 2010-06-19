@@ -19,10 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.common.model.CombatModel.CombatResult;
@@ -31,7 +29,6 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class CombatTest extends FreeColTestCase {
 

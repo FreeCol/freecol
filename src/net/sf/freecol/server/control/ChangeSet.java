@@ -24,9 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -38,9 +35,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
@@ -48,7 +43,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 /**
