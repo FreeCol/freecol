@@ -51,8 +51,8 @@ import org.w3c.dom.NodeList;
 * Handles the network messages that arrives before the game starts.
 */
 public final class PreGameInputHandler extends InputHandler implements StreamedMessageHandler {
-    private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
+    private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
 
     /**
@@ -62,8 +62,6 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     public PreGameInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
     }
-
-
 
 
 
@@ -259,7 +257,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
+        Nation nation = getGame().getSpecification().getNation(element.getAttribute("value"));
 
         player.setNation(nation);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
@@ -278,7 +276,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
+        NationType nationType = getGame().getSpecification().getNationType(element.getAttribute("value"));
 
         player.setNationType(nationType);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
@@ -294,7 +292,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     *                holds all the information.
     */
     private Element setAvailable(Element element) {
-        Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
+        Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
         NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
         getFreeColClient().getGame().getNationOptions().setNationState(nation, state);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();

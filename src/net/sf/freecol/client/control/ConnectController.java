@@ -161,7 +161,7 @@ public final class ConnectController {
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
                 freeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
             }
-            FreeCol.getSpecification().applyDifficultyLevel(level);
+            freeColClient.getGame().getSpecification().applyDifficultyLevel(level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");

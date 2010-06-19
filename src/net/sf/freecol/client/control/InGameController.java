@@ -74,6 +74,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -186,6 +187,10 @@ public final class InGameController implements NetworkConstants {
      */
     public InGameController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
+    }
+
+    private Specification getSpecification() {
+        return freeColClient.getGame().getSpecification();
     }
 
     /**
@@ -997,7 +1002,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Check for adequate support.
-        Event event = FreeCol.getSpecification().getEvent("model.event.declareIndependence");
+        Event event = getSpecification().getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
                 canvas.showInformationMessage(limit.getDescriptionKey(),
@@ -1212,7 +1217,7 @@ public final class InGameController implements NetworkConstants {
         boolean ownedByIndians = false;
 
         java.util.Map<GoodsType, Integer> goodsMap = new HashMap<GoodsType, Integer>();
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isFoodType()) {
                 int potential = 0;
                 if (tile.getType().isPrimaryGoodsType(goodsType)) {
@@ -1277,12 +1282,12 @@ public final class InGameController implements NetworkConstants {
         if (landLocked) {
             messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                           "buildColony.landLocked", unit, 
-                                          FreeCol.getSpecification().getGoodsType("model.goods.fish")));
+                                          getSpecification().getGoodsType("model.goods.fish")));
         }
         if (food < 8) {
             messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                           "buildColony.noFood", unit,
-                                          FreeCol.getSpecification().getGoodsType("model.goods.food")));
+                                          getSpecification().getGoodsType("model.goods.food")));
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
@@ -2106,7 +2111,7 @@ public final class InGameController implements NetworkConstants {
             NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
             for (int i = 0; i < capturedGoods.getLength(); ++i) {
                 Element goods = (Element) capturedGoods.item(i);
-                GoodsType type = FreeCol.getSpecification().getGoodsType(goods.getAttribute("type"));
+                GoodsType type = getSpecification().getGoodsType(goods.getAttribute("type"));
                 int amount = Integer.parseInt(goods.getAttribute("amount"));
                 unit.getGoodsContainer().addGoods(type, amount);
             }

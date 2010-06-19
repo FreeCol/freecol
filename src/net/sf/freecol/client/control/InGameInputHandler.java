@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -630,7 +629,7 @@ public final class InGameInputHandler extends InputHandler {
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
             if (id != null && !id.equals("")) {
-                possibleFoundingFathers.add(FreeCol.getSpecification().getFoundingFather(id));
+                possibleFoundingFathers.add(getGame().getSpecification().getFoundingFather(id));
             }
         }
 
@@ -651,7 +650,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element newConvert(Element element) {
         Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colonyTile"));
         Colony colony = tile.getColony();
-        Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
+        Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
 
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);
