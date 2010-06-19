@@ -340,15 +340,32 @@
                         <res id="shortcutSpec.xml" src="@{freecol.build.dir}/winShortcutSpec.xml"/>
                         <res id="Unix_shortcutSpec.xml" src="@{freecol.build.dir}/unixShortcutSpec.xml"/>
                         <res id="installer.langsel.img" src="@{freecol.build.dir}/install.png"/>
-                        <res id="packsLang.xml_eng" src="@{freecol.build.dir}/installer/lang.xml_eng"/>
-                        <res id="packsLang.xml_ned" src="@{freecol.build.dir}/installer/lang.xml_ned"/>
-                        <res id="packsLang.xml_spa" src="@{freecol.build.dir}/installer/lang.xml_spa"/>
+                        <res id="packsLang.xml_cat" src="@{freecol.build.dir}/installer/lang.xml_cat"/>
+                        <res id="packsLang.xml_chn" src="@{freecol.build.dir}/installer/lang.xml_chn"/>
+                        <res id="packsLang.xml_cze" src="@{freecol.build.dir}/installer/lang.xml_cze"/>
+                        <res id="packsLang.xml_dan" src="@{freecol.build.dir}/installer/lang.xml_dan"/>
                         <res id="packsLang.xml_deu" src="@{freecol.build.dir}/installer/lang.xml_deu"/>
+                        <res id="packsLang.xml_eng" src="@{freecol.build.dir}/installer/lang.xml_eng"/>
+                        <res id="packsLang.xml_eus" src="@{freecol.build.dir}/installer/lang.xml_eus"/>
+                        <res id="packsLang.xml_fin" src="@{freecol.build.dir}/installer/lang.xml_fin"/>
                         <res id="packsLang.xml_fra" src="@{freecol.build.dir}/installer/lang.xml_fra"/>
-                        <res id="packsLang.xml_pol" src="@{freecol.build.dir}/installer/lang.xml_pol"/>
+                        <res id="packsLang.xml_glg" src="@{freecol.build.dir}/installer/lang.xml_glg"/>
+                        <res id="packsLang.xml_hun" src="@{freecol.build.dir}/installer/lang.xml_hun"/>
                         <res id="packsLang.xml_ita" src="@{freecol.build.dir}/installer/lang.xml_ita"/>
+                        <res id="packsLang.xml_jpn" src="@{freecol.build.dir}/installer/lang.xml_jpn"/>
+                        <!-- <res id="packsLang.xml_mys" src="@{freecol.build.dir}/installer/lang.xml_mys"/> -->
+                        <res id="packsLang.xml_ned" src="@{freecol.build.dir}/installer/lang.xml_ned"/>
+                        <res id="packsLang.xml_nor" src="@{freecol.build.dir}/installer/lang.xml_nor"/>
+                        <res id="packsLang.xml_pol" src="@{freecol.build.dir}/installer/lang.xml_pol"/>
                         <res id="packsLang.xml_por" src="@{freecol.build.dir}/installer/lang.xml_por"/>
+                        <res id="packsLang.xml_prt" src="@{freecol.build.dir}/installer/lang.xml_prt"/>
+                        <!-- <res id="packsLang.xml_rom" src="@{freecol.build.dir}/installer/lang.xml_rom"/> -->
+                        <res id="packsLang.xml_rus" src="@{freecol.build.dir}/installer/lang.xml_rus"/>
+                        <!-- <res id="packsLang.xml_scg" src="@{freecol.build.dir}/installer/lang.xml_scg"/> -->
+                        <res id="packsLang.xml_spa" src="@{freecol.build.dir}/installer/lang.xml_spa"/>
+                        <!-- <res id="packsLang.xml_svk" src="@{freecol.build.dir}/installer/lang.xml_svk"/> -->
                         <res id="packsLang.xml_swe" src="@{freecol.build.dir}/installer/lang.xml_swe"/>
+                        <res id="packsLang.xml_ukr" src="@{freecol.build.dir}/installer/lang.xml_ukr"/>
                     </resources>
                     <native type="izpack" name="ShellLink.dll"/>
                     <panels>
@@ -386,7 +403,7 @@
     </target>
 
     <target name="javaInstallerBundle" unless="skip.dist.installer" description="Builds a platform independent installer"
-            depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles">
+            depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles,installer-translations">
         <taskdef name="izpack"
                 classname="com.izforge.izpack.ant.IzPackTask"
                 classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
@@ -725,7 +742,8 @@
     <!-- Creates installer strings. -->
     <target name="installer-translations" depends="build"
             description="Creates properties files for installer translations.">
-        <java classname="net.sf.freecol.tools.InstallerTranslations" classpathref="build/" />
+        <java classname="net.sf.freecol.tools.InstallerTranslations"
+              classpath="build/" />
     </target>
 
     <target name="pmd">

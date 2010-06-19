@@ -46,12 +46,12 @@ public class InstallerTranslations {
         { "zh", "chn", "Chinese" },
         { "cs", "cze", "Czech" },
         { "da", "dan", "Danish" },
-        { "gl", "glg", "Galician" },
         { "de", "deu", "German" },
         { "en", "eng", "English" },
         { "eu", "eus", "Basque" },
         { "fi", "fin", "Finnish" },
         { "fr", "fra", "French" },
+        { "gl", "glg", "Galician" },
         { "hu", "hun", "Hungarian" },
         { "it", "ita", "Italian" },
         { "ja", "jpn", "Japanese" },
@@ -97,10 +97,12 @@ public class InstallerTranslations {
     
     public static void main(String[] args) throws Exception {
 
+        /*
         if (!LANGUAGE_CODES.exists()) {
             System.out.println("Language codes not found.");
             System.exit(1);
         }
+        */
 
         if (!MAIN_FILE.exists()) {
             System.out.println("Main input file not found.");
