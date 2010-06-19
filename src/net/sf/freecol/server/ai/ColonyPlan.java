@@ -208,7 +208,7 @@ public class ColonyPlan {
         List<BuildingType> churches = new ArrayList<BuildingType>();
         List<BuildingType> townHalls = new ArrayList<BuildingType>();
 
-        for (BuildingType type : Specification.getSpecification().getBuildingTypeList()) {
+        for (BuildingType type : colony.getSpecification().getBuildingTypeList()) {
             if (type.hasAbility("model.ability.produceInWater")) {
                 docks.add(type);
             } 
@@ -240,7 +240,7 @@ public class ColonyPlan {
 
         List<UnitType> buildableDefenders = new ArrayList<UnitType>();
         UnitType bestWagon = null;
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
             if (unitType.getDefence() > UnitType.DEFAULT_DEFENCE
                 && !unitType.hasAbility("model.ability.navalUnit")
                 && !unitType.getGoodsRequired().isEmpty()) {
@@ -310,7 +310,7 @@ public class ColonyPlan {
                 // of other buildings (printing press, newspaper)
                 GoodsType outputType = b.getGoodsOutputType();
                 if (outputType != null) {
-                    for (BuildingType otherType : Specification.getSpecification()
+                    for (BuildingType otherType : colony.getSpecification()
                              .getBuildingTypeList()) {
                         if (!otherType.getModifierSet(outputType.getId()).isEmpty()
                             && colony.canBuild(otherType)) {
@@ -483,12 +483,12 @@ public class ColonyPlan {
             return;
         }
 
-        GoodsType bells = Specification.getSpecification().getGoodsType("model.goods.bells");
-        GoodsType food = Specification.getSpecification().getGoodsType("model.goods.food");
-        GoodsType lumber = Specification.getSpecification().getGoodsType("model.goods.lumber");
-        GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType ore = Specification.getSpecification().getGoodsType("model.goods.ore");
-        GoodsType silver = Specification.getSpecification().getGoodsType("model.goods.silver");
+        GoodsType bells = colony.getSpecification().getGoodsType("model.goods.bells");
+        GoodsType food = colony.getSpecification().getGoodsType("model.goods.food");
+        GoodsType lumber = colony.getSpecification().getGoodsType("model.goods.lumber");
+        GoodsType muskets = colony.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType ore = colony.getSpecification().getGoodsType("model.goods.ore");
+        GoodsType silver = colony.getSpecification().getGoodsType("model.goods.silver");
                 
         Building townHall = colony.getBuildingForProducing(bells);
         
@@ -509,9 +509,9 @@ public class ColonyPlan {
         GoodsType buildingReq = null;
         GoodsType buildingRawMat = null;
         Building buildingReqProducer = null;
-        final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType lumberType = Specification.getSpecification().getGoodsType("model.goods.lumber");
-        final GoodsType oreType = Specification.getSpecification().getGoodsType("model.goods.ore");
+        final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
+        final GoodsType lumberType = colony.getSpecification().getGoodsType("model.goods.lumber");
+        final GoodsType oreType = colony.getSpecification().getGoodsType("model.goods.ore");
         
         buildingReq = getBuildingReqGoods();
         
@@ -558,7 +558,7 @@ public class ColonyPlan {
         secondaryRawMaterial = null;
         int primaryRawMaterialProduction = 0;
         int secondaryRawMaterialProduction = 0;
-        List<GoodsType> goodsTypeList = Specification.getSpecification().getGoodsTypeList();
+        List<GoodsType> goodsTypeList = colony.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypeList) {
             // only consider goods that can be transformed
             // do not consider hammers as a valid transformation
@@ -829,7 +829,7 @@ public class ColonyPlan {
      */
     public int getFoodProduction() {
         int amount = 0;
-        for (GoodsType foodType : Specification.getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : colony.getSpecification().getGoodsFood()) {
             amount += getProductionOf(foodType);
         }
 
@@ -897,7 +897,7 @@ public class ColonyPlan {
             if ((tile.getOwningSettlement() == null
                  || tile.getOwningSettlement() == colony)
                 && !ct.isColonyCenterTile()) {
-                for (GoodsType goodsType : Specification.getSpecification().getFarmedGoodsTypeList()) {
+                for (GoodsType goodsType : colony.getSpecification().getFarmedGoodsTypeList()) {
                     int production = market.getSalePrice(goodsType, tile.potential(goodsType, unitType));
                     if (bestProduction == null || value < production) {
                         value = production;
@@ -913,9 +913,9 @@ public class ColonyPlan {
     public void adjustProductionAndManufacture(){
         List<GoodsType> rawMatList = new ArrayList<GoodsType>(); 
 
-        final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType lumberType = Specification.getSpecification().getGoodsType("model.goods.lumber");
-        final GoodsType oreType = Specification.getSpecification().getGoodsType("model.goods.ore");
+        final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
+        final GoodsType lumberType = colony.getSpecification().getGoodsType("model.goods.lumber");
+        final GoodsType oreType = colony.getSpecification().getGoodsType("model.goods.ore");
     
         if(getBuildingReqGoods() == hammersType){
             rawMatList.add(lumberType);
@@ -1025,8 +1025,8 @@ public class ColonyPlan {
         if(currBuild == null){
             return null;
         }
-        final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType toolsType = Specification.getSpecification().getGoodsType("model.goods.tools");
+        final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
+        final GoodsType toolsType = colony.getSpecification().getGoodsType("model.goods.tools");
         
         if(colony.getGoodsCount(hammersType) < currBuild.getAmountRequiredOf(hammersType)){
             return hammersType;

@@ -270,7 +270,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
              * Find the cheapest naval unit
              */
 
-            Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
+            Iterator<UnitType> navalUnits = getSpecification()
+                .getUnitTypesWithAbility("model.ability.navalUnit").iterator();
 
             int lowerPrice = Integer.MAX_VALUE;
 
@@ -343,7 +344,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
          * Find the cheapest colonist, either by recruiting or training
          */
 
-        Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
+        Iterator<UnitType> trainedUnits = getSpecification().getUnitTypesTrainedInEurope().iterator();
 
         int goldToTrain = Integer.MAX_VALUE;
 

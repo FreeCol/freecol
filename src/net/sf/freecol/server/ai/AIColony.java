@@ -246,7 +246,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Tile centerTile = colony.getTile();
         TileImprovementPlan centerPlan = plans.get(centerTile);
         TileImprovementType type = TileImprovement
-            .findBestTileImprovementType(centerTile, FreeCol.getSpecification()
+            .findBestTileImprovementType(centerTile, colony.getSpecification()
                                          .getGoodsType("model.goods.food"));
         if (type == null) {
             if (centerPlan != null) {
@@ -295,7 +295,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit unit : colony.getUnitList()) {
             if (unit.getWorkType() != null
                 && unit.getWorkType() != unit.getType().getExpertProduction()) {
-                UnitType expert = FreeCol.getSpecification().getExpertForProducing(unit.getWorkType());
+                UnitType expert = colony.getSpecification().getExpertForProducing(unit.getWorkType());
                 wishes.add(new WorkerWish(getAIMain(), colony, expertValue, expert, true));
             }
         }
@@ -319,7 +319,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         boolean badlyDefended = isBadlyDefended();
         if (badlyDefended) {
             UnitType bestDefender = null;
-            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
                 if ((bestDefender == null
                      || bestDefender.getDefence() < unitType.getDefence())
                     && !unitType.hasAbility("model.ability.navalUnit")
@@ -366,7 +366,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // add breedable goods
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
             if (goodsType.isBreedable()) {
                 requiredGoods.incrementCount(goodsType, goodsType.getBreedingNumber());
             }
@@ -374,7 +374,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // add materials required to build military equipment
         if (badlyDefended) {
-            for (EquipmentType type : FreeCol.getSpecification().getEquipmentTypeList()) {
+            for (EquipmentType type : colony.getSpecification().getEquipmentTypeList()) {
                 if (type.isMilitaryEquipment()) {
                     for (Unit unit : colony.getUnitList()) {
                         if (unit.canBeEquippedWith(type)) {
@@ -431,7 +431,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private UnitType getNextExpert(boolean onlyFood) {
         // some type should be returned, not null
-        UnitType bestType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        UnitType bestType = colony.getSpecification().getUnitType("model.unit.freeColonist");
         for (WorkLocationPlan plan : colonyPlan.getSortedWorkLocationPlans()) {
             if (plan.getGoodsType().isFoodType() || !onlyFood) {
                 WorkLocation location = plan.getWorkLocation();
@@ -440,7 +440,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     if (colonyTile.getUnit() == null
                         && (colonyTile.getWorkTile().isLand()
                             || colony.hasAbility("model.ability.produceInWater"))) {
-                        bestType = FreeCol.getSpecification()
+                        bestType = colony.getSpecification()
                             .getExpertForProducing(plan.getGoodsType());
                         break;
                     }
@@ -460,7 +460,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int toolsRequiredForBuilding = 0;
         if (buildableType != null) {
             for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == Specification.getSpecification().getGoodsType("model.goods.tools")) {
+                if (goodsRequired.getType() == colony.getSpecification().getGoodsType("model.goods.tools")) {
                     toolsRequiredForBuilding = goodsRequired.getAmount();
                     break;
                 }
@@ -474,7 +474,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int hammersRequiredForBuilding = 0;
         if (buildableType != null) {
             for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == Specification.getSpecification().getGoodsType("model.goods.hammers")) {
+                if (goodsRequired.getType() == colony.getSpecification().getGoodsType("model.goods.hammers")) {
                     hammersRequiredForBuilding = goodsRequired.getAmount();
                     break;
                 }
@@ -537,7 +537,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public void createAIGoods() {
         int capacity = colony.getWarehouseCapacity();
         if (colony.hasAbility("model.ability.export")) {
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isTradeGoods()) {
                     // can only be produced in Europe
                     colony.setExportData(new ExportData(goodsType, false, 0));
@@ -564,11 +564,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
             ArrayList<AIGoods> newAIGoods = new ArrayList<AIGoods>();
 
-            List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+            List<GoodsType> goodsList = colony.getSpecification().getGoodsTypeList();
             loop: for (GoodsType goodsType : goodsList) {
                 // Never export food and lumber
                 if (goodsType.isFoodType()
-                    || goodsType == Specification.getSpecification().getGoodsType("model.goods.lumber")) {
+                    || goodsType == colony.getSpecification().getGoodsType("model.goods.lumber")) {
                     continue;
                 }
                 // Never export unstorable goods
@@ -601,23 +601,23 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                  * sufficient amounts in warehouse:
                  */
                 // TODO: make this more generic
-                if (goodsType == Specification.getSpecification().getGoodsType("model.goods.tools") && colony.getGoodsCount(Specification.getSpecification().getGoodsType("model.goods.tools")) > 0) {
-                    if (colony.getProductionNetOf(Specification.getSpecification().getGoodsType("model.goods.tools")) > 0) {
+                if (goodsType == colony.getSpecification().getGoodsType("model.goods.tools") && colony.getGoodsCount(colony.getSpecification().getGoodsType("model.goods.tools")) > 0) {
+                    if (colony.getProductionNetOf(colony.getSpecification().getGoodsType("model.goods.tools")) > 0) {
                         final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
                         int requiredTools = getToolsRequired(currentlyBuilding);
                         int requiredHammers = getHammersRequired(currentlyBuilding);
-                        int buildTurns = (requiredHammers - colony.getGoodsCount(Specification.getSpecification().getGoodsType("model.goods.hammers"))) /
-                            (colony.getProductionOf(Specification.getSpecification().getGoodsType("model.goods.hammers")) + 1);
+                        int buildTurns = (requiredHammers - colony.getGoodsCount(colony.getSpecification().getGoodsType("model.goods.hammers"))) /
+                            (colony.getProductionOf(colony.getSpecification().getGoodsType("model.goods.hammers")) + 1);
                         if (requiredTools > 0) {
                             if (colony.getWarehouseCapacity() > 100) {
                                 requiredTools += 100;
                             }
-                            int toolsProductionTurns = requiredTools / colony.getProductionNetOf(Specification.getSpecification().getGoodsType("model.goods.tools"));
+                            int toolsProductionTurns = requiredTools / colony.getProductionNetOf(colony.getSpecification().getGoodsType("model.goods.tools"));
                             if (buildTurns <= toolsProductionTurns + 1) {
                                 continue;
                             }
                         } else if (colony.getWarehouseCapacity() > 100
-                                   && colony.getGoodsCount(Specification.getSpecification().getGoodsType("model.goods.tools")) <= 100) {
+                                   && colony.getGoodsCount(colony.getSpecification().getGoodsType("model.goods.tools")) <= 100) {
                             continue;
                         }
                     } else {
@@ -837,7 +837,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         placeExpertsInWorkPlaces(units, workLocationPlans);
 
         boolean workerAdded = true;
-        GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType foodType = colony.getSpecification().getGoodsType("model.goods.food");
         while (workerAdded) {
             workerAdded = false;
             // Use a food production plan if necessary:
@@ -1007,7 +1007,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     bestPick.work(ct);
                     bestPick.setWorkType(rawMaterial);
                 } else {
-                    Building th = colony.getBuildingForProducing(Specification.getSpecification()
+                    Building th = colony.getBuildingForProducing(colony.getSpecification()
                                                                  .getGoodsType("model.goods.bells"));
                     if (th.canAdd(bestPick)) {
                         bestPick.work(th);
@@ -1031,7 +1031,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Changes the production type of workers producing a cargo there
         // is no room for.
-        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        List<GoodsType> goodsList = colony.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsList) {
             int production = colony.getProductionNetOf(goodsType);
             int in_stock = colony.getGoodsCount(goodsType);
@@ -1151,7 +1151,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (colony.getTile().getUnitCount() > 0) {
                 logger.warning("Colony " + colony.getName() + " autodestruct averted.");
                 Unit u = colony.getTile().getFirstUnit();
-                Building th = colony.getBuildingForProducing(Specification.getSpecification()
+                Building th = colony.getBuildingForProducing(colony.getSpecification()
                                                              .getGoodsType("model.goods.bells"));
                 u.work(th);
                 ((AIUnit) getAIMain().getAIObject(u)).setMission(null);
@@ -1204,7 +1204,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             UnitType expert = null;
             if (workLocation instanceof ColonyTile) {
                 tile = ((ColonyTile) workLocation).getWorkTile();
-                expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
+                expert = goodsType.getSpecification().getExpertForProducing(goodsType);
             } else if (workLocation instanceof Building) {
                 building = (Building) workLocation;
                 expert = building.getExpertUnitType();
@@ -1300,7 +1300,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * If there are conditions to arm it, put it outside for later equip
      */
     private void checkForUnarmedExpertSoldier() {
-        EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        EquipmentType musketsEqType = colony.getSpecification().getEquipmentType("model.equipment.muskets");
         
         for(Unit unit : colony.getUnitList()){
             if(colony.getUnitCount() == 1){
@@ -1333,8 +1333,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *and un-mounts a mounted <code>Unit</code> if available, to have horses to breed.
      */
     void checkConditionsForHorseBreed() {
-        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
-        EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        GoodsType horsesType = colony.getSpecification().getGoodsType("model.goods.horses");
+        EquipmentType horsesEqType = colony.getSpecification().getEquipmentType("model.equipment.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
         
         // Colony already is breeding horses

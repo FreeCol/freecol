@@ -88,7 +88,8 @@ public class ActionManager extends OptionGroup {
         add(new GotoAction(freeColClient));
         add(new GotoTileAction(freeColClient));
         // Initialize ImprovementActions
-        for (ImprovementActionType ia : FreeCol.getSpecification().getImprovementActionTypeList()) {
+        for (ImprovementActionType ia : freeColClient.getGame().getSpecification()
+                 .getImprovementActionTypeList()) {
             add(new ImprovementAction(freeColClient, ia));
         }
         add(new LoadAction(freeColClient));

@@ -240,7 +240,7 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     Player player = freeColClient.getMyPlayer();
                     List<ChoiceItem<FoundingFather>> fathers = new ArrayList<ChoiceItem<FoundingFather>>();
-                    for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                    for (FoundingFather father : freeColClient.getGame().getSpecification().getFoundingFathers()) {
                         if (!player.hasFather(father)) {
                             fathers.add(new ChoiceItem<FoundingFather>(Messages.message(father.getNameKey()),
                                                                        father));

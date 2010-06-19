@@ -80,7 +80,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -357,10 +356,9 @@ public final class GUI {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         // ATTENTION: we assume that all base tiles have the same size
-        TileType tileType = FreeCol.getSpecification().getTileTypeList().get(0);
-        tileHeight = lib.getTerrainImageHeight(tileType);
+        tileHeight = lib.getTerrainImageHeight(null);
         halfHeight = tileHeight/2;
-        tileWidth = lib.getTerrainImageWidth(tileType);
+        tileWidth = lib.getTerrainImageWidth(null);
         halfWidth = tileWidth/2;
 
         int dx = tileWidth/16;
