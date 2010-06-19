@@ -411,7 +411,7 @@ public final class InGameController extends Controller {
      */
     public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
-        List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+        List<GoodsType> goodsTypes = getGame().getSpecification().getGoodsTypeList();
         Market market = serverPlayer.getMarket();
 
         // Pick a random type of goods to remove an extra amount of.
@@ -589,7 +589,7 @@ public final class InGameController extends Controller {
         
                     if (targetTile != null) {
                         
-                        List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
+                        List<UnitType> converts = getGame().getSpecification().getUnitTypesWithAbility("model.ability.convert");
                         if (converts.size() > 0) {
                             // perform the conversion from brave to convert in the server
                             Unit brave = indianSettlement.getUnitIterator().next();
@@ -714,7 +714,7 @@ public final class InGameController extends Controller {
                         if (conn != null) {
                             try {
                                 Element reply = conn.ask(chooseFoundingFatherElement);
-                                FoundingFather father = FreeCol.getSpecification().
+                                FoundingFather father = getGame().getSpecification().
                                     getFoundingFather(reply.getAttribute("foundingFather"));
                                 if (!randomFoundingFathers.contains(father)) {
                                     throw new IllegalArgumentException();
@@ -740,7 +740,7 @@ public final class InGameController extends Controller {
      */
     private List<FoundingFather> getRandomFoundingFathers(Player player) {
         // Build weighted random choice for each father type
-        Specification spec = FreeCol.getSpecification();
+        Specification spec = getGame().getSpecification();
         int age = getGame().getTurn().getAge();
         EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
             = new EnumMap<FoundingFatherType,
@@ -834,7 +834,7 @@ public final class InGameController extends Controller {
      * @param action The monarch action.
      */
     private void monarchAction(ServerPlayer serverPlayer, MonarchAction action) {
-        Specification spec = Specification.getSpecification();
+        Specification spec = getGame().getSpecification();
         Monarch monarch = serverPlayer.getMonarch();
         Connection conn = serverPlayer.getConnection();
         int turn = getGame().getTurn().getNumber();
@@ -924,7 +924,7 @@ public final class InGameController extends Controller {
                 break;
                 case Monarch.SUPPORT_SEA:
                 // TODO: make this generic
-                UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+                UnitType unitType = getGame().getSpecification().getUnitType("model.unit.frigate");
                 newUnit = new Unit(getGame(), serverPlayer.getEurope(), serverPlayer, unitType, UnitState.ACTIVE);
                 //serverPlayer.getEurope().add(newUnit);
                 monarchActionElement.appendChild(newUnit.toXMLElement(serverPlayer, monarchActionElement
@@ -982,8 +982,8 @@ public final class InGameController extends Controller {
     }
     
     public List<Unit> createREFUnits(ServerPlayer player, ServerPlayer refPlayer){
-        EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
-        EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+        EquipmentType muskets = getGame().getSpecification().getEquipmentType("model.equipment.muskets");
+        EquipmentType horses = getGame().getSpecification().getEquipmentType("model.equipment.horses");
         
         List<Unit> unitsList = new ArrayList<Unit>();
         List<Unit> navalUnits = new ArrayList<Unit>();
@@ -1069,8 +1069,8 @@ public final class InGameController extends Controller {
             horsesTypeStr = "model.equipment.horses";
         }
 
-        final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType(musketsTypeStr);
-        final EquipmentType horses = FreeCol.getSpecification().getEquipmentType(horsesTypeStr);
+        final EquipmentType muskets = getGame().getSpecification().getEquipmentType(musketsTypeStr);
+        final EquipmentType horses = getGame().getSpecification().getEquipmentType(horsesTypeStr);
 
         EquipmentType[] soldier = new EquipmentType[] { muskets };
         EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
@@ -1285,7 +1285,7 @@ public final class InGameController extends Controller {
         // Generalized continental army muster
         java.util.Map<UnitType, UnitType> upgrades
             = new HashMap<UnitType, UnitType>();
-        Specification spec = Specification.getSpecification();
+        Specification spec = getGame().getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
             UnitType upgrade = unitType.getUnitTypeChange(ChangeType.INDEPENDENCE,
                                                           serverPlayer);
@@ -2119,7 +2119,7 @@ public final class InGameController extends Controller {
         LostCityRumour lostCity = tile.getLostCityRumour();
         if (lostCity == null) return;
 
-        Specification specification = FreeCol.getSpecification();
+        Specification specification = getGame().getSpecification();
         int difficulty = specification.getRangeOption("model.option.difficulty").getValue();
         int dx = 10 - difficulty;
         Game game = unit.getGame();
@@ -3504,7 +3504,7 @@ public final class InGameController extends Controller {
         UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
         if (skill == null) {
             // Seasoned Scout
-            Specification spec = FreeCol.getSpecification();
+            Specification spec = getGame().getSpecification();
             List<UnitType> unitList
                 = spec.getUnitTypesWithAbility("model.ability.expertScout");
             return unitList.get(random.nextInt(unitList.size()));

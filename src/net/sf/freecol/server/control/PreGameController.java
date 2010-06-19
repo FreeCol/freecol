@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -148,7 +147,7 @@ public final class PreGameController extends Controller {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             
             if (player.isEuropean() && !player.isREF()) {
-                player.modifyGold(Specification.getSpecification()
+                player.modifyGold(getGame().getSpecification()
                                   .getIntegerOption(GameOptions.STARTING_MONEY).getValue());
 
                 // Generates the initial recruits for this player.
@@ -157,11 +156,11 @@ public final class PreGameController extends Controller {
                 Europe europe = player.getEurope();
                 for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                     String optionId = "model.option.recruitable.slot" + index;
-                    if (Specification.getSpecification().hasOption(optionId)) {
-                        String unitTypeId = Specification.getSpecification()
+                    if (getGame().getSpecification().hasOption(optionId)) {
+                        String unitTypeId = getGame().getSpecification()
                             .getStringOption(optionId).getValue();
                         if (!StringOption.NONE.equals(unitTypeId)) {
-                            europe.setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
+                            europe.setRecruitable(index, getGame().getSpecification().getUnitType(unitTypeId));
                             continue;
                         }
                     }
@@ -169,7 +168,7 @@ public final class PreGameController extends Controller {
                 }
 
                 Market market = player.getMarket();
-                for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
                     if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {
                         int increase = random.nextInt(3);
                         if (increase > 0) {

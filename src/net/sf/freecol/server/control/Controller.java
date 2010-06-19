@@ -29,11 +29,8 @@ import net.sf.freecol.server.networking.Server;
  * model and for communicating with the clients.
  */
 public abstract class Controller extends FreeColServerHolder {
+
     private static final Logger logger = Logger.getLogger(Controller.class.getName());
-
-
-
-
 
     /**
      * The constructor to use.

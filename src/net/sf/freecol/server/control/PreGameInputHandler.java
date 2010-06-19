@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Nation;
@@ -172,7 +171,7 @@ public final class PreGameInputHandler extends InputHandler {
     private Element nation(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
+            Nation nation = getGame().getSpecification().getNation(element.getAttribute("value"));
             if (getFreeColServer().getGame().getNationOptions().getNations().get(nation) ==
                 NationState.AVAILABLE) {
                 player.setNation(nation);
@@ -198,8 +197,8 @@ public final class PreGameInputHandler extends InputHandler {
     private Element nationType(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
-            NationType fixedNationType = FreeCol.getSpecification().getNation(player.getNationID()).getType();
+            NationType nationType = getGame().getSpecification().getNationType(element.getAttribute("value"));
+            NationType fixedNationType = getGame().getSpecification().getNation(player.getNationID()).getType();
             Advantages advantages = getFreeColServer().getGame().getNationOptions().getNationalAdvantages();
             if (advantages == Advantages.SELECTABLE
                 || (advantages == Advantages.FIXED && nationType.equals(fixedNationType))) {
@@ -226,7 +225,7 @@ public final class PreGameInputHandler extends InputHandler {
     private Element available(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
+            Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
             NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
             getFreeColServer().getGame().getNationOptions().setNationState(nation, state);
             getFreeColServer().getServer().sendToAll(element, player.getConnection());
@@ -261,7 +260,7 @@ public final class PreGameInputHandler extends InputHandler {
         LinkedList<Nation> nations = new LinkedList<Nation>();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-            final Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
+            final Nation nation = getGame().getSpecification().getNation(player.getNationID());
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {
                 if (nations.get(i) == nation) {

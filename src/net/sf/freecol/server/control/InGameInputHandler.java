@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -562,7 +561,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         String taskID = element.getAttribute("taskID");
         Location location = (Location) getGame().getFreeColGameObject(element.getAttribute("location"));
         Player owner = (Player) getGame().getFreeColGameObject(element.getAttribute("owner"));
-        UnitType type = FreeCol.getSpecification().getUnitType(element.getAttribute("type"));
+        UnitType type = getGame().getSpecification().getUnitType(element.getAttribute("type"));
         if (location == null) {
             throw new NullPointerException();
         }
@@ -586,7 +585,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         logger.info("Receiving \"createBuilding\"-request.");
         String taskID = element.getAttribute("taskID");
         Colony colony = (Colony) getGame().getFreeColGameObject(element.getAttribute("colony"));
-        BuildingType type = FreeCol.getSpecification().getBuildingType(element.getAttribute("type"));
+        BuildingType type = getGame().getSpecification().getBuildingType(element.getAttribute("type"));
         if (colony == null) {
             throw new NullPointerException();
         }
@@ -993,7 +992,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         String unitId = trainUnitInEuropeElement.getAttribute("unitType");
-        UnitType unitType = FreeCol.getSpecification().getUnitType(unitId);
+        UnitType unitType = getGame().getSpecification().getUnitType(unitId);
         Unit unit = new Unit(getGame(), europe, player, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
@@ -1011,7 +1010,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
         String typeString = workElement.getAttribute("type");
-        EquipmentType type = FreeCol.getSpecification().getEquipmentType(typeString);
+        EquipmentType type = getGame().getSpecification().getEquipmentType(typeString);
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -1091,7 +1090,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         String workTypeString = workElement.getAttribute("workType");
         if (workTypeString != null) {
-            GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeString);
+            GoodsType workType = getGame().getSpecification().getGoodsType(workTypeString);
             // No reason to send an update to other players: this is always hidden.
             unit.setWorkType(workType);
 
@@ -1123,7 +1122,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.appendChild(tile.getTileItemContainer().toXMLElement(player, reply.getOwnerDocument()));
             }
 
-            TileImprovementType type = FreeCol.getSpecification().getTileImprovementType(improvementTypeString);
+            TileImprovementType type = getGame().getSpecification().getTileImprovementType(improvementTypeString);
             TileImprovement improvement = unit.getTile().findTileImprovementType(type);
             if (improvement == null) {
                 // create new improvement
@@ -1196,7 +1195,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int size = Integer.parseInt(setBuildQueueElement.getAttribute("size"));
         for (int x = 0; x < size; x++) {
             String typeId = setBuildQueueElement.getAttribute("x" + Integer.toString(x));
-            buildQueue.add((BuildableType) Specification.getSpecification().getType(typeId));
+            buildQueue.add((BuildableType) getGame().getSpecification().getType(typeId));
         }
 
         colony.setBuildQueue(buildQueue);
@@ -1294,7 +1293,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element payArrears(Connection connection, Element payArrearsElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(payArrearsElement.getAttribute("goodsType"));
+        GoodsType goodsType = getGame().getSpecification().getGoodsType(payArrearsElement.getAttribute("goodsType"));
         int arrears = player.getArrears(goodsType);
         if (player.getGold() < arrears) {
             throw new IllegalStateException("Not enough gold to pay tax arrears!");
@@ -1451,7 +1450,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element getREFUnits(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        UnitType defaultType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        UnitType defaultType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
         if (player.getMonarch() == null) {
             ServerPlayer enemyPlayer = (ServerPlayer) player.getREFPlayer();
             java.util.Map<UnitType, EnumMap<Role, Integer>> unitHash =
