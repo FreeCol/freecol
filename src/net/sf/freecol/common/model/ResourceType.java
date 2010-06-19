@@ -87,22 +87,16 @@ public final class ResourceType extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         if (maxValue > -1) {
             out.writeAttribute("maximum-value", Integer.toString(maxValue));
             out.writeAttribute("minimum-value", Integer.toString(minValue));
         }
-
-        writeFeatures(out);
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

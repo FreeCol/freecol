@@ -215,7 +215,18 @@ public class FreeColGameObjectType extends FreeColObject {
         // currently, FreeColGameObjectTypes are not serialized
     }
 
-    protected void writeFeatures(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
+        out.writeStartElement(tag);
+        writeAttributes(out);
+        writeChildren(out);
+        out.writeEndElement();
+    }
+
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    }
+
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         for (Ability ability: featureContainer.getAbilities()) {
             ability.toXMLImpl(out);
         }

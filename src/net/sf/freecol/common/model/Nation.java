@@ -160,12 +160,12 @@ public class Nation extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("nation-type", type.getId());
         out.writeAttribute("selectable", Boolean.toString(selectable));
         if (anthem != null) {
@@ -174,10 +174,6 @@ public class Nation extends FreeColGameObjectType {
         if (refNation != null) {
             out.writeAttribute("ref", refNation.getId());
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

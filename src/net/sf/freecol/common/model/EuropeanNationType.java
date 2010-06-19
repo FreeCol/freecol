@@ -178,15 +178,17 @@ public class EuropeanNationType extends NationType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("ref", Boolean.toString(ref));
+    }
 
-        writeFeatures(out);
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
 
         if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
             // default map
@@ -198,10 +200,6 @@ public class EuropeanNationType extends NationType {
                 writeUnit(out, entry.getKey(), entry.getValue(), true);
             }
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     protected void writeUnit(XMLStreamWriter out, String id, AbstractUnit unit, boolean expert)

@@ -256,19 +256,21 @@ public class IndianNationType extends NationType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("number-of-settlements", numberOfSettlements.toString().toLowerCase());
         out.writeAttribute("aggression", aggression.toString().toLowerCase());
         out.writeAttribute("type-of-settlement", getTypeOfSettlement().toString().toLowerCase());
         out.writeAttribute("settlementRadius", Integer.toString(getSettlementRadius()));
         out.writeAttribute("capitalRadius", Integer.toString(getCapitalRadius()));
+    }
 
-        writeFeatures(out);
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
 
         for (RandomChoice<UnitType> choice : skills) {
             out.writeStartElement("skill");
@@ -282,10 +284,6 @@ public class IndianNationType extends NationType {
             out.writeAttribute(ID_ATTRIBUTE_TAG, region);
             out.writeEndElement();
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

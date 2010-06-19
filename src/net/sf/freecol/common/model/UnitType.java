@@ -681,11 +681,11 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("offence", Integer.toString(offence));
         out.writeAttribute("defence", Integer.toString(defence));
@@ -712,7 +712,10 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         if (expertProduction != null) {
             out.writeAttribute("expert-production", expertProduction.getId());
         }
+    }
 
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
         for (UnitTypeChange change : typeChanges) {
             change.toXMLImpl(out);
         }
@@ -721,11 +724,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             out.writeAttribute(ID_ATTRIBUTE_TAG, defaultEquipment.getId());
             out.writeEndElement();
         }
-        super.writeChildren(out);
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

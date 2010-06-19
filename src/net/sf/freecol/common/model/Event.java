@@ -100,18 +100,11 @@ public class Event extends FreeColGameObjectType {
     }
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
-    }
-
-    public static String getXMLElementTagName() {
-        return "event";
+        super.toXMLImpl(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        super.writeAttributes(out);
         if (value != null) {
             out.writeAttribute(VALUE_TAG, value);
         }
@@ -122,7 +115,7 @@ public class Event extends FreeColGameObjectType {
 
 
     public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        writeFeatures(out);
+        super.writeChildren(out);
         if (limits != null) {
             for (Limit limit : limits) {
                 limit.toXMLImpl(out);
@@ -153,6 +146,10 @@ public class Event extends FreeColGameObjectType {
         }
     }
 
+
+    public static String getXMLElementTagName() {
+        return "event";
+    }
 
 
 }

@@ -182,6 +182,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
         if (limits != null) {
             for (Limit limit : limits) {
                 limit.toXMLImpl(out);
@@ -201,7 +202,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
                 out.writeEndElement();
             }
         }
-        writeFeatures(out);
     }
 
 }

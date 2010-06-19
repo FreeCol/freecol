@@ -267,16 +267,18 @@ public class EquipmentType extends BuildableType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("maximum-count", Integer.toString(maximumCount));
         out.writeAttribute("combat-loss-priority", Integer.toString(combatLossPriority));
         out.writeAttribute("role", role.toString().toLowerCase());
+    }
 
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
         for (Map.Entry<String, Boolean> entry : getLocationAbilitiesRequired().entrySet()) {
             out.writeStartElement("required-location-ability");
@@ -297,10 +299,6 @@ public class EquipmentType extends BuildableType {
             out.writeAttribute("by-indians", Boolean.toString(captureEquipmentByIndians));
             out.writeEndElement();
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

@@ -398,12 +398,12 @@ public final class GoodsType extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("is-farmed", Boolean.toString(isFarmed));
         out.writeAttribute("is-food", Boolean.toString(isFood));
         out.writeAttribute("ignore-limit", Boolean.toString(ignoreLimit));
@@ -421,7 +421,10 @@ public final class GoodsType extends FreeColGameObjectType {
         if (storedAs != null) {
             out.writeAttribute("stored-as", storedAs.getId());
         }
+    }
 
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
         if (initialAmount > 0) {
             out.writeStartElement("market");
             out.writeAttribute("initial-amount", Integer.toString(initialAmount));
@@ -429,10 +432,6 @@ public final class GoodsType extends FreeColGameObjectType {
             out.writeAttribute("price-difference", Integer.toString(priceDiff));
             out.writeEndElement();
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

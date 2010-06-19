@@ -324,12 +324,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("natural", Boolean.toString(natural));
         out.writeAttribute("add-work-turns", Integer.toString(addWorkTurns));
         out.writeAttribute("movement-cost", Integer.toString(movementCost));
@@ -346,8 +346,10 @@ public final class TileImprovementType extends FreeColGameObjectType {
             out.writeAttribute("deliver-goods-type", deliverGoodsType.getId());
             out.writeAttribute("deliver-amount", Integer.toString(deliverAmount));
         }
+    }
 
-        writeFeatures(out);
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
         if (scopes != null) {
             for (Scope scope : scopes) {
                 scope.toXMLImpl(out);
@@ -368,10 +370,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 out.writeEndElement();
             }
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {

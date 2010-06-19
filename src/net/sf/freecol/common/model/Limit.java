@@ -253,22 +253,6 @@ public final class Limit extends FreeColGameObjectType {
         }
     }
 
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */    
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
-    }
-
     @Override
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
@@ -291,12 +275,26 @@ public final class Limit extends FreeColGameObjectType {
         }
     }
     
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */    
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
+
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        super.writeAttributes(out);
         out.writeAttribute("operator", operator.toString());
     }
 
     public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
         leftHandSide.toXMLImpl(out, "leftHandSide");
         rightHandSide.toXMLImpl(out, "rightHandSide");
     }

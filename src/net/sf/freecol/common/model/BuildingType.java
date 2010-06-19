@@ -161,11 +161,11 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         if (upgradesFrom != null) {
             out.writeAttribute("upgradesFrom", upgradesFrom.getId());
@@ -182,11 +182,6 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         if (produces != null) {
             out.writeAttribute("produces", produces.getId());
         }
-        super.writeChildren(out);
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     /**

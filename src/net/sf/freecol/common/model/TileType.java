@@ -415,18 +415,22 @@ public final class TileType extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
+    }
 
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("basic-move-cost", Integer.toString(basicMoveCost));
         out.writeAttribute("basic-work-turns", Integer.toString(basicWorkTurns));
         out.writeAttribute("is-forest", Boolean.toString(forest));
         out.writeAttribute("is-water", Boolean.toString(water));
         out.writeAttribute("is-connected", Boolean.toString(connected));
         out.writeAttribute("can-settle", Boolean.toString(canSettle));
+    }
+
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
 
         out.writeStartElement("gen");
         out.writeAttribute("humidityMin", Integer.toString(humidity[0]));
@@ -475,10 +479,6 @@ public final class TileType extends FreeColGameObjectType {
             out.writeAttribute("probability", Integer.toString(choice.getProbability()));
             out.writeEndElement();
         }
-
-        // End element:
-        out.writeEndElement();
-
     }
 
     public static String getXMLElementTagName() {
