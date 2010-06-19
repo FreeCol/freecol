@@ -101,7 +101,7 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
             int production = 0;
             for (Colony colony : player.getColonies()) {
-                production += colony.getProductionOf(Specification.getSpecification()
+                production += colony.getProductionOf(getSpecification()
                                                      .getGoodsType("model.goods.crosses"));
             }
             int turns = 100;

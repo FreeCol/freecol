@@ -29,7 +29,6 @@ import javax.swing.JViewport;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
@@ -86,13 +85,13 @@ public final class ReportRequirementsPanel extends ReportPanel {
         JTextPane textPane = getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
 
-        int numberUnitTypes = FreeCol.getSpecification().numberOfUnitTypes();
-        int numberGoodsTypes = FreeCol.getSpecification().numberOfGoodsTypes();
+        int numberUnitTypes = getSpecification().numberOfUnitTypes();
+        int numberGoodsTypes = getSpecification().numberOfGoodsTypes();
         unitCount = new int[colonies.size()][numberUnitTypes];
         canTrain = new boolean[colonies.size()][numberUnitTypes];
         surplus = new int[colonies.size()][numberGoodsTypes];
 
-        List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+        List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
         // check which colonies can train which units
         for (int index = 0; index < colonies.size(); index++) {
             Colony colony = colonies.get(index);
@@ -127,7 +126,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 Unit unit = colonyTile.getUnit();
                 if (unit != null) {
                     GoodsType workType = unit.getWorkType();
-                    UnitType expert = FreeCol.getSpecification().getExpertForProducing(workType);
+                    UnitType expert = getSpecification().getExpertForProducing(workType);
                     int expertIndex = expert.getIndex();
                     if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
                         addExpertWarning(doc, index, workType, expert);

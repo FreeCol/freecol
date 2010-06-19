@@ -249,7 +249,7 @@ public final class DragListener extends MouseAdapter {
         Colony colony = tempUnit.getLocation().getColony();
         boolean separatorNeeded = false;
 
-        List<GoodsType> farmedGoods = Specification.getSpecification().getFarmedGoodsTypeList();
+        List<GoodsType> farmedGoods = canvas.getSpecification().getFarmedGoodsTypeList();
         // Work in Field - automatically find the best location
         for (GoodsType goodsType : farmedGoods) {
             ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, false, goodsType);
@@ -349,7 +349,7 @@ public final class DragListener extends MouseAdapter {
         }
         int experience = Math.min(tempUnit.getExperience(), 200);
         if (experience > 0 && tempUnit.getWorkType() != null) {
-            UnitType workType = Specification.getSpecification()
+            UnitType workType = canvas.getSpecification()
                 .getExpertForProducing(tempUnit.getWorkType());
             if (tempUnit.getType().canBeUpgraded(workType, ChangeType.EXPERIENCE)) {
                 JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
@@ -437,7 +437,7 @@ public final class DragListener extends MouseAdapter {
 
         EquipmentType horses = null;
         EquipmentType muskets = null;
-        for (EquipmentType equipmentType : Specification.getSpecification().getEquipmentTypeList()) {
+        for (EquipmentType equipmentType : canvas.getSpecification().getEquipmentTypeList()) {
             int count = tempUnit.getEquipment().getCount(equipmentType);
             if (count > 0) {
                 // "remove current equipment" action

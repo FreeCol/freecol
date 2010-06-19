@@ -65,7 +65,7 @@ public class NewEmptyMapAction extends MapboardAction {
         final Canvas canvas = getFreeColClient().getCanvas();
         final Game game = freeColClient.getGame();
 
-        Dimension size = canvas.showFreeColDialog(FreeColDialog.createMapSizeDialog());
+        Dimension size = canvas.showFreeColDialog(FreeColDialog.createMapSizeDialog(canvas));
         if (size == null) {
             return;
         }

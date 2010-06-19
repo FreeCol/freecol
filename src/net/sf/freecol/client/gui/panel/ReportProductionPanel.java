@@ -29,7 +29,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
@@ -67,7 +66,7 @@ public final class ReportProductionPanel extends ReportPanel {
         goodsTypes = new ArrayList<GoodsType>();
         List<String> goodsNames = new ArrayList<String>();
         goodsNames.add(Messages.message("nothing"));
-        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFarmed()) {
                 goodsTypes.add(goodsType);
                 goodsNames.add(Messages.message(goodsType.getNameKey()));
@@ -117,7 +116,7 @@ public final class ReportProductionPanel extends ReportPanel {
             List<List<BuildingType>> basicBuildingTypes = new ArrayList<List<BuildingType>>();
             for (GoodsType goodsType : selectedTypes) {
                 List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
-                for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+                for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
                     if (goodsType.equals(buildingType.getProducedGoodsType())
                         || !buildingType.getModifierSet(goodsType.getId()).isEmpty()) {
                         BuildingType firstLevel = buildingType.getFirstLevel();

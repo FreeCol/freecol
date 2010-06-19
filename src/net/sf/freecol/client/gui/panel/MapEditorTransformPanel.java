@@ -81,15 +81,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
-    private static final UnitType BRAVE = Specification.getSpecification().getUnitType("model.unit.brave");
-
     private final JPanel listPanel;
     private JToggleButton settlementButton;
 
     private ButtonGroup group;
-
-    private static final TileImprovementType riverType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.river");
 
     /**
      * Describe nativePlayer here.
@@ -109,7 +104,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (server.getAIMain() == null) {
                 server.setAIMain(new AIMain(server));
             }
-            for (Nation nation : Specification.getSpecification().getIndianNations()) {
+            for (Nation nation : getSpecification().getIndianNations()) {
                 server.addAIPlayer(nation);
             }
         }
@@ -134,7 +129,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Builds the buttons for all the terrains.
      */
     private void buildList() {
-        List<TileType> tileList = Specification.getSpecification().getTileTypeList();
+        List<TileType> tileList = getSpecification().getTileTypeList();
         for (TileType type : tileList) {
             listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5),
                                       Messages.message(type.getNameKey()),
@@ -146,7 +141,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getLibrary().getRiverImage(20, 0.5),
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
-        listPanel.add(buildButton(getLibrary().getBonusImage(Specification.getSpecification()
+        listPanel.add(buildButton(getLibrary().getBonusImage(getSpecification()
                                                              .getResourceTypeList().get(0), 0.8),
                                   Messages.message("editor.resource"), new ResourceTransform()));
         listPanel.add(buildButton(getLibrary().getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
@@ -283,6 +278,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
 
         public void transform(Tile tile) {
+            TileImprovementType riverType =
+                tile.getSpecification().getTileImprovementType("model.improvement.river");
+
             if (tile.getType().canHaveImprovement(riverType)) {
                 TileItemContainer tic = tile.getTileItemContainer();
                 if (tic == null) {
@@ -400,9 +398,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     settlement = new IndianSettlement(t.getGame(), nativePlayer, t, name, false,
                                                       skill, new HashSet<Player>(), null);
                     t.setSettlement(settlement);
+                    UnitType brave = getSpecification().getUnitType("model.unit.brave");
                     for (int index = 0; index < 5; index++) {
                         settlement.add(new Unit(settlement.getGame(), settlement, settlement.getOwner(),
-                                                BRAVE, UnitState.ACTIVE));
+                                                brave, UnitState.ACTIVE));
                     }
                 }
             }

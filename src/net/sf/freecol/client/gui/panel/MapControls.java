@@ -30,7 +30,6 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -92,7 +91,8 @@ public final class MapControls {
         ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(SentryAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.id)));
-        for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
+        for (ImprovementActionType iaType : freeColClient.getGame().getSpecification()
+                 .getImprovementActionTypeList()) {
             ubList.add(new UnitButton(am.getFreeColAction(iaType.getId())));
         }
         ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.id)));

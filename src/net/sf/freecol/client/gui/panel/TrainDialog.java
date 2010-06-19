@@ -31,7 +31,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -79,13 +78,13 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
 
         switch(europeAction) {
         case TRAIN:
-            trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
+            trainableUnits.addAll(getSpecification().getUnitTypesTrainedInEurope());
             question = new JLabel(Messages.message("trainDialog.clickOn"));
             setLayout(new MigLayout("wrap 3", "[sg]", ""));
             break;
         case PURCHASE:
         default:
-            trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesPurchasedInEurope());
+            trainableUnits.addAll(getSpecification().getUnitTypesPurchasedInEurope());
             question  = new JLabel(Messages.message("purchaseDialog.clickOn"));
             setLayout(new MigLayout("wrap 2", "[sg]", ""));
         }
@@ -154,7 +153,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         if (TRAIN_DONE.equals(command)) {
             setResponse(new Integer(-1));
         } else {
-            UnitType unitType = FreeCol.getSpecification().getUnitType(command);
+            UnitType unitType = getSpecification().getUnitType(command);
             getController().trainUnitInEurope(unitType);
             initialize();
         }

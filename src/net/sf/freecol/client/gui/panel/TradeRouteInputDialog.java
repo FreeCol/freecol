@@ -49,7 +49,6 @@ import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -342,7 +341,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         public GoodsPanel() {
             super(new GridLayout(0, 5, margin, margin));
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     CargoLabel label = new CargoLabel(goodsType);
                     add(label);

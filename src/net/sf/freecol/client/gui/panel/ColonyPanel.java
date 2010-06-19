@@ -63,7 +63,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -507,11 +506,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public void updateProductionPanel() {
         rightProductionPanel.removeAll();
 
-        GoodsType grain = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType grain = getSpecification().getGoodsType("model.goods.food");
         int food = 0;
 
         List<AbstractGoods> foodProduction = new ArrayList<AbstractGoods>();
-        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             int production = colony.getProductionOf(goodsType);
             if (production != 0) {
                 if (goodsType.isFoodType()) {
@@ -1154,7 +1153,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         private void update() {
             removeAll();
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     Goods goods = colony.getGoodsContainer().getGoods(goodsType);
                     if (goods.getAmount() >= getClient().getClientOptions()

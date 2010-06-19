@@ -51,7 +51,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -341,7 +340,7 @@ public final class EuropePanel extends FreeColPanel {
             }       
         }
 
-        List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+        List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
             if (goodsType.isStorable()) {
                 MarketLabel marketLabel = new MarketLabel(goodsType, getMyPlayer().getMarket(), getCanvas());

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
@@ -376,7 +375,7 @@ public class LabourData {
     private UnitData scout;
 
     public LabourData(FreeColClient client) {
-        Specification spec = FreeCol.getSpecification();
+        Specification spec = client.getGame().getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
             if (!unitType.isAvailableTo(client.getMyPlayer())) {
                 continue;
@@ -447,7 +446,7 @@ public class LabourData {
     }
 
     public static List<UnitType> getLabourTypes(Player player) {
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        List<UnitType> unitTypes = player.getSpecification().getUnitTypeList();
         ArrayList<UnitType> labourTypes = new ArrayList<UnitType>();
         for (UnitType unitType : unitTypes) {
             if (unitType.hasSkill() && unitType.isAvailableTo(player)) {

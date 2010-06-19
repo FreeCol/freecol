@@ -33,7 +33,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
@@ -77,7 +76,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         unitOnLand = new TypeCountMap<UnitType>();
         unitInEurope = new TypeCountMap<UnitType>();
         unitLocations = new HashMap<UnitType, Map<Colony, Integer>>();
-        for (UnitType type : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType type : getSpecification().getUnitTypeList()) {
             unitLocations.put(type, new HashMap<Colony, Integer>());
         }
 
@@ -117,7 +116,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
     public void displayData() {
 
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        List<UnitType> unitTypes = getSpecification().getUnitTypeList();
         ArrayList<UnitType> colonists = new ArrayList<UnitType>();
         for (UnitType unitType : unitTypes) {
             if (unitType.hasSkill()) {
@@ -223,7 +222,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         if (OK.equals(command)) {
             super.actionPerformed(event);
         } else {
-            UnitType unitType = FreeCol.getSpecification().getUnitType(command);
+            UnitType unitType = getSpecification().getUnitType(command);
             ReportLabourDetailPanel details = new ReportLabourDetailPanel(getCanvas());
             details.setDetailPanel(createUnitDetails(unitType, details));
             getCanvas().addAsFrame(details);

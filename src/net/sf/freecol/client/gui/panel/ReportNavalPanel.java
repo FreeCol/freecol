@@ -95,7 +95,7 @@ public final class ReportNavalPanel extends ReportPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> ships = new ArrayList<AbstractUnit>();
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player) && unitType.hasAbility("model.ability.navalUnit")) {
                 ships.add(new AbstractUnit(unitType, Role.DEFAULT, navalUnits.getCount(unitType)));
             }

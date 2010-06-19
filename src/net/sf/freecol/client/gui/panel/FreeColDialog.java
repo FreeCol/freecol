@@ -357,9 +357,9 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
 
-    public static FreeColDialog<Dimension> createMapSizeDialog() {
+    public static FreeColDialog<Dimension> createMapSizeDialog(final Canvas canvas) {
 
-        final int defaultSize = FreeCol.getSpecification().getRangeOption("model.option.mapSize")
+        final int defaultSize = canvas.getSpecification().getRangeOption("model.option.mapSize")
             .getValue();
         final int defaultHeight = MapGeneratorOptions.getHeight(defaultSize);
         final int defaultWidth = MapGeneratorOptions.getWidth(defaultSize);
@@ -371,10 +371,9 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
-        final FreeColDialog<Dimension> mapSizeDialog =
-            new FreeColDialog<Dimension>(FreeCol.getFreeColClient().getCanvas());
+        final FreeColDialog<Dimension> mapSizeDialog = new FreeColDialog<Dimension>(canvas);
 
-        mapSizeDialog.setLayout(new MigLayout("wrap 2", "", ""));
+        mapSizeDialog.setLayout(new MigLayout("wrap 2"));
 
         mapSizeDialog.okButton.setText(Messages.message("ok"));
         mapSizeDialog.okButton.addActionListener(new ActionListener() {
@@ -387,7 +386,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                         }
                         mapSizeDialog.setResponse(new Dimension(width, height));
                     } catch (NumberFormatException nfe) {
-                        FreeCol.getFreeColClient().getCanvas().errorMessage("integerAboveZero");
+                        canvas.errorMessage("integerAboveZero");
                     }
                 }
             });

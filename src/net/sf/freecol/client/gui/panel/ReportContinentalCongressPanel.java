@@ -23,7 +23,6 @@ package net.sf.freecol.client.gui.panel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -69,7 +68,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             currentFatherLabel.setVerticalTextPosition(JLabel.TOP);
             currentFatherLabel.setHorizontalTextPosition(JLabel.CENTER);
             reportPanel.add(currentFatherLabel);
-            GoodsType bellsType = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+            GoodsType bellsType = getSpecification().getGoodsType("model.goods.bells");
             FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), bellsType);
             int total = 0;
             for (Colony colony : player.getColonies()) {

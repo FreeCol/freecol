@@ -327,7 +327,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildTerrainSubtree(DefaultMutableTreeNode parent) {
-        for (TileType t : Specification.getSpecification().getTileTypeList()) {
+        for (TileType t : getSpecification().getTileTypeList()) {
             buildTerrainItem(t, parent);
         }
     }
@@ -337,7 +337,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildResourceSubtree(DefaultMutableTreeNode parent) {
-        for (ResourceType r : Specification.getSpecification().getResourceTypeList()) {
+        for (ResourceType r : getSpecification().getResourceTypeList()) {
             buildResourceItem(r, parent);
         }
     }
@@ -347,7 +347,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildUnitSubtree(DefaultMutableTreeNode parent) {
-        for (UnitType u : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType u : getSpecification().getUnitTypeList()) {
             if (u.getSkill() <= 0 ||
                 u.hasAbility("model.ability.expertSoldier")) {
                 buildUnitItem(u, 0.5f, parent);
@@ -360,7 +360,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildGoodsSubtree(DefaultMutableTreeNode parent) {
-        for (GoodsType g : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType g : getSpecification().getGoodsTypeList()) {
             buildGoodsItem(g, parent);
         }
     }
@@ -370,7 +370,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildSkillsSubtree(DefaultMutableTreeNode parent) {
-        for (UnitType u : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType u : getSpecification().getUnitTypeList()) {
             if (u.getSkill() > 0) {
                 buildUnitItem(u, 0.5f, parent);
             }
@@ -388,7 +388,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
         Map<BuildingType, DefaultMutableTreeNode> buildingHash =
             new HashMap<BuildingType, DefaultMutableTreeNode>();
-        for (BuildingType buildingType : Specification.getSpecification().getBuildingTypeList()) {
+        for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.message(buildingType.getNameKey());
                 DefaultMutableTreeNode item =
@@ -431,7 +431,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             fathersByType.put(fatherType, new ArrayList<FoundingFather>());
         }
-        for (FoundingFather foundingFather : Specification.getSpecification().getFoundingFathers()) {
+        for (FoundingFather foundingFather : getSpecification().getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
@@ -451,10 +451,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildNationsSubtree(DefaultMutableTreeNode parent) {
-        for (Nation type : Specification.getSpecification().getEuropeanNations()) {
+        for (Nation type : getSpecification().getEuropeanNations()) {
             buildNationItem(type, parent);
         }
-        for (Nation type : Specification.getSpecification().getIndianNations()) {
+        for (Nation type : getSpecification().getIndianNations()) {
             buildNationItem(type, parent);
         }
     }
@@ -465,9 +465,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildNationTypesSubtree(DefaultMutableTreeNode parent) {
         List<NationType> nations = new ArrayList<NationType>();
-        nations.addAll(Specification.getSpecification().getEuropeanNationTypes());
-        nations.addAll(Specification.getSpecification().getREFNationTypes());
-        nations.addAll(Specification.getSpecification().getIndianNationTypes());
+        nations.addAll(getSpecification().getEuropeanNationTypes());
+        nations.addAll(getSpecification().getREFNationTypes());
+        nations.addAll(getSpecification().getIndianNationTypes());
         for (NationType type : nations) {
             buildNationTypeItem(type, parent);
         }
@@ -723,7 +723,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 List<String> scopeStrings = new ArrayList<String>();
                 for (Scope scope : modifier.getScopes()) {
                     if (scope.getType() != null) {
-                        FreeColGameObjectType objectType = Specification.getSpecification()
+                        FreeColGameObjectType objectType = getSpecification()
                             .getType(scope.getType());
                         scopeStrings.add(Messages.message(objectType.getNameKey()));
                     }
@@ -733,7 +733,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 }
             }
                         
-            GoodsType goodsType = Specification.getSpecification().getGoodsType(modifier.getId());
+            GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
             JButton goodsButton = getGoodsButton(goodsType, text);
             goodsPanel.add(goodsButton);
         }
@@ -784,7 +784,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             detailPanel.add(new JLabel(Integer.toString(type.getSkill())));
 
             List<BuildingType> schools = new ArrayList<BuildingType>();
-            for (final BuildingType buildingType : Specification.getSpecification().getBuildingTypeList()) {
+            for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
                 if (buildingType.hasAbility("model.ability.teach") && 
                     buildingType.canAdd(type)) {
                     schools.add(buildingType);
@@ -834,7 +834,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         List<Modifier> bonusList = new ArrayList<Modifier>();
-        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             bonusList.addAll(type.getModifierSet(goodsType.getId()));
         }
         int bonusNumber = bonusList.size();
@@ -844,7 +844,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             JPanel productionPanel = new JPanel(new GridLayout(0, MODIFIERS_PER_ROW));
             productionPanel.setOpaque(false);
             for (Modifier productionBonus : bonusList) {
-                GoodsType goodsType = Specification.getSpecification().getGoodsType(productionBonus.getId());
+                GoodsType goodsType = getSpecification().getGoodsType(productionBonus.getId());
                 String bonus = getModifierAsString(productionBonus);
                 productionPanel.add(getGoodsButton(goodsType, bonus));
             }
@@ -901,7 +901,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             List<TileImprovementType> improvements = new ArrayList<TileImprovementType>();
             List<Modifier> modifiers = new ArrayList<Modifier>();
             for (TileImprovementType improvementType :
-                     Specification.getSpecification().getTileImprovementTypeList()) {
+                     getSpecification().getTileImprovementTypeList()) {
                 Modifier productionModifier = improvementType.getProductionModifier(type);
                 if (productionModifier != null) {
                     improvements.add(improvementType);
@@ -1029,7 +1029,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             JPanel production = new JPanel();
             production.setOpaque(false);
             production.setLayout(new MigLayout("wrap 3, gapx 20", "", ""));
-            for (UnitType unitType2 : Specification.getSpecification().getUnitTypeList()) {
+            for (UnitType unitType2 : getSpecification().getUnitTypeList()) {
                 if (buildingType.canAdd(unitType2)) {
                     production.add(getButton(unitType2));
                 }
@@ -1060,7 +1060,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         // Specialist
         if (workplaces > 0) {
             detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")));
-            final UnitType unitType = Specification.getSpecification()
+            final UnitType unitType = getSpecification()
                 .getExpertForProducing(buildingType.getProducedGoodsType());
             if (unitType == null) {
                 detailPanel.add(new JLabel(none));
@@ -1078,7 +1078,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
             for (Modifier productionBonus : bonusList) {
                 try {
-                    GoodsType goodsType = Specification.getSpecification()
+                    GoodsType goodsType = getSpecification()
                         .getGoodsType(productionBonus.getId());
                     String bonus = getModifierAsString(productionBonus);
                     productionPanel.add(getGoodsButton(goodsType, bonus));
@@ -1395,7 +1395,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                              Messages.message(entry.getKey() + ".name"),
                              doc.getStyle("regular"));
             List<JButton> requiredTypes = new ArrayList<JButton>();
-            for (FreeColGameObjectType type : Specification.getSpecification()
+            for (FreeColGameObjectType type : getSpecification()
                      .getTypesProviding(entry.getKey(), entry.getValue())) {
                 JButton typeButton = getButton(type);
                 typeButton.addActionListener(this);
@@ -1428,7 +1428,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (OK.equals(command)) {
             getCanvas().remove(this);
         } else {
-            FreeColGameObjectType type = Specification.getSpecification().getType(command);
+            FreeColGameObjectType type = getSpecification().getType(command);
             initialize(type);
         }
     }

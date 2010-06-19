@@ -89,7 +89,7 @@ public final class ReportCargoPanel extends ReportPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> cargoTypes = new ArrayList<AbstractUnit>();
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player)
                 && (unitType.canCarryUnits() || unitType.canCarryGoods())) {
                 cargoTypes.add(new AbstractUnit(unitType, Role.DEFAULT, carriers.getCount(unitType)));

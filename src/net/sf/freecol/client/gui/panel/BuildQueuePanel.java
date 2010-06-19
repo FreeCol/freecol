@@ -68,7 +68,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -116,22 +115,20 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      * A list of unit types that can be build. Most unit types are
      * human and can never be built.
      */
-    private static final List<UnitType> buildableUnits = new ArrayList<UnitType>();
-
-    static {
-        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-            if (!unitType.getGoodsRequired().isEmpty()) {
-                // can be built
-                buildableUnits.add(unitType);
-            }
-        }
-    }
+    private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
     public BuildQueuePanel(Colony colony, Canvas parent) {
 
         super(parent, new MigLayout("wrap 3", "[260:][260:][260:]", "[][][300:400:][]"));
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
+
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+            if (!unitType.getGoodsRequired().isEmpty()) {
+                // can be built
+                buildableUnits.add(unitType);
+            }
+        }
 
         DefaultListModel current = new DefaultListModel();
         for (BuildableType type : colony.getBuildQueue()) {
@@ -256,7 +253,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                   .hasAbility("model.ability.build", unitType, getGame().getTurn())
                   || featureContainer.hasAbility("model.ability.build", unitType))) {
                 boolean builderFound = false;
-                for (Ability ability : FreeCol.getSpecification().getAbilities("model.ability.build")) {
+                for (Ability ability : getSpecification().getAbilities("model.ability.build")) {
                     if (ability.appliesTo(unitType)
                         && ability.getValue()
                         && ability.getSource() != null
@@ -276,7 +273,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (colony.hasAbility(entry.getKey()) != entry.getValue()
                     && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
-                    List<FreeColGameObjectType> sources = FreeCol.getSpecification()
+                    List<FreeColGameObjectType> sources = getSpecification()
                         .getTypesProviding(entry.getKey(), entry.getValue());
                     if (sources.isEmpty()) {
                         // no type provides the required ability
@@ -303,7 +300,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         DefaultListModel buildings = (DefaultListModel) buildingList.getModel();
         DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
         buildings.clear();
-        loop: for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+        loop: for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
             // compare colony.getNoBuildReason()
             List<String> lockReason = new ArrayList<String>();
             Building colonyBuilding = colony.getBuilding(buildingType);
@@ -330,7 +327,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (colony.hasAbility(entry.getKey()) != entry.getValue()
                     && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
-                    List<FreeColGameObjectType> sources = FreeCol.getSpecification()
+                    List<FreeColGameObjectType> sources = getSpecification()
                         .getTypesProviding(entry.getKey(), entry.getValue());
                     if (sources.isEmpty()) {
                         // no type provides the required ability

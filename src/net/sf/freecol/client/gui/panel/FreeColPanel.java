@@ -240,7 +240,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>Specification</code> value
      */
     public Specification getSpecification() {
-        return getGame().getSpecification();
+        return canvas.getSpecification();
     }
 
     /**

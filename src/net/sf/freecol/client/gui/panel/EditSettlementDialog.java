@@ -62,8 +62,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EditSettlementDialog.class.getName());
 
-    private static final UnitType BRAVE = Specification.getSpecification().getUnitType("model.unit.brave");
-
     private static final String REMOVE = "REMOVE";
     
     private final IndianSettlement settlement;
@@ -184,6 +182,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             settlement.setLearnableSkill((UnitType) skill.getSelectedItem());
             int numberOfUnits = (Integer) units.getValue() - settlement.getUnitCount();
             if (numberOfUnits > 0) {
+                UnitType BRAVE = getSpecification().getUnitType("model.unit.brave");
                 for (int index = 0; index < numberOfUnits; index++) {
                     settlement.add(new Unit(settlement.getGame(), settlement, settlement.getOwner(),
                                             BRAVE, UnitState.ACTIVE));

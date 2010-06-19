@@ -36,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -108,13 +107,13 @@ public final class TilePanel extends FreeColPanel {
 
         if (tileType != null) {
             // TODO: make this more generic
-            UnitType colonist = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+            UnitType colonist = getSpecification().getUnitType("model.unit.freeColonist");
 
             JLabel label = null;
             boolean first = true;
-            for (GoodsType goodsType : FreeCol.getSpecification().getFarmedGoodsTypeList()) {
+            for (GoodsType goodsType : getSpecification().getFarmedGoodsTypeList()) {
                 int potential = tile.potential(goodsType, colonist);
-                UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
+                UnitType expert = getSpecification().getExpertForProducing(goodsType);
                 int expertPotential = tile.potential(goodsType, expert);
                 if (potential > 0) {
                     label = new JLabel(String.valueOf(potential),

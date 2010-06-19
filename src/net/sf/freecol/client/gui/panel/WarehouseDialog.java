@@ -34,7 +34,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -94,7 +93,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
         add(ok, "newline 20, split 2, tag ok");
         add(cancel, "tag cancel");
 
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
                 warehouseDialog.add(new WarehouseGoodsPanel(colony, goodsType));
             }

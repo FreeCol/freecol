@@ -58,7 +58,7 @@ public class RebelToolTip extends JToolTip {
         add(new JLabel(Integer.toString(colony.getTory()) + "%"));
 
         int libertyProduction = 0;
-        for (GoodsType goodsType : Specification.getSpecification().getLibertyGoodsTypeList()) {
+        for (GoodsType goodsType : colony.getSpecification().getLibertyGoodsTypeList()) {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
             int netProduction = colony.getProductionNetOf(goodsType);
             libertyProduction += netProduction;

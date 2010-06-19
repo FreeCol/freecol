@@ -114,6 +114,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
@@ -1666,6 +1667,15 @@ public final class Canvas extends JDesktopPane {
      */
     public FreeColClient getClient() {
         return freeColClient;
+    }
+
+    /**
+     * Describe <code>getSpecification</code> method here.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public Specification getSpecification() {
+        return freeColClient.getGame().getSpecification();
     }
 
     /**

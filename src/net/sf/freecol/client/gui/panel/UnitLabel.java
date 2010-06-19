@@ -38,7 +38,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -326,7 +325,7 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
 	    }
 	    break;
 	case WORK_TILE:
-	    GoodsType goodsType = FreeCol.getSpecification().getGoodsType(arg);
+	    GoodsType goodsType = parent.getSpecification().getGoodsType(arg);
 	    // Change workType first for the benefit of change listeners
 	    inGameController.changeWorkType(unit, goodsType);
 	    // Move unit to best producing ColonyTile
@@ -336,7 +335,7 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
             }
 	    break;
 	case WORK_BUILDING:
-	    BuildingType buildingType = FreeCol.getSpecification().getBuildingType(arg);
+	    BuildingType buildingType = parent.getSpecification().getBuildingType(arg);
 	    Building building = unit.getColony().getBuilding(buildingType);
 	    inGameController.work(unit, building);
 	    break;

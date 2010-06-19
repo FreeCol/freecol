@@ -53,7 +53,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         Player player = getMyPlayer();
 
         reportPanel.add(new JLabel(Messages.message("crosses")));
-        GoodsType crosses = Specification.getSpecification().getGoodsType("model.goods.crosses");
+        GoodsType crosses = getSpecification().getGoodsType("model.goods.crosses");
         FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), crosses);
         reportPanel.add(progressBar, "span");
 

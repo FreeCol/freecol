@@ -78,9 +78,6 @@ public final class ReportMilitaryPanel extends ReportPanel {
      private Map<EquippedUnitType, Integer> unitMap;
     */
 
-    private static final UnitType defaultType =
-        Specification.getSpecification().getUnitType("model.unit.freeColonist");
-
     private List<String> colonyNames;
     private List<String> otherNames;
 
@@ -130,7 +127,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         List<AbstractUnit> scoutUnits = new ArrayList<AbstractUnit>();
         List<AbstractUnit> dragoonUnits = new ArrayList<AbstractUnit>();
         List<AbstractUnit> soldierUnits = new ArrayList<AbstractUnit>();
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player) &&
                 !unitType.hasAbility("model.ability.navalUnit") && 
                 (unitType.hasAbility("model.ability.expertSoldier") ||
@@ -144,6 +141,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 }
             }
         }
+        UnitType defaultType = getSpecification().getUnitType("model.unit.freeColonist");
         dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, dragoons.getCount(defaultType)));
         soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, soldiers.getCount(defaultType)));
         scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, scouts.getCount(defaultType)));
@@ -203,6 +201,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             otherNames.add(Messages.message(player.getEurope().getNameKey()));
         }
 
+        UnitType defaultType = getSpecification().getUnitType("model.unit.freeColonist");
         for (Unit unit : player.getUnits()) {
             if (unit.isOffensiveUnit() && !unit.isNaval()) {
                 UnitType unitType = defaultType;

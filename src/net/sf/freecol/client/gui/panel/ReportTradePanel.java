@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -84,7 +83,7 @@ public final class ReportTradePanel extends ReportPanel {
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);
 
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
                 storableGoods.add(goodsType);
             }
@@ -200,7 +199,7 @@ public final class ReportTradePanel extends ReportPanel {
             JButton colonyButton = createColonyButton(colony, colonyIndex);
             reportPanel.add(colonyButton, "cell 0 " + row + " 1 2");
             column = 0;
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (!goodsType.isStorable()) {
                     continue;
                 }

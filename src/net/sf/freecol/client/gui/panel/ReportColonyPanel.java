@@ -27,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
@@ -95,8 +94,8 @@ public final class ReportColonyPanel extends ReportPanel {
             }
 
             // Production
-            GoodsType food = Specification.getSpecification().getGoodsType("model.goods.food");
-            GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
+            GoodsType food = getSpecification().getGoodsType("model.goods.food");
+            GoodsType horses = getSpecification().getGoodsType("model.goods.horses");
             int count = 0;
             int netFood = colony.getFoodProduction() - colony.getFoodConsumption();
             if (netFood != 0) {
@@ -105,7 +104,7 @@ public final class ReportColonyPanel extends ReportPanel {
                 reportPanel.add(productionLabel, "span 2, top");
                 count++;
             }
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isFoodType()) {
                     continue;
                 }
