@@ -26,6 +26,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -87,7 +88,7 @@ public class ActionManager extends OptionGroup {
         add(new GotoAction(freeColClient));
         add(new GotoTileAction(freeColClient));
         // Initialize ImprovementActions
-        for (ImprovementActionType ia : freeColClient.getGame().getSpecification()
+        for (ImprovementActionType ia : Specification.getSpecification()
                  .getImprovementActionTypeList()) {
             add(new ImprovementAction(freeColClient, ia));
         }
