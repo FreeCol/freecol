@@ -2505,7 +2505,7 @@ public final class InGameController extends Controller {
                     if (tile == null) continue;
                     if (tile.isLand() && tile.getOwner() == welcomer) {
                         tile.setOwner(serverPlayer);
-                        cs.add(See.only(serverPlayer), tile);
+                        cs.add(See.perhaps(), tile);
                         break;
                     }
                 }
@@ -2521,9 +2521,6 @@ public final class InGameController extends Controller {
         // Update the name and note the history.
         cs.addPartial(See.only(serverPlayer), serverPlayer, "newLandName");
         Turn turn = serverPlayer.getGame().getTurn();
-        HistoryEvent h = new HistoryEvent(turn,
-                    HistoryEvent.EventType.DISCOVER_NEW_WORLD)
-            .addName("%name%", name);
         cs.addHistory(serverPlayer,
             new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_NEW_WORLD)
                 .addName("%name%", name));
@@ -2648,7 +2645,7 @@ public final class InGameController extends Controller {
         unit.setLocation(newLocation);
         unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
         unit.setState(UnitState.ACTIVE);
-        cs.add(See.only(serverPlayer), (FreeColGameObject) newLocation);
+        cs.add(See.perhaps(), (FreeColGameObject) newLocation);
 
         // Others can (potentially) see the location.
         sendToOthers(serverPlayer, cs);
@@ -2787,6 +2784,7 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(serverPlayer), m);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+
         // Do not update others, this is all private.
         return cs.build(serverPlayer);
     }
@@ -2828,7 +2826,7 @@ public final class InGameController extends Controller {
                 // teaching ability.  Is this Col1 compliant?
                 unit.setType(settlement.getLearnableSkill());
                 // settlement.setLearnableSkill(null);
-                cs.add(See.only(serverPlayer), unit);
+                cs.add(See.perhaps(), unit);
                 result = "expert";
             } else if (random.nextInt(3) == 0) {
                 // Otherwise 1/3 of cases are tales...
@@ -2959,7 +2957,7 @@ public final class InGameController extends Controller {
         case HAPPY: case CONTENT: case DISPLEASED:
             settlement.setMissionary(unit); //TODO: tension change?
             if (missionary == null) {
-                cs.add(See.only(serverPlayer), settlement);
+                cs.add(See.perhaps(), settlement);
             }
         }
         String messageId = "indianSettlement.mission."
@@ -3357,12 +3355,12 @@ public final class InGameController extends Controller {
         }
 
         // Only have to update the carrier location, as that *must*
-        // include the original location of the goods.  Others can see
-        // capacity change.
+        // include the original location of the goods.
         cs.add(See.only(serverPlayer),
                (FreeColGameObject) unit.getLocation());
         cs.add(See.perhaps().except(serverPlayer), unit);
 
+        // Others might see capacity change.
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -3400,9 +3398,9 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), (FreeColGameObject) loc);
         }
         // Always update unit, to show goods are gone.
-        // Others might see a capacity change.
         cs.add(See.perhaps(), unit);
 
+        // Others might see a capacity change.
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -3434,7 +3432,9 @@ public final class InGameController extends Controller {
         // Valid, change type.
         unit.setType(newType);
 
-        // Update just the unit, others can not see it.  TODO: check!
+        // Update just the unit, others can not see it as this only happens
+        // in-colony.  TODO: why not clear speciality in the open,
+        // you can disband...
         return new ChangeSet().add(See.only(serverPlayer), unit)
             .build(serverPlayer);
     }
@@ -3554,7 +3554,7 @@ public final class InGameController extends Controller {
         // Update with settlement tile, and newly owned tiles.
         List<FreeColGameObject> tiles = new ArrayList<FreeColGameObject>();
         tiles.addAll(settlement.getOwnedTiles());
-        cs.add(See.only(serverPlayer), tiles);
+        cs.add(See.perhaps(), tiles);
 
         cs.addHistory(serverPlayer,
             new HistoryEvent(game.getTurn(),
@@ -3602,11 +3602,11 @@ public final class InGameController extends Controller {
         Map map = serverPlayer.getGame().getMap();
         for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
             if (t.getOwningSettlement() == colony && !ownedTiles.contains(t)) {
-                cs.add(See.only(serverPlayer), t);
+                cs.add(See.perhaps(), t);
             }
         }
 
-        // Potentially lots to see.
+        // Others might see a tile ownership change.
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -3623,9 +3623,10 @@ public final class InGameController extends Controller {
                                      Settlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        // Collect the tiles the settlement owns before disposing.
+        // Collect the tiles the settlement owns before disposing,
+        // except the center tile as that is in the dispose below.
         for (Tile t : settlement.getOwnedTiles()) {
-            if (t != settlement.getTile()) cs.add(See.only(serverPlayer), t);
+            if (t != settlement.getTile()) cs.add(See.perhaps(), t);
         }
 
         // Create history event before disposing.
@@ -3668,7 +3669,7 @@ public final class InGameController extends Controller {
 
         // Update the tile for all, and privately any now-angrier
         // owners, or the player gold if a price was paid.
-        cs.add(See.only(serverPlayer), tile);
+        cs.add(See.perhaps(), tile);
         if (price > 0) {
             serverPlayer.modifyGold(-price);
             owner.modifyGold(price);
@@ -3738,7 +3739,7 @@ public final class InGameController extends Controller {
                 colony.changeOwner(tradeItem.getDestination());
                 List<FreeColGameObject> tiles = new ArrayList<FreeColGameObject>();
                 for (Tile t : colony.getOwnedTiles()) tiles.add(t);
-                cs.add(See.only(former), tiles);
+                cs.add(See.perhaps().always(former), tiles);
             }
             int gold = tradeItem.getGold();
             if (gold > 0) {
@@ -3758,7 +3759,7 @@ public final class InGameController extends Controller {
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer) newUnit.getOwner();
                 unit.setOwner(tradeItem.getDestination());
-                cs.add(See.only(former), newUnit);
+                cs.add(See.perhaps().always(former), newUnit);
             }
         }
 
