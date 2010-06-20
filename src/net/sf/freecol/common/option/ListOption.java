@@ -18,7 +18,7 @@ public class ListOption<T> extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ListOption.class.getName());
 
-    public static final String VALUE_TAG = "optionValue";
+    public static final String OPTION_VALUE_TAG = "optionValue";
 
     private ListOptionSelector<T> selector;
     private List<T> value;
@@ -128,7 +128,7 @@ public class ListOption<T> extends AbstractOption {
 
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         for (String id : getValueIds()) {
-            out.writeStartElement(VALUE_TAG);
+            out.writeStartElement(OPTION_VALUE_TAG);
             out.writeAttribute(ID_ATTRIBUTE_TAG, id);
             out.writeEndElement();
         }
@@ -153,7 +153,7 @@ public class ListOption<T> extends AbstractOption {
                 // TODO: remove support for old format
                 setValueIds(readFromListElement(VALUE_TAG, in, String.class));
                 in.nextTag();
-            } else if (VALUE_TAG.equals(in.getLocalName())) {
+            } else if (OPTION_VALUE_TAG.equals(in.getLocalName())) {
                 String valueId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 value.add(selector.getObject(valueId));
                 in.nextTag();
