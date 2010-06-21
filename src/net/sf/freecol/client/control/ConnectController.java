@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -161,7 +162,7 @@ public final class ConnectController {
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
                 freeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
             }
-            freeColClient.getGame().getSpecification().applyDifficultyLevel(level);
+            Specification.getSpecification().applyDifficultyLevel(level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
