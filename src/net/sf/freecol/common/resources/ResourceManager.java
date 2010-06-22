@@ -21,6 +21,7 @@ package net.sf.freecol.common.resources;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.util.LinkedList;
 import java.util.List;
@@ -429,5 +430,59 @@ public class ResourceManager {
         updateIfDirty();
         final ChipResource r = getResource(resource, ChipResource.class);
         return (r != null) ? r.getImage(scale) : null;
+    }
+
+
+    /**
+     * Gets the font with the given name.
+     *
+     * @param resource The name of the resource to query.
+     * @return The <code>Font</code> found in a FontResource, which
+     *     may default to the Java default font if the resource failed
+     *     to load.
+     */
+    public static Font getFont(final String resource) {
+        updateIfDirty();
+        final FontResource r = getResource(resource, FontResource.class);
+        return r.getFont();
+    }
+
+    /**
+     * Gets the font with the given name and applies a style change.
+     *
+     * @param resource The name of the resource to query.
+     * @return The <code>Font</code> found in a FontResource, which
+     *     may default to the Java default font if the resource failed
+     *     to load.
+     */
+    public static Font getFont(final String resource, int style) {
+        Font font = ResourceManager.getFont(resource);
+        return font.deriveFont(style);
+    }
+
+    /**
+     * Gets the font with the given name and applies a size change.
+     *
+     * @param resource The name of the resource to query.
+     * @return The <code>Font</code> found in a FontResource, which
+     *     may default to the Java default font if the resource failed
+     *     to load.
+     */
+    public static Font getFont(final String resource, float size) {
+        Font font = ResourceManager.getFont(resource);
+        return font.deriveFont(size);
+    }
+
+    /**
+     * Gets the font with the given name and applies style and size changes.
+     *
+     * @param resource The name of the resource to query.
+     * @return The <code>Font</code> found in a FontResource, which
+     *     may default to the Java default font if the resource failed
+     *     to load.
+     */
+    public static Font getFont(final String resource, int style, float size) {
+        Font font = ResourceManager.getFont(resource);
+        return font.deriveFont(style, size);
     }
 }

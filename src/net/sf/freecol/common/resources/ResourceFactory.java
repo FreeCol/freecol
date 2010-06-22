@@ -23,7 +23,9 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * A factory class for creating <code>Resource</code> instances.
@@ -81,17 +83,21 @@ public class ResourceFactory {
                         r = new ColorResource(uri);
                     } else if (uri.getSchemeSpecificPart().startsWith(ChipResource.SCHEME)) {
                         r = new ChipResource(uri);
+                    } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
+                        r = new FontResource(uri);
                     }
                 } else if (uri.getPath().endsWith(".sza")) {
                     r = new SZAResource(uri);
+                } else if (uri.getPath().endsWith(".ttf")) {
+                    r = new FontResource(uri);
                 } else if (uri.getPath().endsWith("video.ogg")) {
                     r = new VideoResource(uri);
                 } else {
                     r = new ImageResource(uri);
                 }
                 resources.put(uri, new WeakReference<Resource>(r));
-            } catch(Exception e) {
-                logger.warning("Failed to create resource with URI " + uri);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to create resource with URI: " + uri, e);
             }
         }
         return r;
