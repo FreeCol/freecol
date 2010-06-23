@@ -23,6 +23,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -108,7 +109,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return a <code>String</code> value
      */
     public static String getTypeKey(FoundingFatherType type) {
-        return "model.foundingFather." + type.toString().toLowerCase();
+        return "model.foundingFather." + type.toString().toLowerCase(Locale.US);
     }
 
     /**
@@ -217,7 +218,7 @@ public class FoundingFather extends FreeColGameObjectType {
 
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        String typeString = in.getAttributeValue(null, "type").toUpperCase();
+        String typeString = in.getAttributeValue(null, "type").toUpperCase(Locale.US);
         type = Enum.valueOf(FoundingFatherType.class, typeString);
 
         weight[1] = Integer.parseInt(in.getAttributeValue(null, "weight1"));
@@ -273,7 +274,7 @@ public class FoundingFather extends FreeColGameObjectType {
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("type", type.toString().toLowerCase());
+        out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
         for (int index = 1; index <= 3; index++) {
             out.writeAttribute("weight" + index, Integer.toString(weight[index]));
         }
@@ -295,7 +296,7 @@ public class FoundingFather extends FreeColGameObjectType {
             for (AbstractUnit unit : units) {
                  out.writeStartElement("unit");
                  out.writeAttribute(ID_ATTRIBUTE_TAG, unit.getId());
-                 //out.writeAttribute("role", unit.getRole().toString().toLowerCase());
+                 //out.writeAttribute("role", unit.getRole().toString().toLowerCase(Locale.US));
                  //out.writeAttribute("number", String.valueOf(unit.getNumber()));
                  out.writeEndElement();
             }

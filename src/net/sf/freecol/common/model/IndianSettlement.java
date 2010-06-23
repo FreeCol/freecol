@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -337,7 +338,7 @@ public class IndianSettlement extends Settlement {
         if (alarm.get(player) == null) {
             alarm.put(player, new Tension(0));
         }
-        return "indianSettlement.alarm." + alarm.get(player).getLevel().toString().toLowerCase();
+        return "indianSettlement.alarm." + alarm.get(player).getLevel().toString().toLowerCase(Locale.US);
     }
 
     /**

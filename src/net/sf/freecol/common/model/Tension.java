@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Locale;
+
 public class Tension {
 
     // Minimum possible tension value.
@@ -145,7 +147,7 @@ public class Tension {
      *      current tension level.
      */
     public String toString() {
-        return getLevel().toString().toLowerCase();
+        return getLevel().toString().toLowerCase(Locale.US);
     }    
 
 }

@@ -23,6 +23,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -155,7 +156,7 @@ public class EuropeanNationType extends NationType {
             if ("unit".equals(childName)) {
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 String type = in.getAttributeValue(null, "type");
-                Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase());
+                Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
                 String useExperts = in.getAttributeValue(null, "expert-starting-units");
                 AbstractUnit unit = new AbstractUnit(type, role, 1);
                 Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
@@ -207,7 +208,7 @@ public class EuropeanNationType extends NationType {
         out.writeStartElement("unit");
         out.writeAttribute(ID_ATTRIBUTE_TAG, id);
         out.writeAttribute("type", unit.getId());
-        out.writeAttribute("role", unit.getRole().toString().toLowerCase());
+        out.writeAttribute("role", unit.getRole().toString().toLowerCase(Locale.US));
         //out.writeAttribute("number", String.valueOf(unit.getNumber()));
         if (expert) {
             out.writeAttribute("expert-starting-units", "true");

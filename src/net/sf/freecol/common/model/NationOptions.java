@@ -20,8 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -152,7 +152,7 @@ public class NationOptions extends FreeColObject{
     public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         //setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
 
-        String advantages = getAttribute(in, "nationalAdvantages", "selectable").toUpperCase();
+        String advantages = getAttribute(in, "nationalAdvantages", "selectable").toUpperCase(Locale.US);
         nationalAdvantages = Enum.valueOf(Advantages.class, advantages);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

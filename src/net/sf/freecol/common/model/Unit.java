@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -80,7 +81,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
     
         public String getId() {
-            return toString().toLowerCase();
+            return toString().toLowerCase(Locale.US);
         }
     }
 

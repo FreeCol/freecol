@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Locale;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -380,11 +382,11 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         super.readAttributes(in, specification);
-        setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
+        setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase(Locale.US)));
         value = Float.parseFloat(in.getAttributeValue(null, VALUE_TAG));
         String incrementString = in.getAttributeValue(null, "incrementType");
         if (incrementString != null) {
-            setType(Enum.valueOf(Type.class, incrementString.toUpperCase()));
+            setType(Enum.valueOf(Type.class, incrementString.toUpperCase(Locale.US)));
             increment = Float.parseFloat(in.getAttributeValue(null, "increment"));
         }
         index = getAttribute(in, "index", -1);
@@ -393,7 +395,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
 	super.writeAttributes(out);
 	out.writeAttribute(VALUE_TAG, String.valueOf(value));
-	out.writeAttribute("type", type.toString().toLowerCase());
+	out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
         if (incrementType != null) {
             out.writeAttribute("incrementType", incrementType.toString());
             out.writeAttribute("increment", String.valueOf(increment));

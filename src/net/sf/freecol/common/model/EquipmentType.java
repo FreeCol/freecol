@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -219,7 +220,7 @@ public class EquipmentType extends BuildableType {
         maximumCount = getAttribute(in, "maximum-count", 1);
         combatLossPriority = getAttribute(in, "combat-loss-priority", 0);
         String roleString = getAttribute(in, "role", "default");
-        role = Enum.valueOf(Role.class, roleString.toUpperCase());
+        role = Enum.valueOf(Role.class, roleString.toUpperCase(Locale.US));
     }
 
     public void readChildren(XMLStreamReader in, Specification specification)
@@ -275,7 +276,7 @@ public class EquipmentType extends BuildableType {
         super.writeAttributes(out);
         out.writeAttribute("maximum-count", Integer.toString(maximumCount));
         out.writeAttribute("combat-loss-priority", Integer.toString(combatLossPriority));
-        out.writeAttribute("role", role.toString().toLowerCase());
+        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
     }
 
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {

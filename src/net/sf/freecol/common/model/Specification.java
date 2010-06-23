@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -556,7 +557,7 @@ public final class Specification {
         if (index == -1) {
             return id;
         } else {
-            return id.substring(0, index + 1) + id.substring(index + 1, index + 2).toLowerCase()
+            return id.substring(0, index + 1) + id.substring(index + 1, index + 2).toLowerCase(Locale.US)
                 + id.substring(index + 2);
         }
     }

@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamConstants;
@@ -191,14 +192,14 @@ public class Region extends FreeColGameObject implements Nameable {
         if (prediscovered || isPacific()) {
             return StringTemplate.key(nameKey);
         } else if (name == null) {
-            return StringTemplate.key("model.region." + type.toString().toLowerCase() + ".unknown");
+            return StringTemplate.key("model.region." + type.toString().toLowerCase(Locale.US) + ".unknown");
         } else {
             return StringTemplate.name(name);
         }
     }
 
     public String getTypeNameKey() {
-        return "model.region." + type.toString().toLowerCase() + ".name";
+        return "model.region." + type.toString().toLowerCase(Locale.US) + ".name";
     }
 
     /**

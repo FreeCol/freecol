@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -198,21 +199,21 @@ public class IndianNationType extends NationType {
         if (valueString == null) {
             numberOfSettlements = parent.numberOfSettlements;
         } else {
-            numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString.toUpperCase());
+            numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString.toUpperCase(Locale.US));
         }
 
         valueString = in.getAttributeValue(null, "aggression");
         if (valueString == null) {
             aggression = parent.aggression;
         } else {
-            aggression = Enum.valueOf(AggressionLevel.class, valueString.toUpperCase());
+            aggression = Enum.valueOf(AggressionLevel.class, valueString.toUpperCase(Locale.US));
         }
 
         valueString = in.getAttributeValue(null, "type-of-settlement");
         if (valueString == null) {
             setTypeOfSettlement(parent.getTypeOfSettlement());
         } else {
-            setTypeOfSettlement(Enum.valueOf(SettlementType.class, valueString.toUpperCase()));
+            setTypeOfSettlement(Enum.valueOf(SettlementType.class, valueString.toUpperCase(Locale.US)));
         }
         setSettlementRadius(getAttribute(in, "settlementRadius", parent.getSettlementRadius()));
         setCapitalRadius(getAttribute(in, "capitalRadius", parent.getCapitalRadius()));
@@ -262,9 +263,9 @@ public class IndianNationType extends NationType {
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("number-of-settlements", numberOfSettlements.toString().toLowerCase());
-        out.writeAttribute("aggression", aggression.toString().toLowerCase());
-        out.writeAttribute("type-of-settlement", getTypeOfSettlement().toString().toLowerCase());
+        out.writeAttribute("number-of-settlements", numberOfSettlements.toString().toLowerCase(Locale.US));
+        out.writeAttribute("aggression", aggression.toString().toLowerCase(Locale.US));
+        out.writeAttribute("type-of-settlement", getTypeOfSettlement().toString().toLowerCase(Locale.US));
         out.writeAttribute("settlementRadius", Integer.toString(getSettlementRadius()));
         out.writeAttribute("capitalRadius", Integer.toString(getCapitalRadius()));
     }
