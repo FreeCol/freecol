@@ -299,7 +299,7 @@ public class SimpleCombatModel implements CombatModel {
      * @return All the applicable offensive modifiers.
      */
     public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
-        Specification spec = Specification.getSpecification();
+        Specification spec = attacker.getSpecification();
         Set<Modifier> result = new LinkedHashSet<Modifier>();
 
         result.add(new Modifier(Modifier.OFFENCE, Specification.BASE_OFFENCE_SOURCE,
@@ -395,7 +395,7 @@ public class SimpleCombatModel implements CombatModel {
      * @return All the applicable defensive modifiers.
      */
     public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender) {
-        Specification spec = Specification.getSpecification();
+        Specification spec = attacker.getSpecification();
         Set<Modifier> result = new LinkedHashSet<Modifier>();
         if (defender == null) {
             return result;
@@ -946,11 +946,11 @@ public class SimpleCombatModel implements CombatModel {
     private void getConvert(Unit attacker, IndianSettlement indianSettlement) {
         ModelController mc = attacker.getGame().getModelController();
         int convert = mc.getRandom(attacker.getId() + "getConvert", 100);
-        int convertProbability = (int) FeatureContainer.applyModifierSet(Specification.getSpecification()
+        int convertProbability = (int) FeatureContainer.applyModifierSet(attacker.getSpecification()
                 .getIntegerOption("model.option.nativeConvertProbability").getValue(), attacker.getGame().getTurn(),
                 attacker.getModifierSet("model.modifier.nativeConvertBonus"));
         // TODO: it should be bigger when tension is high
-        int burnProbability = Specification.getSpecification().getIntegerOption("model.option.burnProbability")
+        int burnProbability = attacker.getSpecification().getIntegerOption("model.option.burnProbability")
                 .getValue();
         
         if (convert < convertProbability) {
