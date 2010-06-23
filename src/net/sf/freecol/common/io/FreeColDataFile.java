@@ -34,6 +34,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapping;
 
@@ -46,6 +47,12 @@ public class FreeColDataFile {
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
     
     private static final String RESOURCES_PROPERTIES_FILE = "resources.properties";
+
+    /**
+       A fake URI scheme for transferring the resource lookup to the
+       locale-specific files.
+    */
+    private static final String localeScheme = "locale:";
 
     /** The file this object represents. */
     private final File file;
@@ -130,7 +137,14 @@ public class FreeColDataFile {
     
     protected URI getURI(String filename) {
         try {
-            if (filename.startsWith("urn:")) {
+            if (filename.startsWith(localeScheme)) {
+                String key = filename.substring(localeScheme.length());
+                if (!Messages.containsKey(key)) {
+                    logger.warning("Localized resource lookup failed: " + key);
+                    return null;
+                }
+                return getURI(Messages.message(key));
+            } else if (filename.startsWith("urn:")) {
                 return new URI(filename);
             } else if (file.isDirectory()) {
                 return new File(file, filename).toURI();
@@ -142,7 +156,7 @@ public class FreeColDataFile {
             return null;
         }
     }
-    
+
     /**
      * Creates a <code>ResourceMapping</code> from the file
      * {@value #RESOURCES_PROPERTIES_FILE}.
