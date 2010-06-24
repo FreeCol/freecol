@@ -444,6 +444,7 @@ public class ResourceManager {
     public static Font getFont(final String resource) {
         updateIfDirty();
         final FontResource r = getResource(resource, FontResource.class);
+        if (r == null) return FontResource.getEmergencyFont();
         return r.getFont();
     }
 

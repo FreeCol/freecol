@@ -63,13 +63,26 @@ public class FontResource extends Resource {
      * Gets the <code>Font</code> represented by this resource.  As
      * failure to load a critical font might remove the ability to
      * even display an error message, it is too risky to allow this
-     * routine to return null.  Thus if the desired font was not
-     * found, return the default Java font, not matter how ugly.
+     * routine to return null.  Hence the emergency font use.
      *
      * @return The <code>Font</code> for this resource, or the default
      *     Java font if none found.
      */
     public Font getFont() {
-        return (font == null) ? Font.decode(null) : font;
+        if (font == null) {
+            font = FontResource.getEmergencyFont();
+        }
+        return font;
     }
+
+    /**
+     * Gets a font of last resort, as finding fonts must not fail!
+     * Currently using the default Java font, not matter how ugly.
+     *
+     * @return The default Java font.
+     */
+    public static Font getEmergencyFont() {
+        return Font.decode(null);
+    }
+
 }
