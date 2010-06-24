@@ -500,27 +500,23 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());
-        if (!storedGoods.isEmpty()) {
-            out.writeStartElement(STORED_GOODS_TAG);
-            for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-                out.writeStartElement(Goods.getXMLElementTagName());
-                out.writeAttribute("type", entry.getKey().getId());
-                out.writeAttribute("amount", entry.getValue().toString());
-                out.writeEndElement();
-            }
-            out.writeEndElement();
-        }
-        if (!oldStoredGoods.isEmpty()) {
-            out.writeStartElement(OLD_STORED_GOODS_TAG);
-            for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
-                out.writeStartElement(Goods.getXMLElementTagName());
-                out.writeAttribute("type", entry.getKey().getId());
-                out.writeAttribute("amount", entry.getValue().toString());
-                out.writeEndElement();
-            }
-            out.writeEndElement();
-        }
+        writeStorage(out, STORED_GOODS_TAG, storedGoods);
+        writeStorage(out, OLD_STORED_GOODS_TAG, storedGoods);
         out.writeEndElement();
+    }
+
+    private void writeStorage(XMLStreamWriter out, String tag, Map<GoodsType, Integer> storage)
+        throws XMLStreamException {
+        if (!storage.isEmpty()) {
+            out.writeStartElement(tag);
+            for (Map.Entry<GoodsType, Integer> entry : storage.entrySet()) {
+                out.writeStartElement(Goods.getXMLElementTagName());
+                out.writeAttribute("type", entry.getKey().getId());
+                out.writeAttribute("amount", entry.getValue().toString());
+                out.writeEndElement();
+            }
+            out.writeEndElement();
+        }
     }
 
     /**
@@ -531,26 +527,24 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         setId(in.getAttributeValue(null, "ID"));
         storedGoods.clear();
         oldStoredGoods.clear();
+        Map<GoodsType, Integer> storage;
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(STORED_GOODS_TAG)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
-                        GoodsType goodsType = Specification.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
-                        Integer amount = new Integer(in.getAttributeValue(null, "amount"));
-                        storedGoods.put(goodsType, amount);
-                    }
-                    in.nextTag();
-                }
+                storage = storedGoods;
             } else if (in.getLocalName().equals(OLD_STORED_GOODS_TAG)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
-                        GoodsType goodsType = Specification.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
-                        Integer amount = new Integer(in.getAttributeValue(null, "amount"));
-                        oldStoredGoods.put(goodsType, amount);
-                    }
-                    in.nextTag();
+                storage = oldStoredGoods;
+            } else {
+                continue;
+            }
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
+                    GoodsType goodsType = getGame().getSpecification()
+                        .getGoodsType(in.getAttributeValue(null, "type"));
+                    Integer amount = new Integer(in.getAttributeValue(null, "amount"));
+                    storage.put(goodsType, amount);
                 }
+                in.nextTag();
             }
         }
     }
