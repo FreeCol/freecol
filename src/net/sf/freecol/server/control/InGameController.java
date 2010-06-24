@@ -1736,7 +1736,7 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Buy goods.
+     * Buy goods in Europe.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is buying.
      * @param unit The <code>Unit</code> to carry the goods.
@@ -1776,7 +1776,7 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Sell goods.
+     * Sell goods in Europe.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is selling.
      * @param unit The <code>Unit</code> carrying the goods.
@@ -2395,12 +2395,10 @@ public final class InGameController extends Controller {
                         }
                     } else { // (serverPlayer.isEuropean)
                         // Initialize alarm for native settlements.
-                        // TODO: check if this is still necessary.
                         if (other.isIndian() && settlement != null) {
                             IndianSettlement is = (IndianSettlement) settlement;
-                            if (is.getAlarm(serverPlayer) == null) {
-                                is.setAlarm(serverPlayer,
-                                            other.getTension(serverPlayer));
+                            if (!is.hasContactedSettlement(serverPlayer)) {
+                                is.makeContactSettlement(serverPlayer);
                                 cs.add(See.only(serverPlayer), is);
                             }
                         }
@@ -2667,6 +2665,7 @@ public final class InGameController extends Controller {
 
         Tile tile = settlement.getTile();
         PlayerExploredTile pet = tile.getPlayerExploredTile(serverPlayer);
+        settlement.makeContactSettlement(serverPlayer);
         pet.setVisited();
         pet.setSkill(settlement.getLearnableSkill());
         cs.add(See.only(serverPlayer), tile);
@@ -2704,8 +2703,7 @@ public final class InGameController extends Controller {
 
         // Try to learn
         unit.setMovesLeft(0);
-        Tension tension = settlement.getAlarm(serverPlayer);
-        switch (tension.getLevel()) {
+        switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed
             cs.addDispose(serverPlayer, unit.getLocation(), unit);
             break;
@@ -2746,18 +2744,17 @@ public final class InGameController extends Controller {
         Player indianPlayer = settlement.getOwner();
         int gold = 0;
         int year = getGame().getTurn().getNumber();
+        settlement.makeContactSettlement(serverPlayer);
         if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
             && indianPlayer.getGold() > 0) {
             switch (indianPlayer.getTension(serverPlayer).getLevel()) {
-            case HAPPY:
-            case CONTENT:
+            case HAPPY: case CONTENT:
                 gold = Math.min(indianPlayer.getGold() / 10, 100);
                 break;
             case DISPLEASED:
                 gold = Math.min(indianPlayer.getGold() / 20, 100);
                 break;
-            case ANGRY:
-            case HATEFUL:
+            case ANGRY: case HATEFUL:
             default:
                 break; // do nothing
             }
@@ -2765,7 +2762,8 @@ public final class InGameController extends Controller {
 
         // Increase tension whether we paid or not.  Apply tension
         // directly to the settlement and let propagation work.
-        settlement.modifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL);
+        cs.add(See.only(serverPlayer),
+            settlement.modifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL));
         settlement.setLastTribute(year);
         ModelMessage m;
         if (gold > 0) {
@@ -2804,9 +2802,9 @@ public final class InGameController extends Controller {
         String result;
 
         // Hateful natives kill the scout right away.
-        Player player = unit.getOwner();
-        Tension tension = settlement.getAlarm(player);
-        if (tension != null && tension.getLevel() == Tension.Level.HATEFUL) {
+        settlement.makeContactSettlement(serverPlayer);
+        Tension tension = settlement.getAlarm(serverPlayer);
+        if (tension.getLevel() == Tension.Level.HATEFUL) {
             cs.addDispose(serverPlayer, unit.getLocation(), unit);
             result = "die";
         } else {
@@ -2848,13 +2846,13 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            settlement.setVisited(player);
-            tile.updateIndianSettlementInformation(player);
+            settlement.setVisited(serverPlayer);
+            tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
             Map map = getFreeColServer().getGame().getMap();
             for (Tile t : map.getSurroundingTiles(tile, radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isCoast())) {
-                    player.setExplored(t);
+                    serverPlayer.setExplored(t);
                     cs.add(See.only(serverPlayer), t);
                 }
             }
@@ -2905,11 +2903,13 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         // Denounce failed
+        Player owner = settlement.getOwner();
+        settlement.makeContactSettlement(serverPlayer);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.noDenounce",
                              serverPlayer, unit)
-                .addStringTemplate("%nation%", settlement.getOwner().getNationName()));
+                .addStringTemplate("%nation%", owner.getNationName()));
         cs.addDispose(serverPlayer, unit.getLocation(), unit);
 
         // Others can see missionary disappear
@@ -2945,23 +2945,26 @@ public final class InGameController extends Controller {
 
         // Result depends on tension wrt this settlement.
         // Establish if at least not angry.
-        Tension tension = settlement.getAlarm(serverPlayer);
-        if (tension == null) { // TODO: fix this
-            tension = new Tension(0);
-            settlement.setAlarm(serverPlayer, tension);
-        }
-        switch (tension.getLevel()) {
+        settlement.makeContactSettlement(serverPlayer);
+        switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: case ANGRY:
             cs.addDispose(serverPlayer, unit.getLocation(), unit);
             break;
         case HAPPY: case CONTENT: case DISPLEASED:
-            settlement.setMissionary(unit); //TODO: tension change?
-            if (missionary == null) {
-                cs.add(See.perhaps(), settlement);
-            }
+            cs.add(See.perhaps().always(serverPlayer), unit.getTile());
+            unit.setLocation(null);
+            settlement.setMissionary(unit);
+            settlement.setConvertProgress(0);
+            cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
+                    IndianSettlement.ALARM_NEW_MISSIONARY));
+            Tile tile = settlement.getTile();
+            tile.updatePlayerExploredTile(serverPlayer);
+            tile.updateIndianSettlementInformation(serverPlayer);
+            cs.add(See.perhaps().always(serverPlayer), tile);
+            break;
         }
         String messageId = "indianSettlement.mission."
-            + settlement.getAlarm(serverPlayer).toString().toLowerCase();
+            + settlement.getAlarm(serverPlayer).toString();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer, unit)
@@ -2989,14 +2992,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         // How much gold will be needed?
+        settlement.makeContactSettlement(serverPlayer);
         ServerPlayer enemyPlayer = (ServerPlayer) enemy;
         Player nativePlayer = settlement.getOwner();
-        Tension payingTension = nativePlayer.getTension(serverPlayer);
-        Tension targetTension = nativePlayer.getTension(enemyPlayer);
-        int payingValue = (payingTension == null) ? 0 : payingTension.getValue();
-        int targetValue = (targetTension == null) ? 0 : targetTension.getValue();
-        int goldToPay = (payingTension != null && targetTension != null
-                         && payingValue > targetValue) ? 10000 : 5000;
+        int payingValue = nativePlayer.getTension(serverPlayer).getValue();
+        int targetValue = nativePlayer.getTension(enemyPlayer).getValue();
+        int goldToPay = (payingValue > targetValue) ? 10000 : 5000;
         goldToPay += 20 * (payingValue - targetValue);
         goldToPay = Math.max(goldToPay, 650);
 
@@ -3186,6 +3187,7 @@ public final class InGameController extends Controller {
     public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
+        settlement.makeContactSettlement(serverPlayer);
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to buy without opening a transaction session");
         }
@@ -3217,7 +3219,8 @@ public final class InGameController extends Controller {
         Player settlementPlayer = settlement.getOwner();
         settlement.updateWantedGoods();
         settlement.getTile().updateIndianSettlementInformation(serverPlayer);
-        settlement.modifyAlarm(serverPlayer, -amount / 50);
+        cs.add(See.only(serverPlayer),
+            settlement.modifyAlarm(serverPlayer, -amount / 50));
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
         cs.add(See.only(serverPlayer), settlement);
@@ -3243,6 +3246,7 @@ public final class InGameController extends Controller {
     public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement,
                                     Goods goods, int amount) {
+        settlement.makeContactSettlement(serverPlayer);
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to sell without opening a transaction session");
         }
@@ -3267,7 +3271,8 @@ public final class InGameController extends Controller {
 
         Player settlementPlayer = settlement.getOwner();
         settlementPlayer.modifyGold(-amount);
-        settlement.modifyAlarm(serverPlayer, -settlement.getPrice(goods) / 500);
+        cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
+                -settlement.getPrice(goods) / 500));
         serverPlayer.modifyGold(amount);
         settlement.updateWantedGoods();
         settlement.getTile().updateIndianSettlementInformation(serverPlayer);
@@ -3305,7 +3310,10 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
         if (settlement instanceof IndianSettlement) {
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
-            indianSettlement.modifyAlarm(serverPlayer, -indianSettlement.getPrice(goods) / 50);
+            indianSettlement.makeContactSettlement(serverPlayer);
+            cs.add(See.only(serverPlayer),
+                   indianSettlement.modifyAlarm(serverPlayer,
+                   -indianSettlement.getPrice(goods) / 50));
             indianSettlement.updateWantedGoods();
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), settlement);
@@ -3675,6 +3683,7 @@ public final class InGameController extends Controller {
             owner.modifyGold(price);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         } else if (price < 0 && owner.isIndian()) {
+            ((IndianSettlement) ownerSettlement).makeContactSettlement(serverPlayer);
             cs.add(See.only(serverPlayer),
                    owner.modifyTension(serverPlayer, Tension.TENSION_ADD_LAND_TAKEN,
                                                      (IndianSettlement) ownerSettlement));

@@ -147,7 +147,7 @@ public class Tension {
      *      current tension level.
      */
     public String toString() {
-        return getLevel().toString().toLowerCase(Locale.US);
+        return getLevel().toString();
     }    
 
 }

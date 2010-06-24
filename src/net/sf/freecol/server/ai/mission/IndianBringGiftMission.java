@@ -222,8 +222,7 @@ public class IndianBringGiftMission extends Mission {
         case UNCONTACTED: case WAR: case CEASE_FIRE:
             break;
         case PEACE: case ALLIANCE:
-            return owner.getTension(targetPlayer).getLevel() != null
-                && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
+            return owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
         }
         return false;
     }

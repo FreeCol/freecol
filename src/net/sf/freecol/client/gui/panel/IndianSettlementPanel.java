@@ -61,12 +61,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
                                                        ? "indianCapital"
                                                        : "indianSettlement")
                                .addStringTemplate("%nation%", indian.getNationName()));
-        Tension tension = settlement.getAlarm(player);
-        String tensionString
-            = (!player.hasContacted(indian)) ? "notContacted"
-            : (tension != null) ? tension.toString()
-            : "indianSettlement.tensionUnknown";
-        text += " (" + Messages.message(tensionString) + ")";
+        String messageId = settlement.getShortAlarmLevelMessageId(player);
+        text += " (" + Messages.message(messageId) + ")";
         settlementLabel.setText(text);
         add(settlementLabel);
 

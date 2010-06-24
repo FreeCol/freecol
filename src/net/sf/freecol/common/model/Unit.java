@@ -3232,6 +3232,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param enemyUnit The unit we are attacking.
      */
     // TODO: move to AI code
+    // TODO: propagate changed settlements from modifyAlarm+Tension()
     public void adjustTension(Unit enemyUnit) {
         Player myPlayer = getOwner();
         Player enemy = enemyUnit.getOwner();     

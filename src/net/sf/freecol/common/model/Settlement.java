@@ -507,6 +507,18 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public abstract void newTurn();
 
     /**
+     * Propagates a global change in tension down to a settlement.
+     * Only apply the change if the settlement is aware of the player
+     * causing alarm.
+     *
+     * @param player The <code>Player</code> towards whom the alarm is felt.
+     * @param addToAlarm The amount to add to the current alarm level.
+     * @return True if the settlement alarm level changes as a result
+     *     of this change.
+     */
+    public abstract boolean propagateAlarm(Player player, int addToAlarm);
+
+    /**
      * Removes a specified amount of a type of Goods from this Settlement.
      * 
      * @param type The type of Goods to remove from this settlement.

@@ -2300,6 +2300,19 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
+     * Propagates a global change in tension down to a settlement.
+     * No-op for European colonies.
+     *
+     * @param player The <code>Player</code> towards whom the alarm is felt.
+     * @param addToAlarm The amount to add to the current alarm level.
+     * @return True if the settlement alarm level changes as a result
+     *     of this change.
+     */
+    public boolean propagateAlarm(Player player, int addToAlarm) {
+        return false;
+    }
+
+    /**
      * Returns the capacity of this colony's warehouse. All goods above this
      * limit, except Food, will be removed when calling
      * {@link #newTurn}.

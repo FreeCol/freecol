@@ -123,12 +123,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
                 reportPanel.add(missionLabel);
 
-                Tension tension = settlement.getAlarm(player);
-                String tensionString
-                    = (!player.hasContacted(opponent)) ? "notContacted"
-                    : (known && tension != null) ? tension.toString()
-                    : "indianSettlement.tensionUnknown";
-                reportPanel.add(localizedLabel(tensionString));
+                String messageId = settlement.getShortAlarmLevelMessageId(player);
+                reportPanel.add(localizedLabel(messageId));
 
                 JLabel skillLabel = new JLabel();
                 UnitType skillType = settlement.getLearnableSkill();

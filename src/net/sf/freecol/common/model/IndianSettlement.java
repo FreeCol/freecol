@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
 import net.sf.freecol.common.model.Unit.Role;
 
@@ -106,7 +107,10 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Stores the alarm levels. <b>Only used by AI.</b>
-     * 0-1000 with 1000 as the maximum alarm level.
+     * "Alarm" means: Tension-with-respect-to-a-player-from-an-IndianSettlement.
+     * Alarm is overloaded with the concept of "contact".  If a settlement
+     * has never been contacted by a player, alarm.get(player) will be null.
+     * Acts causing contact initialize this variable.
      */
     private java.util.Map<Player, Tension> alarm = new HashMap<Player, Tension>();
 
@@ -221,15 +225,6 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Returns the alarm Map.
-     *
-     * @return the alarm Map.
-     */
-    public java.util.Map<Player, Tension> getAlarm() {
-        return alarm;
-    }
-
-    /**
      * Get the year of the last tribute.
      *
      * @return The year of the last tribute.
@@ -248,98 +243,160 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Modifies the alarm level towards the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @param addToAlarm The amount to add to the current alarm level.
-     */
-    public void modifyAlarm(Player player, int addToAlarm) {
-        Tension tension = alarm.get(player);
-        Level oldLevel = null;
-        Level newLevel = null;
-        if(tension != null) {
-            oldLevel = tension.getLevel();
-            tension.modify(addToAlarm);            
-        }
-        // propagate alarm upwards
-        if (owner != null) {
-            if (isCapital()) {
-                // capital has a greater impact
-                owner.modifyTension(player, addToAlarm, this);
-            } else {
-                owner.modifyTension(player, addToAlarm/2, this);
-            }
-        }
-        
-        if(alarm.get(player) != null){
-            newLevel = alarm.get(player).getLevel();
-        }
-        if(newLevel != null && !newLevel.equals(oldLevel)){
-            String propertyEvtName = "alarmLevel"; 
-            PropertyChangeEvent e = new PropertyChangeEvent(this,propertyEvtName,oldLevel,newLevel);
-            for(PropertyChangeListener listener : this.getPropertyChangeListeners(propertyEvtName)){
-                listener.propertyChange(e);
-            }
-        }
-        logger.finest("Alarm at " + getName()
-                      + " modified by " + Integer.toString(addToAlarm)
-                      + " now = " + ((alarm.get(player) == null) ? "(none)"
-                                     : Integer.toString(alarm.get(player).getValue())));
-    }
-
-    /**
-     * Propagates the tension felt towards a given nation from the
-     * tribe down to each settlement that has already met that nation.
-     * 
-     * @param player The <code>Player</code> towards whom the alarm is felt.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return True if the alarm level changes as a result of this change.
-     */
-    public boolean propagateAlarm(Player player, int addToAlarm) {
-        Tension tension = alarm.get(player);
-        if (tension != null) {
-            Tension.Level oldLevel = tension.getLevel();
-            tension.modify(addToAlarm);
-            return tension.getLevel() != oldLevel;
-        }
-        return false;
-    }
-
-    /**
-     * Sets alarm towards the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @param newAlarm The new alarm value.
-     */
-    public void setAlarm(Player player, Tension newAlarm) {
-        //sanitize: don't save alarm towards ourselves
-        if (player != owner) {
-            alarm.put(player, newAlarm);
-        }
-    }
-
-    /**
      * Gets the alarm level towards the given player.
+     *
      * @param player The <code>Player</code> to get the alarm level for.
-     * @return An object representing the alarm level.
-     */    
+     * @return The current alarm level or null if the settlement has not
+     *     encoutered the player.
+     */
     public Tension getAlarm(Player player) {
         return alarm.get(player);
     }
 
     /**
-     * Gets the ID of the alarm message associated with the alarm
-     * level of this player.
+     * Sets alarm towards the given player.
      *
-     * @param player The other player.
-     * @return The ID of an alarm level message.
+     * @param newAlarm The new alarm value.
      */
-    public String getAlarmLevelMessage(Player player) {
-        if (alarm.get(player) == null) {
-            alarm.put(player, new Tension(0));
-        }
-        return "indianSettlement.alarm." + alarm.get(player).getLevel().toString().toLowerCase(Locale.US);
+    public void setAlarm(Player player, Tension newAlarm) {
+        if (player != null && player != owner) alarm.put(player, newAlarm);
+     }
+
+    /**
+     * Change the alarm level of this settlement by a given amount.
+     *
+     * @param player The <code>Player</code> the alarm level changes wrt.
+     * @param amount The amount to change the alarm by.
+     * @return True if the <code>Tension.Level</code> of the
+     *     settlement alarm changes as a result of this change.
+     */
+    private boolean changeAlarm(Player player, int amount) {
+        Tension alarm = getAlarm(player);
+        Level oldLevel = alarm.getLevel();
+        alarm.modify(amount);
+        return oldLevel != alarm.getLevel();
     }
+
+    /**
+     * Gets a messageId for a short alarm message associated with the
+     * alarm level of this player.
+     *
+     * @param player The other <code>Player</code>.
+     * @return The alarm messageId.
+     */
+    public String getShortAlarmLevelMessageId(Player player) {
+        return (!player.hasContacted(owner)) ? "wary"
+            : (hasContactedSettlement(player)) ? getAlarm(player).toString()
+            : "indianSettlement.tensionUnknown";
+    }
+
+    /**
+     * Gets a messageId for an alarm message associated with the
+     * alarm level of this player.
+     *
+     * @param player The other <code>Player</code>.
+     * @return The alarm messageId.
+     */
+    public String getAlarmLevelMessageId(Player player) {
+        Tension alarm = (hasContactedSettlement(player)) ? getAlarm(player)
+            : new Tension(Tension.TENSION_MIN);
+        return "indianSettlement.alarm." + alarm.toString();
+    }
+
+    /**
+     * Has a player contacted this settlement?
+     *
+     * @param player The <code>Player</code> to check.
+     * @return True if the player has contacted this settlement.
+     */
+    public boolean hasContactedSettlement(Player player) {
+        return getAlarm(player) != null;
+    }
+
+    /**
+     * Make contact with this settlement (if it has not been
+     * previously contacted).  Initialize tension level to the general
+     * level with respect to the contacting player--- effectively the
+     * average reputation of this player with the overall tribe.
+     *
+     * @param player The <code>Player</code> making contact.
+     * @return True if this was indeed the first contact between settlement
+     *     and player.
+     */
+    public boolean makeContactSettlement(Player player) {
+        if (!hasContactedSettlement(player)) {
+            setAlarm(player, new Tension(owner.getTension(player).getValue()));
+            return true;
+         }
+         return false;
+     }
+
+    /**
+     * Propagate alarm level change to any listeners.
+     * TODO: check if this is still needed when alarm moves server side.
+     *
+     * @param oldLevel The old alarm level.
+     * @param newLevel The new alarm level.
+     */
+    private void announceAlarmLevel(Level oldLevel, Level newLevel) {
+        String propertyEvtName = "alarmLevel";
+        PropertyChangeEvent e
+            = new PropertyChangeEvent(this, propertyEvtName,
+                                      oldLevel, newLevel);
+        for (PropertyChangeListener listener
+                 : getPropertyChangeListeners(propertyEvtName)) {
+            listener.propertyChange(e);
+        }
+    }
+
+    /**
+     * Modifies the alarm level towards the given player due to an event
+     * at this settlement, and propagate the alarm upwards through the
+     * tribe.
+     *
+     * @param player The <code>Player</code>.
+     * @param addToAlarm The amount to add to the current alarm level.
+     * @return A list of settlements whose alarm level has changed.
+     */
+    public List<FreeColGameObject> modifyAlarm(Player player, int addToAlarm) {
+        boolean change = makeContactSettlement(player);
+        Level oldLevel = getAlarm(player).getLevel();
+        change |= changeAlarm(player, addToAlarm);
+
+        // Propagate alarm upwards.  Capital has a greater impact.
+        List<FreeColGameObject> modified = owner.modifyTension(player,
+                ((isCapital()) ? addToAlarm : addToAlarm/2), this);
+        if (change) {
+            announceAlarmLevel(oldLevel, getAlarm(player).getLevel());
+            modified.add(this);
+        }
+        logger.finest("Alarm at " + getName()
+            + " toward " + player.getName()
+            + " modified by " + Integer.toString(addToAlarm)
+            + " now = " + Integer.toString(getAlarm(player).getValue()));
+        return modified;
+    }
+
+    /**
+     * Propagates a global change in tension down to a settlement.
+     * Only apply the change if the settlement is aware of the player
+     * causing alarm.
+     *
+     * @param player The <code>Player</code> towards whom the alarm is felt.
+     * @param addToAlarm The amount to add to the current alarm level.
+     * @return True if the alarm level changes as a result of this change.
+     */
+    public boolean propagateAlarm(Player player, int addToAlarm) {
+        if (hasContactedSettlement(player)) {
+            Level oldLevel = getAlarm(player).getLevel();
+            if (changeAlarm(player, addToAlarm)) {
+                announceAlarmLevel(oldLevel, getAlarm(player).getLevel());
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Returns true if a European player has visited this settlement
@@ -358,9 +415,12 @@ public class IndianSettlement extends Settlement {
     }
     
     /**
-     * Returns true if a the given player has visited this settlement to speak with the chief.
-     * @param player The player to check if has visited the settlement
-     * @return true if a European player has visited this settlement to speak with the chief.
+     * Returns true if a the given player has visited this settlement
+     * to speak with the chief.
+     *
+     * @param player The <code>Player</code> to check.
+     * @return True if the player has visited this settlement to speak
+     *     with the chief.
      */
     public boolean hasBeenVisited(Player player) {
         return visitedBy.contains(player);
@@ -368,14 +428,14 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Sets the visited status of this settlement to true, indicating
-     * that a European has had a chat with the chief.
+     * that a European player has had a chat with the chief.
      *    
-     * @param player a <code>Player</code> value
+     * @param player The visiting <code>Player</code>.
      */
     public void setVisited(Player player) {
-        visitedBy.add(player);
-        if (alarm.get(player) == null) {
-            alarm.put(player, new Tension(0));
+        if (!hasBeenVisited(player)) {
+            makeContactSettlement(player); // Just to be sure
+            visitedBy.add(player);
         }
     }
 
@@ -394,6 +454,7 @@ public class IndianSettlement extends Settlement {
             || !unit.isNaval()
             || unit.getGoodsCount() > 0;
     }
+
 
     /**
      * Adds the given <code>Unit</code> to the list of units that belongs to this
@@ -450,40 +511,41 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Returns the missionary from this settlement if there is one or null if there is none.
-     * @return The missionary from this settlement if there is one or null if there is none.
+     * Gets the missionary from this settlement.
+     *
+     * @return The missionary at this settlement, or null if there is none.
      */
     public Unit getMissionary() {
         return missionary;
     }
 
-
     /**
      * Sets the missionary for this settlement.
+     *
      * @param missionary The missionary for this settlement.
      */
     public void setMissionary(Unit missionary) {
-        if (missionary != null) {
-            if (missionary.getRole() != Role.MISSIONARY) {
-                throw new IllegalArgumentException("Specified unit is not a missionary.");
-            }
-            missionary.setLocation(null);
-            Tension currentAlarm = alarm.get(missionary.getOwner());
-            if (currentAlarm == null) {
-                alarm.put(missionary.getOwner(), new Tension(0));
-            } else {
-                currentAlarm.modify(ALARM_NEW_MISSIONARY);
-            }
-        }
-        if (missionary != this.missionary) {
-            convertProgress = 0;
-        }
-        if (this.missionary != null) {
-            this.missionary.dispose();
-        }
         this.missionary = missionary;
-        getTile().updatePlayerExploredTiles();
     }
+
+    /**
+     * Gets the convert progress status for this settlement.
+     *
+     * @return The convert progress status.
+     */
+    public int getConvertProgress() {
+        return convertProgress;
+    }
+
+    /**
+     * Sets the convert progress status for this settlement.
+     *
+     * @param progress The new convert progress status.
+     */
+    public void setConvertProgress(int progress) {
+        convertProgress = progress;
+    }
+
 
     public GoodsType[] getWantedGoods() {
         return wantedGoods;
@@ -983,7 +1045,7 @@ public class IndianSettlement extends Settlement {
             }
     
             // Increase increment if alarm level is high.
-            increment += 2 * alarm.get(missionary.getOwner()).getValue() / 100;
+            increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;
     
             if (convertProgress >= 100 && getUnitCount() > 2) {
@@ -1087,6 +1149,7 @@ public class IndianSettlement extends Settlement {
                 if (oldAlarm != null) {
                     modifiedAlarm -= 4 + oldAlarm.getValue()/100;
                 }
+                // TODO: notify of settlements with changed alarm
                 modifyAlarm(player, modifiedAlarm);
             }
         }

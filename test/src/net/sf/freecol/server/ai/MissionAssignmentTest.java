@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
@@ -160,10 +161,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         Unit brave = new Unit(game, braveUnitTile, incaPlayer, braveType, UnitState.ACTIVE);
         Unit soldier = new Unit(game, dutchUnitTile, dutchPlayer, veteranType, UnitState.ACTIVE);
 
-        incaPlayer.setStance(dutchPlayer, Stance.PEACE);
-        dutchPlayer.setStance(incaPlayer, Stance.PEACE);
-        incaPlayer.setTension(dutchPlayer, new Tension(0));
-        dutchPlayer.setTension(incaPlayer, new Tension(0));
+        Player.makeContact(incaPlayer, dutchPlayer);
 
         assertFalse("Target should NOT be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
 

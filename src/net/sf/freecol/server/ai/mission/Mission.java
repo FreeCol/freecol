@@ -283,14 +283,9 @@ public abstract class Mission extends AIObject {
                     return false;
                 }
 
-                int tension = 0;
-                Tension alarm = unit.getOwner().getTension(defender.getOwner());
-                if (alarm != null) {
-                    tension = alarm.getValue();
-                }
-
+                int tension = unit.getOwner().getTension(defender.getOwner()).getValue();
                 if (unit.getIndianSettlement() != null &&
-                        unit.getIndianSettlement().getAlarm(defender.getOwner()) != null) {
+                        unit.getIndianSettlement().hasContactedSettlement(defender.getOwner())) {
                     tension += unit.getIndianSettlement().getAlarm(defender.getOwner()).getValue();
                 }
                 if (defender.canCarryTreasure()) {

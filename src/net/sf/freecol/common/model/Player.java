@@ -1619,11 +1619,11 @@ public class Player extends FreeColGameObject implements Nameable {
             if (eventId.equals("model.event.resetNativeAlarm")) {
                 // reduce indian tension and alarm
                 for (Player player : getGame().getPlayers()) {
-                    if (!player.isEuropean() && player.getTension(this) != null) {
-                        player.getTension(this).setValue(0);
+                    if (!player.isEuropean() && player.hasContacted(this)) {
+                        player.setTension(this, new Tension(Tension.TENSION_MIN));
                         for (IndianSettlement is : player.getIndianSettlements()) {
-                            if (is.getAlarm(this) != null) {
-                                is.getAlarm(this).setValue(0);
+                            if (is.hasContactedSettlement(this)) {
+                                is.setAlarm(this, new Tension(Tension.TENSION_MIN));
                             }
                         }
                     }
@@ -2269,14 +2269,14 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param player The <code>Player</code>.
      * @param addToTension The amount to add to the current tension level.
-     * @param origin An <code>IndianSettlement</code> where the alarming event
+     * @param origin A <code>Settlement</code> where the alarming event
      *     occurred.
      * @return A list of objects that may need updating due to the tension
      *     change (such as native settlements).
      */
     public List<FreeColGameObject> modifyTension(Player player,
                                                  int addToTension,
-                                                 IndianSettlement origin) {
+                                                 Settlement origin) {
         if (player == null) {
             throw new IllegalStateException("Null player");
         } else if (player == this) {
@@ -2286,21 +2286,14 @@ public class Player extends FreeColGameObject implements Nameable {
                                             + origin.getId());
         }
 
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         getTension(player).modify(addToTension);
 
-        // For indian players, we also need to set each settlement
-        // alarm.  If the alarm originated on a settlement, it is
-        // propagated to all others.  Global effects, like declaration
-        // of war, affect all settlements.
-        if (isIndian()) {
-            for (Settlement settlement : settlements) {
-                if (origin != null && origin.equals(settlement)) {
-                    // Alarm originated on this settlement, has been
-                    // already applied.
-                    continue;
-                }
-                if (((IndianSettlement) settlement).propagateAlarm(player, addToTension)) {
+        // Propagate tension change as settlement alarm to all
+        // settlements except the one that originated it (if any).
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        for (Settlement settlement : settlements) {
+            if (!settlement.equals(origin)) {
+                if (settlement.propagateAlarm(player, addToTension)) {
                     objects.add(settlement);
                 }
             }
@@ -2334,7 +2327,7 @@ public class Player extends FreeColGameObject implements Nameable {
         } else {
             Tension newTension = tension.get(player);
             if (newTension == null) {
-                newTension = new Tension(0);
+                newTension = new Tension(Tension.TENSION_MIN);
             }
             tension.put(player, newTension);
             return newTension;
@@ -2754,8 +2747,8 @@ public class Player extends FreeColGameObject implements Nameable {
     public static void makeContact(Player player1, Player player2) {
         player1.stance.put(player2.getId(), Stance.PEACE);
         player2.stance.put(player1.getId(), Stance.PEACE);
-        player1.setTension(player2, new Tension(0));
-        player2.setTension(player1, new Tension(0));
+        player1.setTension(player2, new Tension(Tension.TENSION_MIN));
+        player2.setTension(player1, new Tension(Tension.TENSION_MIN));
     }
 
     /**

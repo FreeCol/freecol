@@ -1179,15 +1179,8 @@ public class StandardAIPlayer extends AIPlayer {
                 continue;
             }
 
-            Tension tension = getPlayer().getTension(enemy);
-
-            // Sanitation
-            if (tension == null) {
-                logger.warning(getPlayer() + " tension towards " + enemy + " is NULL");
-                continue;
-            }
-
-            int value = tension.getValue();
+            if (!getPlayer().hasContacted(enemy)) continue;
+            int value = getPlayer().getTension(enemy).getValue();
             int threatModifier = 0;
             int unitThreat = 0;
             if (value >= Tension.TENSION_ADD_MAJOR) {
@@ -1777,8 +1770,8 @@ public class StandardAIPlayer extends AIPlayer {
                 for (int i = 0; i < nearbyColonies.size(); i++) {
                     Colony t = nearbyColonies.get(i);
                     Player to = t.getOwner();
-                    if (getPlayer().getTension(to) == null ||
-                        indianSettlement.getAlarm(to) == null) {
+                    if (!getPlayer().hasContacted(to)
+                        || !indianSettlement.hasContactedSettlement(to)) {
                         continue;
                     }
                     int tension = 1 + getPlayer().getTension(to).getValue()

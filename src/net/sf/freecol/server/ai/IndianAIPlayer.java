@@ -164,29 +164,26 @@ public class IndianAIPlayer extends NewAIPlayer {
                         if (enemy == getPlayer()) {
                             defenders++;
                         } else {
-                            Tension tension = getPlayer().getTension(enemy);
-                            if (tension != null) {
-                                int value = tension.getValue();
-                                if (value >= Tension.TENSION_ADD_MAJOR) {
-                                    threat += 2;
-                                    if (t.getUnitCount() * 2 > worstThreat) {
-                                        if (t.getSettlement() != null) {
-                                            bestTarget = t.getSettlement();
-                                        } else {
-                                            bestTarget = t.getFirstUnit();
-                                        }
-                                        worstThreat = t.getUnitCount() * 2;
+                            int value = getPlayer().getTension(enemy).getValue();
+                            if (value >= Tension.TENSION_ADD_MAJOR) {
+                                threat += 2;
+                                if (t.getUnitCount() * 2 > worstThreat) {
+                                    if (t.getSettlement() != null) {
+                                        bestTarget = t.getSettlement();
+                                    } else {
+                                        bestTarget = t.getFirstUnit();
                                     }
-                                } else if (value >= Tension.TENSION_ADD_MINOR) {
-                                    threat += 1;
-                                    if (t.getUnitCount() > worstThreat) {
-                                        if (t.getSettlement() != null) {
-                                            bestTarget = t.getSettlement();
-                                        } else {
-                                            bestTarget = t.getFirstUnit();
-                                        }
-                                        worstThreat = t.getUnitCount();
+                                    worstThreat = t.getUnitCount() * 2;
+                                }
+                            } else if (value >= Tension.TENSION_ADD_MINOR) {
+                                threat += 1;
+                                if (t.getUnitCount() > worstThreat) {
+                                    if (t.getSettlement() != null) {
+                                        bestTarget = t.getSettlement();
+                                    } else {
+                                        bestTarget = t.getFirstUnit();
                                     }
+                                    worstThreat = t.getUnitCount();
                                 }
                             }
                         }
@@ -305,8 +302,8 @@ public class IndianAIPlayer extends NewAIPlayer {
                 for (int i = 0; i < nearbyColonies.size(); i++) {
                     Colony t = nearbyColonies.get(i);
                     Player to = t.getOwner();
-                    if (getPlayer().getTension(to) == null ||
-                        indianSettlement.getAlarm(to) == null) {
+                    if (!getPlayer().hasContacted(to)
+                        || !indianSettlement.hasContactedSettlement(to)) {
                         continue;
                     }
                     int tension = 1 + getPlayer().getTension(to).getValue() + indianSettlement.getAlarm(to).getValue();

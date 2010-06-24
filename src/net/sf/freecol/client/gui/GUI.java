@@ -2377,13 +2377,12 @@ public final class GUI {
                     }
 
                     // Draw the alarm chip if needed.
-                    if (freeColClient.getMyPlayer() != null) {
-                        Tension alarm = indianSettlement.getAlarm(freeColClient.getMyPlayer());
-                        if (alarm != null) {
-                            final boolean visited = indianSettlement.hasBeenVisited(freeColClient.getMyPlayer());
-                            chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
-                            g.drawImage(chip, (int) xOffset, (int) yOffset, null);
-                        }
+                    Player player = freeColClient.getMyPlayer();
+                    if (player != null
+                        && indianSettlement.hasContactedSettlement(player)) {
+                        final boolean visited = indianSettlement.hasBeenVisited(freeColClient.getMyPlayer());
+                        chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
+                        g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                     }
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");

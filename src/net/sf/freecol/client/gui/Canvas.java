@@ -2010,7 +2010,7 @@ public final class Canvas extends JDesktopPane {
      */
     public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
         StringBuilder text = new StringBuilder(400);
-        text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()))
+        text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer()))
                                      .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
         text.append("\n\n");
         int number = settlement.getOwner().getNumberOfSettlements();
@@ -2115,7 +2115,7 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
-        String messageId = settlement.getAlarmLevelMessage(freeColClient.getMyPlayer());
+        String messageId = settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer());
         ScoutIndianSettlementAction result
             = showChoiceDialog(settlement.getTile(),
                                Messages.message(StringTemplate.template(messageId)
@@ -2151,7 +2151,7 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.incite"),
                 MissionaryAction.INCITE_INDIANS));
-        String messageId = settlement.getAlarmLevelMessage(unit.getOwner());
+        String messageId = settlement.getAlarmLevelMessageId(unit.getOwner());
         StringBuilder introText
             = new StringBuilder(Messages.message(StringTemplate.template(messageId)
                                                  .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
