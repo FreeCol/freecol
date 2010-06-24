@@ -226,6 +226,9 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
 
         targetPlayer = ((Ownable) target).getOwner();
+        if (targetPlayer == null) {
+            return false;
+        }
         Stance stance = owner.getStance(targetPlayer);
 
         return targetPlayer != owner &&
