@@ -35,12 +35,14 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
@@ -87,7 +89,7 @@ public class PioneeringMission extends Mission {
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-        
+
         boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
         if(hasTools){
             state = PioneeringMissionState.IMPROVING;
@@ -320,6 +322,32 @@ public class PioneeringMission extends Mission {
             invalidateMission = true;
             return;
         }            
+
+        Tile target = tileImprovementPlan.getTarget();
+        Player player = getUnit().getOwner();
+        if (target.getOwner() != player) {
+            // Take control of land before proceeding with mission.
+            // Decide whether to pay or steal.
+            // Currently always pay if we can, steal if we can not.
+            int price = player.getLandPrice(target);
+            if (price > 0 && player.getGold() < price) {
+                price = ClaimLandMessage.STEAL_LAND;
+            }
+            ClaimLandMessage message = new ClaimLandMessage(target, null, price);
+            try {
+                connection.sendAndWait(message.toXMLElement());
+            } catch (IOException e) {
+                logger.warning("Could not send \""
+                               + ClaimLandMessage.getXMLElementTagName()
+                               + "\"-message:" + e.getMessage());
+            }
+        }
+        if (target.getOwner() != player) {
+            // Failed to take ownership
+            invalidateMission = true;
+            return;
+        }
+
         makeImprovement(connection);
     }
 

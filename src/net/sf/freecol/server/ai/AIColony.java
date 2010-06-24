@@ -222,21 +222,24 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (wlp.getWorkLocation() instanceof ColonyTile) {
                 ColonyTile colonyTile = (ColonyTile) wlp.getWorkLocation();
                 Tile target = colonyTile.getWorkTile();
+                boolean others = target.getOwningSettlement() != colony
+                    && target.getOwner() == colony.getOwner();
                 TileImprovementPlan plan = plans.get(target);
                 if (plan == null) {
+                    if (others) continue; // owned by another of our colonies
                     plan = wlp.createTileImprovementPlan();
                     if (plan != null) {
-                        if (colonyTile.getUnit() != null) {
-                            plan.setValue(2 * plan.getValue());
-                        }
+                        int value = plan.getValue();
+                        if (colonyTile.getUnit() != null) value *= 2;
+                        value -= colony.getOwner().getLandPrice(target);
+                        plan.setValue(value);
                         tileImprovementPlans.add(plan);
                         plans.put(target, plan);
                     }
-                } else if (wlp.updateTileImprovementPlan(plan) == null) {
+                } else if (wlp.updateTileImprovementPlan(plan) == null
+                           || others) {
                     tileImprovementPlans.remove(plan);
                     plan.dispose();
-                } else if (colonyTile.getUnit() != null) {
-                    plan.setValue(2 * plan.getValue());
                 }
             }
         }
