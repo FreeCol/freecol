@@ -1501,6 +1501,12 @@ public class StandardAIPlayer extends AIPlayer {
                 logger.warning("Trying to assign a mission to an uninitialized object: " + unit.getId());
                 continue;
             }
+
+            if (unit.getState() == UnitState.IN_COLONY
+                && unit.getTile().getSettlement().getUnitCount() <= 1) {
+                // The unit has its hand full keeping the colony alive.
+                continue;
+            }
             
             // only processing naval units
             if(unit.isNaval()){
