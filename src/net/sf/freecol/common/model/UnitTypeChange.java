@@ -20,8 +20,10 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -41,6 +43,23 @@ public class UnitTypeChange extends FreeColObject {
             LOST_CITY, PROMOTION, CREATION, ENTER_COLONY, INDEPENDENCE,
             CLEAR_SKILL, DEMOTION, CAPTURE }
 
+    public static final Map<ChangeType, String> tags =
+        new EnumMap<ChangeType, String>(ChangeType.class);
+
+    static {
+        tags.put(ChangeType.EDUCATION, "learnInSchool");
+        tags.put(ChangeType.NATIVES, "learnFromNatives");
+        tags.put(ChangeType.EXPERIENCE, "learnFromExperience");
+        tags.put(ChangeType.LOST_CITY, "learnInLostCity");
+        tags.put(ChangeType.PROMOTION, "promotion");
+        tags.put(ChangeType.CLEAR_SKILL, "clearSkill");
+        tags.put(ChangeType.DEMOTION, "demotion");
+        tags.put(ChangeType.CAPTURE, "capture");
+        tags.put(ChangeType.CREATION, "creation");
+        tags.put(ChangeType.ENTER_COLONY, "enterColony");
+        tags.put(ChangeType.INDEPENDENCE, "independence");
+    }
+
     protected int turnsToLearn = 0;
 
     protected Set<ChangeType> changeTypes = new HashSet<ChangeType>();
@@ -59,12 +78,9 @@ public class UnitTypeChange extends FreeColObject {
      * Creates a new <code>UnitTypeChange</code> instance.
      *
      * @param in a <code>XMLStreamReader</code> value
+     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public UnitTypeChange(XMLStreamReader in) throws XMLStreamException {
-        this(in, Specification.getSpecification());
-    }
-
     public UnitTypeChange(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         readAttributes(in, specification);
@@ -155,38 +171,13 @@ public class UnitTypeChange extends FreeColObject {
         } else {
             newUnitType = specification.getType(newTypeId, UnitType.class);
             turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
-            if (getAttribute(in, "learnInSchool", false) || turnsToLearn > 0) {
+            if (turnsToLearn > 0) {
                 changeTypes.add(ChangeType.EDUCATION);
             }
-            if (getAttribute(in, "learnFromNatives", false)) {
-                changeTypes.add(ChangeType.NATIVES);
-            }
-            if (getAttribute(in, "learnFromExperience", false)) {
-                changeTypes.add(ChangeType.EXPERIENCE);
-            }
-            if (getAttribute(in, "learnInLostCity", false)) {
-                changeTypes.add(ChangeType.LOST_CITY);
-            }
-            if (getAttribute(in, "promotion", false)) {
-                changeTypes.add(ChangeType.PROMOTION);
-            }
-            if (getAttribute(in, "clearSkill", false)) {
-                changeTypes.add(ChangeType.CLEAR_SKILL);
-            }
-            if (getAttribute(in, "demotion", false)) {
-                changeTypes.add(ChangeType.DEMOTION);
-            }
-            if (getAttribute(in, "capture", false)) {
-                changeTypes.add(ChangeType.CAPTURE);
-            }
-            if (getAttribute(in, "creation", false)) {
-                changeTypes.add(ChangeType.CREATION);
-            }
-            if (getAttribute(in, "enterColony", false)) {
-                changeTypes.add(ChangeType.ENTER_COLONY);
-            }
-            if (getAttribute(in, "independence", false)) {
-                changeTypes.add(ChangeType.INDEPENDENCE);
+            for (ChangeType type : ChangeType.values()) {
+                if (getAttribute(in, tags.get(type), false)) {
+                    changeTypes.add(type);
+                }
             }
         }
     }
@@ -201,8 +192,21 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // currently not serialized
+        out.writeStartElement(getXMLElementTagName());
+        if (newUnitType != null) {
+            out.writeAttribute("unit", newUnitType.getId());
+        }
+        if (turnsToLearn != UNDEFINED) {
+            out.writeAttribute("turnsToLearn", Integer.toString(turnsToLearn));
+        }
+        for (ChangeType type : changeTypes) {
+            out.writeAttribute(tags.get(type), "true");
+        }
+        out.writeEndElement();
     }
 
+    public static final String getXMLElementTagName() {
+        return "upgrade";
+    }
 
 }

@@ -822,6 +822,12 @@
       <xs:attribute name="independence" type="xs:boolean"/>
       <xs:attribute name="enterColony" type="xs:boolean"/>
       <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
+      <!-- TODO: these are downgrades, but serialization can not
+        handle non-static XML Element tag names! We need to combine
+        upgrade and downgrade into a typechange. -->
+        <xs:attribute name="capture" type="xs:boolean"/>
+        <xs:attribute name="demotion" type="xs:boolean"/>
+        <xs:attribute name="clearSkill" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 
