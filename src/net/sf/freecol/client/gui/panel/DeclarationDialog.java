@@ -143,7 +143,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
 
         SignaturePanel() {
-            faFile = (FAFile) UIManager.get("Declaration.signature.font");
+            faFile = (FAFile) ResourceManager.getFAFile("AnimatedFont");
             setOpaque(false);
         }
 

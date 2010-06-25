@@ -86,6 +86,8 @@ public class ResourceFactory {
                     } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
                         r = new FontResource(uri);
                     }
+                } else if (uri.getPath().endsWith(".faf")) {
+                    r = new FAFileResource(uri);
                 } else if (uri.getPath().endsWith(".sza")) {
                     r = new SZAResource(uri);
                 } else if (uri.getPath().endsWith(".ttf")) {

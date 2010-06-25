@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.FAFile;
 import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
@@ -485,5 +486,16 @@ public class ResourceManager {
     public static Font getFont(final String resource, int style, float size) {
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(style, size);
+    }
+
+    /**
+     * Gets a FAFile resource with the given name.
+     *
+     * @param resource The name of the resource to query.
+     * @return The <code>FAFile</code> found in a FAFileResource.
+     */
+    public static FAFile getFAFile(final String resource) {
+        final FAFileResource r = getResource(resource, FAFileResource.class);
+        return r.getFAFile();
     }
 }

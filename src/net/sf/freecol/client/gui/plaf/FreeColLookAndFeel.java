@@ -45,7 +45,6 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.FAFile;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -169,29 +168,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ToEuropePanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
             u.put("EuropeInPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
             u.put("DocksPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            
-            // Add the Font Animation File for the signature:          
-            InputStream faStream = null;            
-            File f = new File(dataDirectory, "fonts" + System.getProperty("file.separator") + "signature.faf");
-            if (f.exists() && f.isFile()) {
-                try {
-                    faStream = new FileInputStream(f.toString());
-                } catch (FileNotFoundException e) {} // Ignored.
-            } else {
-                URL url = resourceLocator.getResource("data/fonts/signature.faf");
-                if (url != null) {
-                    try {
-                        faStream = url.openStream();
-                    } catch (IOException e) {} // Ignored.
-                }
-            }
-            try {
-                if (faStream != null) {
-                    u.put("Declaration.signature.font", new FAFile(faStream));
-                }
-            } catch (IOException e) {
-                logger.warning("Could not load the Font Animation File for the signature.");
-            }
             
             // Add image UI resources:
             String [][] resources = {                
