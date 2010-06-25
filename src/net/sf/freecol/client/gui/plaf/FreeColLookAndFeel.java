@@ -38,6 +38,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -48,51 +50,30 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
- * Implements the "FreeCol Look and Feel".
+ * Implements the FreeCol look and feel.
  */
 public class FreeColLookAndFeel extends MetalLookAndFeel {
+
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
     
-    
     private final static Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
+
     private File dataDirectory;
+
     
     /**
-     * Initiates a new "FreeCol Look and Feel".
+     * Initiates a new FreeCol look and feel.
      *
-     * @exception FreeColException If the ui directory could not be found.
+     * @param dataDirectory The home of the FreeCol data files.
      * @param windowSize The size of the application window.
+     * @exception FreeColException If the ui directory could not be found.
      */
-    public FreeColLookAndFeel(Dimension windowSize) throws FreeColException {
-        this("", windowSize);
-    }
-    
-
-   /**
-    * Initiates a new "FreeCol Look and Feel".
-    *
-    * @param dataFolder The home of the FreeCol data files.
-    * @param windowSize The size of the application window.
-    * @exception FreeColException If the ui directory could not be found.
-    */
-    public FreeColLookAndFeel(String dataFolder, Dimension windowSize) throws FreeColException {
+    public FreeColLookAndFeel(File dataDirectory, Dimension windowSize)
+        throws FreeColException {
         super();
-        
-        if(dataFolder.equals("")) { // lookup is necessary
-            dataDirectory = new File("data");// + System.getProperty("file.separator"));            
 
-            if(!dataDirectory.exists() || !dataDirectory.isDirectory()) {
-                dataDirectory = null;                                
-            }
-        } else {
-            dataDirectory = new File(dataFolder);
-
-            if(!dataDirectory.exists() || !dataDirectory.isDirectory()) {
-                throw new FreeColException("Data directory not found in: " + dataDirectory.getName());
-            }
-        }
-        
         setCurrentTheme(new DefaultMetalTheme() {
             protected ColorUIResource getPrimary1() {
                 return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary1.color"));
@@ -118,15 +99,19 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
             }
         });
+
+        if (dataDirectory.isDirectory()) {
+            this.dataDirectory = dataDirectory;
+        } else {
+            throw new FreeColException("Data directory is not a directory.");
+        }
     }
 
-
-    
-    
-   /**
-    * Creates the look and feel specific defaults table.
-    * @return The defaults table.
-    */
+    /**
+     * Creates the look and feel specific defaults table.
+     *
+     * @return The defaults table.
+     */
     public UIDefaults getDefaults() {
         UIDefaults u = super.getDefaults();
 
@@ -251,7 +236,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     u.put(imageID + ".scaled", bgImage);
                     mt.addImage(bgImage, 0, windowSize.width, windowSize.height);
                 }
-            }*/
+            }
                 
             try {
                 mt.waitForID(0, 30000); // Wait a maximum of 30 seconds for the images to load.
@@ -259,11 +244,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 logger.warning("Interrupted while loading resources!");
             }
             
-            // Add font UI resources:
             resources = new String[][] {                
-                {"HeaderFont", Messages.message("HeaderFont")},
-                {"NormalFont", Messages.message("NormalFont")},
-                {"BoldFont", Messages.message("BoldFont")}
+                //{"HeaderFont", Messages.message("HeaderFont")},
+                //{"NormalFont", Messages.message("NormalFont")},
+                //{"BoldFont", Messages.message("BoldFont")}
             };                  
 
             for (int i=0; i<resources.length; i++) {
@@ -298,7 +282,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));
                 }
             }          
-            
+            */
             
             // Add cursors:
             Image im = (Image) u.get("cursor.go.image");
@@ -316,20 +300,47 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         return u;
     }
     
+    /**
+     * Installs a FreeColLookAndFeel as the default look and feel.
+     *
+     * @param fclaf The <code>FreeColLookAndFeel</code> to install.
+     * @param defaultFont A <code>Font</code> to use by default.
+     * @throws FreeColException if the installation fails.
+     */
+    public static void install(FreeColLookAndFeel fclaf, Font defaultFont)
+        throws FreeColException {
+        try {
+            UIManager.setLookAndFeel(fclaf);
+        } catch (UnsupportedLookAndFeelException e) {
+            throw new FreeColException(e.getMessage());
+        }
+
+        // Set the default font in all UI elements.
+        UIDefaults u = UIManager.getDefaults();
+        java.util.Enumeration<Object> keys = u.keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            if (u.get(key) instanceof javax.swing.plaf.FontUIResource) {
+                u.put(key, defaultFont);
+            }
+        }
+    }
     
     /**
-    * Gets a one line description of this Look and Feel.
-    * @return "The default Look and Feel for FreeCol"
-    */
+     * Gets a one line description of this Look and Feel.
+     *
+     * @return "The default Look and Feel for FreeCol"
+     */
     public String getDescription() {
         return "The default Look and Feel for FreeCol";
     }
 
 
     /**
-    * Gets the name of this Look and Feel.
-    * @return "FreeCol Look and Feel"
-    */
+     * Gets the name of this Look and Feel.
+     *
+     * @return "FreeCol Look and Feel"
+     */
     public String getName() {
         return "FreeCol Look and Feel";
     }

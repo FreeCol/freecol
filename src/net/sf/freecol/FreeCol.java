@@ -43,8 +43,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -115,7 +113,7 @@ public final class FreeCol {
                             consoleLogging = false,
                             introVideo = true;
     private static Dimension windowSize = new Dimension(-1, -1);
-    private static String   dataFolder = "data" + FILE_SEP;
+    private static String dataFolder = "data" + FILE_SEP;
     private static String logFile = null;
 
     private static FreeColClient freeColClient;
@@ -129,6 +127,8 @@ public final class FreeCol {
     private static int debugLevel = DEBUG_OFF;
 
     private static boolean usesExperimentalAI = false;
+
+    private static String fontName = null;
 
     private static int serverPort;
     private static String serverName = null;
@@ -301,35 +301,39 @@ public final class FreeCol {
                 preloadSize = new Dimension(bounds.width, bounds.height);
             }
 
+            Font font = null;
+            if (fontName != null) {
+                font = Font.decode(fontName);
+                if (font == null) {
+                    System.err.println("Font not found: " + fontName);
+                }
+            }
+            if (font == null) {
+                font = ResourceManager.getFont("NormalFont", Font.ITALIC, 13);
+            }
             try {
-                UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder, preloadSize));
-            } catch (UnsupportedLookAndFeelException e) {
-                logger.warning("Could not load the \"FreeCol Look and Feel\"");
+                FreeColLookAndFeel fclaf
+                    = new FreeColLookAndFeel(getDataDirectory(), preloadSize);
+                try {
+                    FreeColLookAndFeel.install(fclaf, font);
+                } catch (FreeColException e) {
+                    e.printStackTrace();
+                    System.err.println("Unable to install FreeCol look-and-feel.");
+                    System.exit(1);
+                }
             } catch (FreeColException e) {
                 removeSplash(splash);
                 e.printStackTrace();
-                System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
-                System.out.println("they are present. If FreeCol is looking in the wrong directory");
-                System.out.println("then run the game with a command-line parameter:");
-                System.out.println("");
+                System.err.println("\nThe data files could not be found by FreeCol. Please make sure");
+                System.err.println("they are present. If FreeCol is looking in the wrong directory");
+                System.err.println("then run the game with a command-line parameter:\n");
                 printUsage();
                 System.exit(1);
-            }
-
-            Font default_font = ((Font)UIManager.get("NormalFont")).deriveFont(Font.ITALIC, 13);
-            java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
-            while (keys.hasMoreElements()) {
-                Object key = keys.nextElement();
-                Object value = UIManager.get (key);
-                if (value instanceof javax.swing.plaf.FontUIResource) {
-                    UIManager.put (key, default_font);
-                }
             }
 
             // TODO: don't use same datafolder for both images and
             // music because the images are best kept inside the .JAR
             // file.
-
             logger.info("Now starting to load images.");
 
             ImageLibrary lib = new ImageLibrary();
@@ -842,6 +846,11 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("experimentalAI")
                           .withDescription(Messages.message("cli.experimentalAI"))
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("font")
+                          .withDescription(Messages.message("cli.font"))
+                          .withArgName(Messages.message("cli.arg.font"))
+                          .hasArg()
+                          .create());
 
         try {
             // parse the command line arguments
@@ -981,6 +990,9 @@ public final class FreeCol {
             }
             if (line.hasOption("experimentalAI")) {
                 usesExperimentalAI = true;
+            }
+            if (line.hasOption("font")) {
+                fontName = line.getOptionValue("font");
             }
         } catch(ParseException e) {
             System.out.println("\n" + e.getMessage() + "\n");
