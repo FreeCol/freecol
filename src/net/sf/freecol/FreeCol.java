@@ -310,9 +310,7 @@ public final class FreeCol {
                     System.err.println("Font not found: " + fontName);
                 }
             }
-            if (font == null) {
-                font = ResourceManager.getFont("NormalFont", Font.ITALIC, 13);
-            }
+            if (font == null) font = ResourceManager.getFont("NormalFont");
             try {
                 FreeColLookAndFeel fclaf
                     = new FreeColLookAndFeel(getDataDirectory(), preloadSize);
