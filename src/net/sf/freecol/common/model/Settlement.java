@@ -301,19 +301,18 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * Try to be as greedy as possible.
      */
     private void claimTiles() {
-        Map map = getGame().getMap();
         Tile settlementTile = getTile();
 
         settlementTile.setOwningSettlement(this);
         settlementTile.setOwner(owner);
         owner.setExplored(settlementTile);
         settlementTile.updatePlayerExploredTiles();
-        for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
+        for (Tile tile : settlementTile.getSurroundingTiles(getRadius())) {
             if (canClaimTile(tile)) {
                 claimTile(tile);
             }
         }
-        for (Tile tile : map.getSurroundingTiles(settlementTile, getLineOfSight())) {
+        for (Tile tile : settlementTile.getSurroundingTiles(getLineOfSight())) {
             owner.setExplored(tile);
         }
     }
@@ -433,9 +432,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     public List<Tile> getOwnedTiles() {
         Tile settlementTile = getTile();
-        Map map = getGame().getMap();
         ArrayList<Tile> tiles = new ArrayList<Tile>();
-        for (Tile t : map.getSurroundingTiles(settlementTile, getRadius())) {
+        for (Tile t : settlementTile.getSurroundingTiles(getRadius())) {
             if (t.getOwningSettlement() == this
                 || (t.getOwningSettlement() == null && t.getOwner() == owner)) {
                 tiles.add(t);

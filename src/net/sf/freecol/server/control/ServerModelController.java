@@ -312,7 +312,6 @@ public class ServerModelController implements ModelController,PropertyChangeList
      *         appears.
      */
     public synchronized Location setToVacantEntryLocation(Unit unit) {
-        Game game = freeColServer.getGame();
         ServerPlayer player = (ServerPlayer) unit.getOwner();
         Location entryLocation;
         String taskID = unit.getId() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
@@ -332,7 +331,7 @@ public class ServerModelController implements ModelController,PropertyChangeList
 
         // Display the tiles surrounding the Unit:
         Element updateElement = Message.createNewRootElement("update");
-        List<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+        List<Tile> surroundingTiles = unit.getTile().getSurroundingTiles(unit.getLineOfSight());
 
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);

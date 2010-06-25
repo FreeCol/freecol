@@ -111,7 +111,7 @@ public class MapTest extends FreeColTestCase {
         Map map = builder.setDimensions(10, 15).build();
 
         // Check in the middle
-        List<Tile> surroundingTiles = map.getSurroundingTiles(map.getTile(4,8), 1);
+        List<Tile> surroundingTiles = map.getTile(4,8).getSurroundingTiles(1);
 
         assertEquals(8, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(4, 6)));
@@ -124,7 +124,7 @@ public class MapTest extends FreeColTestCase {
         assertTrue(surroundingTiles.contains(map.getTile(4, 9)));
 
         // Check on sides
-        surroundingTiles = map.getSurroundingTiles(map.getTile(0, 0), 1);
+        surroundingTiles = map.getTile(0, 0).getSurroundingTiles(1);
 
         assertEquals(3, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(0, 2)));
@@ -132,12 +132,12 @@ public class MapTest extends FreeColTestCase {
         assertTrue(surroundingTiles.contains(map.getTile(0, 1)));
 
         // Check larger range
-        surroundingTiles = map.getSurroundingTiles(map.getTile(4,8), 2);
+        surroundingTiles = map.getTile(4,8).getSurroundingTiles(2);
 
         assertEquals(25 - 1, surroundingTiles.size());
 
         // Check that all tiles are returned
-        surroundingTiles = map.getSurroundingTiles(map.getTile(4,8), 10);
+        surroundingTiles = map.getTile(4,8).getSurroundingTiles(10);
         assertEquals(150 - 1, surroundingTiles.size());
     }
 

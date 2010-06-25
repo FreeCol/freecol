@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -116,7 +115,6 @@ public class DefendSettlementMission extends Mission {
     */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
-        Map map = unit.getGame().getMap();
         
         if (!isValid()) {
             return;

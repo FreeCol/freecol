@@ -2382,7 +2382,7 @@ public class Player extends FreeColGameObject implements Nameable {
             boolean nearbyTileIsOcean = false;
             float advantages = 1f;
             int value = 0;
-            for (Tile tile : getGame().getMap().getSurroundingTiles(t, 1)) {
+            for (Tile tile : t.getSurroundingTiles(1)) {
                 if (tile.getColony() != null) {
                     // can't build next to colony
                     return 0;
@@ -2488,7 +2488,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         //also return 0 if a neighbouring tile contains a colony
-        for (Tile tile : getGame().getMap().getSurroundingTiles(t, 1)) {
+        for (Tile tile : t.getSurroundingTiles(1)) {
             if (tile.getColony() != null) {
                 return 0;
             }

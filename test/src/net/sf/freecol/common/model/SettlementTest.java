@@ -87,7 +87,7 @@ public class SettlementTest extends FreeColTestCase {
             new FreeColTestCase.IndianSettlementBuilder(game);
 
         IndianSettlement settlement = builder.build();
-        for (Tile tile : map.getSurroundingTiles(settlement.getTile(), 1)) {
+        for (Tile tile : settlement.getTile().getSurroundingTiles(1)) {
             assertEquals(tile.isLand(), tile.getOwner() == settlement.getOwner());
             assertEquals(tile.isLand(), tile.getOwningSettlement() == settlement);
         }
@@ -102,7 +102,7 @@ public class SettlementTest extends FreeColTestCase {
         assertFalse(map.getTile(4, 8).isLand());
         
         Colony colony = getStandardColony();
-        for (Tile tile : map.getSurroundingTiles(colony.getTile(), 1)) {
+        for (Tile tile : colony.getTile().getSurroundingTiles(1)) {
             assertEquals(tile.getOwner(), colony.getOwner());
             assertEquals(tile.getOwningSettlement(), colony);
         }

@@ -829,10 +829,8 @@ public final class InGameController extends Controller {
      * @param action The monarch action.
      */
     private void monarchAction(ServerPlayer serverPlayer, MonarchAction action) {
-        Specification spec = getGame().getSpecification();
         Monarch monarch = serverPlayer.getMonarch();
         Connection conn = serverPlayer.getConnection();
-        int turn = getGame().getTurn().getNumber();
         Element monarchActionElement = Message.createNewRootElement("monarchAction");
         monarchActionElement.setAttribute("action", String.valueOf(action));
 
@@ -1901,7 +1899,7 @@ public final class InGameController extends Controller {
         float attackPower = 0, totalAttackPower = 0;
 
         if (!unit.isNaval() || unit.getMovesLeft() <= 0) return null;
-        for (Tile tile : game.getMap().getSurroundingTiles(newTile, 1)) {
+        for (Tile tile : newTile.getSurroundingTiles(1)) {
             // Ships in settlements do not slow enemy ships, but:
             // TODO should a fortress slow a ship?
             Player enemy;
@@ -2300,7 +2298,7 @@ public final class InGameController extends Controller {
         // now be within the line-of-sight.
         List<FreeColGameObject> newTiles = new ArrayList<FreeColGameObject>();
         int los = unit.getLineOfSight();
-        for (Tile tile : game.getMap().getSurroundingTiles(newTile, los)) {
+        for (Tile tile : newTile.getSurroundingTiles(los)) {
             if (!serverPlayer.canSee(tile)) newTiles.add(tile);
         }
 
@@ -2849,8 +2847,7 @@ public final class InGameController extends Controller {
             settlement.setVisited(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
-            Map map = getFreeColServer().getGame().getMap();
-            for (Tile t : map.getSurroundingTiles(tile, radius)) {
+            for (Tile t : tile.getSurroundingTiles(radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isCoast())) {
                     serverPlayer.setExplored(t);
                     cs.add(See.only(serverPlayer), t);
@@ -3385,7 +3382,6 @@ public final class InGameController extends Controller {
                                Goods goods) {
         ChangeSet cs = new ChangeSet();
 
-        FreeColGameObject update;
         Location loc;
         if (unit.isInEurope()) { // Must be a dump of boycotted goods
             loc = null;
@@ -3607,8 +3603,7 @@ public final class InGameController extends Controller {
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
-        Map map = serverPlayer.getGame().getMap();
-        for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
+        for (Tile t : tile.getSurroundingTiles(colony.getRadius())) {
             if (t.getOwningSettlement() == colony && !ownedTiles.contains(t)) {
                 cs.add(See.perhaps(), t);
             }

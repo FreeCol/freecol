@@ -1916,4 +1916,30 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                direction.getOddDY() : direction.getEvenDY());
          return getMap().getTile(x, y);
 }
+
+     /**
+      * Returns all the tiles surrounding the given tile within the
+      * given range. The center tile itself is not included.
+      *
+      * @param t
+      *            The tile that lies on the center of the tiles to return.
+      * @param range
+      *            How far away do we need to go starting from the center tile.
+      * @return The tiles surrounding the given tile.
+      */
+     public List<Tile> getSurroundingTiles(int range) {
+         List<Tile> result = new ArrayList<Tile>();
+         Position tilePosition = getPosition();
+         Iterator<Position> i = (range == 1) ? getMap().getAdjacentIterator(tilePosition)
+                 : getMap().getCircleIterator(tilePosition, true, range);
+
+         while (i.hasNext()) {
+             Position p = i.next();
+             if (!p.equals(tilePosition)) {
+                 result.add(getMap().getTile(p));
+}
+         }
+
+         return result;
+     }
 }
