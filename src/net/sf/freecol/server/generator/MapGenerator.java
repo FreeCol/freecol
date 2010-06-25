@@ -373,10 +373,10 @@ public class MapGenerator implements IMapGenerator {
         
         // Default value for map editor
         int nativeSettlementDensity = 50;
-        boolean isNativeSettlementDensitySet = Specification.getSpecification().hasOption("model.option.nativeSettlementDensity");
+        boolean isNativeSettlementDensitySet = map.getSpecification().hasOption("model.option.nativeSettlementDensity");
         // A difficulty level was set, use the level value instead
         if(isNativeSettlementDensitySet){
-        	nativeSettlementDensity = Specification.getSpecification().getIntegerOption("model.option.nativeSettlementDensity").getValue();
+        	nativeSettlementDensity = map.getSpecification().getIntegerOption("model.option.nativeSettlementDensity").getValue();
         }
         
         int number = mapGeneratorOptions.getNumberOfSettlements() * nativeSettlementDensity / 100;
@@ -541,7 +541,7 @@ public class MapGenerator implements IMapGenerator {
 
         int unitCount = settlement.getGeneratedUnitCount();
         for (int i = 0; i < unitCount; i++) {
-            UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+            UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new Unit(map.getGame(), settlement, player, unitType, UnitState.ACTIVE,
                                  unitType.getDefaultEquipment());
             unit.setIndianSettlement(settlement);
@@ -571,7 +571,7 @@ public class MapGenerator implements IMapGenerator {
 
         // START DEBUG:
         if (FreeCol.isInDebugMode()) {
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : map.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isNewWorldGoodsType())
                     settlement.addGoods(goodsType, 150);
             }
@@ -613,7 +613,7 @@ public class MapGenerator implements IMapGenerator {
         UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
         if (skill == null) {
             // Seasoned Scout
-            List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
+            List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
             return unitList.get(random.nextInt(unitList.size()));
         } else {
             return skill;
@@ -721,17 +721,17 @@ public class MapGenerator implements IMapGenerator {
             // START DEBUG:
             if (FreeCol.isInFullDebugMode()) {
                 // in debug mode give each player a few more units and a colony
-                UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
+                UnitType unitType = map.getSpecification().getUnitType("model.unit.galleon");
                 Unit unit4 = new Unit(game, startTile, player, unitType, UnitState.ACTIVE);
                 
-                unitType = FreeCol.getSpecification().getUnitType("model.unit.privateer");
+                unitType = map.getSpecification().getUnitType("model.unit.privateer");
                 @SuppressWarnings("unused") Unit privateer = new Unit(game, startTile, player, unitType, UnitState.ACTIVE);
                 
-                unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+                unitType = map.getSpecification().getUnitType("model.unit.freeColonist");
                 @SuppressWarnings("unused") Unit unit5 = new Unit(game, unit4, player, unitType, UnitState.SENTRY);
-                unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
+                unitType = map.getSpecification().getUnitType("model.unit.veteranSoldier");
                 @SuppressWarnings("unused") Unit unit6 = new Unit(game, unit4, player, unitType, UnitState.SENTRY);
-                unitType = FreeCol.getSpecification().getUnitType("model.unit.jesuitMissionary");
+                unitType = map.getSpecification().getUnitType("model.unit.jesuitMissionary");
                 @SuppressWarnings("unused") Unit unit7 = new Unit(game, unit4, player, unitType, UnitState.SENTRY);
 
                 Tile colonyTile = null;
@@ -750,13 +750,13 @@ public class MapGenerator implements IMapGenerator {
                 }
 
                 if (colonyTile != null) {
-                    for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                    for (TileType t : map.getSpecification().getTileTypeList()) {
                         if (!t.isWater()) {
                             colonyTile.setType(t);
                             break;
                         }
                     }
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
+                    unitType = map.getSpecification().getUnitType("model.unit.expertFarmer");
                     Unit buildColonyUnit = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     String colonyName = Messages.message(player.getNationName()) + " Colony";
                     Colony colony = new Colony(game, player, colonyName, colonyTile);
@@ -765,12 +765,12 @@ public class MapGenerator implements IMapGenerator {
                     buildColonyUnit.setLocation(colony);
                     if (buildColonyUnit.getLocation() instanceof ColonyTile) {
                         Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
-                        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                        for (TileType t : map.getSpecification().getTileTypeList()) {
                             if (!t.isWater()) {
                                 ct.setType(t);
-                                TileImprovementType plowType = FreeCol.getSpecification()
+                                TileImprovementType plowType = map.getSpecification()
                                     .getTileImprovementType("model.improvement.plow");
-                                TileImprovementType roadType = FreeCol.getSpecification()
+                                TileImprovementType roadType = map.getSpecification()
                                     .getTileImprovementType("model.improvement.road");
                                 TileImprovement road = new TileImprovement(game, ct, roadType);
                                 road.setTurnsToComplete(0);
@@ -783,25 +783,25 @@ public class MapGenerator implements IMapGenerator {
                             }
                         }
                     }
-                    BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.schoolhouse");
+                    BuildingType schoolType = map.getSpecification().getBuildingType("model.building.schoolhouse");
                     Building schoolhouse = new Building(game, colony, schoolType);
                     colony.addBuilding(schoolhouse);
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
+                    unitType = map.getSpecification().getUnitType("model.unit.masterCarpenter");
                     while (!schoolhouse.canAdd(unitType)) {
                         schoolhouse.upgrade();
                     }
                     Unit carpenter = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.elderStatesman");
+                    unitType = map.getSpecification().getUnitType("model.unit.elderStatesman");
                     Unit statesman = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     statesman.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.expertLumberJack");
+                    unitType = map.getSpecification().getUnitType("model.unit.expertLumberJack");
                     Unit lumberjack = new Unit(game, colony, player, unitType, UnitState.ACTIVE);
                     if (lumberjack.getLocation() instanceof ColonyTile) {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
-                        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                        for (TileType t : map.getSpecification().getTileTypeList()) {
                             if (t.isForested()) {
                                 lt.setType(t);
                                 break;
@@ -810,12 +810,12 @@ public class MapGenerator implements IMapGenerator {
                         lumberjack.setWorkType(lumberjack.getType().getExpertProduction());
                     }
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");
+                    unitType = map.getSpecification().getUnitType("model.unit.seasonedScout");
                     @SuppressWarnings("unused")
                     Unit scout = new Unit(game, colonyTile, player, 
                                           unitType, UnitState.ACTIVE);
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
+                    unitType = map.getSpecification().getUnitType("model.unit.veteranSoldier");
                     @SuppressWarnings("unused")
                     Unit unit8 = new Unit(game, colonyTile, player, 
                                           unitType, UnitState.ACTIVE);
@@ -824,7 +824,7 @@ public class MapGenerator implements IMapGenerator {
                     Unit unit9 = new Unit(game, colonyTile, player, 
                                           unitType, UnitState.ACTIVE);
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
+                    unitType = map.getSpecification().getUnitType("model.unit.artillery");
                     @SuppressWarnings("unused")
                     Unit unit10 = new Unit(game, colonyTile, player,
                                            unitType, UnitState.ACTIVE);
@@ -837,17 +837,17 @@ public class MapGenerator implements IMapGenerator {
                     Unit unit12 = new Unit(game, colonyTile, player,
                                            unitType, UnitState.ACTIVE);
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.treasureTrain");
+                    unitType = map.getSpecification().getUnitType("model.unit.treasureTrain");
                     Unit unit13 = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     unit13.setTreasureAmount(10000);
                     
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.wagonTrain");
+                    unitType = map.getSpecification().getUnitType("model.unit.wagonTrain");
                     Unit unit14 = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
-                    GoodsType cigarsType = FreeCol.getSpecification().getGoodsType("model.goods.cigars");
+                    GoodsType cigarsType = map.getSpecification().getGoodsType("model.goods.cigars");
                     Goods cigards = new Goods(game, unit14, cigarsType, 5);
                     unit14.add(cigards);
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.jesuitMissionary");
+                    unitType = map.getSpecification().getUnitType("model.unit.jesuitMissionary");
                     @SuppressWarnings("unused") Unit unit15 = new Unit(game, colonyTile, player,
                                                                        unitType, UnitState.ACTIVE);
                     @SuppressWarnings("unused") Unit unit16 = new Unit(game, colonyTile, player,

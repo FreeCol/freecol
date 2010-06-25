@@ -44,11 +44,6 @@ public class River {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
-    private static final TileType greatRiver = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
-
-    private static final TileImprovementType riverType = 
-        FreeCol.getSpecification().getTileImprovementType("model.improvement.river");
-
     /**
      * Possible direction changes for a river.
      * @see net.sf.freecol.common.model.Map
@@ -286,6 +281,8 @@ public class River {
      * @return true if a river was created, false otherwise.
      */
     public boolean flowFromSource(Map.Position position) {
+        TileImprovementType riverType = 
+            map.getSpecification().getTileImprovementType("model.improvement.river");
         Tile tile = map.getTile(position);
         if (!tile.getType().canHaveImprovement(riverType)) {
             // Mountains, ocean cannot have rivers
@@ -309,6 +306,9 @@ public class River {
      */
     private boolean flow(Map.Position source) {
         
+        TileImprovementType riverType = 
+            map.getSpecification().getTileImprovementType("model.improvement.river");
+
         if (sections.size() % 2 == 0) {
             // get random new direction
             int length = DirectionChange.values().length;
@@ -414,6 +414,7 @@ public class River {
                     logger.fine("Added river (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
+                    TileType greatRiver = map.getSpecification().getTileType("model.tile.greatRiver");
                     tile.setType(greatRiver);   // changing the type resets the improvements
                     //container.addRiver(section.getSize(), section.encodeStyle());
                     if (connected) {

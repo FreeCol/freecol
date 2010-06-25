@@ -65,14 +65,11 @@ public class TerrainGenerator {
     private final MapGeneratorOptions mapGeneratorOptions;
     private final Random random;
 
-    private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
-    private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
-    private TileImprovementType riverType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.river");
-    private TileImprovementType fishBonusLandType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.fishBonusLand");
-    private TileImprovementType fishBonusRiverType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.fishBonusRiver");
+    private TileType ocean;
+    private TileType lake;
+    private TileImprovementType riverType;
+    private TileImprovementType fishBonusLandType;
+    private TileImprovementType fishBonusRiverType;
 
     private ArrayList<TileType> terrainTileTypes = null;
 
@@ -123,6 +120,12 @@ public class TerrainGenerator {
      * @see Map
      */
     public void createMap(Game game, Game importGame, boolean[][] landMap) {
+        ocean = game.getSpecification().getTileType("model.tile.ocean");
+        lake = game.getSpecification().getTileType("model.tile.lake");
+        riverType = game.getSpecification().getTileImprovementType("model.improvement.river");
+        fishBonusLandType = game.getSpecification().getTileImprovementType("model.improvement.fishBonusLand");
+        fishBonusRiverType = game.getSpecification().getTileImprovementType("model.improvement.fishBonusRiver");
+
         final int width = landMap.length;
         final int height = landMap[0].length;
 
@@ -206,7 +209,7 @@ public class TerrainGenerator {
     private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude) {
         Tile t;
         if (landMap[x][y]) {
-            t = new Tile(game, getRandomLandTileType(latitude), x, y);
+            t = new Tile(game, getRandomLandTileType(game, latitude), x, y);
         } else {
             t = new Tile(game, ocean, x, y);
         }
@@ -299,11 +302,12 @@ public class TerrainGenerator {
     /**
      * Gets a random land tile type based on the given percentage.
      *
+     * @param game the Game
      * @param latitudePercent The location of the tile relative to the north/south poles and equator, 
      *        100% is the mid-section of the map (equator) 
      *        0% is on the top/bottom of the map (poles).
      */
-    private TileType getRandomLandTileType(int latitudePercent) {
+    private TileType getRandomLandTileType(Game game, int latitudePercent) {
         // decode options
         final int forestChance = getMapGeneratorOptions().getPercentageOfForests();
         final int temperaturePreference = getMapGeneratorOptions().getTemperature();
@@ -311,7 +315,7 @@ public class TerrainGenerator {
         // create the main list of TileTypes the first time, and reuse it afterwards
         if (terrainTileTypes==null) {
             terrainTileTypes = new ArrayList<TileType>();
-            for (TileType tileType : Specification.getSpecification().getTileTypeList()) {
+            for (TileType tileType : game.getSpecification().getTileTypeList()) {
                 if (tileType.getId().equals("model.tile.hills") ||
                     tileType.getId().equals("model.tile.mountains") ||
                     tileType.isWater()) {
@@ -352,7 +356,7 @@ public class TerrainGenerator {
             localeTemperature = -20;
         
         // humidity calculation
-        int localeHumidity = Specification.getSpecification().getRangeOption(MapGeneratorOptions.HUMIDITY).getValue();
+        int localeHumidity = game.getSpecification().getRangeOption(MapGeneratorOptions.HUMIDITY).getValue();
         int humidityDeviation = 20; // +/- 20% randomization
         localeHumidity += random.nextInt(humidityDeviation*2) - humidityDeviation;
         if (localeHumidity<0) 
@@ -788,7 +792,7 @@ public class TerrainGenerator {
         
         // lookup ocean TileTypes from xml specification
         TileType ocean = null, highSeas = null;
-        for (TileType t : Specification.getSpecification().getTileTypeList()) {
+        for (TileType t : map.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
                 if (t.hasAbility("model.ability.moveToEurope")) {
                     if (highSeas == null) {
@@ -843,7 +847,7 @@ public class TerrainGenerator {
         }
 
         TileType highSeas = null;
-        for (TileType t : Specification.getSpecification().getTileTypeList()) {
+        for (TileType t : map.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
                 if (t.hasAbility("model.ability.moveToEurope")) {
                     highSeas = t;
@@ -892,8 +896,8 @@ public class TerrainGenerator {
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
         
         // lookup the resources from specification
-        TileType hills = Specification.getSpecification().getTileType("model.tile.hills");
-        TileType mountains = Specification.getSpecification().getTileType("model.tile.mountains");
+        TileType hills = map.getSpecification().getTileType("model.tile.hills");
+        TileType mountains = map.getSpecification().getTileType("model.tile.mountains");
         if (hills == null || mountains == null) {
             throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
         }
