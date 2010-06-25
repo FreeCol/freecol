@@ -20,6 +20,7 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -42,41 +43,21 @@ public class FreeColModFile extends FreeColDataFile {
 
     private String id;
     private final ModInfo modInfo;
-    
+
+
     /**
-     * Opens the given file for reading.
-     * 
-     * @param id The id of the mod to load.
-     * @throws IOException if thrown while opening the file.
-     */
-    public FreeColModFile(final String id) {
-        this(id, new File(FreeCol.getModsDirectory(), id));
-    }
-    
-    /**
-     * Opens the given file for reading.
-     * 
-     * @param mi An id object.
-     * @throws IOException if thrown while opening the file.
-     */
-    public FreeColModFile(final ModInfo mi) {
-        this(mi.getId());
-    }
-    
-    /**
-     * Opens the given file for reading.
+     * Make a FreeColModFile from a File.
      *
-     * @param id The id of the mod.
-     * @param file The file to be read.
+     * @param file The <code>File</code> containing a FreeCol mod.
      * @throws IOException if thrown while opening the file.
      */
-    protected FreeColModFile(final String id, final File file) {
+    public FreeColModFile(final File file) {
         super(file);
-        
-        this.id = id;
+
+        this.id = file.getName();
         this.modInfo = new ModInfo(id);
     }
-    
+
     /**
      * Gets the input stream to the specification.
      * 
@@ -116,7 +97,7 @@ public class FreeColModFile extends FreeColDataFile {
             } catch (Exception e) {}
         }
     }
-    
+
     /**
      * Gets the input stream to the mod meta file.
      * 
@@ -128,7 +109,7 @@ public class FreeColModFile extends FreeColDataFile {
     private InputStream getModDescriptorInputStream() throws IOException {
         return getInputStream(MOD_DESCRIPTOR_FILE);
     }
-    
+
     /**
      * File endings that are supported for this type of data file.
      * @return An array of: ".fmd" and ".zip".
@@ -137,27 +118,34 @@ public class FreeColModFile extends FreeColDataFile {
     protected String[] getFileEndings() {
         return FILE_ENDINGS;
     }
-    
+
     /**
      * Gets the ID of this mod.
+     *
      * @return The ID of the mod.
      */
     public String getId() {
         return id;
     }
-    
+
+    /**
+     * Gets the ModInfo for this mod.
+     *
+     * @return The ModInfo for this mod.
+     */
     public ModInfo getModInfo() {
         return modInfo;
     }
-        
+
+
     public static class ModInfo {
 
         private final String id;
-        
+
         private ModInfo(final String id) {
             this.id = id;
         }
-        
+
         /**
          * Gets the ID of this mod.
          * @return The ID of the mod.
@@ -170,18 +158,16 @@ public class FreeColModFile extends FreeColDataFile {
          * Gets the name of this mod.
          */
         public String getName() {
-            // TODO: Get the text from the properties-file within the mod.
             return Messages.message("mod." + getId() + ".name");
         }
-        
+
         /**
          * Gets a short description of this mod.
          */
         public String getShortDescription() {
-            // TODO: Get the text from the properties-file within the mod.
             return Messages.message("mod." + getId() + ".shortDescription");
         }
-        
+
         /**
          * Gets the name of this mod.
          * @return The same as {@link #getName()}.
@@ -190,7 +176,7 @@ public class FreeColModFile extends FreeColDataFile {
             return getName();
         }
     }
-    
+
     protected static class ModDescriptor {
 
         private final String parent;

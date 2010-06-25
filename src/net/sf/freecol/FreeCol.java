@@ -146,6 +146,8 @@ public final class FreeCol {
     private static File autoSaveDirectory;
     
     private static File tcUserDirectory;
+
+    private static File userModsDirectory;
     
     private static String tc = DEFAULT_TC;
     
@@ -512,6 +514,23 @@ public final class FreeCol {
     }
 
     /**
+     * Try to make a directory.
+     *
+     * @param file A <code>File</code> specifying where to make the directory.
+     * @return True if the directory is there after the call.
+     */
+    private static boolean insistDirectory(File file) {
+        if (file.exists()) {
+            if (file.isDirectory()) return true;
+            System.out.println("Could not create directory " + file.getName()
+                + " under " + file.getParentFile().getName()
+                + " because a non-directory with that name is already there.");
+            return false;
+        }
+        return file.mkdir();
+    }
+
+    /**
      * Creates a freecol dir for the current user.
      * 
      * The directory is created within the current user's
@@ -525,7 +544,7 @@ public final class FreeCol {
      * For os.name beginning with "Windows" JFileChooser() is used to 
      * find the path to "My Documents" (or localized equivalent)
      */
-    private static File createAndSetDirectories() {
+    private static void createAndSetDirectories() {
         // TODO: The location of the save directory should be determined by the installer.;
 
         String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
@@ -554,55 +573,23 @@ public final class FreeCol {
         if (mainUserDirectory == null) {
             mainUserDirectory = new File(userHome, freeColDirectoryName);
         }
-        if (mainUserDirectory.exists()) {
-            if (mainUserDirectory.isFile()) {
-                System.out.println("Could not create " + freeColDirectoryName + " under "
-                        + userHome + " because there "
-                        + "already exists a regular file with the same name.");
-                return null;
-            }
-        } else {
-            mainUserDirectory.mkdir();
-        }
+        if (!insistDirectory(mainUserDirectory)) return;
         if (saveDirectory == null) {
             saveDirectory = new File(mainUserDirectory, "save");
         }
-        if (saveDirectory.exists()) {
-            if (saveDirectory.isFile()) {
-                System.out.println("Could not create freecol/save under "
-                        + userHome + " because there "
-                        + "already exists a regular file with the same name.");
-                return null;
-            }
-        } else {
-            saveDirectory.mkdir();
-        }
+        if (!insistDirectory(saveDirectory)) saveDirectory = null;
         
         autoSaveDirectory = new File(saveDirectory, "autosave");
-        if (autoSaveDirectory.exists()) {
-            if (autoSaveDirectory.isFile()) {
-                System.out.println("Could not create freecol/save/autosave under "
-                                   + System.getProperty("user.home") + " because there "
-                                   + "already exists a regular file with the same name.");
-                return null;
-            }
-        } else {
-            autoSaveDirectory.mkdir();
-        }
+        if (!insistDirectory(autoSaveDirectory)) autoSaveDirectory = null;
         
         tcUserDirectory = new File(mainUserDirectory, tc);
-        if (tcUserDirectory.exists()) {
-            if (tcUserDirectory.isFile()) {
-                System.out.println("Could not create freecol/" + tc + " under "
-                        + userHome + " because there "
-                        + "already exists a regular file with the same name.");
-                return null;
-            }
-        } else {
-            tcUserDirectory.mkdir();
-        }
-        clientOptionsFile = new File(tcUserDirectory, "options.xml");
-        return mainUserDirectory;
+        if (!insistDirectory(tcUserDirectory)) tcUserDirectory = null;
+
+        userModsDirectory = new File(mainUserDirectory, "mods");
+        if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
+
+        clientOptionsFile = (tcUserDirectory == null) ? null
+            : new File(tcUserDirectory, "options.xml");
     }
 
     /**
@@ -656,13 +643,23 @@ public final class FreeCol {
     }
     
     /**
-     * Returns the mods directory.
-     * @return The directory where the mods are located.
+     * Gets the mods directory.
+     *
+     * @return The directory where the standard mods are located.
      */
-    public static File getModsDirectory() {
+    public static File getStandardModsDirectory() {
         return new File(getDataDirectory(), "mods");
     }
     
+    /**
+     * Gets the user mods directory.
+     *
+     * @return The directory where user mods are located, or null if none.
+     */
+    public static File getUserModsDirectory() {
+        return userModsDirectory;
+    }
+
     /**
      * Returns the directory where the autogenerated savegames 
      * should be put.

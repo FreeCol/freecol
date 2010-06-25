@@ -27,8 +27,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.io.Mods;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColModFile.ModInfo;
+import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -518,10 +519,11 @@ public class ClientOptions extends OptionMap {
             private Map<String, ModInfo> mods = null; 
             private void init() {
                 if (mods == null) {
-                    final List<ModInfo> modInfos = Mods.getModInfos();
+                    List<FreeColModFile> fcmfs = Mods.getAllMods();
                     mods = new HashMap<String, ModInfo>();
-                    for (ModInfo mi : modInfos) {
-                        mods.put(mi.getId(), mi);
+                    for (FreeColModFile f : fcmfs) {
+                        ModInfo modInfo = f.getModInfo();
+                        mods.put(modInfo.getId(), modInfo);
                     }
                 }
             }
@@ -542,6 +544,27 @@ public class ClientOptions extends OptionMap {
         };
         new ListOption<ModInfo>(selector, USER_MODS, modsGroup);
         add(modsGroup);
+    }
+
+    /**
+     * Gets a list of active mods in this ClientOptions.
+     *
+     * @return A list of active mods.
+     */
+    public List<FreeColModFile> getActiveMods() {
+        final List<FreeColModFile> fcmfs = Mods.getAllMods();
+        List<FreeColModFile> active = new ArrayList<FreeColModFile>();
+        ListOption<?> options = (ListOption<?>) getObject(ClientOptions.USER_MODS);
+        for (Object o : options.getValue()) {
+            String id = ((ModInfo) o).getId();
+            for (FreeColModFile f : fcmfs) {
+                if (id.equals(f.getModInfo().getId())) {
+                    active.add(f);
+                    break;
+                }
+            }
+        }
+        return active;
     }
 
     /**

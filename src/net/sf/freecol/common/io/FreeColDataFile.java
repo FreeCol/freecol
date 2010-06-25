@@ -129,7 +129,7 @@ public class FreeColDataFile {
      * @return an <code>InputStream</code> value
      * @exception IOException if an error occurs
      */
-    protected InputStream getInputStream(String filename) throws IOException {
+    public InputStream getInputStream(String filename) throws IOException {
         final URLConnection connection = getURI(filename).toURL().openConnection();
         connection.setDefaultUseCaches(false);
         return new BufferedInputStream(connection.getInputStream());

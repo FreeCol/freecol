@@ -57,7 +57,6 @@ import net.sf.freecol.client.gui.sound.SoundLibrary;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
@@ -197,18 +196,11 @@ public final class FreeColClient {
             clientOptions.load(FreeCol.getClientOptionsFile());
         }
         
-        // TODO: Move this to a more suitable place:
-        final List<ModInfo> mods = new ArrayList<ModInfo>();
-        final List<ResourceMapping> modResources = new ArrayList<ResourceMapping>(mods.size());
-        for (Object object : ((ListOption<?>) getClientOptions()
-                              .getObject(ClientOptions.USER_MODS)).getValue()) {
-            ModInfo modInfo = (ModInfo) object;
-            if (modInfo != null) { // Ignore broken client options
-                mods.add(modInfo);
-                modResources.add(new FreeColModFile(modInfo).getResourceMapping());
-            }
+        List<ResourceMapping> modMappings = new ArrayList<ResourceMapping>();
+        for (FreeColModFile f : clientOptions.getActiveMods()) {
+            modMappings.add(f.getResourceMapping());
         }
-        ResourceManager.setModMappings(modResources);
+        ResourceManager.setModMappings(modMappings);
         ResourceManager.preload(innerWindowSize);
         
         // Control:

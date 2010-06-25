@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.i18n;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.LinkedList;
@@ -30,6 +31,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
@@ -85,18 +88,19 @@ public class Messages {
 
         messageBundle = new Properties();
 
-        List<File> directories = new LinkedList<File>();
-        directories.add(getI18nDirectory());
-        for (File dir : FreeCol.getModsDirectory().listFiles()) {
-            if (dir.isDirectory()) {
-                directories.add(dir);
-            }
-        }        
+        for (String fileName : getFileNames(language, country, variant)) {
+            File resourceFile = new File(getI18nDirectory(), fileName);
+            loadResources(resourceFile);
+        }
 
-        for (File directory : directories) {
+        for (FreeColModFile fcmf : Mods.getAllMods()) {
             for (String fileName : getFileNames(language, country, variant)) {
-                File resourceFile = new File(directory, fileName);
-                loadResources(resourceFile);
+                try {
+                    InputStream is = fcmf.getInputStream(fileName);
+                    loadResources(is);
+                } catch (IOException e) {
+                    // Ignore.  The file does not have to be there.
+                }
             }
         }
     }
