@@ -80,8 +80,10 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the Colopedia.
@@ -93,7 +95,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     public static enum PanelType { TERRAIN, RESOURCES, UNITS, GOODS, 
             SKILLS, BUILDINGS, FATHERS, NATIONS, NATION_TYPES }
 
-    private static final Font arrowFont = new Font("Dialog", Font.BOLD, 24);
+    private static final Font arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
     private static final DecimalFormat modifierFormat = 
         new DecimalFormat("0.##");
 

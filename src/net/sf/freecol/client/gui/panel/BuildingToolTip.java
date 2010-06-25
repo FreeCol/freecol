@@ -40,7 +40,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public class BuildingToolTip extends JToolTip {
 
-    private static final Font arrowFont = new Font("Dialog", Font.BOLD, 24);
+    private static final Font arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
 
     /**
      * Creates this BuildingToolTip.

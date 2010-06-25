@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
@@ -36,6 +35,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.resources.ResourceManager;
+
 
 /**
  * The ProductionLabel represents Goods that are produced in a
@@ -144,7 +145,7 @@ public final class ProductionLabel extends JComponent {
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 
         
-        setFont(new Font("Dialog", Font.BOLD, 12));
+        setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
         if (amount < 0) {
             setForeground(Color.RED);
         } else {
@@ -440,7 +441,7 @@ public final class ProductionLabel extends JComponent {
             if (maximumProduction > production && production > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            Font font = ((Font) UIManager.get("NormalFont")).deriveFont(Font.BOLD, 12.0f);
+            Font font = ResourceManager.getFont("NormalFont", Font.BOLD, 12f);
             stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
             stringWidth = stringImage.getWidth(null);
         }

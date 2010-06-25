@@ -32,7 +32,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -40,8 +39,10 @@ import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.OptionMap;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
+
 
 /**
 * Dialog for changing the {@link net.sf.freecol.common.model.DifficultyLevel}.
@@ -71,7 +72,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
 
         // Header:
         JLabel header = localizedLabel("gameOptions.difficultySettings.name");
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
+        header.setFont(ResourceManager.getFont("HeaderFont", 48f));
         add(header, "center, wrap 20");
 
         if (showCurrent) {

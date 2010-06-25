@@ -53,7 +53,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
@@ -95,16 +94,16 @@ public class FreeColPanel extends JPanel implements ActionListener {
     private Canvas canvas = null;
 
     // Font to use for text areas
-    protected static final Font defaultFont = new Font("Dialog", Font.BOLD, 12);
+    protected static final Font defaultFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
 
     // Fonts to use for report headers, etc.
-    protected static final Font headerFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 12);
+    protected static final Font headerFont = ResourceManager.getFont("HeaderFont", 12f);
 
-    protected static final Font smallHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 24);
+    protected static final Font smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
 
-    protected static final Font mediumHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 36);
+    protected static final Font mediumHeaderFont = ResourceManager.getFont("HeaderFont", 36f);
 
-    protected static final Font bigHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 48);
+    protected static final Font bigHeaderFont = ResourceManager.getFont("HeaderFont", 48f);
 
     // How many columns (em-widths) to use in the text area
     protected static final int COLUMNS = 20;

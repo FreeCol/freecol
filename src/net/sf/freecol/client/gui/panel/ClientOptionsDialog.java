@@ -32,7 +32,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -40,6 +39,7 @@ import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -102,7 +102,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
 
         // Header:
         header = new JLabel(getClient().getClientOptions().getName(), JLabel.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
+        header.setFont(ResourceManager.getFont("HeaderFont", 48f));
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
         add(header, BorderLayout.NORTH);
 

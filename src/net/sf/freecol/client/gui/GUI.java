@@ -88,7 +88,6 @@ import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
-
 /**
 * This class is responsible for drawing the map/background on the <code>Canvas</code>.
 * In addition, the graphical state of the map (focus, active unit..) is also a responsibility
@@ -1296,7 +1295,7 @@ public final class GUI {
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
         if (gotoPath != null) {
             PathNode temp = gotoPath;
-            Font font = ((Font) UIManager.get("NormalFont")).deriveFont(12.0f);
+            Font font = ResourceManager.getFont("NormalFont", 12f);
             while (temp != null) {
                 Point p = getTilePosition(temp.getTile());
                 if (p != null) {
@@ -1554,7 +1553,7 @@ public final class GUI {
                 final Settlement settlement = settlements.get(index);
                 String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
                 Color backgroundColor = lib.getColor(settlement.getOwner());
-                Font font = ((Font)UIManager.get("NormalFont")).deriveFont(18.0f);
+                Font font = ResourceManager.getFont("NormalFont", 18f);
                 int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                 g.setTransform(settlementTransforms.get(index));
                 switch(colonyLabels) {
@@ -1644,7 +1643,7 @@ public final class GUI {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             synchronized (this) {
-                Font font = ((Font) UIManager.get("NormalFont")).deriveFont(12.0f);
+                Font font = ResourceManager.getFont("NormalFont", 12f);
                 GUIMessage message = getMessage(0);
                 Image si = createStringImage(g, message.getMessage(), message.getColor(), font);
 
@@ -2343,7 +2342,7 @@ public final class GUI {
                         Color theColor = ResourceManager
                             .getColor("productionBonus." + ((Colony) settlement).getProductionBonus()
                                       + ".color");
-                        Font font = new Font("Dialog", Font.BOLD, 12);
+                        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
                         Image stringImage = createStringImage(g, populationString, theColor, font);
                         centerImage(g, stringImage);
                     }
@@ -2478,7 +2477,7 @@ public final class GUI {
                 centerString(g, text);
             } else {
                 g.setColor(Color.BLACK);
-                g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(12.0f));
+                g.setFont(ResourceManager.getFont("NormalFont", 12f));
                 g.drawString(text.substring(0, b),
                              (tileWidth -
                               g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
@@ -2516,7 +2515,7 @@ public final class GUI {
      */
     private void centerString(Graphics2D g, String text) {
         g.setColor(Color.BLACK);
-        g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(12.0f));
+        g.setFont(ResourceManager.getFont("NormalFont", 12f));
         g.drawString(text,
                      (tileWidth - g.getFontMetrics().stringWidth(text))/2,
                      (tileHeight - g.getFontMetrics().getAscent())/2);
@@ -2679,7 +2678,8 @@ public final class GUI {
      */
     public Image createChip(String text, Color border, Color background, Color foreground) {
         // Draw it and put it in the cache
-        Font font = new Font("Default", Font.BOLD, (int) (12 * lib.getScalingFactor()));
+        Font font = ResourceManager.getFont("NormalFont", Font.BOLD,
+                (float) Math.rint(12 * lib.getScalingFactor()));
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();

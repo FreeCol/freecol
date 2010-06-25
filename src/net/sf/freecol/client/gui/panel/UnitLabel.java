@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -49,6 +48,8 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.resources.ResourceManager;
+
 
 /**
  * This label holds Unit data in addition to the JLabel data, which makes it
@@ -273,7 +274,7 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
                                                       "%turns%", Integer.toString(unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
-                Font font = ((Font) UIManager.get("NormalFont")).deriveFont(14f);
+                Font font = ResourceManager.getFont("NormalFont", 14f);
                 Image repairImage1 = parent.getGUI()
                     .createStringImage((Graphics2D)g, underRepair1, Color.RED, font);
                 Image repairImage2 = parent.getGUI()

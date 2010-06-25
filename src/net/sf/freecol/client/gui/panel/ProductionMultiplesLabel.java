@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
@@ -37,6 +36,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.resources.ResourceManager;
+
 
 /**
  * The ProductionLabel represents Goods that are produced in a
@@ -122,7 +123,7 @@ public final class ProductionMultiplesLabel extends JComponent {
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 
-        setFont(new Font("Dialog", Font.BOLD, 12));
+        setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
         totalProduction = 0;
     	
         if (goods != null) {
@@ -512,7 +513,7 @@ public final class ProductionMultiplesLabel extends JComponent {
             if (maximumProduction > totalProduction && totalProduction > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            Font font = ((Font) UIManager.get("NormalFont")).deriveFont(Font.BOLD, 12.0f);
+            Font font = ResourceManager.getFont("NormalFont", Font.BOLD, 12f);
             Image stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
             int textOffset = leftOffset + (coverage - stringImage.getWidth(null))/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
