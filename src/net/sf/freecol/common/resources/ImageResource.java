@@ -78,6 +78,9 @@ public class ImageResource extends Resource {
             } catch (Exception e) {
                 return null;
             }
+            if (mt.statusID(0, false) != MediaTracker.COMPLETE) {
+                return null;
+            }
             image = im;
             return image;
         }
@@ -123,6 +126,9 @@ public class ImageResource extends Resource {
             try {
                 mt.waitForID(0);
             } catch (InterruptedException e) {
+                return null;
+            }
+            if (mt.statusID(0, false) != MediaTracker.COMPLETE) {
                 return null;
             }
             scaledImages.put(d, scaledVersion);
