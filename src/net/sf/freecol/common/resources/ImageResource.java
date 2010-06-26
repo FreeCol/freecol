@@ -27,15 +27,22 @@ import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+
 
 /**
  * A <code>Resource</code> wrapping an <code>Image</code>.
  * @see Resource
  */
 public class ImageResource extends Resource {
+
+    private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
     private Map<Dimension, Image> grayscaleImages = new HashMap<Dimension, Image>();
     private Map<Dimension, Image> scaledImages = new HashMap<Dimension, Image>();
@@ -72,10 +79,18 @@ public class ImageResource extends Resource {
             MediaTracker mt = new MediaTracker(_c);
             Image im;
             try {
-                im = Toolkit.getDefaultToolkit().createImage(getResourceLocator().toURL());
+                // Explicitly check that the URI is valid before
+                // letting createImage go off and look for it, as the
+                // error it throws is cryptic.
+                URL url = getResourceLocator().toURL();
+                InputStream is = url.openStream();
+                is.close();
+                im = Toolkit.getDefaultToolkit().createImage(url);
                 mt.addImage(im, 0);
                 mt.waitForID(0);
             } catch (Exception e) {
+                logger.warning("Failed to load image from: "
+                               + getResourceLocator());
                 return null;
             }
             if (mt.statusID(0, false) != MediaTracker.COMPLETE) {
