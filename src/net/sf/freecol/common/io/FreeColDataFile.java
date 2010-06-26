@@ -49,10 +49,22 @@ public class FreeColDataFile {
     private static final String RESOURCES_PROPERTIES_FILE = "resources.properties";
 
     /**
+       A fake URI scheme for delegating to another resource label.
+    */
+    private static final String resourceScheme = "resource:";
+
+    /**
        A fake URI scheme for transferring the resource lookup to the
        locale-specific files.
     */
     private static final String localeScheme = "locale:";
+
+    /**
+       Upper bound on the number of virtual resource lookups done before
+       giving up suspecting an infinite loop.
+    */
+    private static final int RECURSIVE_LOOKUP_MAX = 16;
+
 
     /** The file this object represents. */
     private final File file;
@@ -134,16 +146,12 @@ public class FreeColDataFile {
         connection.setDefaultUseCaches(false);
         return new BufferedInputStream(connection.getInputStream());
     }
-    
+
     protected URI getURI(String filename) {
         try {
-            if (filename.startsWith(localeScheme)) {
-                String key = filename.substring(localeScheme.length());
-                if (!Messages.containsKey(key)) {
-                    logger.warning("Localized resource lookup failed: " + key);
-                    return null;
-                }
-                return getURI(Messages.message(key));
+            if (filename.startsWith(resourceScheme)
+                || filename.startsWith(localeScheme)) {
+                return resolveVirtualResource(filename);
             } else if (filename.startsWith("urn:")) {
                 return new URI(filename);
             } else if (file.isDirectory()) {
@@ -152,9 +160,39 @@ public class FreeColDataFile {
                 return new URI("jar:file", file + "!/" + jarDirectory + filename, null);
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
+            logger.log(Level.WARNING, "Failed to lookup: " + filename
+                       + " in: " + file, e);
             return null;
         }
+    }
+
+    /**
+     * Resolve one of the virtual resources by looping until it is no
+     * longer virtual and then delegating back to getURI.  Bound the
+     * number of lookups done to prevent infinite loops on
+     * "haha=resource:haha" and relatives.
+     *
+     * @param key The resource to resolve.
+     * @return The resolved non-virtual resource.
+     * @throws IllegalStateException if a locale lookup fails or
+     *     lookups exceed RECURSIVE_LOOKUP_MAX.
+     */
+    private URI resolveVirtualResource(String key)
+        throws IllegalStateException {
+        for (int n = 0; n < RECURSIVE_LOOKUP_MAX; n++) {
+            if (key.startsWith(resourceScheme)) {
+                key = key.substring(resourceScheme.length());
+            } else if (key.startsWith(localeScheme)) {
+                key = key.substring(localeScheme.length());
+                if (!Messages.containsKey(key)) {
+                    throw new IllegalStateException("No such message");
+                }
+                key = Messages.message(key);
+            } else {
+                return getURI(key);
+            }
+        }
+        throw new IllegalStateException("Exceeded virtual lookup depth");
     }
 
     /**
