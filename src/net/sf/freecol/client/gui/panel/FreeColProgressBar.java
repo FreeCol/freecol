@@ -31,8 +31,9 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.resources.ResourceManager;
+
 
 /**
  * Implements a simple progress bar suitable for use with FreeCol. Unlike
@@ -156,18 +157,7 @@ public class FreeColProgressBar extends JPanel {
         }
 
         if (isOpaque()) {
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x = getInsets().left; x < width + getInsets().left; x += tempImage.getWidth(null)) {
-                    for (int y = getInsets().top; y < height + getInsets().top; y += tempImage.getHeight(null)) {
-                        g2d.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g2d.setColor(getBackground());
-                g2d.fillRect(getInsets().left, getInsets().top, width, height);
-            }
+            ImageLibrary.drawTiledImage("BackgroundImage", g, this, getInsets());
         }
 
         int dvalue = 0;

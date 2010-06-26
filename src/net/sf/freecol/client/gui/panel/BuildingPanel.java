@@ -120,26 +120,8 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {
-        int width = 128;
-        int height = 96;
-
         BufferedImage bgImage = fadeImage(ResourceManager.getImage(building.getType().getId() + ".image"), 0.6f, 192.0f);
-        if (bgImage != null) {
-            g.drawImage(bgImage, 0, 0, this);
-        } else {
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                    for (int y = 0; y < height; y += tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g.setColor(getBackground());
-                g.fillRect(0, 0, width, height);
-            }
-        }
+        g.drawImage(bgImage, 0, 0, this);
     }
 
     public BufferedImage fadeImage(Image img, float fade, float target) {

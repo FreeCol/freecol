@@ -111,35 +111,10 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {
-        int width = 128;
-        int height = 96;
-
- 
-        Image bgImage = ResourceManager.getImage("model.building.BuildingSite.image");
-        if (buildable != null) {
-            bgImage = ResourceManager.getImage(buildable.getId() + ".image");
-        }
- 
-        if (bgImage != null) {
-            g.drawImage(bgImage, 0, 0, this);
-            /*
-            g.setColor(new Color(255, 255, 255, 100));
-            g.fillRect(0, 0, width, height);
-            */
-        } else {
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                    for (int y = 0; y < height; y += tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g.setColor(getBackground());
-                g.fillRect(0, 0, width, height);
-            }
-        }
+        Image bgImage = (buildable != null)
+            ? ResourceManager.getImage(buildable.getId() + ".image")
+            : ResourceManager.getImage("model.building.BuildingSite.image");
+        g.drawImage(bgImage, 0, 0, this);
     }
 
     public JToolTip createToolTip() {
@@ -155,5 +130,3 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
     }
 
 }
-
-

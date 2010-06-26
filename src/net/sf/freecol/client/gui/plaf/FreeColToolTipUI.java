@@ -34,19 +34,15 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.plaf.basic.BasicToolTipUI;
 import javax.swing.text.View;
 
-import net.sf.freecol.common.resources.ResourceManager;
-
-
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
-* Draws the image "BackgroundImage" from the defaults table as a tiled
-* background image.
-*/
+ * Draw the "BackgroundImage" resource as a tiled background image.
+ */
 public class FreeColToolTipUI extends BasicToolTipUI {
     
     private static FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
-    
     
 
     public static ComponentUI createUI(JComponent c) {
@@ -54,24 +50,8 @@ public class FreeColToolTipUI extends BasicToolTipUI {
     }
 
     public void paint(Graphics g, JComponent c) {
-
-
         if (c.isOpaque()) {
-            int width = c.getWidth();
-            int height = c.getHeight();
-
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
-                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g.setColor(c.getBackground());
-                g.fillRect(0, 0, width, height);
-            }
+            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
         }
          
         LAFUtilities.setProperties(g, c);

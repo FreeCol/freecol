@@ -35,13 +35,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
 
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
-* Sets the default opaque attribute to <i>false</i> and 
-* uses a 10% black shading on the {@link #paintButtonPressed}.
-*/
+ * Sets the default opaque attribute to <i>false</i> and
+ * uses a 10% black shading on the {@link #paintButtonPressed}.
+ */
 public class FreeColButtonUI extends MetalButtonUI {
 
     public static ComponentUI createUI(JComponent c) {
@@ -56,43 +56,29 @@ public class FreeColButtonUI extends MetalButtonUI {
     }
     
     
-    public void paint(Graphics g, JComponent b) {
-        LAFUtilities.setProperties(g, b);
+    public void paint(Graphics g, JComponent c) {
+        LAFUtilities.setProperties(g, c);
         
-        if (b.isOpaque()) {
-            int width = b.getWidth();
-            int height = b.getHeight();
-            
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-            
-            if (tempImage != null) {
-                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
-                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g.setColor(b.getBackground());
-                g.fillRect(0, 0, width, height);
-            }
+        if (c.isOpaque()) {
+            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
         }
-        super.paint(g, b);
+        super.paint(g, c);
         
-        AbstractButton a = (AbstractButton) b;
+        AbstractButton a = (AbstractButton) c;
         if (a.isRolloverEnabled()) {
             Point p = MouseInfo.getPointerInfo().getLocation();
-            SwingUtilities.convertPointFromScreen(p, b);
-            boolean rollover = b.contains(p);
+            SwingUtilities.convertPointFromScreen(p, c);
+            boolean rollover = c.contains(p);
             if (rollover) { 
-                paintButtonPressed(g, (AbstractButton) b);
+                paintButtonPressed(g, (AbstractButton) c);
             }
         }
     }
     
-    protected void paintButtonPressed(Graphics g, AbstractButton b) {
-        if (b.isContentAreaFilled()) {
+    protected void paintButtonPressed(Graphics g, AbstractButton c) {
+        if (c.isContentAreaFilled()) {
             Graphics2D g2d = (Graphics2D) g;
-            Dimension size = b.getSize();
+            Dimension size = c.getSize();
             Composite oldComposite = g2d.getComposite();
             Color oldColor = g2d.getColor();
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));

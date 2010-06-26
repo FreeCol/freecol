@@ -30,13 +30,11 @@ import javax.swing.plaf.basic.BasicPanelUI;
 
 
 /**
-* Draws the image "BackgroundImage2" from the defaults table as a tiled
-* background image with a partial transparency.
-*/
+ * Draws with partial transparency.
+ */
 public class FreeColTransparentPanelUI extends BasicPanelUI {
     
     private static FreeColTransparentPanelUI sharedInstance = new FreeColTransparentPanelUI();
-    
     
 
     public static ComponentUI createUI(JComponent c) {

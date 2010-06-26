@@ -33,6 +33,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.ColopediaAction;
@@ -41,8 +42,6 @@ import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
-import net.sf.freecol.common.resources.ResourceManager;
-
 
 
 /**
@@ -239,22 +238,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
         if (isOpaque()) {
             super.paintComponent(g);
         } else {
-            Insets insets = getInsets();
-            int width = getWidth() - insets.left - insets.right;
-            int height = getHeight() - insets.top - insets.bottom;
-
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                    for (int y = 0; y < height; y += tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, insets.left + x, insets.top + y, null);
-                    }
-                }
-            } else {
-                g.setColor(getBackground());
-                g.fillRect(insets.left, insets.top, width, height);
-            }
+            ImageLibrary.drawTiledImage("BackgroundImage", g, this, getInsets());
         }
     }    
 }

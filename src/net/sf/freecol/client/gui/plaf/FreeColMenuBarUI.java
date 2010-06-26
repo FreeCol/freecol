@@ -25,17 +25,15 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicMenuBarUI;
 
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
-* Draws the image "BackgroundImage" from the defaults table as a tiled
-* background image.
-*/
+ * Draws the "BackgroundImage" resource as a tiled background image.
+ */
 public class FreeColMenuBarUI extends BasicMenuBarUI {
     
     private static FreeColMenuBarUI sharedInstance = new FreeColMenuBarUI();
-    
 
 
     public static ComponentUI createUI(JComponent c) {
@@ -44,21 +42,7 @@ public class FreeColMenuBarUI extends BasicMenuBarUI {
 
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            int width = c.getWidth();
-            int height = c.getHeight();
-
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
-                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g.setColor(c.getBackground());
-                g.fillRect(0, 0, width, height);
-            }
+            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
         }
     }
 

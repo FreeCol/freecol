@@ -267,26 +267,8 @@ public final class EuropePanel extends FreeColPanel {
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {
-        int width = getWidth();
-        int height = getHeight();
-
         Image bgImage = ResourceManager.getImage("EuropeBackgroundImage", getCanvas().getSize());
-        if (bgImage != null) {
-            g.drawImage(bgImage, 0, 0, this);
-        } else {
-            Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-            if (tempImage != null) {
-                for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                    for (int y = 0; y < height; y += tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
-                    }
-                }
-            } else {
-                g.setColor(getBackground());
-                g.fillRect(0, 0, width, height);
-            }
-        }
+        g.drawImage(bgImage, 0, 0, this);
     }
 
     /**

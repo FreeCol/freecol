@@ -20,15 +20,18 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
@@ -49,6 +52,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
+
 
 /**
  * Holds various images that can be called upon by others in order to display
@@ -693,5 +697,48 @@ public final class ImageLibrary {
         }
     }
 
+
+    /**
+     * Draw a (usually small) background image into a (usually larger)
+     * space specified by a component, tiling the image to fill up the
+     * space.  If the image is not available, just fill with the background
+     * colour.
+     *
+     * @param resource The name of the <code>ImageResource</code> to tile with.
+     * @param g The <code>Graphics</code> to draw to.
+     * @param c The <code>JComponent</code> that defines the space.
+     * @param insets Optional <code>Insets</code> to apply.
+     */
+    public static void drawTiledImage(String resource, Graphics g,
+                                      JComponent c, Insets insets) {
+        int width = c.getWidth();
+        int height = c.getHeight();
+        Image image = ResourceManager.getImage(resource);
+        int dx, dy, xmin, ymin;
+
+        if (insets == null) {
+            xmin = 0;
+            ymin = 0;
+        } else {
+            xmin = insets.left;
+            ymin = insets.top;
+            width -= insets.left + insets.right;
+            height -= insets.top + insets.bottom;
+        }
+        if (image != null && (dx = image.getWidth(null)) > 0
+            && (dy = image.getHeight(null)) > 0) {
+            int xmax, ymax;
+            xmax = xmin + width;
+            ymax = ymin + height;
+            for (int x = xmin; x < xmax; x += dx) {
+                for (int y = ymin; y < ymax; y += dy) {
+                    g.drawImage(image, x, y, null);
+                }
+            }
+        } else {
+            g.setColor(c.getBackground());
+            g.fillRect(xmin, ymin, width, height);
+        }
+    }
 
 }

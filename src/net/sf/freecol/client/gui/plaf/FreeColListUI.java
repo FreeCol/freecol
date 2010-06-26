@@ -28,7 +28,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicListUI;
 
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
+
 
 /**
  * UI-class for lists.
@@ -46,22 +47,7 @@ public class FreeColListUI extends BasicListUI {
     }
 
     public void paint(Graphics g, JComponent c) {
-        int width = c.getWidth();
-        int height = c.getHeight();
-
-        Image tempImage = ResourceManager.getImage("BackgroundImage2");
-
-        if (tempImage != null) {
-            for (int x=0; x<width; x+=tempImage.getWidth(null)) {
-                for (int y=0; y<height; y+=tempImage.getHeight(null)) {
-                    g.drawImage(tempImage, x, y, null);
-                }
-            }
-        } else {
-            g.setColor(c.getBackground());
-            g.fillRect(0, 0, width, height);
-        }
-         
+        ImageLibrary.drawTiledImage("BackgroundImage2", g, c, null);
         LAFUtilities.setProperties(g, c);
         super.paint(g, c);
     }
