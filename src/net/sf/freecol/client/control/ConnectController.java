@@ -275,9 +275,9 @@ public final class ConnectController {
 
                 final MapGeneratorOptions mgo;
                 if (in.getLocalName().equals(MapGeneratorOptions.getXMLElementTagName())) {
-                    mgo = new MapGeneratorOptions(in);
+                    mgo = new MapGeneratorOptions(in, game.getSpecification());
                 } else {
-                    mgo = new MapGeneratorOptions();
+                    mgo = new MapGeneratorOptions(game.getSpecification());
                 }
                 freeColClient.getPreGameController().setMapGeneratorOptions(mgo);
                 

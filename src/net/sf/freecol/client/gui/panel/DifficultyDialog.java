@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.model.DifficultyLevel;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -100,7 +101,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         add(difficultyBox);
 
         // Options:
-        ui = new OptionMapUI(new DifficultyOptionMap(level), false);
+        ui = new OptionMapUI(new DifficultyOptionMap(level, getSpecification()), false);
         ui.setOpaque(false);
         optionPanel = new JPanel();
         optionPanel.setOpaque(true);
@@ -171,7 +172,8 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
     public void itemStateChanged(ItemEvent event) {
         int index = difficultyBox.getSelectedIndex();
         level = getSpecification().getDifficultyLevel(index);
-        ui = new OptionMapUI(new DifficultyOptionMap(level), (index == CUSTOM_INDEX));
+        ui = new OptionMapUI(new DifficultyOptionMap(level, getSpecification()),
+                             (index == CUSTOM_INDEX));
         optionPanel.removeAll();
         optionPanel.add(ui);
         revalidate();
@@ -181,8 +183,8 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
 
     private class DifficultyOptionMap extends OptionMap {
 
-        public DifficultyOptionMap(DifficultyLevel level) {
-            super("difficultySettings");
+        public DifficultyOptionMap(DifficultyLevel level, Specification specification) {
+            super("difficultySettings", specification);
             for (AbstractOption option: level.getOptions().values()) {
                 option.setGroup("difficultySettings");
                 add(option);

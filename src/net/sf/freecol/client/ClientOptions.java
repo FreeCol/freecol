@@ -480,9 +480,10 @@ public class ClientOptions extends OptionMap {
 
     /**
      * Creates a new <code>ClientOptions</code>.
+     * @param specification a <code>Specification</code> value
      */
-    public ClientOptions() {
-        super(getXMLElementTagName());
+    public ClientOptions(Specification specification) {
+        super(getXMLElementTagName(), specification);
     }
 
     /**
@@ -493,28 +494,28 @@ public class ClientOptions extends OptionMap {
      * 
      * @param element The XML <code>Element</code> from which this object
      *            should be constructed.
+     * @param specification a <code>Specification</code> value
      */
-    public ClientOptions(Element element) {
-        super(element, getXMLElementTagName());
+    public ClientOptions(Element element, Specification specification) {
+        super(element, getXMLElementTagName(), specification);
     }
 
     /**
      * Adds the options to this <code>GameOptions</code>.
      */
     protected void addDefaultOptions() {
-        Specification spec = Specification.getSpecification();
         
-        OptionGroup guiGroup = spec.getOptionGroup("clientOptions.gui");
-        guiGroup.add(spec.getOptionGroup("clientOptions.minimap"));
+        OptionGroup guiGroup = getSpecification().getOptionGroup("clientOptions.gui");
+        guiGroup.add(getSpecification().getOptionGroup("clientOptions.minimap"));
         add(guiGroup);
         
-        add(spec.getOptionGroup("clientOptions.messages"));
-        add(spec.getOptionGroup("clientOptions.audio"));
-        add(spec.getOptionGroup("clientOptions.savegames"));
-        add(spec.getOptionGroup("clientOptions.warehouse"));
-        add(spec.getOptionGroup("clientOptions.other"));
+        add(getSpecification().getOptionGroup("clientOptions.messages"));
+        add(getSpecification().getOptionGroup("clientOptions.audio"));
+        add(getSpecification().getOptionGroup("clientOptions.savegames"));
+        add(getSpecification().getOptionGroup("clientOptions.warehouse"));
+        add(getSpecification().getOptionGroup("clientOptions.other"));
         
-        final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
+        final OptionGroup modsGroup = new OptionGroup("clientOptions.mods", getSpecification());
         final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {
             private Map<String, ModInfo> mods = null; 
             private void init() {
@@ -542,7 +543,7 @@ public class ClientOptions extends OptionMap {
                 return t.getName();
             }
         };
-        new ListOption<ModInfo>(selector, USER_MODS, modsGroup);
+        new ListOption<ModInfo>(selector, USER_MODS, modsGroup, getSpecification());
         add(modsGroup);
     }
 

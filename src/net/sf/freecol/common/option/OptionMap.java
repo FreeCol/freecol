@@ -43,6 +43,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.common.model.Specification;
 
 import org.w3c.dom.Element;
 
@@ -60,13 +61,14 @@ public abstract class OptionMap extends OptionGroup {
 
 
     /**
-    * Creates a new <code>OptionMap</code>.
-    *
-    * @param xmlTagName The tag name that should be used for the parent XML-element
-    *           returned by {@link Option#toXMLElement}.
-    */
-    public OptionMap(String xmlTagName) {
-        super(xmlTagName);
+     * Creates a new <code>OptionMap</code>.
+     *
+     * @param xmlTagName The tag name that should be used for the parent XML-element
+     *           returned by {@link Option#toXMLElement}.
+     * @param specification a <code>Specification</code> value
+     */
+    public OptionMap(String xmlTagName, Specification specification) {
+        super(xmlTagName, specification);
         this.xmlTagName = xmlTagName;
         
         values = new LinkedHashMap<String, Option>();
@@ -83,25 +85,28 @@ public abstract class OptionMap extends OptionGroup {
      * @param in The XML stream to read the data from.
      * @param xmlTagName The tag name that should be used for the parent XML-element
      *           returned by {@link Option#toXMLElement}.
-     * @throws XMLStreamException if an error occured during parsing.          
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occured during parsing.
      */
-     public OptionMap(XMLStreamReader in, String xmlTagName) throws XMLStreamException {
-         this(xmlTagName);
-         readFromXML(in);
-     }
+    public OptionMap(XMLStreamReader in, String xmlTagName, Specification specification)
+        throws XMLStreamException {
+        this(xmlTagName, specification);
+        readFromXML(in);
+    }
 
     /**
-    * Creates an <code>OptionMap</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
-    * @param xmlTagName The tag name that should be used for the parent XML-element
-    *           returned by {@link Option#toXMLElement}.
-    */
-    public OptionMap(Element element, String xmlTagName) {
-        this(xmlTagName);
+     * Creates an <code>OptionMap</code> from an XML representation.
+     *
+     * <br><br>
+     *
+     * @param element The XML <code>Element</code> from which this object
+     *                should be constructed.
+     * @param xmlTagName The tag name that should be used for the parent XML-element
+     *           returned by {@link Option#toXMLElement}.
+     * @param specification a <code>Specification</code> value
+     */
+    public OptionMap(Element element, String xmlTagName, Specification specification) {
+        this(xmlTagName, specification);
         readFromXMLElement(element);
     }
 

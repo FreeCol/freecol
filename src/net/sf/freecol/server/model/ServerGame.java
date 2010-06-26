@@ -60,7 +60,7 @@ public class ServerGame extends Game {
         this.combatModel = new SimpleCombatModel();
         //this.viewOwner = null;
 
-        gameOptions = new GameOptions();
+        gameOptions = new GameOptions(getSpecification());
 
         currentPlayer = null;
         //market = new Market(this);

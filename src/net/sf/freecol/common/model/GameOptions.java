@@ -88,23 +88,26 @@ public class GameOptions extends OptionMap {
     public static final String DIFFICULTY = "model.option.difficulty";
     
     /**
-    * Creates a new <code>GameOptions</code>.
-    */
-    public GameOptions() {
-        super(getXMLElementTagName());
+     * Creates a new <code>GameOptions</code>.
+     * @param specification a <code>Specification</code> value
+     */
+    public GameOptions(Specification specification) {
+        super(getXMLElementTagName(), specification);
     }
 
 
     /**
-    * Creates an <code>GameOptions</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * @param in The input stream containing the XML.
-    * @throws XMLStreamException if an error occured during parsing.
-    */
-    public GameOptions(XMLStreamReader in) throws XMLStreamException {
-        super(in, getXMLElementTagName());
+     * Creates an <code>GameOptions</code> from an XML representation.
+     *
+     * <br><br>
+     *
+     * @param in The input stream containing the XML.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occured during parsing.
+     */
+    public GameOptions(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super(in, getXMLElementTagName(), specification);
     }
     
     /**
@@ -114,9 +117,10 @@ public class GameOptions extends OptionMap {
      *
      * @param e An XML-element that will be used to initialize
      *      this object.
+     * @param specification a <code>Specification</code> value
      */
-    public GameOptions(Element e) {
-        super(e, getXMLElementTagName());
+    public GameOptions(Element e, Specification specification) {
+        super(e, getXMLElementTagName(), specification);
     }
 
 

@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Specification;
 
 /**
  * Option for selecting an audio mixer.
@@ -84,9 +85,11 @@ public class AudioMixerOption extends AbstractOption {
      * Creates a new <code>AudioMixerOption</code>.
      *
      * @param in The <code>XMSStreamReader</code> to read the data from
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurs
      */
-    public AudioMixerOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
+    public AudioMixerOption(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        super(NO_ID, specification);
         readFromXML(in);
     }
 

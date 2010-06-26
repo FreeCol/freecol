@@ -59,6 +59,7 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -186,8 +187,8 @@ public final class FreeColClient {
         
         mapEditor = false;
         
-        clientOptions = new ClientOptions();
-        actionManager = new ActionManager(this);
+        clientOptions = new ClientOptions(Specification.getSpecification());
+        actionManager = new ActionManager(this, Specification.getSpecification());
         if (!headless) {
             actionManager.initializeActions();
         }

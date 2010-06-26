@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.model.Specification;
+
 /**
  * Represents an option where the valid choice is an integer and the choices are
  * represented by strings. In general, these strings are localized by looking up
@@ -45,9 +47,12 @@ public class RangeOption extends SelectOption {
      * Creates a new <code>RangeOption</code>.
      * 
      * @param in The <code>XMSStreamReader</code> to read the data from
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurs
      */
-    public RangeOption(XMLStreamReader in) throws XMLStreamException {
-        super(in);
+    public RangeOption(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super(in, specification);
     }
 
     /**

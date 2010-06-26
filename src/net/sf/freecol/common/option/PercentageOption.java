@@ -25,6 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
+
 /**
  * Represents an option where the result is a value between 0 and 100.
  */
@@ -37,9 +39,12 @@ public class PercentageOption extends IntegerOption {
      * Creates a new <code>RangeOption</code>.
      * 
      * @param in The <code>XMSStreamReader</code> to read the data from
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurs
      */
-    public PercentageOption(XMLStreamReader in) throws XMLStreamException {
-        super(in);
+    public PercentageOption(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super(in, specification);
         this.setMinimumValue(0);
         this.setMaximumValue(100);
     }

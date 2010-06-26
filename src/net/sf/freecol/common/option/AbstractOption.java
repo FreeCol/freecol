@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Specification;
 
 /**
  * The super class of all options. GUI components making use of this class can
@@ -40,6 +41,11 @@ abstract public class AbstractOption extends FreeColObject implements Option {
 
     private String optionGroup = "";
 
+    /**
+     * Describe specification here.
+     */
+    private Specification specification;
+
     // Determine if the option has been defined
     // When defined an option won't change when a default value is read from an
     // XML file.
@@ -53,9 +59,29 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * 
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
+     * @param specification a <code>Specification</code> value
      */
-    public AbstractOption(String id) {
+    public AbstractOption(String id, Specification specification) {
         setId(id);
+        setSpecification(specification);
+    }
+
+    /**
+     * Get the <code>Specification</code> value.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public final Specification getSpecification() {
+        return specification;
+    }
+
+    /**
+     * Set the <code>Specification</code> value.
+     *
+     * @param newSpecification The new Specification value.
+     */
+    public final void setSpecification(final Specification newSpecification) {
+        this.specification = newSpecification;
     }
 
     /**

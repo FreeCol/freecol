@@ -398,32 +398,32 @@ public final class Specification {
                 AbstractOption option = null;
                 String optionType = xsr.getLocalName();
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                    option = new OptionGroup(xsr);
+                    option = new OptionGroup(xsr, specification);
                 } else if (IntegerOption.getXMLElementTagName().equals(optionType)
                            || "integer-option".equals(optionType)) {
-                    option = new IntegerOption(xsr);
+                    option = new IntegerOption(xsr, specification);
                 } else if (BooleanOption.getXMLElementTagName().equals(optionType)
                            || "boolean-option".equals(optionType)) {
-                    option = new BooleanOption(xsr);
+                    option = new BooleanOption(xsr, specification);
                 } else if (StringOption.getXMLElementTagName().equals(optionType)
                            || "string-option".equals(optionType)) {
-                    option = new StringOption(xsr);
+                    option = new StringOption(xsr, specification);
                 } else if (RangeOption.getXMLElementTagName().equals(optionType)
                            || "range-option".equals(optionType)) {
-                    option = new RangeOption(xsr);
+                    option = new RangeOption(xsr, specification);
                 } else if (SelectOption.getXMLElementTagName().equals(optionType)
                            || "select-option".equals(optionType)) {
-                    option = new SelectOption(xsr);
+                    option = new SelectOption(xsr, specification);
                 } else if (LanguageOption.getXMLElementTagName().equals(optionType)
                            || "language-option".equals(optionType)) {
-                    option = new LanguageOption(xsr);
+                    option = new LanguageOption(xsr, specification);
                 } else if (FileOption.getXMLElementTagName().equals(optionType)
                            || "file-option".equals(optionType)) {
-                    option = new FileOption(xsr);
+                    option = new FileOption(xsr, specification);
                 } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-                    option = new PercentageOption(xsr);
+                    option = new PercentageOption(xsr, specification);
                 } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-                    option = new AudioMixerOption(xsr);
+                    option = new AudioMixerOption(xsr, specification);
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");
                     xsr.nextTag();

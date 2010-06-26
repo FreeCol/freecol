@@ -79,15 +79,15 @@ public class DifficultyLevel extends FreeColGameObjectType {
             String optionType = in.getLocalName();
             if (IntegerOption.getXMLElementTagName().equals(optionType) ||
                 "integer-option".equals(optionType)) {
-                IntegerOption option = new IntegerOption(in);
+                IntegerOption option = new IntegerOption(in, getSpecification());
                 levelOptions.put(option.getId(), option);
             } else if (BooleanOption.getXMLElementTagName().equals(optionType) ||
                        "boolean-option".equals(optionType)) {
-                BooleanOption option = new BooleanOption(in);
+                BooleanOption option = new BooleanOption(in, getSpecification());
                 levelOptions.put(option.getId(), option);
             } else if (StringOption.getXMLElementTagName().equals(optionType) ||
                        "string-option".equals(optionType)) {
-                StringOption option = new StringOption(in);
+                StringOption option = new StringOption(in, getSpecification());
                 levelOptions.put(option.getId(), option);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");

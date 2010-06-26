@@ -996,7 +996,7 @@ public class Game extends FreeColGameObject {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(GameOptions.getXMLElementTagName())
                 || in.getLocalName().equals("game-options")) {
-                gameOptions = new GameOptions(in);
+                gameOptions = new GameOptions(in, getSpecification());
             } else if (in.getLocalName().equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
                     nationOptions = new NationOptions();
@@ -1043,7 +1043,7 @@ public class Game extends FreeColGameObject {
                 difficultyLevel = new DifficultyLevel();
                 difficultyLevel.readFromXML(in, null);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(in.getLocalName())) {
-                mapGeneratorOptions = new MapGeneratorOptions(in);
+                mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
                 in.nextTag();
@@ -1056,10 +1056,10 @@ public class Game extends FreeColGameObject {
         }
         
         if (gameOptions == null) {
-            gameOptions = new GameOptions();
+            gameOptions = new GameOptions(getSpecification());
         }
         if (mapGeneratorOptions == null) {
-            mapGeneratorOptions = new MapGeneratorOptions();
+            mapGeneratorOptions = new MapGeneratorOptions(getSpecification());
         }
     }
 

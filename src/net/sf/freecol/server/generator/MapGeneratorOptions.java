@@ -154,9 +154,10 @@ public class MapGeneratorOptions extends OptionMap {
 
     /**
      * Creates a new <code>MapGeneratorOptions</code>.
+     * @param specification a <code>Specification</code> value
      */
-    public MapGeneratorOptions() {
-        super(getXMLElementTagName());
+    public MapGeneratorOptions(Specification specification) {
+        super(getXMLElementTagName(), specification);
     }
 
     /**
@@ -167,9 +168,10 @@ public class MapGeneratorOptions extends OptionMap {
      * 
      * @param element The XML <code>Element</code> from which this object
      *            should be constructed.
+     * @param specification a <code>Specification</code> value
      */
-    public MapGeneratorOptions(Element element) {
-        super(element, getXMLElementTagName());
+    public MapGeneratorOptions(Element element, Specification specification) {
+        super(element, getXMLElementTagName(), specification);
     }
 
     /**
@@ -179,10 +181,12 @@ public class MapGeneratorOptions extends OptionMap {
      * <br>
      * 
      * @param in The XML stream to read the data from.
-     * @throws XMLStreamException if an error occurred during parsing.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurred during parsing.
      */
-    public MapGeneratorOptions(XMLStreamReader in) throws XMLStreamException {
-        super(in, getXMLElementTagName());
+    public MapGeneratorOptions(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super(in, getXMLElementTagName(), specification);
     }
 
     /**

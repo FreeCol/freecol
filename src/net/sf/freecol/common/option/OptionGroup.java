@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -44,28 +45,31 @@ public class OptionGroup extends AbstractOption {
     /**
      * Creates a new <code>OptionGroup</code>.
      */
-    public OptionGroup() {
-        this(NO_ID);
+    public OptionGroup(Specification specification) {
+        this(NO_ID, specification);
     }
 
     /**
      * Creates a new <code>OptionGroup</code>.
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
+     * @param specification a <code>Specification</code> value
      */
-    public OptionGroup(String id) {
-        super(id);
+    public OptionGroup(String id, Specification specification) {
+        super(id, specification);
         options = new ArrayList<Option>();
     }
     
     /**
      * Creates a new  <code>OptionGroup</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data. 
+     * @param in The <code>XMLStreamReader</code> containing the data.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurs
      */
-     public OptionGroup(XMLStreamReader in) throws XMLStreamException {
-         this(NO_ID);
-         readFromXML(in);
-     }
+    public OptionGroup(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        this(NO_ID, specification);
+        readFromXML(in);
+    }
 
     /**
     * Adds the given <code>Option</code>.
@@ -128,21 +132,21 @@ public class OptionGroup extends AbstractOption {
             AbstractOption option = null;
             String optionType = in.getLocalName();
             if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
-                option = new IntegerOption(in);
+                option = new IntegerOption(in, getSpecification());
             } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
-                option = new BooleanOption(in);
+                option = new BooleanOption(in, getSpecification());
             } else if (RangeOption.getXMLElementTagName().equals(optionType) || "range-option".equals(optionType)) {
-                option = new RangeOption(in);
+                option = new RangeOption(in, getSpecification());
             } else if (SelectOption.getXMLElementTagName().equals(optionType) || "select-option".equals(optionType)) {
-                option = new SelectOption(in);
+                option = new SelectOption(in, getSpecification());
             } else if (LanguageOption.getXMLElementTagName().equals(optionType) || "language-option".equals(optionType)) {
-                option = new LanguageOption(in);
+                option = new LanguageOption(in, getSpecification());
             } else if (FileOption.getXMLElementTagName().equals(optionType) || "file-option".equals(optionType)) {
-                option = new FileOption(in);
+                option = new FileOption(in, getSpecification());
             } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-                option = new PercentageOption(in);
+                option = new PercentageOption(in, getSpecification());
             } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-                option = new AudioMixerOption(in);
+                option = new AudioMixerOption(in, getSpecification());
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");
                 in.nextTag();

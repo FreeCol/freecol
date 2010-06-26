@@ -96,11 +96,12 @@ public class MapGenerator implements IMapGenerator {
      * Creates a <code>MapGenerator</code>
      *
      * @param random The <code>Random</code> number source to use.
+     * @param specification a <code>Specification</code> value
      * @see #createMap
      */
-    public MapGenerator(Random random) {
+    public MapGenerator(Random random, Specification specification) {
         this.random = random;
-        this.mapGeneratorOptions = new MapGeneratorOptions();
+        this.mapGeneratorOptions = new MapGeneratorOptions(specification);
         landGenerator = new LandGenerator(mapGeneratorOptions, random);
         terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
     }

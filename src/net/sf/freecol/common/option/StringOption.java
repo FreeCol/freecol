@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
 
 /**
  * Represents an option that can be either <i>true</i>
@@ -64,10 +65,13 @@ public class StringOption extends AbstractOption {
 
     /**
      * Creates a new <code>StringOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data. 
+     * @param in The <code>XMLStreamReader</code> containing the data.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurs
      */
-    public StringOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
+    public StringOption(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super(NO_ID, specification);
         readFromXMLImpl(in);
     }
 
