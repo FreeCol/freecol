@@ -557,9 +557,10 @@ public class ClientOptions extends OptionMap {
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
         ListOption<?> options = (ListOption<?>) getObject(ClientOptions.USER_MODS);
         for (Object o : options.getValue()) {
-            String id = ((ModInfo) o).getId();
+            ModInfo modInfo = (ModInfo) o;
+            if (modInfo == null) continue;
             for (FreeColModFile f : fcmfs) {
-                if (id.equals(f.getModInfo().getId())) {
+                if (modInfo.getId().equals(f.getModInfo().getId())) {
                     active.add(f);
                     break;
                 }
