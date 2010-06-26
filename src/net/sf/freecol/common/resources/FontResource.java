@@ -22,6 +22,8 @@ package net.sf.freecol.common.resources;
 import java.awt.Font;
 import java.net.URI;
 import java.net.URL;
+import java.util.logging.Logger;
+
 
 /**
  * A <code>Resource</code> wrapping a <code>Font</code>.
@@ -30,6 +32,8 @@ import java.net.URL;
  * @see Font
  */
 public class FontResource extends Resource {
+
+    private static final Logger logger = Logger.getLogger(FontResource.class.getName());
 
     public static final String SCHEME = "font:";
 
@@ -57,6 +61,9 @@ public class FontResource extends Resource {
             String name = resourceLocator.getSchemeSpecificPart();
             font = Font.decode(name.substring(SCHEME.length()));
         }
+        logger.info("Loaded font: "
+                    + ((font==null) ? "(null)" : font.getFontName())
+                    + " from: " + resourceLocator);
     }
 
     /**
