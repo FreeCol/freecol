@@ -109,6 +109,7 @@ public class MapTest extends FreeColTestCase {
 
         MapBuilder builder = new MapBuilder(game);
         Map map = builder.setDimensions(10, 15).build();
+        game.setMap(map);
 
         // Check in the middle
         List<Tile> surroundingTiles = map.getTile(4,8).getSurroundingTiles(1);
