@@ -1552,44 +1552,47 @@ public final class GUI {
             for (int index = 0; index < settlements.size(); index++) {
                 final Settlement settlement = settlements.get(index);
                 String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
-                Color backgroundColor = lib.getColor(settlement.getOwner());
-                Font font = ResourceManager.getFont("NormalFont", 18f);
-                int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
-                g.setTransform(settlementTransforms.get(index));
-                switch(colonyLabels) {
-                case ClientOptions.COLONY_LABELS_CLASSIC:
-                    Image stringImage = createStringImage(g, name, backgroundColor, font);
-                    g.drawImage(stringImage,
-                                (tileWidth - stringImage.getWidth(null))/2 + 1,
-                                yOffset, null);
-                    break;
-                case ClientOptions.COLONY_LABELS_MODERN:
-                    backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
-                                                backgroundColor.getBlue(), 128);
+                if (name != null) {
+                    Color backgroundColor = lib.getColor(settlement.getOwner());
+                    Font font = ResourceManager.getFont("NormalFont", 18f);
+                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+                    g.setTransform(settlementTransforms.get(index));
+                    switch(colonyLabels) {
+                    case ClientOptions.COLONY_LABELS_CLASSIC:
+                        Image stringImage = createStringImage(g, name, backgroundColor, font);
+                        g.drawImage(stringImage,
+                                    (tileWidth - stringImage.getWidth(null))/2 + 1,
+                                    yOffset, null);
+                        break;
+                    case ClientOptions.COLONY_LABELS_MODERN:
+                        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
+                                                    backgroundColor.getBlue(), 128);
 
-                    Image nameImage = createLabel(g, name, font, backgroundColor);
-
-                    int spacing = 2;
-                    if (settlement instanceof Colony) {
-                        String size = Integer.toString(((Colony) settlement).getUnitCount());
-                        int bonusProduction = ((Colony) settlement).getProductionBonus();
-                        String bonus = bonusProduction > 0 ? "+" + bonusProduction
-                            : Integer.toString(bonusProduction);
-                        Image sizeImage = createLabel(g, size, font, backgroundColor);
-                        Image bonusImage = createLabel(g, bonus, font, backgroundColor);
-                        int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
-                            + bonusImage.getWidth(null) + 2 * spacing;
-                        int labelOffset = (tileWidth - width)/2;
-                        g.drawImage(sizeImage, labelOffset, yOffset, null);
-                        labelOffset += sizeImage.getWidth(null) + spacing;
-                        g.drawImage(nameImage, labelOffset, yOffset, null);
-                        labelOffset += nameImage.getWidth(null) + spacing;
-                        g.drawImage(bonusImage, labelOffset, yOffset, null);
-                    } else {
-                        int labelOffset = (tileWidth - nameImage.getWidth(null))/2;
-                        g.drawImage(nameImage, labelOffset, yOffset, null);
+                        Image nameImage = createLabel(g, name, font, backgroundColor);
+                        if (nameImage != null) {
+                            int spacing = 2;
+                            if (settlement instanceof Colony) {
+                                String size = Integer.toString(((Colony) settlement).getUnitCount());
+                                int bonusProduction = ((Colony) settlement).getProductionBonus();
+                                String bonus = bonusProduction > 0 ? "+" + bonusProduction
+                                    : Integer.toString(bonusProduction);
+                                Image sizeImage = createLabel(g, size, font, backgroundColor);
+                                Image bonusImage = createLabel(g, bonus, font, backgroundColor);
+                                int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
+                                    + bonusImage.getWidth(null) + 2 * spacing;
+                                int labelOffset = (tileWidth - width)/2;
+                                g.drawImage(sizeImage, labelOffset, yOffset, null);
+                                labelOffset += sizeImage.getWidth(null) + spacing;
+                                g.drawImage(nameImage, labelOffset, yOffset, null);
+                                labelOffset += nameImage.getWidth(null) + spacing;
+                                g.drawImage(bonusImage, labelOffset, yOffset, null);
+                            } else {
+                                int labelOffset = (tileWidth - nameImage.getWidth(null))/2;
+                                g.drawImage(nameImage, labelOffset, yOffset, null);
+                            }
+                            break;
+                        }
                     }
-                    break;
                 }
             }
         }
