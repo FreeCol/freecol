@@ -231,7 +231,7 @@ public final class ImageLibrary {
         // Currently used for hills and mountains
         Image terrainImage = getTerrainImage(type, 0, 0, scale);
         Image overlayImage = getOverlayImage(type, 0, 0, scale);
-        Image forestImage = getForestImage(type, scale);
+        Image forestImage = type.isForested() ? getForestImage(type, scale) : null;
         if (overlayImage == null && forestImage == null) {
             return terrainImage;
         } else {
