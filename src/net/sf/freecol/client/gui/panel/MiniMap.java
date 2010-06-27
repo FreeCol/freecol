@@ -166,13 +166,35 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         ((MiniMapZoomOutAction) miniMapZoomOutButton.getAction()).update();
         repaint();
     }
+
+    /**
+     * Set tile size to the given value, or the minimum or maximum
+     * bound of the tile size.
+     *
+     * @param size an <code>int</code> value
+     */
+    public void setTileSize(int size) {
+        tileSize = Math.max(Math.min(size, MAX_TILE_SIZE), MIN_TILE_SIZE);
+        ((MiniMapZoomOutAction) miniMapZoomOutButton.getAction()).update();
+        repaint();
+    }        
     
+    /**
+     * Return true if tile size can be decreased.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean canZoomIn() {
         return (freeColClient.getGame() != null
                 && freeColClient.getGame().getMap() != null
                 && tileSize < MAX_TILE_SIZE);
     }
     
+    /**
+     * Return true if tile size can be increased.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean canZoomOut() {
         return (freeColClient.getGame() != null
                 && freeColClient.getGame().getMap() != null
@@ -217,7 +239,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @param width The width of the map.
      * @param height The height of the map.
      */
-    private void paintMap(Graphics graphics, int width, int height) {
+    public void paintMap(Graphics graphics, int width, int height) {
         final Graphics2D g = (Graphics2D) graphics;
         final AffineTransform originTransform = g.getTransform();
         final Map map = freeColClient.getGame().getMap();
@@ -342,41 +364,43 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * miniRectX/Y are the center of the rectangle.
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
-        TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
-        int miniRectX = (freeColClient.getGUI().getFocus().getX() - firstColumn) * tileSize;
-        int miniRectY = (freeColClient.getGUI().getFocus().getY() - firstRow) * tileSize / 4;
-        int miniRectWidth = (getParent().getWidth() / library.getTerrainImageWidth(tileType) + 1) * tileSize;
-        int miniRectHeight = (getParent().getHeight() / library.getTerrainImageHeight(tileType) + 1) * tileSize / 2;
-        if (miniRectX + miniRectWidth / 2 > width) {
-            miniRectX = width - miniRectWidth / 2 - 1;
-        } else if (miniRectX - miniRectWidth / 2 < 0) {
-            miniRectX = miniRectWidth / 2;
-        }
-        if (miniRectY + miniRectHeight / 2 > height) {
-            miniRectY = height - miniRectHeight / 2 - 1;
-        } else if (miniRectY - miniRectHeight / 2 < 0) {
-            miniRectY = miniRectHeight / 2;
-        }
+        if (getParent() != null) {
+            TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
+            int miniRectX = (freeColClient.getGUI().getFocus().getX() - firstColumn) * tileSize;
+            int miniRectY = (freeColClient.getGUI().getFocus().getY() - firstRow) * tileSize / 4;
+            int miniRectWidth = (getParent().getWidth() / library.getTerrainImageWidth(tileType) + 1) * tileSize;
+            int miniRectHeight = (getParent().getHeight() / library.getTerrainImageHeight(tileType) + 1) * tileSize / 2;
+            if (miniRectX + miniRectWidth / 2 > width) {
+                miniRectX = width - miniRectWidth / 2 - 1;
+            } else if (miniRectX - miniRectWidth / 2 < 0) {
+                miniRectX = miniRectWidth / 2;
+            }
+            if (miniRectY + miniRectHeight / 2 > height) {
+                miniRectY = height - miniRectHeight / 2 - 1;
+            } else if (miniRectY - miniRectHeight / 2 < 0) {
+                miniRectY = miniRectHeight / 2;
+            }
 
-        g.setColor(Color.WHITE);
-        /* Use Math max and min to prevent the rect from being larger than the minimap. */
-        int miniRectMaxX = Math.max(miniRectX - miniRectWidth / 2, 0);
-        int miniRectMaxY = Math.max(miniRectY - miniRectHeight / 2, 0);
-        int miniRectMinWidth = Math.min(miniRectWidth, width - 1);
-        int miniRectMinHeight = Math.min(miniRectHeight, height - 1);
-        /* Prevent the rect from overlapping the bigger adjust rect */
-        if(miniRectMaxX + miniRectMinWidth > width - 1) {
-            miniRectMaxX = width - miniRectMinWidth - 1;
-        }
-        if(miniRectMaxY + miniRectMinHeight > height - 1) {
-            miniRectMaxY = height - miniRectMinHeight - 1;
-        }
-        /* Draw the white rect. */
-        g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
-        /* Draw an additional white rect, if the whole map is shown on the minimap */
-        if (adjustX > 0 && adjustY > 0) {
             g.setColor(Color.WHITE);
-            g.drawRect(0, 0, width - 1, height - 1);
+            /* Use Math max and min to prevent the rect from being larger than the minimap. */
+            int miniRectMaxX = Math.max(miniRectX - miniRectWidth / 2, 0);
+            int miniRectMaxY = Math.max(miniRectY - miniRectHeight / 2, 0);
+            int miniRectMinWidth = Math.min(miniRectWidth, width - 1);
+            int miniRectMinHeight = Math.min(miniRectHeight, height - 1);
+            /* Prevent the rect from overlapping the bigger adjust rect */
+            if(miniRectMaxX + miniRectMinWidth > width - 1) {
+                miniRectMaxX = width - miniRectMinWidth - 1;
+            }
+            if(miniRectMaxY + miniRectMinHeight > height - 1) {
+                miniRectMaxY = height - miniRectMinHeight - 1;
+            }
+            /* Draw the white rect. */
+            g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
+            /* Draw an additional white rect, if the whole map is shown on the minimap */
+            if (adjustX > 0 && adjustY > 0) {
+                g.setColor(Color.WHITE);
+                g.drawRect(0, 0, width - 1, height - 1);
+            }
         }
         g.setTransform(originTransform);
     }

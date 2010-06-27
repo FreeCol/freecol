@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,6 +45,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -562,6 +564,19 @@ public final class FreeColServer {
      *             write or close the file.
      */
     public void saveGame(File file, String username) throws IOException {
+        saveGame(file, username, null);
+    }
+
+    /**
+     * Saves a game.
+     * 
+     * @param file The file where the data will be written.
+     * @param username The username of the player saving the game.
+     * @param image an <code>Image</code> value
+     * @exception IOException If a problem was encountered while trying to open,
+     *             write or close the file.
+     */
+    public void saveGame(File file, String username, BufferedImage image) throws IOException {
         final Game game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         JarOutputStream fos = null;
@@ -577,7 +592,11 @@ public final class FreeColServer {
             }
             fos.closeEntry();
             in.close();
-
+            if (image != null) {
+                fos.putNextEntry(new JarEntry("thumbnail.png"));
+                ImageIO.write(image, "png", fos);
+                fos.closeEntry();
+            }
 
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");

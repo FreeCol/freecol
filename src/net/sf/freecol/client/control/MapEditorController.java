@@ -20,7 +20,8 @@
 
 package net.sf.freecol.client.control;
 
-
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,6 +40,7 @@ import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
@@ -206,7 +208,27 @@ public final class MapEditorController {
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
             public void run() {
                 try {
-                    freeColClient.getFreeColServer().saveGame(file, "mapEditor");
+                    // create thumbnail
+                    MiniMap miniMap = new MiniMap(freeColClient);
+                    miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
+                    int width = freeColClient.getGame().getMap().getWidth()
+                        * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
+                    int height = freeColClient.getGame().getMap().getHeight()
+                        * MiniMap.MAX_TILE_SIZE / 4;
+                    BufferedImage image = new BufferedImage(width, height,
+                                                            BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g2d = image.createGraphics();
+                    miniMap.paintMap(g2d, width, height);
+
+                    // TODO: this can probably done more efficiently
+                    // by applying a suitable AffineTransform to the
+                    // Graphics2D
+                    double scale = 64 / height;
+                    double scaledWidth = (64 * width) / height;
+                    BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
+                                                                  BufferedImage.TYPE_INT_ARGB);
+                    scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
+                    freeColClient.getFreeColServer().saveGame(file, "mapEditor", scaledImage);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             canvas.closeStatusPanel();
