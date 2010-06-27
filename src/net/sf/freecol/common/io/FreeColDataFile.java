@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -35,8 +37,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapping;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -53,6 +57,11 @@ public class FreeColDataFile {
        locale-specific files.
     */
     private static final String localeScheme = "locale:";
+
+    /**
+       A fake URI scheme for resources delegating to other resources.
+    */
+    private static final String resourceScheme = "resource:";
 
     /** The file this object represents. */
     private final File file;
@@ -143,7 +152,12 @@ public class FreeColDataFile {
                     logger.warning("Localized resource lookup failed: " + key);
                     return null;
                 }
-                return getURI(Messages.message(key));
+                String value = Messages.message(key);
+                if (value.startsWith(localeScheme)) {
+                    logger.warning("Localized resources do not nest: " + key);
+                    return null;
+                }
+                return getURI(value);
             } else if (filename.startsWith("urn:")) {
                 return new URI(filename);
             } else if (file.isDirectory()) {
@@ -177,12 +191,40 @@ public class FreeColDataFile {
                 } catch (Exception e) {}
             }
             ResourceMapping rc = new ResourceMapping();
+            List<String> todo = new ArrayList<String>();
             Enumeration<?> pn = properties.propertyNames();
             while (pn.hasMoreElements()) {
                 final String key = (String) pn.nextElement();
-                final URI resourceLocator = getURI(properties.getProperty(key));
-                rc.add(key, ResourceFactory.createResource(resourceLocator));
-            }  
+                final String value = properties.getProperty(key);
+                if (value.startsWith(resourceScheme)) {
+                    todo.add(key);
+                } else {
+                    rc.add(key, ResourceFactory.createResource(getURI(value)));
+                }
+            }
+            boolean progress = true;
+            List<String> miss = new ArrayList<String>();
+            while (progress && !todo.isEmpty()) {
+                miss.clear();
+                progress = false;
+                while (!todo.isEmpty()) {
+                    final String key = todo.remove(0);
+                    final String value = properties.getProperty(key)
+                        .substring(resourceScheme.length());
+                    Resource r = rc.get(value);
+                    if (r == null) {
+                        miss.add(key);
+                    } else {
+                        rc.add(key, r);
+                        progress = true;
+                    }
+                }
+                todo.addAll(miss);
+            }
+            if (!todo.isEmpty()) {
+                logger.warning("Could not resolve virtual resource/s: "
+                               + Utils.join(" ", todo));
+            }
             return rc;
         } catch (FileNotFoundException e) {
             return null;
