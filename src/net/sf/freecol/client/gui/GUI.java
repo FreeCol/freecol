@@ -2311,10 +2311,10 @@ public final class GUI {
 
             TileImprovement improvement = (TileImprovement) item;
             if (improvement.isComplete()) {
-                Image overlay = ResourceManager.getImage(improvement.getType().getId() + ".image", 
-                                                         lib.getScalingFactor());
-                if (overlay != null) {
+                String key = improvement.getType().getId() + ".image";
+                if (ResourceManager.hasResource(key)) {
                     // Has its own Overlay Image in Misc, use it
+                    Image overlay = ResourceManager.getImage(key, lib.getScalingFactor());
                     g.drawImage(overlay, 0, 0, null);
                 } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
                     g.drawImage(lib.getRiverImage(improvement.getStyle()), 0, 0, null);
