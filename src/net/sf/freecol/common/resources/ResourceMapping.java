@@ -60,13 +60,13 @@ public class ResourceMapping {
      * @param rc The <code>ResourceMapping</code>.
      */
     public void addAll(ResourceMapping rc) {
-        if (rc == null) {
-            return;
+        if (rc != null) {
+            resources.putAll(rc.getResources());
         }
-        Map<String, Resource> map = rc.getResources();
-        for (String key : map.keySet()) {
-            resources.put(key, map.get(key));
-        }
+    }
+
+    public boolean containsKey(String key) {
+        return resources.containsKey(key);
     }
 
     /**

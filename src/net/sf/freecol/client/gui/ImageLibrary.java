@@ -274,8 +274,12 @@ public final class ImageLibrary {
     }
 
     public Image getOverlayImage(TileType type, int x, int y, double scale) {
-        int index = (x + y) % 2;
-        return ResourceManager.getImage(type.getId() + ".overlay" + index + ".image", scale);
+        String key = type.getId() + ".overlay" + ((x + y) % 2) + ".image";
+        if (ResourceManager.hasResource(key)) {
+            return ResourceManager.getImage(key, scale);
+        } else {
+            return null;
+        }
     }
 
     /**

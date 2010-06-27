@@ -256,6 +256,10 @@ public class ResourceManager {
         }
     }
 
+    public static boolean hasResource(final String resourceId) {
+        return mergedContainer.containsKey(resourceId);
+    }
+
     public static Map<String, Resource> getResources() {
         return mergedContainer.getResources();
     }
