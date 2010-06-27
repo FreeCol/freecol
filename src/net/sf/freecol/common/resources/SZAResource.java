@@ -51,26 +51,28 @@ public class SZAResource extends Resource {
         super(resourceLocator);
     }
     
+    /**
+     * Preloading the animation.
+     */
+    public void preload() {
+        synchronized (loadingLock) {
+            if (szAnimation == null) {
+                try {
+                    szAnimation = new SimpleZippedAnimation(getResourceLocator().toURL());
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Could not load SimpleZippedAnimation: " + getResourceLocator(), e);
+                }
+            }
+        }
+    }
     
     /**
      * Gets the <code>SimpleZippedAnimation</code> represented by this resource.
      * @return The <code>SimpleZippedAnimation</code> in it's original size.
      */
     public SimpleZippedAnimation getSimpleZippedAnimation() {
-        if (szAnimation != null) {
-            return szAnimation;
-        }
-        synchronized (loadingLock) {
-            if (szAnimation != null) {
-                return szAnimation;
-            }
-            try {
-                szAnimation = new SimpleZippedAnimation(getResourceLocator().toURL());
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not load SimpleZippedAnimation: " + getResourceLocator(), e);
-            }
-            return szAnimation;
-        }
+        if (szAnimation == null) preload();
+        return szAnimation;
     }
     
     /**

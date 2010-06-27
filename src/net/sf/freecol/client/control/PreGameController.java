@@ -217,7 +217,6 @@ public final class PreGameController {
      */
     private void addPlayerResources(String nationId) {
         Color color = ResourceManager.getColor(nationId + ".color");
-        logger.finest("Add resources for " + nationId + " color: " + color);
         ResourceMapping gameMapping = new ResourceMapping();
         gameMapping.add(nationId + ".chip", ChipResource.colorChip(color));
         gameMapping.add(nationId + ".mission.chip",

@@ -57,6 +57,11 @@ public class ColorResource extends Resource {
     }
 
     /**
+     * Preloading is a noop for this resource type.
+     */
+    public void preload() {}
+
+    /**
      * Returns the <code>Color</code> identified by the given
      * string. This is either a hexadecimal integer prefixed with
      * "0x", or the name of a field of the Color class.

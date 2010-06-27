@@ -67,6 +67,11 @@ public class FontResource extends Resource {
     }
 
     /**
+     * Preloading is a noop for this resource type.
+     */
+    public void preload() {}
+
+    /**
      * Gets the <code>Font</code> represented by this resource.  As
      * failure to load a critical font might remove the ability to
      * even display an error message, it is too risky to allow this

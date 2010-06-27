@@ -65,40 +65,41 @@ public class ImageResource extends Resource {
     }
     
     /**
+     * Preload the image.
+     */
+    public void preload() {
+        synchronized (loadingLock) {
+            if (image == null) {
+                MediaTracker mt = new MediaTracker(_c);
+                Image im;
+                try {
+                    // Explicitly check that the URI is valid before
+                    // letting createImage go off and look for it, as the
+                    // error it throws is cryptic.
+                    URL url = getResourceLocator().toURL();
+                    InputStream is = url.openStream();
+                    is.close();
+                    im = Toolkit.getDefaultToolkit().createImage(url);
+                    mt.addImage(im, 0);
+                    mt.waitForID(0);
+                    if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
+                        image = im;
+                    }
+                } catch (Exception e) {
+                    logger.warning("Failed to load image from: "
+                                   + getResourceLocator());
+                }
+            }
+        }
+    }
+
+    /**
      * Gets the <code>Image</code> represented by this resource.
      * @return The image in it's original size.
      */
     public Image getImage() {
-        if (image != null) {
-            return image;
-        }
-        synchronized (loadingLock) {
-            if (image != null) {
-                return image;
-            }
-            MediaTracker mt = new MediaTracker(_c);
-            Image im;
-            try {
-                // Explicitly check that the URI is valid before
-                // letting createImage go off and look for it, as the
-                // error it throws is cryptic.
-                URL url = getResourceLocator().toURL();
-                InputStream is = url.openStream();
-                is.close();
-                im = Toolkit.getDefaultToolkit().createImage(url);
-                mt.addImage(im, 0);
-                mt.waitForID(0);
-            } catch (Exception e) {
-                logger.warning("Failed to load image from: "
-                               + getResourceLocator());
-                return null;
-            }
-            if (mt.statusID(0, false) != MediaTracker.COMPLETE) {
-                return null;
-            }
-            image = im;
-            return image;
-        }
+        if (image == null) preload();
+        return image;
     }
     
     /**

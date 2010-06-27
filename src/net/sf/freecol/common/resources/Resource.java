@@ -40,7 +40,7 @@ public abstract class Resource {
         // empty constructor
         resourceLocator = null;
     }
-    
+
     /**
      * Do not use directly.
      * @param resourceLocator The <code>URI</code> used when loading this
@@ -51,7 +51,11 @@ public abstract class Resource {
         this.resourceLocator = resourceLocator;
     }
     
-    
+    /**
+     * Preload the resource.  Often implemented as a noop.
+     */
+    public abstract void preload();
+
     /**
      * Returns the <code>URI</code> used for loading the resource.
      * @return The <code>URI</code>.

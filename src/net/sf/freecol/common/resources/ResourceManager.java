@@ -191,12 +191,11 @@ public class ResourceManager {
                     getImage("EuropeBackgroundImage", windowSize);
                     getImage("CanvasBackgroundImage", windowSize);
                 }
-                for (String key : mergedContainer.getResources().keySet()) {
+                for (Resource r : mergedContainer.getResources().values()) {
                     if (preloadThread != this) {
                         return;
                     }
-                    getImage(key);
-                    getSimpleZippedAnimation(key);
+                    r.preload();
                 }
             }
         };

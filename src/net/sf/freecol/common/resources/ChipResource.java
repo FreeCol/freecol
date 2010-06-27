@@ -88,7 +88,12 @@ public class ChipResource extends Resource {
         background = ColorResource.getColor(parts[2]);
         foreground = ColorResource.getColor(parts[3]);
     }
-    
+
+    /**
+     * Preloading is a noop for this resource type.
+     */
+    public void preload() {}
+
     /**
      * Get the <code>Foreground</code> value.
      *
