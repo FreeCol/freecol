@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
@@ -41,6 +43,8 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
  */
 public class ResourceManager {
     
+    private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
+
     // the number of different river styles
     public static final int RIVER_STYLES = 81;
 
@@ -245,6 +249,9 @@ public class ResourceManager {
         if (type.isInstance(r)) {
             return type.cast(r);
         } else {
+            logger.finest("getResource(" + resourceId
+                          + ", " + type.getName() + ") -> "
+                          + ((r==null) ? "(null)" : r.getClass().getName()));
             return null;
         }
     }

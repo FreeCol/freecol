@@ -1737,7 +1737,9 @@ public final class GUI {
         }
 
         // Lookup in the cache if the image has been generated already
-        String key = nameString + font.getFontName() + color.getRGB();
+        String key = "stringImage." + nameString
+            + "." + font.getFontName().replace(' ', '-')
+            + "." + Integer.toHexString(color.getRGB());
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
             return image;
@@ -1851,7 +1853,8 @@ public final class GUI {
      * @return an <code>Image</code> value
      */
     private Image createLabel(Graphics2D g, String text, Font font, Color backgroundColor) {
-        String key = text + font.getName() + backgroundColor.getRGB();
+        String key = "label." + text + "." + font.getName().replace(' ', '-')
+            + "." + Integer.toHexString(backgroundColor.getRGB());
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
             return image;
@@ -2658,7 +2661,8 @@ public final class GUI {
                 foregroundColor = Color.GRAY;
         }
         // Lookup in the cache if the image has been generated already
-        String key = backgroundColor.toString() + occupationString;
+        String key = "occupationIndicator." + occupationString
+            + "." + Integer.toHexString(backgroundColor.getRGB());
         Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img == null) {
             img = createChip(occupationString, Color.BLACK, backgroundColor, foregroundColor);
