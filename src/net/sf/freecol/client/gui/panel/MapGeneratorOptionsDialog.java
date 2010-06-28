@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -29,11 +28,8 @@ import java.io.FileFilter;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -54,12 +50,6 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
-    private static final int OK = 0, CANCEL = 1, RESET = 2;
-
-    private JButton ok, cancel;
-
-    private JLabel header;
-
     private final OptionMapUI ui;
 
 
@@ -74,37 +64,21 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
         ui = new OptionMapUI(mgo, editable);
 
-        ok = new JButton(Messages.message("ok"));
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        ok.setMnemonic('O');
-
         JButton reset = new JButton(Messages.message("reset"));
-        reset.setActionCommand(String.valueOf(RESET));
+        reset.setActionCommand("RESET");
         reset.addActionListener(this);
         reset.setMnemonic('R');
         
-        cancel = new JButton(Messages.message("cancel"));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        cancel.addActionListener(this);
-        cancel.setMnemonic('C');
-
-        FreeColPanel.enterPressesWhenFocused(ok);
-        setCancelComponent(cancel);
+        setCancelComponent(cancelButton);
         
         setSize(750, 500);
 
         // Header:
-        header = getDefaultHeader(mgo.getName());
-        add(header, "align center, span");
+        add(getDefaultHeader(mgo.getName()), "align center, span");
 
         /*
-         * TODO: This was a temporary hack for release 0.7.0
-         *       It should be done automatically in the future.
-         *       The image can be included in the mapfile.
-         *       The update should be solved by PropertyEvent.
+         * TODO: The update should be solved by PropertyEvent.
          */
-        //shortcutsPanel.add(new JLabel(Messages.message("shortcuts")));
         File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
         if (mapDirectory.isDirectory()) {
             for (final File file : mapDirectory.listFiles(new FileFilter() {
@@ -140,26 +114,22 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         }
 
         // Options:
-        JPanel uiPanel = new JPanel(new BorderLayout());
-        uiPanel.setOpaque(false);
-        uiPanel.add(ui, BorderLayout.CENTER);
-        uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(uiPanel, "newline, span, growx");
+        add(ui, "newline 20, span, growx");
 
-        ok.setEnabled(editable);
+        okButton.setEnabled(editable);
         
         // Buttons:
-        add(ok, "newline 20, span, split 3, tag ok");
+        add(okButton, "newline 20, span, split 3, tag ok");
         add(reset);
-        add(cancel, "tag cancel");
+        add(cancelButton, "tag cancel");
 
     }
 
     public void requestFocus() {
-        if (ok.isEnabled()) {
-            ok.requestFocus();
+        if (okButton.isEnabled()) {
+            okButton.requestFocus();
         } else {
-            cancel.requestFocus();
+            cancelButton.requestFocus();
         }
     }
 
@@ -181,32 +151,24 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                ui.unregister();
-                ui.updateOption();
-                getCanvas().remove(this);
-                if (!getClient().isMapEditor()) {
-                    getClient().getPreGameController().sendMapGeneratorOptions();
-                    getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
-                }
-                setResponse(new Boolean(true));
-                break;
-            case CANCEL:
-                ui.rollback();
-                ui.unregister();
-                getCanvas().remove(this);
-                setResponse(new Boolean(false));
-                break;
-            case RESET:
-                ui.reset();
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
+        if (OK.equals(command)) {
+            ui.unregister();
+            ui.updateOption();
+            getCanvas().remove(this);
+            if (!getClient().isMapEditor()) {
+                getClient().getPreGameController().sendMapGeneratorOptions();
+                getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+            setResponse(new Boolean(true));
+        } else if (CANCEL.equals(command)) {
+            ui.rollback();
+            ui.unregister();
+            getCanvas().remove(this);
+            setResponse(new Boolean(false));
+        } else if ("RESET".equals(command)) {
+            ui.reset();
+        } else {
+            logger.warning("Invalid ActionCommand: invalid number.");
         }
     }
 }
