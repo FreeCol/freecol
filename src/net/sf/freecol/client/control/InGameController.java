@@ -857,21 +857,22 @@ public final class InGameController implements NetworkConstants {
                 unit.setDestination(currStop.getLocation());
             }
         	
+            String where = Messages.message(currStop.getLocation()
+                                            .getLocationName());
+            String route = unit.getTradeRoute().getName();
             if (unit.getLocation().getTile() == currStop.getLocation().getTile()) {
                 // Trade unit is at current stop
                 logger.info("Trade unit " + unit.getId()
-                            + " in route " + unit.getTradeRoute().getName()
-                            + " is at " + unit.getStop().getLocation().getLocationName());
+                            + " in route " + route + " is at " + where);
                 followTradeRoute(unit);
                 return;
             } else {
-                logger.info("Unit " + unit.getId()
-                            + " is a trade unit in route " + unit.getTradeRoute().getName()
-                            + ", going to " + unit.getStop().getLocation().getLocationName());
+                logger.info("Trade unit " + unit.getId()
+                            + " in route " + route + " is going to " + where);
             }
         } else {
-            logger.info("Moving unit " + unit.getId()
-                        + " to position " + unit.getDestination().getLocationName());
+            logger.info("Moving unit " + unit.getId() + " to position "
+                + Messages.message(unit.getDestination().getLocationName()));
         }
 
         // Destination is either invalid (like an abandoned colony,
