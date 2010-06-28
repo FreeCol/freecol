@@ -1740,7 +1740,7 @@ public final class GUI {
         }
 
         // Lookup in the cache if the image has been generated already
-        String key = "stringImage." + nameString
+        String key = "dynamic.stringImage." + nameString
             + "." + font.getFontName().replace(' ', '-')
             + "." + Integer.toHexString(color.getRGB());
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
@@ -1856,7 +1856,8 @@ public final class GUI {
      * @return an <code>Image</code> value
      */
     private Image createLabel(Graphics2D g, String text, Font font, Color backgroundColor) {
-        String key = "label." + text + "." + font.getName().replace(' ', '-')
+        String key = "dynamic.label." + text
+            + "." + font.getName().replace(' ', '-')
             + "." + Integer.toHexString(backgroundColor.getRGB());
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
@@ -2664,7 +2665,7 @@ public final class GUI {
                 foregroundColor = Color.GRAY;
         }
         // Lookup in the cache if the image has been generated already
-        String key = "occupationIndicator." + occupationString
+        String key = "dynamic.occupationIndicator." + occupationString
             + "." + Integer.toHexString(backgroundColor.getRGB());
         Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img == null) {

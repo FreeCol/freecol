@@ -248,12 +248,19 @@ public class ResourceManager {
         final Resource r = mergedContainer.get(resourceId);
         if (type.isInstance(r)) {
             return type.cast(r);
-        } else {
+        }
+        
+        if (r == null) { // Log only unexpected failures
+            if (!resourceId.startsWith("dynamic.")) {
+                logger.finest("getResource(" + resourceId
+                              + ", " + type.getName() + ") failed");
+            }
+        } else { // Log type errors
             logger.finest("getResource(" + resourceId
                           + ", " + type.getName() + ") -> "
-                          + ((r==null) ? "(null)" : r.getClass().getName()));
-            return null;
+                          + r.getClass().getName());
         }
+        return null;
     }
 
     public static boolean hasResource(final String resourceId) {
