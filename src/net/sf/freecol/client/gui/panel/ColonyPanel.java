@@ -122,6 +122,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             public JToolTip createToolTip() {
                 return new RebelToolTip(colony, getCanvas());
             }
+
+            @Override
+            public String getUIClassID() {
+                return "PopulationPanelUI";
+            }
         };
 
     private final JComboBox nameBox;
@@ -194,7 +199,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         rightProductionPanel.setOpaque(false);
 
-        populationPanel.setOpaque(false);
+        populationPanel.setOpaque(true);
         populationPanel.setToolTipText(" ");
         populationPanel.setLayout(new MigLayout("wrap 5, fill, insets 0",
                                                 "[][]:push[center]:push[right][]", ""));
@@ -208,7 +213,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         populationPanel.add(royalistShield, "bottom");
 
         constructionPanel = new ConstructionPanel(parent, colony);
-        constructionPanel.setOpaque(false);
+        constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();
         outsideColonyPanel.setLayout(new GridLayout(0, 8));

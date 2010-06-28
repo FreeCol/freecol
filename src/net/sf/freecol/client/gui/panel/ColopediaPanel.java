@@ -133,8 +133,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         header = getDefaultHeader(Messages.message("menuBar.colopedia"));
         add(header, "span, align center");
 
-        listPanel = new JPanel();
-        listPanel.setOpaque(false);
+        listPanel = new JPanel() {
+            @Override
+            public String getUIClassID() {
+                return "ColopediaPanelUI";
+            }
+        };
+        listPanel.setOpaque(true);
         JScrollPane sl = new JScrollPane(listPanel, 
                                          JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -142,8 +147,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         sl.getViewport().setOpaque(false);
         add(sl);
 
-        detailPanel = new JPanel();
-        detailPanel.setOpaque(false);
+        detailPanel = new JPanel() {
+            @Override
+            public String getUIClassID() {
+                return "ColopediaPanelUI";
+            }
+        };
+        detailPanel.setOpaque(true);
         JScrollPane detail = new JScrollPane(detailPanel,
                                              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

@@ -158,7 +158,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             this.goodsType = goodsType;
 
             setLayout(new MigLayout("wrap 2", "", ""));
-            setOpaque(false);
+            setOpaque(true);
             String goodsName = Messages.message(goodsType.getNameKey());
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(goodsName),
                     BorderFactory.createEmptyBorder(6, 6, 6, 6)));
@@ -221,5 +221,9 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             }
         }
 
+        @Override
+        public String getUIClassID() {
+            return "WarehouseGoodsPanelUI";
+        }
     }
 }

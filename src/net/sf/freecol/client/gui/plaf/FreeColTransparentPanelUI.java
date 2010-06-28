@@ -30,7 +30,7 @@ import javax.swing.plaf.basic.BasicPanelUI;
 
 
 /**
- * Draws with partial transparency.
+ * Draws with partial transparency.  Used in Europe.
  */
 public class FreeColTransparentPanelUI extends BasicPanelUI {
     

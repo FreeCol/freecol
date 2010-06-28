@@ -115,60 +115,97 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         UIDefaults u = super.getDefaults();
 
         try {
-            u.put("CheckBoxUI", "net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI"));
-            u.put("ComboBoxUI", "net.sf.freecol.client.gui.plaf.FreeColComboBoxUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColComboBoxUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColComboBoxUI"));
-            u.put("RadioButtonUI", "net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI"));
-            u.put("ButtonUI", "net.sf.freecol.client.gui.plaf.FreeColButtonUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColButtonUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColButtonUI"));
-            u.put("TextFieldUI", "net.sf.freecol.client.gui.plaf.FreeColTextFieldUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColTextFieldUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTextFieldUI"));
-            u.put("TextAreaUI", "net.sf.freecol.client.gui.plaf.FreeColTextAreaUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColTextAreaUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTextAreaUI"));
-            u.put("PanelUI", "net.sf.freecol.client.gui.plaf.FreeColPanelUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColPanelUI"));
-            u.put("MenuBarUI", "net.sf.freecol.client.gui.plaf.FreeColMenuBarUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColMenuBarUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColMenuBarUI"));
-            u.put("PopupMenuUI", "net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI"));
-            u.put("LabelUI", "net.sf.freecol.client.gui.plaf.FreeColLabelUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColLabelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColLabelUI"));
-            u.put("MenuItemUI", "net.sf.freecol.client.gui.plaf.FreeColMenuItemUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColMenuItemUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColMenuItemUI"));
-            u.put("ListUI", "net.sf.freecol.client.gui.plaf.FreeColListUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColListUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColListUI"));
-            u.put("TableUI", "net.sf.freecol.client.gui.plaf.FreeColTableUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColTableUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTableUI"));
-            u.put("TableHeaderUI", "net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI"));
-            u.put("ScrollPaneUI", "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
-            u.put("ToolTipUI", "net.sf.freecol.client.gui.plaf.FreeColToolTipUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColToolTipUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColToolTipUI"));            
-            
-            //u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI");
-            //u.put("net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI"));
+            String checkBoxUI = "net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI";
+            u.put("CheckBoxUI", checkBoxUI);
+            u.put(checkBoxUI, Class.forName(checkBoxUI));
+
+            String comboBoxUI = "net.sf.freecol.client.gui.plaf.FreeColComboBoxUI";
+            u.put("ComboBoxUI", comboBoxUI);
+            u.put(comboBoxUI, Class.forName(comboBoxUI));
+
+            String radioButtonUI = "net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI";
+            u.put("RadioButtonUI", radioButtonUI);
+            u.put(radioButtonUI, Class.forName(radioButtonUI));
+
+            String buttonUI = "net.sf.freecol.client.gui.plaf.FreeColButtonUI";
+            u.put("ButtonUI", buttonUI);
+            u.put(buttonUI, Class.forName(buttonUI));
+
+            String textFieldUI = "net.sf.freecol.client.gui.plaf.FreeColTextFieldUI";
+            u.put("TextFieldUI", textFieldUI);
+            u.put(textFieldUI, Class.forName(textFieldUI));
+
+            String textAreaUI = "net.sf.freecol.client.gui.plaf.FreeColTextAreaUI";
+            u.put("TextAreaUI", textAreaUI);
+            u.put(textAreaUI, Class.forName(textAreaUI));
+
+            String panelUI = "net.sf.freecol.client.gui.plaf.FreeColPanelUI";
+            u.put("PanelUI", panelUI);
+            u.put(panelUI, Class.forName(panelUI));
+
+            String menuBarUI = "net.sf.freecol.client.gui.plaf.FreeColMenuBarUI";
+            u.put("MenuBarUI", menuBarUI);
+            u.put(menuBarUI, Class.forName(menuBarUI));
+
+            String popupMenuUI = "net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI";
+            u.put("PopupMenuUI", popupMenuUI);
+            u.put(popupMenuUI, Class.forName(popupMenuUI));
+
+            String labelUI = "net.sf.freecol.client.gui.plaf.FreeColLabelUI";
+            u.put("LabelUI", labelUI);
+            u.put(labelUI, Class.forName(labelUI));
+
+            String menuItemUI = "net.sf.freecol.client.gui.plaf.FreeColMenuItemUI";
+            u.put("MenuItemUI", menuItemUI);
+            u.put(menuItemUI, Class.forName(menuItemUI));
+
+            String listUI = "net.sf.freecol.client.gui.plaf.FreeColListUI";
+            u.put("ListUI", listUI);
+            u.put(listUI, Class.forName(listUI));
+
+            String tableUI = "net.sf.freecol.client.gui.plaf.FreeColTableUI";
+            u.put("TableUI", tableUI);
+            u.put(tableUI, Class.forName(tableUI));
+
+            String tableHeaderUI = "net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI";
+            u.put("TableHeaderUI", tableHeaderUI);
+            u.put(tableHeaderUI, Class.forName(tableHeaderUI));
+
+            String scrollPanelUI = "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI";
+            u.put("ScrollPaneUI", scrollPanelUI);
+            u.put(scrollPanelUI, Class.forName(scrollPanelUI));
+
+            String toolTipUI = "net.sf.freecol.client.gui.plaf.FreeColToolTipUI";
+            u.put("ToolTipUI", toolTipUI);
+            u.put(toolTipUI, Class.forName(toolTipUI));
 
             // Sharing FreeColBrightPanelUI:
-            u.put("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI"));
-            u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
-            u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-            u.put("BuildingsPanelUI", "net.sf.freecol.client.gui.plaf.FreeColPanelUI");
-            u.put("OutsideColonyPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-            u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-            u.put("WarehousePanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            String brightPanelUI = "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI";
+            u.put(brightPanelUI, Class.forName(brightPanelUI));
+            u.put("InPortPanelUI", brightPanelUI);
+            u.put("CargoPanelUI", brightPanelUI);
+            u.put("BuildingsPanelUI", brightPanelUI);
+            u.put("OutsideColonyPanelUI", brightPanelUI);
+            u.put("WarehousePanelUI", brightPanelUI);
+            u.put("ConstructionPanelUI", brightPanelUI);
+            u.put("PopulationPanelUI", brightPanelUI);
+            u.put("WarehouseGoodsPanelUI", brightPanelUI);
+            u.put("ReportPanelUI", brightPanelUI);
+            u.put("ColopediaPanelUI", brightPanelUI);
+            u.put("TilePanelUI", brightPanelUI);
+            u.put("OptionGroupUI", brightPanelUI);
 
             // Sharing FreeColTransparentPanelUI:
-            u.put("net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI"));
-            u.put("MarketPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            u.put("EuropeCargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            u.put("ToAmericaPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            u.put("ToEuropePanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            u.put("EuropeInPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            u.put("DocksPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
-            
+            String transparentPanelUI = "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI";
+            u.put(transparentPanelUI, Class.forName(transparentPanelUI));
+            u.put("MarketPanelUI", transparentPanelUI);
+            u.put("EuropeCargoPanelUI", transparentPanelUI);
+            u.put("ToAmericaPanelUI", transparentPanelUI);
+            u.put("ToEuropePanelUI", transparentPanelUI);
+            u.put("EuropeInPortPanelUI", transparentPanelUI);
+            u.put("DocksPanelUI", transparentPanelUI);
+
+
             // Add image UI resources:
             String [][] resources = {                
             };

@@ -103,7 +103,12 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         // Options:
         ui = new OptionMapUI(new DifficultyOptionMap(level, getSpecification()), false);
         ui.setOpaque(false);
-        optionPanel = new JPanel();
+        optionPanel = new JPanel() {
+            @Override
+            public String getUIClassID() {
+                return "ReportPanelUI";
+            }
+        };
         optionPanel.setOpaque(true);
         optionPanel.add(ui);
         JScrollPane scrollPane = new JScrollPane(optionPanel,

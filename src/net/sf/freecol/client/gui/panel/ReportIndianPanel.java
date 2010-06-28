@@ -59,7 +59,7 @@ public final class ReportIndianPanel extends ReportPanel {
             }
         }
         scrollPane.getViewport().setOpaque(false);
-        reportPanel.setOpaque(false);
+        reportPanel.setOpaque(true);
         reportPanel.doLayout();
     }
 

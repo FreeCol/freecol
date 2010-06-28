@@ -90,7 +90,13 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         header = getDefaultHeader(title);
         add(header, "align center");
 
-        reportPanel = new JPanel();
+        reportPanel = new JPanel() {
+            @Override
+            public String getUIClassID() {
+                return "ReportPanelUI";
+            }
+        };
+
         reportPanel.setOpaque(true);
         reportPanel.setBorder(createBorder());
 

@@ -156,6 +156,10 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     public void removePropertyChangeListeners() {
         colony.removePropertyChangeListener(this);
     }
+
+
+    @Override
+    public String getUIClassID() {
+        return "ConstructionPanelUI";
+    }
 }
-
-

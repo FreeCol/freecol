@@ -62,7 +62,13 @@ public final class ReportTradePanel extends ReportPanel {
 
     private List<Colony> colonies;
 
-    private final JPanel goodsHeader = new JPanel();
+    private final JPanel goodsHeader = new JPanel() {
+        @Override
+        public String getUIClassID() {
+            return "ReportPanelUI";
+        }
+    };
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -104,6 +110,7 @@ public final class ReportTradePanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
         goodsHeader.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
+        goodsHeader.setOpaque(true);
 
         JLabel emptyLabel = new JLabel();
         emptyLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);

@@ -173,4 +173,9 @@ public final class TilePanel extends FreeColPanel {
                                                      ColopediaPanel.PanelType.TERRAIN, tileType));
         }
     }
+
+    @Override
+    public String getUIClassID() {
+        return "TilePanelUI";
+    }
 }

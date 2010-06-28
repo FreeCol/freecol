@@ -73,7 +73,12 @@ public final class CompactLabourReport extends ReportPanel {
 
     private boolean showBuildings;
 
-    private final JPanel headerRow = new JPanel();
+    private final JPanel headerRow = new JPanel() {
+        @Override
+        public String getUIClassID() {
+            return "ReportPanelUI";
+        }
+    };
 
     /**
      * The constructor that will add the items to this panel.
@@ -98,6 +103,7 @@ public final class CompactLabourReport extends ReportPanel {
         this.unitData = data;
 
         headerRow.setBorder(new EmptyBorder(20, 20, 0, 20));
+        headerRow.setOpaque(true);
         scrollPane.setColumnHeaderView(headerRow);
     }
 
