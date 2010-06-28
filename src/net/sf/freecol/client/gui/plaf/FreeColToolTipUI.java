@@ -38,7 +38,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
- * Draw the "BackgroundImage" resource as a tiled background image.
+ * Draw the "background.FreeColToolTip" resource as a tiled background
+ * image on tool tip popups.
  */
 public class FreeColToolTipUI extends BasicToolTipUI {
     
@@ -51,7 +52,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
+            ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
         }
          
         LAFUtilities.setProperties(g, c);

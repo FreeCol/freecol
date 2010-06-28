@@ -29,7 +29,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
- * Draw the "BackgroundImage" resource as a tiled background image.
+ * Draw the "background.FreeColPanel" resource as a tiled background image.
  */
 public class FreeColPanelUI extends BasicPanelUI {
     
@@ -44,7 +44,7 @@ public class FreeColPanelUI extends BasicPanelUI {
 
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
+            ImageLibrary.drawTiledImage("background.FreeColPanel", g, c, null);
         }
     }
 }

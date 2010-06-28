@@ -161,9 +161,8 @@ public class ResourceManager {
      * it blocks until resources needed for the first
      * panels have been loaded.
      * 
-     * It also ensures that the
-     * {@link #startBackgroundPreloading(Dimension) background preloading thread}
-     * is started.
+     * It also ensures that the {@link #startBackgroundPreloading(Dimension)
+     * background preloading thread} is started.
      *  
      * @param windowSize
      */
@@ -173,9 +172,6 @@ public class ResourceManager {
         }
         lastWindowSize = windowSize;
         updateIfDirty(); // starts: startBackgroundPreloading
-        getImage("CanvasBackgroundImage", windowSize);
-        getImage("TitleImage");
-        getImage("BackgroundImage");
     }
     
     /**

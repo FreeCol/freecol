@@ -32,8 +32,9 @@ import javax.swing.table.TableCellRenderer;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
- * A table cell renderer that should be used to display the chosen color in a table.
- * It is being used in the players table (StartGamePanel).
+ * A table cell renderer that should be used to display the chosen
+ * color in a table.  It is being used in the players table
+ * (StartGamePanel).
  */
 public class ColorCellRenderer extends JLabel implements TableCellRenderer {
 
@@ -43,7 +44,7 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
      */
     public ColorCellRenderer(boolean useBorder) {
         if (useBorder) {
-            ImageIcon background = new ImageIcon(ResourceManager.getImage("BackgroundImage"));
+            ImageIcon background = ResourceManager.getImageIcon("background.ColorCellRenderer");
             setBorder(BorderFactory
                       .createCompoundBorder(BorderFactory
                                             .createMatteBorder(5, 10, 5, 10, background),

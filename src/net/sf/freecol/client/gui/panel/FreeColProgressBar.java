@@ -36,9 +36,10 @@ import net.sf.freecol.common.model.GoodsType;
 
 
 /**
- * Implements a simple progress bar suitable for use with FreeCol. Unlike
- * JProgressBar, it also displays the expected increase next turn as well as the
- * estimated time until completion.
+ * Implements a simple progress bar suitable for use with
+ * FreeCol. Unlike JProgressBar, it also displays the expected
+ * increase next turn as well as the estimated time until completion.
+ * Used in the colony panel for the building progress.
  */
 public class FreeColProgressBar extends JPanel {
 
@@ -157,7 +158,7 @@ public class FreeColProgressBar extends JPanel {
         }
 
         if (isOpaque()) {
-            ImageLibrary.drawTiledImage("BackgroundImage", g, this, getInsets());
+            ImageLibrary.drawTiledImage("background.FreeColProgressBar", g, this, getInsets());
         }
 
         int dvalue = 0;

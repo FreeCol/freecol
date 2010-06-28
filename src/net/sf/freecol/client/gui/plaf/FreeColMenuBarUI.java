@@ -29,7 +29,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
- * Draws the "BackgroundImage" resource as a tiled background image.
+ * Use the "background.FreeColMenuBar" resource as a tiled background
+ * image on FreeColMenuBar, such as that at the top of the window.
  */
 public class FreeColMenuBarUI extends BasicMenuBarUI {
     
@@ -42,7 +43,7 @@ public class FreeColMenuBarUI extends BasicMenuBarUI {
 
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
+            ImageLibrary.drawTiledImage("background.FreeColMenuBar", g, c, null);
         }
     }
 

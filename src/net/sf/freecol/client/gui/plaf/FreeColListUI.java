@@ -32,7 +32,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
- * UI-class for lists.
+ * UI-class for lists, such as the drop down list of colonies in the
+ * Colony panel.
  */
 public class FreeColListUI extends BasicListUI {
 
@@ -47,7 +48,7 @@ public class FreeColListUI extends BasicListUI {
     }
 
     public void paint(Graphics g, JComponent c) {
-        ImageLibrary.drawTiledImage("BackgroundImage2", g, c, null);
+        ImageLibrary.drawTiledImage("background.FreeColList", g, c, null);
         LAFUtilities.setProperties(g, c);
         super.paint(g, c);
     }

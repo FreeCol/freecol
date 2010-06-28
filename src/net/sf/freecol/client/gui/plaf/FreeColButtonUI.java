@@ -44,23 +44,24 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColButtonUI extends MetalButtonUI {
 
+    private static FreeColButtonUI sharedInstance = new FreeColButtonUI();
+
+
     public static ComponentUI createUI(JComponent c) {
-        return new FreeColButtonUI();
+        return sharedInstance;
     }
 
-    
     public void installUI(JComponent c) {
         super.installUI(c);
         
         c.setOpaque(false);
     }
     
-    
     public void paint(Graphics g, JComponent c) {
         LAFUtilities.setProperties(g, c);
         
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("BackgroundImage", g, c, null);
+            ImageLibrary.drawTiledImage("background.FreeColButton", g, c, null);
         }
         super.paint(g, c);
         
