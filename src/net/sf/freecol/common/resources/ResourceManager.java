@@ -187,10 +187,6 @@ public class ResourceManager {
         }
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
             public void run() {
-                if (windowSize != null) {
-                    getImage("EuropeBackgroundImage", windowSize);
-                    getImage("CanvasBackgroundImage", windowSize);
-                }
                 for (Resource r : mergedContainer.getResources().values()) {
                     if (preloadThread != this) {
                         return;

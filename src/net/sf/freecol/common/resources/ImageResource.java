@@ -95,6 +95,7 @@ public class ImageResource extends Resource {
 
     /**
      * Gets the <code>Image</code> represented by this resource.
+     *
      * @return The image in it's original size.
      */
     public Image getImage() {
@@ -108,10 +109,11 @@ public class ImageResource extends Resource {
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The <code>Image</code>.
+     * @return The scaled <code>Image</code>.
      */
     public Image getImage(double scale) {
         final Image im = getImage();
+        if (im == null) return im;
         return getImage(new Dimension((int) (im.getWidth(null) * scale), (int) (im.getHeight(null) * scale)));    
     }
     
@@ -124,32 +126,31 @@ public class ImageResource extends Resource {
      */
     public Image getImage(Dimension d) {
         final Image im = getImage();
-        if (im.getWidth(null) == d.width
-                && im.getHeight(null) == d.height) {
+        if (im == null
+            || ((im.getWidth(null)==d.width && im.getHeight(null)==d.height))) {
             return im;
         }
-        final Image cachedScaledVersion = scaledImages.get(d);
-        if (cachedScaledVersion != null) {
-            return cachedScaledVersion;
-        }
+        final Image cachedScaledImage = scaledImages.get(d);
+        if (cachedScaledImage != null) return cachedScaledImage;
         synchronized (loadingLock) {
-            if (scaledImages.get(d) != null) {
-                return scaledImages.get(d);
-            }
+            final Image cached = scaledImages.get(d);
+            if (cached != null) return cached;
             MediaTracker mt = new MediaTracker(_c);
-            final Image scaledVersion = im.getScaledInstance(d.width, d.height, Image.SCALE_SMOOTH);
-            mt.addImage(scaledVersion, 0, d.width, d.height);
             try {
+                Image scaledVersion = im.getScaledInstance(d.width, d.height,
+                                                           Image.SCALE_SMOOTH);
+                mt.addImage(scaledVersion, 0, d.width, d.height);
                 mt.waitForID(0);
-            } catch (InterruptedException e) {
-                return null;
+                if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
+                    scaledImages.put(d, scaledVersion);
+                    return scaledVersion;
+                }
+            } catch (Exception e) {
+                logger.warning("Failed to scale image: "
+                               + getResourceLocator());
             }
-            if (mt.statusID(0, false) != MediaTracker.COMPLETE) {
-                return null;
-            }
-            scaledImages.put(d, scaledVersion);
-            return scaledVersion;
         }
+        return null;
     }
     
     /**
@@ -159,15 +160,19 @@ public class ImageResource extends Resource {
      * @return The <code>Image</code>.
      */
     public Image getGrayscaleImage(Dimension d) {
+        final Image im = getImage();
+        if (im == null) return null;
         final Image cachedGrayscaleImage = grayscaleImages.get(d);
-        if (cachedGrayscaleImage != null) {
-            return cachedGrayscaleImage;
-        }
+        if (cachedGrayscaleImage != null) return cachedGrayscaleImage;
         synchronized (loadingLock) {
-            if (grayscaleImages.get(d) != null) {
-                return grayscaleImages.get(d);
-            }
-            final Image grayscaleImage = convertToGrayscale(getImage(d));
+            final Image cached = grayscaleImages.get(d);
+            if (cached != null) return cached;
+            int width = im.getWidth(null);
+            int height = im.getHeight(null);
+            ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+            BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            srcImage.createGraphics().drawImage(im, 0, 0, null);
+            final Image grayscaleImage = filter.filter(srcImage, null);
             grayscaleImages.put(d, grayscaleImage);
             return grayscaleImage;
         }
@@ -183,22 +188,8 @@ public class ImageResource extends Resource {
      */
     public Image getGrayscaleImage(double scale) {
         final Image im = getImage();
+        if (im == null) return im;
         return getGrayscaleImage(new Dimension((int) (im.getWidth(null) * scale), (int) (im.getHeight(null) * scale)));    
     }
     
-    /**
-     * Converts an image to grayscale
-     * 
-     * @param image Source image to convert
-     * @return The image in grayscale
-     */
-    private Image convertToGrayscale(Image image) {
-        int width = image.getWidth(null);
-        int height = image.getHeight(null);
-        ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-        BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        srcImage.createGraphics().drawImage(image, 0, 0, null);
-        return filter.filter(srcImage, null);
-    }
-
 }
