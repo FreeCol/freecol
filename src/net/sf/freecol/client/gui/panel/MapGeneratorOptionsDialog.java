@@ -21,13 +21,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -43,7 +41,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Dialog for changing the
@@ -57,11 +58,9 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
     private JButton ok, cancel;
 
-    private JPanel buttons = new JPanel(new FlowLayout());
-
     private JLabel header;
 
-    private OptionMapUI ui;
+    private final OptionMapUI ui;
 
 
     /**
@@ -69,32 +68,99 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      * 
      * @param parent The parent of this panel.
      */
-    public MapGeneratorOptionsDialog(Canvas parent) {
+    public MapGeneratorOptionsDialog(Canvas parent, MapGeneratorOptions mgo, boolean editable) {
         super(parent);
-        setLayout(new BorderLayout());
+        setLayout(new MigLayout("wrap 4, fill"));
+
+        ui = new OptionMapUI(mgo, editable);
 
         ok = new JButton(Messages.message("ok"));
         ok.setActionCommand(String.valueOf(OK));
         ok.addActionListener(this);
         ok.setMnemonic('O');
-        buttons.add(ok);
 
         JButton reset = new JButton(Messages.message("reset"));
         reset.setActionCommand(String.valueOf(RESET));
         reset.addActionListener(this);
         reset.setMnemonic('R');
-        buttons.add(reset);
         
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
         cancel.setMnemonic('C');
-        buttons.add(cancel);
 
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
         
         setSize(750, 500);
+
+        // Header:
+        header = getDefaultHeader(mgo.getName());
+        add(header, "align center, span");
+
+        /*
+         * TODO: This was a temporary hack for release 0.7.0
+         *       It should be done automatically in the future.
+         *       The image can be included in the mapfile.
+         *       The update should be solved by PropertyEvent.
+         */
+        //shortcutsPanel.add(new JLabel(Messages.message("shortcuts")));
+        File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
+        if (mapDirectory.isDirectory()) {
+            for (final File file : mapDirectory.listFiles(new FileFilter() {
+                    public boolean accept(File file) {
+                        return file.isFile() && file.getName().endsWith(".fsg");
+                    }
+                })) {
+                String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
+                JButton mapButton = new JButton(mapName);
+                try {
+                    FreeColSavegameFile savegame = new FreeColSavegameFile(file);
+                    Image thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
+                    mapButton.setIcon(new ImageIcon(thumbnail));
+                    mapButton.setHorizontalTextPosition(JButton.CENTER);
+                    mapButton.setVerticalTextPosition(JButton.BOTTOM);
+                } catch(Exception e) {
+                    logger.warning("Failed to read thumbnail.");
+                }
+
+                mapButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            ui.reset();
+                            FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
+                            fou.setValue(file);
+                    
+                            ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
+                            ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
+                            ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+                        }
+                    });
+                add(mapButton);
+            }
+        }
+
+        // Options:
+        JPanel uiPanel = new JPanel(new BorderLayout());
+        uiPanel.setOpaque(false);
+        uiPanel.add(ui, BorderLayout.CENTER);
+        uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(uiPanel, "newline, span, growx");
+
+        ok.setEnabled(editable);
+        
+        // Buttons:
+        add(ok, "newline 20, span, split 3, tag ok");
+        add(reset);
+        add(cancel, "tag cancel");
+
+    }
+
+    public void requestFocus() {
+        if (ok.isEnabled()) {
+            ok.requestFocus();
+        } else {
+            cancel.requestFocus();
+        }
     }
 
     @Override
@@ -107,86 +173,6 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         return getMinimumSize();
     }
     
-    public void initialize(boolean editable, MapGeneratorOptions mgo) {
-        removeAll();
-
-        // Header:
-        header = getDefaultHeader(mgo.getName());
-        add(header, BorderLayout.NORTH);
-
-        // Options:
-        JPanel uiPanel = new JPanel(new BorderLayout());
-        uiPanel.setOpaque(false);
-        ui = new OptionMapUI(mgo, editable);
-        uiPanel.add(ui, BorderLayout.CENTER);
-        uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(uiPanel, BorderLayout.CENTER);
-
-        // Buttons:
-        add(buttons, BorderLayout.SOUTH);
-
-        ok.setEnabled(editable);
-        
-        /*
-         * TODO: This was a temporary hack for release 0.7.0
-         *       It should be done automatically in the future.
-         *       The image can be included in the mapfile.
-         *       The update should be solved by PropertyEvent.
-         */
-        JPanel shortcutsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        shortcutsPanel.setOpaque(false);
-        shortcutsPanel.add(new JLabel(Messages.message("shortcuts")));
-        File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
-        if (mapDirectory.isDirectory()) {
-            for (final File file : mapDirectory.listFiles(new FileFilter() {
-                    public boolean accept(File file) {
-                        return file.isFile() && file.getName().endsWith(".fsg");
-                    }
-                })) {
-                JButton mapButton = new JButton();
-                String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                String imageName = mapName + ".png";
-                File imageFile = new File(mapDirectory, imageName);
-                if (imageFile.exists() && imageFile.isFile()) {
-                    try {
-                        Image mapImage = ImageIO.read(imageFile);
-                        ImageIcon mapIcon = new ImageIcon(mapImage);
-                        mapButton.setIcon(mapIcon);
-                        mapButton.setToolTipText(mapName);
-                    } catch(IOException e) {
-                        logger.warning("Unable to load map image " + imageName);
-                    }
-                } else {
-                    mapButton.setText(mapName);
-                }
-                mapButton.setBorderPainted(false);
-                mapButton.setRolloverEnabled(true);
-                final OptionMapUI theUI = ui;
-                mapButton.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            theUI.reset();
-                            FileOptionUI fou = (FileOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-                            fou.setValue(file);
-                    
-                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
-                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
-                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
-                        }
-                    });
-                shortcutsPanel.add(mapButton);
-            }
-        }
-        uiPanel.add(shortcutsPanel, BorderLayout.NORTH);
-    }
-
-    public void requestFocus() {
-        if (ok.isEnabled()) {
-            ok.requestFocus();
-        } else {
-            cancel.requestFocus();
-        }
-    }
-
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.

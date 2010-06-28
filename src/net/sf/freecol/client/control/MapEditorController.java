@@ -167,7 +167,7 @@ public final class MapEditorController {
         final Game game = freeColClient.getGame();
         final IMapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();        
         
-        boolean ok = canvas.showMapGeneratorOptionsDialog(true, mapGenerator.getMapGeneratorOptions());
+        boolean ok = canvas.showMapGeneratorOptionsDialog(mapGenerator.getMapGeneratorOptions(), true);
         if (!ok) {
             return;
         }

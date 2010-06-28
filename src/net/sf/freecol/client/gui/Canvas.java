@@ -1781,20 +1781,21 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showMapGeneratorOptionsDialog(boolean editable) {
         final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
-        return showMapGeneratorOptionsDialog(editable, mgo);
+        return showMapGeneratorOptionsDialog(mgo, editable);
     }
 
     /**
      * Displays a dialog for setting the map generator options.
      *
+     * @param mgo a <code>MapGeneratorOptions</code> value
      * @param editable The options are only allowed to be changed if this
      *            variable is <code>true</code>.
      * @return <code>true</code> if the options have been modified, and
      *         <code>false</code> otherwise.
      */
-    public boolean showMapGeneratorOptionsDialog(boolean editable, MapGeneratorOptions mgo) {
-        MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this);
-        mapGeneratorOptionsDialog.initialize(editable, mgo);
+    public boolean showMapGeneratorOptionsDialog(MapGeneratorOptions mgo, boolean editable) {
+        MapGeneratorOptionsDialog mapGeneratorOptionsDialog =
+            new MapGeneratorOptionsDialog(this, mgo, editable);
         return showFreeColDialog(mapGeneratorOptionsDialog);
     }
 

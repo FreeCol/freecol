@@ -107,11 +107,11 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testMapAmerica() throws Exception {
-        validateMap("data/maps/america-large.fsg");
+        validateMap("data/maps/America_large.fsg");
     }
 
     public void testMapCaribbean() throws Exception {
-        validateMap("data/maps/caribbean-basin.fsg");
+        validateMap("data/maps/Caribbean_basin.fsg");
     }
 
     public void testStringTemplate() throws Exception {
