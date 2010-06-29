@@ -92,8 +92,12 @@ public class ResourceFactory {
                     r = new SZAResource(uri);
                 } else if (uri.getPath().endsWith(".ttf")) {
                     r = new FontResource(uri);
-                } else if (uri.getPath().endsWith("video.ogg")) {
-                    r = new VideoResource(uri);
+                } else if (uri.getPath().endsWith(".ogg")) {
+                    if (uri.getPath().endsWith(".video.ogg")) {
+                        r = new VideoResource(uri);
+                    } else {
+                        r = new AudioResource(uri);
+                    }
                 } else {
                     r = new ImageResource(uri);
                 }
