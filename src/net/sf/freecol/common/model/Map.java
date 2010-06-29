@@ -1004,38 +1004,6 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Checks if the given <code>Tile</code> is adjacent to the edge of the
-     * map.
-     * 
-     * @param tile
-     *            The <code>Tile</code> to be checked.
-     * @return <code>true</code> if the given tile is at the edge of the map.
-     */
-    public boolean isAdjacentToMapEdge(Tile tile) {
-        for (Direction direction : Direction.values()) {
-            if (tile.getNeighbourOrNull(direction) == null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the given <code>Tile</code> is adjacent to the
-     * east or west edge of the map.
-     * 
-     * @param tile
-     *            The <code>Tile</code> to be checked.
-     * @return <code>true</code> if the given tile is at the edge of the map.
-     */
-    public boolean isAdjacentToVerticalMapEdge(Tile tile) {
-        if ((tile.getNeighbourOrNull(Direction.E) == null)||(tile.getNeighbourOrNull(Direction.W) == null)) {
-            return true;
-        }
-        return false;
-    }
-   
-    /**
      * Finds the best path to <code>Europe</code>.
      * 
      * @param unit
@@ -1076,7 +1044,6 @@ public class Map extends FreeColGameObject {
             }
 
             public boolean check(Unit u, PathNode pathNode) {
-                Map map = u.getGame().getMap();
 
                 if (pathNode.getTile().canMoveToEurope()) {
                     goal = pathNode;
@@ -1088,7 +1055,7 @@ public class Map extends FreeColGameObject {
                 //  connected to europe
                 //or make sure during map generation that high seas tiles
                 //  exist in all sensible spots, then remove this check. 
-                if (map.isAdjacentToVerticalMapEdge(pathNode.getTile())) {
+                if (pathNode.getTile().isAdjacentToVerticalMapEdge()) {
                     goal = pathNode;
                     return true;
                 }
@@ -1121,7 +1088,6 @@ public class Map extends FreeColGameObject {
             }
 
             public boolean check(Unit u, PathNode pathNode) {
-                Map map = getGame().getMap();
                 Tile t = pathNode.getTile();
                 if (t.canMoveToEurope()) {
                     goal = pathNode;
@@ -1133,7 +1099,7 @@ public class Map extends FreeColGameObject {
                 //  connected to europe
                 //or make sure during map generation that high seas tiles
                 //  exist in all sensible spots, then remove this check. 
-                if (map.isAdjacentToVerticalMapEdge(t)) {
+                if (t.isAdjacentToVerticalMapEdge()) {
                     goal = pathNode;
                     return true;
                 }

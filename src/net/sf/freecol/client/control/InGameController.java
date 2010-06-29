@@ -795,7 +795,6 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
-        Map map = freeColClient.getGame().getMap();
         Canvas canvas = freeColClient.getCanvas();
         Location destination = canvas.showSelectDestinationDialog(unit);
         if (destination == null) {
@@ -809,7 +808,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (destination instanceof Europe && unit.getTile() != null
-            && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
+            && (unit.getTile().canMoveToEurope() || unit.getTile().isAdjacentToMapEdge())) {
             moveToEurope(unit);
             nextActiveUnit();
         } else {
@@ -943,7 +942,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (unit.getTile() != null && destination instanceof Europe
-            && map.isAdjacentToMapEdge(unit.getTile())) {
+            && unit.getTile().isAdjacentToMapEdge()) {
             moveToEurope(unit);
         }
 

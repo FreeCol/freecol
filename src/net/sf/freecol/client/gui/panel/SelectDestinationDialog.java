@@ -127,7 +127,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                                                     path.getTotalTurns()));
             } else if (unit.getTile() != null
                        && (unit.getTile().canMoveToEurope()
-                           || getGame().getMap().isAdjacentToMapEdge(unit.getTile()))) {
+                           || unit.getTile().isAdjacentToMapEdge())) {
                 destinations.add(0, new Destination(getMyPlayer().getEurope(), 0));
             }
         }

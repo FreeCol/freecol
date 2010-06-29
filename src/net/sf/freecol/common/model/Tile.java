@@ -1985,5 +1985,33 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          return result;
      }
 
+    /**
+     * Checks if the given <code>Tile</code> is adjacent to the
+     * east or west edge of the map.
+     * 
+     * @return <code>true</code> if the given tile is at the edge of the map.
+     */
+    public boolean isAdjacentToVerticalMapEdge() {
+        if ((getNeighbourOrNull(Direction.E) == null)||(getNeighbourOrNull(Direction.W) == null)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the given <code>Tile</code> is adjacent to the edge of the
+     * map.
+     *
+     * @return <code>true</code> if the given tile is at the edge of the map.
+     */
+    public boolean isAdjacentToMapEdge() {
+        for (Direction direction : Direction.values()) {
+            if (getNeighbourOrNull(direction) == null) {
+                return true;
+}
+        }
+        return false;
+    }
+
 
 }
