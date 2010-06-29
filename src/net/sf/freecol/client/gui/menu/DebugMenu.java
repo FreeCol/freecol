@@ -57,6 +57,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.resources.ImageResource;
+import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -502,11 +504,19 @@ public class DebugMenu extends JMenu {
         add(showResourceKeys);
         showResourceKeys.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    List<String> keys = new ArrayList<String>(ResourceManager.getResources().keySet());
+                    java.util.Map<String, Resource> resources = ResourceManager.getResources();
+                    List<String> keys = new ArrayList<String>(resources.keySet());
                     Collections.sort(keys);
                     StringBuilder builder = new StringBuilder();
                     for (String key : keys) {
-                        builder.append(key + "\n");
+                        builder.append(key);
+                        Resource resource = resources.get(key);
+                        if (resource instanceof ImageResource) {
+                            builder.append(" (");
+                            builder.append(((ImageResource) resource).getCount());
+                            builder.append(")");
+                        }
+                        builder.append("\n");
                     }
                     canvas.showInformationMessage(builder.toString());
                 }

@@ -191,5 +191,9 @@ public class ImageResource extends Resource {
         if (im == null) return im;
         return getGrayscaleImage(new Dimension((int) (im.getWidth(null) * scale), (int) (im.getHeight(null) * scale)));    
     }
+
+    public int getCount() {
+        return grayscaleImages.size() + scaledImages.size();
+    }
     
 }
