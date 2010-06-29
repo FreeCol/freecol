@@ -85,6 +85,7 @@ public class ImageResource extends Resource {
                     if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
                         image = im;
                     }
+                    logger.finest("Preloaded image " + url.toString());
                 } catch (Exception e) {
                     logger.warning("Failed to load image from: "
                                    + getResourceLocator());
