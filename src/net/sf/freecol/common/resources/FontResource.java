@@ -61,9 +61,9 @@ public class FontResource extends Resource {
             String name = resourceLocator.getSchemeSpecificPart();
             font = Font.decode(name.substring(SCHEME.length()));
         }
-        logger.info("Loaded font: "
-                    + ((font==null) ? "(null)" : font.getFontName())
-                    + " from: " + resourceLocator);
+        logger.finest("Loaded font: "
+                      + ((font==null) ? "(null)" : font.getFontName())
+                      + " from: " + resourceLocator);
     }
 
     /**
