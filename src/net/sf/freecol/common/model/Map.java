@@ -1953,9 +1953,7 @@ public class Map extends FreeColGameObject {
             region.toXML(out);
         }
 
-        Iterator<Position> tileIterator = getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile tile = getTile(tileIterator.next());
+        for (Tile tile: getAllTiles()) {
 
             if (showAll || player.hasExplored(tile)) {
                 tile.toXML(out, player, showAll, toSavedGame);

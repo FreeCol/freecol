@@ -1335,15 +1335,12 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
         if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
-            Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
-            while (positionIterator.hasNext()) {
-                Map.Position p = positionIterator.next();
-                Tile tile = getGame().getMap().getTile(p);
+            for (Tile tile: getGame().getMap().getAllTiles()) {
                 // may be null while loading savegame
                 if (tile == null) {
                     continue;
                 }
-                canSeeTiles[p.getX()][p.getY()] = hasExplored(tile);
+                canSeeTiles[tile.getX()][tile.getY()] = hasExplored(tile);
             }
         } else {
             Iterator<Unit> unitIterator = getUnitIterator();
@@ -2943,9 +2940,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private void exploreAllColonies() {
         // explore all tiles surrounding colonies
         ArrayList<Tile> tiles = new ArrayList<Tile>();
-        Iterator<Position> tileIterator = getGame().getMap().getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile tile = getGame().getMap().getTile((tileIterator.next()));
+        for (Tile tile: getGame().getMap().getAllTiles()) {
             // no colony, move on
             if (tile.getColony() == null) {
                 continue;
@@ -3431,10 +3426,7 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         private Iterator<Unit> createUnitIterator() {
             ArrayList<Unit> units = new ArrayList<Unit>();
-            Map map = getGame().getMap();
-            Iterator<Position> tileIterator = map.getWholeMapIterator();
-            while (tileIterator.hasNext()) {
-                Tile t = map.getTile(tileIterator.next());
+            for (Tile t: getGame().getMap().getAllTiles()) {
                 if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(owner)) {
                     Iterator<Unit> unitIterator = t.getUnitIterator();
                     while (unitIterator.hasNext()) {

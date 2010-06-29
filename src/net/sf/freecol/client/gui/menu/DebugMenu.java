@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
@@ -421,10 +420,7 @@ public class DebugMenu extends JMenu {
                     Map serverMap = freeColClient.getFreeColServer().getGame().getMap();
                     Player myServerPlayer = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(
                                                                                                                      freeColClient.getMyPlayer().getId());
-
-                    Iterator<Position> it = serverMap.getWholeMapIterator();
-                    while (it.hasNext()) {
-                        Tile t = serverMap.getTile(it.next());
+                    for (Tile t: serverMap.getAllTiles()) {
                         if (myServerPlayer.canSee(t)) {
                             Iterator<Unit> unitIterator = t.getUnitIterator();
                             while (unitIterator.hasNext()) {

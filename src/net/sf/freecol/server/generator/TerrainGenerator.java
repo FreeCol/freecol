@@ -34,7 +34,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.Map.WholeMapIterator;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Resource;
@@ -181,9 +180,7 @@ public class TerrainGenerator {
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they
         // don't belong (like sugar in large rivers or tobaco on hills).
-        WholeMapIterator iterator = map.getWholeMapIterator();
-        while (iterator.hasNext()) {
-            Tile tile = map.getTile(iterator.next());
+        for (Tile tile: map.getAllTiles()) {
             perhapsAddBonus(tile, !importBonuses);
             if (!tile.isLand()) {
                 encodeStyle(tile);

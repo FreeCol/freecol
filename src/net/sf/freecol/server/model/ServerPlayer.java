@@ -485,11 +485,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * (DEBUG ONLY) Makes the entire map visible.
     */
     public void revealMap() {
-        Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
-
-        while (positionIterator.hasNext()) {
-            Map.Position p = positionIterator.next();
-            setExplored(getGame().getMap().getTile(p));
+        for (Tile tile: getGame().getMap().getAllTiles()) {
+            setExplored(tile);
         }
         
         ((BooleanOption) getGame().getGameOptions().getObject(GameOptions.FOG_OF_WAR)).setValue(false);

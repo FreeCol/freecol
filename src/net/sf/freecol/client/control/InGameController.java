@@ -379,12 +379,8 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
-            // Removes the units we cannot see anymore from the map.
-            Map map = game.getMap();
             player.resetCanSeeTiles();
-            Iterator<Position> tileIterator = map.getWholeMapIterator();
-            while (tileIterator.hasNext()) {
-                Tile t = map.getTile(tileIterator.next());
+            for (Tile t: game.getMap().getAllTiles()) {
                 if (t != null && !player.canSee(t)
                     && t.getFirstUnit() != null) {
                     if (t.getFirstUnit().getOwner() == player) {
