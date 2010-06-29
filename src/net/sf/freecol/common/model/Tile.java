@@ -326,7 +326,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return Distance
      */
     public int getDistanceTo(Tile tile) {
-        return getGame().getMap().getDistance(getPosition(), tile.getPosition());
+        return getPosition().getDistance(tile.getPosition());
     }
 
     /**

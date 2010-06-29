@@ -392,7 +392,7 @@ public class MapGenerator implements IMapGenerator {
                 Tile candidate = map.getTile(position);
                 if (candidate.isSettleable()) {
                     for (Tile tile : settlementTiles) {
-                        if (map.getDistance(position, tile.getPosition()) < minSettlementDistance) {
+                        if (candidate.getDistanceTo(tile) < minSettlementDistance) {
                             continue nextTry;
                         }
                     }                            
@@ -426,7 +426,7 @@ public class MapGenerator implements IMapGenerator {
                 territory.numberOfSettlements = Math.round(2 * share);
                 break;
             }
-            Tile tile = getClosestTile(map, territory.getCenter(), settlementTiles);
+            Tile tile = getClosestTile(territory.getCenter(), settlementTiles);
             if (tile == null) {
                 // no more tiles
                 break;
@@ -459,7 +459,7 @@ public class MapGenerator implements IMapGenerator {
 
         // next, other settlements
         for (Tile tile : settlementTiles) {
-            Territory territory = getClosestTerritory(map, tile, territories);
+            Territory territory = getClosestTerritory(tile, territories);
             if (territory == null) {
                 // no more territories
                 break;
@@ -485,11 +485,11 @@ public class MapGenerator implements IMapGenerator {
     }
 
 
-    private Tile getClosestTile(Map map, Position center, List<Tile> tiles) {
+    private Tile getClosestTile(Position center, List<Tile> tiles) {
         Tile result = null;
         int minimumDistance = Integer.MAX_VALUE;
         for (Tile tile : tiles) {
-            int distance = map.getDistance(tile.getPosition(), center);
+            int distance = tile.getPosition().getDistance(center);
             if (distance < minimumDistance) {
                 minimumDistance = distance;
                 result = tile;
@@ -498,11 +498,11 @@ public class MapGenerator implements IMapGenerator {
         return result;
     }
 
-    private Territory getClosestTerritory(Map map, Tile tile, List<Territory> territories) {
+    private Territory getClosestTerritory(Tile tile, List<Territory> territories) {
         Territory result = null;
         int minimumDistance = Integer.MAX_VALUE;
         for (Territory territory : territories) {
-            int distance = map.getDistance(tile.getPosition(), territory.getCenter());
+            int distance = tile.getPosition().getDistance(territory.getCenter());
             if (distance < minimumDistance) {
                 minimumDistance = distance;
                 result = territory;

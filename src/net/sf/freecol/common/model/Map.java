@@ -508,13 +508,11 @@ public class Map extends FreeColGameObject {
         final PathNode firstNode;
         if (currentUnit != null) {
             firstNode = new PathNode(start, 0,
-                                     getDistance(start.getPosition(),
-                                                 end.getPosition()),
+                                     start.getDistanceTo(end),
                                      Direction.N, currentUnit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
-            firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
-                    end.getPosition()), Direction.N, -1, -1);
+            firstNode = new PathNode(start, 0, start.getDistanceTo(end), Direction.N, -1, -1);
         }
 
         final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
@@ -634,7 +632,7 @@ public class Map extends FreeColGameObject {
                 }
 
                 // Is this an improvement?  If not, ignore.
-                final int f = cost + getDistance(newTile.getPosition(), end.getPosition());
+                final int f = cost + newTile.getDistanceTo(end);
                 PathNode successor = openList.get(newTile.getId());
                 if (successor != null) {
                     if (successor.getF() <= f) {
@@ -1382,48 +1380,6 @@ public class Map extends FreeColGameObject {
     }
     
     /**
-     * Gets the distance in tiles between two map positions. With an isometric
-     * map this is a non-trivial task. The formula below has been developed
-     * largely through trial and error. It should cover all cases, but I
-     * wouldn't bet my life on it.
-     * 
-     * @param position1
-     *            The first position.
-     * @param position2
-     *            The second position.
-     * @return Distance
-     */
-    public int getDistance(Position position1, Position position2) {
-        return getDistance(position1.getX(), position1.getY(),
-                position2.getX(), position2.getY());
-    }
-
-    /**
-     * Gets the distance in tiles between two map positions.
-     * 
-     * @param ax
-     *            Position A x-coordinate
-     * @param ay
-     *            Position A y-coordinate
-     * @param bx
-     *            Position B x-coordinate
-     * @param by
-     *            Position B y-coordinate
-     * @return Distance
-     */
-    public int getDistance(int ax, int ay, int bx, int by) {
-        int r = bx - ax - (ay - by) / 2;
-
-        if (by > ay && ay % 2 == 0 && by % 2 != 0) {
-            r++;
-        } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
-            r--;
-        }
-
-        return Math.max(Math.abs(ay - by + r), Math.abs(r));
-    }
-
-    /**
      * Represents a position on the Map.
      */
     public static final class Position {
@@ -1516,6 +1472,30 @@ public class Map extends FreeColGameObject {
                                    direction.getOddDY() : direction.getEvenDY());
              return new Position(x, y);
     }
+
+        /**
+         * Gets the distance in tiles between two map positions. With an isometric
+         * map this is a non-trivial task. The formula below has been developed
+         * largely through trial and error. It should cover all cases, but I
+         * wouldn't bet my life on it.
+         *
+         * @param position
+         *            The second position.
+         * @return Distance
+         */
+        public int getDistance(Position position) {
+            int ay = getY();
+            int by = position.getY();
+            int r = position.getX() - getX() - (ay - by) / 2;
+
+            if (by > ay && ay % 2 == 0 && by % 2 != 0) {
+                r++;
+            } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
+                r--;
+    }
+
+            return Math.max(Math.abs(ay - by + r), Math.abs(r));
+        }
 
 
     }
