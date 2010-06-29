@@ -2348,8 +2348,7 @@ public final class InGameController extends Controller {
 
                 // Check for new contacts.
                 ServerPlayer welcomer = null;
-                Map map = getGame().getMap();
-                for (Tile t : map.getSurroundingTiles(newTile, 1, 1)) {
+                for (Tile t : newTile.getSurroundingTiles(1, 1)) {
                     if (t == null || !t.isLand()) {
                         continue; // Invalid tile for contact
                     }
@@ -3569,8 +3568,7 @@ public final class InGameController extends Controller {
         // can perhaps see further than the founding unit.
         if (settlement.getLineOfSight() > unit.getLineOfSight()) {
             tiles.clear();
-            Map map = game.getMap();
-            for (Tile t : map.getSurroundingTiles(tile, unit.getLineOfSight()+1,
+            for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight()+1,
                                                   settlement.getLineOfSight())) {
                 if (!tiles.contains(t)) tiles.add(t);
             }

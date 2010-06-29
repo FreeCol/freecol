@@ -1942,4 +1942,48 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
          return result;
      }
+
+
+     /**
+      * Returns all the tiles surrounding the given tile within the
+      * given inclusive upper and lower bounds.
+      * getSurroundingTiles(t, r) is equivalent to getSurroundingTiles(t, 1, r).
+      *
+      * @param t The <code>Tile</code> that lies on the center.
+      * @param rangeMin The inclusive minimum distance from the center tile.
+      * @param rangeMax The inclusive maximum distance from the center tile.
+      * @return A list of the tiles surrounding the given tile.
+      */
+     public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
+         List<Tile> result = new ArrayList<Tile>();
+
+         if (rangeMin > rangeMax || rangeMin < 0) {
+             return result;
+}
+
+         if (rangeMax == 0) {
+             result.add(this);
+             return result;
+         }
+         for (Tile tileToAdd: getSurroundingTiles(rangeMax)){
+             // add all tiles up to rangeMax
+             result.add(tileToAdd);
+         }
+         if (rangeMin == 0) { // remove nothing
+             return result;
+         }
+
+         if (rangeMin == 1) { // remove just the center tile
+             result.remove(this);
+             return result;
+         }
+
+         for (Tile tileToRemove: getSurroundingTiles(rangeMin - 1)) {
+             // remove the tiles closer than rangeMin
+             result.remove(tileToRemove);
+         }
+         return result;
+     }
+
+
 }

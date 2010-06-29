@@ -19,12 +19,10 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Random;
@@ -1276,48 +1274,6 @@ public class Map extends FreeColGameObject {
     }
 
 
-
-    /**
-     * Returns all the tiles surrounding the given tile within the
-     * given inclusive upper and lower bounds.
-     * getSurroundingTiles(t, r) is equivalent to getSurroundingTiles(t, 1, r).
-     *
-     * @param t The <code>Tile</code> that lies on the center.
-     * @param rangeMin The inclusive minimum distance from the center tile.
-     * @param rangeMax The inclusive maximum distance from the center tile.
-     * @return A list of the tiles surrounding the given tile.
-     */
-    public List<Tile> getSurroundingTiles(Tile t, int rangeMin, int rangeMax) {
-        List<Tile> result = new ArrayList<Tile>();
-        if (rangeMin > rangeMax || rangeMin < 0) {
-            return result;
-        }
-        Position tilePosition = new Position(t.getX(), t.getY());
-        if (rangeMax == 0) {
-            result.add(getTile(tilePosition));
-            return result;
-        }
-        Iterator<Position> i = (rangeMax == 1)
-            ? getAdjacentIterator(tilePosition)
-            : getCircleIterator(tilePosition, true, rangeMax);
-        while (i.hasNext()) { // add all tiles up to rangeMax
-            result.add(getTile(i.next()));
-        }
-        if (rangeMin == 0) { // remove nothing
-            return result;
-        } else if (rangeMin == 1) { // remove just the center tile
-            result.remove(getTile(tilePosition));
-            return result;
-        } else if (rangeMin == 2) {
-            i = getAdjacentIterator(tilePosition);
-        } else {
-            i = getCircleIterator(tilePosition, true, rangeMin - 1);
-        }
-        while (i.hasNext()) { // remove the tiles closer than rangeMin
-            result.remove(getTile(i.next()));
-        }
-        return result;
-    }
 
     /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
