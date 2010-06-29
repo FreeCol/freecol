@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Graphics;
-import java.awt.Image;
 
 import javax.swing.JComponent;
 import javax.swing.JList;

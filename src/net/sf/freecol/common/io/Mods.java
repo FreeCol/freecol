@@ -24,11 +24,9 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 
 /**
  * Contains methods for getting a list of available mods.

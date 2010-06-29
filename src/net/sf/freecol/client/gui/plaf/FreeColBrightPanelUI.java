@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.plaf;
 
-import java.awt.Image;
 
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;

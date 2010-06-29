@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FAFile;

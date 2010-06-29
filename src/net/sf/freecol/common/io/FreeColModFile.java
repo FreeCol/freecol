@@ -20,7 +20,6 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,7 +27,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.FreeCol;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 
 

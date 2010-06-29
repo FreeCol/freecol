@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -41,7 +40,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
-import net.sf.freecol.common.model.Unit.Role;
 
 import org.w3c.dom.Element;
 

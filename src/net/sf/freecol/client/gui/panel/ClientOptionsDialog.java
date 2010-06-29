@@ -23,7 +23,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 

@@ -63,7 +63,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;

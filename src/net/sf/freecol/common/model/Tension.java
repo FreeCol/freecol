@@ -20,7 +20,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Locale;
 
 public class Tension {
 

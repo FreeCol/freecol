@@ -20,8 +20,6 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;

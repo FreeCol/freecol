@@ -21,7 +21,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
