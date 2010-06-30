@@ -2832,15 +2832,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return false;
         }
 
-        List<Tile> surroundingTiles = getTile().getSurroundingTiles(1);
+
+        List<Tile> surroundingTiles = new ArrayList<Tile>();
+        for (Tile t: getTile().getSurroundingTiles(1))
+            surroundingTiles.add(t);
+
         if (surroundingTiles.size() != 8) {
             // TODO: the new carribean map has no south pole, and this allows moving to europe
             // via the bottom edge of the map, which is approximately the equator line. 
             // Should we enforce moving to europe requires high seas, and no movement via north/south poles?
             return true;
         } else {
-            for (int i = 0; i < surroundingTiles.size(); i++) {
-                Tile tile = surroundingTiles.get(i);
+            for (Tile tile: getTile().getSurroundingTiles(1)) {
                 if (tile == null || tile.canMoveToEurope()) {
                     return true;
                 }
@@ -3028,10 +3031,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         if (getColony() != null && getColony().getOwner().equals(getOwner())) {
                             getColony().addGoods(deliverType, deliverAmount);
                         } else {
-                            List<Tile> surroundingTiles = getTile().getSurroundingTiles(1);
                             List<Settlement> adjacentColonies = new ArrayList<Settlement>();
-                            for (int i = 0; i < surroundingTiles.size(); i++) {
-                                Tile t = surroundingTiles.get(i);
+                            for (Tile t: getTile().getSurroundingTiles(1)) {
                                 if (t.getColony() != null && t.getColony().getOwner().equals(getOwner())) {
                                     adjacentColonies.add(t.getColony());
                                 }

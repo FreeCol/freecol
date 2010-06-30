@@ -1925,20 +1925,32 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
       *            How far away do we need to go starting from the center tile.
       * @return The tiles surrounding the given tile.
       */
-     public List<Tile> getSurroundingTiles(int range) {
-         List<Tile> result = new ArrayList<Tile>();
-         Position tilePosition = getPosition();
-         Iterator<Position> i = (range == 1) ? getMap().getAdjacentIterator(tilePosition)
-                 : getMap().getCircleIterator(tilePosition, true, range);
+     public Iterable<Tile> getSurroundingTiles(final int range) {
+         return new Iterable<Tile>(){
+             public Iterator<Tile> iterator(){
+                 final Iterator<Position> m;
 
-         while (i.hasNext()) {
-             Position p = i.next();
-             if (!p.equals(tilePosition)) {
-                 result.add(getMap().getTile(p));
+                 if (range == 1)
+                     m = getMap().getAdjacentIterator(getPosition());
+                 else
+                     m = getMap().getCircleIterator(getPosition(), true, range);
+
+                 return new Iterator<Tile>(){
+                     public boolean hasNext() {
+                         return m.hasNext();
 }
+
+                     public Tile next() {
+                         return getMap().getTile(m.next());
          }
 
-         return result;
+                     public void remove() {
+                         m.remove();
+     }
+                 };
+             }
+         };
+
      }
 
 

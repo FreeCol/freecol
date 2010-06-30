@@ -954,9 +954,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
-            List<Tile> surroundingTiles = unit.getTile().getSurroundingTiles(lineOfSight);
-            for (int i = 0; i < surroundingTiles.size(); i++) {
-                Tile t = surroundingTiles.get(i);
+            for (Tile t: unit.getTile().getSurroundingTiles(lineOfSight)) {
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
             }
             update.appendChild(unit.getTile().toXMLElement(player, update.getOwnerDocument()));

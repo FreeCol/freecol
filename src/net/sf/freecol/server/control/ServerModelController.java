@@ -331,10 +331,8 @@ public class ServerModelController implements ModelController,PropertyChangeList
 
         // Display the tiles surrounding the Unit:
         Element updateElement = Message.createNewRootElement("update");
-        List<Tile> surroundingTiles = unit.getTile().getSurroundingTiles(unit.getLineOfSight());
 
-        for (int i = 0; i < surroundingTiles.size(); i++) {
-            Tile t = surroundingTiles.get(i);
+        for (Tile t: unit.getTile().getSurroundingTiles(unit.getLineOfSight())) {
             updateElement.appendChild(t.toXMLElement(player, updateElement.getOwnerDocument()));
         }
 

@@ -223,7 +223,6 @@ public final class MapEditorController {
                     // TODO: this can probably done more efficiently
                     // by applying a suitable AffineTransform to the
                     // Graphics2D
-                    double scale = 64 / height;
                     double scaledWidth = Math.min((64 * width) / height, 128);
                     BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
                                                                   BufferedImage.TYPE_INT_ARGB);

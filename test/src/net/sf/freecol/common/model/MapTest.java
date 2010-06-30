@@ -112,7 +112,10 @@ public class MapTest extends FreeColTestCase {
         game.setMap(map);
 
         // Check in the middle
-        List<Tile> surroundingTiles = map.getTile(4,8).getSurroundingTiles(1);
+        List<Tile> surroundingTiles = new ArrayList<Tile>();
+        for (Tile t: map.getTile(4,8).getSurroundingTiles(1))
+            surroundingTiles.add(t);
+
 
         assertEquals(8, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(4, 6)));
@@ -125,7 +128,9 @@ public class MapTest extends FreeColTestCase {
         assertTrue(surroundingTiles.contains(map.getTile(4, 9)));
 
         // Check on sides
-        surroundingTiles = map.getTile(0, 0).getSurroundingTiles(1);
+        surroundingTiles = new ArrayList<Tile>();
+        for (Tile t: map.getTile(0, 0).getSurroundingTiles(1))
+            surroundingTiles.add(t);
 
         assertEquals(3, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(0, 2)));
@@ -133,12 +138,17 @@ public class MapTest extends FreeColTestCase {
         assertTrue(surroundingTiles.contains(map.getTile(0, 1)));
 
         // Check larger range
-        surroundingTiles = map.getTile(4,8).getSurroundingTiles(2);
+        surroundingTiles = new ArrayList<Tile>();
+        for (Tile t: map.getTile(4, 8).getSurroundingTiles(2))
+            surroundingTiles.add(t);
 
         assertEquals(25 - 1, surroundingTiles.size());
 
         // Check that all tiles are returned
-        surroundingTiles = map.getTile(4,8).getSurroundingTiles(10);
+        surroundingTiles = new ArrayList<Tile>();
+        for (Tile t: map.getTile(4, 8).getSurroundingTiles(10))
+            surroundingTiles.add(t);
+
         assertEquals(150 - 1, surroundingTiles.size());
     }
 
@@ -264,7 +274,7 @@ public class MapTest extends FreeColTestCase {
     public void testRandomDirection() {
         Game game = getStandardGame();
         MapBuilder builder = new MapBuilder(game);
-        Map map = builder.setDimensions(10, 15).build();
+        builder.setDimensions(10, 15).build();
         Direction[] dirs = Direction.getRandomDirectionArray(((MockModelController) game.getModelController()).getPseudoRandom());
         assertNotNull(dirs);
     }
