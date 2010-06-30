@@ -2703,6 +2703,7 @@ public final class GUI {
         g2.fillRect(1, 1, width - 2, height - 2);
         g2.setColor(foreground);
         label.draw(g2, (float) (padding/2 - label.getBounds().getX()), label.getAscent() + padding/2);
+        g2.dispose();
         return bi.getSubimage(0, 0, width, height);
     }
 
