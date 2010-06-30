@@ -3481,10 +3481,7 @@ public final class InGameController extends Controller {
             scale.put(skill.getObject().getExpertProduction(), 1);
         }
 
-        Iterator<Position> iter = map.getAdjacentIterator(tile.getPosition());
-        while (iter.hasNext()) {
-            Map.Position p = iter.next();
-            Tile t = map.getTile(p);
+        for (Tile t: tile.getSurroundingTiles(1)) {
             for (GoodsType goodsType : scale.keySet()) {
                 scale.put(goodsType, scale.get(goodsType).intValue()
                           + t.potential(goodsType, null));

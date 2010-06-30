@@ -794,9 +794,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return true if at least one neighbouring tiles is unexplored, otherwise false
      */
     public boolean hasUnexploredAdjacent() {
-        Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
-        while (tileIterator.hasNext()) {
-            Tile t = getMap().getTile(tileIterator.next());
+        for (Tile t: getSurroundingTiles(1)) {
             if (!t.isExplored()) {
                 return true;
             }

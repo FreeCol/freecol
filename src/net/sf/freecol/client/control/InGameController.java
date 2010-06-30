@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -1232,10 +1231,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        Map map = tile.getGame().getMap();
-        Iterator<Position> tileIterator = map.getAdjacentIterator(tile.getPosition());
-        while (tileIterator.hasNext()) {
-            Tile newTile = map.getTile(tileIterator.next());
+        for (Tile newTile: tile.getSurroundingTiles(1)) {
             if (newTile.isLand()) {
                 for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
                     entry.setValue(entry.getValue().intValue() +
@@ -1247,9 +1243,8 @@ public final class InGameController implements NetworkConstants {
                         // we are using newTile
                         ownedBySelf = true;
                     } else {
-                        Iterator<Position> ownTileIt = map.getAdjacentIterator(newTile.getPosition());
-                        while (ownTileIt.hasNext()) {
-                            Colony colony = map.getTile(ownTileIt.next()).getColony();
+                        for (Tile ownTile: newTile.getSurroundingTiles(1)) {
+                            Colony colony = ownTile.getColony();
                             if (colony != null && colony.getOwner() == unit.getOwner()) {
                                 // newTile can be used from an own colony
                                 ownedBySelf = true;
