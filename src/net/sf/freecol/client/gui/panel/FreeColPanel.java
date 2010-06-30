@@ -112,25 +112,25 @@ public class FreeColPanel extends JPanel implements ActionListener {
     protected static final int margin = 3;
 
     // The color to use for links
-    protected static final Color LINK_COLOR =
-        ResourceManager.getColor("lookAndFeel.link.color");
+    protected static final Color LINK_COLOR
+        = ResourceManager.getColor("lookAndFeel.link.color");
 
-    // The color to use for selected items in lists
-    protected static final Color LIST_SELECT_COLOR =
-        ResourceManager.getColor("lookAndFeel.listSelect.color");
+    // The color to use for borders
+    protected static final Color BORDER_COLOR
+        = ResourceManager.getColor("lookAndFeel.border.color");
 
     // The borders to use for table cells
     public static final Border TOPCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, LINK_COLOR),
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
     public static final Border CELLBORDER = 
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LINK_COLOR),
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
     public static final Border LEFTCELLBORDER = 
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, LINK_COLOR),
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
     public static final Border TOPLEFTCELLBORDER = 
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, LINK_COLOR),
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 
