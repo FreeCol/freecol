@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
 
@@ -404,16 +403,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
                 setExplored(unit.getTile());
 
-                Iterator<Position> positionIterator;
+                int radius;
                 if (unit.getColony() != null) {
-                    positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, 2);
+                    radius = 2;
                 } else {
-                    positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
+                    radius = unit.getLineOfSight();
                 }
 
-                while (positionIterator.hasNext()) {
-                    Map.Position p = positionIterator.next();
-                    setExplored(map.getTile(p));
+
+                for (Tile tile: unit.getTile().getSurroundingTiles(radius)) {
+                    setExplored(tile);
                 }
             }
 
@@ -463,17 +462,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         setExplored(unit.getTile());
-        canSeeTiles[unit.getTile().getPosition().getX()][unit.getTile().getPosition().getY()] = true;
+        canSeeTiles[unit.getTile().getX()][unit.getTile().getY()] = true;
 
-        Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
-        while (positionIterator.hasNext()) {
-            Map.Position p = positionIterator.next();
-            if (p == null) {
-                continue;
-            }
-            setExplored(getGame().getMap().getTile(p));
+        for (Tile tile: unit.getTile().getSurroundingTiles(unit.getLineOfSight())) {
+            setExplored(tile);
             if (canSeeTiles != null) {
-                canSeeTiles[p.getX()][p.getY()] = true;
+                canSeeTiles[tile.getX()][tile.getY()] = true;
             } else {
                 invalidateCanSeeTiles();
             }

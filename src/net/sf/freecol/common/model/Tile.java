@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
@@ -278,9 +277,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (settlement == null) {
             Settlement nearSettlement = null;
             int radius = 8; // more than 8 tiles away is no longer "near"
-            CircleIterator mapIterator = getMap().getCircleIterator(getPosition(), true, radius);
-            while (mapIterator.hasNext()) {
-                nearSettlement = getMap().getTile(mapIterator.nextPosition()).getSettlement();
+            for (Tile tile: getSurroundingTiles(radius)) {
+                nearSettlement = tile.getSettlement();
                 if (nearSettlement != null) {
                     return StringTemplate.template("nameLocation")
                         .add("%name%", type.getNameKey())

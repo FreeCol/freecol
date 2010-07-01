@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
 
@@ -815,9 +814,7 @@ public class IndianSettlement extends Settlement {
      */
     public int getMaximumProduction(GoodsType goodsType) {
         int amount = 0;
-        Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
-        while (it.hasNext()) {
-            Tile workTile = getGame().getMap().getTile(it.next());
+        for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
             if (workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) {
                 // TODO: make unitType brave
                 amount += workTile.potential(goodsType, null);
@@ -940,9 +937,7 @@ public class IndianSettlement extends Settlement {
 
     public int getProductionOf(GoodsType type) {
         int potential = 0;
-        Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
-        while (it.hasNext()) {
-            Tile workTile = getGame().getMap().getTile(it.next());
+        for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
             if ((workTile.getOwningSettlement() == null ||
                  workTile.getOwningSettlement() == this) && !workTile.isOccupied()) {
                 // TODO: make unitType brave
@@ -1091,9 +1086,7 @@ public class IndianSettlement extends Settlement {
             extraAlarm.put(enemy, new Integer(0));
         }
         int alarmRadius = getRadius() + ALARM_RADIUS; // the radius in which Europeans cause alarm
-        Iterator<Position> ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
-        while (ci.hasNext()) {
-            Tile tile = getGame().getMap().getTile(ci.next());
+        for (Tile tile: getTile().getSurroundingTiles(alarmRadius)) {
             Colony colony = tile.getColony();
                 
             if (colony == null) {

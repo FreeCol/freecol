@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -172,10 +171,9 @@ public class ManageMissionariesGoal extends Goal {
             //Possible TODO: Slightly randomize findings?
             //Otherwise, missionaries starting from the same position will find
             //the same settlement.
-            Iterator<Position> i = player.getGame().getMap().getCircleIterator(t.getPosition(), true, MAX_SEARCH_RADIUS);
-            while (i.hasNext()) {
-                Position pos = i.next();
-                Settlement s = player.getGame().getMap().getTile(pos).getSettlement();
+
+            for (Tile settlementTile: t.getSurroundingTiles(MAX_SEARCH_RADIUS)) {
+                Settlement s = settlementTile.getSettlement();
                 if (s instanceof IndianSettlement &&
                     (((IndianSettlement)s).getMissionary()==null ||
                     ((IndianSettlement)s).getMissionary().getOwner()!=player.getPlayer())) {
