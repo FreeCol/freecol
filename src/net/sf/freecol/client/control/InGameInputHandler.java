@@ -741,25 +741,32 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
+        String nation = Messages.message(unit.getOwner().getNationName());
         if (goodsElement == null) {
             gold = Integer.parseInt(element.getAttribute("gold"));
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = new ShowConfirmDialogSwingTask(colony.getTile(), "indianDemand.gold.text",
-                        "indianDemand.gold.yes", "indianDemand.gold.no", "%nation%", Messages.message(unit.getOwner()
-                                .getNationName()), "%colony%", colony.getName(), "%amount%", String.valueOf(gold))
-                        .confirm();
+                accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
+                        "indianDemand.gold.text",
+                        "indianDemand.gold.yes", "indianDemand.gold.no",
+                        "%nation%", nation,
+                        "%colony%", colony.getName(),
+                        "%amount%", String.valueOf(gold)).confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS, "indianDemand.gold.text", colony, unit)
-                        .addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
-                                colony.getName()).addName("%amount%", String.valueOf(gold));
+                m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                                     "indianDemand.gold.text", colony, unit)
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                        .addName("%colony%", colony.getName())
+                        .addName("%amount%", String.valueOf(gold));
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS, "indianDemand.gold.text", colony, unit)
-                        .addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
-                                colony.getName()).addName("%amount%", String.valueOf(gold));
+                m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                                     "indianDemand.gold.text", colony, unit)
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                        .addName("%colony%", colony.getName())
+                        .addName("%amount%", String.valueOf(gold));
                 accepted = false;
                 break;
             default:
@@ -774,41 +781,55 @@ public final class InGameInputHandler extends InputHandler {
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (goods.getType().isFoodType()) {
-                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(), "indianDemand.food.text",
-                            "indianDemand.food.yes", "indianDemand.food.no", "%nation%", Messages.message(unit
-                                    .getOwner().getNationName()), "%colony%", colony.getName(), "%amount%", String
-                                    .valueOf(goods.getAmount())).confirm();
+                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
+                            "indianDemand.food.text",
+                            "indianDemand.food.yes", "indianDemand.food.no",
+                            "%nation%", nation,
+                            "%colony%", colony.getName(),
+                            "%amount%", String.valueOf(goods.getAmount()))
+                        .confirm();
                 } else {
-                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(), Messages.message(StringTemplate
-                            .template("indianDemand.other.no").addStringTemplate("%nation%",
-                                    unit.getOwner().getNationName()).addName("%colony%", colony.getName()).addAmount(
-                                    "%amount%", goods.getAmount()).add("%goods%", goods.getNameKey())),
-                            "indianDemand.other.text", "indianDemand.other.yes").confirm();
+                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
+                            "indianDemand.other.text",
+                            "indianDemand.other.yes", "indianDemand.other.no",
+                            "%nation%", nation,
+                            "%colony%", colony.getName(),
+                            "%amount%", String.valueOf(goods.getAmount()),
+                            "%goods%", Messages.message(goods.getNameKey()))
+                        .confirm();
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS, "indianDemand.food.text", colony,
-                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
-                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount()));
+                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                            "indianDemand.food.text", colony, unit)
+                            .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                            .addName("%colony%", colony.getName())
+                            .addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
-                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS, "indianDemand.other.text", colony,
-                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
-                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add("%goods%",
-                            goods.getNameKey());
+                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                            "indianDemand.other.text", colony, unit)
+                            .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                            .addName("%colony%", colony.getName())
+                            .addName("%amount%", String.valueOf(goods.getAmount()))
+                            .add("%goods%", goods.getNameKey());
                 }
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS, "indianDemand.food.text", colony,
-                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
-                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount()));
+                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                            "indianDemand.food.text", colony, unit)
+                            .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                            .addName("%colony%", colony.getName())
+                            .addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
-                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS, "indianDemand.other.text", colony,
-                            unit).addStringTemplate("%nation%", unit.getOwner().getNationName()).addName("%colony%",
-                            colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add("%goods%",
-                            goods.getNameKey());
+                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                            "indianDemand.other.text", colony, unit)
+                            .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                            .addName("%colony%", colony.getName())
+                            .addName("%amount%", String.valueOf(goods.getAmount()))
+                            .add("%goods%", goods.getNameKey());
                 }
                 accepted = false;
                 break;
