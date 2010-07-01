@@ -2308,6 +2308,13 @@ public final class InGameController extends Controller {
         if (oldLocation instanceof Unit) {
             unit.setMovesLeft(0); // Disembark always consumes all moves.
         } else {
+            if (unit.getMoveCost(newTile) <= 0) {
+                logger.warning("Move of unit: " + unit.getId()
+                               + " from: " + oldLocation.getTile().getId()
+                               + " to: " + newTile.getId()
+                               + " has bogus cost: " + unit.getMoveCost(newTile));
+                unit.setMovesLeft(0);
+            }
             unit.setMovesLeft(unit.getMovesLeft() - unit.getMoveCost(newTile));
         }
 

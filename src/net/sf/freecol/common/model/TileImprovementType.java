@@ -261,11 +261,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 cost++;
             }
         }
-        if (movementCost >= 0) {
+        if (movementCost > 0) {
+            // Only >0 values are meaningful (see spec).
+            // Do not return zero from a movement costing routine or
+            // units get free moves!
             if (movementCost < cost) {
-                return movementCost;
-            } else {
-                return cost;
+                cost = movementCost;
             }
         }
         return cost;

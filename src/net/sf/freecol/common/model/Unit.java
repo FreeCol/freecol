@@ -1175,20 +1175,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         int cost = target.getMoveCost(from);
 
-        // Using +2 in order to make 1/3 and 2/3 move count as 3/3, only when
-        // getMovesLeft > 0
-        if (cost > ml) {
-            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2 || target.getSettlement()!=null) && ml != 0) {
-                return ml;
-            }
-
-            return cost;
-        } else if (isNaval() && from.isLand() && from.getSettlement() == null) {
+        if (isNaval() && from.isLand()
+            && from.getSettlement() == null) {
             // Ship on land due to it was in a colony which was abandoned
-            return ml;
-        } else {
-            return cost;
+            cost = ml;
+        } else if (cost > ml) {
+            // Using +2 in order to make 1/3 and 2/3 move count as
+            // 3/3, only when getMovesLeft > 0
+            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2
+                 || target.getSettlement()!=null) && ml != 0) {
+                cost = ml;
+            }
         }
+        return cost;
     }
 
     /**
