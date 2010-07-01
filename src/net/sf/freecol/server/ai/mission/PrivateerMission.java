@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -228,8 +229,8 @@ public class PrivateerMission extends Mission {
         	Position ColPos = unitPos.getAdjacent(direction);
         	Colony colony = getGame().getMap().getTile(ColPos).getColony();
         	if(colony == nearestPort){
-        		move(connection, direction);
-        		return;
+              AIMessage.askMove(getAIUnit(), direction);
+              return;
         	}
         	else{
         		String errMsg = "Privateer (" + unit.getId() + ") with PrivateerMission trying to enter settlement";

@@ -47,6 +47,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -304,7 +305,7 @@ public class PioneeringMission extends Mission {
             Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null
                     && unit.getMoveType(direction).isProgress()) {
-                move(connection, direction);
+                AIMessage.askMove(getAIUnit(), direction);
             }
             
             if(unit.getTile() != tileImprovementPlan.getTarget()){

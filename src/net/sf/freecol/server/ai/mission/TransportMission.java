@@ -56,6 +56,7 @@ import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -644,7 +645,7 @@ public class TransportMission extends Mission {
             	if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
             		moveUnitToEurope(connection, carrier);
             	} else {
-            		move(connection, r);
+                  AIMessage.askMove(getAIUnit(), r);
             	}
 
             	if (!(carrier.getLocation() instanceof Europe)) {

@@ -33,7 +33,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -147,19 +147,9 @@ public class CreateMissionAtSettlementGoal extends Goal {
                                 Direction d = pathNode.getDirection();
                                 u.getUnit().setMovesLeft(0);
                                                         
-                                Element establishMsg = Message.createNewRootElement("missionaryAtSettlement");
-                                establishMsg.setAttribute("unit", u.getUnit().getId());
-                                establishMsg.setAttribute("direction", d.toString());
-                                establishMsg.setAttribute("action", "establish");
-
-                                //Possible TODO: Inform other players about this change.
-                                //Should be done centrally, though.
-
-                                try {
-                                    player.getConnection().sendAndWait(establishMsg);
-                                } catch (IOException e) {
-                                    logger.warning("Could not send \"move\"-message!");
-                                }
+                                AIMessage.askEstablishMission(u,
+                                    pathNode.getDirection(),
+                                    ((IndianSettlement)target).getMissionary() != null);
                             } else {
                                 //we can't establish a mission here
                                 addUnitToParent(u);

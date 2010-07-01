@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -73,16 +74,7 @@ public class GotoAdjacentGoal extends Goal {
                                 logger.warning("Accidental rumour exploration!");
                             }
                         
-                            Element moveElement = Message.createNewRootElement("move");
-                            moveElement.setAttribute("unit", u.getUnit().getId());
-                            moveElement.setAttribute("direction", pathNode.getDirection().toString());
-
-                            try {
-                                player.getConnection().sendAndWait(moveElement);
-                            } catch (IOException e) {
-                                logger.warning("Could not send \"move\"-message!");
-                            }
-                            
+                            AIMessage.askMove(u, pathNode.getDirection());
                             pathNode = pathNode.next;
                 }
                 if (u.getUnit().getTile().isAdjacent(target)) {

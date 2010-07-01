@@ -43,6 +43,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -141,7 +142,7 @@ public abstract class Mission extends AIObject {
                && pathNode.getTurns() == 0
                && this.isValid() == true
                && getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
-            move(connection, pathNode.getDirection());         
+            AIMessage.askMove(aiUnit, pathNode.getDirection());
             pathNode = pathNode.next;
         }
         if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()).isLegal()) {
@@ -151,48 +152,24 @@ public abstract class Mission extends AIObject {
     }
 
     protected void moveRandomly(Connection connection) {
-        Tile thisTile = getUnit().getTile();
         Unit unit = getUnit();
         Direction[] randomDirections = Direction.getRandomDirectionArray(getAIRandom());
         while (unit.getMovesLeft() > 0) {
-            Direction direction = Direction.N;
+            Tile thisTile = getUnit().getTile();
             int j;
             for (j = 0; j < randomDirections.length; j++) {
-                direction = randomDirections[j];
-                if (thisTile.getNeighbourOrNull(direction) != null &&
-                    unit.getMoveType(direction) == MoveType.MOVE) {
-                    break;
+                Direction direction = randomDirections[j];
+                if (thisTile.getNeighbourOrNull(direction) != null
+                    && unit.getMoveType(direction) == MoveType.MOVE) {
+                    AIMessage.askMove(aiUnit, direction);
+                    continue;
                 }
             }
-            if (j == randomDirections.length){
-                unit.setMovesLeft(0);
-                break;
-            }
-            thisTile = thisTile.getNeighbourOrNull(direction);
-
-            move(connection, direction);
+            unit.setMovesLeft(0);
         }
     }
 
-    /**
-    * Moves the unit owning this mission in the given direction.
-    * 
-    * @param connection The <code>Connection</code> to use
-    *         when communicating with the server.    
-    * @param direction The direction to move the unit.         
-    */
-    protected void move(Connection connection, Direction direction) {
-        Element moveElement = Message.createNewRootElement("move");
-        moveElement.setAttribute("unit", getUnit().getId());
-        moveElement.setAttribute("direction", direction.toString());
 
-        try {
-            connection.sendAndWait(moveElement);
-        } catch (IOException e) {
-            logger.warning("Could not send \"move\"-message!");
-        }
-    }
-    
     protected void moveUnitToAmerica(Connection connection, Unit unit) {
         Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
         moveToAmericaElement.setAttribute("unit", unit.getId());
@@ -217,7 +194,7 @@ public abstract class Mission extends AIObject {
     protected void moveButDontAttack(Connection connection, Direction direction) {
         if (direction != null) {
             if (getUnit().getMoveType(direction).isProgress()) {
-                move(connection, direction);
+                AIMessage.askMove(aiUnit, direction);
             }
         }
     }
