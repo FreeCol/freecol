@@ -248,11 +248,11 @@ public final class InGameController extends Controller {
      * @param element An <code>Element</code> containing the update.
      */
     public void sendElement(ServerPlayer serverPlayer, Element element) {
-        if (element != null) {
+        if (element != null && serverPlayer.isConnected()) {
             try {
                 serverPlayer.getConnection().sendAndWait(element);
             } catch (Exception e) {
-                logger.warning(e.getMessage());
+                logger.log(Level.WARNING, "Send element failure", e);
             }
         }
     }
@@ -264,11 +264,11 @@ public final class InGameController extends Controller {
      * @param element An <code>Element</code> containing a query.
      */
     public Element askElement(ServerPlayer serverPlayer, Element element) {
-        if (element != null) {
+        if (element != null && serverPlayer.isConnected()) {
             try {
                 return serverPlayer.getConnection().ask(element);
             } catch (IOException e) {
-                logger.warning(e.getMessage());
+                logger.log(Level.WARNING, "Ask element failure", e);
             }
         }
         return null;
@@ -294,7 +294,7 @@ public final class InGameController extends Controller {
             pmodifier = oldStance.getTensionModifier(stance);
             omodifier = otherPlayer.getStance(player).getTensionModifier(stance);
         } catch (IllegalStateException e) { // Catch illegal transitions
-            logger.warning(e.getMessage());
+            logger.log(Level.WARNING, "Illegal stance transition", e);
             return false;
         }
         player.setStance(otherPlayer, stance);
@@ -604,7 +604,7 @@ public final class InGameController extends Controller {
                                 european.getConnection().send(updateElement);
                                 logger.info("New convert created for " + european.getName() + " with ID=" + unit.getId());
                             } catch (IOException e) {
-                                logger.warning("Could not send message to: " + european.getName());
+                                logger.log(Level.WARNING, "Could not send message to: " + european.getName(), e);
                             }
                         }
                     }
@@ -673,7 +673,7 @@ public final class InGameController extends Controller {
                 try {
                     ((ServerPlayer) entry.getKey()).getConnection().send(entry.getValue());
                 } catch (IOException e) {
-                    logger.warning("Could not send message to: " + entry.getKey().getName());
+                    logger.log(Level.WARNING, "Could not send message to: " + entry.getKey().getName(), e);
                 }
             }
             weakestAIPlayer.setDead(true);
@@ -716,7 +716,7 @@ public final class InGameController extends Controller {
                                 }
                                 nextPlayer.setCurrentFather(father);
                             } catch (IOException e) {
-                                logger.warning("Could not send message to: " + nextPlayer.getName());
+                                logger.log(Level.WARNING, "Could not send message to: " + nextPlayer.getName(), e);
                             }
                         }
                     }
@@ -867,7 +867,7 @@ public final class InGameController extends Controller {
                     }
                 }
             } catch (IOException e) {
-                logger.warning("Could not send message to: " + serverPlayer.getName());
+                logger.log(Level.WARNING, "Could not send message to: " + serverPlayer.getName(), e);
             }
             break;
         case LOWER_TAX:
@@ -877,7 +877,7 @@ public final class InGameController extends Controller {
                 serverPlayer.setTax(lowerTax); // to avoid cheating
                 conn.send(monarchActionElement);
             } catch (IOException e) {
-                logger.warning("Could not send message to: " + serverPlayer.getName());
+                logger.log(Level.WARNING, "Could not send message to: " + serverPlayer.getName(), e);
             }
             break;
         case ADD_TO_REF:
@@ -891,7 +891,7 @@ public final class InGameController extends Controller {
             try {
                 conn.send(monarchActionElement);
             } catch (IOException e) {
-                logger.warning("Could not send message to: " + serverPlayer.getName());
+                logger.log(Level.WARNING, "Could not send message to: " + serverPlayer.getName(), e);
             }
             break;
         case DECLARE_WAR:
@@ -949,7 +949,7 @@ public final class InGameController extends Controller {
                     conn.send(updateElement);
                 }
             } catch (IOException e) {
-                logger.warning("Could not send message to: " + serverPlayer.getName());
+                logger.log(Level.WARNING, "Could not send message to: " + serverPlayer.getName(), e);
             }
             break;
         case NO_ACTION:
@@ -1190,8 +1190,7 @@ public final class InGameController extends Controller {
             			try {
             				enemyPlayer.getConnection().send(opponentAttackElement);
             			} catch (IOException e) {
-            				logger.warning("Could not send message to: " + enemyPlayer.getName()
-            						+ " with connection " + enemyPlayer.getConnection());
+                      logger.log(Level.WARNING, "Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection(), e);
             			}
             		}
                 }
