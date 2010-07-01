@@ -569,28 +569,31 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        getConnectController().quitGame(true);
+        getConnectController().quitGame(isSingleplayer());
         if (!windowed) {
             try {
                 gd.setFullScreenWindow(null);
             } catch(Exception e) {
                 // this can fail, but who cares?
                 // we are quitting anyway
+                System.exit(1);
             }
         }
         System.exit(0);
     }
 
     /**
-     * Retires the player from the game. Returns true if the player
-     * achieved a new high score.
+     * Retires the player from the game.
      *
-     * @return a <code>boolean</code> value
+     * @return True if the player achieved a new high score.
      */
     public boolean retire() {
         Element retireElement = Message.createNewRootElement("retire");
         Element reply = client.ask(retireElement);
-        return ("true".equals(reply.getAttribute("highScore")));
+        boolean result = reply != null && "true".equals(reply.getAttribute("highScore"));
+        Element endTurnElement = Message.createNewRootElement("endTurn");
+        client.send(endTurnElement);
+        return result;
     }
 
 

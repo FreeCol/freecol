@@ -92,7 +92,7 @@ public final class VictoryPanel extends FreeColPanel {
                 getCanvas().showInformationMessage("highscores.new");
                 getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
             }
-            getCanvas().quit();
+            getClient().quit();
         } else {
             if(getClient().retire()){
                 getCanvas().showInformationMessage("highscores.new");

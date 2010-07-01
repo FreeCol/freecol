@@ -124,15 +124,12 @@ public final class ReportHighScoresPanel extends ReportPanel {
     }
     
     /**
-     * This function tests if the player has chosen to retire previously and shows the quit menu
-     *if true.
+     * Just drop the panel.  Retired players quitting is handled in
+     * Canvas.retire().
      * 
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-    	getCanvas().remove(this);
-    	if(getClient().isRetired()){
-    		getCanvas().quit();
-    	}
+        getCanvas().remove(this);
     }
 }

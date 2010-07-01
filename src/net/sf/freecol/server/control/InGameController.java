@@ -440,11 +440,12 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Kill a player, remove any leftovers, inform all players.
+     * Build a ChangeSet to mark a player dead and remove any leftovers
      *
      * @param serverPlayer The <code>ServerPlayer</code> to kill.
+     * @return A <code>ChangeSet</code> that kills the player.
      */
-    private void killPlayer(ServerPlayer serverPlayer) {
+    private ChangeSet killPlayer(ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
 
         // Mark the player as dead.
@@ -462,20 +463,33 @@ public final class InGameController extends Controller {
 
         // Clean up missions
         if (serverPlayer.isEuropean()) {
+            List<ServerPlayer> europeans = new ArrayList<ServerPlayer>();
+            List<ServerPlayer> natives = new ArrayList<ServerPlayer>();
             for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-                if (!other.isIndian()) continue;
+                if (other.isEuropean()) {
+                    europeans.add(other);
+                } else {
+                    natives.add(other);
+                }
+            }
+            for (ServerPlayer other : natives) {
                 for (IndianSettlement s : other.getIndianSettlements()) {
                     Unit unit = s.getMissionary();
                     if (unit != null && unit.getOwner() == serverPlayer) {
                         s.setMissionary(null);
                         cs.addDispose(serverPlayer, s.getTile(), unit);
+                        for (ServerPlayer euro : europeans) {
+                            s.getTile().updatePlayerExploredTile(euro);
+                        }
                     }
                 }
             }
         }
 
         // Remove settlements.  Update formerly owned tiles.
-        for (Settlement settlement : serverPlayer.getSettlements()) {
+        List<Settlement> settlements = serverPlayer.getSettlements();
+        while (!settlements.isEmpty()) {
+            Settlement settlement = settlements.remove(0);
             for (Tile tile : settlement.getOwnedTiles()) {
                 if (tile != settlement.getTile()) {
                     cs.add(See.only(serverPlayer), tile);
@@ -485,12 +499,13 @@ public final class InGameController extends Controller {
         }
 
         // Remove units
-        for (Unit unit : serverPlayer.getUnits()) {
+        List<Unit> units = serverPlayer.getUnits();
+        while (!units.isEmpty()) {
+            Unit unit = units.remove(0);
             cs.addDispose(serverPlayer, unit.getLocation(), unit);
         }
 
-        // Everyone sees players leave.
-        sendToAll(cs);
+        return cs;
     }
 
 
@@ -526,7 +541,7 @@ public final class InGameController extends Controller {
         
         synchronized (newPlayer) {
             if (newPlayer.checkForDeath()) {
-                killPlayer(newPlayer);
+                sendToAll(killPlayer(newPlayer));
                 logger.info(newPlayer.getNation() + " is dead.");
                 return nextPlayer();
             }
@@ -618,6 +633,35 @@ public final class InGameController extends Controller {
         
         return newPlayer;
     }
+
+
+    /**
+     * Handle a player retiring.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
+     * @return An element cleaning up the player.
+     */
+    public Element retire(ServerPlayer serverPlayer) {
+        FreeColServer freeColServer = getFreeColServer();
+        boolean highScore = freeColServer.newHighScore(serverPlayer);
+        if (highScore) {
+            try {
+                freeColServer.saveHighScores();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to save high scores", e);
+                highScore = false;
+            }
+        }
+
+        // Clean up the player.
+        ChangeSet cs = killPlayer(serverPlayer);
+        cs.addAttribute(See.only(serverPlayer), "highScore",
+                        Boolean.toString(highScore));
+
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
+    }
+
 
     private void checkSpanishSuccession() {
         boolean rebelMajority = false;
@@ -2932,9 +2976,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Unit missionary = settlement.getMissionary();
+        Tile tile = settlement.getTile();
         if (missionary != null) {
             ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
             settlement.setMissionary(null);
+            tile.updatePlayerExploredTile(serverPlayer);
+            tile.updateIndianSettlementInformation(serverPlayer);
 
             // Inform the enemy of loss of mission
             cs.addDispose(enemy, settlement.getTile(), missionary);
@@ -2959,7 +3006,6 @@ public final class InGameController extends Controller {
             settlement.setConvertProgress(0);
             cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
                     IndianSettlement.ALARM_NEW_MISSIONARY));
-            Tile tile = settlement.getTile();
             tile.updatePlayerExploredTile(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.perhaps().always(serverPlayer), tile);

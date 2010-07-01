@@ -1419,21 +1419,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element retire(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Element reply = Message.createNewRootElement("confirmRetire");
-        boolean highScore = getFreeColServer().newHighScore(player);
-        if (highScore) {
-            try {
-                getFreeColServer().saveHighScores();
-                reply.setAttribute("highScore", "true");
-            } catch (Exception e) {
-                logger.warning(e.toString());
-                reply.setAttribute("highScore", "false");
-            }
-        } else {
-            reply.setAttribute("highScore", "false");
-        }
-        return reply;
+        FreeColServer server = getFreeColServer();
+        ServerPlayer serverPlayer = server.getPlayer(connection);
+        return server.getInGameController().retire(serverPlayer);
     }
 
 
