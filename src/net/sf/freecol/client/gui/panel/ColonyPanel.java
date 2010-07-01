@@ -72,6 +72,8 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -1534,6 +1536,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 getCanvas().showInformationMessage(msg);
             }
             updateSoLLabel();
+        } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
+            FreeColGameObject object = (FreeColGameObject) e.getSource();
+            String oldType = (String) e.getOldValue();
+            String newType = (String) e.getNewValue();
+            getCanvas().showInformationMessage(object,
+                                               "model.colony.unitChange",
+                                               "%oldType%", oldType,
+                                               "%newType%", newType);
+            updateTilePanel();
         } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
             updateTilePanel();
             updateProductionPanel();

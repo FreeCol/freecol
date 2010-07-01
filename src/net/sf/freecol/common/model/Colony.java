@@ -67,7 +67,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         PRODUCTION_CHANGE,
         BONUS_CHANGE,
         WAREHOUSE_CHANGE,
-        BUILD_QUEUE_CHANGE
+        BUILD_QUEUE_CHANGE,
+        UNIT_TYPE_CHANGE
     }
 
     public static enum NoBuildReason {

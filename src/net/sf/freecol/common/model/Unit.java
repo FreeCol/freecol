@@ -36,6 +36,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
@@ -1982,9 +1984,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (newType == null) {
                 getOwner().modifyScore(getType().getScoreValue());
             } else {
+                Colony colony = newLocation.getColony();
+                String oldName = unitType.getId() + ".name";
                 getOwner().modifyScore(-getType().getScoreValue());
                 setType(newType);
                 getOwner().modifyScore(getType().getScoreValue() * 2);
+                String newName = newType.getId() + ".name";
+                colony.firePropertyChange(ColonyChangeEvent.UNIT_TYPE_CHANGE.toString(),
+                                          oldName, newName);
             }
             newLocation.getColony().updatePopulation(1);
             if (getState() != UnitState.IN_COLONY) {
