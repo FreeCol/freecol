@@ -112,6 +112,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = remove(element);
             } else if (type.equals("animateMove")) {
                 reply = animateMove(element);
+            } else if (type.equals("animateAttack")) {
+                reply = animateAttack(element);
             } else if (type.equals("opponentAttack")) {
                 reply = opponentAttack(element);
             } else if (type.equals("setCurrentPlayer")) {
@@ -262,9 +264,9 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "animateMove"-message. This only performs animation, if
-     * required. It does not actually change unit positions, which happens in an
-     * "update".
+     * Handles an "animateMove"-message. This only performs animation,
+     * if required. It does not actually change unit positions, which
+     * happens in an "update".
      * 
      * @param element An element (root element in a DOM-parsed XML tree) that
      *            holds attributes for the old and new tiles and an element for
@@ -275,6 +277,12 @@ public final class InGameInputHandler extends InputHandler {
         FreeColClient client = getFreeColClient();
         Game game = getGame();
         String unitId = element.getAttribute("unit");
+        if (unitId == null) {
+            logger.warning("Animation"
+                           + " for: " + client.getMyPlayer().getId()
+                           + " ommitted unitId");
+            return null;
+        }
         Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
         if (unit == null
             && (unit = getUnitFromElement(game, element)) == null) {
