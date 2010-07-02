@@ -914,18 +914,16 @@ public class TerrainGenerator {
                 }
 
                 // do not start a mountain range too close to another
-                Iterator<Position> it = map.getCircleIterator(p, true, 3);
-                while (it.hasNext()) {
-                    if (map.getTile(it.next()).getType() == mountains) {
+                for (Tile t: startTile.getSurroundingTiles(3)) {
+                    if (t.getType() == mountains) {
                         continue nextTry;
                     }
                 }
 
                 // do not add a mountain range too close to the ocean/lake
                 // this helps with good locations for building colonies on shore
-                it = map.getCircleIterator(p, true, 2);
-                while (it.hasNext()) {
-                    if (!map.getTile(it.next()).isLand()) {
+                for (Tile t: startTile.getSurroundingTiles(2)) {
+                    if (!t.isLand()) {
                         continue nextTry;
                     }
                 }
@@ -947,7 +945,7 @@ public class TerrainGenerator {
                     nextTile.setType(mountains);
                     mountainRegion.addTile(nextTile);
                     counter++;
-                    it = map.getCircleIterator(p, false, 1);
+                    Iterator<Position> it = map.getCircleIterator(p, false, 1);
                     while (it.hasNext()) {
                         Tile neighborTile = map.getTile(it.next());
                         if (neighborTile==null || !neighborTile.isLand() || neighborTile.getType()==mountains)
@@ -985,18 +983,16 @@ public class TerrainGenerator {
                 }
                 // do not add hills too close to a mountain range
                 // this would defeat the purpose of adding random hills
-                Iterator<Position> it = map.getCircleIterator(p, true, 3);
-                while (it.hasNext()) {
-                    if (map.getTile(it.next()).getType() == mountains) {
+                for (Tile tile: t.getSurroundingTiles(3)) {
+                    if (tile.getType() == mountains) {
                         continue nextTry;
                     }
                 }
 
                 // do not add hills too close to the ocean/lake
                 // this helps with good locations for building colonies on shore
-                it = map.getCircleIterator(p, true, 1);
-                while (it.hasNext()) {
-                    if (!map.getTile(it.next()).isLand()) {
+                for (Tile tile: t.getSurroundingTiles(1)) {
+                    if (!tile.isLand()) {
                         continue nextTry;
                     }
                 }
@@ -1035,9 +1031,8 @@ public class TerrainGenerator {
                     continue;
                 }
                 // check the river source/spring is not too close to the ocean
-                Iterator<Position> it = map.getCircleIterator(position, true, 2);
-                while (it.hasNext()) {
-                    Tile neighborTile = map.getTile(it.next());
+
+                for (Tile neighborTile: map.getTile(position).getSurroundingTiles(2)) {
                     if (!neighborTile.isLand()) {
                         continue nextTry;
                     }

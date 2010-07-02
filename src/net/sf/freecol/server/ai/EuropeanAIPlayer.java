@@ -45,7 +45,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Message;
@@ -237,7 +236,6 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      * Takes the necessary actions to secure a european colony
      */
     protected void secureColony(Colony colony) {
-        Map map = getPlayer().getGame().getMap();
         int olddefenders = 0;
         int defenders = 0;
         int threat = 0;
@@ -249,9 +247,8 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 defenders++;
             }
         }
-        Iterator<Position> positionIterator = map.getCircleIterator(colony.getTile().getPosition(), true, 5);
-        while (positionIterator.hasNext()) {
-            Tile t = map.getTile(positionIterator.next());
+
+        for (Tile t: colony.getTile().getSurroundingTiles(5)) {
             if (t.getFirstUnit() != null) {
                 if (t.getFirstUnit().getOwner() == getPlayer()) {
                     Iterator<Unit> uit = t.getUnitIterator();

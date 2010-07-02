@@ -1,8 +1,6 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Map.CircleIterator;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -19,14 +17,10 @@ public class IndianSettlementTest extends FreeColTestCase {
      * @param nTiles
      */
     private void setOverlapingCamps(Game game, IndianSettlement camp1, IndianSettlement camp2, int nTiles){
-        Map map = game.getMap();
         Tile settlementTile = camp1.getTile();
         
         // Change tile ownership around camp1 to camp2
-        CircleIterator tilesAroundCamp = map.getCircleIterator(settlementTile.getPosition(), true, camp1.getRadius());    
-        while(tilesAroundCamp.hasNext()){
-            Position p = tilesAroundCamp.next();
-            Tile t = map.getTile(p);
+        for (Tile t: settlementTile.getSurroundingTiles(camp1.getRadius())){
             t.setOwningSettlement(camp2);
         }
     }

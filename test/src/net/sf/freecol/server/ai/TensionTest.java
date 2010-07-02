@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.ClaimLandMessage;
@@ -94,9 +93,7 @@ public class TensionTest extends FreeColTestCase {
             IndianSettlement settlement = builder.player(indian).settlementTile(tile).skillToTeach(null).capital(true).build();
 
             tile.setOwningSettlement(settlement);
-            Iterator<Position> circleIterator = map.getCircleIterator(tile.getPosition(), true, settlement.getRadius());
-            while (circleIterator.hasNext()) {
-                Tile newTile = map.getTile(circleIterator.next());
+            for (Tile newTile: tile.getSurroundingTiles(settlement.getRadius())) {
                 newTile.setOwningSettlement(settlement);
                 newTile.setOwner(indian);
             }

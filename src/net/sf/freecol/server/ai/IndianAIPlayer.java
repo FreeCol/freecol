@@ -29,7 +29,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -37,7 +36,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
@@ -145,15 +143,12 @@ public class IndianAIPlayer extends NewAIPlayer {
      */
     public void secureIndianSettlement(IndianSettlement is) {
         if (is.getOwner().isAtWar()) {
-            Map map = getPlayer().getGame().getMap();
             if (is.getUnitCount() > 2) {
                 int defenders = is.getTile().getUnitCount();
                 int threat = 0;
                 int worstThreat = 0;
                 Location bestTarget = null;
-                Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
-                while (positionIterator.hasNext()) {
-                    Tile t = map.getTile(positionIterator.next());
+                for (Tile t: is.getTile().getSurroundingTiles(2)) {
                     // ignore sea tiles
                     // Indians dont have sea power
                     if(!t.isLand()){
@@ -230,10 +225,7 @@ public class IndianAIPlayer extends NewAIPlayer {
             }
             // Creates a list of nearby colonies:
             ArrayList<Colony> nearbyColonies = new ArrayList<Colony>();
-            Iterator<Position> it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
-                                                                         MAX_DISTANCE_TO_BRING_GIFT);
-            while (it.hasNext()) {
-                Tile t = getGame().getMap().getTile(it.next());
+            for (Tile t: indianSettlement.getTile().getSurroundingTiles(MAX_DISTANCE_TO_BRING_GIFT)) {
                 if (t.getColony() != null
                     && IndianBringGiftMission.isValidMission(getPlayer(), t.getColony().getOwner())) {
                     nearbyColonies.add(t.getColony());
@@ -288,10 +280,8 @@ public class IndianAIPlayer extends NewAIPlayer {
             }
             // Creates a list of nearby colonies:
             ArrayList<Colony> nearbyColonies = new ArrayList<Colony>();
-            Iterator<Position> it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
-                                                                         MAX_DISTANCE_TO_MAKE_DEMANDS);
-            while (it.hasNext()) {
-                Tile t = getGame().getMap().getTile(it.next());
+
+            for (Tile t: indianSettlement.getTile().getSurroundingTiles(MAX_DISTANCE_TO_MAKE_DEMANDS)) {
                 if (t.getColony() != null) {
                     nearbyColonies.add(t. getColony());
                 }
