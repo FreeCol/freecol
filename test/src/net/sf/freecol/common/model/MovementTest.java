@@ -58,6 +58,16 @@ public class MovementTest extends FreeColTestCase {
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
 
+        // Plowing should not change result
+        assertTrue("No improvements", tile2.getTileImprovements().isEmpty());
+        TileImprovement ti = new TileImprovement(game, tile2, spec().getTileImprovementType("model.improvement.plow"));
+        ti.setTurnsToComplete(0);
+        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
+        tile2.getTileItemContainer().addTileItem(ti);
+        assertTrue("Plowed", tile2.getCompletedTileImprovements().size() == 1);
+        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertEquals(Math.min(moveCost, colonistType.getMovement()),
+                     colonist.getMoveCost(tile2));
     }
 
     public void testMoveFromPlainsToHills() throws Exception {
