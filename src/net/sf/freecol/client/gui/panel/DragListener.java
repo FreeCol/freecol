@@ -231,7 +231,7 @@ public final class DragListener extends MouseAdapter {
                 menu.add(menuItem);
             }
             for (Goods goods : tempUnit.getGoodsList()) {
-                JMenuItem menuItem = new JMenuItem("    " + goods.toString());
+                JMenuItem menuItem = new JMenuItem("    " + Messages.message(goods.getLabel(true)));
                 menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
                 menu.add(menuItem);
             }
