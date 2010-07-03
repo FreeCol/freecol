@@ -513,7 +513,7 @@ public final class ProductionMultiplesLabel extends JComponent {
             if (maximumProduction > totalProduction && totalProduction > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            Font font = ResourceManager.getFont("NormalFont", Font.BOLD, 12f);
+            Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
             Image stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
             int textOffset = leftOffset + (coverage - stringImage.getWidth(null))/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;

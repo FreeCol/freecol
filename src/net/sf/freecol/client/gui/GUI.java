@@ -1741,6 +1741,7 @@ public final class GUI {
         // Lookup in the cache if the image has been generated already
         String key = "dynamic.stringImage." + nameString
             + "." + font.getFontName().replace(' ', '-')
+            + "." + font.getSize()
             + "." + Integer.toHexString(color.getRGB());
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
@@ -2692,7 +2693,7 @@ public final class GUI {
      */
     public Image createChip(String text, Color border, Color background, Color foreground) {
         // Draw it and put it in the cache
-        Font font = ResourceManager.getFont("NormalFont", Font.BOLD,
+        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
                 (float) Math.rint(12 * lib.getScalingFactor()));
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
@@ -2701,9 +2702,9 @@ public final class GUI {
         float padding = 6 * lib.getScalingFactor();
         int width = (int) (label.getBounds().getWidth() + padding);
         int height = (int) (label.getAscent() + label.getDescent() + padding);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g2.setColor(border);
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);

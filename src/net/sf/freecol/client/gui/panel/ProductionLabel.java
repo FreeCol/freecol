@@ -441,7 +441,7 @@ public final class ProductionLabel extends JComponent {
             if (maximumProduction > production && production > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            Font font = ResourceManager.getFont("NormalFont", Font.BOLD, 12f);
+            Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
             stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
             stringWidth = stringImage.getWidth(null);
         }
