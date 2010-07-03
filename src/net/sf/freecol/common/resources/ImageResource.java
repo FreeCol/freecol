@@ -160,7 +160,7 @@ public class ImageResource extends Resource {
      * @return The <code>Image</code>.
      */
     public Image getGrayscaleImage(Dimension d) {
-        final Image im = getImage();
+        final Image im = getImage(d);
         if (im == null) return null;
         final Image cachedGrayscaleImage = grayscaleImages.get(d);
         if (cachedGrayscaleImage != null) return cachedGrayscaleImage;
