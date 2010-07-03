@@ -1741,9 +1741,9 @@ public final class GUI {
         // Lookup in the cache if the image has been generated already
         String key = "dynamic.stringImage." + nameString
             + "." + font.getFontName().replace(' ', '-')
-            + "." + font.getSize()
+            + "." + Integer.toString(font.getSize())
             + "." + Integer.toHexString(color.getRGB());
-        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        Image image = (Image) ResourceManager.getImage(key);//, lib.getScalingFactor());
         if (image != null) {
             return image;
         }
