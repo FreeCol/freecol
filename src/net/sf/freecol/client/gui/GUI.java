@@ -1783,7 +1783,7 @@ public final class GUI {
             }
         }
         ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        return (Image) ResourceManager.getImage(key);//, lib.getScalingFactor());
     }
 
     /**
