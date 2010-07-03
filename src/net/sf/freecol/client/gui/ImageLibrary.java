@@ -356,19 +356,21 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the beach image at the given index.
+     * Returns the beach edge image at the given index.
      * 
      * @param index The index of the image to return.
      * @return The image at the given index.
      */
-    public Image getBeachImage(int index) {
-        return ResourceManager.getImage("beach" + index, scalingFactor);
-    }
-
     public Image getBeachEdgeImage(int index) {
         return ResourceManager.getImage("model.tile.beach.edge" + index, scalingFactor);
     }
 
+    /**
+     * Returns the beach corner image at the given index.
+     * 
+     * @param index The index of the image to return.
+     * @return The image at the given index.
+     */
     public Image getBeachCornerImage(int index) {
         return ResourceManager.getImage("model.tile.beach.corner" + index, scalingFactor);
     }
@@ -565,6 +567,17 @@ public final class ImageLibrary {
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(Settlement settlement) {
+        return getSettlementImage(settlement, scalingFactor);
+    }
+
+    /**
+     * Returns the graphics that will represent the given settlement.
+     * 
+     * @param settlement The settlement whose graphics type is needed.
+     * @param scale a <code>double</code> value
+     * @return The graphics that will represent the given settlement.
+     */
+    public Image getSettlementImage(Settlement settlement, double scale) {
 
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
@@ -613,7 +626,7 @@ public final class ImageLibrary {
                 + (settlement.isCapital() ? ".capital" : ".settlement")
                 + ((((IndianSettlement) settlement).getMissionary() == null) ? "" : ".mission")
                 + ".image";
-            return ResourceManager.getImage(key);
+            return ResourceManager.getImage(key, scale);
         }
     }
 
