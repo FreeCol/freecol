@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -85,6 +86,7 @@ import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -736,6 +738,11 @@ public final class FreeColServer {
                     throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
                 }
             }
+            // TODO: remove compatibility code
+            for (Tile tile : game.getMap().getAllTiles()) {
+                TerrainGenerator.encodeStyle(tile);
+            }
+            // end compatibility code
             Collections.sort(game.getPlayers(), Player.playerComparator);
             if (aiMain == null) {
                 aiMain = new AIMain(this);
