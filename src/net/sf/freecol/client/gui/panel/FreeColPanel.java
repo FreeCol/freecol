@@ -94,16 +94,12 @@ public class FreeColPanel extends JPanel implements ActionListener {
     private Canvas canvas = null;
 
     // Font to use for text areas
-    protected static final Font defaultFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+    protected static final Font defaultFont = ResourceManager.getFont("NormalFont", 13f);
 
     // Fonts to use for report headers, etc.
-    protected static final Font headerFont = ResourceManager.getFont("HeaderFont", 12f);
-
-    protected static final Font smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
-
+    protected static final Font  smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
     protected static final Font mediumHeaderFont = ResourceManager.getFont("HeaderFont", 36f);
-
-    protected static final Font bigHeaderFont = ResourceManager.getFont("HeaderFont", 48f);
+    protected static final Font    bigHeaderFont = ResourceManager.getFont("HeaderFont", 48f);
 
     // How many columns (em-widths) to use in the text area
     protected static final int COLUMNS = 20;
@@ -145,9 +141,8 @@ public class FreeColPanel extends JPanel implements ActionListener {
             .getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = styleContext.addStyle("regular", defaultStyle);
-        StyleConstants.setFontFamily(regular, "Dialog");
-        StyleConstants.setBold(regular, true);
-        StyleConstants.setFontSize(regular, 12);
+        StyleConstants.setFontFamily(regular, "LiberationSerif");
+        StyleConstants.setFontSize(regular, 13);
 
         Style buttonStyle = styleContext.addStyle("button", regular);
         StyleConstants.setForeground(buttonStyle, LINK_COLOR);
