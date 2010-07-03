@@ -213,7 +213,7 @@
 
   <xs:simpleType name="OptionId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.option\.([a-zA-Z])+" />
+      <xs:pattern value="model\.option(\.[a-zA-Z0-9]+)+" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -241,7 +241,40 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:element name="booleanOption">
+    <xs:complexType>
+      <xs:attribute name="id" type="OptionId" use="required" />
+      <xs:attribute name="value" type="xs:boolean" use="required" />
+    </xs:complexType>
+  </xs:element>
 
+  <xs:element name="fileOption">
+    <xs:complexType>
+      <xs:attribute name="id" type="OptionId" use="required" />
+      <xs:attribute name="value" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="integerOption">
+    <xs:complexType>
+      <xs:attribute name="id" type="OptionId" use="required" />
+      <xs:attribute name="value" type="xs:int" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="selectOption">
+    <xs:complexType>
+      <xs:attribute name="id" type="OptionId" use="required" />
+      <xs:attribute name="value" type="xs:int" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="stringOption">
+    <xs:complexType>
+      <xs:attribute name="id" type="OptionId" use="required" />
+      <xs:attribute name="value" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>
 

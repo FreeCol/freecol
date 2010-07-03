@@ -23,7 +23,6 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
-  <xs:include schemaLocation="data-gameOptions.xsd" />
   <xs:include schemaLocation="data-nationOptions.xsd" />
   <xs:include schemaLocation="data-player.xsd" />
   <xs:include schemaLocation="data-map.xsd" />
@@ -40,6 +39,8 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	<xs:element ref="gameOptions" />
 	<xs:element ref="nationOptions" />
+	<xs:element ref="mapGeneratorOptions" />
+	<xs:element ref="difficultyLevel" />
 	<xs:element ref="player" />
 	<xs:element ref="map" />
 	<xs:element ref="modelMessage" />
@@ -66,6 +67,60 @@
   <xs:element name="cibola">
     <xs:complexType>
       <xs:attribute name="id" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="gameOptions">
+    <xs:annotation>
+      <xs:documentation>
+	This class contains the game options.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+	<xs:element ref="booleanOption" />
+	<xs:element ref="integerOption" />
+	<xs:element ref="selectOption" />
+      </xs:choice>
+
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="mapGeneratorOptions">
+    <xs:annotation>
+      <xs:documentation>
+	This class contains the game options.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+	<xs:element ref="booleanOption" />
+	<xs:element ref="integerOption" />
+	<xs:element ref="selectOption" />
+	<xs:element ref="fileOption" />
+      </xs:choice>
+
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="difficultyLevel">
+    <xs:annotation>
+      <xs:documentation>
+	This class contains the game's difficulty options.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+	<xs:element ref="booleanOption" />
+	<xs:element ref="integerOption" />
+	<xs:element ref="selectOption" />
+	<xs:element ref="stringOption" />
+      </xs:choice>
+
+      <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
