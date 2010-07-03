@@ -22,6 +22,7 @@ package net.sf.freecol.server.generator;
 import java.awt.Rectangle;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,6 +60,10 @@ public class TerrainGenerator {
     public static final int PACIFIC_SCORE_VALUE = 100;
 
     public static final int LAND_REGION_MAX_SIZE = 75;
+
+    public static final Direction[] corners = new Direction[] {
+        Direction.N, Direction.E, Direction.S, Direction.W
+    };
 
     private final MapGeneratorOptions mapGeneratorOptions;
     private final Random random;
@@ -188,19 +193,43 @@ public class TerrainGenerator {
         }
     }
 
-    public static void encodeStyle(Tile tile) {
-        int base = 1;
-        int style = 0;
-        for (Direction d : Direction.values()) {
-            Tile otherTile = tile.getNeighbourOrNull(d);
-            if (otherTile != null && otherTile.isLand()) {
-                style += base;
-            }
-            base *= 2;
-        }
-        tile.setStyle(style);
-    }
+    public static void encodeStyle(Tile ocean) {
+        EnumMap<Direction, Boolean> connections =
+            new EnumMap<Direction, Boolean>(Direction.class);
 
+        // corners
+        for (Direction d : corners) {
+            Tile tile = ocean.getNeighbourOrNull(d);
+            connections.put(d, (tile != null && tile.isLand()));
+        }
+        // edges
+        for (Direction d : Direction.longSides) {
+            Tile tile = ocean.getNeighbourOrNull(d);
+            if (tile != null && tile.isLand()) {
+                connections.put(d, true);
+                // ignore adjacent corners
+                connections.put(d.getNextDirection(), false);
+                connections.put(d.getPreviousDirection(), false);
+            } else {
+                connections.put(d, false);
+            }
+        }
+        int result = 0;
+        int index = 0;
+        for (Direction d : corners) {
+            if (connections.get(d)) {
+                result += (int) Math.pow(2, index);
+            }
+            index++;
+        }
+        for (Direction d : Direction.longSides) {
+            if (connections.get(d)) {
+                result += (int) Math.pow(2, index);
+            }
+            index++;
+        }
+        ocean.setStyle(result);
+    }
 
     private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude) {
         Tile t;

@@ -60,7 +60,6 @@ public class FreeColTcFile extends FreeColModFile {
                 result = new ResourceMapping();
             }
             result.addAll(createRiverMapping());
-            result.addAll(createBeachMapping());
             result.addAll(super.getResourceMapping());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -139,18 +138,6 @@ public class FreeColTcFile extends FreeColModFile {
             key = "delta_" + d + "_large";
             path = pathPrefix + key + ".png";
             map.add(key, ResourceFactory.createResource(getURI(path)));
-        }
-        return map;
-    }
-
-    public ResourceMapping createBeachMapping() {
-        ResourceMapping map = new ResourceMapping();
-        String pathPrefix = "resources/images/terrain/beach/";
-        String path;
-        // beach0 is never used
-        for (int index = 1; index < ResourceManager.BEACH_STYLES; index++) {
-            path = pathPrefix +"beach" + index + ".png";
-            map.add("beach" + index, ResourceFactory.createResource(getURI(path)));
         }
         return map;
     }

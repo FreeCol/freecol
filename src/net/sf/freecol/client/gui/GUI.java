@@ -2049,7 +2049,14 @@ public final class GUI {
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
 
         if (!tile.isLand() && tile.getStyle() > 0) {
-            g.drawImage(lib.getBeachImage(tile.getStyle()), 0, 0, null);
+            int edgeStyle = tile.getStyle() >> 4;
+            if (edgeStyle > 0) {
+                g.drawImage(lib.getBeachEdgeImage(edgeStyle), 0, 0, null);
+            }
+            int cornerStyle = tile.getStyle() & 15;
+            if (cornerStyle > 0) {
+                g.drawImage(lib.getBeachCornerImage(cornerStyle), 0, 0, null);
+            }
         }
 
         for (Direction direction : Direction.values()) {

@@ -365,6 +365,14 @@ public final class ImageLibrary {
         return ResourceManager.getImage("beach" + index, scalingFactor);
     }
 
+    public Image getBeachEdgeImage(int index) {
+        return ResourceManager.getImage("model.tile.beach.edge" + index, scalingFactor);
+    }
+
+    public Image getBeachCornerImage(int index) {
+        return ResourceManager.getImage("model.tile.beach.corner" + index, scalingFactor);
+    }
+
     /**
      * Returns the forest image for a terrain type.
      * 
