@@ -1888,8 +1888,8 @@ public class Player extends FreeColGameObject implements Nameable {
     public void setNation(Nation newNation) {
         Nation oldNation = getNation();
         nationID = newNation.getId();
-        getGame().getNationOptions().getNations().put(oldNation, NationState.AVAILABLE);
         getGame().getNationOptions().getNations().put(newNation, NationState.NOT_AVAILABLE);
+        getGame().getNationOptions().getNations().put(oldNation, NationState.AVAILABLE);
     }
 
     /**
