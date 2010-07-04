@@ -183,7 +183,9 @@ public class ResourceManager {
         }
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
             public void run() {
-                for (Resource r : mergedContainer.getResources().values()) {
+                List<Resource> resources =
+                    new LinkedList<Resource>(mergedContainer.getResources().values());
+                for (Resource r : resources) {
                     if (preloadThread != this) {
                         return;
                     }
