@@ -110,9 +110,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             // colonyLabel
             try {
+                if (index != 0) {
+                    doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
+                }
                 StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, true));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             } catch(Exception e) {
                 logger.warning(e.toString());
             }
@@ -164,7 +166,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!hasWarning) {
                 try {
-                    doc.insertString(doc.getLength(), Messages.message("report.requirements.met") + "\n\n",
+                    doc.insertString(doc.getLength(), "\n\n" + Messages.message("report.requirements.met"),
                                      doc.getStyle("regular"));
                 } catch(Exception e) {
                     logger.warning(e.toString());
@@ -189,7 +191,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 "%unit%", expertName);
 
         try {
-            doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
+            doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
 
             ArrayList<Colony> severalExperts = new ArrayList<Colony>();
             ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
@@ -204,34 +206,32 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!severalExperts.isEmpty()) {
                 doc.insertString(doc.getLength(), 
-                        Messages.message("report.requirements.severalExperts", "%unit%", expertName), 
+                        "\n" + Messages.message("report.requirements.severalExperts", "%unit%", expertName) + " ", 
                         doc.getStyle("regular"));
-                for (int index = 0; index < severalExperts.size() - 1; index++) {
+                int lastExpertsIndex = severalExperts.size() - 1;
+                for (int index = 0; index <= lastExpertsIndex; index++) {
                     Colony colony = severalExperts.get(index);
                     StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                    doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                    if (index != lastExpertsIndex) {
+                        doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                    }
                 }
-                Colony colony = severalExperts.get(severalExperts.size() - 1);
-                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
-                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
 
             if (!canTrainExperts.isEmpty()) {
                 doc.insertString(doc.getLength(), 
-                        Messages.message("report.requirements.canTrainExperts", "%unit%", expertName), 
+                        "\n" + Messages.message("report.requirements.canTrainExperts", "%unit%", expertName) + " ", 
                         doc.getStyle("regular"));
-                for (int index = 0; index < canTrainExperts.size() - 1; index++) {
+                int lastExpertsIndex = canTrainExperts.size() - 1;
+                for (int index = 0; index <= lastExpertsIndex; index++) {
                     Colony colony = canTrainExperts.get(index);
                     StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                    doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                    if (index != lastExpertsIndex) {
+                        doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                    }
                 }
-                Colony colony = canTrainExperts.get(canTrainExperts.size() - 1);
-                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
-                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
   
         } catch(Exception e) {
@@ -248,7 +248,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                              .add("%input%", input.getNameKey()));
 
         try {
-            doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
+            doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
 
             ArrayList<Colony> withSurplus = new ArrayList<Colony>();
             ArrayList<Integer> theSurplus = new ArrayList<Integer>();
@@ -261,7 +261,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!withSurplus.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                                 Messages.message(StringTemplate.template("report.requirements.surplus")
+                                 "\n" + Messages.message(StringTemplate.template("report.requirements.surplus")
                                                   .add("%goods%", input.getNameKey())) + " ",
                                  doc.getStyle("regular"));
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
@@ -275,7 +275,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 String amount = " (" + theSurplus.get(theSurplus.size() - 1) + ")";
                 StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, amount, false));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
 
 
