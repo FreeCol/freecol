@@ -391,7 +391,7 @@ public final class CompactLabourReport extends ReportPanel {
         Building productionBuilding = null;
 
         if (!allColonists) {
-            workingAs = Messages.message(unitType.getId() + ".workingAs");
+            workingAs = Messages.message(unitType.getWorkingAsKey());
             if (colony != null) {
                 GoodsType expert = unitType.getExpertProduction();
                 if (expert != null) {

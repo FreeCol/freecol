@@ -138,6 +138,10 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
 
+    public final String getWorkingAsKey() {
+        return getId() + ".workingAs";
+    }
+
     /**
      * Returns <code>true</code> if Units of this type can carry other Units.
      *

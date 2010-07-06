@@ -81,36 +81,38 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         // Display Panel
 
-        //Create a text pane.
+        // create a text pane
         JTextPane textPane = getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
 
+        int numberColonies = colonies.size();
         int numberUnitTypes = getSpecification().numberOfUnitTypes();
         int numberGoodsTypes = getSpecification().numberOfGoodsTypes();
-        unitCount = new int[colonies.size()][numberUnitTypes];
-        canTrain = new boolean[colonies.size()][numberUnitTypes];
-        surplus = new int[colonies.size()][numberGoodsTypes];
+        unitCount = new int[numberColonies][numberUnitTypes];
+        canTrain = new boolean[numberColonies][numberUnitTypes];
+        surplus = new int[numberColonies][numberGoodsTypes];
 
-        List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
         // check which colonies can train which units
-        for (int index = 0; index < colonies.size(); index++) {
-            Colony colony = colonies.get(index);
+        int unitTypeIndex = 0;
+        List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
+        for (int colonyIndex = 0; colonyIndex < numberColonies; colonyIndex++) {
+            Colony colony = colonies.get(colonyIndex);
             for (Unit unit : colony.getUnitList()) {
-                unitCount[index][unit.getType().getIndex()]++;
-                canTrain[index][unit.getType().getIndex()] = colony.canTrain(unit.getType());
+                unitTypeIndex = unit.getType().getIndex();
+                unitCount[colonyIndex][unitTypeIndex]++;
+                canTrain[colonyIndex][unitTypeIndex] = colony.canTrain(unit.getType());
             }
             for (GoodsType goodsType : goodsTypes) {
-                surplus[index][goodsType.getIndex()] = colony.getProductionNetOf(goodsType);
+                surplus[colonyIndex][goodsType.getIndex()] = colony.getProductionNetOf(goodsType);
             }
         }
 
-        for (int index = 0; index < colonies.size(); index++) {
-
-            Colony colony = colonies.get(index);
+        for (int colonyIndex = 0; colonyIndex < numberColonies; colonyIndex++) {
+            Colony colony = colonies.get(colonyIndex);
 
             // colonyLabel
             try {
-                if (index != 0) {
+                if (colonyIndex != 0) {
                     doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
                 }
                 StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, true));
@@ -119,20 +121,68 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 logger.warning(e.toString());
             }
 
-            boolean[] expertWarning = new boolean[numberUnitTypes];
+            boolean[] missingExpertWarning = new boolean[numberUnitTypes];
+            boolean[] badAssignmentWarning = new boolean[numberUnitTypes];
             boolean[] productionWarning = new boolean[numberGoodsTypes];
             boolean hasWarning = false;
 
             // check if all unit requirements are met
+            for (Unit expert : colony.getUnitList()) {
+                if (expert.getSkillLevel() > 0)
+                {
+                    GoodsType production = expert.getWorkType();
+                    GoodsType expertise = expert.getType().getExpertProduction();
+                    if (production != null && expertise != null && production != expertise) {
+                        // we have an expert not doing the job of their expertise
+                        //    check if there is a non-expert doing the job instead
+                        for (Unit nonExpert : colony.getUnitList()) {
+                            if ((nonExpert.getWorkType() == expertise) && (nonExpert.getType() != expert.getType())) {
+                                // we've found a unit of a different type doing the job of this expert's expertise
+                                //  now check if the production would be better if the units swapped positions
+                                int expertProductionNow = 0;
+                                int nonExpertProductionNow = 0;
+                                int expertProductionPotential = 0;
+                                int nonExpertProductionPotential = 0;
+                                
+                                // get the current and potential productions for the work location of the expert
+                                if (expert.getWorkTile() != null) {
+                                    expertProductionNow = expert.getWorkTile().getProductionOf(expert, expertise);
+                                    nonExpertProductionPotential = expert.getWorkTile().getProductionOf(nonExpert, expertise);
+                                } else if (expert.getWorkBuilding() != null) {
+                                    expertProductionNow = expert.getWorkBuilding().getUnitProductivity(expert);
+                                    nonExpertProductionPotential = expert.getWorkBuilding().getUnitProductivity(nonExpert);
+                                }
+                                
+                                // get the current and potential productions for the work location of the non-expert
+                                if (nonExpert.getWorkTile() != null) {
+                                    nonExpertProductionNow = nonExpert.getWorkTile().getProductionOf(nonExpert, expertise);
+                                    expertProductionPotential = nonExpert.getWorkTile().getProductionOf(expert, expertise);
+                                } else if (nonExpert.getWorkBuilding() != null) {
+                                    nonExpertProductionNow = nonExpert.getWorkBuilding().getUnitProductivity(nonExpert);
+                                    expertProductionPotential = nonExpert.getWorkBuilding().getUnitProductivity(expert);
+                                }
+                                
+                                // let the player know if the two units would be more productive were they to swap roles
+                                int expertIndex = expert.getType().getIndex();
+                                if ((expertProductionNow + nonExpertProductionNow) < (expertProductionPotential + nonExpertProductionPotential) && !badAssignmentWarning[expertIndex]) {
+                                    addBadAssignmentWarning(doc, colonyIndex, expert, nonExpert);
+                                    badAssignmentWarning[expertIndex] = true;
+                                    hasWarning = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
                 Unit unit = colonyTile.getUnit();
                 if (unit != null) {
                     GoodsType workType = unit.getWorkType();
                     UnitType expert = getSpecification().getExpertForProducing(workType);
                     int expertIndex = expert.getIndex();
-                    if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
-                        addExpertWarning(doc, index, workType, expert);
-                        expertWarning[expertIndex] = true;
+                    if (unitCount[colonyIndex][expertIndex] == 0 && !missingExpertWarning[expertIndex]) {
+                        addExpertWarning(doc, colonyIndex, workType, expert);
+                        missingExpertWarning[expertIndex] = true;
                         hasWarning = true;
                     }
                 }
@@ -145,10 +195,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     // check if this building has no expert producing goods
                     int expertIndex = expert.getIndex();
                     if (building.getFirstUnit() != null &&
-                        !expertWarning[expertIndex] &&
-                        unitCount[index][expertIndex] == 0) {
-                        addExpertWarning(doc, index, goodsType, expert);
-                        expertWarning[expertIndex] = true;
+                        !missingExpertWarning[expertIndex] &&
+                        unitCount[colonyIndex][expertIndex] == 0) {
+                        addExpertWarning(doc, colonyIndex, goodsType, expert);
+                        missingExpertWarning[expertIndex] = true;
                         hasWarning = true;
                     }
                 }
@@ -157,7 +207,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     int goodsIndex = goodsType.getIndex();
                     if (building.getProductionNextTurn() < building.getMaximumProduction() &&
                         !productionWarning[goodsIndex]) {
-                        addProductionWarning(doc, index, goodsType, building.getGoodsInputType());
+                        addProductionWarning(doc, colonyIndex, goodsType, building.getGoodsInputType());
                         productionWarning[goodsIndex] = true;
                         hasWarning = true;
                     }
@@ -181,6 +231,28 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
         textPane.setCaretPosition(0);
 
+    }
+
+    private void addBadAssignmentWarning(StyledDocument doc, int colonyIndex, Unit expert, Unit nonExpert) {
+        GoodsType expertGoods = expert.getWorkType();
+        GoodsType nonExpertGoods = nonExpert.getWorkType();
+        String colonyName = colonies.get(colonyIndex).getName();
+        String expertName = Messages.message(expert.getType().getNameKey());
+        String nonExpertName = Messages.message(nonExpert.getType().getNameKey());
+        String expertProductionName = Messages.message(expertGoods.getWorkingAsKey());
+        String nonExpertProductionName = Messages.message(nonExpertGoods.getWorkingAsKey());
+        String newMessage = Messages.message("report.requirements.badAssignment",
+            "%colony%", colonyName,
+            "%expert%", expertName,
+            "%expertWork%", expertProductionName,
+            "%nonExpert%", nonExpertName,
+            "%nonExpertWork%", nonExpertProductionName);
+
+        try {
+            doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
+        } catch(Exception e) {
+            logger.warning(e.toString());
+        }
     }
 
     private void addExpertWarning(StyledDocument doc, int colonyIndex, GoodsType goodsType, UnitType workType) {

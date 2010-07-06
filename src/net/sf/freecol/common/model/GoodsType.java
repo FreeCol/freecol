@@ -129,6 +129,10 @@ public final class GoodsType extends FreeColGameObjectType {
         return (madeFrom != null && madeFrom.isNewWorldGoodsType());
     }
 
+    public final String getWorkingAsKey() {
+        return getId() + ".workingAs";
+    }
+
     /**
      * Get the <code>ImmigrationType</code> value.
      *
