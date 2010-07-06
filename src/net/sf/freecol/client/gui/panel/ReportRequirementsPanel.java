@@ -259,20 +259,44 @@ public final class ReportRequirementsPanel extends ReportPanel {
         String expertName = Messages.message(workType.getNameKey());
         String colonyName = colonies.get(colonyIndex).getName();
         String goods = Messages.message(goodsType.getNameKey());
+        String work = Messages.message(goodsType.getWorkingAsKey());
         String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
                 "%unit%", expertName);
 
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
 
+            ArrayList<Colony> misusedExperts = new ArrayList<Colony>();
             ArrayList<Colony> severalExperts = new ArrayList<Colony>();
             ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
             for (int index = 0; index < colonies.size(); index++) {
+			    Colony colony = colonies.get(index);
+                for (Unit unit : colony.getUnitList()) {
+					GoodsType expertise = unit.getType().getExpertProduction();
+                    if ((unit.getSkillLevel() > 0) && (expertise == goodsType) && (expertise != unit.getWorkType())) {
+                        misusedExperts.add(colony);
+                    }
+				}
                 if (unitCount[index][workType.getIndex()] > 1) {
-                    severalExperts.add(colonies.get(index));
+                    severalExperts.add(colony);
                 }
                 if (canTrain[index][workType.getIndex()]) {
-                    canTrainExperts.add(colonies.get(index));
+                    canTrainExperts.add(colony);
+                }
+            }
+
+            if (!misusedExperts.isEmpty()) {
+                doc.insertString(doc.getLength(), 
+                        "\n" + Messages.message("report.requirements.misusedExperts", "%unit%", expertName, "%work%", work) + " ", 
+                        doc.getStyle("regular"));
+                int lastExpertsIndex = misusedExperts.size() - 1;
+                for (int index = 0; index <= lastExpertsIndex; index++) {
+                    Colony colony = misusedExperts.get(index);
+                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
+                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                    if (index != lastExpertsIndex) {
+                        doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                    }
                 }
             }
 
