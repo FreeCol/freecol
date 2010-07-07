@@ -296,8 +296,8 @@ public class FreeColPanel extends JPanel implements ActionListener {
                         return super.getFont(attr);
                     } else {
                         int fontStyle = Font.PLAIN;
-                        if (StyleConstants.isBold(attr)) fontStyle &= Font.BOLD;
-                        if (StyleConstants.isItalic(attr)) fontStyle &= Font.ITALIC;
+                        if (StyleConstants.isBold(attr)) fontStyle |= Font.BOLD;
+                        if (StyleConstants.isItalic(attr)) fontStyle |= Font.ITALIC;
                         return (fontStyle == Font.PLAIN) ? font : font.deriveFont(fontStyle);
                     }
                 }
