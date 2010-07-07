@@ -54,6 +54,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -141,7 +142,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
             .getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = styleContext.addStyle("regular", defaultStyle);
-        StyleConstants.setFontFamily(regular, "LiberationSerif");
+        StyleConstants.setFontFamily(regular, "NormalFont");
         StyleConstants.setFontSize(regular, 13);
 
         Style buttonStyle = styleContext.addStyle("button", regular);
@@ -286,7 +287,23 @@ public class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>JTextPane</code> value
      */
     public static JTextPane getDefaultTextPane(String text) {
-        JTextPane textPane = new JTextPane(new DefaultStyledDocument(styleContext));
+
+        DefaultStyledDocument document = new DefaultStyledDocument(styleContext) {
+                public Font getFont(AttributeSet attr) {
+                    Font font = ResourceManager.getFont(StyleConstants.getFontFamily(attr),
+                                                        StyleConstants.getFontSize(attr));
+                    if (font == null) {
+                        return super.getFont(attr);
+                    } else {
+                        int fontStyle = Font.PLAIN;
+                        if (StyleConstants.isBold(attr)) fontStyle &= Font.BOLD;
+                        if (StyleConstants.isItalic(attr)) fontStyle &= Font.ITALIC;
+                        return (fontStyle == Font.PLAIN) ? font : font.deriveFont(fontStyle);
+                    }
+                }
+            };
+
+        JTextPane textPane = new JTextPane(document);
         textPane.setOpaque(false);
         textPane.setEditable(false);
         textPane.setLogicalStyle(styleContext.getStyle("regular"));
