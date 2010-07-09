@@ -138,21 +138,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             }
         }
 
-        summary = new JTextPane();
+        summary = getDefaultTextPane();
         summary.setOpaque(false);
         summary.setEditable(false);
-
-        StyledDocument document = summary.getStyledDocument();
-        //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        
-        Style regular = document.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Dialog");
-        StyleConstants.setBold(def, true);
-        StyleConstants.setFontSize(def, 12);
-
-        Style buttonStyle = document.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
     }
 
     /**
