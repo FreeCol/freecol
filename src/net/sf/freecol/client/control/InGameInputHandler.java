@@ -1009,8 +1009,15 @@ public final class InGameInputHandler extends InputHandler {
         boolean firstContact = other != null && stance == Stance.PEACE
             && player.getStance(other) == Stance.UNCONTACTED;
 
-        first.setStance(second, stance);
-        if (second.getStance(first) != stance) second.setStance(first, stance);
+        try {
+            first.setStance(second, stance);
+            if (second.getStance(first) != stance) {
+                second.setStance(first, stance);
+			}
+        } catch (IllegalStateException e) {
+            logger.log(Level.WARNING, "Illegal stance transition", e);
+            return null;
+        }
 
         // Message processing follows.  The AI is not interested.
         if (player.isAI()) return null;

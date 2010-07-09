@@ -297,8 +297,13 @@ public final class InGameController extends Controller {
             logger.log(Level.WARNING, "Illegal stance transition", e);
             return false;
         }
-        player.setStance(otherPlayer, stance);
-        otherPlayer.setStance(player, stance);
+        try {
+            player.setStance(otherPlayer, stance);
+            otherPlayer.setStance(player, stance);
+        } catch (IllegalStateException e) {
+            logger.log(Level.WARNING, "Illegal stance transition", e);
+            return false;
+        }
 
         // Everyone might see the stance change if it meets the stance
         // visibility criteria.
