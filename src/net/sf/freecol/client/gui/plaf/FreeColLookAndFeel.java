@@ -68,30 +68,30 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         super();
 
         setCurrentTheme(new DefaultMetalTheme() {
-            protected ColorUIResource getPrimary1() {
-                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary1.color"));
-            }
+                protected ColorUIResource getPrimary1() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary1.color"));
+                }
 
-            protected ColorUIResource getPrimary2() {
-                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.backgroundSelect.color"));
-            }
+                protected ColorUIResource getPrimary2() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.backgroundSelect.color"));
+                }
 
-            protected ColorUIResource getPrimary3() {
-                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary3.color"));
-            }
+                protected ColorUIResource getPrimary3() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary3.color"));
+                }
 
-            protected ColorUIResource getSecondary1() {
-                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.secondary1.color"));
-            }
+                protected ColorUIResource getSecondary1() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.secondary1.color"));
+                }
 
-            protected ColorUIResource getSecondary2() {
-                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabled.color"));
-            }
+                protected ColorUIResource getSecondary2() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabled.color"));
+                }
 
-            protected ColorUIResource getSecondary3() {
-                return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
-            }
-        });
+                protected ColorUIResource getSecondary3() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
+                }
+            });
 
         if (dataDirectory.isDirectory()) {
             this.dataDirectory = dataDirectory;
@@ -198,103 +198,13 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ToEuropePanelUI", transparentPanelUI);
             u.put("EuropeInPortPanelUI", transparentPanelUI);
             u.put("DocksPanelUI", transparentPanelUI);
-
-
-            // Add image UI resources:
-            String [][] resources = {                
-            };
-
-            /*
-              Use a media tracker to ensure that the resources are loaded
-              before we start the GUI.
-            */
-            MediaTracker mt = new MediaTracker(new Component() {});
-            
-            for (int i=0; i<resources.length; i++) {
-                Image image = null;                
-                File file = new File(dataDirectory, "images" + System.getProperty("file.separator") + "ui" + System.getProperty("file.separator") + resources[i][1]);
-                
-                if (file.exists() && file.isFile()) {
-                    image = Toolkit.getDefaultToolkit().getImage(file.toString());    
-                } else {
-                    URL url = resourceLocator.getResource("data/images/ui/"+  resources[i][1]);
-                    if (url != null) {
-                        image = Toolkit.getDefaultToolkit().getImage(url);
-                    }
-                }
-
-                if (image == null) {
-                    logger.warning("Could not find image: " + resources[i][1]);
-                } else {
-                    mt.addImage(image, 0);
-                    u.put(resources[i][0], image);
-                }
-            }
-            
-            // Resize background image:
-            /*String[] fullscreenImages = new String[] {
-                "CanvasBackgroundImage",
-                "EuropeBackgroundImage"
-            };
-            for (String imageID : fullscreenImages) {
-                Image bgImage = (Image) u.get(imageID);
-                if (bgImage.getWidth(null) != windowSize.width || bgImage.getHeight(null) != windowSize.height) {
-                    bgImage = bgImage.getScaledInstance(windowSize.width, windowSize.height, Image.SCALE_SMOOTH);
-                    u.put(imageID + ".scaled", bgImage);
-                    mt.addImage(bgImage, 0, windowSize.width, windowSize.height);
-                }
-            }
-                
-            try {
-                mt.waitForID(0, 30000); // Wait a maximum of 30 seconds for the images to load.
-            } catch (InterruptedException e) {
-                logger.warning("Interrupted while loading resources!");
-            }
-            
-            resources = new String[][] {                
-                //{"HeaderFont", Messages.message("HeaderFont")},
-                //{"NormalFont", Messages.message("NormalFont")},
-                //{"BoldFont", Messages.message("BoldFont")}
-            };                  
-
-            for (int i=0; i<resources.length; i++) {
-                InputStream fontStream = null; 
-                
-                File file = new File(dataDirectory, "fonts" + System.getProperty("file.separator") + resources[i][1]);
-                if (file.exists() && file.isFile()) {
-                    try {
-                        fontStream = new FileInputStream(file.toString());
-                    } catch (FileNotFoundException e) {} // Ignored.
-                } else {
-                    URL url = resourceLocator.getResource("data/fonts/" + resources[i][1]);
-                    if (url != null) {
-                        try {
-                            fontStream = url.openStream();
-                        } catch (IOException e) {} // Ignored.
-                    }
-                }    
-
-                if (fontStream != null) {  
-                    try {
-                        u.put(resources[i][0], Font.createFont(Font.TRUETYPE_FONT, fontStream));
-                    } catch (FontFormatException e) {
-                        logger.warning("Could not load font: " + resources[i][1] + " because it has the wrong format.");
-                        u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));
-                    } catch (IOException ie) {
-                        logger.warning("Could not load font: " + resources[i][1] + " because of an IO problem.");
-                        u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
-                    }                                
-                } else {           
-                    logger.warning("Could not find font: " + resources[i][1]);
-                    u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));
-                }
-            }          
-            */
             
             // Add cursors:
-            Image im = (Image) u.get("cursor.go.image");
+            Image im = ResourceManager.getImage("cursor.go.image");
             if (im != null) {
-                u.put("cursor.go", Toolkit.getDefaultToolkit().createCustomCursor(im, new Point(im.getWidth(null)/2, im.getHeight(null)/2), "go"));
+                u.put("cursor.go", Toolkit.getDefaultToolkit()
+                      .createCustomCursor(im, new Point(im.getWidth(null)/2,
+                                                        im.getHeight(null)/2), "go"));
             } else {
                 u.put("cursor.go", Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
