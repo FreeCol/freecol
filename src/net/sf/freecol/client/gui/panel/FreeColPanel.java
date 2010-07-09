@@ -108,6 +108,10 @@ public class FreeColPanel extends JPanel implements ActionListener {
     // The margin to use for HIGLayout
     protected static final int margin = 3;
 
+    // The color to use for things the player probably shouldn't do
+    protected static final Color WARNING_COLOR
+        = ResourceManager.getColor("lookAndFeel.warning.color");
+
     // The color to use for links
     protected static final Color LINK_COLOR
         = ResourceManager.getColor("lookAndFeel.link.color");
@@ -134,6 +138,8 @@ public class FreeColPanel extends JPanel implements ActionListener {
     protected boolean editable = true;
 
     protected JButton okButton = new JButton(Messages.message("ok"));
+
+    protected static final String okCommand = "OK";
 
     protected static StyleContext styleContext = new StyleContext();
 
@@ -178,7 +184,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
         addMouseListener(new MouseAdapter() {
         });
 
-        okButton.setActionCommand(OK);
+        okButton.setActionCommand(okCommand);
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
@@ -472,7 +478,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (OK.equals(command)) {
+        if (command.equals(okCommand)) {
             getCanvas().remove(this);
         }
     }

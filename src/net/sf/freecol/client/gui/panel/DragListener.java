@@ -28,6 +28,7 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -61,6 +62,8 @@ import net.sf.freecol.common.model.WorkLocation;
  * component to which it is attached is draggable (moveable to be precise).
  */
 public final class DragListener extends MouseAdapter {
+
+    private static final Logger logger = Logger.getLogger(DragListener.class.getName());
 
     private final FreeColPanel parentPanel;
     private final Canvas canvas;
@@ -284,7 +287,7 @@ public final class DragListener extends MouseAdapter {
                         locName +=  " " + Messages.message(goodsType.getNameKey()) +")";
                         menuItem.setText(locName);
                         if (addOutput == 0) {
-                            menuItem.setForeground(FreeColPanel.LINK_COLOR);
+                            menuItem.setForeground(FreeColPanel.WARNING_COLOR);
                         }
                     }
                     menuItem.setActionCommand(UnitAction.WORK_BUILDING.toString() + ":" +
@@ -320,39 +323,50 @@ public final class DragListener extends MouseAdapter {
     }
     
     private boolean addEducationItems(final UnitLabel unitLabel, final JPopupMenu menu) {
-        Unit tempUnit = unitLabel.getUnit();
-        ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
-        if (tempUnit.getGame().getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
-            for (Unit teacher : tempUnit.getColony().getTeachers()) {
-                if (tempUnit.canBeStudent(teacher) &&
-                    tempUnit.getLocation() instanceof WorkLocation &&
-                    teacher.getStudent() != tempUnit) {
-                    ImageIcon unitIcon = imageLibrary.getUnitImageIcon(teacher, 0.5);
-                    JMenuItem menuItem = new JMenuItem(Messages.message("assignToTeacher"),
-                                                       unitIcon);
-                    menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
-                    menuItem.addActionListener(unitLabel);
+        Unit unit = unitLabel.getUnit();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
+        
+        if (unit.getGame().getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
+            for (Unit teacher : unit.getColony().getTeachers()) {
+                if (unit.canBeStudent(teacher) && (unit.getLocation() instanceof WorkLocation)) {
+                    JMenuItem menuItem = null;
+                    ImageIcon teacherIcon = imageLibrary.getUnitImageIcon(teacher, 0.5);
+                    if (teacher.getStudent() != unit) {
+                        menuItem = new JMenuItem(Messages.message("assignToTeacher"), teacherIcon);
+                        menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
+                        menuItem.addActionListener(unitLabel);
+                    } else {
+                        String teacherName = Messages.message(teacher.getType().getNameKey());
+                        menuItem = new JMenuItem(Messages.message("menu.unit.apprentice", "%unit%", teacherName), teacherIcon);
+                        menuItem.setEnabled(false);
+                    }
                     menu.add(menuItem);
                     separatorNeeded = true;
                 }
             }
         }
-        if (tempUnit.getTurnsOfTraining() > 0 && tempUnit.getStudent() != null) {
-            JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") +
-                                               ": " + tempUnit.getTurnsOfTraining() +
-                                               "/" + tempUnit.getNeededTurnsOfTraining());
-            teaching.setEnabled(false);
-            menu.add(teaching);
+        
+        if ((unit.getTurnsOfTraining() > 0) && (unit.getStudent() != null)) {
+            JMenuItem menuItem = new JMenuItem(Messages.message("menuBar.teacher") +
+                                               ": " + unit.getTurnsOfTraining() +
+                                               "/" + unit.getNeededTurnsOfTraining());
+            menuItem.setEnabled(false);
+            menu.add(menuItem);
             separatorNeeded = true;
         }
-        int experience = Math.min(tempUnit.getExperience(), 200);
-        if (experience > 0 && tempUnit.getWorkType() != null) {
-            UnitType workType = canvas.getSpecification()
-                .getExpertForProducing(tempUnit.getWorkType());
-            if (tempUnit.getType().canBeUpgraded(workType, ChangeType.EXPERIENCE)) {
-                JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
-                                                         ": " + experience + "/5000");
+        
+        int experience = Math.min(unit.getExperience(), 200);
+        GoodsType goods = unit.getExperienceType();
+        if (goods == null) {
+            goods = unit.getWorkType();
+        }
+        if (experience > 0 && goods != null) {
+            UnitType expertType = canvas.getSpecification().getExpertForProducing(goods);
+            if (unit.getType().canBeUpgraded(expertType, ChangeType.EXPERIENCE)) {
+                String jobName = Messages.message(goods.getWorkingAsKey());
+                ImageIcon expertIcon = imageLibrary.getUnitImageIcon(expertType, 0.5);
+                JMenuItem experienceItem = new JMenuItem(Messages.message("menu.unit.experience", "%job%", jobName) + " " + experience + "/5000", expertIcon);
                 experienceItem.setEnabled(false);
                 menu.add(experienceItem);
                 separatorNeeded = true;
@@ -364,14 +378,14 @@ public final class DragListener extends MouseAdapter {
 
 
     private boolean addCommandItems(final UnitLabel unitLabel, final JPopupMenu menu) {
-    	final Unit tempUnit = unitLabel.getUnit();
+        final Unit tempUnit = unitLabel.getUnit();
         final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
-    	
-    	JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
+        
+        JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
         menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE
-        						&& !isUnitBetweenEuropeAndNewWorld);
+                                && !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
 
         if (!(tempUnit.getLocation() instanceof Europe)) {
@@ -389,7 +403,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled(unitState != UnitState.SENTRY
-        						&& !isUnitBetweenEuropeAndNewWorld);
+                                && !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
         
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
@@ -397,7 +411,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
-        						&& !isUnitBetweenEuropeAndNewWorld);
+                                && !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
 
         if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {

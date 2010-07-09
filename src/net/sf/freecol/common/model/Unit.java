@@ -852,24 +852,24 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param newStudent The new Student value.
      */
     public final void setStudent(final Unit newStudent) {
-    	Unit oldStudent = this.student;
-    	if(oldStudent == newStudent){
-    		return;
-    	}
-    	
+        Unit oldStudent = this.student;
+        if(oldStudent == newStudent){
+            return;
+        }
+        
         if (newStudent == null) {
-        	this.student = null;
-        	if(oldStudent != null && oldStudent.getTeacher() == this){
-        		oldStudent.setTeacher(null);
-        	}
+            this.student = null;
+            if(oldStudent != null && oldStudent.getTeacher() == this){
+                oldStudent.setTeacher(null);
+            }
         } else if (newStudent.getColony() != null &&
                    newStudent.getColony() == getColony() &&
                    newStudent.canBeStudent(this)) {
-        	if(oldStudent != null && oldStudent.getTeacher() == this){
-        		oldStudent.setTeacher(null);
-        	}
-        	this.student = newStudent;
-        	newStudent.setTeacher(this);
+            if(oldStudent != null && oldStudent.getTeacher() == this){
+                oldStudent.setTeacher(null);
+            }
+            this.student = newStudent;
+            newStudent.setTeacher(this);
         } else {
             throw new IllegalStateException("unit can not be student: " + newStudent);
         }
@@ -890,26 +890,26 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param newTeacher The new Teacher value.
      */
     public final void setTeacher(final Unit newTeacher) {
-    	Unit oldTeacher = this.teacher;
-    	if(newTeacher == oldTeacher){
-    		return;
-    	}
-    	
+        Unit oldTeacher = this.teacher;
+        if(newTeacher == oldTeacher){
+            return;
+        }
+        
         if (newTeacher == null) {
-        	this.teacher = null;
-        	if(oldTeacher != null && oldTeacher.getStudent() == this){
-        		oldTeacher.setStudent(null);
-        	}
+            this.teacher = null;
+            if(oldTeacher != null && oldTeacher.getStudent() == this){
+                oldTeacher.setStudent(null);
+            }
         } else {
             UnitType skillTaught = newTeacher.getType().getSkillTaught();
             if (newTeacher.getColony() != null &&
                 newTeacher.getColony() == getColony() &&
                 getColony().canTrain(skillTaught)) {
-            	if(oldTeacher != null && oldTeacher.getStudent() == this){
-            		oldTeacher.setStudent(null);
-            	}
-            	this.teacher = newTeacher;
-            	this.teacher.setStudent(this);
+                if(oldTeacher != null && oldTeacher.getStudent() == this){
+                    oldTeacher.setStudent(null);
+                }
+                this.teacher = newTeacher;
+                this.teacher.setStudent(this);
             } else {
                 throw new IllegalStateException("unit can not be teacher: " + newTeacher);
             }
@@ -961,6 +961,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Gets the type of goods this unit has accrued experience producing.
+     * 
+     * @return The type of goods this unit would produce.
+     */
+    public GoodsType getExperienceType() {
+        return workType;
+    }
+
+    /**
      * Gets the type of goods this unit is producing in its current occupation.
      * 
      * @return The type of goods this unit would produce.
@@ -981,6 +990,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (type == null) {
             throw new IllegalStateException("GoodsType must not be 'null'.");
         } else if (workType != type) {
+            logger.finest("resetting experience for " + this);
             experience = 0;
             if (type.isFarmed()) {
                 GoodsType oldWorkType = workType;
@@ -1630,7 +1640,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Verifies if the unit is aboard a carrier
      */
     public boolean isOnCarrier(){
-    	return(this.getLocation() instanceof Unit);
+        return(this.getLocation() instanceof Unit);
     }
     
     /**
@@ -1669,12 +1679,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                                 + " left on " + toString());
             }
             if (units.contains(locatable)) {
-            	logger.warning("Tried to add a 'Locatable' already in the carrier.");
-            	return;
+                logger.warning("Tried to add a 'Locatable' already in the carrier.");
+                return;
             }
             
             if (units.equals(Collections.emptyList())) {
-            	units = new ArrayList<Unit>();
+                units = new ArrayList<Unit>();
             } 
             units.add(unit);
             unit.setState(UnitState.SENTRY);
@@ -1823,29 +1833,29 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         given <code>Player</code>.
      */
     public boolean isVisibleTo(Player player) {
-    	if(player == getOwner()){
-    		return true;
-    	}
-    	
-    	Tile unitTile = getTile();
-    	if(unitTile == null){
-    		return false;
-    	}
-    	
-    	if(!player.canSee(unitTile)){
-    		return false;
-    	}
-    	
-    	Settlement settlement = unitTile.getSettlement();
-    	if(settlement != null && settlement.getOwner() != player){
-    		return false;
-    	}
+        if(player == getOwner()){
+            return true;
+        }
+        
+        Tile unitTile = getTile();
+        if(unitTile == null){
+            return false;
+        }
+        
+        if(!player.canSee(unitTile)){
+            return false;
+        }
+        
+        Settlement settlement = unitTile.getSettlement();
+        if(settlement != null && settlement.getOwner() != player){
+            return false;
+        }
 
-    	if(isOnCarrier() && ((Unit) getLocation()).getOwner() != player){
-    		return false;
-    	}
-    	
-    	return true;
+        if(isOnCarrier() && ((Unit) getLocation()).getOwner() != player){
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -2213,7 +2223,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     getOwner().getMarket().buy(goods.getType(), requiredAmount, getOwner());
                 }
             } else if(getIndianSettlement() != null) {
-            	for (AbstractGoods goods : equipmentType.getGoodsRequired()) {            		
+                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {                    
                     int requiredAmount = amount * goods.getAmount();
                     if(getIndianSettlement().getGoodsCount(goods.getType()) < requiredAmount){
                         throw new IllegalStateException("Not enough goods to equip");
@@ -2349,11 +2359,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         
         if(!(getLocation() instanceof Europe)){
-        	return false;
+            return false;
         }
         
         if(isBetweenEuropeAndNewWorld()){
-        	return false;
+            return false;
         }
         return true;
     }
@@ -2369,12 +2379,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         
         if(!(getLocation() instanceof Europe)){
-        	return false;
+            return false;
         }
         
         if(getState() == UnitState.TO_EUROPE 
-        		|| getState() == UnitState.TO_AMERICA){
-        	return true;
+                || getState() == UnitState.TO_AMERICA){
+            return true;
         }
         return false;
     }
@@ -2489,16 +2499,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     // TODO: make these go away, if possible, private if not
     public boolean isArmed() {
-    	if(getOwner().isIndian()){
+        if(getOwner().isIndian()){
             return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.indian.muskets"));
-    	}
+        }
         return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.muskets"));
     }
 
     public boolean isMounted() {
-    	if(getOwner().isIndian()){
+        if(getOwner().isIndian()){
             return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.indian.horses"));
-    	}
+        }
         return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.horses"));
     }
 
