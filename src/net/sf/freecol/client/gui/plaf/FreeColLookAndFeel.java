@@ -109,69 +109,35 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         UIDefaults u = super.getDefaults();
 
         try {
-            String checkBoxUI = "net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI";
-            u.put("CheckBoxUI", checkBoxUI);
-            u.put(checkBoxUI, Class.forName(checkBoxUI));
-
-            String comboBoxUI = "net.sf.freecol.client.gui.plaf.FreeColComboBoxUI";
-            u.put("ComboBoxUI", comboBoxUI);
-            u.put(comboBoxUI, Class.forName(comboBoxUI));
-
-            String radioButtonUI = "net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI";
-            u.put("RadioButtonUI", radioButtonUI);
-            u.put(radioButtonUI, Class.forName(radioButtonUI));
-
-            String buttonUI = "net.sf.freecol.client.gui.plaf.FreeColButtonUI";
-            u.put("ButtonUI", buttonUI);
-            u.put(buttonUI, Class.forName(buttonUI));
-
-            String textFieldUI = "net.sf.freecol.client.gui.plaf.FreeColTextFieldUI";
-            u.put("TextFieldUI", textFieldUI);
-            u.put(textFieldUI, Class.forName(textFieldUI));
-
-            String textAreaUI = "net.sf.freecol.client.gui.plaf.FreeColTextAreaUI";
-            u.put("TextAreaUI", textAreaUI);
-            u.put(textAreaUI, Class.forName(textAreaUI));
-
-            String panelUI = "net.sf.freecol.client.gui.plaf.FreeColPanelUI";
-            u.put("PanelUI", panelUI);
-            u.put(panelUI, Class.forName(panelUI));
-
-            String menuBarUI = "net.sf.freecol.client.gui.plaf.FreeColMenuBarUI";
-            u.put("MenuBarUI", menuBarUI);
-            u.put(menuBarUI, Class.forName(menuBarUI));
-
-            String popupMenuUI = "net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI";
-            u.put("PopupMenuUI", popupMenuUI);
-            u.put(popupMenuUI, Class.forName(popupMenuUI));
-
-            String labelUI = "net.sf.freecol.client.gui.plaf.FreeColLabelUI";
-            u.put("LabelUI", labelUI);
-            u.put(labelUI, Class.forName(labelUI));
-
-            String menuItemUI = "net.sf.freecol.client.gui.plaf.FreeColMenuItemUI";
-            u.put("MenuItemUI", menuItemUI);
-            u.put(menuItemUI, Class.forName(menuItemUI));
-
-            String listUI = "net.sf.freecol.client.gui.plaf.FreeColListUI";
-            u.put("ListUI", listUI);
-            u.put(listUI, Class.forName(listUI));
-
-            String tableUI = "net.sf.freecol.client.gui.plaf.FreeColTableUI";
-            u.put("TableUI", tableUI);
-            u.put(tableUI, Class.forName(tableUI));
-
-            String tableHeaderUI = "net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI";
-            u.put("TableHeaderUI", tableHeaderUI);
-            u.put(tableHeaderUI, Class.forName(tableHeaderUI));
-
-            String scrollPanelUI = "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI";
-            u.put("ScrollPaneUI", scrollPanelUI);
-            u.put(scrollPanelUI, Class.forName(scrollPanelUI));
-
-            String toolTipUI = "net.sf.freecol.client.gui.plaf.FreeColToolTipUI";
-            u.put("ToolTipUI", toolTipUI);
-            u.put(toolTipUI, Class.forName(toolTipUI));
+            int offset = "FreeCol".length();
+            for (Class uiClass : new Class[] {
+                    FreeColButtonUI.class,          
+                    FreeColCheckBoxUI.class,        
+                    FreeColComboBoxUI.class,        
+                    FreeColLabelUI.class,           
+                    FreeColListUI.class,            
+                    FreeColMenuBarUI.class,         
+                    FreeColMenuItemUI.class,        
+                    FreeColPanelUI.class,           
+                    FreeColPopupMenuUI.class,       
+                    FreeColRadioButtonUI.class,     
+                    FreeColScrollPaneUI.class,      
+                    FreeColTableHeaderUI.class,     
+                    FreeColTableUI.class,           
+                    FreeColTextAreaUI.class,        
+                    FreeColTextFieldUI.class,       
+                    FreeColToolTipUI.class,         
+                    FreeColTransparentPanelUI.class
+                }) {
+                String name = uiClass.getName();
+                int index = name.lastIndexOf("FreeCol");
+                if (index >= 0) {
+                    index += offset;
+                    String shortName = name.substring(index);
+                    u.put(shortName, name);
+                    u.put(name, uiClass);
+                }
+            }
 
             // Sharing FreeColBrightPanelUI:
             String brightPanelUI = "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI";
