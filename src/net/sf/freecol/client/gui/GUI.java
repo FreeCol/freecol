@@ -1548,46 +1548,55 @@ public final class GUI {
         Display the colony names.
         */
         if (settlements.size() > 0 && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
+            Player clientPlayer = freeColClient.getMyPlayer();
             for (int index = 0; index < settlements.size(); index++) {
                 final Settlement settlement = settlements.get(index);
-                String name = Messages.message(settlement.getNameFor(freeColClient.getMyPlayer()));
+                String name = Messages.message(settlement.getNameFor(clientPlayer));
                 if (name != null) {
                     Color backgroundColor = lib.getColor(settlement.getOwner());
                     Font font = ResourceManager.getFont("NormalFont", 18f);
-                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+//                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+                    int yOffset = lib.getTerrainImageHeight(FreeCol.getSpecification().getTileType("model.tile.plains"));
                     g.setTransform(settlementTransforms.get(index));
                     switch(colonyLabels) {
                     case ClientOptions.COLONY_LABELS_CLASSIC:
                         Image stringImage = createStringImage(g, name, backgroundColor, font);
-                        g.drawImage(stringImage,
-                                    (tileWidth - stringImage.getWidth(null))/2 + 1,
-                                    yOffset, null);
+                        g.drawImage(stringImage, (tileWidth - stringImage.getWidth(null))/2 + 1, yOffset, null);
                         break;
                     case ClientOptions.COLONY_LABELS_MODERN:
-                        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
-                                                    backgroundColor.getBlue(), 128);
-
+                    default:
+                        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
                         Image nameImage = createLabel(g, name, font, backgroundColor);
                         if (nameImage != null) {
-                            int spacing = 2;
+                            int spacing = 3;
+                            Image leftImage = null;
+                            Image rightImage = null;
                             if (settlement instanceof Colony) {
                                 String size = Integer.toString(((Colony) settlement).getUnitCount());
+                                leftImage = createLabel(g, size, font, backgroundColor);
+                            } else if ((settlement instanceof IndianSettlement) && (((IndianSettlement) settlement).isCapital())) {
+                                leftImage = createLabel(g, "\u2606", font, backgroundColor);
+                            }
+                            if ((settlement instanceof Colony) && (settlement.getOwner() == clientPlayer)) {
                                 int bonusProduction = ((Colony) settlement).getProductionBonus();
-                                String bonus = bonusProduction > 0 ? "+" + bonusProduction
-                                    : Integer.toString(bonusProduction);
-                                Image sizeImage = createLabel(g, size, font, backgroundColor);
-                                Image bonusImage = createLabel(g, bonus, font, backgroundColor);
-                                int width = nameImage.getWidth(null) + sizeImage.getWidth(null)
-                                    + bonusImage.getWidth(null) + 2 * spacing;
-                                int labelOffset = (tileWidth - width)/2;
-                                g.drawImage(sizeImage, labelOffset, yOffset, null);
-                                labelOffset += sizeImage.getWidth(null) + spacing;
-                                g.drawImage(nameImage, labelOffset, yOffset, null);
+                                if (bonusProduction != 0) {
+                                    String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
+                                    rightImage = createLabel(g, bonus, font, backgroundColor);
+                                }
+                            }
+                            int width = nameImage.getWidth(null)
+                                + (leftImage != null ? leftImage.getWidth(null) + spacing : 0)
+                                + (rightImage != null ? rightImage.getWidth(null) + spacing : 0);
+                            int labelOffset = (tileWidth - width)/2;
+                            yOffset -= nameImage.getHeight(null)/2;
+                            if (leftImage != null) {
+                                g.drawImage(leftImage, labelOffset, yOffset, null);
+                                labelOffset += leftImage.getWidth(null) + spacing;
+                            }
+                            g.drawImage(nameImage, labelOffset, yOffset, null);
+                            if (rightImage != null) {
                                 labelOffset += nameImage.getWidth(null) + spacing;
-                                g.drawImage(bonusImage, labelOffset, yOffset, null);
-                            } else {
-                                int labelOffset = (tileWidth - nameImage.getWidth(null))/2;
-                                g.drawImage(nameImage, labelOffset, yOffset, null);
+                                g.drawImage(rightImage, labelOffset, yOffset, null);
                             }
                             break;
                         }
@@ -1864,9 +1873,11 @@ public final class GUI {
             return image;
         }
         TextLayout label = new TextLayout(text, font, g.getFontRenderContext());
-        int padding = 10;
-        int width = (int) label.getBounds().getWidth() + padding;
-        int height = (int) (label.getAscent() + label.getDescent()) + padding;
+        int hPadding = 15;
+        int vPadding = 10;
+        int radius = Math.min(hPadding, vPadding);
+        int height = (int) (label.getAscent() + label.getDescent()) + vPadding;
+        int width = Math.max((int) label.getBounds().getWidth() + hPadding, height);
 
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
@@ -1875,9 +1886,9 @@ public final class GUI {
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
         g2.setColor(backgroundColor);
-        g2.fill(new RoundRectangle2D.Float(0, 0, width, height, padding, padding));
+        g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
         g2.setColor(getForegroundColor(backgroundColor));
-        label.draw(g2, padding/2, label.getAscent() + padding/2);
+        label.draw(g2, (width - (float)label.getBounds().getWidth())/2, label.getAscent() + vPadding/2);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
@@ -2369,14 +2380,19 @@ public final class GUI {
                     centerImage(g, settlementImage);
 
                     // Draw the color chip for the settlement.
-                    String text = indianSettlement.isCapital() ? "*" : "-";
+                    String text = null;
+                    Image chip = null;
                     Color background = lib.getColor(indianSettlement.getOwner());
                     Color foreground = getForegroundColor(background);
-                    Image chip = createChip(text, Color.BLACK, background, foreground);
                     float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                     float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
-                    g.drawImage(chip, (int) xOffset, (int) yOffset, null);
-                    xOffset += chip.getWidth(null) + 2;
+                    int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
+                    if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
+                        text = indianSettlement.isCapital() ? "*" : "-";
+                        chip = createChip(text, Color.BLACK, background, foreground);
+                        g.drawImage(chip, (int) xOffset, (int) yOffset, null);
+                        xOffset += chip.getWidth(null) + 2;
+                    }
 
                     // Draw the mission chip if needed.
                     Unit missionary = indianSettlement.getMissionary();
