@@ -1574,16 +1574,30 @@ public final class GUI {
                             if (settlement instanceof Colony) {
                                 String size = Integer.toString(((Colony) settlement).getUnitCount());
                                 leftImage = createLabel(g, size, font, backgroundColor);
-                            } else if ((settlement instanceof IndianSettlement) && (((IndianSettlement) settlement).isCapital())) {
-                                leftImage = createLabel(g, "\u2606", font, backgroundColor);
-                            }
-                            if ((settlement instanceof Colony) && (settlement.getOwner() == clientPlayer)) {
-                                int bonusProduction = ((Colony) settlement).getProductionBonus();
-                                if (bonusProduction != 0) {
-                                    String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
-                                    rightImage = createLabel(g, bonus, font, backgroundColor);
+                                
+                                if (settlement.getOwner() == clientPlayer) {
+                                    int bonusProduction = ((Colony) settlement).getProductionBonus();
+                                    if (bonusProduction != 0) {
+                                        String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
+                                        rightImage = createLabel(g, bonus, font, backgroundColor);
+                                    }
+                                }
+                            } else if (settlement instanceof IndianSettlement) {
+                                IndianSettlement nativeSettlement = (IndianSettlement) settlement;
+                                if (nativeSettlement.isCapital()) {
+                                    leftImage = createLabel(g, "\u2606", font, backgroundColor);
+                                }
+                                
+                                Unit missionary = nativeSettlement.getMissionary();
+                                if (missionary != null) {
+                                    boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                                    String cross = expert ? "\u271E" : "\u271D";
+                                    backgroundColor = lib.getColor(missionary.getOwner());
+                                    backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
+                                    rightImage = createLabel(g, cross, font, backgroundColor);
                                 }
                             }
+                            
                             int width = nameImage.getWidth(null)
                                 + (leftImage != null ? leftImage.getWidth(null) + spacing : 0)
                                 + (rightImage != null ? rightImage.getWidth(null) + spacing : 0);
@@ -2379,7 +2393,6 @@ public final class GUI {
                     // Draw image of indian settlement in center of the tile.
                     centerImage(g, settlementImage);
 
-                    // Draw the color chip for the settlement.
                     String text = null;
                     Image chip = null;
                     Color background = lib.getColor(indianSettlement.getOwner());
@@ -2388,28 +2401,28 @@ public final class GUI {
                     float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
                     int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
                     if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
+                        // Draw the color chip for the settlement.
                         text = indianSettlement.isCapital() ? "*" : "-";
                         chip = createChip(text, Color.BLACK, background, foreground);
                         g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
-                    }
 
-                    // Draw the mission chip if needed.
-                    Unit missionary = indianSettlement.getMissionary();
-                    if (missionary != null) {
-                        boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                        Color mission = (expert ? Color.BLACK : Color.GRAY);
-                        Color cross = lib.getColor(missionary.getOwner());
-                        chip = createChip("\u271D", Color.BLACK, mission, cross);
-                        g.drawImage(chip, (int) xOffset, (int) yOffset, null);
-                        xOffset += chip.getWidth(null) + 2;
+                        // Draw the mission chip if needed.
+                        Unit missionary = indianSettlement.getMissionary();
+                        if (missionary != null) {
+                            boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                            Color mission = (expert ? Color.BLACK : Color.GRAY);
+                            Color cross = lib.getColor(missionary.getOwner());
+                            chip = createChip("\u271D", Color.BLACK, mission, cross);
+                            g.drawImage(chip, (int) xOffset, (int) yOffset, null);
+                            xOffset += chip.getWidth(null) + 2;
+                        }
                     }
 
                     // Draw the alarm chip if needed.
                     Player player = freeColClient.getMyPlayer();
-                    if (player != null
-                        && indianSettlement.hasContactedSettlement(player)) {
-                        final boolean visited = indianSettlement.hasBeenVisited(freeColClient.getMyPlayer());
+                    if (player != null && indianSettlement.hasContactedSettlement(player)) {
+                        final boolean visited = indianSettlement.hasBeenVisited(player);
                         chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
                         g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                     }
