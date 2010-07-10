@@ -24,6 +24,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -114,11 +115,13 @@ public class FreeColProgressBar extends JPanel {
         this.step = step;
 
         setBorder(BorderFactory.createLineBorder(PRIMARY_1));
-        ImageIcon icon = parent.getImageLibrary().getGoodsImageIcon(goodsType);
-        // scale to a height of 16px, preserving aspect ratio
-        image = icon.getImage().getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
-        iconWidth = image.getWidth(this);
-        setPreferredSize(new Dimension(200, 20));
+		if (goodsType != null) {
+			ImageIcon icon = parent.getImageLibrary().getGoodsImageIcon(goodsType);
+			// scale to a height of 16px, preserving aspect ratio
+			image = icon.getImage().getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
+			iconWidth = image.getWidth(this);
+        }
+		setPreferredSize(new Dimension(200, 20));
     }
 
     /**
@@ -153,7 +156,7 @@ public class FreeColProgressBar extends JPanel {
         int width = getWidth() - getInsets().left - getInsets().right;
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
-        if (iconWidth < 0) {
+        if (image != null && iconWidth < 0) {
             iconWidth = image.getWidth(this);
         }
 
@@ -212,6 +215,7 @@ public class FreeColProgressBar extends JPanel {
         }
 
         g2d.setColor(Color.BLACK);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.drawString(progressString, restWidth / 2 + iconWidth, getHeight() / 2 + stringHeight / 4);
 
         g2d.dispose();

@@ -63,13 +63,17 @@ public class RebelToolTip extends JToolTip {
             libertyProduction += netProduction;
             add(new ProductionLabel(goodsType, netProduction, parent), "span 2");
         }
+		int liberty = colony.getLiberty();
+		int modulo = liberty % Colony.LIBERTY_PER_REBEL;
+		FreeColProgressBar progress = new FreeColProgressBar(parent, null, 0, Colony.LIBERTY_PER_REBEL, modulo, libertyProduction);
+		progress.setPreferredSize(new Dimension((int) getPreferredSize().getWidth() - 32, 20));
+		add(progress, "span 3");
 
         float turns100 = 0;
         float turns50 = 0;
         float turnsNext = 0;
 
         if (libertyProduction > 0) {
-            int liberty = colony.getLiberty();
             int requiredLiberty = Colony.LIBERTY_PER_REBEL * colony.getUnitCount();
 
             if (liberty < requiredLiberty) {
@@ -96,7 +100,6 @@ public class RebelToolTip extends JToolTip {
         add(new JLabel(turns50 == 0 ? na : Integer.toString((int) Math.ceil(turns50))), "skip");
         add(new JLabel(Messages.message("report.100percent")));
         add(new JLabel(turns100 == 0 ? na : Integer.toString((int) Math.ceil(turns100))), "skip");
-
     }
 
 
