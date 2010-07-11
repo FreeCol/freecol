@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2008  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client;
+package net.sf.freecol.client.gui;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -25,10 +25,11 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for net.sf.freecol.client");
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui");
         //$JUnit-BEGIN$
-        suite.addTest(net.sf.freecol.client.control.AllTests.suite());
-        suite.addTest(net.sf.freecol.client.gui.AllTests.suite());
+        suite.addTest(net.sf.freecol.client.gui.i18n.AllTests.suite());
+        suite.addTestSuite(net.sf.freecol.client.gui.sound.SoundTest.class);
+        suite.addTestSuite(FontTest.class);
         //$JUnit-END$
         return suite;
     }
