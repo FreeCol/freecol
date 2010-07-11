@@ -89,7 +89,7 @@ public abstract class FreeColObject {
      */
     private String id;
 
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private PropertyChangeSupport pcs = null;
 
     /**
      * Get the <code>Id</code> value.
@@ -670,59 +670,95 @@ public abstract class FreeColObject {
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (pcs == null) {
+            pcs = new PropertyChangeSupport(this);
+        }
         pcs.addPropertyChangeListener(listener);
     }
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        if (pcs == null) {
+            pcs = new PropertyChangeSupport(this);
+        }
         pcs.addPropertyChangeListener(propertyName, listener);
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        if (pcs != null) {
+            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        }
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        if (pcs != null) {
+            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        }
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        if (pcs != null) {
+            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        }
     }
 
     public void firePropertyChange(PropertyChangeEvent event) {
-        pcs.firePropertyChange(event);
+        if (pcs != null) {
+            pcs.firePropertyChange(event);
+        }
     }
 
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
+        if (pcs != null) {
+            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        }
     }
 
     public void firePropertyChange(String propertyName, int oldValue, int newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
+        if (pcs != null) {
+            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        }
     }
 
     public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
+        if (pcs != null) {
+            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        }
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners() {
-        return pcs.getPropertyChangeListeners();
+        if (pcs == null) {
+            return new PropertyChangeListener[0];
+        } else {
+            return pcs.getPropertyChangeListeners();
+        }
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-        return pcs.getPropertyChangeListeners(propertyName);
+        if (pcs == null) {
+            return new PropertyChangeListener[0];
+        } else {
+            return pcs.getPropertyChangeListeners(propertyName);
+        }
     }
 
     public boolean hasListeners(String propertyName) {
-        return pcs.hasListeners(propertyName);
+        if (pcs == null) {
+            return false;
+        } else {
+            return pcs.hasListeners(propertyName);
+        }
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(listener);
+        if (pcs != null) {
+            pcs.removePropertyChangeListener(listener);
+        }
     }
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(propertyName, listener);
+        if (pcs != null) {
+            pcs.removePropertyChangeListener(propertyName, listener);
+        }
     }
 
 
