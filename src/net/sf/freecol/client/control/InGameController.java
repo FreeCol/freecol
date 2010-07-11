@@ -2193,7 +2193,7 @@ public final class InGameController implements NetworkConstants {
             
             // settlement was indian capital, indians surrender
             String burned = attackResultElement.getAttribute("indianCapitalBurned");
-            if (burned != null) {
+            if (burned != null && burned.length() > 0) {
             	Player indianPlayer = defender.getOwner();
             	indianPlayer.surrenderTo(freeColClient.getMyPlayer());
             	//show message
