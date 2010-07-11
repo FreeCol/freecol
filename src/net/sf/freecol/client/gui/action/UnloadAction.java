@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * An action for unloading the currently selected unit.
  */
@@ -50,6 +51,7 @@ public class UnloadAction extends UnitAction {
      */
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
+            && getFreeColClient().getGUI().getActiveUnit() != null
             && getFreeColClient().getGUI().getActiveUnit().isCarrier()
             && getFreeColClient().getGUI().getActiveUnit().getGoodsCount() > 0;
     }    
@@ -61,48 +63,11 @@ public class UnloadAction extends UnitAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         if (unit != null) {
-            if (!unit.isInEurope() && unit.getColony() == null) {
-                if (getFreeColClient().getCanvas().showConfirmDialog(unit.getTile(), "dumpAllCargo", "yes", "no")) {
-                    unloadAllCargo(unit);
-                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager()
-                                            .getFreeColAction(MapControlsAction.id)).getMapControls();
-                    if (controls != null) {
-                        controls.update();
-                    }
-                }
-            } else {
-                unloadAllCargo(unit);
-                unloadAllUnits(unit);
-                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager()
-                                        .getFreeColAction(MapControlsAction.id)).getMapControls();
-                if (controls != null) {
-                    controls.update();
-                }
-            }
+            getFreeColClient().getInGameController().unload(unit);
+            MapControls controls
+                = ((MapControlsAction) getFreeColClient().getActionManager()
+                   .getFreeColAction(MapControlsAction.id)).getMapControls();
+            if (controls != null) controls.update();
         }
     }
-
-    /**
-     * Unload all units on a carrier.
-     *
-     * @param carrier A <code>Unit</code> to unload units off.
-     */
-    private void unloadAllUnits(Unit carrier) {
-        for (Unit unit : new ArrayList<Unit>(carrier.getUnitList())) {
-            getFreeColClient().getInGameController().leaveShip(unit);
-        }
-    }
-
-    /**
-     * Unload all goods on a carrier.
-     *
-     * @param carrier A <code>Unit</code> to unload goods off.
-     */
-    private void unloadAllCargo(Unit carrier) {
-        Boolean dump = carrier.getColony() == null;
-        for (Goods goods : new ArrayList<Goods>(carrier.getGoodsList())) {
-            getFreeColClient().getInGameController().unloadCargo(goods, dump);
-        }
-    }
-
 }

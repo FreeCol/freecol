@@ -3520,6 +3520,52 @@ public final class InGameController implements NetworkConstants {
         unloadGoods(goods, carrier, colony);
     }
 
+    /**
+     * Unload, including dumping cargo.
+     *
+     * @param unit The <code>Unit<code> that is dumping.
+     */
+    public void unload(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        // Sanity tests.
+        if (unit == null) {
+            throw new IllegalArgumentException("Null unit.");
+        } else if (!unit.isCarrier()) {
+            throw new IllegalArgumentException("Unit is not a carrier.");
+        }
+
+        boolean inEurope = unit.isInEurope();
+        if (unit.getColony() != null) {
+            // In colony, unload units and goods.
+            for (Unit u : new ArrayList<Unit>(unit.getUnitList())) {
+                leaveShip(unit);
+            }
+            for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
+                unloadCargo(goods, false);
+            }
+        } else {
+            if (inEurope) { // In Europe, unload non-boycotted goods
+                for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
+                    if (player.canTrade(goods)) unloadCargo(goods, false);
+                }
+            }
+            // Goods left here must be dumped.
+            if (unit.getGoodsCount() > 0) {
+                List<Goods> goodsList = canvas.showDumpCargoDialog(unit);
+                if (goodsList != null) {
+                    for (Goods goods : goodsList) {
+                        unloadCargo(goods, true);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Buy goods in Europe.

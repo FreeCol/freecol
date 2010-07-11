@@ -69,6 +69,7 @@ import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
+import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
@@ -2052,6 +2053,17 @@ public final class Canvas extends JDesktopPane {
                 Messages.message("cancel"),
                 choices);
         return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
+    }
+
+    /**
+     * Displays the <code>DumpCargoDialog</code>.
+     *
+     * @param unit The <code>Unit</code> that is dumping.
+     * @return A list of <code>Goods</code> to dump.
+     */
+    public List<Goods> showDumpCargoDialog(Unit unit) {
+        DumpCargoDialog dumpDialog = new DumpCargoDialog(this, unit);
+        return showFreeColDialog(dumpDialog, unit.getTile());
     }
 
     /**

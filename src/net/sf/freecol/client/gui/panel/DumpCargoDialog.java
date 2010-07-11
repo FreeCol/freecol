@@ -35,10 +35,11 @@ import net.sf.freecol.common.model.Unit;
 
 import net.miginfocom.swing.MigLayout;
 
+
 /**
- * This panel is used to show information about a tile.
+ * This panel is used to handle dumping cargo.
  */
-public final class DumpCargoDialog extends FreeColPanel {
+public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());
@@ -62,11 +63,12 @@ public final class DumpCargoDialog extends FreeColPanel {
     public DumpCargoDialog(Canvas parent, Unit unit) {
         super(parent);
 
-        header = new JLabel(Messages.message("dumpGoods"));
-        header.setFont(mediumHeaderFont);
+        header = new JLabel(Messages.message("dumpCargo"));
+        header.setFont(smallHeaderFont);
+        add(header);
 
-        cancelButton = new JButton("cancel");
-        cancelButton.setActionCommand(String.valueOf(CANCEL));
+        cancelButton = new JButton(Messages.message("cancel"));
+        cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
 
         goodsList = unit.getGoodsList();
@@ -77,9 +79,10 @@ public final class DumpCargoDialog extends FreeColPanel {
         for (Goods goods : goodsList) {
             // TODO: find out why check box is not displayed when icon
             // is present
-            JCheckBox checkBox = new JCheckBox(goods.toString(),
-                                               //getLibrary().getGoodsImageIcon(goods.getType()),
-                                               true);
+            JCheckBox checkBox
+                = new JCheckBox(Messages.message(goods.getLabel(true)),
+                                //getLibrary().getGoodsImageIcon(goods.getType()),
+                                true);
             checkBoxes.add(checkBox);
             add(checkBox);
         }
@@ -99,13 +102,16 @@ public final class DumpCargoDialog extends FreeColPanel {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
+            List<Goods> dump = new ArrayList<Goods>();
             for (int index = 0; index < checkBoxes.size(); index++) {
                 if (checkBoxes.get(index).isSelected()) {
-                    getController().unloadCargo(goodsList.get(index), true);
+                    dump.add(goodsList.get(index));
                 }
             }
+            setResponse(dump);
+        } else {
+            setResponse(null);
         }
-        getCanvas().remove(this);
     }
 
 }
