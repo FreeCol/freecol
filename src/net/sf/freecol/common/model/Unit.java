@@ -780,6 +780,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // EquipmentType abilities always apply
         for (EquipmentType equipmentType : equipment.keySet()) {
             result.addAll(equipmentType.getFeatureContainer().getAbilitySet(id));
+            // player abilities may also apply to equipment (missionary) 
+            result.addAll(getOwner().getFeatureContainer()
+                          .getAbilitySet(id, equipmentType, getGame().getTurn()));
         }
         return FeatureContainer.hasAbility(result);
     }
@@ -801,6 +804,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // EquipmentType modifiers always apply
         for (EquipmentType equipmentType : equipment.keySet()) {
             result.addAll(equipmentType.getFeatureContainer().getModifierSet(id));
+            // player modifiers may also apply to equipment (unused) 
+            result.addAll(getOwner().getFeatureContainer()
+                          .getModifierSet(id, equipmentType, getGame().getTurn()));
         }
         return result;
     }
