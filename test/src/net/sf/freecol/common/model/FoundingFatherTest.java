@@ -372,6 +372,36 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
+    public void testBrebeuf() {
+
+    	Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        FoundingFather brebeuf = spec().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
+
+        UnitType colonist = spec().getUnitType("model.unit.freeColonist");
+        String ability = "model.ability.expertMissionary";
+
+        assertTrue(brebeuf.hasAbility(ability));
+        assertFalse(dutch.hasAbility(ability));
+
+        game.setMap(getTestMap());
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
+        EquipmentType bible = spec().getEquipmentType("model.equipment.missionary");
+
+        Unit missionary = new Unit(game, null, dutch, colonist, UnitState.ACTIVE, bible);
+        camp.setMissionary(missionary);
+
+        assertTrue(bible.hasAbility("model.ability.missionary"));
+        assertTrue(missionary.hasAbility("model.ability.missionary"));
+
+        dutch.addFather(brebeuf);
+        assertTrue(dutch.hasAbility(ability));
+        assertTrue(missionary.hasAbility(ability));
+
+    }
+
+
     public void testBellsRequired() {
 
         int[] expectedValues = new int[] {
