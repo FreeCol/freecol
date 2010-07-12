@@ -111,7 +111,12 @@ public class EmbarkMessage extends Message {
         Tile destinationTile = null;
         Direction direction;
         if (directionString == null) {
-            if (sourceLocation != carrier.getLocation()) {
+            // Can not just check location as that fails between a colony
+            // work location and the colony tile, can not just check tile
+            // as that can be null for both off-map and Europe.
+            if (sourceLocation != carrier.getLocation()
+            		&& (sourceLocation.getTile() == null
+                    || sourceLocation.getTile() != carrier.getTile())) {
                 return Message.clientError("Unit: " + unitId
                                            + " and carrier: " + carrierId
                                            + " are not co-located.");
