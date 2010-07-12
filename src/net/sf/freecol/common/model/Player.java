@@ -1607,8 +1607,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 if (europe != null) {
                     FeatureContainer fc = getFeatureContainer();
                     for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                        if (fc.hasAbility("model.ability.canNotRecruitUnit",
-                                          europe.getRecruitable(i))) {
+                        if (!fc.hasAbility("model.ability.canRecruitUnit",
+                                           europe.getRecruitable(i))) {
                             europe.setRecruitable(i, generateRecruitable());
                         }
                     }
@@ -2050,7 +2050,7 @@ public class Player extends FreeColGameObject implements Nameable {
         FeatureContainer fc = getFeatureContainer();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
-                && !fc.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
+                && fc.hasAbility("model.ability.canRecruitUnit", unitType)) {
                 recruitables.add(new RandomChoice<UnitType>(unitType,
                         unitType.getRecruitProbability()));
             }

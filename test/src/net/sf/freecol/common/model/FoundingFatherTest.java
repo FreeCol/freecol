@@ -401,6 +401,39 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
+    public void testBrewster() {
+
+    	Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        String ability = "model.ability.canRecruitUnit";
+        assertTrue(dutch.hasAbility(ability));
+
+        for (UnitType unitType : spec().getUnitTypeList()) {
+            if (unitType.isRecruitable()) {
+                assertTrue("Unable to recruit " + unitType.toString(),
+                           dutch.getFeatureContainer().hasAbility(ability, unitType));
+            }
+        }
+
+        dutch.addFather(spec().getFoundingFather("model.foundingFather.williamBrewster"));
+        // ability is no longer general, but limited to certain unit types
+        assertFalse(dutch.hasAbility(ability));
+
+        for (UnitType unitType : spec().getUnitTypeList()) {
+            if (unitType.isRecruitable()) {
+                if (unitType.getSkill() < 0) {
+                    assertFalse("Able to recruit " + unitType.toString(),
+                                dutch.getFeatureContainer().hasAbility(ability, unitType));
+                } else {
+                    assertTrue("Unable to recruit " + unitType.toString(),
+                               dutch.getFeatureContainer().hasAbility(ability, unitType));
+                }
+            }
+        }
+
+    }
+
 
     public void testBellsRequired() {
 
