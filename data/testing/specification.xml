@@ -1474,7 +1474,7 @@
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
       <ability id="model.ability.selectRecruit" value="true"/>
-      <ability id="model.ability.canNotRecruitUnit" value="true">
+      <ability id="model.ability.canRecruitUnit" value="false">
         <scope type="model.unit.indenturedServant"/>
         <scope type="model.unit.pettyCriminal"/>
         <scope type="model.unit.freeColonist"/>
@@ -1511,6 +1511,7 @@
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <ability id="model.ability.canRecruitUnit" />
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
                 type="percentage" value="50" />
     </european-nation-type>
