@@ -63,6 +63,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
@@ -3649,5 +3650,19 @@ public final class GUI {
      */
     public int getTileWidth() {
         return tileWidth;
+    }
+    
+    
+    public static String getTurnsText(Colony colony, BuildableType buildable) {
+        String turnsStr = Messages.message("notApplicable.short");
+        int turnsLeft = colony.getTurnsToComplete(buildable);
+        if (turnsLeft >= 0) {
+            turnsStr = Integer.toString(turnsLeft);
+        }
+        else if(turnsLeft != Integer.MIN_VALUE){
+            turnsStr = ">" + Integer.toString(turnsLeft*-1);
+        }
+        
+        return turnsStr;
     }
 }

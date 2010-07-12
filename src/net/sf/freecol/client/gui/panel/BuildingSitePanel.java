@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -88,14 +89,7 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
             JLabel turnsLabel = new JLabel();
             turnsLabel.setBackground(Color.WHITE);
             turnsLabel.setOpaque(true);
-            String turnsStr = Messages.message("notApplicable.short");
-            int turnsLeft = colony.getTurnsToComplete(buildable);
-            if (turnsLeft >= 0) {
-                turnsStr = Integer.toString(turnsLeft);
-            }
-            else if(turnsLeft != Integer.MIN_VALUE){
-                turnsStr = ">" + Integer.toString(turnsLeft*-1);
-            }
+            String turnsStr = GUI.getTurnsText(colony, buildable);
             turnsLabel.setText(turnsStr);
           
             add(turnsLabel, "align center, wrap");

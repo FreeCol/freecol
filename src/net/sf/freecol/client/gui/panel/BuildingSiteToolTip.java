@@ -29,6 +29,7 @@ import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -55,20 +56,14 @@ public class BuildingSiteToolTip extends JToolTip {
             add(FreeColPanel.getDefaultTextArea(Messages.message("colonyPanel.clickToBuild")),
                 "span, align center");
         } else {
-            int turnsToComplete = colony.getTurnsToComplete(buildable);
-            String turns = Messages.message("notApplicable.short");
-            if (turnsToComplete >= 0) {
-                turns = Integer.toString(turnsToComplete);
-            }
-            else if(turnsToComplete != Integer.MIN_VALUE){
-                turns = ">" + Integer.toString(turnsToComplete*-1);
-            }
+            String turnsStr = GUI.getTurnsText(colony, buildable);
+            
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
                                             "%buildable%", Messages.message(buildable.getNameKey()))),
                 "span, align center");
 
             add(new JLabel(Messages.message("turnsToComplete.long",
-                                            "%number%", turns)),
+                                            "%number%", turnsStr)),
                 "span, align center");
             add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image"))));
 
