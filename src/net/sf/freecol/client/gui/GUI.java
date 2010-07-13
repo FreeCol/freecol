@@ -1586,7 +1586,8 @@ public final class GUI {
                             } else if (settlement instanceof IndianSettlement) {
                                 IndianSettlement nativeSettlement = (IndianSettlement) settlement;
                                 if (nativeSettlement.isCapital()) {
-                                    leftImage = createLabel(g, "\u2606", font, backgroundColor);
+//                                    leftImage = createLabel(g, "\u2606", font, backgroundColor);
+                                             leftImage = createCapitalMarker(nameImage.getHeight(null), 5, backgroundColor);
                                 }
                                 
                                 Unit missionary = nativeSettlement.getMissionary();
@@ -1904,6 +1905,53 @@ public final class GUI {
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
         g2.setColor(getForegroundColor(backgroundColor));
         label.draw(g2, (width - (float)label.getBounds().getWidth())/2, label.getAscent() + vPadding/2);
+        ResourceManager.addGameMapping(key, new ImageResource(bi));
+        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+    }
+
+
+    /**
+     * Draws the pentagram indicating a native capital.
+     *
+     */
+    public Image createCapitalMarker(int extent, int padding, Color backgroundColor) {
+        String key = "dynamic.label.nativeCapital"
+            + "." + Integer.toHexString(backgroundColor.getRGB());
+        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        if (image != null) {
+            return image;
+        }
+
+          // create path
+          double deg2rad = Math.PI/180.0;
+          double angle = -90.0 * deg2rad;
+          double offset = extent * 0.5;
+          double size = (extent - padding - padding) * 0.5;
+        
+          GeneralPath path = new GeneralPath();
+          path.moveTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+          angle += 144 * deg2rad;
+          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+          angle += 144 * deg2rad;
+          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+          angle += 144 * deg2rad;
+          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+          angle += 144 * deg2rad;
+          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+          path.closePath();
+        
+          // draw everything
+        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g.setColor(backgroundColor);
+        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
+        g.setColor(getForegroundColor(backgroundColor));
+        g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.draw(path);
+          g.setColor(getForegroundColor(getForegroundColor(backgroundColor)));
+        g.fill(path);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
