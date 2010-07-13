@@ -776,11 +776,10 @@ public final class Specification {
         return immigrationGoodsTypeList;
     }
 
-    /**
-     * Describe <code>numberOfFarmedGoodsTypes</code> method here.
-     *
-     * @return an <code>int</code> value
-     */
+    public List<GoodsType> getFoodGoodsTypeList() {
+        return foodGoodsTypeList;
+    }
+
     public int numberOfFarmedGoodsTypes() {
         return farmedGoodsTypeList.size();
     }
@@ -795,6 +794,9 @@ public final class Specification {
         return getType(id, GoodsType.class);
     }
 
+    /**
+     * Deprecated: use getFoodGoodsTypeList() instead
+     */
     public List<GoodsType> getGoodsFood() {
         return foodGoodsTypeList;
     }
