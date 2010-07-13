@@ -81,6 +81,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -119,7 +120,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private final JLabel popLabel = new JLabel();
     private final JLabel royalistMemberLabel = new JLabel();
 
-    private final JPanel rightProductionPanel = new JPanel();
+    private final JPanel netProductionPanel = new JPanel();
     private final JPanel populationPanel = new JPanel() {
             public JToolTip createToolTip() {
                 return new RebelToolTip(colony, getCanvas());
@@ -199,7 +200,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, true), "released");
         SwingUtilities.replaceUIInputMap(fillButton, JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
 
-        rightProductionPanel.setOpaque(false);
+        netProductionPanel.setOpaque(false);
 
         populationPanel.setOpaque(true);
         populationPanel.setToolTipText(" ");
@@ -317,7 +318,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]", "[][][][][growprio 200,shrinkprio 10][growprio 150,shrinkprio 50]"));
 
         add(nameBox, "height 48:, grow");
-        add(rightProductionPanel);
+        add(netProductionPanel, "growx");
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
@@ -510,8 +511,136 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     public void updateProductionPanel() {
-        rightProductionPanel.removeAll();
-
+        netProductionPanel.removeAll();
+        
+        int gross = 0, net = 0;
+        Specification spec = getSpecification();
+        
+        
+        // food
+        List<AbstractGoods> ratios;
+        List<GoodsType> goodsTypes = spec.getFoodGoodsTypeList();
+        for (GoodsType goodsType : goodsTypes) {
+            gross += colony.getProductionOf(goodsType);
+            net += colony.getProductionNetOf(goodsType);
+        }
+        if (net != 0) {
+            GoodsType goodsType = spec.getGoodsType("model.goods.food");
+            netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+//            ratios = new ArrayList<AbstractGoods>();
+//            for (GoodsType goodsType : goodsTypes) {
+//                // get food production proportions so we can represent surplus in the same ratios
+//                ratios.add(new AbstractGoods(goodsType, colony.getProductionOf(goodsType) * net / gross));
+//            }
+//            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
+        }
+        
+        // liberty
+        gross = net = 0;
+        goodsTypes = spec.getLibertyGoodsTypeList();
+        for (GoodsType goodsType : goodsTypes) {
+            gross += colony.getProductionOf(goodsType);
+            net += colony.getProductionNetOf(goodsType);
+        }
+        if (net != 0) {
+            GoodsType goodsType = spec.getGoodsType("model.goods.bells");
+            netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+//            ratios = new ArrayList<AbstractGoods>();
+//            for (GoodsType goodsType : goodsTypes) {
+//                ratios.add(new AbstractGoods(goodsType, colony.getProductionOf(goodsType) * net / gross));
+//            }
+//            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
+        }
+        
+        
+        // immigration
+        gross = net = 0;
+        goodsTypes = spec.getImmigrationGoodsTypeList();
+        for (GoodsType goodsType : goodsTypes) {
+            gross += colony.getProductionOf(goodsType);
+            net += colony.getProductionNetOf(goodsType);
+        }
+        if (net != 0) {
+            GoodsType goodsType = spec.getGoodsType("model.goods.crosses");
+            netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+//            ratios = new ArrayList<AbstractGoods>();
+//            for (GoodsType goodsType : goodsTypes) {
+//                ratios.add(new AbstractGoods(goodsType, colony.getProductionOf(goodsType) * net / gross));
+//            }
+//            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
+        }
+        
+        
+        
+        List<GoodsType> generalGoods = new ArrayList<GoodsType>(spec.getGoodsTypeList());
+        generalGoods.removeAll(spec.getFoodGoodsTypeList());
+        generalGoods.removeAll(spec.getLibertyGoodsTypeList());
+        generalGoods.removeAll(spec.getImmigrationGoodsTypeList());
+        generalGoods.removeAll(spec.getFarmedGoodsTypeList());
+        
+        // non-storable goods
+        goodsTypes = new ArrayList<GoodsType>(generalGoods);
+        for (GoodsType goodsType : goodsTypes) {
+            if (!goodsType.isStorable()) {
+                generalGoods.remove(goodsType);
+                net = colony.getProductionNetOf(goodsType);
+                if (net != 0) {
+                    netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+                }
+            }
+        }
+        
+        
+        // farmed goods
+        goodsTypes = spec.getFarmedGoodsTypeList();
+        goodsTypes.removeAll(spec.getFoodGoodsTypeList());
+        goodsTypes.removeAll(spec.getLibertyGoodsTypeList());
+        goodsTypes.removeAll(spec.getImmigrationGoodsTypeList());
+        for (GoodsType goodsType : goodsTypes) {
+            net = colony.getProductionNetOf(goodsType);
+            if (net != 0) {
+                netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+            }
+        }
+        
+        
+        // everything left except military & breedables
+        goodsTypes = new ArrayList<GoodsType>(generalGoods);
+        for (GoodsType goodsType : goodsTypes) {
+            if (!goodsType.isMilitaryGoods() && !goodsType.isBreedable()) {
+                generalGoods.remove(goodsType);
+                net = colony.getProductionNetOf(goodsType);
+                if (net != 0) {
+                    netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+                }
+            }
+        }
+        
+        
+        // military goods
+        goodsTypes = new ArrayList<GoodsType>(generalGoods);
+        for (GoodsType goodsType : goodsTypes) {
+            if (!goodsType.isBreedable()) {
+                generalGoods.remove(goodsType);
+                net = colony.getProductionNetOf(goodsType);
+                if (net != 0) {
+                    netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+                }
+            }
+        }
+        
+        
+        // breedable things go last
+        goodsTypes = new ArrayList<GoodsType>(generalGoods);
+        for (GoodsType goodsType : goodsTypes) {
+            generalGoods.remove(goodsType);
+            net = colony.getProductionNetOf(goodsType);
+            if (net != 0) {
+                netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+            }
+        }
+        
+/*
         GoodsType grain = getSpecification().getGoodsType("model.goods.food");
         int food = 0;
 
@@ -525,7 +654,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 } else if (goodsType.isBreedable()) {
                     ProductionLabel horseLabel = new ProductionLabel(goodsType, production, getCanvas());
                     horseLabel.setMaxGoodsIcons(1);
-                    rightProductionPanel.add(horseLabel);
+                    netProductionPanel.add(horseLabel);
                 } else if (goodsType.isImmigrationType() || goodsType.isLibertyType()) {
                     int consumption = colony.getConsumption(goodsType);
                     ProductionLabel bellsLabel = new ProductionLabel(goodsType, production, getCanvas());
@@ -534,30 +663,23 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         int surplus = production - consumption;
                         ProductionLabel surplusLabel = new ProductionLabel(goodsType, surplus, getCanvas());
                         surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
-                        rightProductionPanel.add(surplusLabel, 0);
+                        netProductionPanel.add(surplusLabel, 0);
                     }
-                    rightProductionPanel.add(bellsLabel, 0);
+                    netProductionPanel.add(bellsLabel, 0);
                 } else {
                     production = colony.getProductionNetOf(goodsType);
-                    rightProductionPanel.add(new ProductionLabel(goodsType, production, getCanvas()));
+                    netProductionPanel.add(new ProductionLabel(goodsType, production, getCanvas()));
                 }
             } 
         }
-
-        /*
-        ProductionMultiplesLabel surplusLabel =
-            new ProductionMultiplesLabel(surplusProduction, getCanvas());
-        surplusLabel.setDrawPlus(true);
-        surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
-        rightProductionPanel.add(surplusLabel, 0);
-        */
-        rightProductionPanel.add(new ProductionLabel(grain, food - colony.getFoodConsumption(), getCanvas()), 0);
+        
+        netProductionPanel.add(new ProductionLabel(grain, food - colony.getFoodConsumption(), getCanvas()), 0);
 
         ProductionMultiplesLabel label = new ProductionMultiplesLabel(foodProduction, getCanvas());
         label.setToolTipPrefix(Messages.message("totalProduction"));
-        rightProductionPanel.add(label, 0);
-
-        rightProductionPanel.revalidate();
+        netProductionPanel.add(label, 0);
+*/
+        netProductionPanel.revalidate();
     }
     
     /**
