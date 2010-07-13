@@ -44,7 +44,6 @@ public class FontTest extends FreeColTestCase {
     static {
         specialCharacters.put('\u00D7', "MULTIPLICATION SIGN");
         specialCharacters.put('\u2192', "RIGHTWARDS ARROW");
-        specialCharacters.put('\u2606', "WHITE STAR");
         specialCharacters.put('\u271D', "LATIN CROSS");
         specialCharacters.put('\u271E', "SHADOWED WHITE LATIN CROSS");
     }
