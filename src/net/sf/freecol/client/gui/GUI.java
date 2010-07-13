@@ -1922,35 +1922,37 @@ public final class GUI {
             return image;
         }
 
-          // create path
-          double deg2rad = Math.PI/180.0;
-          double angle = -90.0 * deg2rad;
-          double offset = extent * 0.5;
-          double size = (extent - padding - padding) * 0.5;
-        
-          GeneralPath path = new GeneralPath();
-          path.moveTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-          angle += 144 * deg2rad;
-          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-          angle += 144 * deg2rad;
-          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-          angle += 144 * deg2rad;
-          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-          angle += 144 * deg2rad;
-          path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-          path.closePath();
-        
-          // draw everything
+        // create path
+        double deg2rad = Math.PI/180.0;
+        double angle = -90.0 * deg2rad;
+        double offset = extent * 0.5;
+        double size = (extent - padding - padding) * 0.5;
+
+        GeneralPath path = new GeneralPath();
+        path.moveTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        angle += 144 * deg2rad;
+        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        angle += 144 * deg2rad;
+        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        angle += 144 * deg2rad;
+        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        angle += 144 * deg2rad;
+        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        path.closePath();
+
+        // draw everything
         BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-          g.setColor(backgroundColor);
+        g.setColor(backgroundColor);
         g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(getForegroundColor(backgroundColor));
-        g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//        g.setColor(getForegroundColor(backgroundColor));
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.draw(path);
-          g.setColor(getForegroundColor(getForegroundColor(backgroundColor)));
+//        g.setColor(getForegroundColor(getForegroundColor(backgroundColor)));
+        g.setColor(Color.WHITE);
         g.fill(path);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
@@ -2162,18 +2164,13 @@ public final class GUI {
                     }
                     */
                     // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                    g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                   tile.getX(), tile.getY()),
-                                0, 0, null);
+                    g.drawImage(lib.getBorderImage(borderingTile.getType(), direction, tile.getX(), tile.getY()), 0, 0, null);
                     TileImprovement river = borderingTile.getRiver();
-                    if (river != null &&
-                        (direction == Direction.SE || direction == Direction.SW ||
-                         direction == Direction.NE || direction == Direction.NW)) {
+                    if (river != null && (direction == Direction.SE || direction == Direction.SW ||
+                                          direction == Direction.NE || direction == Direction.NW)) {
                         int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
                         if (branches[direction.getReverseDirection().ordinal()] > 0) {
-                            g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(),
-                                                               tile.getX(), tile.getY()),
-                                        0, 0, null);
+                            g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(), tile.getX(), tile.getY()), 0, 0, null);
                         }
                     }
                } else if (tile.isExplored() && borderingTile.isExplored()) {
