@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 
@@ -66,10 +68,7 @@ public interface CombatModel {
         public static final float UNKNOWN_ODDS = -1.0f;
         
         public float win;
-        // public float evade;
-        // public float capture;
-        // public float demote;
-        // public float promote;
+
         public CombatOdds(float win) {
             this.win = win;
         }
@@ -77,126 +76,74 @@ public interface CombatModel {
 
 
     /**
-     * Calculates the chance of the outcomes of combat between units.
+     * Calculates the chance of the outcomes of a combat.
      * 
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
+     * @param attacker The attacker.
+     * @param defender The defender.
      * @return The <code>CombatOdds</code>.
      */
-    public CombatOdds calculateCombatOdds(Unit attacker, Unit defender);
+    public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
+                                          FreeColGameObject defender);
 
     /**
-     * Calculates the chance of the outcomes of a colony bombarding a unit.
+     * Get the offensive power of a attacker wrt a defender.
      *
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The <code>CombatOdds</code>.
-     */
-    public CombatOdds calculateCombatOdds(Colony attacker, Unit defender);
-
-
-    /**
-     * Generates a result of a unit attacking another.
-     *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The <code>CombatResult</code>.
-     */
-    public CombatResult generateAttackResult(Unit attacker, Unit defender);
-
-    /**
-     * Generates the result of a colony bombarding a unit.
-     *
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The <code>CombatResult</code>.
-     */
-    public CombatResult generateAttackResult(Colony attacker, Unit defender);
-
-
-    /**
-     * Get the offensive power of a unit attacking another.
-     *
-     * Null can be passed for the defender when only the attacker unit
+     * Null can be passed for the defender when only the attacker
      * stats are required.
      * 
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
+     * @param attacker The attacker.
+     * @param defender The defender.
      * @return The offensive power.
      */
-    public float getOffencePower(Unit attacker, Unit defender);
+    public float getOffencePower(FreeColGameObject attacker,
+                                 FreeColGameObject defender);
 
     /**
-     * Get the offensive power of a colony bombarding a unit.
+     * Get the defensive power of a defender wrt an attacker.
      * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The offensive power.
-     */
-    public float getOffencePower(Colony attacker, Unit defender);
-
-    /**
-     * Get the defensive power of a unit defending against another.
-     * 
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
+     * @param attacker The attacker.
+     * @param defender The defender.
      * @return The defensive power.
      */
-    public float getDefencePower(Unit attacker, Unit defender);
+    public float getDefencePower(FreeColGameObject attacker,
+                                 FreeColGameObject defender);
 
     /**
-     * Get the defensive power of a unit defending against a colony.
-     * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The defensive power.
-     */
-    public float getDefencePower(Colony attacker, Unit defender);
-
-
-    /**
-     * Collect all the offensive modifiers that apply to a unit
-     * attacking another.
+     * Collect all the offensive modifiers that apply to an attack.
      * 
      * Null can be passed as the defender when only the attacker unit
      * stats are required.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
+     * @param attacker The attacker.
+     * @param defender The defender.
      * @return All the applicable offensive modifiers.
      */
-    public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender);
-
-    /**
-     * Collect all the offensive modifiers that apply to a colony
-     * bombarding a unit.
-     * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return All the applicable offensive modifiers.
-     */
-    public Set<Modifier> getOffensiveModifiers(Colony attacker, Unit defender);
+    public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
+                                               FreeColGameObject defender);
 
     /**
      * Collect all defensive modifiers that apply to a unit defending
      * against another.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
+     * @param attacker The attacker.
+     * @param defender The defender.
      * @return All the applicable defensive modifiers.
      */
-    public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender);
+    public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
+                                               FreeColGameObject defender);
 
     /**
-     * Collect all defensive modifiers that apply to a unit defending
-     * against a colony.
-     * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return All the applicable defensive modifiers.
+     * Generates a result of an attack.
+     * To be called by the server only.
+     *
+     * @param random A pseudo-random number source.
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return The results of the combat.
      */
-    public Set<Modifier> getDefensiveModifiers(Colony attacker, Unit defender);
-
+    public List<CombatResult> generateAttackResult(Random random,
+                                                   FreeColGameObject attacker,
+                                                   FreeColGameObject defender);
 
     /**
      * Attack a unit with the given outcome.

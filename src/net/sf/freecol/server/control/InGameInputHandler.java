@@ -791,7 +791,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         } else {
             defendingPlayer = defender.getOwner();
-            result = unit.getGame().getCombatModel().generateAttackResult(unit, defender); 
+            result = unit.getGame().getCombatModel().generateAttackResult(getFreeColServer().getServerRandom(), unit, defender).get(0);
         }
         if (result.type == CombatResultType.DONE_SETTLEMENT) {
             plunderGold = newTile.getSettlement().getPlunder();

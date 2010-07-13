@@ -1187,7 +1187,7 @@ public final class InGameController extends Controller {
             		logger.warning(colony.getName() + " found enemy unit to bombard: " +
                                        unit.toString());
             		// generate bombardment result
-            		CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
+            		CombatModel.CombatResult result = combatModel.generateAttackResult(random, colony, unit).get(0);
 
             		// ship was damaged, get repair location
             		Location repairLocation = null;

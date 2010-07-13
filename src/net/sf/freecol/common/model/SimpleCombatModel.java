@@ -23,17 +23,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
 /**
  * This class implements the original Colonization combat model.
+ * Note that the damage part of any CombatResult is ignored throughout.
  */
 public class SimpleCombatModel implements CombatModel {
 
@@ -61,8 +65,268 @@ public class SimpleCombatModel implements CombatModel {
 
     public SimpleCombatModel() {}
 
+
     /**
-     * Check some special case attack results.
+     * Calculates the odds of success in combat.
+     * 
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return The combat odds.
+     */
+    public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
+                                          FreeColGameObject defender) {
+        if (attacker == null || defender == null) {
+            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);    
+        }
+        
+        float attackPower = getOffencePower(attacker, defender);
+        float defencePower = getDefencePower(attacker, defender);
+        if (attackPower == 0.0f && defencePower == 0.0f) {
+            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
+        }
+        float victory = attackPower / (attackPower + defencePower);
+        return new CombatOdds(victory);
+    }
+
+    /**
+     * Get the offensive power of a unit attacking another.
+     * 
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return The offensive power.
+     */
+    public float getOffencePower(FreeColGameObject attacker,
+                                 FreeColGameObject defender) {
+        float result = 0.0f;
+        if (attacker instanceof Settlement) { // Bombardment
+            if (defender instanceof Unit
+                && ((Unit) defender).isNaval()
+                && attacker.hasAbility("model.ability.bombardShips")) {
+                for (Unit unit : ((Settlement) attacker).getTile().getUnitList()) {
+                    if (unit.hasAbility("model.ability.bombard")) {
+                        result += unit.getType().getOffence();
+                    }
+                }
+            }
+        } else if (attacker instanceof Unit) {
+            result = FeatureContainer.applyModifierSet(0,
+                    attacker.getGame().getTurn(),
+                    getOffensiveModifiers(attacker, defender));
+        } else {
+            throw new IllegalArgumentException("Bogus attacker");
+        }
+        return (result > MAXIMUM_BOMBARD_POWER) ? MAXIMUM_BOMBARD_POWER
+            : result;
+    }
+
+    /**
+     * Get the defensive power wrt an attacker.
+     * 
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return The defensive power.
+     */
+    public float getDefencePower(FreeColGameObject attacker,
+                                 FreeColGameObject defender) {
+        float result = 0.0f;
+        if (attacker instanceof Settlement) {
+            // Bombardment
+            if (defender instanceof Unit) {
+                result = ((Unit) defender).getType().getDefence();
+            }
+        } else if (attacker instanceof Unit) {
+            result = FeatureContainer.applyModifierSet(0,
+                    defender.getGame().getTurn(),
+                    getDefensiveModifiers(attacker, defender));
+        } else {
+            throw new IllegalArgumentException("Bogus attacker");
+        }
+        return result;
+    }
+
+    /**
+     * Collect all the offensive modifiers that apply to an attack.
+     * 
+     * Null can be passed as the defender when only the attacker
+     * stats are required.
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return All the applicable offensive modifiers.
+     */
+    public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
+                                               FreeColGameObject defender) {
+        Set<Modifier> result = new LinkedHashSet<Modifier>();
+        if (attacker instanceof Settlement) { // Bombardment
+            result.add(new Modifier("model.modifier.bombardModifier",
+                                    getOffencePower(attacker, defender),
+                                    Modifier.Type.ADDITIVE));
+        } else if (attacker instanceof Unit) {
+            Unit attackerUnit = (Unit) attacker;
+            UnitType type = attackerUnit.getType();
+            Specification spec = attackerUnit.getSpecification();
+            result.add(new Modifier(Modifier.OFFENCE, Specification.BASE_OFFENCE_SOURCE,
+                                    type.getOffence(),
+                                    Modifier.Type.ADDITIVE));
+            result.addAll(type.getFeatureContainer().getModifierSet(Modifier.OFFENCE));
+            result.addAll(attackerUnit.getOwner().getFeatureContainer()
+                          .getModifierSet(Modifier.OFFENCE, type));
+            if (attackerUnit.isNaval()) {
+                int goodsCount = attackerUnit.getGoodsCount();
+                if (goodsCount > 0) {
+                    // -12.5% penalty for every unit of cargo.
+                    // TODO: shouldn't this be -cargo/capacity?
+                    result.add(new Modifier(Modifier.OFFENCE, Specification.CARGO_PENALTY_SOURCE,
+                                            -12.5f * goodsCount,
+                                            Modifier.Type.PERCENTAGE));
+                }
+            } else {
+                for (EquipmentType equipment : attackerUnit.getEquipment().keySet()) {
+                    result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.OFFENCE));
+                }
+                // 50% attack bonus
+                result.addAll(spec.getModifiers(ATTACK_BONUS));
+                // movement penalty
+                int movesLeft = attackerUnit.getMovesLeft();
+                if (movesLeft == 1) {
+                    result.addAll(spec.getModifiers(BIG_MOVEMENT_PENALTY));
+                } else if (movesLeft == 2) {
+                    result.addAll(spec.getModifiers(SMALL_MOVEMENT_PENALTY));
+                }
+
+                if (defender instanceof Unit
+                    && ((Unit) defender).getTile().getSettlement() == null) {
+                    Unit defenderUnit = (Unit) defender;
+                    /**
+                     * Ambush bonus in the open = defender's defence bonus, if
+                     * defender is REF, or attacker is indian.
+                     */
+                    if (attacker.hasAbility("model.ability.ambushBonus") ||
+                        defender.hasAbility("model.ability.ambushPenalty")) {
+                        Set<Modifier> ambushModifiers = defenderUnit.getTile().getType()
+                            .getModifierSet(Modifier.DEFENCE);
+                        for (Modifier modifier : ambushModifiers) {
+                            Modifier ambushModifier = new Modifier(modifier);
+                            ambushModifier.setId(Modifier.OFFENCE);
+                            ambushModifier.setSource(Specification.AMBUSH_BONUS_SOURCE);
+                            result.add(ambushModifier);
+                        }
+                    }
+
+                    // 75% Artillery in the open penalty
+                    if (attackerUnit.hasAbility("model.ability.bombard") &&
+                        attackerUnit.getTile().getSettlement() == null) {
+                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
+                    }
+                } else if (defender instanceof Settlement
+                           || (defender instanceof Unit
+                               && ((Unit) defender).getTile().getSettlement() != null)) {
+                    // Attacking a settlement
+                    // REF bombardment bonus
+                    result.addAll(attackerUnit.getModifierSet("model.modifier.bombardBonus"));
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Bogus attacker");
+        }
+        return result;
+    }
+
+    /**
+     * Collect all defensive modifiers when defending against an attack.
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return All the applicable defensive modifiers.
+     */
+    public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
+                                               FreeColGameObject defender) {
+        Set<Modifier> result = new LinkedHashSet<Modifier>();
+        if (attacker instanceof Settlement) {
+            if (defender instanceof Unit) {
+                result.add(new Modifier("model.modifier.defenceBonus",
+                                        ((Unit)defender).getType().getDefence(),
+                                        Modifier.Type.ADDITIVE));
+            }
+        } else if (attacker instanceof Unit) {
+            if (defender instanceof Unit) {
+                Unit defenderUnit = (Unit) defender;
+                Specification spec = attacker.getSpecification();
+                result.add(new Modifier(Modifier.DEFENCE, Specification.BASE_DEFENCE_SOURCE,
+                                        defenderUnit.getType().getDefence(),
+                                        Modifier.Type.ADDITIVE));
+                result.addAll(defenderUnit.getType().getFeatureContainer()
+                              .getModifierSet(Modifier.DEFENCE));
+                if (defenderUnit.isNaval()) {
+                    int goodsCount = defenderUnit.getVisibleGoodsCount();
+                    if (goodsCount > 0) {
+                        // -12.5% penalty for every unit of cargo.
+                        // TODO: shouldn't this be -cargo/capacity?
+                        result.add(new Modifier(Modifier.DEFENCE, Specification.CARGO_PENALTY_SOURCE,
+                                                -12.5f * goodsCount,
+                                                Modifier.Type.PERCENTAGE));
+                    }
+                } else {
+                    // Paul Revere makes an unarmed colonist in a
+                    // settlement pick up a stock-piled musket if
+                    // attacked, so the bonus should be applied for
+                    // unarmed colonists inside colonies where there are
+                    // muskets available. Indians can also pick up
+                    // equipment.
+                    TypeCountMap<EquipmentType> autoEquipList = defenderUnit.getAutomaticEquipment();
+                    if (autoEquipList != null) {
+                        // add modifiers given by equipment of defense
+                        for(EquipmentType equipment : autoEquipList.keySet()){
+                            result.addAll(equipment.getModifierSet("model.modifier.defence"));
+                        }
+                    }
+
+                    for (EquipmentType equipment : defenderUnit.getEquipment().keySet()) {
+                        result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.DEFENCE));
+                    }
+                    // 50% fortify bonus
+                    if (defenderUnit.getState() == UnitState.FORTIFIED) {
+                        result.addAll(spec.getModifiers(FORTIFIED));
+                    }
+
+                    if (defenderUnit.getTile() != null) {
+                        Tile tile = defenderUnit.getTile();
+                        if (tile.getSettlement() == null) {
+                            // In the open
+                            if (!(attacker.hasAbility("model.ability.ambushBonus") ||
+                                  defender.hasAbility("model.ability.ambushPenalty"))) {
+                                // Terrain defensive bonus.
+                                result.addAll(tile.getType().getDefenceBonus());
+                            }
+                            if (defenderUnit.hasAbility("model.ability.bombard") &&
+                                defenderUnit.getState() != UnitState.FORTIFIED) {
+                                // -75% Artillery in the Open penalty
+                                result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
+                            }
+                        } else {
+                            result.addAll(tile.getSettlement().getOwner().getFeatureContainer()
+                                          .getModifierSet(Modifier.SETTLEMENT_DEFENCE));
+                            if (tile.getSettlement().isCapital()) {
+                                result.addAll(tile.getSettlement().getOwner().getFeatureContainer()
+                                              .getModifierSet(Modifier.CAPITAL_DEFENCE));
+                            }
+                            if (defenderUnit.hasAbility("model.ability.bombard") &&
+                                ((Unit) attacker).getOwner().isIndian()) {
+                                // 100% defence bonus against an Indian raid
+                                result.addAll(spec.getModifiers(ARTILLERY_AGAINST_RAID));
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Bogus attacker");
+        }
+        return result;
+    }
+
+    /**
+     * Check some special case attack results for units.
      * Naval losers are sunk if they can not find a repair location.
      * Some wins become settlement defeats.
      *
@@ -77,11 +341,6 @@ public class SimpleCombatModel implements CombatModel {
             && type == CombatResultType.WIN
             && defender.getOwner().getRepairLocation(defender) == null) {
             type = CombatResultType.GREAT_WIN;
-        } else if (attacker != null
-                   && attacker.isNaval()
-                   && type == CombatResultType.LOSS
-                   && attacker.getOwner().getRepairLocation(attacker) == null) {
-            type = CombatResultType.GREAT_LOSS;
         } else if (type.compareTo(CombatResultType.WIN) >= 0
                    && defender.getTile().getSettlement() != null) {
             Settlement settlement = defender.getTile().getSettlement();
@@ -102,388 +361,81 @@ public class SimpleCombatModel implements CombatModel {
         return type;
     }
 
-
-    // Implementation of CombatModel follows.
-    // Note that the damage part of any CombatResult is ignored throughout.
-
     /**
-     * Calculates the chance of the outcomes of combat between the units.
-     * Currently only calculates the chance of winning combat. 
-     * 
-     * @param attacker The attacking <code>Unit</code>. 
-     * @param defender The defending <code>Unit</code>.
-     * @return The combat odds.
-     */
-    public CombatOdds calculateCombatOdds(Unit attacker, Unit defender) {
-        if (attacker == null || defender == null) {
-            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);    
-        }
-        
-        float attackPower = getOffencePower(attacker, defender);
-        float defencePower = getDefencePower(attacker, defender);
-        if (attackPower == 0.0f && defencePower == 0.0f) {
-            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
-        }
-        float victory = attackPower / (attackPower + defencePower);
-        return new CombatOdds(victory);
-    }
-
-    /**
-     * Calculates the chance of the outcomes of bombarding a unit.
-     * Currently only calculates the chance of winning combat.
-     * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The combat odds.
-     */
-    public CombatOdds calculateCombatOdds(Colony attacker, Unit defender) {
-        if (attacker == null || defender == null) {
-            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
-        }
-
-        float attackPower = getOffencePower(attacker, defender);
-        float defencePower = getDefencePower(attacker, defender);
-        if (attackPower == 0.0f && defencePower == 0.0f) {
-            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
-        }
-        float victory = attackPower / (attackPower + defencePower);
-        return new CombatOdds(victory);
-    }
-
-    /**
-     * Generates a result of an attack.
+     * Generates a result of a unit attacking.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The result of the combat.
+     * @param random A pseudo-random number source.
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return The results of the combat.
      */
-    public CombatResult generateAttackResult(Unit attacker, Unit defender) {
-        ModelController mc = attacker.getGame().getModelController();
-        CombatOdds odds = calculateCombatOdds(attacker, defender);
-        int magic = 1000000;
-        float r = (1.0f/magic) * mc.getRandom(attacker.getId() + ".attack." + defender.getId(), magic);
-
-        // Generate a random float 0 <= r < 1.0.
-        // Partition this range into wins < odds.win and losses above.
-        // Within the 0 <= r < odds.win range, partition the first 10%
-        // to be great wins and the rest to be ordinary wins.
-        //   r < 0.1 * odds.win  => great win
-        //   else r < odds.win   => win
-        // Within the odds.win <= r < 1.0 range, partition the first
-        // 20% to be evasions (only if naval defender of course), the
-        // next 70% to be ordinary losses, and the rest great losses.
-        //   r < odds.win + 0.2 * (1.0 - odds.win) = 0.8 * odds.win + 0.2
-        //     => evade
-        //   else r < odds.win + (0.2 + 0.7) * (1.0 - odds.win)
-        //     = 0.1 * odds.win + 0.9 => loss
-        //   else => great loss
-        CombatResultType type
-            = (r < 0.1 * odds.win) ? CombatResultType.GREAT_WIN
-            : (r < odds.win) ? CombatResultType.WIN
-            : (r < 0.8 * odds.win + 0.2 && defender.isNaval())
-                ? CombatResultType.EVADES
-            : (r < 0.1 * odds.win + 0.9) ? CombatResultType.LOSS
-            : CombatResultType.GREAT_LOSS;
-        type = checkResult(type, attacker, defender);
-        logger.info("Attack " + attacker.toString()
-                    + " v " + defender.toString()
-                    + ": victory=" + Float.toString(odds.win)
-                    + " random=" + Float.toString(r)
-                    + " => " + type.toString());
-        return new CombatResult(type, 0);
-    }
-
-    /**
-     * Generates the result of a colony bombarding a unit.
-     *
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The result of the combat.
-     */
-    public CombatResult generateAttackResult(Colony attacker, Unit defender) {
-        ModelController mc = attacker.getGame().getModelController();
-        CombatOdds odds = calculateCombatOdds(attacker, defender);
-        int magic = 1000000;
-        float r = (1.0f/magic) * mc.getRandom(attacker.getId() + ".bombard." + defender.getId(), magic);
+    public List<CombatResult> generateAttackResult(Random random,
+                                                   FreeColGameObject attacker,
+                                                   FreeColGameObject defender) {
+        ArrayList<CombatResult> result = new ArrayList<CombatResult>();
         CombatResultType type;
-        if (r <= odds.win) {
-            float offencePower = getOffencePower(attacker, defender);
-            float defencePower = getDefencePower(attacker, defender);
-            int diff = Math.round(defencePower * 2 - offencePower);
-            int r2 = mc.getRandom(attacker.getId() + ".damage." + defender.getId(), Math.max(diff, 3));
-            type = (r2 == 0) ? CombatResultType.GREAT_WIN
-                : CombatResultType.WIN;
-            type = checkResult(type, null, defender);
+        ModelController mc = attacker.getGame().getModelController();
+        CombatOdds odds = calculateCombatOdds(attacker, defender);
+        float r = random.nextFloat();
+
+        if (attacker instanceof Settlement) {
+            if (r <= odds.win) {
+                float offencePower = getOffencePower(attacker, defender);
+                float defencePower = getDefencePower(attacker, defender);
+                int diff = Math.round(defencePower * 2 - offencePower);
+                int r2 = random.nextInt(Math.max(diff, 3));
+                type = (r2 == 0) ? CombatResultType.GREAT_WIN
+                    : CombatResultType.WIN;
+                if (defender instanceof Unit) {
+                    type = checkResult(type, null, (Unit) defender);
+                }
+            } else {
+                type = CombatResultType.EVADES;
+            }
+            logger.info("Bombard " + attacker.toString()
+                        + " v " + defender.toString()
+                        + ": victory=" + Float.toString(odds.win)
+                        + " random=" + Float.toString(r)
+                        + " => " + type.toString());
+        } else if (attacker instanceof Unit) {
+            Unit attackerUnit = (Unit) attacker;
+            // For a random float 0 <= r < 1.0:
+            // Partition this range into wins < odds.win and losses above.
+            // Within the 0 <= r < odds.win range, partition the first 10%
+            // to be great wins and the rest to be ordinary wins.
+            //   r < 0.1 * odds.win  => great win
+            //   else r < odds.win   => win
+            // Within the odds.win <= r < 1.0 range, partition the first
+            // 20% to be evasions (only if naval defender of course), the
+            // next 70% to be ordinary losses, and the rest great losses.
+            //   r < odds.win + 0.2 * (1.0 - odds.win) = 0.8 * odds.win + 0.2
+            //     => evade
+            //   else r < odds.win + (0.2 + 0.7) * (1.0 - odds.win)
+            //     = 0.1 * odds.win + 0.9 => loss
+            //   else => great loss
+            type = (r < 0.1 * odds.win) ? CombatResultType.GREAT_WIN
+                : (r < odds.win) ? CombatResultType.WIN
+                : (r < 0.8 * odds.win + 0.2
+                   && (defender instanceof Unit) && ((Unit) defender).isNaval())
+                ? CombatResultType.EVADES
+                : (r < 0.1 * odds.win + 0.9) ? CombatResultType.LOSS
+                : CombatResultType.GREAT_LOSS;
+            if (attackerUnit.isNaval()
+                && type == CombatResultType.LOSS
+                && attackerUnit.getOwner().getRepairLocation(attackerUnit) == null) {
+                type = CombatResultType.GREAT_LOSS;
+            } else if (defender instanceof Unit) {
+                type = checkResult(type, attackerUnit, (Unit) defender);
+            }
+            logger.info("Attack " + attackerUnit.toString()
+                        + " v " + defender.toString()
+                        + ": victory=" + Float.toString(odds.win)
+                        + " random=" + Float.toString(r)
+                        + " => " + type.toString());
         } else {
-            type = CombatResultType.EVADES;
+            throw new IllegalStateException("Bogus attacker");
         }
-        logger.info("Bombard " + attacker.toString()
-                    + " v " + defender.toString()
-                    + ": victory=" + Float.toString(odds.win)
-                    + " random=" + Float.toString(r)
-                    + " => " + type.toString());
-        return new CombatResult(type, 0);
-    }
-
-
-    /**
-     * Get the offensive power of a unit attacking another.
-     * 
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The offensive power.
-     */
-    public float getOffencePower(Unit attacker, Unit defender) {
-        return FeatureContainer.applyModifierSet(0,
-                attacker.getGame().getTurn(),
-                getOffensiveModifiers(attacker, defender));
-    }
-
-    /**
-     * Get the offensive power of a colony bombarding a unit.
-     *
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The offensive power.
-     */
-    public float getOffencePower(Colony attacker, Unit defender) {
-        float attackPower = 0;
-        if (defender.isNaval() &&
-            attacker.hasAbility("model.ability.bombardShips")) {
-            for (Unit unit : attacker.getTile().getUnitList()) {
-                if (unit.hasAbility("model.ability.bombard")) {
-                    attackPower += unit.getType().getOffence();
-                    if (attackPower >= MAXIMUM_BOMBARD_POWER) {
-                        return MAXIMUM_BOMBARD_POWER;
-                    }
-                }
-            }
-        }
-        return attackPower;
-    }
-    
-    /**
-     * Get the defensive power of a unit defending against another.
-     * 
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The defensive power.
-     */
-    public float getDefencePower(Unit attacker, Unit defender) {
-        return FeatureContainer.applyModifierSet(0,
-                attacker.getGame().getTurn(),
-                getDefensiveModifiers(attacker, defender));
-    }
-
-    /**
-     * Get the defensive power of a unit defending against a colony.
-     * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return The defensive power.
-     */
-    public float getDefencePower(Colony attacker, Unit defender) {
-        return defender.getType().getDefence();
-    }
-
-
-    /**
-     * Collect all the offensive modifiers that apply to a unit
-     * attacking another.
-     * 
-     * Null can be passed as the defender when only the attacker unit
-     * stats are required.
-     *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return All the applicable offensive modifiers.
-     */
-    public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
-        Specification spec = attacker.getSpecification();
-        Set<Modifier> result = new LinkedHashSet<Modifier>();
-
-        result.add(new Modifier(Modifier.OFFENCE, Specification.BASE_OFFENCE_SOURCE,
-                                attacker.getType().getOffence(),
-                                Modifier.Type.ADDITIVE));
-
-        result.addAll(attacker.getType().getFeatureContainer()
-                      .getModifierSet(Modifier.OFFENCE));
-
-        result.addAll(attacker.getOwner().getFeatureContainer()
-                      .getModifierSet(Modifier.OFFENCE, attacker.getType()));
-
-        if (attacker.isNaval()) {
-            int goodsCount = attacker.getGoodsCount();
-            if (goodsCount > 0) {
-                // -12.5% penalty for every unit of cargo.
-                // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.OFFENCE, Specification.CARGO_PENALTY_SOURCE,
-                                        -12.5f * goodsCount,
-                                        Modifier.Type.PERCENTAGE));
-            }
-        } else {
-            for (EquipmentType equipment : attacker.getEquipment().keySet()) {
-                result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.OFFENCE));
-            }
-            // 50% attack bonus
-            result.addAll(spec.getModifiers(ATTACK_BONUS));
-            // movement penalty
-            int movesLeft = attacker.getMovesLeft();
-            if (movesLeft == 1) {
-                result.addAll(spec.getModifiers(BIG_MOVEMENT_PENALTY));
-            } else if (movesLeft == 2) {
-                result.addAll(spec.getModifiers(SMALL_MOVEMENT_PENALTY));
-            }
-
-            if (defender != null && defender.getTile() != null) {
-
-                if (defender.getTile().getSettlement() == null) {
-                    /**
-                     * Ambush bonus in the open = defender's defence bonus, if
-                     * defender is REF, or attacker is indian.
-                     */
-                    if (attacker.hasAbility("model.ability.ambushBonus") ||
-                        defender.hasAbility("model.ability.ambushPenalty")) {
-                        Set<Modifier> ambushModifiers = defender.getTile().getType()
-                            .getModifierSet(Modifier.DEFENCE);
-                        for (Modifier modifier : ambushModifiers) {
-                            Modifier ambushModifier = new Modifier(modifier);
-                            ambushModifier.setId(Modifier.OFFENCE);
-                            ambushModifier.setSource(Specification.AMBUSH_BONUS_SOURCE);
-                            result.add(ambushModifier);
-                        }
-                    }
-
-                    // 75% Artillery in the open penalty
-                    if (attacker.hasAbility("model.ability.bombard") &&
-                        attacker.getTile().getSettlement() == null) {
-                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
-                    }
-                } else {
-                    // Attacking a settlement
-                    // REF bombardment bonus
-                    result.addAll(attacker.getModifierSet("model.modifier.bombardBonus"));
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Collect all the offensive modifiers that apply to a colony
-     * bombarding a unit.
-     * 
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return All the applicable offensive modifiers.
-     */
-    public Set<Modifier> getOffensiveModifiers(Colony attacker, Unit defender) {
-        Set<Modifier> result = new HashSet<Modifier>();
-        result.add(new Modifier("model.modifier.bombardModifier",
-                                getOffencePower(attacker, defender),
-                                Modifier.Type.ADDITIVE));
-        return result;
-    }
-
-    /**
-     * Collect all defensive modifiers that apply to a unit defending
-     * against another.
-     *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return All the applicable defensive modifiers.
-     */
-    public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender) {
-        Specification spec = attacker.getSpecification();
-        Set<Modifier> result = new LinkedHashSet<Modifier>();
-        if (defender == null) {
-            return result;
-        }
-
-        result.add(new Modifier(Modifier.DEFENCE, Specification.BASE_DEFENCE_SOURCE,
-                                defender.getType().getDefence(),
-                                Modifier.Type.ADDITIVE));
-        result.addAll(defender.getType().getFeatureContainer()
-                      .getModifierSet(Modifier.DEFENCE));
-
-
-        if (defender.isNaval()) {
-            int goodsCount = defender.getVisibleGoodsCount();
-            if (goodsCount > 0) {
-                // -12.5% penalty for every unit of cargo.
-                // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.DEFENCE, Specification.CARGO_PENALTY_SOURCE,
-                                        -12.5f * goodsCount,
-                                        Modifier.Type.PERCENTAGE));
-            }
-        } else {
-            // Paul Revere makes an unarmed colonist in a settlement pick up
-            // a stock-piled musket if attacked, so the bonus should be applied
-            // for unarmed colonists inside colonies where there are muskets
-            // available. Indians can also pick up equipment.
-            TypeCountMap<EquipmentType> autoEquipList = defender.getAutomaticEquipment();
-            if (autoEquipList != null) {
-                // add modifiers given by equipment of defense
-                for(EquipmentType equipment : autoEquipList.keySet()){
-                    result.addAll(equipment.getModifierSet("model.modifier.defence"));
-                }
-            }
-
-            for (EquipmentType equipment : defender.getEquipment().keySet()) {
-                result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.DEFENCE));
-            }
-            // 50% fortify bonus
-            if (defender.getState() == UnitState.FORTIFIED) {
-                result.addAll(spec.getModifiers(FORTIFIED));
-            }
-
-            if (defender.getTile() != null) {
-                Tile tile = defender.getTile();
-                if (tile.getSettlement() == null) {
-                    // In the open
-                    if (!(attacker.hasAbility("model.ability.ambushBonus") ||
-                          defender.hasAbility("model.ability.ambushPenalty"))) {
-                        // Terrain defensive bonus.
-                        result.addAll(tile.getType().getDefenceBonus());
-                    }
-                    if (defender.hasAbility("model.ability.bombard") &&
-                        defender.getState() != UnitState.FORTIFIED) {
-                        // -75% Artillery in the Open penalty
-                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
-                    }
-                } else {
-                    result.addAll(tile.getSettlement().getOwner().getFeatureContainer()
-                                  .getModifierSet(Modifier.SETTLEMENT_DEFENCE));
-                    if (tile.getSettlement().isCapital()) {
-                        result.addAll(tile.getSettlement().getOwner().getFeatureContainer()
-                                      .getModifierSet(Modifier.CAPITAL_DEFENCE));
-                    }
-                    if (defender.hasAbility("model.ability.bombard") &&
-                        attacker.getOwner().isIndian()) {
-                        // 100% defence bonus against an Indian raid
-                        result.addAll(spec.getModifiers(ARTILLERY_AGAINST_RAID));
-                    }
-                }
-            }
-
-        }
-        return result;
-    }
-
-    /**
-     * Collect all defensive modifiers that apply to a unit defending
-     * against a colony.
-     *
-     * @param attacker The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @return All the applicable defensive modifiers.
-     */
-    public Set<Modifier> getDefensiveModifiers(Colony attacker, Unit defender) {
-        Set<Modifier> result = new LinkedHashSet<Modifier>();
-        result.add(new Modifier("model.modifier.defenceBonus",
-                                defender.getType().getDefence(),
-                                Modifier.Type.ADDITIVE));
+        result.add(new CombatResult(type, 0));
         return result;
     }
 
