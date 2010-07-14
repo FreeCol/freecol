@@ -5,7 +5,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 
 
 /**
@@ -32,11 +31,11 @@ public class Animations {
      * @param canvas The <code>Canvas</code> to draw the animation on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
-     * @param result The <code>CombatResultType</code> to animate.
+     * @param success Did the attack succeed?
      */
     public static void unitAttack(Canvas canvas, Unit attacker, Unit defender,
-                                  CombatResultType result) {
-        new UnitAttackAnimation(canvas, attacker, defender, result).animate();
+                                  boolean success) {
+        new UnitAttackAnimation(canvas, attacker, defender, success).animate();
     }
 
 

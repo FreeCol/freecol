@@ -336,7 +336,7 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
         Unit defender = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("defender"));
-        CombatResultType result = Enum.valueOf(CombatResultType.class, element.getAttribute("result"));
+        boolean success = Boolean.parseBoolean(element.getAttribute("success"));
         if (unit == null || defender == null) {
             throw new IllegalStateException("animateAttack"
                                             + ((unit == null) ? ": null unit" : "")
@@ -347,7 +347,7 @@ public final class InGameInputHandler extends InputHandler {
         // All is well, queue the animation.
         // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
         try {
-            new UnitAttackAnimationCanvasSwingTask(unit, defender, result,
+            new UnitAttackAnimationCanvasSwingTask(unit, defender, success,
                                                    unit != lastAnimatedUnit)
                 .invokeSpecial();
         } catch (Exception exception) {
@@ -447,7 +447,7 @@ public final class InGameInputHandler extends InputHandler {
                         getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage),
                                 repairLocation);
                     } else {
-                        Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result);
+                        Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result.isSuccess());
                         unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage),
                                 plunderGold, repairLocation);
                         if (!unit.isDisposed()
@@ -1494,7 +1494,7 @@ public final class InGameInputHandler extends InputHandler {
 
         private final Unit defender;
 
-        private final CombatResultType result;
+        private final boolean success;
 
         private boolean focus;
 
@@ -1505,10 +1505,11 @@ public final class InGameInputHandler extends InputHandler {
          * 
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
-         * @param result The result of the attack.
+         * @param success Did the attack succeed?
          */
-        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender, CombatResultType result) {
-            this(unit, defender, result, true);
+        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
+                                                  boolean success) {
+            this(unit, defender, success, true);
         }
 
         /**
@@ -1517,13 +1518,14 @@ public final class InGameInputHandler extends InputHandler {
          * 
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
-         * @param result The result of the attack.
+         * @param success Did the attack succeed?
          * @param focus Focus on the source tile before the animation.
          */
-        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender, CombatResultType result, boolean focus) {
+        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
+                                                  boolean success, boolean focus) {
             this.unit = unit;
             this.defender = defender;
-            this.result = result;
+            this.success = success;
             this.focus = focus;
         }
 
@@ -1532,7 +1534,7 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !gui.onScreen(unit.getTile().getPosition())) {
                 gui.setFocusImmediately(unit.getTile().getPosition());
             }
-            Animations.unitAttack(canvas, unit, defender, result);
+            Animations.unitAttack(canvas, unit, defender, success);
             canvas.refresh();
         }
     }

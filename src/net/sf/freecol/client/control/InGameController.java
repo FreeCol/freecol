@@ -2140,7 +2140,7 @@ public final class InGameController implements NetworkConstants {
                 freeColClient.playSound(SoundEffect.ATTACK_DRAGOON);
             }
             
-            Animations.unitAttack(freeColClient.getCanvas(), unit, defender, result);
+            Animations.unitAttack(freeColClient.getCanvas(), unit, defender, result.isSuccess());
 
             try {
                 game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);

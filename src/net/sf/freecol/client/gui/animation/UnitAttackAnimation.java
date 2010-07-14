@@ -23,7 +23,6 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -37,7 +36,7 @@ final class UnitAttackAnimation {
     private final Canvas canvas;
     private final Unit attacker;
     private final Unit defender;
-    private final CombatResultType result;
+    private final boolean success;
 
     /**
      * Build a new attack animation.
@@ -45,14 +44,14 @@ final class UnitAttackAnimation {
      * @param canvas The <code>Canvas</code> to draw the animation on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
-     * @param result The <code>CombatResultType</code> to animate.
+     * @param success Does the attack succeed?
      */
     public UnitAttackAnimation(Canvas canvas, Unit attacker, Unit defender,
-                               CombatResultType result) {
+                               boolean success) {
         this.canvas = canvas;
         this.attacker = attacker;
         this.defender = defender;
-        this.result = result;
+        this.success = success;
     }
 
     /**
@@ -102,8 +101,7 @@ final class UnitAttackAnimation {
             }
         }
 
-        if (!result.isSuccess()
-            && Animations.getAnimationSpeed(canvas, defender) > 0) {
+        if (!success && Animations.getAnimationSpeed(canvas, defender) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(canvas, defender, direction)) != null) {
                 new UnitImageAnimation(canvas, defender, sza).animate();

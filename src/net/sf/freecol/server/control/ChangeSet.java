@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -200,7 +199,7 @@ public class ChangeSet {
     private static class AttackChange extends Change {
         private Unit unit;
         private Unit defender;
-        private CombatResult result;
+        private boolean success;
 
         /**
          * Build a new AttackChange.
@@ -208,14 +207,13 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
-         * @param result The result of the combat.
+         * @param success Did the attack succeed.
          */
-        AttackChange(See vis, Unit unit, Unit defender,
-                     CombatResult result) {
+        AttackChange(See vis, Unit unit, Unit defender, boolean success) {
             super(vis);
             this.unit = unit;
             this.defender = defender;
-            this.result = result;
+            this.success = success;
         }
 
         /**
@@ -234,7 +232,7 @@ public class ChangeSet {
          * @return True if the player should be notified.
          */
         @Override
-            public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return serverPlayer == unit.getOwner()
                 || serverPlayer == defender.getOwner()
                 || (unit.isVisibleTo(serverPlayer)
@@ -253,7 +251,7 @@ public class ChangeSet {
             Element element = doc.createElement("animateAttack");
             element.setAttribute("unit", unit.getId());
             element.setAttribute("defender", defender.getId());
-            element.setAttribute("result", result.type.toString());
+            element.setAttribute("success", Boolean.toString(success));
             return element;
         }
     }
@@ -814,12 +812,12 @@ public class ChangeSet {
      * @param see The visibility of this change.
      * @param unit The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
-     * @param result The result of the combat.
+     * @param success Did the attack succeed?
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addAttack(See vis, Unit unit, Unit defender,
-                               CombatResult result) {
-        changes.add(new AttackChange(vis, unit, defender, result));
+                               boolean success) {
+        changes.add(new AttackChange(vis, unit, defender, success));
         return this;
     }
 
