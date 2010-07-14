@@ -1556,6 +1556,7 @@ public final class GUI {
                 if (name != null) {
                     Color backgroundColor = lib.getColor(settlement.getOwner());
                     Font font = ResourceManager.getFont("NormalFont", 18f);
+                    Font productionFont = ResourceManager.getFont("NormalFont", 12f);
 //                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                     int yOffset = lib.getTerrainImageHeight(FreeCol.getSpecification().getTileType("model.tile.plains"));
                     g.setTransform(settlementTransforms.get(index));
@@ -1567,7 +1568,21 @@ public final class GUI {
                     case ClientOptions.COLONY_LABELS_MODERN:
                     default:
                         backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                        Image nameImage = createLabel(g, name, font, backgroundColor);
+                        
+                        TextSpecification[] specs = new TextSpecification[1];
+                        if (settlement instanceof Colony && settlement.getOwner() == clientPlayer) {
+                            Colony colony = (Colony) settlement;
+                            BuildableType buildable = colony.getCurrentlyBuilding();
+                            if (buildable != null) {
+                                specs = new TextSpecification[2];
+                                String turnsStr = getTurnsText(colony, buildable);
+                                String nowBuilding = Messages.message(buildable.getNameKey()) + " " + turnsStr;
+                                specs[1] = new TextSpecification(nowBuilding, productionFont);
+                            }
+                        }
+                        specs[0] = new TextSpecification(name, font);
+
+                        Image nameImage = createLabel(g, specs, backgroundColor);
                         if (nameImage != null) {
                             int spacing = 3;
                             Image leftImage = null;
@@ -1881,19 +1896,52 @@ public final class GUI {
      * @return an <code>Image</code> value
      */
     private Image createLabel(Graphics2D g, String text, Font font, Color backgroundColor) {
-        String key = "dynamic.label." + text
-            + "." + font.getName().replace(' ', '-')
-            + "." + Integer.toHexString(backgroundColor.getRGB());
+        TextSpecification[] specs = new TextSpecification[1];
+        specs[0] = new TextSpecification(text, font);
+        return createLabel(g, specs, backgroundColor);
+    }
+
+
+    /**
+     * Creates an Image that shows the given text centred on a
+     * translucent rounded rectangle with the given color.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param textSpecs a <code>TextSpecification</code> array
+     * @param backgroundColor a <code>Color</code> value
+     * @return an <code>Image</code> value
+     */
+    private Image createLabel(Graphics2D g, TextSpecification[] textSpecs, Color backgroundColor) {
+        int hPadding = 15;
+        int vPadding = 10;
+        int linePadding = 2;
+        int width = 0;
+        int height = vPadding;
+        int i;
+
+        TextSpecification spec;
+        TextLayout[] labels = new TextLayout[textSpecs.length];
+        TextLayout label;
+        String key = "dynamic.label.";
+
+        for (i = 0; i < textSpecs.length; i++) {
+            spec = textSpecs[i];
+            if (i > 0) key += '.';
+            key += spec.text + "." + spec.font.getName().replace(' ', '-');
+            label = new TextLayout(spec.text, spec.font, g.getFontRenderContext());
+            labels[i] = label;
+            width = Math.max(width, (int) label.getBounds().getWidth() + hPadding);
+            height += (int) (label.getAscent() + label.getDescent());
+            if (i > 0) height += linePadding;
+        }
+        key += "." + Integer.toHexString(backgroundColor.getRGB());
+
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
             return image;
         }
-        TextLayout label = new TextLayout(text, font, g.getFontRenderContext());
-        int hPadding = 15;
-        int vPadding = 10;
+
         int radius = Math.min(hPadding, vPadding);
-        int height = (int) (label.getAscent() + label.getDescent()) + vPadding;
-        int width = Math.max((int) label.getBounds().getWidth() + hPadding, height);
 
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
@@ -1904,7 +1952,12 @@ public final class GUI {
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
         g2.setColor(getForegroundColor(backgroundColor));
-        label.draw(g2, (width - (float)label.getBounds().getWidth())/2, label.getAscent() + vPadding/2);
+        int offset = 0;
+        for (i = 0; i < labels.length; i++) {
+            if (i > 0) offset += labels[i - 1].getAscent() + linePadding;
+            labels[i].draw(g2, (float) (width - labels[i].getBounds().getWidth())/2,
+                           offset + labels[i].getAscent() + vPadding/2);
+        }
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
@@ -3709,5 +3762,15 @@ public final class GUI {
         }
         
         return turnsStr;
+    }
+
+
+    class TextSpecification {
+        public String text;
+        public Font font;
+        public TextSpecification(String newText, Font newFont) {
+            text = newText;
+            font = newFont;
+        }
     }
 }
