@@ -32,25 +32,36 @@ public class ModelMessage extends StringTemplate {
 
     /** Constants describing the type of message. */
     public static enum MessageType { 
-        DEFAULT,
-        WARNING,
-        SONS_OF_LIBERTY,
-        GOVERNMENT_EFFICIENCY,
-        WAREHOUSE_CAPACITY,
-        UNIT_IMPROVED,
-        UNIT_DEMOTED,
-        UNIT_LOST,
-        UNIT_ADDED,
-        BUILDING_COMPLETED,
-        FOREIGN_DIPLOMACY,
-        MARKET_PRICES,
-        LOST_CITY_RUMOUR,
-        GIFT_GOODS,
-        MISSING_GOODS,
-        TUTORIAL,
-        COMBAT_RESULT,
-        ACCEPTED_DEMANDS,
-        REJECTED_DEMANDS
+
+        DEFAULT(null),
+        WARNING("model.option.guiShowWarning"),
+        SONS_OF_LIBERTY("model.option.guiShowSonsOfLiberty"),
+        GOVERNMENT_EFFICIENCY("model.option.guiShowGovernmentEfficiency"),
+        WAREHOUSE_CAPACITY("model.option.guiShowWarehouseCapacity"),
+        UNIT_IMPROVED("model.option.guiShowUnitImproved"),
+        UNIT_DEMOTED("model.option.guiShowUnitDemoted"),
+        UNIT_LOST("model.option.guiShowUnitLost"),
+        UNIT_ADDED("model.option.guiShowUnitAdded"),
+        BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
+        FOREIGN_DIPLOMACY("model.option.guiShowForeignDiplomacy"),
+        MARKET_PRICES("model.option.guiShowMarketPrices"),
+        LOST_CITY_RUMOUR(null),
+        GIFT_GOODS(null),
+        MISSING_GOODS("model.option.guiShowMissingGoods"),
+        TUTORIAL("model.option.guiShowTutorial"),
+        COMBAT_RESULT(null),
+        ACCEPTED_DEMANDS(null),
+        REJECTED_DEMANDS(null);
+
+        private String optionName;
+
+        MessageType(String optionName) {
+            this.optionName = optionName;
+        }
+
+        public String getOptionName() {
+            return optionName;
+        }
     }
 
     private String ownerId; /* deprecated */

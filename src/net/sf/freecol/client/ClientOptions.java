@@ -183,32 +183,6 @@ public class ClientOptions extends OptionMap {
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String SHOW_SONS_OF_LIBERTY = "model.option.guiShowSonsOfLiberty";
-
-    public static final String SHOW_WARNING = "model.option.guiShowWarning";
-
-    public static final String SHOW_GOVERNMENT_EFFICIENCY = "model.option.guiShowGovernmentEfficiency";
-
-    public static final String SHOW_WAREHOUSE_CAPACITY = "model.option.guiShowWarehouseCapacity";
-
-    public static final String SHOW_UNIT_IMPROVED = "model.option.guiShowUnitImproved";
-
-    public static final String SHOW_UNIT_DEMOTED = "model.option.guiShowUnitDemoted";
-
-    public static final String SHOW_UNIT_ADDED = "model.option.guiShowUnitAdded";
-
-    public static final String SHOW_UNIT_LOST = "model.option.guiShowUnitLost";
-
-    public static final String SHOW_BUILDING_COMPLETED = "model.option.guiShowBuildingCompleted";
-
-    public static final String SHOW_FOREIGN_DIPLOMACY = "model.option.guiShowForeignDiplomacy";
-
-    public static final String SHOW_MARKET_PRICES = "model.option.guiShowMarketPrices";
-
-    public static final String SHOW_MISSING_GOODS = "model.option.guiShowMissingGoods";
-
-    public static final String SHOW_TUTORIAL = "model.option.guiShowTutorial";
-
     public static final String SHOW_COLONY_WARNINGS = "model.option.guiShowColonyWarnings";
 
     public static final String SHOW_PRECOMBAT = "model.option.guiShowPreCombat";
@@ -633,35 +607,7 @@ public class ClientOptions extends OptionMap {
      * @return a <code>BooleanOption</code> value
      */
     public BooleanOption getBooleanOption(ModelMessage message) {
-        switch (message.getMessageType()) {
-        case WARNING:
-            return (BooleanOption) getObject(ClientOptions.SHOW_WARNING);
-        case SONS_OF_LIBERTY:
-            return (BooleanOption) getObject(ClientOptions.SHOW_SONS_OF_LIBERTY);
-        case GOVERNMENT_EFFICIENCY:
-            return (BooleanOption) getObject(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
-        case WAREHOUSE_CAPACITY:
-            return (BooleanOption) getObject(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
-        case UNIT_IMPROVED:
-            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_IMPROVED);
-        case UNIT_DEMOTED:
-            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_DEMOTED);
-        case UNIT_LOST:
-            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_LOST);
-        case UNIT_ADDED:
-            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_ADDED);
-        case BUILDING_COMPLETED:
-            return (BooleanOption) getObject(ClientOptions.SHOW_BUILDING_COMPLETED);
-        case FOREIGN_DIPLOMACY:
-            return (BooleanOption) getObject(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
-        case MARKET_PRICES:
-            return (BooleanOption) getObject(ClientOptions.SHOW_MARKET_PRICES);
-        case MISSING_GOODS:
-            return (BooleanOption) getObject(ClientOptions.SHOW_MISSING_GOODS);
-        case DEFAULT:
-        default:
-            return null;
-        }
+        return (BooleanOption) getObject(message.getMessageType().getOptionName());
     }
 
     protected boolean isCorrectTagName(String tagName) {

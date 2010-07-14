@@ -95,6 +95,7 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
@@ -4806,38 +4807,11 @@ public final class InGameController implements NetworkConstants {
      * @return true if the message should be delivered
      */
     private boolean shouldAllowMessage(ModelMessage message) {
-
-        switch (message.getMessageType()) {
-        case DEFAULT:
+        BooleanOption option = freeColClient.getClientOptions().getBooleanOption(message);
+        if (option == null) {
             return true;
-        case WARNING:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WARNING);
-        case SONS_OF_LIBERTY:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_SONS_OF_LIBERTY);
-        case GOVERNMENT_EFFICIENCY:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
-        case WAREHOUSE_CAPACITY:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
-        case UNIT_IMPROVED:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_IMPROVED);
-        case UNIT_DEMOTED:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_DEMOTED);
-        case UNIT_LOST:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_LOST);
-        case UNIT_ADDED:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_ADDED);
-        case BUILDING_COMPLETED:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_BUILDING_COMPLETED);
-        case FOREIGN_DIPLOMACY:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
-        case MARKET_PRICES:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MARKET_PRICES);
-        case MISSING_GOODS:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MISSING_GOODS);
-        case TUTORIAL:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_TUTORIAL);
-        default:
-            return true;
+        } else {
+            return option.getValue();
         }
     }
 
