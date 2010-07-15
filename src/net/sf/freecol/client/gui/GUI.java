@@ -1304,24 +1304,24 @@ public final class GUI {
                     final Color textColor; 
                     if (temp.getTurns() == 0) {
                         g.setColor(Color.GREEN);                        
-                        image = getPathImage(activeUnit);
+                        image = lib.getPathImage(activeUnit);
                         if (activeUnit != null 
                                 && tile.isExplored()
                                 && activeUnit.isNaval()
                                 && tile.isLand() 
                                 && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                            image = getPathImage(activeUnit.getFirstUnit());
+                            image = lib.getPathImage(activeUnit.getFirstUnit());
                         }
                         textColor = Color.BLACK;
                     } else {
                         g.setColor(Color.RED);
-                        image = getPathNextTurnImage(activeUnit);
+                        image = lib.getPathNextTurnImage(activeUnit);
                         if (activeUnit != null
                                 && tile.isExplored()
                                 && activeUnit.isNaval()
                                 && tile.isLand() 
                                 && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                            image = getPathNextTurnImage(activeUnit.getFirstUnit());
+                            image = lib.getPathNextTurnImage(activeUnit.getFirstUnit());
                         }
                         textColor = Color.WHITE;
                     }                
@@ -1713,53 +1713,6 @@ public final class GUI {
         
     }
     
-    /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
-     * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
-     */
-    private Image getPathImage(Unit u) {
-        if (u == null) {
-            return null;
-        } else {
-            return ResourceManager.getImage("path." + u.getPathTypeImage() + ".image");
-        }
-    }
-    
-    /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
-     * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
-     *
-    private Image getPathIllegalImage(Unit u) {
-        if (u == null || u.isNaval()) {
-            return (Image) UIManager.get("path.naval.illegal.image");
-        } else if (u.isMounted()) {
-            return (Image) UIManager.get("path.horse.illegal.image");
-        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
-            return (Image) UIManager.get("path.wagon.illegal.image");
-        } else {
-            return (Image) UIManager.get("path.foot.illegal.image");
-        }
-    }
-    */
-    
-    /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
-     * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
-     */
-    private Image getPathNextTurnImage(Unit u) {
-        if (u == null) {
-            return null;
-        } else {
-            return ResourceManager.getImage("path." + u.getPathTypeImage() + ".nextTurn.image");
-        }
-    }
-
     /**
      * Creates an image with a string of a given color and with 
      * a black border around the glyphs.

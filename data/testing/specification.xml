@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.41 -->
+<!-- specification version 0.42 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -603,8 +603,7 @@
 
     <unit-types>
     <!-- ATTENTION: skillTaught can NOT be inherited because it defaults to the unit type itself! -->
-    <unit-type id="colonist" abstract="true" offence="0" defence="1" movement="3" lineOfSight="1"
-               pathImage="foot">
+    <unit-type id="colonist" abstract="true" offence="0" defence="1" movement="3" lineOfSight="1">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -797,7 +796,7 @@
     </unit-type>
     <unit-type id="model.unit.indianConvert" offence="0"  defence="1"
                movement="3" lineOfSight="1" maximumAttrition="10"
-               scoreValue="3" skill="0" pathImage="foot">
+               scoreValue="3" skill="0">
       <ability id="model.ability.convert" value="true"/>
       <modifier id="model.goods.food" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
@@ -856,7 +855,7 @@
       <modifier id="model.modifier.defence" type="additive" value="4"/>
       <required-ability id="model.ability.royalExpeditionaryForce"/>
     </unit-type>
-    <unit-type id="ship" abstract="true" pathImage="naval">
+    <unit-type id="ship" abstract="true">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
@@ -897,7 +896,7 @@
       <ability id="model.ability.captureGoods" value="true"/>
       <ability id="model.ability.piracy" value="true"/>
     </unit-type>
-    <unit-type id="wagon" abstract="true" lineOfSight="1" pathImage="wagon" />
+    <unit-type id="wagon" abstract="true" lineOfSight="1" />
     <unit-type id="model.unit.artillery" extends="wagon" offence="7" defence="5" movement="3"
                price="500" scoreValue="2">
       <required-goods id="model.goods.hammers" value="192"/>
@@ -932,8 +931,7 @@
        <unit-type id="model.unit.milkmaid" extends="colonist"
                   expert-production="model.goods.food" />
        -->
-    <unit-type id="model.unit.revenger" offence="666" defence="666" movement="18" lineOfSight="3"
-               pathImage="foot">
+    <unit-type id="model.unit.revenger" offence="666" defence="666" movement="18" lineOfSight="3">
       <ability id="model.ability.undead" value="true"/>
       <ability id="model.ability.multipleAttacks" value="true"/>
       <required-ability id="model.ability.undead"/>

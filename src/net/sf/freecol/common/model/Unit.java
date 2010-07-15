@@ -3543,19 +3543,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return unitType.getHitPoints() - getHitpoints();
     }
 
-    /**
-     * Return the type of the image which will be used to draw the path
-     *
-     * @return a <code>String</code> to form the resource key
-     */
-    public String getPathTypeImage() {
-        if (isMounted()) {
-            return "horse";
-        } else {
-            return unitType.getPathImage();
-        }
-    }
-
     /*
      * Get the available equipment that can be equipped automatically in case of an attack
      * Returns null if it cannot be automatically equipped.

@@ -766,4 +766,64 @@ public final class ImageLibrary {
         }
     }
 
+    private String getPathType(Unit unit) {
+        if (unit.isNaval()) {
+            return "naval";
+        } else if (unit.isMounted()) {
+            return "horse";
+        } else if (unit.getType().hasSkill() || unit.isUndead()) {
+            return "foot";
+        } else {
+            return "wagon";
+        }
+    }
+
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     */
+    public Image getPathImage(Unit u) {
+        if (u == null) {
+            return null;
+        } else {
+            return ResourceManager.getImage("path." + getPathType(u) + ".image");
+        }
+    }
+    
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     *
+    private Image getPathIllegalImage(Unit u) {
+        if (u == null || u.isNaval()) {
+            return (Image) UIManager.get("path.naval.illegal.image");
+        } else if (u.isMounted()) {
+            return (Image) UIManager.get("path.horse.illegal.image");
+        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
+            return (Image) UIManager.get("path.wagon.illegal.image");
+        } else {
+            return (Image) UIManager.get("path.foot.illegal.image");
+        }
+    }
+    */
+    
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     */
+    public Image getPathNextTurnImage(Unit u) {
+        if (u == null) {
+            return null;
+        } else {
+            return ResourceManager.getImage("path." + getPathType(u) + ".nextTurn.image");
+        }
+    }
+
+
 }

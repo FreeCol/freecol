@@ -98,11 +98,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     private int scoreValue = 0;
 
     /**
-     * Describe pathImage here.
-     */
-    private String pathImage;
-
-    /**
      * Describe maximumAttrition here.
      */
     private int maximumAttrition = INFINITY;
@@ -442,24 +437,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     }
 
     /**
-     * Get the <code>PathImage</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getPathImage() {
-        return pathImage;
-    }
-
-    /**
-     * Set the <code>PathImage</code> value.
-     *
-     * @param newPathImage The new PathImage value.
-     */
-    public void setPathImage(final String newPathImage) {
-        this.pathImage = newPathImage;
-    }
-
-    /**
      * Get the <code>SkillTaught</code> value.
      *
      * @return an <code>UnitType</code> value
@@ -619,8 +596,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         String skillString = in.getAttributeValue(null, "skillTaught");
         skillTaught = (skillString == null) ? this : specification.getUnitType(skillString);
 
-        pathImage = getAttribute(in, "pathImage", parent.pathImage);
-
         recruitProbability = getAttribute(in, "recruitProbability", parent.recruitProbability);
         skill = getAttribute(in, "skill", parent.skill);
 
@@ -713,9 +688,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             out.writeAttribute("price", Integer.toString(price));
         }
         out.writeAttribute("skillTaught", skillTaught.getId());
-        if (pathImage != null) {
-            out.writeAttribute("pathImage", pathImage);
-        }
         if (expertProduction != null) {
             out.writeAttribute("expert-production", expertProduction.getId());
         }

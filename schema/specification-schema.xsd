@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.41
+<!-- XSD for specification version 0.42
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -17,6 +17,7 @@
      0.39: remove color from nation and add audio options
      0.40: change tile(s) children of tile improvement to scope
      0.41: add consumes element to unit-type
+     0.42: remove pathImage attribute from unit-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -328,7 +329,6 @@
       <xs:attribute name="price" type="xs:nonNegativeInteger"/>
       <xs:attribute name="hitPoints" type="xs:nonNegativeInteger"/>
       <xs:attribute name="recruitProbability" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="pathImage" type="xs:string"/>
       <xs:attribute name="expert-production" type="xs:IDREF"/>
       <xs:attribute name="skillTaught" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:int"/>
