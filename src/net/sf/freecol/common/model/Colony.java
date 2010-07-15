@@ -572,24 +572,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Gets the specified <code>ColonyTile</code>.
-     * 
-     * @param x The x-coordinate of the <code>Tile</code>.
-     * @param y The y-coordinate of the <code>Tile</code>.
-     * @return The <code>ColonyTile</code> for the <code>Tile</code>
-     *         returned by {@link #getTile(int, int)}.
-     */
-    public ColonyTile getColonyTile(int x, int y) {
-        Tile t = getTile(x, y);
-        for (ColonyTile c : colonyTiles) {
-            if (c.getWorkTile() == t) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns the <code>ColonyTile</code> matching the given
      * <code>Tile</code>.
      * 

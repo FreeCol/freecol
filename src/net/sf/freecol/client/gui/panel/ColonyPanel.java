@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -1364,7 +1365,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
-                    ColonyTile tile = getColony().getColonyTile(x, y);
+                    ColonyTile tile = getColonyTile(x, y);
                     if (tile==null)
                         continue;
                     ASingleTilePanel p = new ASingleTilePanel(tile, x, y);
@@ -1374,6 +1375,58 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
         }
 
+
+        /**
+         * Gets a <code>Tile</code> from the neighbourhood of this 
+         * <code>Colony</code>.
+         * 
+         * @param x The x-coordinate of the <code>Tile</code>.
+         * @param y The y-coordinate of the <code>Tile</code>. 
+         * @return The <code>Tile</code>.
+         */
+        public Tile getTile(int x, int y) {
+            Tile tile = colony.getTile();
+            if (x==0 && y==0) {
+                return tile.getNeighbourOrNull(Direction.N);
+            } else if (x==0 && y== 1) {
+                return tile.getNeighbourOrNull(Direction.NE);
+            } else if (x==0 && y== 2) {
+                return tile.getNeighbourOrNull(Direction.E);
+            } else if (x==1 && y== 0) {
+                return tile.getNeighbourOrNull(Direction.NW);
+            } else if (x==1 && y== 1) {
+                return tile;
+            } else if (x==1 && y== 2) {
+                return tile.getNeighbourOrNull(Direction.SE);
+            } else if (x==2 && y== 0) {
+                return tile.getNeighbourOrNull(Direction.W);
+            } else if (x==2 && y== 1) {
+                return tile.getNeighbourOrNull(Direction.SW);
+            } else if (x==2 && y== 2) {
+                return tile.getNeighbourOrNull(Direction.S);
+            } else {
+                return null;
+            }
+        }
+
+
+        /**
+         * Gets the specified <code>ColonyTile</code>.
+         * 
+         * @param x The x-coordinate of the <code>Tile</code>.
+         * @param y The y-coordinate of the <code>Tile</code>.
+         * @return The <code>ColonyTile</code> for the <code>Tile</code>
+         *         returned by {@link #getTile(int, int)}.
+         */
+        public ColonyTile getColonyTile(int x, int y) {
+            Tile t = getTile(x, y);
+            for (ColonyTile c : colony.getColonyTiles()) {
+                if (c.getWorkTile() == t) {
+                    return c;
+                }
+            }
+            return null;
+        }
 
         public void removePropertyChangeListeners() {
             for (Component component : getComponents()) {
@@ -1391,14 +1444,16 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
 
+            TileType tileType = getColony().getTile().getType();
+            int tileWidth = getLibrary().getTerrainImageWidth(tileType) / 2;
+            int tileHeight = getLibrary().getTerrainImageHeight(tileType) / 2;
             if (getColony() != null) {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
-                        TileType tileType = getColony().getTile().getType();
-                        Tile tile = getColony().getTile(x, y);
+                        Tile tile = getTile(x, y);
+                        int xx = ((2 - x) + y) * tileWidth;
+                        int yy = (x + y) * tileHeight;
                         if (tile != null) {
-                            int xx = ((2 - x) + y) * getLibrary().getTerrainImageWidth(tileType) / 2;
-                            int yy = (x + y) * getLibrary().getTerrainImageHeight(tileType) / 2;
                             g.translate(xx, yy);
                             colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tile, getColony());
                             g.translate(-xx, -yy);
@@ -1461,6 +1516,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 revalidate();
                 repaint();
             }
+
 
             /**
              * Initialized the center of the colony panel tile. The one

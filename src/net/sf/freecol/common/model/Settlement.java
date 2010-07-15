@@ -236,39 +236,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
     
     /**
-     * Gets a <code>Tile</code> from the neighbourhood of this 
-     * <code>Colony</code>.
-     * 
-     * @param x The x-coordinate of the <code>Tile</code>.
-     * @param y The y-coordinate of the <code>Tile</code>. 
-     * @return The <code>Tile</code>.
-     */
-    public Tile getTile(int x, int y) {
-        if (x==0 && y==0) {
-            return tile.getNeighbourOrNull(Direction.N);
-        } else if (x==0 && y== 1) {
-            return tile.getNeighbourOrNull(Direction.NE);
-        } else if (x==0 && y== 2) {
-            return tile.getNeighbourOrNull(Direction.E);
-        } else if (x==1 && y== 0) {
-            return tile.getNeighbourOrNull(Direction.NW);
-        } else if (x==1 && y== 1) {
-            return tile;
-        } else if (x==1 && y== 2) {
-            return tile.getNeighbourOrNull(Direction.SE);
-        } else if (x==2 && y== 0) {
-            return tile.getNeighbourOrNull(Direction.W);
-        } else if (x==2 && y== 1) {
-            return tile.getNeighbourOrNull(Direction.SW);
-        } else if (x==2 && y== 2) {
-            return tile.getNeighbourOrNull(Direction.S);
-        } else {
-            return null;
-        }
-    }
-
-
-    /**
      * Can a settlement claim a tile?
      *
      * @param tile The <code>Tile</code> to claim.
@@ -395,33 +362,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public List<Goods> getCompactGoods() {
         return goodsContainer.getCompactGoods();
     }
-
-
-    /**
-     * Adds a <code>Locatable</code> to this Location.
-     *
-     * @param locatable The <code>Locatable</code> to add to this Location.
-     */
-    public abstract void add(Locatable locatable);
-
-    /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable The <code>Locatable</code> to remove from this Location.
-     */
-    public abstract void remove(Locatable locatable);
-
-    public abstract boolean canAdd(Locatable locatable);
-
-    /**
-     * Returns the number of units in this settlement.
-     *
-     * @return The number of units in this settlement.
-     */
-    public abstract int getUnitCount();
-
-    public abstract boolean contains(Locatable locatable);
-
 
     /**
      * Get the tiles this settlement owns.
