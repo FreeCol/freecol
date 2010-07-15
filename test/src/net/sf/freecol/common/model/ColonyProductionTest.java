@@ -163,7 +163,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     	int expectedBellCount = 0;
     	int bellsProdPerTurn = colony.getProductionOf(bellsType);
     	int expectedBellProd = 1;
-    	int bellsUpkeep = colony.getConsumption(bellsType);
+    	int bellsUpkeep = colony.getConsumptionOf(bellsType);
     	int expectedBellUpkeep =  colony.getUnitCount() - 2;
     	int bellsNetProdPerTurn = colony.getProductionNetOf(bellsType);
     	int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;

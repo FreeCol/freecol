@@ -173,6 +173,9 @@ public class IndianSettlementTest extends FreeColTestCase {
         
         int foodProduced = camp1.getProductionOf(foodType);
         int foodConsumed = camp1.getFoodConsumption();
+        UnitType brave = spec().getUnitType("model.unit.brave");
+        assertEquals(2, brave.getConsumptionOf(spec().getGoodsType("model.goods.food")));
+        assertEquals(2 * camp1.getUnitCount(), foodConsumed);
         assertTrue("Food Produced should be less the food consumed",foodProduced < foodConsumed);
         
         //add horses

@@ -74,4 +74,8 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
         return values.size();
     }
 
+    public void putAll(TypeCountMap<T> other) {
+        values.putAll(other.values);
+    }
+
 }

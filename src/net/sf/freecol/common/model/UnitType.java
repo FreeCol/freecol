@@ -36,7 +36,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
 
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
-    public static final int FOOD_CONSUMPTION = 2;
 
     /**
      * Describe offence here.
@@ -119,9 +118,9 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     private EquipmentType defaultEquipment;
 
     /**
-     * Describe foodConsumed here.
+     * The goods consumed per turn when in a settlement.
      */
-    private int foodConsumed = FOOD_CONSUMPTION;
+    private TypeCountMap<GoodsType> consumption = new TypeCountMap<GoodsType>();
 
     /**
      * The possible type changes for this unit type.
@@ -479,24 +478,14 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     }
 
     /**
-     * Returns the amount of food this unit type consumes per turn. At
-     * the moment, this is 2 for all unit types.
+     * Returns the number of units of the given GoodsType this
+     * UnitType consumes per turn (when in a settlement).
      *
-     * @return an <code>int</code> value
+     * @return units consumed
      */
-    public int getFoodConsumed() {
-        return foodConsumed;
+    public int getConsumptionOf(GoodsType goodsType) {
+        return consumption.getCount(goodsType);
     }
-
-    /**
-     * Set the <code>FoodConsumed</code> value.
-     *
-     * @param newFoodConsumed The new FoodConsumed value.
-     */
-    public void setFoodConsumed(final int newFoodConsumed) {
-        this.foodConsumed = newFoodConsumed;
-    }
-
 
     public int compareTo(UnitType other) {
         return getIndex() - other.getIndex();
@@ -646,6 +635,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             typeChanges.addAll(parent.typeChanges);
             defaultEquipment = parent.defaultEquipment;
             getFeatureContainer().add(parent.getFeatureContainer());
+            consumption.putAll(parent.consumption);
         }
     }
 
@@ -669,6 +659,19 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
                 String equipmentString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 if (equipmentString != null) {
                     defaultEquipment = specification.getEquipmentType(equipmentString);
+                }
+                in.nextTag(); // close this element
+            } else if ("consumes".equals(nodeName)) {
+                String typeString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                String valueString = in.getAttributeValue(null, VALUE_TAG);
+                if (typeString != null && valueString != null) {
+                    try {
+                        GoodsType type = specification.getGoodsType(typeString);
+                        int amount = Integer.parseInt(valueString);
+                        consumption.incrementCount(type, amount);
+                    } catch(Exception e) {
+                        logger.warning("Failed to parse integer " + valueString);
+                    }
                 }
                 in.nextTag(); // close this element
             } else {
@@ -727,6 +730,14 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             out.writeStartElement("default-equipment");
             out.writeAttribute(ID_ATTRIBUTE_TAG, defaultEquipment.getId());
             out.writeEndElement();
+        }
+        if (!consumption.isEmpty()) {
+            for (GoodsType goodsType : consumption.keySet()) {
+                out.writeStartElement("consumes");
+                out.writeAttribute(ID_ATTRIBUTE_TAG, goodsType.getId());
+                out.writeAttribute(VALUE_TAG, Integer.toString(consumption.getCount(goodsType)));
+                out.writeEndElement();
+            }
         }
     }
 

@@ -1069,23 +1069,21 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return immigration;
     }
 
-    
     /**
-     * Returns the number of goods of a given type used by the colony
+     * Returns the number of goods of a given type used by the settlement
      * each turn.
      *
-     * @param goodsType a <code>GoodsType</code> value
+     * @param goodsTypes <code>GoodsType</code> values
      * @return an <code>int</code> value
      */
-    public int getConsumption(GoodsType goodsType) {
-        // TODO: make this more generic
-        if (getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
-            return Math.max(0, getUnitCount() - 2);
-        } else if (getSpecification().getGoodsType("model.goods.food").equals(goodsType)) {
-            return getFoodConsumption();
-        } else {
-            return 0;
+    public int getConsumptionOf(GoodsType... goodsTypes) {
+        int result = super.getConsumptionOf(goodsTypes);
+        for (GoodsType goodsType : goodsTypes) {
+            if (getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
+                result -= getSpecification().getIntegerOption("model.option.unitsThatUseNoBells").getValue();
+            }
         }
+        return Math.max(0, result);
     }
 
     /**
@@ -1246,7 +1244,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      *         <code>Unit</code> or <code>null</code> if there is none.
      */
     private Occupation getOccupationFor(Unit unit) {
-        if (getFoodProduction() > getFoodConsumption() + unit.getType().getFoodConsumed()) {
+        if (getFoodProduction() > getFoodConsumption() +
+            unit.getType().getConsumptionOf(getSpecification().getGoodsType("model.goods.food"))) {
             GoodsType expertProduction = unit.getType().getExpertProduction();
             if (expertProduction == null) {
                 if (unit.getExperience() > 0) {
@@ -1387,7 +1386,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public int getProductionNetOf(GoodsType goodsType) {
         int count = getProductionNextTurn(goodsType);
-        int used = getConsumption(goodsType);
+        int used = getConsumptionOf(goodsType);
 
         Building bldg = getBuildingForConsuming(goodsType);
         if (bldg != null) {
@@ -2290,7 +2289,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         // consume luxury goods, for example
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFoodType()) {
-                removeGoods(goodsType, getConsumption(goodsType));
+                removeGoods(goodsType, getConsumptionOf(goodsType));
             }
         }
 

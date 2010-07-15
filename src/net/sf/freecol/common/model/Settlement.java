@@ -47,7 +47,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             UNDEAD, 
             INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY }
 
-    public static final int RADIUS = 1;
+    // TODO: remove this -- requires AI to calculate actual consumption
     public static final int FOOD_CONSUMPTION = 2;
 
     /** The <code>Player</code> owning this <code>Settlement</code>. */
@@ -580,12 +580,29 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public abstract int getProductionOf(GoodsType goodsType);
 
     /**
+     * Returns the number of goods of a given type used by the settlement
+     * each turn.
+     *
+     * @param goodsTypes <code>GoodsType</code> values
+     * @return an <code>int</code> value
+     */
+    public int getConsumptionOf(GoodsType... goodsTypes) {
+        int result = 0;
+        for (GoodsType goodsType : goodsTypes) {
+            for (Unit unit : getUnitList()) {
+                result += unit.getType().getConsumptionOf(goodsType);
+            }
+        }
+        return Math.max(0, result);
+    }
+
+    /**
      * Gives the food needed to keep all units alive in this Settlement.
      * 
      * @return The amount of food eaten in this colony each this turn.
      */
     public int getFoodConsumption() {
-        return FOOD_CONSUMPTION * getUnitCount();
+        return getConsumptionOf(getSpecification().getGoodsType("model.goods.food"));
     }
     
     /**

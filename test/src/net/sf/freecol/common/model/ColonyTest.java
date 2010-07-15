@@ -186,9 +186,9 @@ public class ColonyTest extends FreeColTestCase {
         colony.newTurn();
         assertEquals(population, colony.getUnitCount());
         assertEquals(4, colony.getProductionOf(bellsType));
-        assertEquals(population - 2, colony.getConsumption(bellsType));
+        assertEquals(population - 2, colony.getConsumptionOf(bellsType));
 
-        int bells = colony.getProductionOf(bellsType) - colony.getConsumption(bellsType);
+        int bells = colony.getProductionOf(bellsType) - colony.getConsumptionOf(bellsType);
         assertEquals(bells, colony.getProductionNetOf(bellsType));
         assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
@@ -203,7 +203,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
 
-        int crosses = colony.getProductionOf(crossType) - colony.getConsumption(crossType);
+        int crosses = colony.getProductionOf(crossType) - colony.getConsumptionOf(crossType);
         assertEquals(crosses, colony.getProductionNetOf(crossType));
         assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());
@@ -236,7 +236,7 @@ public class ColonyTest extends FreeColTestCase {
 
         assertTrue("colony produces less food than it consumes",
                    colony.getFoodProduction() > colony.getFoodConsumption() +
-                   freeColonist.getFoodConsumed());
+                   freeColonist.getConsumptionOf(food));
 
         // colonist with no skill or experience will produce food
         Unit colonist = new Unit(game, colony.getOwner(), freeColonist);
@@ -306,11 +306,14 @@ public class ColonyTest extends FreeColTestCase {
         GoodsType bells = spec().getGoodsType("model.goods.bells");
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         GoodsType cloth = spec().getGoodsType("model.goods.cloth");
+        GoodsType food = spec().getGoodsType("model.goods.food");
         BuildingType townHall = spec().getBuildingType("model.building.townHall");
         BuildingType weaversHouse = spec().getBuildingType("model.building.weaverHouse");
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+        assertEquals(2, freeColonist.getConsumptionOf(food));
         UnitType weaver = spec().getUnitType("model.unit.masterWeaver");
+        assertEquals(2, weaver.getConsumptionOf(food));
 
         Game game = getGame();
         game.setMap(getTestMap(spec().getTileType("model.tile.arctic"), true));
@@ -318,7 +321,7 @@ public class ColonyTest extends FreeColTestCase {
 
         assertTrue("colony produces more food than it consumes",
                    colony.getFoodProduction() < colony.getFoodConsumption() +
-                   freeColonist.getFoodConsumed());
+                   freeColonist.getConsumptionOf(food));
 
         // colonist produces bells because they require no input
         Unit colonist = new Unit(game, colony.getOwner(), spec().getUnitType("model.unit.freeColonist"));

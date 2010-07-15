@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.40 -->
+<!-- specification version 0.41 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -593,13 +593,15 @@
   </improvementaction-types>
 
   <unit-types>
-    <!--- ATTENTION: skillTaught can NOT be inherited! -->
+    <!-- ATTENTION: skillTaught can NOT be inherited because it defaults to the unit type itself! -->
     <unit-type id="colonist" abstract="true" offence="0" defence="1" movement="3" lineOfSight="1"
                pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <downgrade unit="model.unit.freeColonist"/>
+      <consumes id="model.goods.food" value="2" />
+      <consumes id="model.goods.bells" value="1" />
     </unit-type>
     <unit-type id="model.unit.freeColonist" extends="colonist" scoreValue="3" skill="0"
                recruitProbability="20">
@@ -805,6 +807,8 @@
       <modifier id="model.goods.tools" type="additive" value="-2" />
       <downgrade /> <!-- clears all unit type changes! -->
       <upgrade unit="model.unit.freeColonist" learnInSchool="false"/>
+      <consumes id="model.goods.food" value="2" />
+      <consumes id="model.goods.bells" value="1" />
     </unit-type>
     <unit-type id="model.unit.brave" offence="1" defence="1" movement="3" lineOfSight="1" space="1">
       <ability id="model.ability.carryGoods" value="true"/>
@@ -816,6 +820,14 @@
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <required-ability id="model.ability.native"/>
+      <consumes id="model.goods.food" value="2" />
+      <consumes id="model.goods.rum" value="2" />
+      <consumes id="model.goods.tradeGoods" value="2" />
+      <consumes id="model.goods.ore" value="1" />
+      <consumes id="model.goods.silver" value="1" />
+      <consumes id="model.goods.cigars" value="1" />
+      <consumes id="model.goods.coats" value="1" />
+      <consumes id="model.goods.cloth" value="1" />
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
                skillTaught="model.unit.veteranSoldier" skill="4">
@@ -1563,6 +1575,7 @@
       <integerOption id="model.option.taxAdjustment" value="0"/>
       <integerOption id="model.option.mercenaryPrice" value="50"/>
       <integerOption id="model.option.maximumTax" value="50"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="veryHigh" />
@@ -1590,6 +1603,7 @@
       <integerOption id="model.option.taxAdjustment" value="1"/>
       <integerOption id="model.option.mercenaryPrice" value="60"/>
       <integerOption id="model.option.maximumTax" value="60"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="high" />
@@ -1616,6 +1630,7 @@
       <integerOption id="model.option.taxAdjustment" value="2"/>
       <integerOption id="model.option.mercenaryPrice" value="65"/>
       <integerOption id="model.option.maximumTax" value="65"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="medium" />
@@ -1641,6 +1656,7 @@
       <integerOption id="model.option.taxAdjustment" value="3"/>
       <integerOption id="model.option.mercenaryPrice" value="70"/>
       <integerOption id="model.option.maximumTax" value="70"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="low" />
@@ -1665,6 +1681,7 @@
       <integerOption id="model.option.taxAdjustment" value="4"/>
       <integerOption id="model.option.mercenaryPrice" value="75"/>
       <integerOption id="model.option.maximumTax" value="75"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <stringOption  id="model.option.tileProduction" value="veryLow" />
@@ -1689,6 +1706,7 @@
       <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
       <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
       <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="veryLow">

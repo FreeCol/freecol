@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.40
+<!-- XSD for specification version 0.41
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -16,6 +16,7 @@
      0.38: remove overlay attribute from tileimprovement-type
      0.39: remove color from nation and add audio options
      0.40: change tile(s) children of tile improvement to scope
+     0.41: add consumes element to unit-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -312,6 +313,7 @@
         <xs:element ref="required-goods"/>
         <xs:element ref="default-equipment"/>
         <xs:element ref="limit"/>
+        <xs:element ref="consumes"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
@@ -801,6 +803,14 @@
       <xs:attribute name="value" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="consumes">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="default-equipment">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>

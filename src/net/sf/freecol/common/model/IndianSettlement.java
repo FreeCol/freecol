@@ -994,24 +994,13 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        /* Consume goods: TODO: make this more generic */
-        consumeGoods(getSpecification().getGoodsType("model.goods.food"),
-                     getFoodConsumption());
-        consumeGoods(getSpecification().getGoodsType("model.goods.rum"),
-                     2 * workers);
-        consumeGoods(getSpecification().getGoodsType("model.goods.tradeGoods"),
-                     2 * workers);
-        /* TODO: do we need this at all? At the moment, most Indian Settlements
-           consume more than they produce.
-        for (GoodsType goodsType : getSpecification().getNewWorldGoodsTypeList()) {
-            consumeGoods(goodsType, workers);
+        /* Consume goods */
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+            consumeGoods(goodsType, getConsumptionOf(goodsType));
+            /* TODO: do we need this at all? At the moment, most Indian Settlements
+               consume more than they produce.
+            */
         }
-        */
-        consumeGoods(getSpecification().getGoodsType("model.goods.ore"), workers);
-        consumeGoods(getSpecification().getGoodsType("model.goods.silver"), workers);
-        consumeGoods(getSpecification().getGoodsType("model.goods.cigars"), workers);
-        consumeGoods(getSpecification().getGoodsType("model.goods.coats"), workers);
-        consumeGoods(getSpecification().getGoodsType("model.goods.cloth"), workers);
         goodsContainer.removeAbove(500);
 
         checkForNewIndian();
