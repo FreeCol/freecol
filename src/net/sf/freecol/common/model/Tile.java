@@ -35,10 +35,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.PathType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 import org.w3c.dom.Element;
 
@@ -1510,9 +1513,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else if (getSettlement() != null) {
             IndianSettlement settlement = (IndianSettlement) getSettlement();
             pet.setMissionary(settlement.getMissionary());
-            if (settlement.hasBeenVisited(player)) {
-                pet.setVisited();
-            }
+            pet.setVisited();
             /*
              * These attributes should not be updated by this method: skill,
              * highlyWantedGoods, wantedGoods1 and wantedGoods2
@@ -1671,12 +1672,167 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
     
     /**
-     * Returns a String representation of this Tile.
-     * 
-     * @return A String representation of this Tile.
+     * Gets the position adjacent Tile to a given Tile, in a given
+     * direction.
+     *
+     * @param direction The direction (N, NE, E, etc.)
+     * @return Adjacent tile
      */
-    public String toString() {
-        return "Tile("+x+","+y+"):"+((type==null)?"unknown":type.getId());
+     public Tile getAdjacentTile(Direction direction) {
+         int x = getX() + ((getY() & 1) != 0 ?
+                               direction.getOddDX() : direction.getEvenDX());
+         int y = getY() + ((getY() & 1) != 0 ?
+                               direction.getOddDY() : direction.getEvenDY());
+         return getMap().getTile(x, y);
+}
+
+     /**
+      * Returns all the tiles surrounding the given tile within the
+      * given range. The center tile itself is not included.
+      *
+      * @param t
+      *            The tile that lies on the center of the tiles to return.
+      * @param range
+      *            How far away do we need to go starting from the center tile.
+      * @return The tiles surrounding the given tile.
+      */
+     public Iterable<Tile> getSurroundingTiles(final int range) {
+         return new Iterable<Tile>(){
+             public Iterator<Tile> iterator(){
+                 final Iterator<Position> m;
+
+                 if (range == 1)
+                     m = getMap().getAdjacentIterator(getPosition());
+                 else
+                     m = getMap().getCircleIterator(getPosition(), true, range);
+
+                 return new Iterator<Tile>(){
+                     public boolean hasNext() {
+                         return m.hasNext();
+}
+
+                     public Tile next() {
+                         return getMap().getTile(m.next());
+         }
+
+                     public void remove() {
+                         m.remove();
+     }
+                 };
+             }
+         };
+
+     }
+
+
+     /**
+      * Returns all the tiles surrounding the given tile within the
+      * given inclusive upper and lower bounds.
+      * getSurroundingTiles(t, r) is equivalent to getSurroundingTiles(t, 1, r).
+      *
+      * @param t The <code>Tile</code> that lies on the center.
+      * @param rangeMin The inclusive minimum distance from the center tile.
+      * @param rangeMax The inclusive maximum distance from the center tile.
+      * @return A list of the tiles surrounding the given tile.
+      */
+     public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
+         List<Tile> result = new ArrayList<Tile>();
+
+         if (rangeMin > rangeMax || rangeMin < 0) {
+             return result;
+}
+
+         if (rangeMax == 0) {
+             result.add(this);
+             return result;
+         }
+         for (Tile tileToAdd: getSurroundingTiles(rangeMax)){
+             // add all tiles up to rangeMax
+             result.add(tileToAdd);
+         }
+         if (rangeMin == 0) { // remove nothing
+             return result;
+         }
+
+         if (rangeMin == 1) { // remove just the center tile
+             result.remove(this);
+             return result;
+         }
+
+         for (Tile tileToRemove: getSurroundingTiles(rangeMin - 1)) {
+             // remove the tiles closer than rangeMin
+             result.remove(tileToRemove);
+         }
+         return result;
+     }
+
+    /**
+     * Checks if the given <code>Tile</code> is adjacent to the
+     * east or west edge of the map.
+     * 
+     * @return <code>true</code> if the given tile is at the edge of the map.
+     */
+    public boolean isAdjacentToVerticalMapEdge() {
+        if ((getNeighbourOrNull(Direction.E) == null)
+            || (getNeighbourOrNull(Direction.W) == null)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the given <code>Tile</code> is adjacent to the edge of the
+     * map.
+     *
+     * @return <code>true</code> if the given tile is at the edge of the map.
+     */
+    public boolean isAdjacentToMapEdge() {
+        for (Direction direction : Direction.values()) {
+            if (getNeighbourOrNull(direction) == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Finds the closest <code>Location</code> to this tile where
+     * a ship can be repaired.
+     *
+     * @param player The <code>Player</code> whose repair locations
+     *     are searched.
+     * @return The closest <code>Location</code> where a ship can be repaired.
+     */
+    public Location getRepairLocation(Player player) {
+        Location closestLocation = null;
+        int shortestDistance = INFINITY;
+        Map map = getGame().getMap();
+        for (Colony colony : player.getColonies()) {
+            if (colony == null || colony.getTile() == this) {
+                // Disallow a colony on the start tile, as this routine
+                // can be called as part of colony capture, and thus this
+                // colony will no longer be suitable.
+                continue;
+            }
+            int distance;
+            if (colony.hasAbility("model.ability.repairUnits")) {
+                // Tile.getDistanceTo(Tile) doesn't care about
+                // connectivity, so we need to check for an available
+                // path to target colony instead
+                PathNode pn = map.findPath(this, colony.getTile(),
+                                           PathType.ONLY_SEA);
+                if (pn != null
+                    && (distance = pn.getTotalTurns()) < shortestDistance) {
+                    closestLocation = colony;
+                    shortestDistance = distance;
+                }
+            }
+        }
+        boolean connected = isConnected()
+            || (getColony() != null && getColony().isConnected());
+        return (closestLocation != null) ? closestLocation
+            : (connected) ? player.getEurope()
+            : null;
     }
 
 
@@ -1890,6 +2046,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Returns a String representation of this Tile.
+     * 
+     * @return A String representation of this Tile.
+     */
+    public String toString() {
+        return "Tile("+x+","+y+"):"+((type==null)?"unknown":type.getId());
+    }
+
+    /**
      * Returns the tag name of the root element representing this object.
      * 
      * @return "tile".
@@ -1897,129 +2062,5 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public static String getXMLElementTagName() {
         return "tile";
     }
-
-    /**
-     * Gets the position adjacent Tile to a given Tile, in a given
-     * direction.
-     *
-     * @param direction The direction (N, NE, E, etc.)
-     * @return Adjacent tile
-     */
-     public Tile getAdjacentTile(Direction direction) {
-         int x = getX() + ((getY() & 1) != 0 ?
-                               direction.getOddDX() : direction.getEvenDX());
-         int y = getY() + ((getY() & 1) != 0 ?
-                               direction.getOddDY() : direction.getEvenDY());
-         return getMap().getTile(x, y);
-}
-
-     /**
-      * Returns all the tiles surrounding the given tile within the
-      * given range. The center tile itself is not included.
-      *
-      * @param t
-      *            The tile that lies on the center of the tiles to return.
-      * @param range
-      *            How far away do we need to go starting from the center tile.
-      * @return The tiles surrounding the given tile.
-      */
-     public Iterable<Tile> getSurroundingTiles(final int range) {
-         return new Iterable<Tile>(){
-             public Iterator<Tile> iterator(){
-                 final Iterator<Position> m;
-
-                 if (range == 1)
-                     m = getMap().getAdjacentIterator(getPosition());
-                 else
-                     m = getMap().getCircleIterator(getPosition(), true, range);
-
-                 return new Iterator<Tile>(){
-                     public boolean hasNext() {
-                         return m.hasNext();
-}
-
-                     public Tile next() {
-                         return getMap().getTile(m.next());
-         }
-
-                     public void remove() {
-                         m.remove();
-     }
-                 };
-             }
-         };
-
-     }
-
-
-     /**
-      * Returns all the tiles surrounding the given tile within the
-      * given inclusive upper and lower bounds.
-      * getSurroundingTiles(t, r) is equivalent to getSurroundingTiles(t, 1, r).
-      *
-      * @param t The <code>Tile</code> that lies on the center.
-      * @param rangeMin The inclusive minimum distance from the center tile.
-      * @param rangeMax The inclusive maximum distance from the center tile.
-      * @return A list of the tiles surrounding the given tile.
-      */
-     public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
-         List<Tile> result = new ArrayList<Tile>();
-
-         if (rangeMin > rangeMax || rangeMin < 0) {
-             return result;
-}
-
-         if (rangeMax == 0) {
-             result.add(this);
-             return result;
-         }
-         for (Tile tileToAdd: getSurroundingTiles(rangeMax)){
-             // add all tiles up to rangeMax
-             result.add(tileToAdd);
-         }
-         if (rangeMin == 0) { // remove nothing
-             return result;
-         }
-
-         if (rangeMin == 1) { // remove just the center tile
-             result.remove(this);
-             return result;
-         }
-
-         for (Tile tileToRemove: getSurroundingTiles(rangeMin - 1)) {
-             // remove the tiles closer than rangeMin
-             result.remove(tileToRemove);
-         }
-         return result;
-     }
-
-    /**
-     * Checks if the given <code>Tile</code> is adjacent to the
-     * east or west edge of the map.
-     * 
-     * @return <code>true</code> if the given tile is at the edge of the map.
-     */
-    public boolean isAdjacentToVerticalMapEdge() {
-        if ((getNeighbourOrNull(Direction.E) == null)||(getNeighbourOrNull(Direction.W) == null)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the given <code>Tile</code> is adjacent to the edge of the
-     * map.
-     *
-     * @return <code>true</code> if the given tile is at the edge of the map.
-     */
-    public boolean isAdjacentToMapEdge() {
-        for (Direction direction : Direction.values()) {
-            if (getNeighbourOrNull(direction) == null) {
-                return true;
-}
-        }
-        return false;
-    }
-
 
 }

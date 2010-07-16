@@ -526,6 +526,19 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the missionary from this settlement if there is one and
+     * it is owned by a specified player.
+     *
+     * @param player The player purported to own the missionary
+     * @return The missionary from this settlement if there is one and
+     *     it is owned by the specified player, otherwise null.
+     */
+    public Unit getMissionary(Player player) {
+        return (missionary == null || missionary.getOwner() != player) ? null
+            : missionary;
+    }
+
+    /**
      * Gets the convert progress status for this settlement.
      *
      * @return The convert progress status.

@@ -1959,34 +1959,7 @@ public class Player extends FreeColGameObject implements Nameable {
         } else if (unit.getTile() == null) {
             throw new IllegalArgumentException("Repair for unit not on the map!?!");
         }
-
-        Location closestLocation = null;
-        int shortestDistance = INFINITY;
-        for (Colony colony : getColonies()) {
-            if (colony == null || colony.getTile() == unit.getTile()) {
-                // This happens when is called from damageAllShips because
-                // the colony is being captured and can't be repaired in that
-                // colony
-                continue;
-            }
-            int distance;
-            if (colony.hasAbility("model.ability.repairUnits")) {
-                // Tile.getDistanceTo(Tile) doesn't care about
-                // connectivity, so we need to check for an available
-                // path to target colony instead
-                PathNode pn = unit.findPath(colony.getTile());
-                if (pn != null && (distance = pn.getTotalTurns()) < shortestDistance) {
-                    closestLocation = colony;
-                    shortestDistance = distance;
-                }
-            }
-        }
-        if (closestLocation != null) {
-            return closestLocation;
-        }
-        Tile tile = unit.getTile();
-        return ((tile.getColony() != null && tile.getColony().isConnected())
-                || tile.isConnected()) ? getEurope() : null;
+        return unit.getTile().getRepairLocation(unit.getOwner());
     }
 
     public void incrementLiberty(int amount) {

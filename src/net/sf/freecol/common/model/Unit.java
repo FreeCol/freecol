@@ -3543,9 +3543,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return unitType.getHitPoints() - getHitpoints();
     }
 
-    /*
-     * Get the available equipment that can be equipped automatically in case of an attack
-     * Returns null if it cannot be automatically equipped.
+    /**
+     * Gets the available equipment that can be equipped automatically
+     * in case of an attack.
+     *
+     * @return The equipment that can be automatically equipped by
+     *     this unit, or null if none.
      */
     public TypeCountMap<EquipmentType> getAutomaticEquipment(){
         // Paul Revere makes an unarmed colonist in a settlement pick up
@@ -3577,31 +3580,103 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
 
         for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
-                for (Ability ability : autoDefence) {
-                    if (!ability.appliesTo(equipment)){
-                        continue;
-                    }
-                    if (!canBeEquippedWith(equipment)) {
-                        continue;
-                    }
+            for (Ability ability : autoDefence) {
+                if (!ability.appliesTo(equipment)){
+                    continue;
+                }
+                if (!canBeEquippedWith(equipment)) {
+                    continue;
+                }
 
-                    boolean hasReqGoods = true;
-                    for(AbstractGoods goods : equipment.getGoodsRequired()){
-                        if(settlement.getGoodsCount(goods.getType()) < goods.getAmount()){
-                            hasReqGoods = false;
-                            break;
-                        }
-                    }
-                    if(hasReqGoods){
-                        // lazy initialization, required
-                        if(equipmentList == null){
-                            equipmentList = new TypeCountMap<EquipmentType>();
-                        }
-                        equipmentList.incrementCount(equipment, 1);
+                boolean hasReqGoods = true;
+                for(AbstractGoods goods : equipment.getGoodsRequired()){
+                    if(settlement.getGoodsCount(goods.getType()) < goods.getAmount()){
+                        hasReqGoods = false;
+                        break;
                     }
                 }
+                if(hasReqGoods){
+                    // lazy initialization, required
+                    if(equipmentList == null){
+                        equipmentList = new TypeCountMap<EquipmentType>();
+                    }
+                    equipmentList.incrementCount(equipment, 1);
+                }
+            }
         }
         return equipmentList;
+    }
+
+    /**
+     * Does losing a piece of equipment mean the death of this unit?
+     *
+     * @param lose The <code>EquipmentType</code> to lose.
+     * @return True if the unit is doomed.
+     */
+    public boolean losingEquipmentKillsUnit(EquipmentType lose) {
+        if (hasAbility("model.ability.disposeOnAllEquipLost")) {
+            for (EquipmentType equip : getEquipment().keySet()) {
+                if (equip != lose) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the probability that an attack by this unit will provoke a
+     * native to convert.
+     *
+     * @return A probability of conversion as an integer in [0..100].
+     */
+    public int getConvertProbability() {
+        Specification spec = getSpecification();
+        int opt = spec.getIntegerOption("model.option.nativeConvertProbability")
+            .getValue();
+        return (int) FeatureContainer.applyModifierSet(opt,
+                getGame().getTurn(),
+                getModifierSet("model.modifier.nativeConvertBonus"));
+    }
+
+    /**
+     * Gets the probability that an attack by this unit will provoke natives
+     * to burn our missions.
+     *
+     * @return A probability of burning as an integer in [0..100].
+     */
+    public int getBurnProbability() {
+        // TODO: enhance burn probability proportionally with tension
+        return getSpecification()
+            .getIntegerOption("model.option.burnProbability").getValue();
+    }
+
+    /**
+     * Get a type change for this unit.
+     *
+     * @param change The <code>ChangeType</code> to consider.
+     * @return The resulting new unit type.
+     */
+    public UnitType getTypeChange(ChangeType change) {
+        return getType().getUnitTypeChange(change, getOwner());
+    }
+
+    /**
+     * Gets the best combat equipment type that this unit has.
+     *
+     * @param equipment The equipment to look through, such as returned by
+     *     @see Unit#getEquipment() and/or @see Unit#getAutomaticEquipment().
+     * @return The equipment type to lose, or null if none.
+     */
+    public EquipmentType getBestCombatEquipmentType(TypeCountMap<EquipmentType> equipment) {
+        EquipmentType lose = null;
+        int combatLossPriority = -1;
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            if (equipmentType.getCombatLossPriority() > combatLossPriority) {
+                lose = equipmentType;
+                combatLossPriority = equipmentType.getCombatLossPriority();
+            }
+        }
+        return lose;
     }
 
 
