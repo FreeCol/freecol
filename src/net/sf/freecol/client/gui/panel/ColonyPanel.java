@@ -1346,6 +1346,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public final class TilePanel extends FreeColPanel {
 
         private final ColonyPanel colonyPanel;
+        private Tile[][] tiles = new Tile[3][3];
 
         /**
          * Creates this TilePanel.
@@ -1361,73 +1362,30 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void initialize() {
+            Tile tile = colony.getTile();
+            tiles[0][0] = tile.getNeighbourOrNull(Direction.N);
+            tiles[0][1] = tile.getNeighbourOrNull(Direction.NE);
+            tiles[0][2] = tile.getNeighbourOrNull(Direction.E);
+            tiles[1][0] = tile.getNeighbourOrNull(Direction.NW);
+            tiles[1][1] = tile;
+            tiles[1][2] = tile.getNeighbourOrNull(Direction.SE);
+            tiles[2][0] = tile.getNeighbourOrNull(Direction.W);
+            tiles[2][1] = tile.getNeighbourOrNull(Direction.SW);
+            tiles[2][2] = tile.getNeighbourOrNull(Direction.S);
+
             int layer = 2;
 
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
-                    ColonyTile tile = getColonyTile(x, y);
-                    if (tile==null)
-                        continue;
-                    ASingleTilePanel p = new ASingleTilePanel(tile, x, y);
-                    add(p, new Integer(layer));
-                    layer++;
+                    if (tiles[x][y] != null) {
+                        ColonyTile colonyTile = colony.getColonyTile(tiles[x][y]);
+                        ASingleTilePanel p = new ASingleTilePanel(colonyTile, x, y);
+                        add(p, new Integer(layer));
+                        layer++;
+                    }
                 }
             }
         }
-
-
-        /**
-         * Gets a <code>Tile</code> from the neighbourhood of this 
-         * <code>Colony</code>.
-         * 
-         * @param x The x-coordinate of the <code>Tile</code>.
-         * @param y The y-coordinate of the <code>Tile</code>. 
-         * @return The <code>Tile</code>.
-         */
-        public Tile getTile(int x, int y) {
-            Tile tile = colony.getTile();
-            if (x==0 && y==0) {
-                return tile.getNeighbourOrNull(Direction.N);
-            } else if (x==0 && y== 1) {
-                return tile.getNeighbourOrNull(Direction.NE);
-            } else if (x==0 && y== 2) {
-                return tile.getNeighbourOrNull(Direction.E);
-            } else if (x==1 && y== 0) {
-                return tile.getNeighbourOrNull(Direction.NW);
-            } else if (x==1 && y== 1) {
-                return tile;
-            } else if (x==1 && y== 2) {
-                return tile.getNeighbourOrNull(Direction.SE);
-            } else if (x==2 && y== 0) {
-                return tile.getNeighbourOrNull(Direction.W);
-            } else if (x==2 && y== 1) {
-                return tile.getNeighbourOrNull(Direction.SW);
-            } else if (x==2 && y== 2) {
-                return tile.getNeighbourOrNull(Direction.S);
-            } else {
-                return null;
-            }
-        }
-
-
-        /**
-         * Gets the specified <code>ColonyTile</code>.
-         * 
-         * @param x The x-coordinate of the <code>Tile</code>.
-         * @param y The y-coordinate of the <code>Tile</code>.
-         * @return The <code>ColonyTile</code> for the <code>Tile</code>
-         *         returned by {@link #getTile(int, int)}.
-         */
-        public ColonyTile getColonyTile(int x, int y) {
-            Tile t = getTile(x, y);
-            for (ColonyTile c : colony.getColonyTiles()) {
-                if (c.getWorkTile() == t) {
-                    return c;
-                }
-            }
-            return null;
-        }
-
         public void removePropertyChangeListeners() {
             for (Component component : getComponents()) {
                 if (component instanceof ASingleTilePanel) {
@@ -1450,12 +1408,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             if (getColony() != null) {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
-                        Tile tile = getTile(x, y);
-                        int xx = ((2 - x) + y) * tileWidth;
-                        int yy = (x + y) * tileHeight;
-                        if (tile != null) {
+                        if (tiles[x][y] != null) {
+                            int xx = ((2 - x) + y) * tileWidth;
+                            int yy = (x + y) * tileHeight;
                             g.translate(xx, yy);
-                            colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tile, getColony());
+                            colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tiles[x][y], getColony());
                             g.translate(-xx, -yy);
                         }
                     }
