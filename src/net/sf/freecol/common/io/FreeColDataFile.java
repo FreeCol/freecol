@@ -48,6 +48,7 @@ import net.sf.freecol.common.util.Utils;
  * is either a ZIP-file or a directory containing certain files.
  */
 public class FreeColDataFile {
+
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
     
     private static final String RESOURCES_PROPERTIES_FILE = "resources.properties";
@@ -127,6 +128,43 @@ public class FreeColDataFile {
             } catch (Exception e) {}
         }
     }
+
+    /**
+     * Returns a list containing the names of all
+     * message files to load.
+     *
+     * @param prefix a <code>String</code> value
+     * @param suffix a <code>String</code> value
+     * @param language a <code>String</code> value
+     * @param country a <code>String</code> value
+     * @param variant a <code>String</code> value
+     * @return a <code>List<String></code> value
+     */
+    public static List<String> getFileNames(String prefix, String suffix, String language,
+                                            String country, String variant) {
+
+        List<String> result = new ArrayList<String>(4);
+
+        if (!language.equals("")) {
+            language = "_" + language;
+        }
+        if (!country.equals("")) {
+            country = "_" + country;
+        }
+        if (!variant.equals("")) {
+            variant = "_" + variant;
+        }
+
+        result.add(prefix + suffix);
+        String filename = prefix + language + suffix;
+        if (!result.contains(filename)) result.add(filename);
+        filename = prefix + language + country + suffix;
+        if (!result.contains(filename)) result.add(filename);
+        filename = prefix + language + country + variant + suffix;
+        if (!result.contains(filename)) result.add(filename);
+        return result;
+    }
+
 
     /**
      * Returns an input stream for the specified resource.

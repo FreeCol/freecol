@@ -86,52 +86,27 @@ public class Messages {
     private static void setMessageBundle(String language, String country, String variant) {
 
         messageBundle = new Properties();
+        List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX, FILE_SUFFIX, language, country, variant);
 
-        for (String fileName : getFileNames(language, country, variant)) {
+        for (String fileName : filenames) {
             File resourceFile = new File(getI18nDirectory(), fileName);
             loadResources(resourceFile);
+            logger.finest("Loaded message bundle " + fileName + " from messages.");
         }
 
         for (FreeColModFile fcmf : Mods.getAllMods()) {
-            for (String fileName : getFileNames(language, country, variant)) {
+            for (String fileName : filenames) {
                 try {
                     InputStream is = fcmf.getInputStream(fileName);
                     loadResources(is);
+                    logger.finest("Loaded message bundle " + fileName + " from "
+                                  + fcmf.getModInfo().getName() + ".");
                 } catch (IOException e) {
                     // Ignore.  The file does not have to be there.
                 }
             }
         }
     }
-
-    /**
-     * Returns an ordered string array containing the names of all
-     * message files to load.
-     *
-     * @param language a <code>String</code> value
-     * @param country a <code>String</code> value
-     * @param variant a <code>String</code> value
-     * @return a <code>String[]</code> value
-     */
-    public static String[] getFileNames(String language, String country, String variant) {
-
-       if (!language.equals("")) {
-            language = "_" + language;
-        }
-        if (!country.equals("")) {
-            country = "_" + country;
-        }
-        if (!variant.equals("")) {
-            variant = "_" + variant;
-        }
-        return new String[] {
-            FILE_PREFIX + FILE_SUFFIX,
-            FILE_PREFIX + language + FILE_SUFFIX,
-            FILE_PREFIX + language + country + FILE_SUFFIX,
-            FILE_PREFIX + language + country + variant + FILE_SUFFIX
-        };
-   }
-
 
     /**
      * Returns the directory containing language property files.
