@@ -593,7 +593,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         
         
         // farmed goods
-        goodsTypes = spec.getFarmedGoodsTypeList();
+        goodsTypes = new ArrayList<GoodsType>(spec.getFarmedGoodsTypeList());
         goodsTypes.removeAll(spec.getFoodGoodsTypeList());
         goodsTypes.removeAll(spec.getLibertyGoodsTypeList());
         goodsTypes.removeAll(spec.getImmigrationGoodsTypeList());
