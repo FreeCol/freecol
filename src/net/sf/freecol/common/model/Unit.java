@@ -2626,16 +2626,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Sends this <code>Unit</code> to the closest <code>Location</code> it
-     * can get repaired.
-     */
-    public void sendToRepairLocation(Location l) {
-        setLocation(l);
-        setState(UnitState.ACTIVE);
-        setMovesLeft(0);
-    }
-
-    /**
      * Returns a String representation of this Unit.
      * 
      * @return A String representation of this Unit.
@@ -3339,29 +3329,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Captures the goods on board of the enemy unit.
-     * 
-     * @param enemyUnit The unit we are attacking.
-     */
-    public void captureGoods(Unit enemyUnit) {
-        if (!canCaptureGoods()) {
-            return;
-        }
-        // can capture goods; regardless attacking/defending
-        Iterator<Goods> iter = enemyUnit.getGoodsIterator();
-        while (iter.hasNext() && getSpaceLeft() > 0) {
-            // TODO: show CaptureGoodsDialog if there's not enough
-            // room for everything.
-            Goods g = iter.next();
-
-            // MESSY, but will mess up the iterator if we do this
-            // besides, this gets cleared out later
-            // enemy.getGoodsContainer().removeGoods(g);
-            getGoodsContainer().addGoods(g);
-        }
-    }
-
-    /**
      * Gets the Colony this unit is in.
      * 
      * @return The Colony it's in, or null if it is not in a Colony
@@ -3386,18 +3353,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else {
             return Math.round(FeatureContainer.applyModifierSet(base, getGame().getTurn(),
                                                                 getModifierSet(goodsType.getId())));
-        }
-    }
-
-
-    /**
-     * Disposes all Units aboard this one.
-     */
-    public void disposeAllUnits() {
-        // Copy the list first, as the Unit will try to remove itself
-        // from its location.
-        for (Unit unit : new ArrayList<Unit>(units)) {
-            unit.dispose();
         }
     }
 
@@ -3669,11 +3624,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public EquipmentType getBestCombatEquipmentType(TypeCountMap<EquipmentType> equipment) {
         EquipmentType lose = null;
-        int combatLossPriority = -1;
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            if (equipmentType.getCombatLossPriority() > combatLossPriority) {
-                lose = equipmentType;
-                combatLossPriority = equipmentType.getCombatLossPriority();
+        if (equipment != null) {
+            int priority = -1;
+            for (EquipmentType equipmentType : equipment.keySet()) {
+                if (equipmentType.getCombatLossPriority() > priority) {
+                    lose = equipmentType;
+                    priority = equipmentType.getCombatLossPriority();
+                }
             }
         }
         return lose;
