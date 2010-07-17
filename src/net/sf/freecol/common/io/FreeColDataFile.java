@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +52,8 @@ public class FreeColDataFile {
 
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
     
-    private static final String RESOURCES_PROPERTIES_FILE = "resources.properties";
+    private static final String FILE_PREFIX = "resources";
+    private static final String FILE_SUFFIX = ".properties";
 
     /**
        A fake URI scheme for transferring the resource lookup to the
@@ -211,65 +213,72 @@ public class FreeColDataFile {
     }
 
     /**
-     * Creates a <code>ResourceMapping</code> from the file
-     * {@value #RESOURCES_PROPERTIES_FILE}.
+     * Creates a <code>ResourceMapping</code> from the available
+     * resource files.
      * 
      * @return A <code>ResourceMapping</code> or <code>null</code>
      *      there is no resource mapping file.
      */
     public ResourceMapping getResourceMapping() {
-        try {
-            final Properties properties = new Properties();
-            final InputStream is = getInputStream(RESOURCES_PROPERTIES_FILE);
+
+        final Properties properties = new Properties();
+        Locale locale = Locale.getDefault();
+        for (String fileName : getFileNames(FILE_PREFIX, FILE_SUFFIX, locale.getLanguage(),
+                                            locale.getCountry(), locale.getVariant())) {
             try {
-                properties.load(is);
-            } finally {
+                final InputStream is = getInputStream(fileName);
                 try {
-                    is.close();
-                } catch (Exception e) {}
-            }
-            ResourceMapping rc = new ResourceMapping();
-            List<String> todo = new ArrayList<String>();
-            Enumeration<?> pn = properties.propertyNames();
-            while (pn.hasMoreElements()) {
-                final String key = (String) pn.nextElement();
-                final String value = properties.getProperty(key);
-                if (value.startsWith(resourceScheme)) {
-                    todo.add(key);
-                } else {
-                    rc.add(key, ResourceFactory.createResource(getURI(value)));
+                    properties.load(is);
+                    logger.info("Loaded ResourceMapping " + fileName + " from " + file + ".");
+                } finally {
+                    try {
+                        is.close();
+                    } catch (Exception e) {}
                 }
+            } catch (FileNotFoundException e) {
+                logger.finest("No ResourceMapping " + fileName + " in " + file + ".");
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
+                return null;
             }
-            boolean progress = true;
-            List<String> miss = new ArrayList<String>();
-            while (progress && !todo.isEmpty()) {
-                miss.clear();
-                progress = false;
-                while (!todo.isEmpty()) {
-                    final String key = todo.remove(0);
-                    final String value = properties.getProperty(key)
-                        .substring(resourceScheme.length());
-                    Resource r = rc.get(value);
-                    if (r == null) {
-                        miss.add(key);
-                    } else {
-                        rc.add(key, r);
-                        progress = true;
-                    }
-                }
-                todo.addAll(miss);
-            }
-            if (!todo.isEmpty()) {
-                logger.warning("Could not resolve virtual resource/s: "
-                               + Utils.join(" ", todo));
-            }
-            return rc;
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
-            return null;
         }
+
+        ResourceMapping rc = new ResourceMapping();
+        List<String> todo = new ArrayList<String>();
+        Enumeration<?> pn = properties.propertyNames();
+        while (pn.hasMoreElements()) {
+            final String key = (String) pn.nextElement();
+            final String value = properties.getProperty(key);
+            if (value.startsWith(resourceScheme)) {
+                todo.add(key);
+            } else {
+                rc.add(key, ResourceFactory.createResource(getURI(value)));
+            }
+        }
+        boolean progress = true;
+        List<String> miss = new ArrayList<String>();
+        while (progress && !todo.isEmpty()) {
+            miss.clear();
+            progress = false;
+            while (!todo.isEmpty()) {
+                final String key = todo.remove(0);
+                final String value = properties.getProperty(key)
+                    .substring(resourceScheme.length());
+                Resource r = rc.get(value);
+                if (r == null) {
+                    miss.add(key);
+                } else {
+                    rc.add(key, r);
+                    progress = true;
+                }
+            }
+            todo.addAll(miss);
+        }
+        if (!todo.isEmpty()) {
+            logger.warning("Could not resolve virtual resource/s: "
+                           + Utils.join(" ", todo));
+        }
+        return rc;
     }
     
     /**

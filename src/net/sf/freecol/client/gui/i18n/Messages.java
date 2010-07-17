@@ -102,7 +102,8 @@ public class Messages {
                     logger.finest("Loaded message bundle " + fileName + " from "
                                   + fcmf.getModInfo().getName() + ".");
                 } catch (IOException e) {
-                    // Ignore.  The file does not have to be there.
+                    logger.fine("No message bundle " + fileName + " in "
+                                + fcmf.getModInfo().getName() + ".");
                 }
             }
         }
