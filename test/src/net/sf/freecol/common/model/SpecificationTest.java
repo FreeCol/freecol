@@ -28,8 +28,9 @@ import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.RangeOption;
+import net.sf.freecol.util.test.FreeColTestCase;
 
-public final class SpecificationTest extends TestCase {
+public final class SpecificationTest extends FreeColTestCase {
 
     /**
      * Make sure that a specification object can be created without an exception
@@ -248,6 +249,22 @@ public final class SpecificationTest extends TestCase {
                 assertEquals(equipmentTypeStr + " has wrong value for req. ability " + key,abilitiesReq.get(key),ability.getValue());
             }
         }
+    }
+
+    public void testGoodsTypes() {
+
+        GoodsType food = spec().getGoodsType("model.goods.food");
+        assertTrue(food.isFarmed());
+        assertTrue(spec().getFarmedGoodsTypeList().contains(food));
+        assertTrue(food.isFoodType());
+        assertTrue(spec().getFoodGoodsTypeList().contains(food));
+
+        GoodsType fish = spec().getGoodsType("model.goods.fish");
+        assertTrue(fish.isFarmed());
+        assertTrue(spec().getFarmedGoodsTypeList().contains(fish));
+        assertTrue(fish.isFoodType());
+        assertTrue(spec().getFoodGoodsTypeList().contains(fish));
+
     }
 
 }
