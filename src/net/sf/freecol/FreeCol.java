@@ -85,6 +85,7 @@ public final class FreeCol {
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
+    public static final int     DEFAULT_PORT = 3541;
     
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
@@ -130,9 +131,8 @@ public final class FreeCol {
 
     private static String fontName = null;
 
-    private static int serverPort;
+    private static int serverPort = DEFAULT_PORT;
     private static String serverName = null;
-    private static final int DEFAULT_PORT = 3541;
 
     private static File mainUserDirectory = null;
 
@@ -190,9 +190,6 @@ public final class FreeCol {
         // parse command line arguments
         handleArgs(args);
         
-        // Display splash screen:
-        final JWindow splash = (displaySplash) ? displaySplash(splashFilename) : null;
-
         createAndSetDirectories();
         initLogging();
 
@@ -201,7 +198,6 @@ public final class FreeCol {
         Messages.setMessageBundle(locale);
         
         if (javaCheck && !checkJavaVersion()) {
-            removeSplash(splash);
             System.err.println("Java version " + MIN_JDK_VERSION +
                                " or better is recommended in order to run FreeCol." +
                                " Use --no-java-check to skip this check.");
@@ -210,166 +206,20 @@ public final class FreeCol {
 
         int  minMemory = 128;  // million bytes
         if (memoryCheck && Runtime.getRuntime().maxMemory() < minMemory * 1000000) {
-            removeSplash(splash);
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
             System.exit(1);
         }
         
         if (!initializeResourceFolders()) {
-            removeSplash(splash);
             System.exit(1);
         }
 
         if (standAloneServer) {
-            logger.info("Starting stand-alone server.");
-            try {
-                final FreeColServer freeColServer;
-                if (savegameFile != null) {
-                    XMLStream xs = null;
-                    try {
-                        // Get suggestions for "singleplayer" and "public game" settings from the file:
-                        final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
-                        xs = FreeColServer.createXMLStreamReader(fis);
-                        final XMLStreamReader in = xs.getXMLStreamReader();
-                        in.nextTag();
-                        final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
-                        final boolean defaultPublicServer;
-                        final String publicServerStr =  in.getAttributeValue(null, "publicServer");
-                        if (publicServerStr != null) {
-                            defaultPublicServer = Boolean.valueOf(publicServerStr).booleanValue();
-                        } else {
-                            defaultPublicServer = false;
-                        }
-                        xs.close();
-                        
-                        freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
-                        if (checkIntegrity) {
-                        	String integrityCheckMsg = "";
-                        	boolean integrityOK = freeColServer.getIntegrity();
-                        	if(integrityOK){
-                        		integrityCheckMsg = Messages.message("cli.check-savegame.success");
-                        	}
-                        	else{
-                        		integrityCheckMsg = Messages.message("cli.check-savegame.failure");
-                        	}
-                        	System.out.println(integrityCheckMsg);
-                        	System.exit(integrityOK ? 0 : 1);
-                        }
-                    } catch (Exception e) {
-                        removeSplash(splash);
-                        if (checkIntegrity) {
-                        	System.out.println(Messages.message("cli.check-savegame.failure"));
-                        }
-                        System.out.println("Could not load savegame.");
-                        System.exit(1);
-                        return;
-                    } finally {
-                        xs.close();
-                    }
-                } else {
-                    try {
-                        freeColServer = new FreeColServer(publicServer, false, serverPort, serverName);
-                    } catch (NoRouteToServerException e) {
-                        removeSplash(splash);
-                        System.out.println(Messages.message("server.noRouteToServer"));
-                        System.exit(1);
-                        return;
-                    }
-                }
-
-                Runtime runtime = Runtime.getRuntime();
-                runtime.addShutdownHook(new Thread() {
-                        public void run() {
-                            freeColServer.getController().shutdown();
-                        }
-                    });
-            } catch (IOException e) {
-                removeSplash(splash);
-                System.err.println("Error while loading server: " + e);
-                System.exit(1);
-            }
+            startServer();
         } else {
-            final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-            if (windowSize.width == -1 || windowSize.height == -1) {
-                // Allow room for frame handles, taskbar etc if using windowed mode:
-                windowSize.width = bounds.width - DEFAULT_WINDOW_SPACE;
-                windowSize.height = bounds.height - DEFAULT_WINDOW_SPACE;
-            }
-            final Dimension preloadSize;
-            if (windowed) {
-                preloadSize = windowSize;
-            } else {
-                preloadSize = new Dimension(bounds.width, bounds.height);
-            }
-
-            Font font = null;
-            if (fontName != null) {
-                font = Font.decode(fontName);
-                if (font == null) {
-                    System.err.println("Font not found: " + fontName);
-                }
-            }
-            if (font == null) font = ResourceManager.getFont("NormalFont");
-            try {
-                FreeColLookAndFeel fclaf
-                    = new FreeColLookAndFeel(getDataDirectory(), preloadSize);
-                try {
-                    FreeColLookAndFeel.install(fclaf, font);
-                } catch (FreeColException e) {
-                    e.printStackTrace();
-                    System.err.println("Unable to install FreeCol look-and-feel.");
-                    System.exit(1);
-                }
-            } catch (FreeColException e) {
-                removeSplash(splash);
-                e.printStackTrace();
-                System.err.println("\nThe data files could not be found by FreeCol. Please make sure");
-                System.err.println("they are present. If FreeCol is looking in the wrong directory");
-                System.err.println("then run the game with a command-line parameter:\n");
-                printUsage();
-                System.exit(1);
-            }
-
-            // TODO: don't use same datafolder for both images and
-            // music because the images are best kept inside the .JAR
-            // file.
-            logger.info("Now starting to load images.");
-
-            ImageLibrary lib = new ImageLibrary();
-
-            MusicLibrary    musicLibrary = null;
-            SfxLibrary      sfxLibrary = null;
-            if (sound) {
-                try {
-                    musicLibrary = new MusicLibrary(dataFolder);
-                } catch (FreeColException e) {
-                    System.out.println("The music files could not be loaded by FreeCol. Disabling music.");
-                }
-
-                try {
-                    sfxLibrary = new SfxLibrary(dataFolder);
-                } catch (FreeColException e) {
-                    System.out.println("The sfx files could not be loaded by FreeCol. Disabling sfx.");
-                }
-            }
-
-            final boolean loadSavegame = (savegameFile != null);
-            boolean showVideo = (introVideo && !loadSavegame);
-            freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary, showVideo);
-
-            if (loadSavegame) {
-                final FreeColClient theFreeColClient = freeColClient;
-                final File theSavegameFile = savegameFile;
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            theFreeColClient.getConnectController().loadGame(theSavegameFile);
-                        }
-                    });
-            }
+            startClient();
         }
-        
-        removeSplash(splash);
     }
 
     /**
@@ -953,18 +803,20 @@ public final class FreeCol {
                     debugLevel = DEBUG_FULL;
                 }
                 // user set log level has precedence
-                if(!line.hasOption("log-level")){
+                if (!line.hasOption("log-level")){
                     logLevel = Level.FINEST;
                 }
             }
             if (line.hasOption("server")) {
                 standAloneServer = true;
                 String arg = line.getOptionValue("server");
-                try {
-                    serverPort = Integer.parseInt(arg);
-                } catch (NumberFormatException nfe) {
-                    System.out.println(Messages.message("cli.error.port", "%string%", arg));
-                    System.exit(1);
+                if (arg != null) {
+                    try {
+                        serverPort = Integer.parseInt(arg);
+                    } catch (NumberFormatException nfe) {
+                        System.out.println(Messages.message("cli.error.port", "%string%", arg));
+                        System.exit(1);
+                    }
                 }
             }
             if (line.hasOption("private")) {
@@ -1059,6 +911,160 @@ public final class FreeCol {
      */
     public static boolean usesExperimentalAI() {
         return usesExperimentalAI;
+    }
+
+    private static void startServer() {
+        logger.info("Starting stand-alone server.");
+        try {
+            final FreeColServer freeColServer;
+            if (savegameFile != null) {
+                XMLStream xs = null;
+                try {
+                    // Get suggestions for "singleplayer" and "public game" settings from the file:
+                    final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
+                    xs = FreeColServer.createXMLStreamReader(fis);
+                    final XMLStreamReader in = xs.getXMLStreamReader();
+                    in.nextTag();
+                    final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer"));
+                    final boolean defaultPublicServer;
+                    final String publicServerStr =  in.getAttributeValue(null, "publicServer");
+                    if (publicServerStr != null) {
+                        defaultPublicServer = Boolean.valueOf(publicServerStr).booleanValue();
+                    } else {
+                        defaultPublicServer = false;
+                    }
+                    xs.close();
+                        
+                    freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer,
+                                                      serverPort, serverName);
+                    if (checkIntegrity) {
+                        String integrityCheckMsg = "";
+                        boolean integrityOK = freeColServer.getIntegrity();
+                        if(integrityOK){
+                            integrityCheckMsg = Messages.message("cli.check-savegame.success");
+                        }
+                        else{
+                            integrityCheckMsg = Messages.message("cli.check-savegame.failure");
+                        }
+                        System.out.println(integrityCheckMsg);
+                        System.exit(integrityOK ? 0 : 1);
+                    }
+                } catch (Exception e) {
+                    if (checkIntegrity) {
+                        System.out.println(Messages.message("cli.check-savegame.failure"));
+                    }
+                    System.out.println("Could not load savegame.");
+                    System.exit(1);
+                    return;
+                } finally {
+                    xs.close();
+                }
+            } else {
+                try {
+                    freeColServer = new FreeColServer(publicServer, false, serverPort, serverName);
+                } catch (NoRouteToServerException e) {
+                    System.out.println(Messages.message("server.noRouteToServer"));
+                    System.exit(1);
+                    return;
+                }
+            }
+
+            Runtime runtime = Runtime.getRuntime();
+            runtime.addShutdownHook(new Thread() {
+                    public void run() {
+                        freeColServer.getController().shutdown();
+                    }
+                });
+        } catch (IOException e) {
+            System.err.println("Error while loading server: " + e);
+            System.exit(1);
+        }
+    }
+
+    public static void startClient() {
+
+        // Display splash screen:
+        final JWindow splash = (displaySplash) ? displaySplash(splashFilename) : null;
+
+        final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        if (windowSize.width == -1 || windowSize.height == -1) {
+            // Allow room for frame handles, taskbar etc if using windowed mode:
+            windowSize.width = bounds.width - DEFAULT_WINDOW_SPACE;
+            windowSize.height = bounds.height - DEFAULT_WINDOW_SPACE;
+        }
+        final Dimension preloadSize;
+        if (windowed) {
+            preloadSize = windowSize;
+        } else {
+            preloadSize = new Dimension(bounds.width, bounds.height);
+        }
+
+        Font font = null;
+        if (fontName != null) {
+            font = Font.decode(fontName);
+            if (font == null) {
+                System.err.println("Font not found: " + fontName);
+            }
+        }
+        if (font == null) font = ResourceManager.getFont("NormalFont");
+        try {
+            FreeColLookAndFeel fclaf
+                = new FreeColLookAndFeel(getDataDirectory(), preloadSize);
+            try {
+                FreeColLookAndFeel.install(fclaf, font);
+            } catch (FreeColException e) {
+                e.printStackTrace();
+                System.err.println("Unable to install FreeCol look-and-feel.");
+                System.exit(1);
+            }
+        } catch (FreeColException e) {
+            removeSplash(splash);
+            e.printStackTrace();
+            System.err.println("\nThe data files could not be found by FreeCol. Please make sure");
+            System.err.println("they are present. If FreeCol is looking in the wrong directory");
+            System.err.println("then run the game with a command-line parameter:\n");
+            printUsage();
+            System.exit(1);
+        }
+
+        // TODO: don't use same datafolder for both images and
+        // music because the images are best kept inside the .JAR
+        // file.
+        logger.info("Now starting to load images.");
+
+        ImageLibrary lib = new ImageLibrary();
+
+        MusicLibrary    musicLibrary = null;
+        SfxLibrary      sfxLibrary = null;
+        if (sound) {
+            try {
+                musicLibrary = new MusicLibrary(dataFolder);
+            } catch (FreeColException e) {
+                System.out.println("The music files could not be loaded by FreeCol. Disabling music.");
+            }
+
+            try {
+                sfxLibrary = new SfxLibrary(dataFolder);
+            } catch (FreeColException e) {
+                System.out.println("The sfx files could not be loaded by FreeCol. Disabling sfx.");
+            }
+        }
+
+        final boolean loadSavegame = (savegameFile != null);
+        boolean showVideo = (introVideo && !loadSavegame);
+        freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary, showVideo);
+
+        if (loadSavegame) {
+            final FreeColClient theFreeColClient = freeColClient;
+            final File theSavegameFile = savegameFile;
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        theFreeColClient.getConnectController().loadGame(theSavegameFile);
+                    }
+                });
+        }
+        
+        removeSplash(splash);
     }
 
 }
