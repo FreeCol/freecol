@@ -38,8 +38,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
@@ -102,7 +102,6 @@ public final class FreeCol {
     private static String FREECOL_REVISION;
     
     private static final String MIN_JDK_VERSION = "1.5";
-    private static final String FILE_SEP = System.getProperty("file.separator");
 
     private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
     private static final String DEFAULT_TC = "freecol";
@@ -114,7 +113,7 @@ public final class FreeCol {
                             consoleLogging = false,
                             introVideo = true;
     private static Dimension windowSize = new Dimension(-1, -1);
-    private static String dataFolder = "data" + FILE_SEP;
+    private static String dataFolder = "data";
     private static String logFile = null;
 
     private static FreeColClient freeColClient;
@@ -398,22 +397,20 @@ public final class FreeCol {
         String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
                 ".freecol" : "freecol";
 
-        String userHome = System.getProperty("user.home");
+        File userHome = FileSystemView.getFileSystemView().getDefaultDirectory();
         
         // Checks for OS specific paths, however if the old {home}/.freecol exists
         // that overrides OS-specifics for backwards compatibility.
-        if(System.getProperty("os.name").equals("Mac OS X")) {
+        // TODO: remove compatibility code
+        if (System.getProperty("os.name").equals("Mac OS X")) {
             // We are running on a Mac and should use {home}/Library/FreeCol
-            
-            if(!new File(userHome, freeColDirectoryName).isDirectory()) {
-                userHome = userHome + System.getProperty("file.separator") + "Library" + System.getProperty("file.separator");
+            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
+                userHome = new File(userHome, "Library");
                 freeColDirectoryName = "FreeCol";
             }
-        } else if(System.getProperty("os.name").startsWith("Windows")) {
+        } else if (System.getProperty("os.name").startsWith("Windows")) {
             // We are running on Windows and should use "My Documents" (or localized equivalent)
-            
-            if(!new File(userHome, freeColDirectoryName).isDirectory()) {
-                userHome = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
                 freeColDirectoryName = "FreeCol";
             }
         }
@@ -720,9 +717,6 @@ public final class FreeCol {
             }
             if (line.hasOption("freecol-data")) {
                 dataFolder = line.getOptionValue("freecol-data");
-                if (!dataFolder.endsWith(FILE_SEP)) {
-                    dataFolder += FILE_SEP;
-                }
             }
             if (line.hasOption("tc")) {
                 tc = line.getOptionValue("tc");
