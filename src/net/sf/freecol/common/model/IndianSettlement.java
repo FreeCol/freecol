@@ -1428,6 +1428,9 @@ public class IndianSettlement extends Settlement {
 
         visitedBy.clear();
         alarm = new HashMap<Player, Tension>();
+        missionary = null;
+        units.clear();
+        ownedUnits.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
