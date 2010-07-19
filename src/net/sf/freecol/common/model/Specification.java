@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.action.ImprovementActionType;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -94,56 +95,56 @@ public final class Specification {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
-    private final Map<String, FreeColGameObjectType> allTypes;
+    private final Map<String, FreeColGameObjectType> allTypes = new HashMap<String, FreeColGameObjectType>();
 
-    private final Map<String, AbstractOption> allOptions;
+    private final Map<String, AbstractOption> allOptions = new HashMap<String, AbstractOption>();
 
-    private final Map<String, OptionGroup> allOptionGroups;
+    private final Map<String, OptionGroup> allOptionGroups = new HashMap<String, OptionGroup>();
 
-    private final Map<GoodsType, UnitType> experts;
+    private final Map<GoodsType, UnitType> experts = new HashMap<GoodsType, UnitType>();
 
-    private final Map<String, List<Ability>> allAbilities;
+    private final Map<String, List<Ability>> allAbilities = new HashMap<String, List<Ability>>();
 
-    private final Map<String, List<Modifier>> allModifiers;
+    private final Map<String, List<Modifier>> allModifiers = new HashMap<String, List<Modifier>>();
 
-    private final List<BuildingType> buildingTypeList;
+    private final List<BuildingType> buildingTypeList = new ArrayList<BuildingType>();
 
-    private final List<GoodsType> goodsTypeList;
-    private final List<GoodsType> farmedGoodsTypeList;
-    private final List<GoodsType> foodGoodsTypeList;
-    private final List<GoodsType> newWorldGoodsTypeList;
-    private final List<GoodsType> libertyGoodsTypeList;
-    private final List<GoodsType> immigrationGoodsTypeList;
+    private final List<GoodsType> goodsTypeList = new ArrayList<GoodsType>();
+    private final List<GoodsType> farmedGoodsTypeList = new ArrayList<GoodsType>();
+    private final List<GoodsType> foodGoodsTypeList = new ArrayList<GoodsType>();
+    private final List<GoodsType> newWorldGoodsTypeList = new ArrayList<GoodsType>();
+    private final List<GoodsType> libertyGoodsTypeList = new ArrayList<GoodsType>();
+    private final List<GoodsType> immigrationGoodsTypeList = new ArrayList<GoodsType>();
 
-    private final List<ResourceType> resourceTypeList;
+    private final List<ResourceType> resourceTypeList = new ArrayList<ResourceType>();
 
-    private final List<TileType> tileTypeList;
+    private final List<TileType> tileTypeList = new ArrayList<TileType>();
 
-    private final List<TileImprovementType> tileImprovementTypeList;
+    private final List<TileImprovementType> tileImprovementTypeList = new ArrayList<TileImprovementType>();
 
-    private final List<ImprovementActionType> improvementActionTypeList;
+    private final List<ImprovementActionType> improvementActionTypeList = new ArrayList<ImprovementActionType>();
 
-    private final List<UnitType> unitTypeList;
-    private final List<UnitType> unitTypesTrainedInEurope;
-    private final List<UnitType> unitTypesPurchasedInEurope;
+    private final List<UnitType> unitTypeList = new ArrayList<UnitType>();
+    private final List<UnitType> unitTypesTrainedInEurope = new ArrayList<UnitType>();
+    private final List<UnitType> unitTypesPurchasedInEurope = new ArrayList<UnitType>();
 
-    private final List<FoundingFather> foundingFathers;
+    private final List<FoundingFather> foundingFathers = new ArrayList<FoundingFather>();
 
-    private final List<Nation> nations;
-    private final List<Nation> europeanNations;
-    private final List<Nation> REFNations;
-    private final List<Nation> indianNations;
+    private final List<Nation> nations = new ArrayList<Nation>();
+    private final List<Nation> europeanNations = new ArrayList<Nation>();
+    private final List<Nation> REFNations = new ArrayList<Nation>();
+    private final List<Nation> indianNations = new ArrayList<Nation>();
 
-    private final List<NationType> nationTypes;
-    private final List<EuropeanNationType> europeanNationTypes;
-    private final List<EuropeanNationType> REFNationTypes;
-    private final List<IndianNationType> indianNationTypes;
+    private final List<NationType> nationTypes = new ArrayList<NationType>();
+    private final List<EuropeanNationType> europeanNationTypes = new ArrayList<EuropeanNationType>();
+    private final List<EuropeanNationType> REFNationTypes = new ArrayList<EuropeanNationType>();
+    private final List<IndianNationType> indianNationTypes = new ArrayList<IndianNationType>();
 
-    private final List<EquipmentType> equipmentTypes;
+    private final List<EquipmentType> equipmentTypes = new ArrayList<EquipmentType>();
 
-    private final List<DifficultyLevel> difficultyLevels;
-    private final List<Event> events;
-    private final List<Modifier> specialModifiers;
+    private final List<DifficultyLevel> difficultyLevels = new ArrayList<DifficultyLevel>();
+    private final List<Event> events = new ArrayList<Event>();
+    private final List<Modifier> specialModifiers = new ArrayList<Modifier>();
 
     private int storableTypes = 0;
 
@@ -165,51 +166,6 @@ public final class Specification {
      */
     protected Specification(InputStream in) {
         logger.info("Initializing Specification");
-        initialized = false;
-
-        allTypes = new HashMap<String, FreeColGameObjectType>();
-        allOptions = new HashMap<String, AbstractOption>();
-        allOptionGroups = new HashMap<String, OptionGroup>();
-        experts = new HashMap<GoodsType, UnitType>();
-
-        allAbilities = new HashMap<String, List<Ability>>();
-        allModifiers = new HashMap<String, List<Modifier>>();
-
-        buildingTypeList = new ArrayList<BuildingType>();
-
-        goodsTypeList = new ArrayList<GoodsType>();
-        foodGoodsTypeList = new ArrayList<GoodsType>();
-        farmedGoodsTypeList = new ArrayList<GoodsType>();
-        newWorldGoodsTypeList = new ArrayList<GoodsType>();
-        libertyGoodsTypeList = new ArrayList<GoodsType>();
-        immigrationGoodsTypeList = new ArrayList<GoodsType>();
-
-        resourceTypeList = new ArrayList<ResourceType>();
-        tileTypeList = new ArrayList<TileType>();
-        tileImprovementTypeList = new ArrayList<TileImprovementType>();
-        improvementActionTypeList = new ArrayList<ImprovementActionType>();
-
-        unitTypeList = new ArrayList<UnitType>();
-        unitTypesPurchasedInEurope = new ArrayList<UnitType>();
-        unitTypesTrainedInEurope = new ArrayList<UnitType>();
-
-        foundingFathers = new ArrayList<FoundingFather>();
-
-        nations = new ArrayList<Nation>();
-        europeanNations = new ArrayList<Nation>();
-        REFNations = new ArrayList<Nation>();
-        indianNations = new ArrayList<Nation>();
-
-        nationTypes = new ArrayList<NationType>();
-        europeanNationTypes = new ArrayList<EuropeanNationType>();
-        REFNationTypes = new ArrayList<EuropeanNationType>();
-        indianNationTypes = new ArrayList<IndianNationType>();
-
-        equipmentTypes = new ArrayList<EquipmentType>();
-        difficultyLevels = new ArrayList<DifficultyLevel>();
-        events = new ArrayList<Event>();
-        specialModifiers = new ArrayList<Modifier>();
-
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
                 ARTILLERY_PENALTY_SOURCE,
@@ -227,8 +183,14 @@ public final class Specification {
             allTypes.put(source.getId(), source);
         }
 
-        Map<String, ChildReader> readerMap =
-            new HashMap<String, ChildReader>();
+        load(in);
+    }
+
+    private void load(InputStream in) {
+
+        initialized = false;
+
+        Map<String, ChildReader> readerMap = new HashMap<String, ChildReader>();
         readerMap.put("nations",
                       new TypeReader<Nation>(Nation.class, nations));
         readerMap.put("building-types",
@@ -261,16 +223,30 @@ public final class Specification {
 
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
-            xsr.nextTag();
+            //xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String childName = xsr.getLocalName();
-                logger.finest("Found child named " + childName);
-
-                ChildReader reader = readerMap.get(childName);
-                if (reader == null) {
-                    throw new RuntimeException("unexpected: " + childName);
+                if (childName.equals("freecol-specification")) {
+                    String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                    logger.info("Reading specification " + id);
+                    String parentId = xsr.getAttributeValue(null, "extends");
+                    if (parentId != null) {
+                        FreeColTcFile parent = new FreeColTcFile(parentId);
+                        try {
+                            load(parent.getSpecificationInputStream());
+                        } catch(Exception e) {
+                            logger.warning("Failed to load parent specification " + parentId);
+                        }
+                        initialized = false;
+                    }
                 } else {
-                    reader.readChildren(xsr, this);
+                    logger.finest("Found child named " + childName);
+                    ChildReader reader = readerMap.get(childName);
+                    if (reader == null) {
+                        throw new RuntimeException("unexpected: " + childName);
+                    } else {
+                        reader.readChildren(xsr, this);
+                    }
                 }
             }
         } catch (XMLStreamException e) {

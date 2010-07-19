@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.ByteArrayInputStream;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -266,5 +267,21 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(spec().getFoodGoodsTypeList().contains(fish));
 
     }
+
+    public void testExtends() {
+        String specification = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<freecol-specification id=\"test\" extends=\"freecol\">"
+            + "<unit-types>"
+            + "<unit-type id=\"model.unit.milkmaid\" extends=\"colonist\" "
+            + "expert-production=\"model.goods.food\" />"
+            + "</unit-types>"
+            + "</freecol-specification>";
+
+        Specification spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
+
+        assertNotNull(spec.getUnitType("model.unit.milkmaid"));
+        assertNotNull(spec.getUnitType("model.unit.caravel"));
+    }
+
 
 }
