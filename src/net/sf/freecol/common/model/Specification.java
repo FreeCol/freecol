@@ -183,12 +183,13 @@ public final class Specification {
             allTypes.put(source.getId(), source);
         }
 
+        initialized = false;
         load(in);
+        clean();
+        initialized = true;
     }
 
     private void load(InputStream in) {
-
-        initialized = false;
 
         Map<String, ChildReader> readerMap = new HashMap<String, ChildReader>();
         readerMap.put("nations",
@@ -237,7 +238,6 @@ public final class Specification {
                         } catch(Exception e) {
                             logger.warning("Failed to load parent specification " + parentId);
                         }
-                        initialized = false;
                     }
                 } else {
                     logger.finest("Found child named " + childName);
@@ -255,6 +255,9 @@ public final class Specification {
             logger.warning(sw.toString());
             throw new RuntimeException("Error parsing specification");
         }
+    }
+
+    private void clean() {
 
         Iterator<FreeColGameObjectType> typeIterator = allTypes.values().iterator();
         while (typeIterator.hasNext()) {
@@ -321,7 +324,6 @@ public final class Specification {
             }
         }
 
-        initialized = true;
         logger.info("Specification initialization complete. "
                     + allTypes.size() + " FreeColGameObjectTypes,\n"
                     + allOptions.size() + " Options, "

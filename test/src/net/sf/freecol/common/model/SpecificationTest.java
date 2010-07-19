@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -281,6 +282,13 @@ public final class SpecificationTest extends FreeColTestCase {
 
         assertNotNull(spec.getUnitType("model.unit.milkmaid"));
         assertNotNull(spec.getUnitType("model.unit.caravel"));
+
+        // restore original values
+        try {
+            spec = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
+        } catch(Exception e) {
+            System.out.println(e);
+        }
     }
 
 
