@@ -201,9 +201,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         Building building;
         List<BuildingType> buildingTypes = getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
-            if ((buildingType.getUpgradesFrom() == null
-                 && buildingType.getGoodsRequired().isEmpty())
-                || isFree(buildingType)) {
+            if (buildingType.isAutomaticBuild()
+                || isAutomaticBuild(buildingType)) {
                 building = new Building(getGame(), this, buildingType);
                 building.addPropertyChangeListener(this);
                 addBuilding(building);
@@ -260,17 +259,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Returns <code>true</code> if a building of the given type can
-     * be built for free.
+     * Is a building type able to be automatically built at no cost.
+     * True when the playe has a modifier that collapses the cost to zero.
      *
      * @param buildingType a <code>BuildingType</code> value
-     * @return a <code>boolean</code> value
+     * @return True if the building is available at zero cost.
      */
-    private boolean isFree(BuildingType buildingType) {
+    public boolean isAutomaticBuild(BuildingType buildingType) {
         float value = owner.getFeatureContainer()
             .applyModifier(100f, "model.modifier.buildingPriceBonus",
                            buildingType, getGame().getTurn());
-        return (value == 0f && canBuild(buildingType));
+        return value == 0f && canBuild(buildingType);
     }
 
     /**
@@ -282,6 +281,19 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
         featureContainer.add(building.getType().getFeatureContainer());
+    }
+
+    /**
+     * Remove a building from this Colony.
+     *
+     * @param building The <code>Building</code> to remove.
+     * @return True if the building was removed.
+     */
+    public boolean removeBuilding(final Building building) {
+        BuildingType buildingType = building.getType().getFirstLevel();
+        boolean result = buildingMap.remove(buildingType.getId()) != null;
+        featureContainer.remove(building.getType().getFeatureContainer());
+        return result;
     }
 
 
@@ -308,7 +320,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (population > 0) {
             // this means we might get a building for free
             for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
-                if (isFree(buildingType)) {
+                if (isAutomaticBuild(buildingType)) {
                     Building b = createFreeBuilding(buildingType);
                     if (b != null) {
                         addBuilding(b);
@@ -1014,6 +1026,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                            oldBuildQueue, newBuildQueue);
     }
 
+    /**
+     * Damage or even destroy a building.
+     *
+     * @param building The <code>Building</code> to damage.
+     * @return True if the building was damaged or destroyed.
+     */
+    public boolean damageBuilding(Building building) {
+        BuildingType type = building.getType().getUpgradesFrom();
+        return (type == null) ? removeBuilding(building)
+            : building.damage();
+    }
 
     /**
      * Describe <code>getLiberty</code> method here.

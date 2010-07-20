@@ -87,6 +87,13 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     /**
+     * Does this buildable need goods to build?
+     */
+    public boolean needsGoodsToBuild() {
+        return !goodsRequired.isEmpty();
+    }
+
+    /**
      * Get the <code>PopulationRequired</code> value.
      *
      * @return an <code>int</code> value

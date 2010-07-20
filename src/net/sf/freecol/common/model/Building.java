@@ -210,17 +210,22 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #damage
      */
     public boolean canBeDamaged() {
-        return buildingType.getGoodsRequired() != null;
+        return !buildingType.isAutomaticBuild()
+            && !colony.isAutomaticBuild(buildingType);
     }
     
     /**
      * Reduces this building to previous level (is set to UpgradesFrom
      * attribute in BuildingType) or is destroyed if it's the first level
+     *
+     * @return True if the building was damaged.
      */
-    public void damage() {
+    public boolean damage() {
         if (canBeDamaged()) {
             setType(buildingType.getUpgradesFrom());
+            return true;
         }
+        return false;
     }
     
     /**

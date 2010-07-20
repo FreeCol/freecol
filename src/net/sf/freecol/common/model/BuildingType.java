@@ -104,6 +104,13 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     }
 
     /**
+     * Is this building type automatically built in any colony?
+     */
+    public boolean isAutomaticBuild() {
+        return !needsGoodsToBuild() && getUpgradesFrom() == null;
+    }
+
+    /**
      * Get the index for the given Modifier.
      *
      * @param modifier a <code>Modifier</code> value
