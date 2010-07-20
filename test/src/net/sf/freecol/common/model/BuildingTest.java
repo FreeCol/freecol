@@ -301,16 +301,19 @@ public class BuildingTest extends FreeColTestCase {
         modifierSet = stockade.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         assertEquals(100f, modifierSet.iterator().next().getValue());
+        assertEquals(0f, stockade.getFeatureContainer().applyModifier(0, "model.modifier.minimumColonySize"));
 
         BuildingType fort = spec().getBuildingType("model.building.fort");
         modifierSet = fort.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         assertEquals(150f, modifierSet.iterator().next().getValue());
+        assertEquals(0f, stockade.getFeatureContainer().applyModifier(0, "model.modifier.minimumColonySize"));
         
         BuildingType fortress = spec().getBuildingType("model.building.fortress");
         modifierSet = fortress.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         assertEquals(200f, modifierSet.iterator().next().getValue());
+        assertEquals(0f, stockade.getFeatureContainer().applyModifier(0, "model.modifier.minimumColonySize"));
 
     }
 

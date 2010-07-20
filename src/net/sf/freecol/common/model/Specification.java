@@ -361,8 +361,7 @@ public final class Specification {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
                 object.readFromXML(xsr, specification);
-                allTypes.put(object.getId(), object);
-                if (!object.isAbstractType()) {
+                if (!object.isAbstractType() && !result.contains(object)) {
                     result.add(object);
                 }
             }

@@ -66,9 +66,9 @@
       <xs:attribute name="is-farmed" type="xs:boolean"/>
       <xs:attribute name="ignore-limit" type="xs:boolean"/>
       <xs:attribute name="is-food" type="xs:boolean"/>
-      <xs:attribute name="made-from" type="xs:IDREF"/>
+      <xs:attribute name="made-from" type="GoodsTypeId"/>
       <xs:attribute name="storable" type="xs:boolean"/>
-      <xs:attribute name="stored-as" type="xs:IDREF"/>
+      <xs:attribute name="stored-as" type="GoodsTypeId"/>
       <xs:attribute name="new-world-goods" type="xs:boolean"/>
       <xs:attribute name="trade-goods" type="xs:boolean"/>
       <xs:attribute name="breeding-number" type="xs:nonNegativeInteger"/>
@@ -152,14 +152,14 @@
 
   <xs:element name="resource">
     <xs:complexType>
-      <xs:attribute name="type" use="required" type="xs:IDREF"/>
+      <xs:attribute name="type" use="required" type="ResourceTypeId"/>
       <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
 
   <xs:element name="production">
     <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
+      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="tile-production" type="xs:string"/>
     </xs:complexType>
@@ -167,7 +167,7 @@
 
   <xs:element name="primary-production">
     <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
+      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="tile-production" type="xs:string"/>
     </xs:complexType>
@@ -175,7 +175,7 @@
 
   <xs:element name="secondary-production">
     <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="xs:IDREF"/>
+      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="tile-production" type="xs:string"/>
     </xs:complexType>
@@ -203,7 +203,7 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
-      <xs:attribute name="extends" use="optional" type="xs:IDREF" />
+      <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="combat-loss-priority" type="xs:int"/>
       <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
       <xs:attribute name="role">
@@ -223,13 +223,13 @@
 
   <xs:element name="compatible-equipment">
     <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
     </xs:complexType>
   </xs:element>
 
   <xs:element name="capture-equipment">
     <xs:complexType>
-      <xs:attribute name="id" type="xs:IDREF"/>
+      <xs:attribute name="id" type="EquipmentTypeId"/>
       <xs:attribute name="by-indians" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
@@ -255,9 +255,9 @@
       <xs:attribute name="natural" type="xs:boolean"/>
       <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
       <xs:attribute name="occupation-string" type="xs:string"/>
-      <xs:attribute name="expended-equipment-type" type="xs:IDREF"/>
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
       <xs:attribute name="expended-amount" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="deliver-goods-type" type="xs:IDREF"/>
+      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
       <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
@@ -267,8 +267,8 @@
 
   <xs:element name="change">
     <xs:complexType>
-      <xs:attribute name="from" use="required" type="xs:IDREF"/>
-      <xs:attribute name="to" use="required" type="xs:IDREF"/>
+      <xs:attribute name="from" use="required" type="TileTypeId"/>
+      <xs:attribute name="to" use="required" type="TileTypeId"/>
     </xs:complexType>
   </xs:element>
 
@@ -292,7 +292,7 @@
 
   <xs:element name="action">
     <xs:complexType>
-      <xs:attribute name="tileimprovement-type" use="required" type="xs:IDREF"/>
+      <xs:attribute name="tileimprovement-type" use="required" type="TileImprovementTypeId"/>
       <xs:attribute name="name" use="required" type="xs:string"/>
       <xs:attribute name="image-id" use="required" type="xs:string"/>
     </xs:complexType>
@@ -321,7 +321,7 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
-      <xs:attribute name="extends" use="optional" type="xs:IDREF" />
+      <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>
@@ -332,7 +332,7 @@
       <xs:attribute name="price" type="xs:nonNegativeInteger"/>
       <xs:attribute name="hitPoints" type="xs:nonNegativeInteger"/>
       <xs:attribute name="recruitProbability" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="expert-production" type="xs:IDREF"/>
+      <xs:attribute name="expert-production" type="GoodsTypeId"/>
       <xs:attribute name="skillTaught" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:int"/>
       <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
@@ -359,16 +359,16 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
-      <xs:attribute name="extends" use="optional" type="xs:IDREF" />
+      <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="basicProduction" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="produces" type="xs:IDREF"/>
-      <xs:attribute name="consumes" type="xs:IDREF"/>
+      <xs:attribute name="produces" type="GoodsTypeId"/>
+      <xs:attribute name="consumes" type="GoodsTypeId"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="sequence" type="xs:nonNegativeInteger"/>
       <xs:attribute name="minSkill" type="xs:int"/>
       <xs:attribute name="maxSkill" type="xs:int"/>
-      <xs:attribute name="upgradesFrom" type="xs:IDREF"/>
+      <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
     </xs:complexType>
   </xs:element>
 
@@ -388,19 +388,19 @@
         <xs:element ref="event"/>
         <xs:element name="nation">
           <xs:complexType>
-            <xs:attribute name="id" use="required" type="xs:IDREF"/>
+            <xs:attribute name="id" use="required" type="NationId"/>
           </xs:complexType>
         </xs:element>
         <xs:element ref="nation-type"/>
         <xs:element name="unit">
           <xs:complexType>
-            <xs:attribute name="id" use="required" type="xs:IDREF"/>
+            <xs:attribute name="id" use="required" type="UnitTypeId"/>
           </xs:complexType>
         </xs:element>
         <xs:element name="upgrade">
           <xs:complexType>
-            <xs:attribute name="from-id" use="required" type="xs:IDREF"/>
-            <xs:attribute name="to-id" use="required" type="xs:IDREF"/>
+            <xs:attribute name="from-id" use="required" type="UnitTypeId"/>
+            <xs:attribute name="to-id" use="required" type="UnitTypeId"/>
           </xs:complexType>
         </xs:element>
       </xs:choice>
@@ -445,7 +445,7 @@
 
   <xs:element name="nation-type">
     <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="id" use="required" type="NationTypeId"/>
     </xs:complexType>
   </xs:element>
 
@@ -472,7 +472,7 @@
           <xs:element name="unit">
             <xs:complexType>
               <xs:attribute name="id" use="required" type="xs:string"/>
-              <xs:attribute name="type" use="required" type="xs:IDREF"/>
+              <xs:attribute name="type" use="required" type="UnitTypeId"/>
               <xs:attribute name="role">
                 <xs:simpleType>
                   <xs:restriction base="xs:token">
@@ -497,7 +497,7 @@
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" type="xs:boolean" />
-      <xs:attribute name="extends" type="xs:IDREF" />
+      <xs:attribute name="extends" type="xs:string" />
       <xs:attribute name="ref" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
@@ -512,7 +512,7 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" type="xs:boolean" />
-      <xs:attribute name="extends" type="xs:IDREF" />
+      <xs:attribute name="extends" type="xs:string" />
       <xs:attribute name="number-of-settlements">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -548,7 +548,7 @@
 
   <xs:element name="skill">
     <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="id" use="required" type="UnitTypeId"/>
       <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
@@ -564,7 +564,7 @@
         <xs:element maxOccurs="unbounded" name="nation">
           <xs:complexType>
             <xs:attribute name="id" use="required" type="xs:ID"/>
-            <xs:attribute name="nation-type" use="required" type="xs:IDREF"/>
+            <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
             <xs:attribute name="anthem" type="xs:string"/>
             <xs:attribute name="ref" type="xs:string"/>
@@ -802,21 +802,21 @@
 
   <xs:element name="required-goods">
     <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
 
   <xs:element name="consumes">
     <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
 
   <xs:element name="default-equipment">
     <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:IDREF"/>
+      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
     </xs:complexType>
   </xs:element>
 
@@ -880,8 +880,8 @@
   <xs:complexType name="ScopeType">
     <xs:attribute name="matchesNull" type="xs:boolean"/>
     <xs:attribute name="matchNegated" type="xs:boolean"/>
-    <xs:attribute name="type" type="xs:IDREF"/>
-    <xs:attribute name="ability-id" type="xs:string"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="ability-id" type="AbilityId"/>
     <xs:attribute name="ability-value" type="xs:boolean"/>
     <xs:attribute name="method-name" type="xs:string"/>
     <xs:attribute name="method-value" type="xs:string"/>
@@ -915,5 +915,74 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+
+  <!-- Game Object Types -->
+
+  <!-- Either a building type or a unit type -->
+  <xs:simpleType name="AbilityId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.ability\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EquipmentTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BuildingTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.building\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="GoodsTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.goods\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NationId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.nation\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NationTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.nationType\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OptionId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.option(\.[a-zA-Z0-9]+)+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.resource\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileImprovementTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.improvement\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.tile\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UnitTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.unit\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>

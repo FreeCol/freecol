@@ -180,7 +180,7 @@
 
   <!-- Structure for tile-types
        Notes:
-       Parent options: ref, name, basic-move-cost, basic-work-turns, sail-to-europe
+       Parent options: ref, name, basic-move-cost, basic-work-turns
        Children: gen, modifier, production, resource
        gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
        - humidity is a percentage of water vapor saturation (0 is absolute dryness, 100 is total saturation)
@@ -422,7 +422,7 @@
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
-	  <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
+      <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
@@ -446,7 +446,7 @@
       <ability id="model.ability.improveTerrain" value="true"/>
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
     </equipment-type>
     <equipment-type id="model.equipment.missionary" role="missionary">
@@ -940,90 +940,99 @@
   </unit-types>
   
   <building-types>
-    <building-type id="model.building.townHall" basicProduction="3" workplaces="3"
+    <building-type id="model.building.townHall" basicProduction="3"
                    produces="model.goods.bells" sequence="1">
       <modifier id="model.goods.bells" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.carpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
+    <building-type id="model.building.carpenterHouse" basicProduction="3"
+                   consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
       <ability id="model.ability.build">
         <scope type="model.unit.wagonTrain"/>
       </ability>
     </building-type>
-    <building-type id="model.building.lumberMill"     basicProduction="6" workplaces="3" 
-                   consumes="model.goods.lumber" produces="model.goods.hammers"
-                   upgradesFrom="model.building.carpenterHouse" required-population="3" sequence="2">
+    <building-type id="model.building.lumberMill" extends="model.building.carpenterHouse"
+                   basicProduction="6" upgradesFrom="model.building.carpenterHouse"
+                   required-population="3">
       <required-goods id="model.goods.hammers" value="52"/>
-      <ability id="model.ability.build">
-        <scope type="model.unit.wagonTrain"/>
-      </ability>
     </building-type>
-    <building-type id="model.building.blacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
+    <building-type id="model.building.blacksmithHouse" basicProduction="3"
+                   consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
       <ability id="model.ability.build">
         <scope type="model.equipment.tools"/>
         <scope type="model.equipment.muskets"/>
       </ability>
     </building-type>
-    <building-type id="model.building.blacksmithShop"  basicProduction="6" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" upgradesFrom="model.building.blacksmithHouse" sequence="3">
+    <building-type id="model.building.blacksmithShop" extends="model.building.blacksmithHouse"
+                   basicProduction="6" upgradesFrom="model.building.blacksmithHouse">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.ironWorks"       basicProduction="6" workplaces="3"
-                   consumes="model.goods.ore" produces="model.goods.tools"
-                   upgradesFrom="model.building.blacksmithShop" required-population="8" sequence="3">
+    <building-type id="model.building.ironWorks" extends="model.building.blacksmithShop"
+                   upgradesFrom="model.building.blacksmithShop" required-population="8">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.tools" type="percentage" value="50"/> 
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.tobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" sequence="4">
+    <building-type id="model.building.tobacconistHouse" basicProduction="3"
+                   consumes="model.goods.tobacco" produces="model.goods.cigars" sequence="4">
     </building-type>
-    <building-type id="model.building.tobacconistShop"  basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" upgradesFrom="model.building.tobacconistHouse" sequence="4">
+    <building-type id="model.building.tobacconistShop" extends="model.building.tobacconistHouse"
+                   basicProduction="6" upgradesFrom="model.building.tobacconistHouse">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.cigarFactory"     basicProduction="6" workplaces="3"
-                   consumes="model.goods.tobacco" produces="model.goods.cigars"
-                   upgradesFrom="model.building.tobacconistShop" required-population="8" sequence="4">
+    <building-type id="model.building.cigarFactory" extends="model.building.tobacconistShop"
+                   upgradesFrom="model.building.tobacconistShop" required-population="8">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cigars" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.weaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" sequence="5">
+    <building-type id="model.building.weaverHouse" basicProduction="3"
+                   consumes="model.goods.cotton" produces="model.goods.cloth" sequence="5">
     </building-type>
-    <building-type id="model.building.weaverShop"  basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.weaverHouse" sequence="5">
+    <building-type id="model.building.weaverShop" extends="model.building.weaverHouse"
+                   basicProduction="6" upgradesFrom="model.building.weaverHouse">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.textileMill" basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.weaverShop" required-population="8" sequence="5">
+    <building-type id="model.building.textileMill" extends="model.building.weaverShop"
+                   upgradesFrom="model.building.weaverShop" required-population="8">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cloth" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.distillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" sequence="6">
+    <building-type id="model.building.distillerHouse" basicProduction="3"
+                   consumes="model.goods.sugar" produces="model.goods.rum" sequence="6">
     </building-type>
-    <building-type id="model.building.rumDistillery"  basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.distillerHouse" sequence="6">
+    <building-type id="model.building.rumDistillery" extends="model.building.distillerHouse"
+                   basicProduction="6" upgradesFrom="model.building.distillerHouse">
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.rumFactory"     basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.rumDistillery" required-population="8" sequence="6">
+    <building-type id="model.building.rumFactory" extends="model.building.rumDistillery"
+                   upgradesFrom="model.building.rumDistillery" required-population="8">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.rum" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.furTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" sequence="7">
+    <building-type id="model.building.furTraderHouse" basicProduction="3"
+                   consumes="model.goods.furs" produces="model.goods.coats" sequence="7">
     </building-type>
-    <building-type id="model.building.furTradingPost" basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.furTraderHouse" sequence="7">
+    <building-type id="model.building.furTradingPost" extends="model.building.furTraderHouse"
+                   basicProduction="6" upgradesFrom="model.building.furTraderHouse">
       <required-goods id="model.goods.hammers" value="56"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.furFactory"     basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.furTradingPost" required-population="6" sequence="7">
+    <building-type id="model.building.furFactory" extends="model.building.furTradingPost"
+                   upgradesFrom="model.building.furTradingPost" required-population="6">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
@@ -1035,85 +1044,91 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.college"     workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.schoolhouse" required-population="8" sequence="8">
+    <building-type id="model.building.college" extends="model.building.schoolhouse"
+                   workplaces="2" maxSkill="2" upgradesFrom="model.building.schoolhouse"
+                   required-population="8">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.university"  workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.college" required-population="10" sequence="8">
+    <building-type id="model.building.university" extends="model.building.college"
+                   workplaces="3" maxSkill="3" upgradesFrom="model.building.college"
+                   required-population="10">
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.armory"   basicProduction="3" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
+    <building-type id="model.building.armory" basicProduction="3"
+                   consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.build">
         <scope type="model.unit.artillery"/>
       </ability>
     </building-type>
-    <building-type id="model.building.magazine" basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.armory" required-population="8" sequence="9">
+    <building-type id="model.building.magazine" extends="model.building.armory"
+                   basicProduction="6" upgradesFrom="model.building.armory" required-population="8">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <ability id="model.ability.build">
-        <scope type="model.unit.artillery"/>
-      </ability>
     </building-type>
-    <building-type id="model.building.arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.magazine" required-population="8" sequence="9">
+    <building-type id="model.building.arsenal" extends="model.building.magazine"
+                   upgradesFrom="model.building.magazine">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.muskets" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
-      <ability id="model.ability.build">
-        <scope type="model.unit.artillery"/>
-      </ability>
     </building-type>
-    <building-type id="model.building.chapel"    workplaces="0" produces="model.goods.crosses" sequence="10">
+    <building-type id="model.building.chapel" workplaces="0" produces="model.goods.crosses" sequence="10">
       <modifier id="model.goods.crosses" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.chapel" required-population="3" sequence="10">
+    <building-type id="model.building.church" extends="model.building.chapel"
+                   basicProduction="3" upgradesFrom="model.building.chapel"
+                   workplaces="3" required-population="3">
       <required-goods id="model.goods.hammers" value="64"/>
-      <modifier id="model.goods.crosses" type="additive" value="2"/>
+      <modifier id="model.goods.crosses" type="additive" value="1"/>
       <ability id="model.ability.dressMissionary" value="true"/>
     </building-type>
-    <building-type id="model.building.cathedral" basicProduction="6" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.church" required-population="8" sequence="10">
+    <building-type id="model.building.cathedral" extends="model.building.church"
+                   basicProduction="6" upgradesFrom="model.building.church"
+                   required-population="8">
       <required-goods id="model.goods.hammers" value="176"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <modifier id="model.goods.crosses" type="additive" value="3"/>
-      <ability id="model.ability.dressMissionary" value="true"/>
+      <modifier id="model.goods.crosses" type="additive" value="1"/>
     </building-type>
     <building-type id="model.building.stockade" workplaces="0" required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
+      <!-- TODO: abilties to prevent the effects of Indian raids. -->
     </building-type>
-    <building-type id="model.building.fort"     workplaces="0" upgradesFrom="model.building.stockade"
+    <!-- fort can not inherit from stockade due to percentage modifiers! -->
+    <building-type id="model.building.fort" workplaces="0" upgradesFrom="model.building.stockade"
                    required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
-      <ability id="model.ability.bombardShips" value="true"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
+      <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
     <building-type id="model.building.fortress" workplaces="0" upgradesFrom="model.building.fort"
-                   required-population="8" sequence="12">
+                   required-population="8" sequence="11">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
-      <ability id="model.ability.bombardShips" value="true"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
+      <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
-    <building-type id="model.building.depot"              workplaces="0" sequence="13">
+    <building-type id="model.building.depot" workplaces="0" sequence="13">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.warehouse"          workplaces="0" upgradesFrom="model.building.depot" sequence="13">
+    <building-type id="model.building.warehouse" extends="model.building.depot"
+                   upgradesFrom="model.building.depot">
       <required-goods id="model.goods.hammers" value="80"/>
-      <modifier id="model.modifier.warehouseStorage" type="additive" value="200"/>
+      <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.warehouseExpansion" workplaces="0" upgradesFrom="model.building.warehouse" sequence="13">
+    <building-type id="model.building.warehouseExpansion" extends="model.building.warehouse"
+                   upgradesFrom="model.building.warehouse">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="20"/>
-      <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
+      <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
     <building-type id="model.building.country" workplaces="0" consumes="model.goods.food"
                    produces="model.goods.horses" sequence="14">
@@ -1123,33 +1138,28 @@
         <scope type="model.equipment.horses"/>
       </ability>
     </building-type>
-    <building-type id="model.building.stables" workplaces="0" consumes="model.goods.food"
-                   produces="model.goods.horses" upgradesFrom="model.building.country" sequence="14">
+    <building-type id="model.building.stables" extends="model.building.country"
+                   upgradesFrom="model.building.country">
+      <modifier id="model.goods.horses" type="percentage" value="50"/>
       <required-goods id="model.goods.hammers" value="64"/>
-      <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.docks"   workplaces="0" sequence="15">
+    <building-type id="model.building.docks" workplaces="0" sequence="15">
       <required-ability id="model.ability.hasPort" value="true" />
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
     </building-type>
-    <building-type id="model.building.drydock" workplaces="0" upgradesFrom="model.building.docks"
-                   required-population="4" sequence="15">
+    <building-type id="model.building.drydock" extends="model.building.docks"
+                   upgradesFrom="model.building.docks" required-population="4">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairUnits" value="true">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.shipyard" workplaces="0" upgradesFrom="model.building.drydock"
-                   required-population="8" sequence="15">
+    <building-type id="model.building.shipyard" extends="model.building.drydock"
+                   upgradesFrom="model.building.drydock" required-population="8">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <ability id="model.ability.produceInWater" value="true"/>
-      <ability id="model.ability.repairUnits" value="true">
-        <scope ability-id="model.ability.navalUnit"/>
-      </ability>
       <ability id="model.ability.build">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
@@ -1159,8 +1169,9 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.goods.bells" type="percentage" value="50"/>
     </building-type>
-    <building-type id="model.building.newspaper" workplaces="0" upgradesFrom="model.building.printingPress"
-                   required-population="4" sequence="16">
+    <!-- newspaper can not inherit from printing press due to percentage modifiers! -->
+    <building-type id="model.building.newspaper" upgradesFrom="model.building.printingPress"
+                   workplaces="0" required-population="4" sequence="16">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
       <modifier id="model.goods.bells" type="percentage" value="100"/>
@@ -1339,132 +1350,75 @@
                 type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the Dutch player -->
-    <european-nation-type id="model.nationType.trade">
+    <european-nation-type id="model.nationType.trade" extends="model.nationType.default">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="-50"/>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.merchantman"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the French player -->
-    <european-nation-type id="model.nationType.cooperation">
+    <european-nation-type id="model.nationType.cooperation" extends="model.nationType.default">
       <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
       <unit id="pioneer" type="model.unit.hardyPioneer" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the English player -->
-    <european-nation-type id="model.nationType.immigration">
+    <european-nation-type id="model.nationType.immigration" extends="model.nationType.default">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the Spanish player -->
-    <european-nation-type id="model.nationType.conquest">
+    <european-nation-type id="model.nationType.conquest" extends="model.nationType.default">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="200"/>
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
       <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" mounted="true"/>
-      <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
     </european-nation-type>
   </european-nation-types>
 
   <indian-nation-types>
-    <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
+    <indian-nation-type id="default" abstract="true">
+      <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
+      </ability>
+      <ability id="model.ability.native"/>
+    </indian-nation-type>
+    <indian-nation-type id="camp-or-village" abstract="true" extends="default">
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
+    </indian-nation-type>
+    <indian-nation-type id="model.nationType.apache" extends="camp-or-village" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.west" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.sioux" extends="camp-or-village" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_camp">
       <skill id="model.unit.masterTobaccoPlanter" probability="20"/>
       <skill id="model.unit.expertFurTrapper" probability="10"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
       <skill id="model.unit.expertFarmer" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.northWest" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.tupi" extends="camp-or-village" number-of-settlements="low"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
       <skill id="model.unit.masterCottonPlanter" probability="10"/>
       <skill id="model.unit.expertFurTrapper" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.southEast" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.arawak" extends="camp-or-village" number-of-settlements="low"
                         aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.east" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.cherokee" extends="camp-or-village" number-of-settlements="average"
                         aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
@@ -1473,20 +1427,9 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFarmer" probability="3"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.northEast" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.iroquois" extends="camp-or-village" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_village">
       <skill id="model.unit.expertFurTrapper" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
@@ -1495,62 +1438,31 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFisherman" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.north" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
-                        aggression="low" type-of-settlement="inca_city"
+    <indian-nation-type id="city" abstract="true" extends="default" number-of-settlements="high"
                         settlementRadius="2" capitalRadius="3">
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="100" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="100" />
       <skill id="model.unit.expertSilverMiner" probability="20"/>
-      <skill id="model.unit.expertOreMiner" probability="10"/>
-      <skill id="model.unit.expertFisherman" probability="10"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
+      <skill id="model.unit.expertFisherman" probability="10"/>
+    </indian-nation-type>
+    <indian-nation-type id="model.nationType.inca" extends="city"
+                        aggression="low" type-of-settlement="inca_city">
+      <skill id="model.unit.expertOreMiner" probability="10"/>
       <skill id="model.unit.masterWeaver" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="100" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="100" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
-                        aggression="high" type-of-settlement="aztec_city"
-                        settlementRadius="2" capitalRadius="3">
-      <skill id="model.unit.expertSilverMiner" probability="20"/>
-      <skill id="model.unit.expertFarmer" probability="10"/>
-      <skill id="model.unit.expertFisherman" probability="10"/>
+    <indian-nation-type id="model.nationType.aztec" extends="city"
+                        aggression="high" type-of-settlement="aztec_city">
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
-      <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
-      <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
-      </ability>
-      <ability id="model.ability.native"/>
       <region id="model.region.center" />
       <region id="model.region.east" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="100" />
-      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
-                type="percentage" value="100" />
     </indian-nation-type>
   </indian-nation-types>
 
@@ -1568,21 +1480,21 @@
             nation-type="model.nationType.conquest" selectable="true"
             ref="model.nation.spanishREF"/>
     <nation id="model.nation.inca"
-            nation-type="model.nationType.inca" />
+            nation-type="model.nationType.inca"/>
     <nation id="model.nation.aztec"
-            nation-type="model.nationType.aztec" />
+            nation-type="model.nationType.aztec"/>
     <nation id="model.nation.arawak"
-            nation-type="model.nationType.arawak" />
+            nation-type="model.nationType.arawak"/>
     <nation id="model.nation.cherokee"
-            nation-type="model.nationType.cherokee" />
+            nation-type="model.nationType.cherokee"/>
     <nation id="model.nation.iroquois"
-            nation-type="model.nationType.iroquois" />
+            nation-type="model.nationType.iroquois"/>
     <nation id="model.nation.sioux"
-            nation-type="model.nationType.sioux" />
+            nation-type="model.nationType.sioux"/>
     <nation id="model.nation.apache"
-            nation-type="model.nationType.apache" />
+            nation-type="model.nationType.apache"/>
     <nation id="model.nation.tupi"
-            nation-type="model.nationType.tupi" />
+            nation-type="model.nationType.tupi"/>
     <nation id="model.nation.dutchREF"
             nation-type="model.nationType.ref"/>
     <nation id="model.nation.frenchREF"
@@ -1624,6 +1536,7 @@
       <integerOption id="model.option.taxAdjustment" value="0"/>
       <integerOption id="model.option.mercenaryPrice" value="50"/>
       <integerOption id="model.option.maximumTax" value="50"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="veryHigh" />
@@ -1651,6 +1564,7 @@
       <integerOption id="model.option.taxAdjustment" value="1"/>
       <integerOption id="model.option.mercenaryPrice" value="60"/>
       <integerOption id="model.option.maximumTax" value="60"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="true" />
       <stringOption  id="model.option.tileProduction" value="high" />
@@ -1677,6 +1591,7 @@
       <integerOption id="model.option.taxAdjustment" value="2"/>
       <integerOption id="model.option.mercenaryPrice" value="65"/>
       <integerOption id="model.option.maximumTax" value="65"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="medium" />
@@ -1702,6 +1617,7 @@
       <integerOption id="model.option.taxAdjustment" value="3"/>
       <integerOption id="model.option.mercenaryPrice" value="70"/>
       <integerOption id="model.option.maximumTax" value="70"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="low" />
@@ -1726,6 +1642,7 @@
       <integerOption id="model.option.taxAdjustment" value="4"/>
       <integerOption id="model.option.mercenaryPrice" value="75"/>
       <integerOption id="model.option.maximumTax" value="75"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <stringOption  id="model.option.tileProduction" value="veryLow" />
@@ -1750,6 +1667,7 @@
       <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
       <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
       <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
+      <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <booleanOption id="model.option.expertStartingUnits" value="false" />
       <stringOption  id="model.option.tileProduction" value="veryLow">
@@ -1776,10 +1694,10 @@
       <!-- Does the Custom House sell boycotted goods -->
       <booleanOption id="model.option.customIgnoreBoycott" defaultValue="true"/>
       <!-- Whether experts have connections, producing without raw materials in factories -->
-      <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
+      <booleanOption id="model.option.expertsHaveConnections" defaultValue="true"/>
       <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
       <!-- Whether to educate the least skilled unit first -->
-      <booleanOption id="model.option.allowStudentSelection" value="false"/>
+      <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
     </optionGroup>
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
@@ -1821,10 +1739,10 @@
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
       <!-- Whether to display the map controls by default or not. -->
       <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
-      <!-- Whether to display borders by default or not. -->
-      <booleanOption id="model.option.displayBorders" defaultValue="false"/>
       <!-- Whether to display the grid by default or not. -->
       <booleanOption id="model.option.displayGrid" defaultValue="false"/>
+      <!-- Whether to display borders by default or not. -->
+      <booleanOption id="model.option.displayBorders" defaultValue="false"/>
       <!-- Whether to have a delay on a unit's last move or not. -->
       <booleanOption id="model.option.unitLastMoveDelay" defaultValue="true"/>
       <!-- Option for in tile text display -->
@@ -1971,7 +1889,7 @@
     </optionGroup>
     <optionGroup id="mapGeneratorOptions.landGenerator" >
       <!-- Option for setting the size of the map -->
-      <rangeOption id="model.option.mapSize" defaultValue="0" localizedLabels="true">
+      <rangeOption id="model.option.mapSize" defaultValue="1" localizedLabels="true">
         <rangeValue label="small" value="0"/>
         <rangeValue label="medium" value="1"/>
         <rangeValue label="large" value="2"/>
@@ -1983,8 +1901,15 @@
         <rangeValue label="small" value="15"/>
         <rangeValue label="medium" value="25"/>
         <rangeValue label="large" value="30"/>
-        <rangeValue label="veryLarge" value="40"/>
-        <rangeValue label="huge" value="50"/>
+        <rangeValue label="veryLarge" value="35"/>
+        <rangeValue label="huge" value="40"/>
+      </rangeOption>
+      <!-- Option for setting the type of land generator to be used -->
+      <rangeOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
+        <rangeValue label="Classic" value="0"/>
+        <rangeValue label="Continent" value="1"/>
+        <rangeValue label="Archipelago" value="2"/>
+        <rangeValue label="Islands" value="3"/>
       </rangeOption>
     </optionGroup>
     <optionGroup id="mapGeneratorOptions.terrainGenerator" >
