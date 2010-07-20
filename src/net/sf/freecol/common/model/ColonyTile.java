@@ -656,7 +656,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         unit = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                setUnit(updateFreeColGameObject(in, Unit.class));
+                unit = updateFreeColGameObject(in, Unit.class);
             }
         }
 

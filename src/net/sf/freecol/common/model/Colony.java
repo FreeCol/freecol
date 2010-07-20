@@ -2323,6 +2323,94 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                            event.getOldValue(), event.getNewValue());
     }
 
+    /**
+     * Returns just this Colony itself.
+     *
+     * @return this colony.
+     */
+    public Colony getColony() {
+        return this;
+    }
+
+    /**
+     * Returns true when colony has a stockade
+     *
+     * @return whether the colony has a stockade
+     */
+    public boolean hasStockade() {
+        return (getStockade() != null);
+    }
+
+    /**
+     * Returns the stockade building
+     *
+     * @return a <code>Building</code>
+     */
+    public Building getStockade() {
+        // TODO: it should search for more than one building?
+        for (Building building : buildingMap.values()) {
+            if (!building.getType().getModifierSet("model.modifier.defence").isEmpty()) {
+                return building;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Set<Modifier> getModifierSet(String id) {
+        Set<Modifier> result = featureContainer.getModifierSet(id, null, getGame().getTurn());
+        result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
+        return result;
+    }
+
+    /**
+     * Returns true if the Colony, or its owner has the ability
+     * identified by <code>id</code>.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return hasAbility(id, null);
+    }
+
+    /**
+     * Returns true if the Colony, or its owner has the ability
+     * identified by <code>id</code>.
+     *
+     * @param id a <code>String</code> value
+     * @param type a <code>FreeColGameObjectType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType type) {
+        HashSet<Ability> colonyAbilities
+            = new HashSet<Ability>(featureContainer.getAbilitySet(id, type, getGame().getTurn()));
+        Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, type, getGame().getTurn());
+        colonyAbilities.addAll(playerAbilities);
+        return FeatureContainer.hasAbility(colonyAbilities);
+    }
+
+    /**
+     * Verify if colony has the conditions to bombard an
+     * enemy ship adjacent to it
+     * @return true if it can, false otherwise
+     */
+    public boolean canBombardEnemyShip(){
+    	// only sea-side colonies can bombard
+    	if(isLandLocked()){
+            return false;
+    	}
+    	// does not have the buildings that give such abilities
+    	if(!hasAbility("model.ability.bombardShips")){
+            return false;
+    	}
+    	return true;
+    }
 
     /**
      * Dispose of this colony.
@@ -2460,11 +2548,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         liberty = getAttribute(in, "liberty", 0);
         immigration = getAttribute(in, "immigration", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
+        featureContainer = new FeatureContainer();
         landLocked = getAttribute(in, "landLocked", true);
         if (!landLocked) {
             featureContainer.addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
+
+        // Clear containers
+        colonyTiles.clear();
+        buildingMap.clear();
+        exportData.clear();
         buildQueue.clear();
 
         // Read child elements:
@@ -2474,19 +2568,19 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 if (ct == null) {
                     ct = new ColonyTile(getGame(), in);
                     ct.addPropertyChangeListener(this);
-                    colonyTiles.add(ct);
                 } else {
                     ct.readFromXML(in);
                 }
+                colonyTiles.add(ct);
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
                 Building building = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (building == null) {
                     building = new Building(getGame(), in);
                     building.addPropertyChangeListener(this);
-                    addBuilding(building);
                 } else {
                     building.readFromXML(in);
                 }
+                addBuilding(building);
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (gc == null) {
@@ -2524,99 +2618,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 in.nextTag();
             }
         }
-    }
-
-    /**
-     * Returns just this Colony itself.
-     * 
-     * @return this colony.
-     */
-    public Colony getColony() {
-        return this;
-    }
-    
-    /**
-     * Returns true when colony has a stockade
-     *
-     * @return whether the colony has a stockade
-     */
-    public boolean hasStockade() {
-        return (getStockade() != null);
-    }
-    
-    /**
-     * Returns the stockade building
-     *
-     * @return a <code>Building</code>
-     */ 
-    public Building getStockade() {
-        // TODO: it should search for more than one building?
-        for (Building building : buildingMap.values()) {
-            if (!building.getType().getModifierSet("model.modifier.defence").isEmpty()) {
-                return building;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public final Set<Modifier> getModifierSet(String id) {
-        Set<Modifier> result = featureContainer.getModifierSet(id, null, getGame().getTurn());
-        result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
-        return result;
-    }
-
-    /**
-     * Returns true if the Colony, or its owner has the ability
-     * identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return hasAbility(id, null);
-    }
-
-    /**
-     * Returns true if the Colony, or its owner has the ability
-     * identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @param type a <code>FreeColGameObjectType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id, FreeColGameObjectType type) {
-        HashSet<Ability> colonyAbilities = 
-            new HashSet<Ability>(featureContainer.getAbilitySet(id, type, getGame().getTurn()));
-        Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, type, getGame().getTurn());
-        colonyAbilities.addAll(playerAbilities);
-        return FeatureContainer.hasAbility(colonyAbilities);
-    }
-
-    public FeatureContainer getFeatureContainer() {
-        return featureContainer;
-    }
-    
-    /**
-     * Verify if colony has the conditions to bombard an
-     * enemy ship adjacent to it
-     * @return true if it can, false otherwise
-     */
-    public boolean canBombardEnemyShip(){
-    	// only sea-side colonies can bombard
-    	if(isLandLocked()){
-            return false;
-    	}
-    	// does not have the buildings that give such abilities
-    	if(!hasAbility("model.ability.bombardShips")){
-            return false;
-    	}
-    	return true;
     }
 
     /**
