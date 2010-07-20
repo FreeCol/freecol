@@ -35,9 +35,7 @@ public final class SfxLibrary extends SoundLibrary {
      * @throws FreeColException If the "sfx"-directory could not be found in the path spesified by <i>freeColHome</i>.
      */
     public SfxLibrary(String freeColHome) throws FreeColException {
-        super(new File((freeColHome.equals("") ?
-                        "data" + System.getProperty("file.separator"): 
-                        freeColHome) + "audio" + System.getProperty("file.separator") + "sfx"));
+        super(new File(new File(("".equals(freeColHome) ? "data" : freeColHome), "audio"), "sfx"));
     }
 
 
