@@ -459,7 +459,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * Updates the SoL membership label.
      */
     private void updateSoLLabel() {
-        int population = colony.getUnitCount();
+        int population = getColony().getUnitCount();
         int members = getColony().getMembers();
         int rebels = getColony().getSoL();
         String rebelNumber = Messages.message("colonyPanel.rebelLabel", "%number%",
@@ -522,8 +522,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         List<AbstractGoods> ratios;
         List<GoodsType> goodsTypes = spec.getFoodGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
-            gross += colony.getProductionOf(goodsType);
-            net += colony.getProductionNetOf(goodsType);
+            gross += getColony().getProductionOf(goodsType);
+            net += getColony().getProductionNetOf(goodsType);
         }
         if (net != 0) {
             GoodsType goodsType = spec.getGoodsType("model.goods.food");
@@ -540,8 +540,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         gross = net = 0;
         goodsTypes = spec.getLibertyGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
-            gross += colony.getProductionOf(goodsType);
-            net += colony.getProductionNetOf(goodsType);
+            gross += getColony().getProductionOf(goodsType);
+            net += getColony().getProductionNetOf(goodsType);
         }
         if (net != 0) {
             GoodsType goodsType = spec.getGoodsType("model.goods.bells");
@@ -558,8 +558,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         gross = net = 0;
         goodsTypes = spec.getImmigrationGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
-            gross += colony.getProductionOf(goodsType);
-            net += colony.getProductionNetOf(goodsType);
+            gross += getColony().getProductionOf(goodsType);
+            net += getColony().getProductionNetOf(goodsType);
         }
         if (net != 0) {
             GoodsType goodsType = spec.getGoodsType("model.goods.crosses");
@@ -584,7 +584,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         for (GoodsType goodsType : goodsTypes) {
             if (!goodsType.isStorable()) {
                 generalGoods.remove(goodsType);
-                net = colony.getProductionNetOf(goodsType);
+                net = getColony().getProductionNetOf(goodsType);
                 if (net != 0) {
                     netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
                 }
@@ -598,7 +598,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         goodsTypes.removeAll(spec.getLibertyGoodsTypeList());
         goodsTypes.removeAll(spec.getImmigrationGoodsTypeList());
         for (GoodsType goodsType : goodsTypes) {
-            net = colony.getProductionNetOf(goodsType);
+            net = getColony().getProductionNetOf(goodsType);
             if (net != 0) {
                 netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
             }
@@ -610,7 +610,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         for (GoodsType goodsType : goodsTypes) {
             if (!goodsType.isMilitaryGoods() && !goodsType.isBreedable()) {
                 generalGoods.remove(goodsType);
-                net = colony.getProductionNetOf(goodsType);
+                net = getColony().getProductionNetOf(goodsType);
                 if (net != 0) {
                     netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
                 }
@@ -623,7 +623,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         for (GoodsType goodsType : goodsTypes) {
             if (!goodsType.isBreedable()) {
                 generalGoods.remove(goodsType);
-                net = colony.getProductionNetOf(goodsType);
+                net = getColony().getProductionNetOf(goodsType);
                 if (net != 0) {
                     netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
                 }
@@ -635,7 +635,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         goodsTypes = new ArrayList<GoodsType>(generalGoods);
         for (GoodsType goodsType : goodsTypes) {
             generalGoods.remove(goodsType);
-            net = colony.getProductionNetOf(goodsType);
+            net = getColony().getProductionNetOf(goodsType);
             if (net != 0) {
                 netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
             }
@@ -721,12 +721,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 unload();
                 break;
             case WAREHOUSE:
-                if (getCanvas().showFreeColDialog(new WarehouseDialog(getCanvas(), colony))) {
+                if (getCanvas().showFreeColDialog(new WarehouseDialog(getCanvas(), getColony()))) {
                     warehousePanel.update();
                 }
                 break;
             case BUILDQUEUE:
-                getCanvas().showSubPanel(new BuildQueuePanel(colony, getCanvas()));
+                getCanvas().showSubPanel(new BuildQueuePanel(getColony(), getCanvas()));
                 break;
             case FILL:
                 fill();
@@ -771,9 +771,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
-                if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
-                    int amount = Math.min(100 - goods.getAmount(), colony.getGoodsCount(goods.getType()));
-                    getController().loadCargo(new Goods(goods.getGame(), colony, goods.getType(), amount), unit);
+                if (goods.getAmount() < 100 && getColony().getGoodsCount(goods.getType()) > 0) {
+                    int amount = Math.min(100 - goods.getAmount(), getColony().getGoodsCount(goods.getType()));
+                    getController().loadCargo(new Goods(goods.getGame(), getColony(), goods.getType(), amount), unit);
                 }
             }
         }
@@ -1274,7 +1274,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         public void initialize() {
             // get notified of warehouse changes
-            colony.getGoodsContainer().addPropertyChangeListener(this);
+            getColony().getGoodsContainer().addPropertyChangeListener(this);
             update();
             revalidate();
             repaint();
@@ -1284,7 +1284,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             removeAll();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
-                    Goods goods = colony.getGoodsContainer().getGoods(goodsType);
+                    Goods goods = getColony().getGoodsContainer().getGoods(goodsType);
                     if (goods.getAmount() >= getClient().getClientOptions()
                         .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS)) {
                         GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
@@ -1362,7 +1362,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void initialize() {
-            Tile tile = colony.getTile();
+            Tile tile = getColony().getTile();
             tiles[0][0] = tile.getNeighbourOrNull(Direction.N);
             tiles[0][1] = tile.getNeighbourOrNull(Direction.NE);
             tiles[0][2] = tile.getNeighbourOrNull(Direction.E);
@@ -1378,7 +1378,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
                     if (tiles[x][y] != null) {
-                        ColonyTile colonyTile = colony.getColonyTile(tiles[x][y]);
+                        ColonyTile colonyTile = getColony().getColonyTile(tiles[x][y]);
                         ASingleTilePanel p = new ASingleTilePanel(colonyTile, x, y);
                         add(p, new Integer(layer));
                         layer++;
@@ -1397,7 +1397,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         @Override
         public void paintComponent(Graphics g) {
             GUI colonyTileGUI = getCanvas().getColonyTileGUI();
-            Game game = colony.getGame();
+            Game game = getColony().getGame();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -1554,13 +1554,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         Tile tile = colonyTile.getWorkTile();
                         Player player = unit.getOwner();
 
-                        logger.info("Colony " + colony.getName()
+                        logger.info("Colony " + getColony().getName()
                                     + " claims tile " + tile.toString()
                                     + " with unit " + unit.getId());
                         if ((tile.getOwner() != player
-                             || tile.getOwningSettlement() != colony)
-                            && !getController().claimLand(tile, colony, 0)) {
-                            logger.warning("Colony " + colony.getName()
+                             || tile.getOwningSettlement() != getColony())
+                            && !getController().claimLand(tile, getColony(), 0)) {
+                            logger.warning("Colony " + getColony().getName()
                                            + " could not claim tile " + tile.toString()
                                            + " with unit " + unit.getId());
                             return null;
@@ -1580,7 +1580,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             ((UnitLabel) comp).setSmall(false);
 
                             if (getClient().getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
-                                ColonyTile bestTile = colony.getVacantColonyTileFor(unit, false, workType);
+                                ColonyTile bestTile = getColony().getVacantColonyTileFor(unit, false, workType);
                                 if (colonyTile != bestTile
                                     && (colonyTile.getProductionOf(unit, workType)
                                         < bestTile.getProductionOf(unit, workType))) {
