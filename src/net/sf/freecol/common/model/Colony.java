@@ -2387,7 +2387,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public final Set<Modifier> getModifierSet(String id) {
         Set<Modifier> result = featureContainer.getModifierSet(id, null, getGame().getTurn());
-        result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
+        if (owner != null) { // Null owner happens during dispose.
+            result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
+        }
         return result;
     }
 
