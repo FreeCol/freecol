@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -423,11 +424,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if ((tileDefender == null || !tileDefender.isDefensiveUnit()) &&
             getSettlement() != null) {
             // Then, find the strongest defender working in a settlement, if any
-            Unit settlementDefender = settlement.getDefendingUnit(attacker);
-            // return the strongest of these two units
-            if (settlementDefender != null && 
-                getGame().getCombatModel().getDefencePower(attacker, settlementDefender) > defencePower) {
-                return settlementDefender;
+            Unit settlementDefender;
+            try {
+                // HACK: The AI is prone to removing all units in a
+                // settlement which causes Colony.getDefendingUnit()
+                // to throw.  Recover by treating settlementDefender
+                // as null, but log in the hope that the AI will be
+                // fixed one day.
+                settlementDefender = settlement.getDefendingUnit(attacker);
+            } catch (IllegalStateException e) {
+                logger.log(Level.WARNING, "No defender", e);
+                return tileDefender;
+            }
+            // Return the strongest of the two units
+            if (settlementDefender != null) {
+                float tmpPower = getGame().getCombatModel()
+                    .getDefencePower(attacker, settlementDefender);
+                if (tmpPower > defencePower) {
+                    return settlementDefender;
+                }
             }
         }
         return tileDefender;
