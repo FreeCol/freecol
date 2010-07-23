@@ -445,8 +445,7 @@ public final class EuropePanel extends FreeColPanel {
             switch (europeAction) {
             case EXIT:
                 getMyPlayer().getMarket().removeTransactionListener(log);
-                europe.removePropertyChangeListener(docksPanel);
-                europe.removePropertyChangeListener(inPortPanel);
+                removePropertyChangeListeners();
                 getCanvas().remove(this);
                 getController().nextModelMessage();
                 break;
@@ -475,6 +474,20 @@ public final class EuropePanel extends FreeColPanel {
             logger.warning("Invalid action number");
         }
     }
+
+    private void removePropertyChangeListeners() {
+        europe.removePropertyChangeListener(docksPanel);
+        europe.removePropertyChangeListener(inPortPanel);
+        for (JPanel panel : new JPanel[] { docksPanel, inPortPanel, toEuropePanel, toAmericaPanel }) {
+            for (Component component : panel.getComponents()) {
+                if (component instanceof UnitLabel) {
+                    ((UnitLabel) component).dispose();
+                }
+            }
+        }
+
+    }
+
 
     /**
      * Asks for pay arrears of a type of goods, if those goods are boycotted
