@@ -83,6 +83,9 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     public void initialize() {
    
         removeAll();
+        for (UnitLabel label : unitLabels) {
+            label.dispose();
+        }
         unitLabels.clear();
 
         if (building.getProductionNextTurn() == 0) {
@@ -111,6 +114,9 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         GoodsType inputType = building.getGoodsInputType();
         if (inputType != null) {
             building.getColony().removePropertyChangeListener(inputType.getId(), this);
+        }
+        for (UnitLabel label : unitLabels) {
+            label.dispose();
         }
     }
 
