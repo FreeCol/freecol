@@ -407,4 +407,8 @@ public final class UnitLabel extends JLabel implements ActionListener, PropertyC
     		updateIcon();
     	}
     }
+
+    public void dispose() {
+        unit.removePropertyChangeListener(Unit.EQUIPMENT_CHANGE, this);
+    }
 }
