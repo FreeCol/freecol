@@ -908,12 +908,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * @param colony The new colony value.
      */
     private synchronized void setColony(Colony colony) {
-        if (this.colony != null){
+        if (this.colony != null) {
             this.colony.removePropertyChangeListener(this);
+            this.colony.getTile().removePropertyChangeListener(this);
         }
         this.colony = colony;
-        if (this.colony != null){
+        if (this.colony != null) {
             this.colony.addPropertyChangeListener(this);
+            this.colony.getTile().addPropertyChangeListener(this);
         }
         editable = (colony.getOwner() == getMyPlayer());
     }
@@ -1691,6 +1693,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             buildingsPanel.update();
         } else if (Building.UNIT_CHANGE.equals(property)) {
             // already processed by BuildingPanel
+        } else if (Tile.UNIT_CHANGE.equals(property)) {
+            outsideColonyPanel.initialize();
         } else {
             logger.warning("Unknown property change event: " + e.getPropertyName());
         }

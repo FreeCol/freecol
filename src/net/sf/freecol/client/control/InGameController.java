@@ -3932,6 +3932,8 @@ public final class InGameController implements NetworkConstants {
         if (unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building
             || unit.getLocation() instanceof ColonyTile) {
             putOutsideColony(unit);
+        } else if (unit.getLocation() instanceof Tile) {
+            unit.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
         } else if (carrier != null) {
             boardShip(unit, carrier);
         }

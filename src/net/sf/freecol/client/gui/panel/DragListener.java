@@ -537,7 +537,6 @@ public final class DragListener extends MouseAdapter {
                             .equipUnit(tempUnit, horseType, 1);
                         canvas.getClient().getInGameController()
                             .equipUnit(tempUnit, musketType, 1);
-                        unitLabel.updateIcon();
                     }
                 });
             menu.add(newItem);

@@ -82,23 +82,15 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param parent The parent that knows more than we do.
      */
     public UnitLabel(Unit unit, Canvas parent) {
-        ImageLibrary lib = parent.getImageLibrary();
-        setIcon(lib.getUnitImageIcon(unit));
-        setDisabledIcon(lib.getUnitImageIcon(unit, true));
         this.unit = unit;
-        setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
-        StringTemplate label = unit.getEquipmentLabel();
-        if (label != null) {
-            setDescriptionLabel(getDescriptionLabel() + " (" 
-                                + Messages.message(label) + ")");
-        }
         this.parent = parent;
-        selected = false;
+        this.inGameController = parent.getClient().getInGameController();
 
+        selected = false;
         setSmall(false);
         setIgnoreLocation(false);
 
-        this.inGameController = parent.getClient().getInGameController();
+        updateIcon();
     }
 
     /**
@@ -356,13 +348,22 @@ public final class UnitLabel extends JLabel implements ActionListener {
 	    inGameController.clearSpeciality(unit);
 	    break;
 	case CLEAR_ORDERS:
-		inGameController.clearOrders(unit);
+            inGameController.clearOrders(unit);
 	}
 	updateIcon();
     }
 
 
     public void updateIcon() {
+        ImageLibrary lib = parent.getImageLibrary();
+        setIcon(lib.getUnitImageIcon(unit));
+        setDisabledIcon(lib.getUnitImageIcon(unit, true));
+        setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
+        StringTemplate label = unit.getEquipmentLabel();
+        if (label != null) {
+            setDescriptionLabel(getDescriptionLabel() + " (" 
+                                + Messages.message(label) + ")");
+        }
         setSmall(isSmall);
 
         Component uc = getParent();
