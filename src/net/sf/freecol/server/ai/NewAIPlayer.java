@@ -147,13 +147,19 @@ public abstract class NewAIPlayer extends AIObject {
         Player player = getPlayer();
         for (Player p : getGame().getPlayers()) {
             if (p != player) {
-                Stance newStance = (p.getREFPlayer() == player
-                                    && p.getPlayerType() == PlayerType.REBEL)
-                    ? Stance.WAR
-                    : player.getStance(p).getStanceFromTension(player.getTension(p));
+                Stance newStance;
+                boolean symmetric;
+                if (p.getREFPlayer() == player
+                    && p.getPlayerType() == PlayerType.REBEL) {
+                    newStance = Stance.WAR;
+                    symmetric = true;
+                } else {
+                    newStance = player.getStance(p).getStanceFromTension(player.getTension(p));
+                    symmetric = newStance == Stance.WAR;
+                }
                 if (newStance != player.getStance(p)) {
                     getAIMain().getFreeColServer().getInGameController()
-                        .sendChangeStance(player, newStance, p);
+                        .sendChangeStance(player, newStance, p, symmetric);
                 }
             }
         }

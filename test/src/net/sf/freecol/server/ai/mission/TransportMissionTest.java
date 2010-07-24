@@ -19,8 +19,12 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
@@ -42,6 +46,7 @@ import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.Transportable;
 import net.sf.freecol.server.ai.mission.TransportMission.Destination;
 import net.sf.freecol.server.control.Controller;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -95,7 +100,8 @@ public class TransportMissionTest extends FreeColTestCase {
     
     public void testTransportMissionInvalidAfterCombatLost() {   
         Game game = startServerGame();
-        
+        InGameController igc = (InGameController) server.getController();
+
         Map map = game.getMap();
         assertNotNull(map);
         
@@ -118,18 +124,19 @@ public class TransportMissionTest extends FreeColTestCase {
         assertTrue(colonist.getLocation()==galleon);
         
         //Create the attacker
-        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile2 = map.getTile(5, 9);
         UnitType privateerType = spec().getUnitType("model.unit.privateer");
-        Unit privateer = new Unit(game, tile2, player2, privateerType, UnitState.ACTIVE);
+        Unit privateer = new Unit(game, tile2, french, privateerType, UnitState.ACTIVE);
                 
         // assign transport mission to the ship
         aiUnit.setMission(new TransportMission(aiMain, aiUnit));
         
         //Simulate the combat
-        CombatModel combatModel = game.getCombatModel();
-        CombatModel.CombatResult combatResult = new CombatModel.CombatResult(CombatModel.CombatResultType.WIN,galleon.getHitpoints());
-        combatModel.attack(privateer, galleon, combatResult , 0, player1.getEurope());
+        List<CombatResult> crs = new ArrayList<CombatResult>();
+        crs.add(CombatResult.WIN);
+        crs.add(CombatResult.DAMAGE_SHIP_ATTACK);
+        igc.combat(french, privateer, galleon, crs);
 
         // Verify that the outcome of the combat is  a return to Europe for repairs
         // and also invalidation of the transport mission as side effect

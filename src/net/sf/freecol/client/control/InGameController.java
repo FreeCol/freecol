@@ -86,7 +86,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -98,6 +97,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
+import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
@@ -2057,163 +2057,52 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
             Settlement settlement = tile.getSettlement();
             // Don't tell the player how a settlement is defended!
-            Unit defender = (settlement != null) ? null
+            FreeColGameObject defender = (settlement != null) ? settlement
                 : tile.getDefendingUnit(attacker);
             Canvas canvas = freeColClient.getCanvas();
-            return canvas.showPreCombatDialog(attacker, defender, settlement);
+            return canvas.showPreCombatDialog(attacker, defender, tile);
         }
         return true;
     }
 
     /**
-     * Performs an attack in a specified direction.
-     * Note that the server handles the attack calculations here.
+     * Attack.
      *
      * @param unit The <code>Unit</code> to perform the attack.
      * @param direction The direction in which to attack.
      */
     private void attack(Unit unit, Direction direction) {
-        Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
-        Tile target = unit.getTile().getNeighbourOrNull(direction);
-
-        Element attackElement = Message.createNewRootElement("attack");
-        attackElement.setAttribute("unit", unit.getId());
-        attackElement.setAttribute("direction", direction.toString());
-
-        // Get the result of the attack from the server:
-        Element attackResultElement = client.ask(attackElement);
-        if (attackResultElement != null &&
-            attackResultElement.getTagName().equals("attackResult")) {
-            // process the combat result
-            CombatResultType result = Enum.valueOf(CombatResultType.class, attackResultElement.getAttribute("result"));
-            int damage = Integer.parseInt(attackResultElement.getAttribute("damage"));
-            int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
-            Location repairLocation = (Location) game.getFreeColGameObjectSafely(attackResultElement.getAttribute("repairIn"));
-
-            // If a successful attack against a colony, we need to update the
-            // tile:
-            Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
-            if (utElement != null) {
-                Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
-                updateTile.readFromXMLElement(utElement);
-            }
-
-            // If there are captured goods, add to unit
-            NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
-            for (int i = 0; i < capturedGoods.getLength(); ++i) {
-                Element goods = (Element) capturedGoods.item(i);
-                GoodsType type = getSpecification().getGoodsType(goods.getAttribute("type"));
-                int amount = Integer.parseInt(goods.getAttribute("amount"));
-                unit.getGoodsContainer().addGoods(type, amount);
-            }
-
-            // Get the defender:
-            Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
-            Unit defender;
-            if (unitElement != null) {
-                defender = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (defender == null) {
-                    defender = new Unit(game, unitElement);
-                } else {
-                    defender.readFromXMLElement(unitElement);
-                }
-                defender.setLocation(target);
-            } else {
-                // TODO: Erik - ensure this cannot happen!
-                logger.log(Level.SEVERE, "Server reallyAttack did not return a defender!");
-                defender = target.getDefendingUnit(unit);
-                if (defender == null) {
-                    throw new IllegalStateException("No defender available!");
-                }
-            }
-
-            if (result == CombatResultType.DONE_SETTLEMENT) {
-                freeColClient.playSound(SoundEffect.CAPTURED_BY_ARTILLERY);
-            } else if (defender.isNaval() && result == CombatResultType.GREAT_WIN 
-                       || unit.isNaval() && result == CombatResultType.GREAT_LOSS) {
-                freeColClient.playSound(SoundEffect.SUNK);
-            } else if (unit.isNaval()) {
-                freeColClient.playSound(SoundEffect.ATTACK_NAVAL);
-            } else if (unit.hasAbility("model.ability.bombard")) {
-                freeColClient.playSound(SoundEffect.ATTACK_ARTILLERY);
-            } else if (unit.isMounted()) {
-                freeColClient.playSound(SoundEffect.ATTACK_DRAGOON);
-            }
-            
-            Animations.unitAttack(freeColClient.getCanvas(), unit, defender, result.isSuccess());
-
-            try {
-                game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);
-            } catch (Exception e) {
-                // Ignore the exception (the update further down will fix any
-                // problems).
-                LogRecord lr = new LogRecord(Level.WARNING, "Exception in reallyAttack");
-                lr.setThrown(e);
-                logger.log(lr);
-            }
-
-            // Get the convert
-            Element convertElement = getChildElement(attackResultElement, "convert");
-            Unit convert;
-            if (convertElement != null) {
-                unitElement = (Element) convertElement.getFirstChild();
-                convert = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (convert == null) {
-                    convert = new Unit(game, unitElement);
-                } else {
-                    convert.readFromXMLElement(unitElement);
-                }
-                convert.setLocation(convert.getLocation());
-                
-                StringTemplate nation = defender.getOwner().getNationName();
-                ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                                        "model.unit.newConvertFromAttack", convert)
-                    .addStringTemplate("%nation%", nation)
-                    .addStringTemplate("%unit%", Messages.getLabel(convert));
-                freeColClient.getMyPlayer().addModelMessage(message);
-                nextModelMessage();
-            }
-            
-            if (defender.canCarryTreasure() &&
-                (result == CombatResultType.WIN ||
-                 result == CombatResultType.GREAT_WIN)) {
-                checkCashInTreasureTrain(defender);
-            }
-                
-            if (!defender.isDisposed()
-                && ((result == CombatResultType.DONE_SETTLEMENT && unitElement != null)
-                    || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
-                defender.dispose();
-            }
- 
-            Element updateElement = getChildElement(attackResultElement, "update");
-            if (updateElement != null) {
-                freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-            }
-            
-            // settlement was indian capital, indians surrender
-            String burned = attackResultElement.getAttribute("indianCapitalBurned");
-            if (burned != null && burned.length() > 0) {
-            	Player indianPlayer = defender.getOwner();
-            	indianPlayer.surrenderTo(freeColClient.getMyPlayer());
-            	//show message
-            	ModelMessage message = new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                                        "indianSettlement.capitalBurned", indianPlayer)
-                    .addName("%name%", burned)
-                    .addStringTemplate("%nation%", indianPlayer.getNationName());
-            	freeColClient.getMyPlayer().addModelMessage(message);
-            	nextModelMessage();
-            }
-
-            if (unit.getMovesLeft() <= 0) {
-                nextActiveUnit(unit.getTile());
-            }
-
-            freeColClient.getCanvas().refresh();
-        } else {
-            logger.log(Level.SEVERE, "Server returned null from attack!");
+        String sound = askAttack(unit, direction);
+        if ("ATTACK_ARTILLERY".equals(sound)) {
+            freeColClient.playSound(SoundEffect.ATTACK_ARTILLERY);
+        } else if ("ATTACK_DRAGOON".equals(sound)) {
+            freeColClient.playSound(SoundEffect.ATTACK_DRAGOON);
+        } else if ("ATTACK_NAVAL".equals(sound)) {
+            freeColClient.playSound(SoundEffect.ATTACK_NAVAL);
+        } else if ("CAPTURED_BY_ARTILLERY".equals(sound)) {
+            freeColClient.playSound(SoundEffect.CAPTURED_BY_ARTILLERY);
+        } else if ("SUNK".equals(sound)) {
+            freeColClient.playSound(SoundEffect.SUNK);
         }
+        freeColClient.getCanvas().refresh();
+        nextActiveUnit();
+    }
+
+    /**
+     * Server query-response for attacking.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param direction The direction in which to attack.
+     */
+    private String askAttack(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        AttackMessage message = new AttackMessage(unit, direction);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return null;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return reply.getAttribute("sound");
     }
 
     /**

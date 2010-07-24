@@ -577,6 +577,27 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the modifier set for a given id from the feature container.
+     *
+     * @param id The id to look up.
+     * @return The modifier set.
+     */
+    public Set<Modifier> getModifierSet(String id) {
+        return featureContainer.getModifierSet(id);
+    }
+
+    /**
+     * Get the modifier set for a given id and type from the feature container.
+     *
+     * @param id The id to look up.
+     * @param type The associated type.
+     * @return The modifier set.
+     */
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType type) {
+        return featureContainer.getModifierSet(id, type);
+    }
+
+    /**
      * Does a player have a particular ability.
      *
      * @param ability The ability to test.
@@ -2245,20 +2266,6 @@ public class Player extends FreeColGameObject implements Nameable {
             tension.put(player, newTension);
             return newTension;
         }
-    }
-
-    /**
-     * Indian player surrenders
-     * @param player The <code>Player</code> he surrenders to.
-     *
-     */
-    public void surrenderTo(Player player) {
-        if(!isIndian()){
-            logger.warning("Only indians should surrender");
-            return;
-        }
-        changeRelationWithPlayer(player, Stance.PEACE);
-        getTension(player).setValue(Tension.SURRENDED);
     }
 
     /**

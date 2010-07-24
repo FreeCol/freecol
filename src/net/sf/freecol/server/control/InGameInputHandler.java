@@ -52,13 +52,13 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
+import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
@@ -162,10 +162,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new AskSkillMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("attack", new CurrentPlayerNetworkRequestHandler() {
+        register(AttackMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return attack(connection, element);
+                return new AttackMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(EmbarkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -743,224 +743,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setTradeRoute(tradeRoute);
         }
         return null;
-    }
-
-    /**
-     * Handles an "attack"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param attackElement The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element attack(Connection connection, Element attackElement) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        // Get parameters:
-        String unitID = attackElement.getAttribute("unit");
-        Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
-        Direction direction = Enum.valueOf(Direction.class, attackElement.getAttribute("direction"));
-        // Test the parameters:
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + unitID);
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile newTile = unit.getTile().getNeighbourOrNull(direction);
-        if (newTile == null) {
-            throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
-                    + unitID);
-        }
-        CombatResult result;
-        int plunderGold = -1;
-        Unit defender = newTile.getDefendingUnit(unit);
-        Player defendingPlayer = null;
-        if (defender == null) {
-            if (newTile.getSettlement() != null) {
-                defendingPlayer = newTile.getSettlement().getOwner();
-                result = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
-            } else {
-                throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
-                        + unitID);
-            }
-        } else {
-            defendingPlayer = defender.getOwner();
-            result = unit.getGame().getCombatModel().generateAttackResult(getFreeColServer().getServerRandom(), unit, defender).get(0);
-        }
-        if (result.type == CombatResultType.DONE_SETTLEMENT) {
-            plunderGold = newTile.getSettlement().getPlunder();
-        }
-        
-        // Gets repair location if necessary
-        Location repairLocation = null;
-        
-        Player loserOwner = null;
-        switch (result.type) {
-        case WIN:
-            if (defender.isNaval()) {
-                loserOwner = defendingPlayer;
-                repairLocation = loserOwner.getRepairLocation(defender);
-            }
-            break;
-        case DONE_SETTLEMENT:
-            for (Unit victim : newTile.getUnitList()) {
-                if (victim.isNaval()) {
-                    loserOwner = victim.getOwner();
-                    repairLocation = loserOwner.getRepairLocation(victim);
-                    break;
-                }
-            }
-            break;
-        case LOSS:
-            if (unit.isNaval()) {
-                loserOwner = player;
-                repairLocation = loserOwner.getRepairLocation(unit);
-            }
-            break;
-        case EVADES:
-        case GREAT_LOSS:
-        case GREAT_WIN:
-            // Nothing special to do here.
-            break;
-        }
-        
-        // Inform the players (other then the player attacking) about
-        // the attack:
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
-            if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
-                opponentAttackElement.setAttribute("direction", direction.toString());
-                opponentAttackElement.setAttribute("result", result.type.toString());
-                opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
-                opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
-                opponentAttackElement.setAttribute("unit", unit.getId());
-                opponentAttackElement.setAttribute("defender", defender.getId());
-                
-                if (defender.getOwner() == enemyPlayer) {
-                	// Naval battle, defender lost, needs repair location
-                	if(repairLocation != null && loserOwner == defender.getOwner()){
-                		opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
-                	}
-                    // always update the attacker, defender needs its location
-                	opponentAttackElement.setAttribute("update", "unit");
-                	//Note: We should not send every info on the unit to the enemy player
-                    opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
-                            opponentAttackElement.getOwnerDocument(),false,false));
-                } else if (!defender.isVisibleTo(enemyPlayer)) {
-                    opponentAttackElement.setAttribute("update", "defender");
-                    /*
-                     * We need to send the ID of the Tile, since the unit
-                     * may be inside a (hidden) ColonyTile:
-                     */
-                    opponentAttackElement.setAttribute("defenderTile", defender.getTile().getId());
-                    if (!enemyPlayer.canSee(defender.getTile())) {
-                        enemyPlayer.setExplored(defender.getTile());
-                        opponentAttackElement.appendChild(defender.getTile()
-                            .toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                    }
-                	//Note: We should not send every info on the unit to the player
-                	// Ex: defender is in Colony Tile, player does not (and should not) have access to
-                	// this info; with showAll=false, only the necessary info is sent
-                    opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer,
-                            opponentAttackElement.getOwnerDocument(),false,false));
-                } else if (!unit.isVisibleTo(enemyPlayer)) {
-                	//Note: We should not send every info on the unit to the player
-                	// Ex: defender is in Colony Tile, player does not (and should not) have access to
-                	// this info; with showAll=false, only the necessary info is sent
-                    opponentAttackElement.setAttribute("update", "unit");
-                    Element unitElm = unit.toXMLElement(enemyPlayer,opponentAttackElement.getOwnerDocument(),false,false);
-                    opponentAttackElement.appendChild(unitElm);
-                }
-                try {
-                    enemyPlayer.getConnection().sendAndWait(opponentAttackElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName()
-                                   + " with connection " + enemyPlayer.getConnection());
-                }
-            }
-        }
-        // Create the reply for the attacking player:
-        Element reply = Message.createNewRootElement("attackResult");
-        reply.setAttribute("result", result.type.toString());
-        reply.setAttribute("damage", String.valueOf(result.damage));
-        reply.setAttribute("plunderGold", Integer.toString(plunderGold));
-        
-        // Naval battle, attacker lost, needs repair location
-        if(repairLocation != null && player == loserOwner){
-        	reply.setAttribute("repairIn", repairLocation.getId());
-        }
-        
-        if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getColony() != null) {
-            // If a colony will been won, send an updated tile:
-            reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
-            reply.appendChild(defender.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
-        } else {
-        	//Note: We should not send every info on the unit to the player
-        	// Ex: defender is in Colony Tile, player does not (and should not) have access to
-        	// this info; with showAll=false, only the necessary info is sent
-            reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument(), false, false));
-        }
-        
-        // Destroyed settlement was an indian capital, indians surrender
-        // add capital burned flag
-        boolean isIndianCapitalBurned=false;
-        if(result.type == CombatResultType.DONE_SETTLEMENT && 
-        		newTile.getSettlement() instanceof IndianSettlement &&
-        		((IndianSettlement) newTile.getSettlement()).isCapital()) {
-        	isIndianCapitalBurned = true;
-        	reply.setAttribute("indianCapitalBurned", newTile.getSettlement().getName());
-        }
-        
-        int oldUnits = unit.getTile().getUnitCount();
-        
-        // update server info
-        unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, repairLocation);
-        if(isIndianCapitalBurned){
-        	defendingPlayer.surrenderTo(player);
-        }
-        
-        // We need to send an update of the unit, may have been changed
-        //like getting cargo
-        if (result.type.compareTo(CombatResultType.WIN) >= 0 && unit.isNaval()){
-        	Element update = reply.getOwnerDocument().createElement("update");
-        	update.appendChild(unit.toXMLElement(player,update.getOwnerDocument()));
-        	reply.appendChild(update);
-        }
-        
-        if (result.type.compareTo(CombatResultType.WIN) >= 0 
-            && unit.getTile() != newTile
-            && oldUnits < unit.getTile().getUnitCount()) {
-            // If unit won, didn't move, there are more units,
-            // then if the last one is not European it must be a convert
-            // (not a combat captive), so send it
-            Unit lastUnit = unit.getTile().getLastUnit();
-            if (!lastUnit.getOwner().isEuropean()) {
-                Element convertElement = reply.getOwnerDocument().createElement("convert");
-                convertElement.appendChild(lastUnit.toXMLElement(unit.getOwner(), reply.getOwnerDocument()));
-                reply.appendChild(convertElement);
-            }
-        }
-        
-        if (result.type.compareTo(CombatResultType.EVADES) >= 0 && unit.getTile().equals(newTile)) {
-            // In other words, we moved...
-            Element update = reply.getOwnerDocument().createElement("update");
-            int lineOfSight = unit.getLineOfSight();
-            if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getSettlement() != null) {
-                lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
-            }
-            for (Tile t: unit.getTile().getSurroundingTiles(lineOfSight)) {
-                update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
-            }
-            update.appendChild(unit.getTile().toXMLElement(player, update.getOwnerDocument()));
-            reply.appendChild(update);
-        }
-        return reply;
     }
 
     /**

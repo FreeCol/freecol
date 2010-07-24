@@ -10,7 +10,8 @@ public class MockPseudoRandom extends Random {
     private List<Integer> setNumberList;
     private boolean cycleNumbers;
     private Random random;
-    
+    private final float scale = 1.0f / (float) Integer.MAX_VALUE;
+
     public MockPseudoRandom(){
         this(new ArrayList<Integer>(),false);
     }
@@ -28,27 +29,34 @@ public class MockPseudoRandom extends Random {
         cycleNumbers = toCycle;
     }
     
-    //@Override
-    public int nextInt(int n) {
-        if(pos < setNumberList.size()){
+    private int getNext() {
+        if (pos < setNumberList.size()) {
             int number = setNumberList.get(pos);
-            if(number >= n){
-                throw new IllegalArgumentException("Number in queue is bigger than " + n);
-            }
             pos++;
             return number;
         }
-        if(cycleNumbers && !setNumberList.isEmpty()){
+        if (cycleNumbers && !setNumberList.isEmpty()) {
             int number = setNumberList.get(0);
             pos = 1;
-            if(number >= n){
-                throw new IllegalArgumentException("Number in queue is bigger than " + n);
-            }
             return number;
         }
-        if(random == null){
+        if (random == null) {
             random = new Random(0);
         }
-        return random.nextInt(n);
+        return -1;
+    }
+
+    public int nextInt(int n) {
+        int number = getNext();
+        if (number < 0) return random.nextInt(n);
+        if (number >= n) {
+            throw new IllegalArgumentException("Number in queue is bigger than " + n);
+        }
+        return number;
+    }
+
+    public float nextFloat() {
+        int number = getNext();
+        return (number < 0) ? random.nextFloat() : number * scale;
     }
 }

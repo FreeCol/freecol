@@ -56,7 +56,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -114,8 +113,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = animateMove(element);
             } else if (type.equals("animateAttack")) {
                 reply = animateAttack(element);
-            } else if (type.equals("opponentAttack")) {
-                reply = opponentAttack(element);
             } else if (type.equals("setCurrentPlayer")) {
                 reply = setCurrentPlayer(element);
             } else if (type.equals("newTurn")) {
@@ -334,142 +331,43 @@ public final class InGameInputHandler extends InputHandler {
         FreeColClient client = getFreeColClient();
         if (client.isHeadless()) return null;
         Game game = getGame();
-        Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
-        Unit defender = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("defender"));
+        String attackerId = element.getAttribute("attacker");
+        Unit attacker = (Unit) game.getFreeColGameObjectSafely(attackerId);
+        if (attacker == null
+            && (attacker = getUnitFromElement(game, element)) == null) {
+            logger.warning("Attack animation"
+                           + " for: " + client.getMyPlayer().getId()
+                           + " incorrectly omitted attacker: " + attackerId);
+            return null;
+        }
+        String defenderId = element.getAttribute("defender");
+        Unit defender = (Unit) game.getFreeColGameObjectSafely(defenderId);
+        if (defender == null
+            && (defender = getUnitFromElement(game, element)) == null) {
+            logger.warning("Attack animation"
+                           + " for: " + client.getMyPlayer().getId()
+                           + " incorrectly omitted defender: " + defenderId);
+            return null;
+        }
+
         boolean success = Boolean.parseBoolean(element.getAttribute("success"));
-        if (unit == null || defender == null) {
+        if (attacker == null || defender == null) {
             throw new IllegalStateException("animateAttack"
-                                            + ((unit == null) ? ": null unit" : "")
-                                            + ((defender == null) ? ": null defender" : "")
-                                            );
+                    + ((attacker == null) ? ": null attacker" : "")
+                    + ((defender == null) ? ": null defender" : ""));
         }
 
         // All is well, queue the animation.
         // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
         try {
-            new UnitAttackAnimationCanvasSwingTask(unit, defender, success,
-                                                   unit != lastAnimatedUnit)
+            new UnitAttackAnimationCanvasSwingTask(attacker, defender, success,
+                                                   attacker != lastAnimatedUnit)
                 .invokeSpecial();
         } catch (Exception exception) {
             logger.warning("UnitAttackAnimationCanvasSwingTask raised "
                            + exception.toString());
         }
-        lastAnimatedUnit = unit;
-        return null;
-    }
-
-
-    /**
-     * Handles an "opponentAttack"-message.
-     * 
-     * @param opponentAttackElement The element (root element in a DOM-parsed
-     *            XML tree) that holds all the information.
-     */
-    private Element opponentAttack(final Element opponentAttackElement) {
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("unit"));
-                    Colony colony = (Colony) getGame().getFreeColGameObjectSafely(
-                            opponentAttackElement.getAttribute("colony"));
-                    Unit defender = (Unit) getGame().getFreeColGameObjectSafely(
-                            opponentAttackElement.getAttribute("defender"));
-
-                    CombatResultType result = Enum.valueOf(CombatResultType.class, opponentAttackElement
-                            .getAttribute("result"));
-                    int damage = Integer.parseInt(opponentAttackElement.getAttribute("damage"));
-                    int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
-                    Location repairLocation = (Location) getGame().getFreeColGameObjectSafely(
-                            opponentAttackElement.getAttribute("repairIn"));
-
-                    if (opponentAttackElement.hasAttribute("update")) {
-                        String updateAttribute = opponentAttackElement.getAttribute("update");
-                        if (updateAttribute.equals("unit")) {
-                            Element unitElement = Message.getChildElement(opponentAttackElement, Unit
-                                    .getXMLElementTagName());
-                            unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-                            if (unit == null) {
-                                unit = new Unit(getGame(), unitElement);
-                            } else {
-                                unit.readFromXMLElement(unitElement);
-                            }
-                            if (unit.getTile() == null) {
-                                throw new NullPointerException("unit.getTile() == null");
-                            }
-                            unit.setLocation(unit.getTile());
-                        } else if (updateAttribute.equals("defender")) {
-                            final Tile defenderTile = (Tile) getGame().getFreeColGameObjectSafely(
-                                    opponentAttackElement.getAttribute("defenderTile"));
-                            final Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile
-                                    .getXMLElementTagName());
-                            if (defenderTileElement != null) {
-                                final Tile checkTile = (Tile) getGame().getFreeColGameObject(
-                                        defenderTileElement.getAttribute("ID"));
-                                if (checkTile != defenderTile) {
-                                    throw new IllegalStateException(
-                                            "Trying to update another tile than the defending unit's tile.");
-                                }
-                                defenderTile.readFromXMLElement(defenderTileElement);
-                            }
-                            Element defenderElement = Message.getChildElement(opponentAttackElement, Unit
-                                    .getXMLElementTagName());
-                            defender = (Unit) getGame().getFreeColGameObject(defenderElement.getAttribute("ID"));
-                            if (defender == null) {
-                                defender = new Unit(getGame(), defenderElement);
-                            } else {
-                                defender.readFromXMLElement(defenderElement);
-                            }
-                            defender.setLocationNoUpdate(defenderTile);
-                        } else if (updateAttribute.equals("tile")) {
-                            Element tileElement = Message.getChildElement(opponentAttackElement, Tile
-                                    .getXMLElementTagName());
-                            Tile tile = (Tile) getGame().getFreeColGameObject(tileElement.getAttribute("ID"));
-                            if (tile == null) {
-                                tile = new Tile(getGame(), tileElement);
-                            } else {
-                                tile.readFromXMLElement(tileElement);
-                            }
-                            colony = tile.getColony();
-                        } else {
-                            throw new IllegalStateException("Unknown update " + updateAttribute);
-                        }
-                    }
-
-                    if (unit == null && colony == null) {
-                        throw new NullPointerException("unit == null && colony == null");
-                    }
-
-                    if (defender == null) {
-                        throw new NullPointerException("defender == null");
-                    }
-
-                    if (colony != null) {
-                        getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage),
-                                repairLocation);
-                    } else {
-                        Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result.isSuccess());
-                        unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage),
-                                plunderGold, repairLocation);
-                        if (!unit.isDisposed()
-                                && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
-                            unit.dispose();
-                        }
-                    }
-
-                    if (!defender.isDisposed()
-                            && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient()
-                                    .getMyPlayer()))) {
-                        if (result == CombatResultType.DONE_SETTLEMENT && defender.getColony() != null
-                                && !defender.getColony().isDisposed()) {
-                            defender.getColony().setUnitCount(defender.getColony().getUnitCount());
-                        }
-                        defender.dispose();
-                    }
-                }
-            });
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while handling opponentAttack message.", e);
-        }
+        lastAnimatedUnit = attacker;
         return null;
     }
 

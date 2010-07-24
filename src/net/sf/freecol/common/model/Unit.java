@@ -2626,16 +2626,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Sends this <code>Unit</code> to the closest <code>Location</code> it
-     * can get repaired.
-     */
-    public void sendToRepairLocation(Location l) {
-        setLocation(l);
-        setState(UnitState.ACTIVE);
-        setMovesLeft(0);
-    }
-
-    /**
      * Returns a String representation of this Unit.
      * 
      * @return A String representation of this Unit.
@@ -3273,52 +3263,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Adjusts the tension and alarm levels of the enemy unit's owner according
-     * to the type of attack.
-     * 
-     * @param enemyUnit The unit we are attacking.
-     */
-    // TODO: move to AI code
-    // TODO: propagate changed settlements from modifyAlarm+Tension()
-    public void adjustTension(Unit enemyUnit) {
-        Player myPlayer = getOwner();
-        Player enemy = enemyUnit.getOwner();     
-        if(myPlayer.isAI()){
-            myPlayer.modifyTension(enemy, -Tension.TENSION_ADD_MINOR);
-            if (getIndianSettlement() != null) {
-                getIndianSettlement().modifyAlarm(enemy, -Tension.TENSION_ADD_UNIT_DESTROYED / 2);
-            }
-        }
-
-        // Increases the enemy's tension levels:
-        if (enemy.isAI()) {
-            Settlement settlement = enemyUnit.getTile().getSettlement();
-            if (settlement != null) {
-                // we are attacking an indian settlement - let propagation take care of the effects on the tribe
-                if (settlement instanceof IndianSettlement) {
-                    IndianSettlement indianSettlement = (IndianSettlement) settlement;
-                    if (indianSettlement.isCapital()){
-                        indianSettlement.modifyAlarm(myPlayer, Tension.TENSION_ADD_CAPITAL_ATTACKED);
-                    } else {
-                        indianSettlement.modifyAlarm(myPlayer, Tension.TENSION_ADD_SETTLEMENT_ATTACKED);
-                    }
-                } else { // we are attacking an european settlement
-                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_NORMAL);
-                }
-            } else {
-                // we are attacking an enemy unit in the open
-                // only one effect - at the home town if there's one or directly to the enemy nation
-                IndianSettlement homeTown = enemyUnit.getIndianSettlement();
-                if (homeTown != null) {
-                    homeTown.modifyAlarm(myPlayer, Tension.TENSION_ADD_UNIT_DESTROYED);
-                } else {
-                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_MINOR);
-                }
-            }
-        }
-    }
-
-    /**
      * Returns true if this unit can carry treasure (like a treasure train)
      * 
      * @return <code>true</code> if this <code>Unit</code> is capable of
@@ -3339,27 +3283,25 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Captures the goods on board of the enemy unit.
-     * 
-     * @param enemyUnit The unit we are attacking.
+     * After winning a battle, can this unit the loser equipment?
+     *
+     * @param equip The <code>EquipmentType</code> to consider.
+     * @param loser The loser <code>Unit</code>.
+     * @return The <code>EquipmentType</code> to capture, which may
+     *     differ from the equip parameter due to transformations such
+     *     as to the native versions of horses and muskets.
+     *     Or return null if capture is not possible.
      */
-    public void captureGoods(Unit enemyUnit) {
-        if (!canCaptureGoods()) {
-            return;
+    public EquipmentType canCaptureEquipment(EquipmentType equip, Unit loser) {
+        if (hasAbility("model.ability.captureEquipment")) {
+            if (getOwner().isIndian() != loser.getOwner().isIndian()) {
+                equip = equip.getCaptureEquipment(getOwner().isIndian());
+            }
+            return (canBeEquippedWith(equip)) ? equip : null;
         }
-        // can capture goods; regardless attacking/defending
-        Iterator<Goods> iter = enemyUnit.getGoodsIterator();
-        while (iter.hasNext() && getSpaceLeft() > 0) {
-            // TODO: show CaptureGoodsDialog if there's not enough
-            // room for everything.
-            Goods g = iter.next();
-
-            // MESSY, but will mess up the iterator if we do this
-            // besides, this gets cleared out later
-            // enemy.getGoodsContainer().removeGoods(g);
-            getGoodsContainer().addGoods(g);
-        }
+        return null;
     }
+
 
     /**
      * Gets the Colony this unit is in.
@@ -3386,18 +3328,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else {
             return Math.round(FeatureContainer.applyModifierSet(base, getGame().getTurn(),
                                                                 getModifierSet(goodsType.getId())));
-        }
-    }
-
-
-    /**
-     * Disposes all Units aboard this one.
-     */
-    public void disposeAllUnits() {
-        // Copy the list first, as the Unit will try to remove itself
-        // from its location.
-        for (Unit unit : new ArrayList<Unit>(units)) {
-            unit.dispose();
         }
     }
 
@@ -3627,13 +3557,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Gets the probability that an attack by this unit will provoke a
      * native to convert.
      *
-     * @return A probability of conversion as an integer in [0..100].
+     * @return A probability of conversion.
      */
-    public int getConvertProbability() {
+    public float getConvertProbability() {
         Specification spec = getSpecification();
         int opt = spec.getIntegerOption("model.option.nativeConvertProbability")
             .getValue();
-        return (int) FeatureContainer.applyModifierSet(opt,
+        return 0.01f * FeatureContainer.applyModifierSet(opt,
                 getGame().getTurn(),
                 getModifierSet("model.modifier.nativeConvertBonus"));
     }
@@ -3642,11 +3572,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Gets the probability that an attack by this unit will provoke natives
      * to burn our missions.
      *
-     * @return A probability of burning as an integer in [0..100].
+     * @return A probability of burning missions.
      */
-    public int getBurnProbability() {
+    public float getBurnProbability() {
         // TODO: enhance burn probability proportionally with tension
-        return getSpecification()
+        return 0.01f * getSpecification()
             .getIntegerOption("model.option.burnProbability").getValue();
     }
 

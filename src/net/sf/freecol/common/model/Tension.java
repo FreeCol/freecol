@@ -56,7 +56,7 @@ public class Tension {
     public static final int RESUME_WAR_MODIFIER = 750; // War from cease fire
 
     /** Tension level to set when surrendering. */
-    public static final int SURRENDED
+    public static final int SURRENDERED
         = (Level.CONTENT.limit + Level.HAPPY.limit) / 2;
     
     /** 

@@ -329,24 +329,6 @@ public class IndianSettlement extends Settlement {
      }
 
     /**
-     * Propagate alarm level change to any listeners.
-     * TODO: check if this is still needed when alarm moves server side.
-     *
-     * @param oldLevel The old alarm level.
-     * @param newLevel The new alarm level.
-     */
-    private void announceAlarmLevel(Level oldLevel, Level newLevel) {
-        String propertyEvtName = "alarmLevel";
-        PropertyChangeEvent e
-            = new PropertyChangeEvent(this, propertyEvtName,
-                                      oldLevel, newLevel);
-        for (PropertyChangeListener listener
-                 : getPropertyChangeListeners(propertyEvtName)) {
-            listener.propertyChange(e);
-        }
-    }
-
-    /**
      * Modifies the alarm level towards the given player due to an event
      * at this settlement, and propagate the alarm upwards through the
      * tribe.
@@ -364,7 +346,6 @@ public class IndianSettlement extends Settlement {
         List<FreeColGameObject> modified = owner.modifyTension(player,
                 ((isCapital()) ? addToAlarm : addToAlarm/2), this);
         if (change) {
-            announceAlarmLevel(oldLevel, getAlarm(player).getLevel());
             modified.add(this);
         }
         logger.finest("Alarm at " + getName()
@@ -386,10 +367,7 @@ public class IndianSettlement extends Settlement {
     public boolean propagateAlarm(Player player, int addToAlarm) {
         if (hasContactedSettlement(player)) {
             Level oldLevel = getAlarm(player).getLevel();
-            if (changeAlarm(player, addToAlarm)) {
-                announceAlarmLevel(oldLevel, getAlarm(player).getLevel());
-                return true;
-            }
+            return changeAlarm(player, addToAlarm);
         }
         return false;
     }

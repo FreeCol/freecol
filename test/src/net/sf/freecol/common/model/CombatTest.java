@@ -24,16 +24,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
-public class CombatTest extends FreeColTestCase {
 
-    CombatResult victory = new CombatResult(CombatModel.CombatResultType.WIN, 0);
-    CombatResult defeat = new CombatResult(CombatModel.CombatResultType.LOSS, 0);
+public class CombatTest extends FreeColTestCase {
 
     TileType plains = spec().getTileType("model.tile.plains");
     TileType hills = spec().getTileType("model.tile.hills");
@@ -227,244 +224,12 @@ public class CombatTest extends FreeColTestCase {
         assertEquals("Wrong move type",MoveType.ATTACK, privateer.getMoveType(tile1));
     }
 
-    public void testAtackedNavalUnitIsDamaged(){
-    	Game game = getStandardGame();
-        CombatModel combatModel = game.getCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        dutch.setStance(french, Stance.WAR);
-        french.setStance(dutch, Stance.WAR);
-        
-        assertEquals("Dutch should be at war with french",dutch.getStance(french),Stance.WAR);
-        assertEquals("French should be at war with dutch",french.getStance(dutch),Stance.WAR);
-        
-        Map map = getTestMap(ocean);
-        game.setMap(map);
-        Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
-        Tile tile3 = map.getTile(6, 8);
-        tile3.setExploredBy(dutch, true);
-        tile3.setExploredBy(french, true);
 
-        Unit galleon = new Unit(game, tile1, dutch, galleonType, UnitState.ACTIVE);
-        Unit privateer = new Unit(game, tile2, french, privateerType, UnitState.ACTIVE);
-        
-        String errMsg = "Galleon should be empty";
-        assertEquals(errMsg,galleon.getGoodsCount(),0);
-
-        GoodsType musketType = spec().getGoodsType("model.goods.muskets");
-        Goods cargo = new Goods(game,galleon,musketType,100);
-        galleon.add(cargo);
-        
-        errMsg = "Galleon should be loaded";
-        assertEquals(errMsg,galleon.getGoodsCount(),1);
-        
-        errMsg = "Galeon should not be repairing";
-        assertFalse(errMsg,galleon.isUnderRepair());
-        
-        galleon.setDestination(tile3);
-        errMsg = "Wrong destination for Galeon";
-        assertEquals(errMsg, tile3, galleon.getDestination());
-        
-        int damage = galleon.getHitpoints() -1;
-        CombatModel.CombatResultType combatResolution = CombatModel.CombatResultType.WIN;
-        
-        CombatModel.CombatResult combatResult = new  CombatModel.CombatResult(combatResolution,damage);
-        
-        combatModel.attack(privateer, galleon, combatResult, 0, dutch.getEurope());
-        
-        errMsg = "Galleon should be in Europe repairing";
-        assertTrue(errMsg,galleon.isUnderRepair());
-        
-        errMsg = "Galleon should be empty";
-        assertEquals(errMsg,galleon.getGoodsCount(),0);
-        
-        errMsg = "Galeon should no longer have a destination";
-        assertTrue(errMsg, galleon.getDestination() == null);
-    }
-
-    public void testUnarmedAttack() {
-
-        Game game = getStandardGame();
-        CombatModel combatModel = game.getCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        dutch.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
-
-        Map map = getTestMap(plains);
-        game.setMap(map);
-        Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
-
-        // no default equipment
-        Unit colonial = new Unit(game, tile1, dutch, colonialType, UnitState.ACTIVE, 
-                                 EquipmentType.NO_EQUIPMENT);
-        assertEquals(colonialType, colonial.getType());
-        assertEquals(UnitType.DEFAULT_OFFENCE, colonial.getType().getOffence());
-        assertEquals(UnitType.DEFAULT_DEFENCE, colonial.getType().getDefence());
-        assertFalse(colonial.isOffensiveUnit());
-
-        // has default equipment
-        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
-        assertTrue(soldier.isArmed());
-        assertTrue(soldier.isOffensiveUnit());
-
-        assertEquals("Unarmed colonial regular can not attack!",
-                     Unit.MoveType.MOVE_NO_ATTACK_CIVILIAN, colonial.getMoveType(tile2));
-
-
-        combatModel.attack(soldier, colonial, victory, 0, null);
-        assertEquals(french, colonial.getOwner());
-        assertEquals(tile2, colonial.getTile());
-        assertEquals(colonistType, colonial.getType());
-
-    }
-
-    public void testAttackColonyWithVeteran() {
-    	Game game = getGame();
-    	Map map = getTestMap(true);
-    	game.setMap(map);
-    	
-        Colony colony = getStandardColony();
-
-        SimpleCombatModel combatModel = new SimpleCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.frenchREF");
-
-        dutch.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
-        assertTrue(french.isREF());
-
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
-
-        Unit colonist = colony.getUnitIterator().next();
-        colonist.setType(colonialType);
-        assertEquals(colonialType, colonist.getType());
-
-        Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
-        Unit attacker = new Unit(getGame(), tile2, french, veteranType, UnitState.ACTIVE, horses, muskets);
-
-        // defender should lose horses
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-        combatModel.attack(attacker, defender, victory, 0, null);
-        assertTrue(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(veteranType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertTrue(defender.isArmed());
-        assertEquals(veteranType, defender.getType());
-
-        // attacker should lose horses
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-        combatModel.attack(attacker, defender, defeat, 0, null);
-        assertFalse(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(veteranType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertTrue(defender.isArmed());
-        assertEquals(veteranType, defender.getType());
-
-        // defender should lose muskets
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-        combatModel.attack(attacker, defender, victory, 0, null);
-        assertFalse(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(veteranType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertFalse(defender.isArmed());
-        assertEquals(veteranType, defender.getType());
-        // this should force DONE_SETTLEMENT
-        assertFalse(defender.isDefensiveUnit());
-
-        CombatResult done = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
-        combatModel.attack(attacker, defender, done, 0, dutch.getEurope());
-        assertFalse(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(veteranType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertFalse(defender.isArmed());
-        assertEquals(colonistType, defender.getType());
-        assertEquals(colony.getTile(), attacker.getTile());
-        assertEquals(colony.getTile(), defender.getTile());
-        assertEquals(attacker.getOwner(), colony.getOwner());
-        assertEquals(colonist.getType(), colonistType);
-
-    }
-
-    public void testAttackColonyWithBrave() {
-    	Game game = getGame();
-    	Map map = getTestMap(true);
-    	game.setMap(map);
-    	
-        Colony colony = getStandardColony(1, 5, 8);
-
-        SimpleCombatModel combatModel = new SimpleCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
-
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(inca, true);
-
-        Unit colonist = colony.getUnitIterator().next();
-        Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
-        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
-
-        assertTrue(attacker.isArmed());
-        assertTrue(attacker.isMounted());
-        assertTrue(inca.isIndian());
-        
-        // defender should lose horses
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-        combatModel.attack(attacker, defender, victory, 0, null);
-        assertEquals(1, colony.getUnitCount());
-        assertTrue(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(braveType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertTrue(defender.isArmed());
-        assertEquals(veteranType, defender.getType());
-        assertTrue(defender.isDefensiveUnit());
-        
-        // defender should lose muskets
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-        combatModel.attack(attacker, defender, victory, 0, null);
-        assertEquals(1, colony.getUnitCount());
-        assertTrue(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(braveType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertFalse(defender.isArmed());
-        assertEquals(veteranType, defender.getType());
-        // this should force DONE_SETTLEMENT
-        assertFalse(defender.isDefensiveUnit());
-
-        // colony should be destroyed
-        CombatResult done = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
-        combatModel.attack(attacker, defender, done, 0, dutch.getEurope());
-        assertTrue(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(braveType, attacker.getType());
-        assertFalse(defender.isDisposed());
-        assertTrue(colonist.isDisposed());
-        assertTrue(colony.isDisposed());
-        assertEquals(colony.getTile(), attacker.getTile());
-
-    }
 
     public void testDefendColonyWithUnarmedColonist() {
-    	Game game = getGame();
-    	Map map = getTestMap(true);
-    	game.setMap(map);
+        Game game = getGame();
+        Map map = getTestMap(true);
+        game.setMap(map);
     	
         Colony colony = getStandardColony();
 
@@ -524,62 +289,6 @@ public class CombatTest extends FreeColTestCase {
             assertFalse(defenceModifiers.contains(defenceModifier));
         }
     }
-    
-    public void testLoseColonyDefenceWithRevere() {
-        Game game = getGame();
-        Map map = getTestMap(true);
-        game.setMap(map);
-        
-        Colony colony = getStandardColony();
-     
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
-        dutch.setStance(inca, Stance.WAR);
-        inca.setStance(dutch, Stance.WAR);
-        
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(inca, true);
-
-        Unit colonist = colony.getUnitIterator().next();
-        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
-
-        assertEquals(colonist, colony.getDefendingUnit(attacker));
-
-        dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
-        
-        java.util.Map<GoodsType,Integer> goodsAdded = new HashMap<GoodsType,Integer>();
-        for (AbstractGoods goods : muskets.getGoodsRequired()) {
-            colony.addGoods(goods);
-            goodsAdded.put(goods.getType(), goods.getAmount());
-        }
-
-        // Disable following test since SimpleCombatModel stopped
-        // taking a RNG parameter.
-        // TODO: write proper tests for generateAttackResult.
-        //
-        // We need a deterministic random
-        //List<Integer> setValues = new ArrayList<Integer>();
-        //setValues.add(1);
-        //MockPseudoRandom mockRandom = new MockPseudoRandom(setValues,false);
-        //SimpleCombatModel combatModel = new SimpleCombatModel(mockRandom);
-        //CombatResult result = combatModel.generateAttackResult(attacker, colonist);
-        //String errMsg = "Wrong combat result, cannot be DONE_SETTLEMENT";
-        //assertFalse(errMsg,result.type == CombatResultType.DONE_SETTLEMENT);
-        String errMsg;
-        CombatModel combatModel = new SimpleCombatModel();
-
-        combatModel.attack(attacker, colonist, victory, 0, null);
-        
-        assertFalse("Colonist should not be disposed",colonist.isDisposed());
-        assertFalse("Colonist should not be captured",colonist.getOwner() == attacker.getOwner());
-        
-        for (AbstractGoods goods : muskets.getGoodsRequired()) {
-            boolean goodsLost = colony.getGoodsCount(goods.getType()) < goodsAdded.get(goods.getType());
-            errMsg = "Colony should have lose " + goods.getType().toString();
-            assertTrue(errMsg,goodsLost);
-        }
-    }
 
     public void testDefendSettlement() {
 
@@ -621,61 +330,6 @@ public class CombatTest extends FreeColTestCase {
         }
     }
     
-    public void testPioneerDiesNotLosesEquipment() {
-    	Game game = getStandardGame();
-        CombatModel combatModel = game.getCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        Map map = getTestMap();
-        game.setMap(map);
-        
-        Tile tile1 = map.getTile(5, 8);       
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
-
-        Unit pioneer = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
-        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
-
-        soldier.equipWith(muskets, true);
-        soldier.equipWith(horses, true);
-        soldier.setMovesLeft(1);
-        pioneer.equipWith(tools, true);
-
-        combatModel.attack(soldier, pioneer, victory, 0, null);
-        assertTrue("Pioneer should be dead", pioneer.isDisposed());
-    }
-
-    public void testScoutDiesNotLosesEquipment() {
-        Game game = getStandardGame();
-        CombatModel combatModel = game.getCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        Map map = getTestMap();
-        game.setMap(map);
-        
-        Tile tile1 = map.getTile(5, 8);       
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
-
-        Unit scout = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
-        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
-
-        soldier.equipWith(muskets, true);
-        soldier.equipWith(horses, true);
-        scout.setMovesLeft(1);
-        scout.equipWith(horses, true);
-
-        combatModel.attack(soldier, scout, victory, 0, null);
-        assertTrue("Scout should be dead", scout.isDisposed());
-    }
-
-
     public void testAttackIgnoresMovementPoints() throws Exception {
 
         Game game = getStandardGame();

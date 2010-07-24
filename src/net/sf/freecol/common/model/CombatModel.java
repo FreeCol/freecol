@@ -23,43 +23,45 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Unit;
 
-public interface CombatModel {
 
-    public static enum CombatResultType {
-        GREAT_LOSS(false),
-        LOSS(false),
-        EVADES(false),
-        WIN(true),
-        GREAT_WIN(true),
-        DONE_SETTLEMENT(true);
-        
-        private final boolean success;
-        
-        private CombatResultType(boolean success) {
-            this.success = success;
-        }
-        
-        /**
-         * Returns if this combat result was a success
-         * for the attacking unit.
-         * 
-         * @return <code>true</code> if the attack was a
-         *      success and <code>false</code> otherwise.
-         */
-        public boolean isSuccess() {
-            return success;
-        }
+abstract public class CombatModel {
+
+    public static enum CombatResult {
+        // Special results that set the sense of the result.
+        NO_RESULT,
+        LOSE,
+        WIN,
+        // Specific actions
+        AUTOEQUIP_UNIT,       // Defending unit auto-arms
+        BURN_MISSIONS,        // Defending natives burn attackers missions
+        CAPTURE_AUTOEQUIP,    // Winner captures loser auto-equipment
+        CAPTURE_COLONY,       // Winning Europeans capture a colony
+        CAPTURE_CONVERT,      // Winning Europeans cause native to convert
+        CAPTURE_EQUIP,        // Winner captures loser equipment
+        CAPTURE_UNIT,         // Losing unit is captured
+        DAMAGE_COLONY_SHIPS,  // Ships in losing colony are damaged
+        DAMAGE_SHIP_ATTACK,   // Losing ship is damaged by normal attack
+        DAMAGE_SHIP_BOMBARD,  // Losing ship is damaged by bombardment
+        DEMOTE_UNIT,          // Losing unit is demoted
+        DESTROY_COLONY,       // Winning natives burn a colony
+        DESTROY_SETTLEMENT,   // Winner destroys a native settlement
+        EVADE_ATTACK,         // Defending ship evades normal attack
+        EVADE_BOMBARD,        // Defending ship evades bombardment
+        LOOT_SHIP,            // Losing ship is looted
+        LOSE_AUTOEQUIP,       // Losing unit auto-arms and loses the arms
+        LOSE_EQUIP,           // Losing unit loses some equipment
+        PILLAGE_COLONY,       // Winning natives pillage an undefended colony
+        PROMOTE_UNIT,         // Winning unit is promoted
+        SINK_COLONY_SHIPS,    // Ships in losing colony are sunk
+        SINK_SHIP_ATTACK,     // Losing ship is sunk by normal attack
+        SINK_SHIP_BOMBARD,    // Losing ship is sunk by bombardment
+        SLAUGHTER_UNIT,       // Losing unit is slaughtered
     }
 
-    public class CombatResult {
-        public CombatResultType type;
-        public int damage;
-        public CombatResult(CombatResultType type, int damage) {
-            this.type = type;
-            this.damage = damage;
-        }
-    }
 
     /**
      * Odds a particular outcome will occur in combat.
@@ -76,14 +78,71 @@ public interface CombatModel {
 
 
     /**
+     * Empty constructor is sufficient.
+     */
+    public CombatModel() {}
+
+
+    /**
+     * Is this just a measurement of offence power?
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return True if no defender is provided.
+     */
+    public boolean combatIsMeasurement(FreeColGameObject attacker,
+                                       FreeColGameObject defender) {
+        return attacker instanceof Unit && defender == null;
+    }
+
+    /**
+     * Is this combat a normal attack?
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return True if the combat is a normal attack.
+     */
+    public boolean combatIsAttack(FreeColGameObject attacker,
+                                  FreeColGameObject defender) {
+        return attacker instanceof Unit && defender instanceof Unit;
+    }
+
+    /**
+     * Is this combat a attack on a settlement?  These happen on the client
+     * side only, for the purposes of the pre-combat display.  In these cases
+     * the actual defender unit is hidden from the attacker player, so
+     * the defender is shown as the settlement itself.
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return True if the combat is a client-side attack on a settlement.
+     */
+    public boolean combatIsSettlementAttack(FreeColGameObject attacker,
+                                            FreeColGameObject defender) {
+        return attacker instanceof Unit && defender instanceof Settlement;
+    }
+    /**
+     * Is this combat a bombardment?
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return True if the combat is a bombardment.
+     */
+    public boolean combatIsBombard(FreeColGameObject attacker,
+                                   FreeColGameObject defender) {
+        return attacker instanceof Settlement && defender instanceof Unit
+            && ((Unit) defender).isNaval();
+    }
+
+    /**
      * Calculates the chance of the outcomes of a combat.
      * 
      * @param attacker The attacker.
      * @param defender The defender.
      * @return The <code>CombatOdds</code>.
      */
-    public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
-                                          FreeColGameObject defender);
+    abstract public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
+                                                   FreeColGameObject defender);
 
     /**
      * Get the offensive power of a attacker wrt a defender.
@@ -95,8 +154,8 @@ public interface CombatModel {
      * @param defender The defender.
      * @return The offensive power.
      */
-    public float getOffencePower(FreeColGameObject attacker,
-                                 FreeColGameObject defender);
+    abstract public float getOffencePower(FreeColGameObject attacker,
+                                          FreeColGameObject defender);
 
     /**
      * Get the defensive power of a defender wrt an attacker.
@@ -105,8 +164,8 @@ public interface CombatModel {
      * @param defender The defender.
      * @return The defensive power.
      */
-    public float getDefencePower(FreeColGameObject attacker,
-                                 FreeColGameObject defender);
+    abstract public float getDefencePower(FreeColGameObject attacker,
+                                          FreeColGameObject defender);
 
     /**
      * Collect all the offensive modifiers that apply to an attack.
@@ -118,8 +177,8 @@ public interface CombatModel {
      * @param defender The defender.
      * @return All the applicable offensive modifiers.
      */
-    public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
-                                               FreeColGameObject defender);
+    abstract public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
+                                                        FreeColGameObject defender);
 
     /**
      * Collect all defensive modifiers that apply to a unit defending
@@ -129,11 +188,13 @@ public interface CombatModel {
      * @param defender The defender.
      * @return All the applicable defensive modifiers.
      */
-    public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
-                                               FreeColGameObject defender);
+    abstract public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
+                                                        FreeColGameObject defender);
 
     /**
-     * Generates a result of an attack.
+     * Generates a list of results of an attack.  The first must be one
+     * of NO_RESULT, LOSE or WIN.  The rest can be any other CombatResult
+     * suitable to the situation.
      * To be called by the server only.
      *
      * @param random A pseudo-random number source.
@@ -141,33 +202,8 @@ public interface CombatModel {
      * @param defender The defender.
      * @return The results of the combat.
      */
-    public List<CombatResult> generateAttackResult(Random random,
-                                                   FreeColGameObject attacker,
-                                                   FreeColGameObject defender);
-
-    /**
-     * Attack a unit with the given outcome.
-     * 
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @param result The result of the attack.
-     * @param plunderGold The amount of gold plundered.
-     * @param repairLocation A <code>Location</code> to send damaged
-     *            naval units.
-     */
-    public void attack(Unit attacker, Unit defender, CombatResult result,
-                       int plunderGold, Location repairLocation);
-
-    /**
-     * Bombard a unit with the given outcome.
-     * 
-     * @param colony The attacking <code>Colony</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @param result The result of the bombardment.
-     * @param repairLocation A <code>Location</code> to send damaged
-     *            naval units.
-     */
-    public void bombard(Colony colony, Unit defender, CombatResult result,
-                        Location repairLocation);
+    abstract public List<CombatResult> generateAttackResult(Random random,
+                                                            FreeColGameObject attacker,
+                                                            FreeColGameObject defender);
 
 }

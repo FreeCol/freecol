@@ -761,10 +761,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Gets the amount of Units at this Location. These units are located in a
-     * {@link WorkLocation} in this <code>Colony</code>.
+     * Gets the number of units at this colony.  Units are located in a
+     * {@link WorkLocation}s.
      * 
-     * @return The amount of Units at this Location.
+     * @return The number of <code>Unit</code>s in this colony.
      */
     @Override
     public int getUnitCount() {
@@ -778,6 +778,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return count;
     }
 
+    /**
+     * Gets a list of all units in working in this colony.
+     *
+     * @return A list of <code>Unit</code>s in this colony.
+     */
     public List<Unit> getUnitList() {
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (WorkLocation wl : getWorkLocations()) {
@@ -787,7 +792,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         }
         return units;
     }
-    
+
+
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
     }
@@ -901,7 +907,70 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Get the amount of gold plundered when this colony is captured.
+     * Determines whether this colony is sufficiently unprotected and
+     * contains something worth pillaging.  To be called by CombatModels
+     * when the attacker has defeated an unarmed colony defender.
+     *
+     * @param attacker The <code>Unit</code> that has defeated the defender.
+     * @return True if the attacker can pillage this colony.
+     */
+    public boolean canBePillaged(Unit attacker) {
+        return !hasStockade()
+            && attacker.hasAbility("model.ability.pillageUnprotectedColony")
+            && !(getBurnableBuildingList().isEmpty()
+                 && getShipList().isEmpty()
+                 && (getLootableGoodsList().isEmpty()
+                     || !attacker.getType().canCarryGoods()
+                     || attacker.getSpaceLeft() == 0)
+                 && getPlunder() == 0);
+    }
+
+    /**
+     * Gets the buildings in this colony that could be burned by a raid.
+     *
+     * @return A list of burnable buildings.
+     */
+    public List<Building> getBurnableBuildingList() {
+        List<Building> buildingList = new ArrayList<Building>();
+        for (Building building : getBuildings()) {
+            if (building.canBeDamaged()) buildingList.add(building);
+        }
+        return buildingList;
+    }
+
+    /**
+     * Gets a list of all ships in this colony (although they are really
+     * located on the colony tile).
+     *
+     * @return A list of ships in this colony.
+     */
+    public List<Unit> getShipList() {
+        List<Unit> shipList = new ArrayList<Unit>();
+        for (Unit u : getTile().getUnitList()) {
+            if (u.isNaval()) shipList.add(u);
+        }
+        return shipList;
+    }
+
+    /**
+     * Gets a list of all stored goods in this colony, suitable for
+     * being looted.
+     *
+     * @return A list of lootable goods in this colony.
+     */
+    public List<Goods> getLootableGoodsList() {
+        List<Goods> goodsList = new ArrayList<Goods>();
+        for (Goods goods : getGoodsContainer().getGoods()) {
+            if (goods.getType().isStorable()) goodsList.add(goods);
+        }
+        return goodsList;
+    }
+
+    /**
+     * Calculates the amount of gold to be plundered when this colony
+     * is looted or captured.
+     *
+     * @return The amount of gold plundered.
      */
     public int getPlunder() {
         return (owner.getGold() * (getUnitCount() + 1))

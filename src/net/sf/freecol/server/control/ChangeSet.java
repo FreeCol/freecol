@@ -62,11 +62,12 @@ public class ChangeSet {
         private static final int PERHAPS = 0;
         private static final int ONLY = -1;
         private ServerPlayer seeAlways;
+        private ServerPlayer seePerhaps;
         private ServerPlayer seeNever;
         private int type;
 
         private See(int type) {
-            this.seeAlways = this.seeNever = null;
+            this.seeAlways = this.seePerhaps = this.seeNever = null;
             this.type = type;
         }
 
@@ -100,10 +101,15 @@ public class ChangeSet {
             return new See(ONLY).always(player);
         }
 
-        // Use these to modify a See.perhaps() visibility.
+        // Use these to modify a See visibility.
 
         public See always(ServerPlayer player) {
             seeAlways = player;
+            return this;
+        }
+
+        public See perhaps(ServerPlayer player) {
+            seePerhaps = player;
             return this;
         }
 
@@ -111,6 +117,7 @@ public class ChangeSet {
             seeNever = player;
             return this;
         }
+
     }
 
     // Abstract template for all types of Change.
@@ -197,7 +204,7 @@ public class ChangeSet {
      * Encapsulate an attack.
      */
     private static class AttackChange extends Change {
-        private Unit unit;
+        private Unit attacker;
         private Unit defender;
         private boolean success;
 
@@ -205,13 +212,13 @@ public class ChangeSet {
          * Build a new AttackChange.
          *
          * @param see The visibility of this change.
-         * @param unit The <code>Unit</code> that is attacking.
+         * @param attacker The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
          * @param success Did the attack succeed.
          */
-        AttackChange(See vis, Unit unit, Unit defender, boolean success) {
+        AttackChange(See vis, Unit attacker, Unit defender, boolean success) {
             super(vis);
-            this.unit = unit;
+            this.attacker = attacker;
             this.defender = defender;
             this.success = success;
         }
@@ -233,9 +240,9 @@ public class ChangeSet {
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return serverPlayer == unit.getOwner()
+            return serverPlayer == attacker.getOwner()
                 || serverPlayer == defender.getOwner()
-                || (unit.isVisibleTo(serverPlayer)
+                || (attacker.isVisibleTo(serverPlayer)
                     && defender.isVisibleTo(serverPlayer));
         }
 
@@ -249,9 +256,16 @@ public class ChangeSet {
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("animateAttack");
-            element.setAttribute("unit", unit.getId());
+            element.setAttribute("attacker", attacker.getId());
             element.setAttribute("defender", defender.getId());
             element.setAttribute("success", Boolean.toString(success));
+            if (!attacker.isVisibleTo(serverPlayer)) {
+                element.appendChild(attacker.toXMLElement(serverPlayer, doc,
+                                                          false, false));
+            } else if (!defender.isVisibleTo(serverPlayer)) {
+                element.appendChild(defender.toXMLElement(serverPlayer, doc,
+                                                          false, false));
+            }
             return element;
         }
     }
@@ -338,7 +352,7 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 1.  Up front with the updates.
+         * @return 1.  Right after the animations.
          */
         public int sortPriority() {
             return 1;
@@ -481,10 +495,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 1.  Vanilla update.
+         * @return 2.  Vanilla update.
          */
         public int sortPriority() {
-            return 1;
+            return 2;
         }
 
         /**
@@ -543,10 +557,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 1.  Special update, but still an update.
+         * @return 2.  Special update, but still an update.
          */
         public int sortPriority() {
-            return 1;
+            return 2;
         }
 
         /**
@@ -592,7 +606,7 @@ public class ChangeSet {
                      List<FreeColGameObject> objects) {
             super(vis);
             this.tile = (loc instanceof Tile) ? (Tile) loc : null;
-            this.fcgo = objects.remove(0);
+            this.fcgo = objects.remove(objects.size() - 1);
             this.contents = objects;
         }
 
@@ -627,13 +641,13 @@ public class ChangeSet {
             Element element = doc.createElement("remove");
             // The main object may be visible, but the contents are by
             // only visible if the deeper ownership test succeeds.
-            fcgo.addToRemoveElement(element);
             if (fcgo instanceof Ownable
                 && ((Ownable) fcgo).getOwner() == serverPlayer) {
                 for (FreeColGameObject o : contents) {
                     o.addToRemoveElement(element);
                 }
             }
+            fcgo.addToRemoveElement(element);
             return element;
         }
     }
@@ -664,7 +678,7 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 1.  Group with updates, do not disturb the order.
+         * @return 1.  Before the updates.
          */
         public int sortPriority() {
             return 1;
@@ -722,10 +736,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 2.  Messages and history are after the updates.
+         * @return 3.  Messages and history are after the updates.
          */
         public int sortPriority() {
-            return 2;
+            return 3;
         }
 
         /**
@@ -738,7 +752,10 @@ public class ChangeSet {
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("addObject");
-            addToOwnedElement(template, element, serverPlayer);
+            Element child = template.toXMLElement(serverPlayer, doc,
+                                                  false, false);
+            child.setAttribute("owner", serverPlayer.getId());
+            element.appendChild(child);
             return element;
         }
     }
@@ -759,22 +776,6 @@ public class ChangeSet {
         changes = new ArrayList<Change>(other.changes);
     }
 
-    /**
-     * Convenience function to add an object to an element, where the
-     * object should have its "owner" field set.  This is useful for
-     * ModelMessage and HistoryEvent objects.
-     *
-     * @param fco The <code>FreeColObject</code> to add.
-     * @param element The <code>Element</code> to add to.
-     * @param player The owner <code>Player</code>.
-     */
-    public static void addToOwnedElement(FreeColObject fco, Element element,
-                                         Player player) {
-        Document doc = element.getOwnerDocument();
-        Element child = fco.toXMLElement(player, doc, false, false);
-        child.setAttribute("owner", player.getId());
-        element.appendChild(child);
-    }
 
     // Helper routines that should be used to construct a change set.
 
@@ -856,10 +857,6 @@ public class ChangeSet {
      */
     public ChangeSet addDispose(ServerPlayer owner, Location loc,
                                 FreeColGameObject obj) {
-        if (loc instanceof Tile) {
-            changes.add(new ObjectChange(See.perhaps().always(owner),
-                                         (Tile) loc));
-        }
         changes.add(new RemoveChange(See.perhaps().always(owner), loc,
                                      obj.disposeList()));
         return this;

@@ -55,7 +55,7 @@ import org.w3c.dom.Element;
 /**
  * A server-side implementation of the <code>ModelController</code> interface.
  */
-public class ServerModelController implements ModelController,PropertyChangeListener {
+public class ServerModelController implements ModelController {
 
     private static final Logger logger = Logger.getLogger(ServerModelController.class.getName());
 
@@ -538,23 +538,5 @@ public class ServerModelController implements ModelController,PropertyChangeList
         /** The number of turns before a <code>TaskEntry</code> has expired. */
         private static final int TASK_ENTRY_TIME_OUT = 5;
     }
-    
-    public void updateModelListening(){
-        for(Player player : freeColServer.getGame().getPlayers()){
-            if(!player.isIndian()){
-                continue;
-            }
-            for(Settlement settlement : player.getIndianSettlements()){
-                settlement.addPropertyChangeListener("alarmLevel", this);
-            }
-        }
-    }
 
-    
-    public void propertyChange(PropertyChangeEvent e) {
-        if(e.getPropertyName() == "alarmLevel"){
-            IndianSettlement settlement = (IndianSettlement) e.getSource();
-            update(settlement.getTile());
-        }
-    }
 }
