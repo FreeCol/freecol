@@ -814,8 +814,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
             buildingsPanel.removePropertyChangeListeners();
             tilePanel.removePropertyChangeListeners();
-            outsideColonyPanel.disposeLabels();
-            inPortPanel.disposeLabels();
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
                 getController().nextModelMessage();
@@ -1109,8 +1107,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void initialize() {
-
-            disposeLabels();
+            
             removeAll();
             if (colony == null) {
                 return;
@@ -1132,14 +1129,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
             revalidate();
             repaint();
-        }
-
-        public void disposeLabels() {
-            for (Component component : getComponents()) {
-                if (component instanceof UnitLabel) {
-                    ((UnitLabel) component).dispose();
-                }
-            }
         }
 
         public Colony getColony() {
@@ -1227,8 +1216,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
                 ColonyPanel.this.setSelectedUnit(null);
             }
-
-            disposeLabels();
+            
             removeAll();
             if (colony == null) {
                 return;
@@ -1266,15 +1254,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 ColonyPanel.this.setSelectedUnit(selectedUnit);
             }
         }
-
-        public void disposeLabels() {
-            for (Component component : getComponents()) {
-                if (component instanceof UnitLabel) {
-                    ((UnitLabel) component).dispose();
-                }
-            }
-        }
-
     }
 
     /**
@@ -1468,7 +1447,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 
             private void initialize() {
 
-                disposeLabels();
                 removeAll();
                 UnitLabel unitLabel = null;
                 if (colonyTile.getUnit() != null) {
@@ -1494,14 +1472,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                 revalidate();
                 repaint();
-            }
-
-            public void disposeLabels() {
-                for (Component component : getComponents()) {
-                    if (component instanceof UnitLabel) {
-                        ((UnitLabel) component).dispose();
-                    }
-                }
             }
 
 
@@ -1541,7 +1511,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             public void removePropertyChangeListeners() {
                 colonyTile.removePropertyChangeListener(this);
-                disposeLabels();
             }
 
             /**
