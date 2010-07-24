@@ -176,6 +176,7 @@ public final class InGameController extends Controller {
 
     /**
      * Send an element to all players.
+     * Deprecated, please avoid if possible.
      *
      * @param element The <code>Element</code> to send.
      */
@@ -209,6 +210,7 @@ public final class InGameController extends Controller {
 
     /**
      * Send an element to all players except one.
+     * Deprecated, please avoid if possible.
      *
      * @param serverPlayer A <code>ServerPlayer</code> to exclude.
      * @param element An <code>Element</code> to send.
@@ -229,6 +231,7 @@ public final class InGameController extends Controller {
 
     /**
      * Send an element to a list of players.
+     * Deprecated, please avoid if possible.
      *
      * @param serverPlayers The <code>ServerPlayer</code>s to send to.
      * @param element An <code>Element</code> to send.
@@ -253,6 +256,7 @@ public final class InGameController extends Controller {
 
     /**
      * Send an element to a specific player.
+     * Deprecated, please avoid if possible.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to update.
      * @param element An <code>Element</code> containing the update.
@@ -269,6 +273,7 @@ public final class InGameController extends Controller {
 
     /**
      * Ask for a reply from a specific player.
+     * Deprecated, please avoid if possible.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
      * @param element An <code>Element</code> containing a query.
@@ -550,6 +555,7 @@ public final class InGameController extends Controller {
                     if (unit != null && unit.getOwner() == serverPlayer) {
                         s.setMissionary(null);
                         cs.addDispose(serverPlayer, s.getTile(), unit);
+                        cs.add(See.perhaps(), s.getTile());
                         for (ServerPlayer euro : europeans) {
                             s.getTile().updatePlayerExploredTile(euro);
                         }
@@ -563,9 +569,7 @@ public final class InGameController extends Controller {
         while (!settlements.isEmpty()) {
             Settlement settlement = settlements.remove(0);
             for (Tile tile : settlement.getOwnedTiles()) {
-                if (tile != settlement.getTile()) {
-                    cs.add(See.only(serverPlayer), tile);
-                }
+                cs.add(See.perhaps(), tile);
             }
             cs.addDispose(serverPlayer, settlement.getTile(), settlement);
         }
@@ -574,6 +578,9 @@ public final class InGameController extends Controller {
         List<Unit> units = serverPlayer.getUnits();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
+            if (unit.getLocation() instanceof Tile) {
+                cs.add(See.perhaps(), unit.getTile());
+            }
             cs.addDispose(serverPlayer, unit.getLocation(), unit);
         }
 
@@ -5259,6 +5266,7 @@ public final class InGameController extends Controller {
         }
 
         // Original player also sees conclusion of diplomacy.
+        // TODO: eliminate the explicit Element hackery
         sendToOthers(serverPlayer, cs);
         Element element = cs.build(serverPlayer);
         element.appendChild(new DiplomacyMessage(unit, settlement, agreement)
@@ -5283,6 +5291,7 @@ public final class InGameController extends Controller {
 
         closeTransactionSession(unit, settlement);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+        // TODO: eliminate the explicit Element hackery
         Element element = cs.build(serverPlayer);
         element.appendChild(new DiplomacyMessage(unit, settlement, agreement)
                             .toXMLElement());
@@ -5342,6 +5351,7 @@ public final class InGameController extends Controller {
             // If the unit is on a carrier we need to update the
             // client with it first as the diplomacy message refers to it.
             // Ask the other player about this proposal.
+            // TODO: eliminate the explicit Element hackery
             diplomacy = new DiplomacyMessage(unit, settlement, agreement);
             Element proposal = diplomacy.toXMLElement();
             if (!unit.isVisibleTo(other)) {
@@ -5404,6 +5414,7 @@ public final class InGameController extends Controller {
 
         // Spying is private.
         // Have to tack on the settlement.
+        // TODO: eliminate the explicit Element hackery
         Element reply = cs.build(serverPlayer);
         Element child = settlement.toXMLElement(serverPlayer,
                                                 reply.getOwnerDocument(),

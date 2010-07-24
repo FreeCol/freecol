@@ -516,7 +516,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         });
         register("retire", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
-                return retire(connection, element);
+                FreeColServer server = getFreeColServer();
+                ServerPlayer serverPlayer = server.getPlayer(connection);
+                return server.getInGameController().retire(serverPlayer);
             }
         });
     }
@@ -1184,20 +1186,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(score.toXMLElement(player, reply.getOwnerDocument()));
         }
         return reply;
-    }
-
-
-    /**
-     * Handles a "retire"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element retire(Connection connection, Element element) {
-        FreeColServer server = getFreeColServer();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        return server.getInGameController().retire(serverPlayer);
     }
 
 
