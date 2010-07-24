@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -667,7 +668,7 @@ public final class GUI {
                         if (s.getOwner().equals(freeColClient.getMyPlayer())) {
                             canvas.showColonyPanel((Colony) s);
                         } else if (FreeCol.isInDebugMode()) {
-                            freeColClient.getInGameController().debugForeignColony(t);
+                            debugForeignColony(t);
                         }
                     } else if (s instanceof IndianSettlement) {
                         canvas.showIndianSettlementPanel((IndianSettlement) s);
@@ -720,6 +721,20 @@ public final class GUI {
             if (selectedTile != null) {
                 freeColClient.getCanvas().refreshTile(selectedTile);
             }
+        }
+    }
+
+    /**
+     * Detailed view of a foreign colony when in debug mode.
+     *
+     * @param tile The <code>Tile</code> with the colony.
+     */
+    public void debugForeignColony(Tile tile) {
+        if (FreeCol.isInDebugMode() && tile != null
+            && tile.getSettlement() instanceof Colony) {
+            FreeColGameObject fcgo = freeColClient.getFreeColServer().getGame()
+                .getFreeColGameObject(tile.getSettlement().getId());
+            freeColClient.getCanvas().showColonyPanel((Colony) fcgo);
         }
     }
 

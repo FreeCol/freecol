@@ -112,19 +112,9 @@ public class SpySettlementMessage extends Message {
                                        + ": " + type.whyIllegal());
         }
 
-        unit.setMovesLeft(0);
-        // Two versions of the tile, one detailed, one not.
-        // The client is trusted (gritch gritch) to pop the first off,
-        // show it, then process the update as normal.
-        // Given we are *correctly* revealing information the client
-        // would not normally have, there is not much to be done about
-        // the trust issue.
-        Element reply = createNewRootElement("update");
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(tile.toXMLElement(serverPlayer, doc, true, false));
-        reply.appendChild(tile.toXMLElement(serverPlayer, doc, false, false));
-        reply.appendChild(unit.toXMLElement(serverPlayer, doc));
-        return reply;
+        // Spy on the settlement
+        return server.getInGameController()
+            .spySettlement(serverPlayer, unit, settlement);
     }
 
     /**

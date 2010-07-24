@@ -99,6 +99,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -5384,6 +5385,31 @@ public final class InGameController extends Controller {
         default:
             return Message.clientError("Bogus trade");
         }
+    }
+
+    /**
+     * Spy on a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is spying.
+     * @param unit The <code>Unit</code> that is spying.
+     * @param settlement The <code>Settlement</code> to spy on.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element spySettlement(ServerPlayer serverPlayer, Unit unit,
+                                 Settlement settlement) {
+        ChangeSet cs = new ChangeSet();
+
+        unit.setMovesLeft(0);
+        cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+
+        // Spying is private.
+        // Have to tack on the settlement.
+        Element reply = cs.build(serverPlayer);
+        Element child = settlement.toXMLElement(serverPlayer,
+                                                reply.getOwnerDocument(),
+                                                true, false);
+        reply.appendChild(child);
+        return reply;
     }
 
 }

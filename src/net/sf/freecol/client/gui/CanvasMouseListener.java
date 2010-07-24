@@ -66,7 +66,7 @@ public final class CanvasMouseListener implements MouseListener {
                 if (FreeCol.isInDebugMode()) {
                     Tile tile = canvas.getClient().getGame().getMap().getTile(position);
                     if (tile.getSettlement() != null) {
-                        canvas.getClient().getInGameController().debugForeignColony(tile);
+                        gui.debugForeignColony(tile);
                     }
                 } else {
                     gui.showColonyPanel(position);

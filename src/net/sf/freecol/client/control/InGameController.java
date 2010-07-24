@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -108,7 +109,6 @@ import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
@@ -2634,18 +2634,9 @@ public final class InGameController implements NetworkConstants {
      * @param direction The <code>Direction</code> of a colony to spy on.
      */
     private void moveSpy(Unit unit, Direction direction) {
-        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
-        Element reply;
-        if (colony != null && (reply = askSpy(unit, direction)) != null) {
-            // Sleight of hand here.  The update contains two versions
-            // of the colony tile.  The first child node is a detailed
-            // view, which is read explicitly, displayed, removed, then
-            // superseded as the update is processed normally.
-            Element tileElement = (Element) reply.getFirstChild();
-            colony.getTile().readFromXMLElement(tileElement);
+        Colony colony = askSpy(unit, direction);
+        if (colony != null) {
             freeColClient.getCanvas().showColonyPanel(colony);
-            reply.removeChild(tileElement);
-            freeColClient.getInGameInputHandler().update(reply);
         }
         nextActiveUnit();
     }
@@ -2655,12 +2646,31 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is spying.
      * @param direction The <code>Direction</code> of a colony to spy on.
-     * @return An element containing two views of the tile containing the colony.
+     * @return A private version of the colony to display.
      */
-    private Element askSpy(Unit unit, Direction direction) {
+    private Colony askSpy(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
-        SpySettlementMessage message = new SpySettlementMessage(unit, direction);
-        return askExpecting(client, message.toXMLElement(), null);
+        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
+        if (colony == null || colony.getOwner() == unit.getOwner()) return null;
+        SpySettlementMessage message = new SpySettlementMessage(unit,
+                                                                direction);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return null;
+
+        // Sleight of hand here.  The reply is a normal update message
+        // with the *full* colony under a new ID appended as the last
+        // node.  Pull that off, process the rest normally, and return
+        // the independently read colony node.  This is hacky as the
+        // client retains the colony information, it may not be
+        // correctly updated with the proper limited range of
+        // information normally available to the player until some
+        // arbitrarily later event triggers an update.
+        Element colonyElement = (Element) reply.getLastChild();
+        reply.removeChild(colonyElement);
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        colony.readFromXMLElement(colonyElement);
+        return colony;
     }
 
     /**
@@ -3049,28 +3059,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     // End of move-consequents
-
-
-    /**
-     * Detailed view of a foreign colony when in debug mode.
-     *
-     * @param tile The <code>Tile</code> with the colony.
-     */
-    public void debugForeignColony(Tile tile) {
-        if (FreeCol.isInDebugMode() && tile != null) {
-            DebugForeignColonyMessage message = new DebugForeignColonyMessage(tile);
-            Element reply = askExpecting(freeColClient.getClient(),
-                                         message.toXMLElement(), null);
-            if (reply != null) {
-                // Similar sleight of hand as in moveSpy.
-                Element tileElement = (Element) reply.getFirstChild();
-                tile.readFromXMLElement(tileElement);
-                freeColClient.getCanvas().showColonyPanel(tile.getColony());
-                reply.removeChild(tileElement);
-                freeColClient.getInGameInputHandler().update(reply);
-            }
-        }
-    }
 
 
     /**
