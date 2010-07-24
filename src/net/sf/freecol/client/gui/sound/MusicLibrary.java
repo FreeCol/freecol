@@ -37,12 +37,12 @@ public final class MusicLibrary extends SoundLibrary {
 
 
     /**
-    * The constructor.
-    * @param freeColHome A directory containing the "music"-directory.
-    * @throws FreeColException If the "music"-directory could not be found in the path specified by <i>freeColHome</i>.
-    */
-    public MusicLibrary(String freeColHome) throws FreeColException {
-        super(new File(new File(("".equals(freeColHome) ? "data" : freeColHome), "audio"), "music"));
+     * The constructor.
+     * @param dir a <code>File</code> value
+     * @exception FreeColException If the "music"-directory could not be found in the path specified by <i>freeColHome</i>.
+     */
+    public MusicLibrary(File dir) throws FreeColException {
+        super(new File(dir, "music"));
     }
 
 

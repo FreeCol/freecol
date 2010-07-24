@@ -20,9 +20,13 @@
 package net.sf.freecol.client;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -30,9 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
-
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -51,11 +57,14 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.WindowedFrame;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.gui.sound.SoundLibrary;
+import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -63,14 +72,13 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
-import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
-
 import org.w3c.dom.Element;
 
 /**
@@ -80,6 +88,11 @@ import org.w3c.dom.Element;
 public final class FreeColClient {
 
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
+
+    /**
+     * The space not being used in windowed mode.
+     */
+    private static final int DEFAULT_WINDOW_SPACE = 100;
 
     // Control:
     private ConnectController connectController;
@@ -165,25 +178,83 @@ public final class FreeColClient {
      * Creates a new <code>FreeColClient</code>. Creates the control objects
      * and starts the GUI.
      * 
-     * @param windowed Determines if the <code>Canvas</code> should be
-     *            displayed within a <code>JFrame</code> (when
-     *            <code>true</code>) or in fullscreen mode (when
-     *            <code>false</code>).
-     * @param innerWindowSize The inner size of the window (borders not included).
-     * @param imageLibrary The object holding the images.
-     * @param musicLibrary The object holding the music.
-     * @param sfxLibrary The object holding the sound effects.
+     * @param savegameFile a <code>File</code> value
+     * @param size a <code>Dimension</code> value
+     * @param sound a <code>boolean</code> value
+     * @param splashFilename a <code>String</code> value
      * @param showOpeningVideo Display the opening video.
+     * @param fontName a <code>String</code> value
      */
-    public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
-                         ImageLibrary imageLibrary, MusicLibrary musicLibrary,
-                         SfxLibrary sfxLibrary, final boolean showOpeningVideo) {
+    public FreeColClient(final File savegameFile, Dimension size, final boolean sound,
+                         final String splashFilename, final boolean showOpeningVideo, String fontName) {
+
+        // Display splash screen:
+        JWindow splash = null;
+        if (splashFilename != null) {
+            splash = displaySplash(splashFilename);
+        }
+
         headless = "true".equals(System.getProperty("java.awt.headless", "false"));
-        this.windowed = windowed;
-        this.imageLibrary = imageLibrary;
-        this.musicLibrary = musicLibrary;
-        this.sfxLibrary = sfxLibrary;
-        
+
+        imageLibrary = new ImageLibrary();
+
+        if (sound) {
+            File dir = new File(FreeCol.getDataDirectory(), "audio");
+            try {
+                musicLibrary = new MusicLibrary(dir);
+            } catch (FreeColException e) {
+                logger.warning("Could not load music files from " + dir);
+            }
+
+            try {
+                sfxLibrary = new SfxLibrary(dir);
+            } catch (FreeColException e) {
+                logger.warning("Could not load sfx files from " + dir);
+            }
+        }
+
+        windowed = (size != null);
+
+        if (size != null && size.width < 0) {
+            final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
+                                 bounds.height - DEFAULT_WINDOW_SPACE);
+        }
+        final Dimension windowSize = size;
+        logger.info("Window size is " + windowSize);
+
+        Font font = null;
+        if (fontName != null) {
+            font = Font.decode(fontName);
+            if (font == null) {
+                System.err.println("Font not found: " + fontName);
+            }
+        }
+        if (font == null) font = ResourceManager.getFont("NormalFont");
+        try {
+            FreeColLookAndFeel fclaf
+                = new FreeColLookAndFeel(FreeCol.getDataDirectory(), windowSize);
+            try {
+                FreeColLookAndFeel.install(fclaf, font);
+            } catch (FreeColException e) {
+                e.printStackTrace();
+                System.err.println("Unable to install FreeCol look-and-feel.");
+                System.exit(1);
+            }
+        } catch (FreeColException e) {
+            removeSplash(splash);
+            e.printStackTrace();
+            System.err.println("\nThe data files could not be found by FreeCol. Please make sure");
+            System.err.println("they are present. If FreeCol is looking in the wrong directory");
+            System.err.println("then run the game with a command-line parameter:\n");
+            System.exit(1);
+        }
+
+        // TODO: don't use same datafolder for both images and
+        // music because the images are best kept inside the .JAR
+        // file.
+        logger.info("Now starting to load images.");
+
         mapEditor = false;
         
         clientOptions = new ClientOptions(Specification.getSpecification());
@@ -201,7 +272,7 @@ public final class FreeColClient {
             modMappings.add(f.getResourceMapping());
         }
         ResourceManager.setModMappings(modMappings);
-        ResourceManager.preload(innerWindowSize);
+        ResourceManager.preload(size);
         
         // Control:
         connectController = new ConnectController(this);
@@ -211,17 +282,27 @@ public final class FreeColClient {
         inGameInputHandler = new InGameInputHandler(this);
         modelController = new ClientModelController(this);
         mapEditorController = new MapEditorController(this);
+
+        removeSplash(splash);
         
         // Gui:
         if (!headless) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        startGUI(innerWindowSize, showOpeningVideo);
+                        startGUI(windowSize, (showOpeningVideo && savegameFile == null));
                     }
                 });
         }
         worker = new Worker();
         worker.start();
+
+        if (savegameFile != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        connectController.loadGame(savegameFile);
+                    }
+                });
+        }
         
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
@@ -242,6 +323,37 @@ public final class FreeColClient {
         }
     }
 
+    /**
+     * Displays a splash screen.
+     * @return The splash screen. It should be removed by the caller
+     *      when no longer needed by a call to removeSplash().
+     */
+    private static JWindow displaySplash(String filename) {
+        try {
+            Image im = Toolkit.getDefaultToolkit().getImage(filename);
+            JWindow f = new JWindow();
+            f.getContentPane().add(new JLabel(new ImageIcon(im)));
+            f.pack();
+            Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+            f.setLocation(center.x - f.getWidth() / 2, center.y - f.getHeight() / 2);
+            f.setVisible(true);
+            return f;
+        } catch (Exception e) {
+            logger.warning(e.toString());
+            return null;
+        }
+    }
+
+    /**
+     * Removes splash screen.
+     */
+    private static void removeSplash(JWindow splash) {
+        if (splash != null) {
+            splash.setVisible(false);
+            splash.dispose();
+        }
+    }
+    
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */

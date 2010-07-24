@@ -31,11 +31,11 @@ public final class SfxLibrary extends SoundLibrary {
 
     /**
      * The constructor.
-     * @param freeColHome A directory containing the "audio"-directory.
-     * @throws FreeColException If the "sfx"-directory could not be found in the path spesified by <i>freeColHome</i>.
+     * @param dir a <code>File</code> value
+     * @exception FreeColException If the "sfx"-directory could not be found in the path spesified by <i>freeColHome</i>.
      */
-    public SfxLibrary(String freeColHome) throws FreeColException {
-        super(new File(new File(("".equals(freeColHome) ? "data" : freeColHome), "audio"), "sfx"));
+    public SfxLibrary(File dir) throws FreeColException {
+        super(new File(dir, "sfx"));
     }
 
 

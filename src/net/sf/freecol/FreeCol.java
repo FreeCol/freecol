@@ -20,12 +20,6 @@
 package net.sf.freecol;
 
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,21 +33,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JWindow;
-import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.sound.MusicLibrary;
-import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.FreeColDataFile;
@@ -91,11 +77,6 @@ public final class FreeCol {
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
 
-    /**
-     * The space not being used in windowed mode.
-     */
-    private static final int     DEFAULT_WINDOW_SPACE = 100;
-
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     private static final String FREECOL_VERSION = "0.9.0-svn";
@@ -112,7 +93,6 @@ public final class FreeCol {
                             memoryCheck = true,
                             consoleLogging = false,
                             introVideo = true;
-    private static Dimension windowSize = new Dimension(-1, -1);
     private static String dataFolder = "data";
     private static String logFile = null;
 
@@ -162,7 +142,7 @@ public final class FreeCol {
     
     private static String splashFilename = DEFAULT_SPLASH_FILE;
     private static boolean displaySplash = false;
-
+    private static Dimension windowSize;
 
 
     private FreeCol() {
@@ -217,41 +197,10 @@ public final class FreeCol {
         if (standAloneServer) {
             startServer();
         } else {
-            startClient();
+            freeColClient = new FreeColClient(savegameFile, windowSize, sound, splashFilename, introVideo, fontName);
         }
     }
 
-    /**
-     * Displays a splash screen.
-     * @return The splash screen. It should be removed by the caller
-     *      when no longer needed by a call to removeSplash().
-     */
-    private static JWindow displaySplash(String filename) {
-        try {
-            Image im = Toolkit.getDefaultToolkit().getImage(filename);
-            JWindow f = new JWindow();
-            f.getContentPane().add(new JLabel(new ImageIcon(im)));
-            f.pack();
-            Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-            f.setLocation(center.x - f.getWidth() / 2, center.y - f.getHeight() / 2);
-            f.setVisible(true);
-            return f;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while displaying splash screen", e);
-            return null;
-        }
-    }
-
-    /**
-     * Removes splash screen.
-     */
-    private static void removeSplash(JWindow splash) {
-        if (splash != null) {
-            splash.setVisible(false);
-            splash.dispose();
-        }
-    }
-    
     /**
      * Initialize loggers.
      */
@@ -760,7 +709,9 @@ public final class FreeCol {
             if (line.hasOption("windowed")) {
                 windowed = true;
                 String dimensions = line.getOptionValue("windowed");
-                if (dimensions != null) {
+                if (dimensions == null) {
+                    windowSize = new Dimension(-1, -1);
+                } else {
                     String[] xy = dimensions.split("[^0-9]");
                     if (xy.length == 2) {
                         windowSize = new Dimension(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
@@ -973,92 +924,6 @@ public final class FreeCol {
             System.err.println("Error while loading server: " + e);
             System.exit(1);
         }
-    }
-
-    public static void startClient() {
-
-        // Display splash screen:
-        final JWindow splash = (displaySplash) ? displaySplash(splashFilename) : null;
-
-        final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        if (windowSize.width == -1 || windowSize.height == -1) {
-            // Allow room for frame handles, taskbar etc if using windowed mode:
-            windowSize.width = bounds.width - DEFAULT_WINDOW_SPACE;
-            windowSize.height = bounds.height - DEFAULT_WINDOW_SPACE;
-        }
-        final Dimension preloadSize;
-        if (windowed) {
-            preloadSize = windowSize;
-        } else {
-            preloadSize = new Dimension(bounds.width, bounds.height);
-        }
-
-        Font font = null;
-        if (fontName != null) {
-            font = Font.decode(fontName);
-            if (font == null) {
-                System.err.println("Font not found: " + fontName);
-            }
-        }
-        if (font == null) font = ResourceManager.getFont("NormalFont");
-        try {
-            FreeColLookAndFeel fclaf
-                = new FreeColLookAndFeel(getDataDirectory(), preloadSize);
-            try {
-                FreeColLookAndFeel.install(fclaf, font);
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                System.err.println("Unable to install FreeCol look-and-feel.");
-                System.exit(1);
-            }
-        } catch (FreeColException e) {
-            removeSplash(splash);
-            e.printStackTrace();
-            System.err.println("\nThe data files could not be found by FreeCol. Please make sure");
-            System.err.println("they are present. If FreeCol is looking in the wrong directory");
-            System.err.println("then run the game with a command-line parameter:\n");
-            printUsage();
-            System.exit(1);
-        }
-
-        // TODO: don't use same datafolder for both images and
-        // music because the images are best kept inside the .JAR
-        // file.
-        logger.info("Now starting to load images.");
-
-        ImageLibrary lib = new ImageLibrary();
-
-        MusicLibrary    musicLibrary = null;
-        SfxLibrary      sfxLibrary = null;
-        if (sound) {
-            try {
-                musicLibrary = new MusicLibrary(dataFolder);
-            } catch (FreeColException e) {
-                System.out.println("The music files could not be loaded by FreeCol. Disabling music.");
-            }
-
-            try {
-                sfxLibrary = new SfxLibrary(dataFolder);
-            } catch (FreeColException e) {
-                System.out.println("The sfx files could not be loaded by FreeCol. Disabling sfx.");
-            }
-        }
-
-        final boolean loadSavegame = (savegameFile != null);
-        boolean showVideo = (introVideo && !loadSavegame);
-        freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary, showVideo);
-
-        if (loadSavegame) {
-            final FreeColClient theFreeColClient = freeColClient;
-            final File theSavegameFile = savegameFile;
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        theFreeColClient.getConnectController().loadGame(theSavegameFile);
-                    }
-                });
-        }
-        
-        removeSplash(splash);
     }
 
 }

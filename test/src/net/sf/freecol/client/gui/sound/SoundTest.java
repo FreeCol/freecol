@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.sound;
 
+import java.io.File;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
@@ -51,15 +54,16 @@ public class SoundTest extends FreeColTestCase {
         final AudioMixerOption amo = (AudioMixerOption) clientOptions.getObject(ClientOptions.AUDIO_MIXER);
         final PercentageOption po = (PercentageOption) clientOptions.getObject(ClientOptions.MUSIC_VOLUME);
         po.setValue(10); // 10% volume
-        
+
+        File dir = new File(FreeCol.getDataDirectory(), "audio");
         try {
-            musicLibrary = new MusicLibrary("data/");
+            musicLibrary = new MusicLibrary(dir);
         } catch (FreeColException e) {
             System.out.println("The music files could not be found.");
             fail();
         }
         try {
-            sfxLibrary = new SfxLibrary("data/");
+            sfxLibrary = new SfxLibrary(dir);
         } catch (FreeColException e) {
             System.out.println("The music files could not be found.");
             fail();
