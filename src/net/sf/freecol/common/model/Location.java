@@ -47,6 +47,14 @@ public interface Location {
     public StringTemplate getLocationName();
 
     /**
+     * Returns the name of this location for a particular player.
+     *
+     * @param player The <code>Player</code> to return the name for.
+     * @return The name of this location.
+     */
+    public StringTemplate getLocationNameFor(Player player);
+
+    /**
      * Adds a <code>Locatable</code> to this Location.
      * 
      * @param locatable

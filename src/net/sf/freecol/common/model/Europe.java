@@ -478,7 +478,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
                     getOwner().addModelMessage(new ModelMessage("model.unit.shipRepaired",
                                                                 this, unit)
                                     .addStringTemplate("%unit%", unit.getLabel())
-                                    .addStringTemplate("%repairLocation%", getLocationName()));
+                                    .addStringTemplate("%repairLocation%", getLocationNameFor(getOwner())));
                 }
             }
         }
@@ -491,6 +491,16 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      */
     public StringTemplate getLocationName() {
         return StringTemplate.key(getNameKey());
+    }
+
+    /**
+     * Returns the name of this location for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the name for.
+     * @return The name of this location.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return getLocationName();
     }
 
     /**

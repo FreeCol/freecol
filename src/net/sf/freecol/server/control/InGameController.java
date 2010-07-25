@@ -3432,12 +3432,15 @@ public final class InGameController extends Controller {
      */
     private void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        StringTemplate loserLocation = loser.getLocation().getLocationName();
         StringTemplate loserNation = loserPlayer.getNationName();
+        StringTemplate loserLocation = loser.getLocation()
+            .getLocationNameFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
         String messageID = loser.getType().getId() + ".captured";
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
+        StringTemplate winnerLocation = winner.getLocation()
+            .getLocationNameFor(winnerPlayer);
 
         // Loser message pre-capture
         cs.addMessage(See.only(loserPlayer),
@@ -3470,7 +3473,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%unit%", oldName)
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", loserLocation));
+                      .addStringTemplate("%location%", winnerLocation));
     }
 
     /**
@@ -3504,7 +3507,7 @@ public final class InGameController extends Controller {
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         Location repair = ship.getTile().getRepairLocation(shipPlayer);
-        StringTemplate repairLocationName = repair.getLocationName();
+        StringTemplate repairLocationName = repair.getLocationNameFor(shipPlayer);
         Location oldLocation = ship.getLocation();
         StringTemplate shipNation = ship.getApparentOwnerName();
 
@@ -3539,7 +3542,7 @@ public final class InGameController extends Controller {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         Location repair = ship.getTile().getRepairLocation(shipPlayer);
-        StringTemplate repairLocationName = repair.getLocationName();
+        StringTemplate repairLocationName = repair.getLocationNameFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
         cs.addMessage(See.only(attackerPlayer),
@@ -3597,11 +3600,14 @@ public final class InGameController extends Controller {
     private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
-        StringTemplate loserLocation = loser.getLocation().getLocationName();
+        StringTemplate loserLocation = loser.getLocation()
+            .getLocationNameFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
         String messageID = loser.getType().getId() + ".demoted";
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
+        StringTemplate winnerLocation = winner.getLocation()
+            .getLocationNameFor(winnerPlayer);
 
         UnitType type = loser.getTypeChange(ChangeType.DEMOTION);
         if (type == null || type == loser.getType()) {
@@ -3620,7 +3626,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%unit%", loser.getLabel())
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", loserLocation));
+                      .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        messageID, loser)
@@ -3863,10 +3869,13 @@ public final class InGameController extends Controller {
     private void csLoseEquip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
-        StringTemplate loserLocation = loser.getLocation().getLocationName();
+        StringTemplate loserLocation = loser.getLocation()
+            .getLocationNameFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
+        StringTemplate winnerLocation = winner.getLocation()
+            .getLocationNameFor(winnerPlayer);
         EquipmentType equip
             = loser.getBestCombatEquipmentType(loser.getEquipment());
 
@@ -3884,7 +3893,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%unit%", loser.getLabel())
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", loserLocation));
+                      .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        messageID, loser)
@@ -4097,9 +4106,12 @@ public final class InGameController extends Controller {
     private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
+        StringTemplate winnerLocation = winner.getLocation()
+            .getLocationNameFor(winnerPlayer);
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
-        StringTemplate locationName = loser.getLocation().getLocationName();
+        StringTemplate loserLocation = loser.getLocation()
+            .getLocationNameFor(loserPlayer);
         String messageID = loser.getType().getId() + ".destroyed";
 
         cs.addMessage(See.only(winnerPlayer),
@@ -4110,7 +4122,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%unit%", loser.getLabel())
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", locationName));
+                      .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        messageID, loser)
@@ -4119,7 +4131,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%unit%", loser.getLabel())
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", locationName));
+                      .addStringTemplate("%location%", loserLocation));
 
         // Transfer equipment, do not generate messages for the loser.
         EquipmentType equip;
@@ -4434,7 +4446,7 @@ public final class InGameController extends Controller {
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "indianSettlement.mission.denounced",
                                  settlement)
-                    .addStringTemplate("%settlement%", settlement.getLocationName()));
+                    .addStringTemplate("%settlement%", settlement.getLocationNameFor(enemy)));
         }
 
         // Result depends on tension wrt this settlement.

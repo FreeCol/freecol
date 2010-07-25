@@ -826,8 +826,8 @@ public final class InGameController implements NetworkConstants {
      */
     public void moveToDestination(Unit unit) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
@@ -891,7 +891,7 @@ public final class InGameController implements NetworkConstants {
         if (path == null) {
             canvas.showInformationMessage(unit,
                 StringTemplate.template("selectDestination.failed")
-                .addStringTemplate("%destination%", destination.getLocationName()));
+                .addStringTemplate("%destination%", destination.getLocationNameFor(player)));
             setDestination(unit, null);
             return;
         }

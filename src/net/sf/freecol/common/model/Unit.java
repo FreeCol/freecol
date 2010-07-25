@@ -391,6 +391,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Returns the name for this unit, as a location, for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the name for.
+     * @return A name for this unit, as a location.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return getLocationName();
+    }
+
+    /**
      * Get the <code>UnitType</code> value.
      * 
      * @return an <code>UnitType</code> value
@@ -3135,7 +3145,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
                                                         messageId, this)
                             .addStringTemplate("%unit%", getLabel())
-                            .addStringTemplate("%location%", getLocation().getLocationName()));
+                            .addStringTemplate("%location%", getLocation().getLocationNameFor(getOwner())));
             firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
         }
     }

@@ -128,6 +128,16 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
                 .addName("%location%", name);
         }
     }
+
+    /**
+     * Returns the name of this ColonyTile for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the name for.
+     * @return The name of this ColonyTile.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return getLocationName();
+    }
     
     /**
      * Returns a description of the tile, with the name of the tile

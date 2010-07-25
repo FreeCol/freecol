@@ -303,6 +303,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Returns the name of this location for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the location name for.
+     * @return The name of this location.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return (settlement == null) ? getLocationName()
+            : settlement.getLocationNameFor(player);
+    }
+
+    /**
      * Get the <code>Style</code> value.
      *
      * @return an <code>int</code> value

@@ -1263,6 +1263,16 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public StringTemplate getLocationName() {
         return StringTemplate.name(getName());
     }
+
+    /**
+     * Returns a suitable name for this colony for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the name for.
+     * @return The name of this colony.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return StringTemplate.name(getNameFor(player));
+    }
     
     /**
      * Gets the combined production of all food types.

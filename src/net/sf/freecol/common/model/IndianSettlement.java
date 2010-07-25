@@ -209,7 +209,7 @@ public class IndianSettlement extends Settlement {
      * @return The name as a <code>String</code>.
      */
     public String getNameFor(Player player) {
-        return (hasBeenVisited(player)) ? getName()
+        return (hasContactedSettlement(player)) ? getName()
             : "indianSettlement.nameUnknown";
     }
 
@@ -219,6 +219,16 @@ public class IndianSettlement extends Settlement {
      */
     public StringTemplate getLocationName() {
         return StringTemplate.name(getName());
+    }
+
+    /**
+     * Returns a suitable (non-unique) name for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the name for.
+     * @return The name of this settlement.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return StringTemplate.name(getNameFor(player));
     }
 
     /**

@@ -161,6 +161,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
+     * Returns the name of this location for a particular player.
+     *
+     * @param player The <code>Player</code> to prepare the name for.
+     * @return The name of this location.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        return getLocationName();
+    }
+
+    /**
      * Gets the name of the improved building of the same type. An improved
      * building is a building of a higher level.
      * 
@@ -498,7 +508,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                     getOwner().addModelMessage(new ModelMessage("model.unit.unitRepaired",
                                                                 this)
                                     .addStringTemplate("%unit%", unit.getLabel())
-                                    .addStringTemplate("%repairLocation%", getLocationName()));
+                                    .addStringTemplate("%repairLocation%", getLocationNameFor(getOwner())));
                 }
             }
         }
