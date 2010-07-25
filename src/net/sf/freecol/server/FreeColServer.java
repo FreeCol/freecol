@@ -202,8 +202,7 @@ public final class FreeColServer {
      */
     public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(publicServer, singleplayer, port, name, NationOptions.getDefaults(),
-             FreeCol.getSpecification().getDifficultyLevel("model.difficulty.medium"));
+        this(publicServer, singleplayer, port, name, NationOptions.getDefaults(), null);
     }
 
     public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name,
@@ -218,7 +217,9 @@ public final class FreeColServer {
         game = new ServerGame(modelController);
         game.setNationOptions(nationOptions);
         game.setDifficultyLevel(level);
-        FreeCol.getSpecification().applyDifficultyLevel(level);
+        if (level != null) {
+            getSpecification().applyDifficultyLevel(level);
+        }
         // TODO: pass specification
         mapGenerator = new MapGenerator(random, null);
         userConnectionHandler = new UserConnectionHandler(this);
@@ -297,13 +298,18 @@ public final class FreeColServer {
 
         // Apply the difficulty level
         if (game.getDifficultyLevel() == null) {
-            Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+            getSpecification().applyDifficultyLevel("model.difficulty.medium");
         } else {
-            Specification.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
+            getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
         }
 
         updateMetaServer(true);
         startMetaServerUpdateThread();
+    }
+
+    public Specification getSpecification() {
+        // TODO: server needs its own copy of the Specification
+        return Specification.getSpecification();
     }
 
     /**
@@ -338,7 +344,7 @@ public final class FreeColServer {
         }
         final ServerPlayer p = (ServerPlayer) getGame().getPlayerByName(username);
         synchronized (p) {
-            List<UnitType> undeads = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.undead");
+            List<UnitType> undeads = getSpecification().getUnitTypesWithAbility("model.ability.undead");
             ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
             ArrayList<UnitType> landUnits = new ArrayList<UnitType>();
             for (UnitType undead : undeads) {
