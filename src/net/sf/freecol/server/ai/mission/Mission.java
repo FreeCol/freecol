@@ -479,20 +479,6 @@ public abstract class Mission extends AIObject {
     }
 
 
-    public void attack(Connection connection, Unit unit, Direction direction) {
-        assert direction != null;
-        Element element = Message.createNewRootElement("attack");
-        element.setAttribute("unit", unit.getId());
-        element.setAttribute("direction", direction.toString());
-    
-        try {
-            connection.ask(element);
-        } catch (IOException e) {
-            logger.warning("Could not send message!");
-        }
-    }
-    
-    
     protected boolean unitLeavesShip(Connection connection, Unit unit) {
         DisembarkMessage message = new DisembarkMessage(unit);
         try {

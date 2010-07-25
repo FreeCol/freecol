@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -64,6 +65,13 @@ public class AIMessage {
             }
         }
         return false;
+    }
+
+
+    public static void askAttack(AIUnit aiUnit, Direction direction) {
+        AIPlayer owner = aiUnit.getOwner();
+        sendMessage(owner.getConnection(),
+                    new AttackMessage(aiUnit.getUnit(), direction));
     }
 
 

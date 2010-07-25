@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -154,7 +155,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     Player enemy = defender.getOwner();
                     if (unit.getOwner().atWarWith(enemy)
                         || ((Ownable) target).getOwner() == enemy) {
-                        attack(connection, unit, direction);
+                        AIMessage.askAttack(getAIUnit(), direction);
                     }
                 }
             }

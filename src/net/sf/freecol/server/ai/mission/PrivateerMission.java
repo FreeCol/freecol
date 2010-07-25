@@ -164,8 +164,8 @@ public class PrivateerMission extends Mission {
             }
             // catch up with the prey
             if (unit.getMoveType(direction) == MoveType.ATTACK) {
-            	logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " attacking target");
-                attack(connection, unit, direction);
+                logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " attacking target");
+                AIMessage.askAttack(getAIUnit(), direction);
             }
         } else {
             // No target found, just make a random move

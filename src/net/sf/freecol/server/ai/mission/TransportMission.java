@@ -469,7 +469,7 @@ public class TransportMission extends Mission {
             if (!canAttackPlayer(defender.getOwner())) {
                 return;
             }
-            attack(connection, carrier, direction);
+            AIMessage.askAttack(getAIUnit(), direction);
         }
     }
     
@@ -487,7 +487,7 @@ public class TransportMission extends Mission {
             final Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null &&
                     carrier.getMoveType(direction) == MoveType.ATTACK) {
-                attack(connection, carrier, direction);
+                AIMessage.askAttack(getAIUnit(), direction);
             }
         }
     }

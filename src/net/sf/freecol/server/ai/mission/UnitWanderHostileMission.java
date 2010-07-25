@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -109,7 +110,7 @@ public class UnitWanderHostileMission extends Mission {
             Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null &&
                 unit.getMoveType(direction) == MoveType.ATTACK) {
-                attack(connection, unit, direction);
+                AIMessage.askAttack(getAIUnit(), direction);
             }
         } else {
             // Just make a random move if no target can be found.

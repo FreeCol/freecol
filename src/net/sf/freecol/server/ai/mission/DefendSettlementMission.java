@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -159,7 +160,7 @@ public class DefendSettlementMission extends Mission {
             if (bestTarget != null) {
                 // this must be true, since it is the only way to get
                 // a bestTarget
-                attack(connection, unit, bestDirection);               
+                AIMessage.askAttack(getAIUnit(), bestDirection);
                 return;
             }
         }

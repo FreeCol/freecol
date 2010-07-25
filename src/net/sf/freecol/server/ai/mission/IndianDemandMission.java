@@ -44,6 +44,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -209,7 +210,7 @@ public class IndianDemandMission extends Mission {
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension >= Tension.Level.CONTENT.getLimit()) {
                         // if we didn't get what we wanted, attack
-                        attack(connection, unit, r);
+                        AIMessage.askAttack(getAIUnit(), r);
                     }
                 }
                 completed = true;
