@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -102,7 +101,7 @@ public class SellGoodsMessage extends Message {
         if (!carrier.isInEurope()) {
             return Message.clientError("Not in Europe: " + carrierId);
         }
-        GoodsType type = FreeCol.getSpecification().getGoodsType(goodsTypeId);
+        GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
         if (type == null) {
             return Message.clientError("Not a goods type: " + goodsTypeId);
         }
