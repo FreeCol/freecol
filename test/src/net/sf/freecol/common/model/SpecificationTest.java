@@ -291,5 +291,33 @@ public final class SpecificationTest extends FreeColTestCase {
         }
     }
 
+    public void testExtendsDelete() {
+        String specification = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<freecol-specification id=\"test\" extends=\"freecol\">"
+            + "<unit-types>"
+            + "<delete id=\"model.unit.caravel\" />"
+            + "</unit-types>"
+            + "</freecol-specification>";
+
+        Specification spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
+
+        try {
+            spec.getUnitType("model.unit.caravel");
+            fail("Caravel is defined.");
+        } catch(IllegalArgumentException e) {
+        }
+
+        for (UnitType unitType : spec.getUnitTypeList()) {
+            assertFalse("model.unit.caravel".equals(unitType.getId()));
+        }
+
+        // restore original values
+        try {
+            spec = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+    }
+
 
 }

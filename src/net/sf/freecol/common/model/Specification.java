@@ -359,10 +359,18 @@ public final class Specification {
 
         public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
-                object.readFromXML(xsr, specification);
-                if (!object.isAbstractType() && !result.contains(object)) {
-                    result.add(object);
+                if ("delete".equals(xsr.getLocalName())) {
+                    String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                    FreeColGameObjectType object = allTypes.remove(id);
+                    if (object != null) {
+                        result.remove(object);
+                    }
+                } else {
+                    T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
+                    object.readFromXML(xsr, specification);
+                    if (!object.isAbstractType() && !result.contains(object)) {
+                        result.add(object);
+                    }
                 }
             }
         }

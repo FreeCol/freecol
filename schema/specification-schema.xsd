@@ -19,6 +19,7 @@
      0.41: add consumes element to unit-type
      0.42: remove pathImage attribute from unit-type
      0.43: add attributes id and extends to specification
+     0.44: add delete element
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -51,6 +52,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="goods-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="GoodsTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -88,6 +90,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="resource-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="ResourceTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -107,6 +110,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="tile-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="TileTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -185,6 +189,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="equipment-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="EquipmentTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -238,6 +243,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="tileimprovement-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="TileImprovementTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -276,6 +282,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="improvementaction-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="ImprovementActionTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -302,6 +309,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="unit-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="UnitTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -344,6 +352,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="building-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="BuildingTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -376,6 +385,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="founding-father"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="FoundingFatherId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -453,6 +463,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="european-nation-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="NationTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -461,6 +472,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="indian-nation-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="NationTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -578,6 +590,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="difficultyLevel"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="DifficultyLevelId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -921,37 +934,55 @@
   <!-- Either a building type or a unit type -->
   <xs:simpleType name="AbilityId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.ability\.([a-zA-Z])+" />
+      <xs:pattern value="model\.ability\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="EquipmentTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z])+" />
+      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="BuildingTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.building\.([a-zA-Z])+" />
+      <xs:pattern value="model\.building\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DifficultyLevelId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.difficulty\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FoundingFatherId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.foundingFather\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="GoodsTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.goods\.([a-zA-Z])+" />
+      <xs:pattern value="model\.goods\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImprovementActionTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="imp([a-zA-Z]+)Action" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="NationId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.nation\.([a-zA-Z])+" />
+      <xs:pattern value="model\.nation\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="NationTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.nationType\.([a-zA-Z])+" />
+      <xs:pattern value="model\.nationType\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -963,25 +994,25 @@
 
   <xs:simpleType name="ResourceTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.resource\.([a-zA-Z])+" />
+      <xs:pattern value="model\.resource\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="TileImprovementTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.improvement\.([a-zA-Z])+" />
+      <xs:pattern value="model\.improvement\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="TileTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.tile\.([a-zA-Z])+" />
+      <xs:pattern value="model\.tile\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="UnitTypeId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="model\.unit\.([a-zA-Z])+" />
+      <xs:pattern value="model\.unit\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
