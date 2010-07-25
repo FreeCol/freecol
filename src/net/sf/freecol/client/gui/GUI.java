@@ -1573,7 +1573,7 @@ public final class GUI {
                     Font font = ResourceManager.getFont("NormalFont", 18f);
                     Font productionFont = ResourceManager.getFont("NormalFont", 12f);
 //                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
-                    int yOffset = lib.getTerrainImageHeight(FreeCol.getSpecification().getTileType("model.tile.plains"));
+                    int yOffset = tileHeight;
                     g.setTransform(settlementTransforms.get(index));
                     switch(colonyLabels) {
                     case ClientOptions.COLONY_LABELS_CLASSIC:
