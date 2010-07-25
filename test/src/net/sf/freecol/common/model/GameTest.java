@@ -38,7 +38,7 @@ public class GameTest extends FreeColTestCase {
         
         game.setMap(getTestMap());
 
-        game.addPlayer(new Player(game, "TestPlayer", false, FreeCol.getSpecification().getNation("model.nation.dutch")));
+        game.addPlayer(new Player(game, "TestPlayer", false, Specification.getSpecification().getNation("model.nation.dutch")));
 
         // map tiles are null
         //game.newTurn();
@@ -53,7 +53,7 @@ public class GameTest extends FreeColTestCase {
         List<Player> players = new ArrayList<Player>();
 
         int counter = 0;
-        for (Nation n : FreeCol.getSpecification().getNations()) {
+        for (Nation n : Specification.getSpecification().getNations()) {
             if (defaultOptions.getNationState(n) == NationOptions.NationState.NOT_AVAILABLE) {
                 counter++;
             } else {
@@ -70,7 +70,7 @@ public class GameTest extends FreeColTestCase {
 
         Collections.sort(players, Player.playerComparator);
         Collections.sort(game.getPlayers(), Player.playerComparator);
-        assertEquals(FreeCol.getSpecification().getNations().size() - counter,
+        assertEquals(Specification.getSpecification().getNations().size() - counter,
                      game.getPlayers().size());
         assertEquals(players, game.getPlayers());
     }

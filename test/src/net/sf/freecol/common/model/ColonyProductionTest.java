@@ -35,20 +35,20 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y);
+                tiles[x][y] = new Tile(game, Specification.getSpecification().getTileType("model.tile.plains"), x, y);
             }
         }
 
         Map map = new Map(game, tiles);
 
         Resource grain = new Resource(game, map.getTile(5, 8),
-                                      FreeCol.getSpecification().getResourceType("model.resource.grain"));
+                                      Specification.getSpecification().getResourceType("model.resource.grain"));
         map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
                 
         game.setMap(map);
-        UnitType veteran = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
+        UnitType veteran = Specification.getSpecification().getUnitType("model.unit.veteranSoldier");
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
@@ -66,10 +66,10 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(dutch, colony.getTile().getOwner());
 
         // Should have 50 Muskets and nothing else
-        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
         assertNotNull(muskets);
             
-        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){
+        for (GoodsType type : Specification.getSpecification().getGoodsTypeList()){
             if (type == muskets)
                 assertEquals(50, colony.getGoodsCount(type));
             else
@@ -97,20 +97,20 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y);
+                tiles[x][y] = new Tile(game, Specification.getSpecification().getTileType("model.tile.plains"), x, y);
             }
         }
 
         Map map = new Map(game, tiles);
 
         Resource grain = new Resource(game, map.getTile(5, 8),
-                                      FreeCol.getSpecification().getResourceType("model.resource.grain"));
+                                      Specification.getSpecification().getResourceType("model.resource.grain"));
         map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
                 
         game.setMap(map);
-        UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+        UnitType pioneerType = Specification.getSpecification().getUnitType("model.unit.hardyPioneer");
         GoodsType foodType = spec().getGoodsType("model.goods.food");
         Unit pioneer = new Unit(game, map.getTile(6, 8), dutch, pioneerType, UnitState.ACTIVE,
                                 pioneerType.getDefaultEquipment());
@@ -129,10 +129,10 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(dutch, colony.getTile().getOwner());
 
         // Should have 100 tools and nothing else
-        GoodsType tools = FreeCol.getSpecification().getGoodsType("model.goods.tools");
+        GoodsType tools = Specification.getSpecification().getGoodsType("model.goods.tools");
         assertNotNull(tools);
             
-        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){
+        for (GoodsType type : Specification.getSpecification().getGoodsTypeList()){
             if (type == tools)
                 assertEquals(100, colony.getGoodsCount(type));
             else
@@ -151,7 +151,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     }
     
     public void testBellNetProduction(){
-    	GoodsType bellsType = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+    	GoodsType bellsType = Specification.getSpecification().getGoodsType("model.goods.bells");
     	    	
     	Game game = getStandardGame();
     	

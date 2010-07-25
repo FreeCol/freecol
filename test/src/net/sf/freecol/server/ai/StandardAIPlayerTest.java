@@ -19,13 +19,13 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -44,7 +44,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
     final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-    final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+    final EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
     
     FreeColServer server = null;
 	
@@ -82,7 +82,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        final EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
         
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         builder.initialColonists(1).addColonist(indenturedServantType);
@@ -135,7 +135,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
         final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        final EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
 
         colony.addGoods(horsesType, 10);
         
@@ -194,7 +194,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
         final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        final EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
 
         colony.addGoods(musketsType, 100);
         colony.addGoods(horsesType, 100);

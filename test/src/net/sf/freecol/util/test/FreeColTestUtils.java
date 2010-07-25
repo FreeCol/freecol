@@ -3,11 +3,11 @@ package net.sf.freecol.util.test;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -34,7 +34,7 @@ public class FreeColTestUtils {
     public static class ColonyBuilder{
         
         // Required parameter
-        static final UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        static final UnitType colonistType = Specification.getSpecification().getUnitType("model.unit.freeColonist");
         private Game game;
         
         private HashMap<UnitType,Integer> colonists = new HashMap<UnitType,Integer>();

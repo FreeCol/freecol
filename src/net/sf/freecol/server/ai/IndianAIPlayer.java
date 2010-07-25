@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -32,6 +30,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -98,7 +97,7 @@ public class IndianAIPlayer extends NewAIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
 
-        int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
+        int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
         ArrayList<ArrayList<Wish>> workerWishes = new ArrayList<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < numberOfUnits; i++) {

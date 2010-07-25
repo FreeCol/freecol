@@ -33,13 +33,13 @@ import org.w3c.dom.Element;
 
 public class GoodsTest extends FreeColTestCase {
 
-    public static GoodsType cottonType = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
+    public static GoodsType cottonType = Specification.getSpecification().getGoodsType("model.goods.cotton");
 
-    public static TileType plainsType = FreeCol.getSpecification().getTileType("model.tile.plains");
+    public static TileType plainsType = Specification.getSpecification().getTileType("model.tile.plains");
 
-    public static UnitType privateerType = FreeCol.getSpecification().getUnitType("model.unit.privateer");
-    public static UnitType wagonTrainType = FreeCol.getSpecification().getUnitType("model.unit.wagonTrain");
-    public static UnitType veteranSoldierType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
+    public static UnitType privateerType = Specification.getSpecification().getUnitType("model.unit.privateer");
+    public static UnitType wagonTrainType = Specification.getSpecification().getUnitType("model.unit.wagonTrain");
+    public static UnitType veteranSoldierType = Specification.getSpecification().getUnitType("model.unit.veteranSoldier");
 
 
     public void testGoodsGameLocationIntInt() {
@@ -47,7 +47,7 @@ public class GoodsTest extends FreeColTestCase {
         Map map = getTestMap(plainsType);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(),
-                              FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
+                              Specification.getSpecification().getUnitType("model.unit.wagonTrain"),
                               UnitState.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
@@ -63,7 +63,7 @@ public class GoodsTest extends FreeColTestCase {
             Map map = getTestMap(plainsType);
 
             Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), 
-                                  FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
+                                  Specification.getSpecification().getUnitType("model.unit.wagonTrain"),
                                   UnitState.ACTIVE);
 
             Goods g = new Goods(getGame(), wagon, cottonType, 75);
@@ -109,25 +109,25 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testGetRawMaterial() {
-    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
-    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
+    	GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
+    	GoodsType cloth = Specification.getSpecification().getGoodsType("model.goods.cloth");
     	
         assertEquals(null, cotton.getRawMaterial());
         assertEquals(cotton, cloth.getRawMaterial());
     }
 
     public void testGetManufactoredGoods() {
-    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
-    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
+    	GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
+    	GoodsType cloth = Specification.getSpecification().getGoodsType("model.goods.cloth");
     	
         assertEquals(null, cloth.getProducedMaterial());
         assertEquals(cloth, cotton.getProducedMaterial());
     }
 
     public void testIsFarmedGoods() {
-    	GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
-    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
-    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
+    	GoodsType bells = Specification.getSpecification().getGoodsType("model.goods.bells");
+    	GoodsType cloth = Specification.getSpecification().getGoodsType("model.goods.cloth");
+    	GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
     	
         assertFalse(bells.isFarmed());
         assertTrue(cotton.isFarmed());
@@ -135,12 +135,12 @@ public class GoodsTest extends FreeColTestCase {
     }
     
     public void testMilitaryGoods() {
-        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
-        GoodsType crosses = FreeCol.getSpecification().getGoodsType("model.goods.crosses");
-        GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
-        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
-        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horses = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        GoodsType bells = Specification.getSpecification().getGoodsType("model.goods.bells");
+        GoodsType crosses = Specification.getSpecification().getGoodsType("model.goods.crosses");
+        GoodsType cloth = Specification.getSpecification().getGoodsType("model.goods.cloth");
+        GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
+        GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
         
         assertFalse(bells.isMilitaryGoods());
         assertFalse(crosses.isMilitaryGoods());
@@ -151,18 +151,18 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testBuildingMaterials() {
-        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
-        GoodsType crosses = FreeCol.getSpecification().getGoodsType("model.goods.crosses");
-        GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
-        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
-        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horses = FreeCol.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType hammers = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
-        GoodsType tools = FreeCol.getSpecification().getGoodsType("model.goods.tools");
-        GoodsType fish = FreeCol.getSpecification().getGoodsType("model.goods.fish");
-        GoodsType food = FreeCol.getSpecification().getGoodsType("model.goods.food");
-        GoodsType ore = FreeCol.getSpecification().getGoodsType("model.goods.ore");
-        GoodsType lumber = FreeCol.getSpecification().getGoodsType("model.goods.lumber");
+        GoodsType bells = Specification.getSpecification().getGoodsType("model.goods.bells");
+        GoodsType crosses = Specification.getSpecification().getGoodsType("model.goods.crosses");
+        GoodsType cloth = Specification.getSpecification().getGoodsType("model.goods.cloth");
+        GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
+        GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
+        GoodsType hammers = Specification.getSpecification().getGoodsType("model.goods.hammers");
+        GoodsType tools = Specification.getSpecification().getGoodsType("model.goods.tools");
+        GoodsType fish = Specification.getSpecification().getGoodsType("model.goods.fish");
+        GoodsType food = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType ore = Specification.getSpecification().getGoodsType("model.goods.ore");
+        GoodsType lumber = Specification.getSpecification().getGoodsType("model.goods.lumber");
         
         // for EquipmentType horses
         assertTrue(horses.isBuildingMaterial());

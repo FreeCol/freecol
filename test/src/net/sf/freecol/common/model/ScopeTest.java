@@ -25,8 +25,8 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class ScopeTest extends FreeColTestCase {
 
 
-    UnitType carpenter = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
-    UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+    UnitType carpenter = Specification.getSpecification().getUnitType("model.unit.masterCarpenter");
+    UnitType frigate = Specification.getSpecification().getUnitType("model.unit.frigate");
 
     public void testEmptyScope(){
     	

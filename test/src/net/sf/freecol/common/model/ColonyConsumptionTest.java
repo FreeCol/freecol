@@ -18,7 +18,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y);
+                tiles[x][y] = new Tile(game, Specification.getSpecification().getTileType("model.tile.plains"), x, y);
             }
         }
         
@@ -30,7 +30,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(map.getTile(5, 8)).build();
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         GoodsType foodType = spec().getGoodsType("model.goods.food");
-        UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        UnitType colonistType = Specification.getSpecification().getUnitType("model.unit.freeColonist");
         new Unit(game, colony.getBuildingForProducing(bellsType), dutch, colonistType, UnitState.ACTIVE,
                  colonistType.getDefaultEquipment());
         assertEquals(0, colony.getFoodCount());
@@ -57,7 +57,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.desert"), x, y);
+                tiles[x][y] = new Tile(game, Specification.getSpecification().getTileType("model.tile.desert"), x, y);
             }
         }
         
@@ -87,7 +87,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
             }
         }
 
-        UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        UnitType colonistType = Specification.getSpecification().getUnitType("model.unit.freeColonist");
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
 
         new Unit(game, colony.getBuildingForProducing(bellsType), dutch, colonistType, UnitState.ACTIVE,
@@ -117,7 +117,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.marsh"), x, y);
+                tiles[x][y] = new Tile(game, Specification.getSpecification().getTileType("model.tile.marsh"), x, y);
             }
         }
 
@@ -128,7 +128,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
            
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
         
-        UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+        UnitType pioneerType = Specification.getSpecification().getUnitType("model.unit.hardyPioneer");
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
 
         int unitsBeforeNewTurn = 3;

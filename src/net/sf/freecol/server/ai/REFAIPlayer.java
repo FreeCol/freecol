@@ -26,12 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -102,7 +102,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
 
-        int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
+        int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
         ArrayList<ArrayList<Wish>> workerWishes = new ArrayList<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < numberOfUnits; i++) {

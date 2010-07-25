@@ -167,7 +167,7 @@ public class WorkLocationPlan extends ValuedAIObject {
 
             ColonyTile ct = (ColonyTile) workLocation;
             Tile t = ct.getWorkTile();
-            UnitType expertUnitType = FreeCol.getSpecification().getExpertForProducing(goodsType);
+            UnitType expertUnitType = Specification.getSpecification().getExpertForProducing(goodsType);
 
             int base = t.getMaximumPotential(goodsType, expertUnitType);
 
@@ -254,7 +254,7 @@ public class WorkLocationPlan extends ValuedAIObject {
     public void readFromXMLElement(Element element) {
         workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
         priority = Integer.parseInt(element.getAttribute("priority"));
-        goodsType = FreeCol.getSpecification().getGoodsType(element.getAttribute("goodsType"));
+        goodsType = Specification.getSpecification().getGoodsType(element.getAttribute("goodsType"));
     }
 
 

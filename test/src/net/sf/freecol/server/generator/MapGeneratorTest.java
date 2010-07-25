@@ -46,7 +46,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testWithNoIndians() {
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc);
-        Specification s = FreeCol.getSpecification();
+        Specification s = Specification.getSpecification();
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -80,7 +80,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
-        Nation nation = FreeCol.getSpecification().getNation(
+        Nation nation = Specification.getSpecification().getNation(
                                                              "model.nation.dutch");
 
         g.addPlayer(new Player(g, nation.getType().getNameKey(), false, nation));
@@ -115,7 +115,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         Vector<Player> players = new Vector<Player>();
 
-        for (Nation n : FreeCol.getSpecification().getNations()) {
+        for (Nation n : Specification.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
                 p = new Player(g, n.getType().getNameKey(), false, n);
@@ -172,7 +172,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         Vector<Player> players = new Vector<Player>();
 
-        for (Nation n : FreeCol.getSpecification().getNations()) {
+        for (Nation n : Specification.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
                 p = new Player(g, n.getType().getNameKey(), false, n);

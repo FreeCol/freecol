@@ -233,7 +233,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertNull(b);
         
         // increasing population to 3 should give access to stockade
-        UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+        UnitType pioneerType = Specification.getSpecification().getUnitType("model.unit.hardyPioneer");
         Unit unit = new Unit(getGame(), colony.getTile(), player, pioneerType, UnitState.ACTIVE, 
                              pioneerType.getDefaultEquipment());
         // set the unit as a farmer in the colony

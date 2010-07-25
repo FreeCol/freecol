@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -33,6 +32,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -305,13 +305,13 @@ public class AIColonyTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(1);
         AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
-        final GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        final GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
         int foodSuplus = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
         assertTrue("Setup error, colony does not have food surplus", foodSuplus > 0);
                 
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        final EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
         Unit scout = new Unit(getGame(), colony.getTile(), colony.getOwner(), colonistType, UnitState.ACTIVE, horsesEqType);
         assertTrue("Scout should be mounted",scout.isMounted());
         

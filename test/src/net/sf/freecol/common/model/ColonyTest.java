@@ -29,7 +29,7 @@ public class ColonyTest extends FreeColTestCase {
     BuildingType churchType = spec().getBuildingType("model.building.chapel");
     BuildingType townHallType = spec().getBuildingType("model.building.townHall");
     BuildingType carpenterHouseType =  spec().getBuildingType("model.building.carpenterHouse");
-    BuildingType lumberMillType =  FreeCol.getSpecification().getBuildingType("model.building.lumberMill");
+    BuildingType lumberMillType =  Specification.getSpecification().getBuildingType("model.building.lumberMill");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");

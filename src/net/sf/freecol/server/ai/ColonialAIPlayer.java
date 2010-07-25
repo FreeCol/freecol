@@ -355,7 +355,7 @@ public class ColonialAIPlayer extends AIPlayer {
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
-            List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+            List<GoodsType> goodsTypes = Specification.getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
                     averageIncome += getPlayer().getIncomeAfterTaxes(type);
@@ -589,7 +589,7 @@ public class ColonialAIPlayer extends AIPlayer {
     private void cheat() {
         logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
             getPlayer().resetArrears(goodsType);
         }
         
@@ -597,7 +597,7 @@ public class ColonialAIPlayer extends AIPlayer {
         if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isAI()
                 && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
-            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+            List<UnitType> unitTypes = Specification.getSpecification().getUnitTypeList();
             
             if (getAIRandom().nextInt(10) == 1) {
                 int price = 0;
@@ -789,7 +789,7 @@ public class ColonialAIPlayer extends AIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
         
-        int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
+        int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
         Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < numberOfUnits; i++) {

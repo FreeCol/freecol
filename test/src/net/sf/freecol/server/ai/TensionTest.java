@@ -21,12 +21,12 @@ package net.sf.freecol.server.ai;
 
 import java.util.Iterator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -99,7 +99,7 @@ public class TensionTest extends FreeColTestCase {
             }
             int unitCount = settlement.getGeneratedUnitCount();
             for (int i = 0; i < unitCount; i++) {
-                UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+                UnitType unitType = Specification.getSpecification().getUnitType("model.unit.brave");
                 Unit unit = new Unit(game, settlement, indian, unitType, UnitState.ACTIVE,
                                      unitType.getDefaultEquipment());
                 unit.setIndianSettlement(settlement);
@@ -116,7 +116,7 @@ public class TensionTest extends FreeColTestCase {
             assertEquals(Stance.PEACE, stance);
 
             // create 2 unarmed european units next to the indianSettlement
-            UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+            UnitType unitType = Specification.getSpecification().getUnitType("model.unit.hardyPioneer");
             @SuppressWarnings("unused") Unit unit1 = new Unit(game, map.getTile(7, 9), european, unitType, UnitState.ACTIVE);
             @SuppressWarnings("unused") Unit unit2 = new Unit(game, map.getTile(5, 9), european, unitType, UnitState.ACTIVE);
 

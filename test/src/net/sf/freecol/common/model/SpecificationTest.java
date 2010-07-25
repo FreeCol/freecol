@@ -242,7 +242,7 @@ public final class SpecificationTest extends FreeColTestCase {
             equipmentTypeStr = entry.getKey();
             expectAbilities = entry.getValue();
 
-            EquipmentType equipmentType = FreeCol.getSpecification().getEquipmentType(equipmentTypeStr);
+            EquipmentType equipmentType = Specification.getSpecification().getEquipmentType(equipmentTypeStr);
             abilitiesReq = equipmentType.getAbilitiesRequired();
             for (Entry<String, Boolean> ability : expectAbilities.entrySet()) {
                 String key = ability.getKey();

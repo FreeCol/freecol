@@ -292,15 +292,6 @@ public final class FreeCol {
     }
     
     /**
-     * Returns the specification object for Freecol. 
-     * 
-     * @return the specification to be used by all other classes.
-     */
-    public static Specification getSpecification() {
-        return Specification.getSpecification();
-    }
-
-    /**
      * Gets the <code>FreeColClient</code>.
      * @return The <code>FreeColClient</code>, or <code>null</code>
      *      if the game is run as a standalone server. 

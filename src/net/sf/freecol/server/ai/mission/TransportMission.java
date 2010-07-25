@@ -31,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
@@ -42,6 +41,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -1029,7 +1029,7 @@ public class TransportMission extends Mission {
 
         int priceTrained = 0;
         UnitType cheapestTrained = null;
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesTrainedInEurope();
+        List<UnitType> unitTypes = Specification.getSpecification().getUnitTypesTrainedInEurope();
         for (UnitType unitType : unitTypes) {
             int price = europe.getUnitPrice(unitType);
             if (cheapestTrained == null || price < priceTrained) {

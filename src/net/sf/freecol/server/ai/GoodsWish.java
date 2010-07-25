@@ -26,9 +26,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
@@ -179,7 +179,7 @@ public class GoodsWish extends Wish {
          }
          setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
          
-         goodsType = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
+         goodsType = Specification.getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
 
          final String amountStr = in.getAttributeValue(null, "amountRequested");
          if (amountStr != null) {

@@ -32,13 +32,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -69,9 +69,9 @@ public abstract class NewAIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    protected static EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
-    protected static EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
-    protected static EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+    protected static EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
+    protected static EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+    protected static EquipmentType toolsType = Specification.getSpecification().getEquipmentType("model.equipment.tools");
 
     /*
      * Stores temporary information for sessions (trading with another player

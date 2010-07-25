@@ -28,13 +28,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
@@ -140,7 +140,7 @@ public class IndianBringGiftMission extends Mission {
                 // Load the goods:
                 List<Goods> goodsList = new ArrayList<Goods>();
                 GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
-                for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
+                for (GoodsType goodsType : Specification.getSpecification().getNewWorldGoodsTypeList()) {
                     if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
                         goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
                                                 goodsType,

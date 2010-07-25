@@ -127,7 +127,7 @@ public class FreeColTestCase extends TestCase {
         game.setNationOptions(NationOptions.getDefaults());
 
         Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
-        for (Nation n : FreeCol.getSpecification().getNations()) {
+        for (Nation n : Specification.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
                 p = new Player(game, n.getRulerNameKey(), false, n);
@@ -506,10 +506,10 @@ public class FreeColTestCase extends TestCase {
     		UnitType skillToTeach = null;
     		
     		if(skillTaught != null){
-    			skillToTeach = FreeCol.getSpecification().getUnitType(skillTaught);
+    			skillToTeach = Specification.getSpecification().getUnitType(skillTaught);
     		}
     			
-    		UnitType indianBraveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+    		UnitType indianBraveType = Specification.getSpecification().getUnitType("model.unit.brave");
     		
     		// indianPlayer not set, get default
     		if(indianPlayer == null){

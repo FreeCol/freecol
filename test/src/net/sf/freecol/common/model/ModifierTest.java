@@ -107,8 +107,8 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testScope() {
 
-        UnitType carpenter = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
-        UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+        UnitType carpenter = Specification.getSpecification().getUnitType("model.unit.masterCarpenter");
+        UnitType frigate = Specification.getSpecification().getUnitType("model.unit.frigate");
 
         Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
         Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
@@ -168,7 +168,7 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testTimeLimits() {
 
-        UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+        UnitType frigate = Specification.getSpecification().getUnitType("model.unit.frigate");
 
         Modifier modifier1 = new Modifier("test", 1, Modifier.Type.ADDITIVE);
         Modifier modifier2 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
@@ -205,7 +205,7 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testIncrements() {
 
-        UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+        UnitType frigate = Specification.getSpecification().getUnitType("model.unit.frigate");
 
         Modifier modifier1 = new Modifier("test", 1, Modifier.Type.ADDITIVE);
         Modifier modifier2 = new Modifier("test", 2, Modifier.Type.ADDITIVE);

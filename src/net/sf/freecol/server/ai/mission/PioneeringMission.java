@@ -30,12 +30,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
@@ -69,7 +69,7 @@ public class PioneeringMission extends Mission {
     
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
-    private static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+    private static final EquipmentType toolsType = Specification.getSpecification().getEquipmentType("model.equipment.tools");
 
     private static enum PioneeringMissionState {GET_TOOLS,IMPROVING};
     
