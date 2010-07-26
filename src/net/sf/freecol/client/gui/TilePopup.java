@@ -48,13 +48,17 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIUnit;
@@ -298,31 +302,34 @@ public final class TilePopup extends JPopupMenu {
                 add(takeOwnership);
                 hasAnItem = true;
             }
-        }
-        if (FreeCol.isInDebugMode() && tile.hasLostCityRumour()) {
-            JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");
-            rumourItem.setOpaque(false);
-            rumourItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        List<ChoiceItem<RumourType>> rumours = new ArrayList<ChoiceItem<RumourType>>();
-                        for (RumourType rumour : RumourType.values()) {
-                            if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
-                            rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
+            if (tile.hasLostCityRumour()) {
+                JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");
+                rumourItem.setOpaque(false);
+                rumourItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            debugSetRumourType(tile);
                         }
-                        RumourType rumourChoice = freeColClient.getCanvas()
-                            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel", rumours);
-                        tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
-                        final Tile serverTile = (Tile) freeColClient.getFreeColServer().getGame().getFreeColGameObject(tile.getId());
-                        serverTile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
+                    });
+                add(rumourItem);
+            }
+            JMenuItem addu = new JMenuItem("Add unit");
+            addu.setOpaque(false);
+            addu.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        debugAddNewUnitToTile(tile);
                     }
                 });
-            add(rumourItem);
-        }
-        if (FreeCol.isInDebugMode()) {
+            add(addu);
             JMenuItem dumpItem = new JMenuItem("Dump tile");
             dumpItem.setOpaque(false);
             dumpItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
+                        System.err.println("Client side:");
+                        tile.dumpObject();
+                        System.err.println("\nServer side:");
+                        Game sGame = freeColClient.getFreeColServer().getGame();
+                        Tile sTile = (Tile) sGame.getFreeColGameObject(tile.getId());
+                        sTile.dumpObject();
                         tile.dumpObject();
                     }
                 });
@@ -496,6 +503,52 @@ public final class TilePopup extends JPopupMenu {
      */
     public boolean hasItem() {
         return hasAnItem;
+    }
+
+    /**
+     * Debug action to set the lost city rumour type on a tile.
+     *
+     * @param tile The <code>Tile</code> to operate on.
+     */
+    private void debugSetRumourType(Tile tile) {
+        List<ChoiceItem<RumourType>> rumours = new ArrayList<ChoiceItem<RumourType>>();
+        for (RumourType rumour : RumourType.values()) {
+            if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
+            rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
+        }
+        RumourType rumourChoice = freeColClient.getCanvas()
+            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel", rumours);
+        tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
+        final Tile serverTile = (Tile) freeColClient.getFreeColServer()
+            .getGame().getFreeColGameObject(tile.getId());
+        serverTile.getTileItemContainer().getLostCityRumour()
+            .setType(rumourChoice);
+    }
+
+    /**
+     * Debug action to add a new unit to a tile.
+     *
+     * @param tile The <code>Tile</code> to add to.
+     */
+    private void debugAddNewUnitToTile(Tile tile) {
+        List<ChoiceItem<UnitType>> uts = new ArrayList<ChoiceItem<UnitType>>();
+        for (UnitType t : Specification.getSpecification().getUnitTypeList()) {
+            uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString() + ".name"), t));
+        }
+        UnitType unitChoice = freeColClient.getCanvas()
+            .showChoiceDialog(null, "Select Unit Type", "Cancel", uts);
+        if (unitChoice != null) {
+            Game game = freeColClient.getGame();
+            Game sGame = freeColClient.getFreeColServer().getGame();
+            Player player = freeColClient.getMyPlayer();
+            Player sPlayer = (Player) sGame.getFreeColGameObject(player.getId());
+            Tile sTile = (Tile) sGame.getFreeColGameObject(tile.getId());
+            Unit sUnit = new Unit(sGame, sTile, sPlayer, unitChoice, UnitState.ACTIVE);
+            Unit unit = new Unit(game, sUnit.toXMLElement(Message.createNewDocument()));
+            tile.add(unit);
+            player.invalidateCanSeeTiles();
+            canvas.refresh();
+        }
     }
 
 }

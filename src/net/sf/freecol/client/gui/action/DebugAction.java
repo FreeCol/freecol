@@ -28,7 +28,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 
 /**
- * Toggle debug mode.
+ * Switch debug mode on.
  */
 public class DebugAction extends FreeColAction {
 
@@ -45,11 +45,22 @@ public class DebugAction extends FreeColAction {
     }
 
     /**
+     * Checks if this action should be enabled.
+     *
+     * @return True if not already in debug mode.
+     */
+    public boolean shouldBeEnabled() {
+        return !FreeCol.isInDebugMode();
+    }
+
+    /**
      * Applies this action.
      * 
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getInGameController().setInDebugMode(!FreeCol.isInDebugMode());
+        if (shouldBeEnabled()) {
+            freeColClient.getInGameController().setInDebugMode(true);
+        }
     }
 }
