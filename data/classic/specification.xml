@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.43 -->
+<!-- specification version 0.45 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -606,7 +606,7 @@
                recruitProbability="20">
       <ability id="model.ability.bornInColony" value="true"/>
       <ability id="model.ability.foundInLostCity" value="true"/>
-      <downgrade /> <!-- clears all unit type changes! -->
+      <downgrade unit="model.unit.freeColonist" delete="true" />
       <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
       <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
       <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
@@ -748,7 +748,7 @@
     </unit-type>
     <unit-type id="model.unit.indenturedServant" extends="colonist"              
                skill="-1" recruitProbability="20" scoreValue="2" >
-      <downgrade /> <!-- clears all unit type changes! -->
+      <downgrade unit="model.unit.freeColonist" delete="true" />
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4" promotion="true"/>
       <upgrade unit="model.unit.expertFarmer" learnFromNatives="true" learnInSchool="false"/>
       <upgrade unit="model.unit.expertFisherman" learnFromNatives="true" learnInSchool="false"/>
@@ -772,7 +772,7 @@
     </unit-type>
     <unit-type id="model.unit.pettyCriminal" extends="colonist"               
                skill="-2" recruitProbability="20" scoreValue="1" >
-      <downgrade /> <!-- clears all unit type changes! -->
+      <downgrade unit="model.unit.freeColonist" delete="true" />
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4" promotion="true"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="true" learnInSchool="false"/>
       <modifier id="model.goods.rum" type="additive" value="-2" />
@@ -804,7 +804,7 @@
       <modifier id="model.goods.crosses" type="additive" value="-2" />
       <modifier id="model.goods.hammers" type="additive" value="-2" />
       <modifier id="model.goods.tools" type="additive" value="-2" />
-      <downgrade /> <!-- clears all unit type changes! -->
+      <downgrade unit="model.unit.freeColonist" delete="true" />
       <upgrade unit="model.unit.freeColonist" learnInSchool="false"/>
       <consumes id="model.goods.food" value="2" />
       <consumes id="model.goods.bells" value="1" />
@@ -1099,22 +1099,20 @@
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
       <!-- TODO: abilties to prevent the effects of Indian raids. -->
     </building-type>
-    <!-- fort can not inherit from stockade due to percentage modifiers! -->
-    <building-type id="model.building.fort" workplaces="0" upgradesFrom="model.building.stockade"
-                   required-population="3" sequence="11">
+    <building-type id="model.building.fort" extends="model.building.stockade"
+                   upgradesFrom="model.building.stockade">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="100"/>
+      <modifier id="model.modifier.defence" delete="true" />
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
-    <building-type id="model.building.fortress" workplaces="0" upgradesFrom="model.building.fort"
-                   required-population="8" sequence="11">
+    <building-type id="model.building.fortress" extends="model.building.fort"
+                   upgradesFrom="model.building.fort">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
+      <modifier id="model.modifier.defence" delete="true" />
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
-      <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
     <building-type id="model.building.depot" workplaces="0" sequence="13">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
@@ -1169,11 +1167,11 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.goods.bells" type="percentage" value="50"/>
     </building-type>
-    <!-- newspaper can not inherit from printing press due to percentage modifiers! -->
-    <building-type id="model.building.newspaper" upgradesFrom="model.building.printingPress"
-                   workplaces="0" required-population="4" sequence="16">
+    <building-type id="model.building.newspaper" extends="model.building.printingPress"
+                   upgradesFrom="model.building.printingPress" required-population="4" >
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
+      <modifier id="model.goods.bells" delete="true" />
       <modifier id="model.goods.bells" type="percentage" value="100"/>
     </building-type>
     <building-type id="model.building.customHouse" workplaces="0" sequence="17">

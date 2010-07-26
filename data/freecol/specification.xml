@@ -19,20 +19,15 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.43 -->
+<!-- specification version 0.45 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification id="freecol" extends="classic">
 
   <building-types>
     <building-type id="model.building.stockade">
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="-3"/>
-    </building-type>
-    <building-type id="model.building.fort">
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="-3"/>
-    </building-type>
-    <building-type id="model.building.fortress">
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="-3"/>
+      <modifier id="model.modifier.minimumColonySize" delete="true" />
+      <modifier id="model.modifier.minimumColonySize" type="additive" value="0"/>
     </building-type>
   </building-types>
   <european-nation-types>

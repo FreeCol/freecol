@@ -270,24 +270,38 @@ public class FreeColGameObjectType extends FreeColObject {
         throws XMLStreamException {
         String childName = in.getLocalName();
         if (Ability.getXMLElementTagName().equals(childName)) {
-            Ability ability = new Ability(in, specification);
-            if (ability.getSource() == null) {
-                ability.setSource(this);
+            if (getAttribute(in, "delete", false)) {
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                featureContainer.removeAbilities(id);
+                in.nextTag();
+                return null;
+            } else {
+                Ability ability = new Ability(in, specification);
+                if (ability.getSource() == null) {
+                    ability.setSource(this);
+                }
+                addAbility(ability); // Ability close the element
+                specification.addAbility(ability);
+                return ability;
             }
-            addAbility(ability); // Ability close the element
-            specification.addAbility(ability);
-            return ability;
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
-            Modifier modifier = new Modifier(in, specification);
-            if (modifier.getSource() == null) {
-                modifier.setSource(this);
+            if (getAttribute(in, "delete", false)) {
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                featureContainer.removeModifiers(id);
+                in.nextTag();
+                return null;
+            } else {
+                Modifier modifier = new Modifier(in, specification);
+                if (modifier.getSource() == null) {
+                    modifier.setSource(this);
+                }
+                if (modifier.getIndex() < 0) {
+                    modifier.setIndex(getModifierIndex(modifier));
+                }
+                addModifier(modifier); // Modifier close the element
+                specification.addModifier(modifier);
+                return modifier;
             }
-            if (modifier.getIndex() < 0) {
-                modifier.setIndex(getModifierIndex(modifier));
-            }
-            addModifier(modifier); // Modifier close the element
-            specification.addModifier(modifier);
-            return modifier;
         } else {
             logger.warning("Parsing of " + childName + " is not implemented yet");
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||

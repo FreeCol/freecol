@@ -413,6 +413,15 @@ public class FeatureContainer {
     }
 
     /**
+     * Describe <code>removeAbilities</code> method here.
+     *
+     * @param id a <code>String</code> value
+     */
+    public void removeAbilities(String id) {
+        abilities.remove(id);
+    }
+
+    /**
      * Removes and returns a Modifier from this modifier set.
      *
      * @param oldModifier a <code>Modifier</code> value
@@ -431,6 +440,15 @@ public class FeatureContainer {
                 return null;
             }
         }
+    }
+
+    /**
+     * Describe <code>removeModifiers</code> method here.
+     *
+     * @param id a <code>String</code> value
+     */
+    public void removeModifiers(String id) {
+        modifiers.remove(id);
     }
 
     /**

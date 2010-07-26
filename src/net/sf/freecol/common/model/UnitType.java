@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -619,10 +620,18 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             String nodeName = in.getLocalName();
             if ("downgrade".equals(nodeName)
                 || "upgrade".equals(nodeName)) {
-                UnitTypeChange change = new UnitTypeChange(in, specification);
-                if (change.getNewUnitType() == null) {
-                    typeChanges.clear();
+                if (getAttribute(in, "delete", false)) {
+                    String unitId = in.getAttributeValue(null, "unit");
+                    Iterator<UnitTypeChange> iterator = typeChanges.iterator();
+                    while (iterator.hasNext()) {
+                        if (unitId.equals(iterator.next().getNewUnitType().getId())) {
+                            iterator.remove();
+                            break;
+                        }
+                    }
+                    in.nextTag();
                 } else {
+                    UnitTypeChange change = new UnitTypeChange(in, specification);
                     if ("downgrade".equals(nodeName)
                         && change.getChangeTypes().isEmpty()) {
                         // add default downgrade type

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.42
+<!-- XSD for specification version 0.45
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -20,6 +20,7 @@
      0.42: remove pathImage attribute from unit-type
      0.43: add attributes id and extends to specification
      0.44: add delete element
+     0.45: add delete attribute to upgrade, downgrade, ability and modifier
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -772,6 +773,7 @@
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="value" type="xs:boolean"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
       <xs:attribute name="source" type="xs:string"/>
     </xs:complexType>
   </xs:element>
@@ -782,7 +784,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="type" use="required">
+      <xs:attribute name="type">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="additive"/>
@@ -791,7 +793,8 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="value" use="required" type="xs:float"/>
+      <xs:attribute name="value" type="xs:float"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
       <xs:attribute name="source" type="xs:string"/>
       <xs:attribute name="index" type="xs:nonNegativeInteger"/>
     </xs:complexType>
@@ -845,6 +848,7 @@
       <xs:attribute name="learnInSchool" type="xs:boolean"/>
       <xs:attribute name="promotion" type="xs:boolean"/>
       <xs:attribute name="creation" type="xs:boolean"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
       <xs:attribute name="independence" type="xs:boolean"/>
       <xs:attribute name="enterColony" type="xs:boolean"/>
       <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
@@ -866,6 +870,7 @@
       <xs:attribute name="capture" type="xs:boolean"/>
       <xs:attribute name="demotion" type="xs:boolean"/>
       <xs:attribute name="clearSkill" type="xs:boolean"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 
