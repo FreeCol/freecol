@@ -288,15 +288,13 @@ public final class ReportTurnPanel extends ReportPanel {
     }
 
     private void insertMessage(StyledDocument document, ModelMessage message, Player player) {
-        String input;
         try {
-            input = Messages.message(message.getDefaultId());
-        } catch (NullPointerException e) {
-//            Messages.message() return null if there is no match for DefaultId.
-            input = Messages.message(message.getId());
-        }
-
-        try {
+            String input;
+            String id = message.getId();
+            if (id == null || id.equals(input = Messages.message(id))) {
+                // id not present, fallback to default
+                input = Messages.message(message.getDefaultId());
+            }
             int start = input.indexOf('%');
             if (start == -1) {
                 // no variables present
