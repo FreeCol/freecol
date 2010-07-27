@@ -35,6 +35,11 @@ import org.w3c.dom.Element;
 */
 public class GameOptions extends OptionMap {
 
+    /**
+     * Describe specification here.
+     */
+    private Specification specification;
+
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "model.option.startingMoney";
 
@@ -92,7 +97,8 @@ public class GameOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public GameOptions(Specification specification) {
-        super(getXMLElementTagName(), specification);
+        super(getXMLElementTagName());
+        setSpecification(specification);
     }
 
 
@@ -107,7 +113,8 @@ public class GameOptions extends OptionMap {
      */
     public GameOptions(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        super(in, getXMLElementTagName(), specification);
+        super(in, getXMLElementTagName());
+        setSpecification(specification);
     }
     
     /**
@@ -120,11 +127,27 @@ public class GameOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public GameOptions(Element e, Specification specification) {
-        super(e, getXMLElementTagName(), specification);
+        super(e, getXMLElementTagName());
+        setSpecification(specification);
     }
 
+    /**
+     * Get the <code>Specification</code> value.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public final Specification getSpecification() {
+        return specification;
+    }
 
-
+    /**
+     * Set the <code>Specification</code> value.
+     *
+     * @param newSpecification The new Specification value.
+     */
+    public final void setSpecification(final Specification newSpecification) {
+        this.specification = newSpecification;
+    }
 
     /**
     * Adds the options to this <code>GameOptions</code>.

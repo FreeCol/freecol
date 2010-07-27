@@ -47,7 +47,7 @@ public class ActionManager extends OptionGroup {
      * @param specification a <code>Specification</code> value
      */
     public ActionManager(FreeColClient freeColClient, Specification specification) {
-        super("actionManager", specification);
+        super("actionManager");
 
         this.freeColClient = freeColClient;
 

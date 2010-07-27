@@ -43,6 +43,11 @@ import org.w3c.dom.Element;
 public class MapGeneratorOptions extends OptionMap {
 
     /**
+     * Describe specification here.
+     */
+    private Specification specification;
+
+    /**
      * Option for setting the size of the map. Possible values are:
      * <ul>
      * <li>{@link #MAP_SIZE_SMALL}</li>
@@ -157,7 +162,8 @@ public class MapGeneratorOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public MapGeneratorOptions(Specification specification) {
-        super(getXMLElementTagName(), specification);
+        super(getXMLElementTagName());
+        setSpecification(specification);
     }
 
     /**
@@ -171,7 +177,8 @@ public class MapGeneratorOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public MapGeneratorOptions(Element element, Specification specification) {
-        super(element, getXMLElementTagName(), specification);
+        super(element, getXMLElementTagName());
+        setSpecification(specification);
     }
 
     /**
@@ -186,7 +193,26 @@ public class MapGeneratorOptions extends OptionMap {
      */
     public MapGeneratorOptions(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        super(in, getXMLElementTagName(), specification);
+        super(in, getXMLElementTagName());
+        setSpecification(specification);
+    }
+
+    /**
+     * Get the <code>Specification</code> value.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public final Specification getSpecification() {
+        return specification;
+    }
+
+    /**
+     * Set the <code>Specification</code> value.
+     *
+     * @param newSpecification The new Specification value.
+     */
+    public final void setSpecification(final Specification newSpecification) {
+        this.specification = newSpecification;
     }
 
     /**

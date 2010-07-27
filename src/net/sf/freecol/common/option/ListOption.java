@@ -9,7 +9,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Specification;
 
 /**
  * An option for a list of something.
@@ -29,12 +28,11 @@ public class ListOption<T> extends AbstractOption {
      * Creates a new <code>ListOption</code>.
      * @param selector a ListOptionSelector
      * @param in The <code>XMLStreamReader</code> containing the data. 
-     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public ListOption(ListOptionSelector<T> selector, XMLStreamReader in, Specification specification)
+    public ListOption(ListOptionSelector<T> selector, XMLStreamReader in)
         throws XMLStreamException {
-        super(NO_ID, specification);
+        super(NO_ID);
         value = new ArrayList<T>();
         this.selector = selector;
         readFromXML(in);
@@ -46,12 +44,10 @@ public class ListOption<T> extends AbstractOption {
      * @param selector a ListOptionSelector
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
-     * @param specification a <code>Specification</code> value
      * @param defaultValues The default values of this option.
      */
-    public ListOption(ListOptionSelector<T> selector, String id, Specification specification,
-                      T... defaultValues) {
-        this(selector, id, null, specification, defaultValues);
+    public ListOption(ListOptionSelector<T> selector, String id, T... defaultValues) {
+        this(selector, id, null, defaultValues);
     }
 
     /**
@@ -61,12 +57,11 @@ public class ListOption<T> extends AbstractOption {
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
      * @param optionGroup the OptionGroup this option belongs to.
-     * @param specification a <code>Specification</code> value
      * @param defaultValues The default values of this option.
      */
     public ListOption(ListOptionSelector<T> selector, String id, OptionGroup optionGroup,
-                      Specification specification, T... defaultValues) {
-        super(id, specification);
+                      T... defaultValues) {
+        super(id);
         optionGroup.add(this);
         setGroup(optionGroup.getId());
         value = new ArrayList<T>();

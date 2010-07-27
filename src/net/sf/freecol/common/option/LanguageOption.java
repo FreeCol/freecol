@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Specification;
 
 /**
  * Option for selecting a language. The possible choices are determined
@@ -87,11 +86,10 @@ public class LanguageOption extends AbstractOption {
     /**
      * Creates a new  <code>IntegerOption</code>.
      * @param in The <code>XMLStreamReader</code> containing the data.
-     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public LanguageOption(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        super(NO_ID, specification);
+    public LanguageOption(XMLStreamReader in) throws XMLStreamException {
+        super(NO_ID);
          if (languages.size() == 0) {
              prepareLanguages();
          }

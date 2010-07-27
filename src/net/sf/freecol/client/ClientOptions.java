@@ -457,7 +457,7 @@ public class ClientOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public ClientOptions() {
-        super(getXMLElementTagName(), null);
+        super(getXMLElementTagName());
     }
 
     /**
@@ -468,10 +468,9 @@ public class ClientOptions extends OptionMap {
      * 
      * @param element The XML <code>Element</code> from which this object
      *            should be constructed.
-     * @param specification a <code>Specification</code> value
      */
-    public ClientOptions(Element element, Specification specification) {
-        super(element, getXMLElementTagName(), specification);
+    public ClientOptions(Element element) {
+        super(element, getXMLElementTagName());
     }
 
     /**
@@ -481,7 +480,7 @@ public class ClientOptions extends OptionMap {
 
         load(new File(new File(FreeCol.getDataDirectory(), "base"), "client-options.xml"), false);
         
-        final OptionGroup modsGroup = new OptionGroup("clientOptions.mods", getSpecification());
+        final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
         final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {
             private Map<String, ModInfo> mods = null; 
             private void init() {
@@ -509,7 +508,7 @@ public class ClientOptions extends OptionMap {
                 return t.getName();
             }
         };
-        new ListOption<ModInfo>(selector, USER_MODS, modsGroup, getSpecification());
+        new ListOption<ModInfo>(selector, USER_MODS, modsGroup);
         add(modsGroup);
     }
 

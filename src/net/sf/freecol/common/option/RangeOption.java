@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.model.Specification;
 
 /**
  * Represents an option where the valid choice is an integer and the choices are
@@ -39,6 +38,7 @@ import net.sf.freecol.common.model.Specification;
  * conventional index, this implies to manage a fixed rank for each possible values.
  */
 public class RangeOption extends SelectOption {
+
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(RangeOption.class.getName());
 
@@ -47,12 +47,10 @@ public class RangeOption extends SelectOption {
      * Creates a new <code>RangeOption</code>.
      * 
      * @param in The <code>XMSStreamReader</code> to read the data from
-     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public RangeOption(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-        super(in, specification);
+    public RangeOption(XMLStreamReader in) throws XMLStreamException {
+        super(in);
     }
 
     /**
