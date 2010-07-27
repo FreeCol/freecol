@@ -3435,7 +3435,7 @@ public final class InGameController extends Controller {
         StringTemplate loserLocation = loser.getLocation()
             .getLocationNameFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
-        String messageID = loser.getType().getId() + ".captured";
+        String messageId = loser.getType().getId() + ".captured";
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
         StringTemplate winnerLocation = winner.getLocation()
@@ -3454,7 +3454,7 @@ public final class InGameController extends Controller {
         // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser)
+                                       messageId, loser)
                       .setDefaultId("model.unit.unitCaptured")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%unit%", oldName)
@@ -3463,7 +3463,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser.getTile())
+                                       messageId, loser.getTile())
                       .setDefaultId("model.unit.unitCaptured")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%unit%", oldName)
@@ -3599,7 +3599,7 @@ public final class InGameController extends Controller {
         StringTemplate loserLocation = loser.getLocation()
             .getLocationNameFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
-        String messageID = loser.getType().getId() + ".demoted";
+        String messageId = loser.getType().getId() + ".demoted";
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
         StringTemplate winnerLocation = winner.getLocation()
@@ -3616,7 +3616,7 @@ public final class InGameController extends Controller {
 
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, winner)
+                                       messageId, winner)
                       .setDefaultId("model.unit.unitDemoted")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%oldName%", oldName)
@@ -3626,7 +3626,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser)
+                                       messageId, loser)
                       .setDefaultId("model.unit.unitDemoted")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%oldName%", oldName)
@@ -3876,13 +3876,13 @@ public final class InGameController extends Controller {
             = loser.getBestCombatEquipmentType(loser.getEquipment());
 
         loser.removeEquipment(equip, 1, true);
-        String messageID = (loser.getEquipment().isEmpty())
+        String messageId = (loser.getEquipment().isEmpty())
             ? "model.unit.unitDemotedToUnarmed"
             : loser.getType().getId() + ".demoted";
 
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, winner)
+                                       messageId, winner)
                       .setDefaultId("model.unit.unitDemoted")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%oldName%", oldName)
@@ -3892,7 +3892,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser)
+                                       messageId, loser)
                       .setDefaultId("model.unit.unitDemoted")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%oldName%", oldName)
@@ -4107,11 +4107,11 @@ public final class InGameController extends Controller {
         StringTemplate loserNation = loserPlayer.getNationName();
         StringTemplate loserLocation = loser.getLocation()
             .getLocationNameFor(loserPlayer);
-        String messageID = loser.getType().getId() + ".destroyed";
+        String messageId = loser.getType().getId() + ".destroyed";
 
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, winner)
+                                       messageId, winner)
                       .setDefaultId("model.unit.unitSlaughtered")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%unit%", loser.getLabel())
@@ -4120,7 +4120,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser.getTile())
+                                       messageId, loser.getTile())
                       .setDefaultId("model.unit.unitSlaughtered")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%unit%", loser.getLabel())
