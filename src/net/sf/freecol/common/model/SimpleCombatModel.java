@@ -434,9 +434,9 @@ public class SimpleCombatModel extends CombatModel {
             //   else => great loss
             if (r < odds.win) {
                 great = r < 0.1f * odds.win; // Great Win
-                r /= odds.win; // Normalize to 0.0 <= r < 1.0
                 crs.add(CombatResult.WIN);
-                resolveAttack(attackerUnit, defenderUnit, great, r, crs);
+                resolveAttack(attackerUnit, defenderUnit, great, r / odds.win,
+                              crs);
             } else if (r < 0.8f * odds.win + 0.2f && defenderUnit.isNaval()) {
                 crs.add(CombatResult.NO_RESULT);
                 crs.add(CombatResult.EVADE_ATTACK);
@@ -631,7 +631,8 @@ public class SimpleCombatModel extends CombatModel {
 
             // Capture suitable units if the winner is capable.
             } else if (loser.hasAbility("model.ability.canBeCaptured")
-                       && winner.hasAbility("model.ability.captureUnits")) {
+                       && winner.hasAbility("model.ability.captureUnits")
+                       && loser.getCaptureType(winner) != null) {
                 crs.add(CombatResult.CAPTURE_UNIT);
 
             // Final catch all is just to slaughter.

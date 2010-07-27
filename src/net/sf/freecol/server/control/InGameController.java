@@ -378,26 +378,14 @@ public final class InGameController extends Controller {
         units.addAll(settlement.getTile().getUnitList());
         for (Unit u : units) {
             u.setState(UnitState.ACTIVE);
-
-            if (unit.isUndead()) {
-                // Undead just infect
-                u.setType(unit.getType());
+            UnitType demote = u.getCaptureType(unit);
+            if (demote == null) {
+                // Dispose notification unnecessary, new owner has not
+                // seen this unit yet.
+                u.dispose();
             } else {
-                // Demote all units
-                UnitType downgrade = u.getType()
-                    .getUnitTypeChange(ChangeType.CAPTURE, newOwner);
-                if (downgrade != null) u.setType(downgrade);
-                // However, not all units might be available
-                while (!u.getType().isAvailableTo(newOwner)) {
-                    UnitType demote = u.getTypeChange(ChangeType.DEMOTION);
-                    if (demote == null) {
-                        // Dispose notification unnecessary, new owner
-                        // has not seen this unit yet.
-                        u.dispose();
-                        break;
-                    }
-                    u.setType(demote);
-                }
+                u.setType(demote);
+                u.setOwner(newOwner);
             }
         }
 
@@ -1439,9 +1427,13 @@ public final class InGameController extends Controller {
                 if (u.getType().hasAbility("model.ability.refUnit")) {
                     // Make sure the independent player does not end
                     // up owning any Kings Regulars!
-                    UnitType downgrade = u.getType().getUnitTypeChange(ChangeType.CAPTURE,
-                                                                       independent);
-                    if (downgrade != null) u.setType(downgrade);
+                    Unit captor = independent.getUnits().get(0);
+                    UnitType downgrade = u.getCaptureType(captor);
+                    if (downgrade == null) {
+                        cs.addDispose(serverPlayer, u.getLocation(), u);
+                        continue;
+                    }
+                    u.setType(downgrade);
                 }
                 u.setOwner(independent);
                 surrender.addStringTemplate(u.getLabel());
@@ -3444,12 +3436,8 @@ public final class InGameController extends Controller {
         // Capture the unit
         loser.setOwner(winnerPlayer);
         loser.setLocation(winner.getTile());
-        if (winner.isUndead()) {
-            loser.setType(winner.getType());
-        } else {
-            UnitType downgrade = loser.getTypeChange(ChangeType.CAPTURE);
-            if (downgrade != null) loser.setType(downgrade);
-        }
+        UnitType downgrade = loser.getCaptureType(winner);
+        loser.setType(downgrade);
 
         // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),

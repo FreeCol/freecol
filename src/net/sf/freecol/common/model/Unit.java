@@ -3601,6 +3601,32 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Gets the type this unit should become when captured by a supplied unit.
+     *
+     * @param captor The capturing <code>Unit</code>.
+     * @return The <code>UnitType</code> to convert this unit to on capture,
+     *     or null if the unit can not be demoted to a type available to the
+     *     capturing player.
+     */
+    public UnitType getCaptureType(Unit captor) {
+        if (captor.isUndead()) return captor.getType(); // Undead just infect
+
+        // Demote all units
+        Player newOwner = captor.getOwner();
+        UnitType type = getType();
+        UnitType downgrade = type.getUnitTypeChange(ChangeType.CAPTURE,
+                                                    newOwner);
+        if (downgrade != null) type = downgrade;
+        // However, not all units might be available
+        while (!type.isAvailableTo(newOwner)) {
+            downgrade = type.getUnitTypeChange(ChangeType.DEMOTION, newOwner);
+            if (downgrade == null) return null; // Fail, have to kill.
+            type = downgrade;
+        }
+        return type;
+    }
+
+    /**
      * Gets the best combat equipment type that this unit has.
      *
      * @param equipment The equipment to look through, such as returned by
