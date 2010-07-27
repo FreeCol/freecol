@@ -249,6 +249,17 @@ public abstract class OptionMap extends OptionGroup {
      *            options from.
      */
     public void load(File loadFile) {
+        load(loadFile, true);
+    }
+
+    /**
+     * Reads the options from the given file.
+     * 
+     * @param loadFile The <code>File</code> to read the
+     *            options from.
+     * @param update a <code>boolean</code> value
+     */
+    public void load(File loadFile, boolean update) {
         if (loadFile == null || !loadFile.exists()) {
             logger.warning("Could not find the client options file.");
             return;
@@ -261,7 +272,13 @@ public abstract class OptionMap extends OptionGroup {
             while (!isCorrectTagName(in.getLocalName())) {
                 in.nextTag();
             }
-            readFromXML(in);
+            if (update) {
+                logger.finest("Updating " + getId() + " from " + loadFile.getPath());
+                updateFromXML(in);
+            } else {
+                logger.finest("Loading " + getId() + " from " + loadFile.getPath());
+                readFromXML(in);
+            }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while loading options.", e);
         } finally {
@@ -321,16 +338,6 @@ public abstract class OptionMap extends OptionGroup {
         }
 
         out.writeEndElement();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        updateFromXML(in);
     }
 
     /**

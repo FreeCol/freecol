@@ -131,7 +131,9 @@ public class OptionGroup extends AbstractOption {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             AbstractOption option = null;
             String optionType = in.getLocalName();
-            if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
+            if (OptionGroup.getXMLElementTagName().equals(optionType)) {
+                option = new OptionGroup(in, getSpecification());
+            } else if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
                 option = new IntegerOption(in, getSpecification());
             } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
                 option = new BooleanOption(in, getSpecification());

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,7 +45,6 @@ import net.sf.freecol.common.option.ListOptionSelector;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.SelectOption;
-
 import org.w3c.dom.Element;
 
 /**
@@ -456,8 +456,8 @@ public class ClientOptions extends OptionMap {
      * Creates a new <code>ClientOptions</code>.
      * @param specification a <code>Specification</code> value
      */
-    public ClientOptions(Specification specification) {
-        super(getXMLElementTagName(), specification);
+    public ClientOptions() {
+        super(getXMLElementTagName(), null);
     }
 
     /**
@@ -478,16 +478,8 @@ public class ClientOptions extends OptionMap {
      * Adds the options to this <code>GameOptions</code>.
      */
     protected void addDefaultOptions() {
-        
-        OptionGroup guiGroup = getSpecification().getOptionGroup("clientOptions.gui");
-        guiGroup.add(getSpecification().getOptionGroup("clientOptions.minimap"));
-        add(guiGroup);
-        
-        add(getSpecification().getOptionGroup("clientOptions.messages"));
-        add(getSpecification().getOptionGroup("clientOptions.audio"));
-        add(getSpecification().getOptionGroup("clientOptions.savegames"));
-        add(getSpecification().getOptionGroup("clientOptions.warehouse"));
-        add(getSpecification().getOptionGroup("clientOptions.other"));
+
+        load(new File(new File(FreeCol.getDataDirectory(), "base"), "client-options.xml"), false);
         
         final OptionGroup modsGroup = new OptionGroup("clientOptions.mods", getSpecification());
         final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {
