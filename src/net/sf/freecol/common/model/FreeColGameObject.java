@@ -572,31 +572,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Convenience function to add this object to an element intended to
-     * signal removal of the object.
-     *
-     * @param removeElement The remove element.
-     */
-    public void addToRemoveElement(Element removeElement) {
-        Document doc = removeElement.getOwnerDocument();
-        removeElement.appendChild(this.toXMLElementPartial(doc));
-    }
-
-    /**
-     * Convenience function to add a list of objects to an element
-     * intended to signal removal of the objects.
-     *
-     * @param removeElement The remove element.
-     * @param objects A list of objects to remove.
-     */
-    public static void addToRemoveElement(Element removeElement, List<FreeColGameObject> objects) {
-        Document doc = removeElement.getOwnerDocument();
-        for (FreeColGameObject o : objects) {
-            removeElement.appendChild(o.toXMLElementPartial(doc));
-        }
-    }
-
-    /**
      * Gets the tag name of the root element representing this object.
      * This method should be overwritten by any sub-class, preferably
      * with the name of the class with the first letter in lower case.

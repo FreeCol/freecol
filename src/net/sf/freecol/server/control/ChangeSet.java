@@ -644,10 +644,12 @@ public class ChangeSet {
             if (fcgo instanceof Ownable
                 && ((Ownable) fcgo).getOwner() == serverPlayer) {
                 for (FreeColGameObject o : contents) {
-                    o.addToRemoveElement(element);
+                    element.appendChild(o.toXMLElementPartial(doc));
                 }
+                element.setAttribute("divert", (tile != null) ? tile.getId()
+                                     : serverPlayer.getId());
             }
-            fcgo.addToRemoveElement(element);
+            element.appendChild(fcgo.toXMLElementPartial(doc));
             return element;
         }
     }

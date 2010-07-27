@@ -228,16 +228,27 @@ public final class InGameInputHandler extends InputHandler {
      *            that holds all the information.
      */
     private Element remove(Element removeElement) {
-
+        Game game = getGame();
+        String divertString = removeElement.getAttribute("divert");
+        FreeColGameObject divert
+            = (divertString == null || divertString.isEmpty()) ? null
+            : game.getFreeColGameObject(divertString);
+        Player player = getFreeColClient().getMyPlayer();
         NodeList nodeList = removeElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            FreeColGameObject fcgo = getGame().getFreeColGameObject(element.getAttribute("ID"));
-
+            String idString = element.getAttribute("ID");
+            FreeColGameObject fcgo
+                = (idString == null || idString.isEmpty()) ? null
+                : game.getFreeColGameObject(idString);
             if (fcgo != null) {
+                if (divert != null) {
+                    player.divertModelMessages(fcgo, divert);
+                }
                 fcgo.dispose();
             } else {
-                logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
+                logger.warning("Could not find FreeColGameObject with ID: "
+                               + element.getAttribute("ID"));
             }
         }
 

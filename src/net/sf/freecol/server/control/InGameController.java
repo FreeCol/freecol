@@ -377,7 +377,6 @@ public final class InGameController extends Controller {
         List<Unit> units = settlement.getUnitList();
         units.addAll(settlement.getTile().getUnitList());
         for (Unit u : units) {
-            oldOwner.divertModelMessages(u, oldOwner);
             u.setState(UnitState.ACTIVE);
 
             if (unit.isUndead()) {
@@ -3294,7 +3293,7 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(colonyPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        "model.unit.colonyCapturedBy",
-                                       attackerPlayer)
+                                       colony.getTile())
                       .addName("%colony%", colony.getName())
                       .addAmount("%amount%", plunder)
                       .addStringTemplate("%player%", attackerNation));
@@ -3442,19 +3441,7 @@ public final class InGameController extends Controller {
         StringTemplate winnerLocation = winner.getLocation()
             .getLocationNameFor(winnerPlayer);
 
-        // Loser message pre-capture
-        cs.addMessage(See.only(loserPlayer),
-                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser)
-                      .setDefaultId("model.unit.unitCaptured")
-                      .addStringTemplate("%nation%", loserNation)
-                      .addStringTemplate("%unit%", oldName)
-                      .addStringTemplate("%enemyNation%", winnerNation)
-                      .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", loserLocation));
-
         // Capture the unit
-        loserPlayer.divertModelMessages(loser, loser.getTile());
         loser.setOwner(winnerPlayer);
         loser.setLocation(winner.getTile());
         if (winner.isUndead()) {
@@ -3464,7 +3451,7 @@ public final class InGameController extends Controller {
             if (downgrade != null) loser.setType(downgrade);
         }
 
-        // Winner message post-capture when we own the loser
+        // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        messageID, loser)
@@ -3474,6 +3461,15 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
                       .addStringTemplate("%location%", winnerLocation));
+        cs.addMessage(See.only(loserPlayer),
+                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                       messageID, loser.getTile())
+                      .setDefaultId("model.unit.unitCaptured")
+                      .addStringTemplate("%nation%", loserNation)
+                      .addStringTemplate("%unit%", oldName)
+                      .addStringTemplate("%enemyNation%", winnerNation)
+                      .addStringTemplate("%enemyUnit%", winner.getLabel())
+                      .addStringTemplate("%location%", loserLocation));
     }
 
     /**
@@ -3617,6 +3613,7 @@ public final class InGameController extends Controller {
             return;
         }
         loser.setType(type);
+
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        messageID, winner)
@@ -3664,7 +3661,7 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(colonyPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        "model.unit.colonyBurning",
-                                       colonyPlayer)
+                                       colony.getTile())
                       .addName("%colony%", colony.getName())
                       .addAmount("%amount%", plunder)
                       .addStringTemplate("%nation%", attackerNation)
@@ -3678,7 +3675,6 @@ public final class InGameController extends Controller {
 
         // Dispose of the colony and its contents.
         // Update all formerly owned tiles.
-        colonyPlayer.divertModelMessages(colony, colonyPlayer);
         csAddOtherSettlementTiles(attacker, colony, colonyPlayer, cs);
         cs.addDispose(colonyPlayer, colony.getTile(), colony);
     }
@@ -4046,7 +4042,7 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(shipPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        "model.unit.shipSunk",
-                                       ship)
+                                       ship.getTile())
                       .addStringTemplate("%unit%", ship.getLabel())
                       .addStringTemplate("%enemyUnit%", attackerUnit.getLabel())
                       .addStringTemplate("%enemyNation%", attackerNation));
@@ -4077,7 +4073,7 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(shipPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                        "model.unit.shipSunkByBombardment",
-                                       ship)
+                                       ship.getTile())
                       .addName("%colony%", settlement.getName())
                       .addStringTemplate("%unit%", ship.getLabel()));
 
@@ -4092,7 +4088,6 @@ public final class InGameController extends Controller {
      */
     private void csSinkShip(Unit ship, ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        shipPlayer.divertModelMessages(ship, ship.getTile());
         cs.addDispose(shipPlayer, ship.getLocation(), ship);
     }
 
@@ -4125,7 +4120,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageID, loser)
+                                       messageID, loser.getTile())
                       .setDefaultId("model.unit.unitSlaughtered")
                       .addStringTemplate("%nation%", loserNation)
                       .addStringTemplate("%unit%", loser.getLabel())
