@@ -50,11 +50,7 @@ public class IndianSettlement extends Settlement {
 
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
 
-    public static final int MISSIONARY_TENSION = -10;
     public static final int MAX_CONVERT_DISTANCE = 10;
-    public static final int ALARM_RADIUS = 2;
-    public static final int ALARM_TILE_IN_USE = 2;
-    public static final int ALARM_NEW_MISSIONARY = -100;
     public static final int MAX_HORSES_PER_TURN = 2;
     public static final int TALES_RADIUS = 6;
 
@@ -376,7 +372,6 @@ public class IndianSettlement extends Settlement {
      */
     public boolean propagateAlarm(Player player, int addToAlarm) {
         if (hasContactedSettlement(player)) {
-            Level oldLevel = getAlarm(player).getLevel();
             return changeAlarm(player, addToAlarm);
         }
         return false;
@@ -1006,11 +1001,6 @@ public class IndianSettlement extends Settlement {
 
         checkForNewIndian();
 
-        /* Increase alarm: */
-        if (getUnitCount() > 0) {
-            increaseAlarm();
-        }
-        
         breedHorses();
          
         updateWantedGoods();
@@ -1068,74 +1058,6 @@ public class IndianSettlement extends Settlement {
             // Also, some available RUM is consumed
         }
     }
-
-    private void increaseAlarm() {
-
-        java.util.Map<Player, Integer> extraAlarm = new HashMap<Player, Integer>();
-        for (Player enemy : getGame().getEuropeanPlayers()) {
-            extraAlarm.put(enemy, new Integer(0));
-        }
-        int alarmRadius = getRadius() + ALARM_RADIUS; // the radius in which Europeans cause alarm
-        for (Tile tile: getTile().getSurroundingTiles(alarmRadius)) {
-            Colony colony = tile.getColony();
-                
-            if (colony == null) {
-                // Nearby military units:
-                if (tile.getFirstUnit() != null) {
-                    Player enemy =  tile.getFirstUnit().getOwner();
-                    if (enemy.isEuropean()) {
-                        int alarm = extraAlarm.get(enemy);
-                        for (Unit unit : tile.getUnitList()) {
-                            if (unit.isOffensiveUnit() && !unit.isNaval()) {
-                                alarm += unit.getType().getOffence();
-                            }
-                        }
-                        extraAlarm.put(enemy, alarm);
-                    }
-                }
-                
-                // Land being used by another settlement:
-                if (tile.getOwningSettlement() != null) {
-                    Player enemy = tile.getOwningSettlement().getOwner();
-                    if (enemy!=null && enemy.isEuropean()) {
-                        extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + ALARM_TILE_IN_USE);
-                    }
-                }
-            } else {
-                // Settlement:
-                Player enemy = colony.getOwner();
-                extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + ALARM_TILE_IN_USE + colony.getUnitCount());
-            }
-        }
-
-        // Missionary helps reducing alarm a bit, here and to the tribe as a whole.
-        // No reduction effect on other settlements (1/4 of this) unless this is capital. 
-        if (missionary != null) {
-            Player enemy = missionary.getOwner();
-            int missionaryAlarm = MISSIONARY_TENSION;
-            if (missionary.hasAbility("model.ability.expertMissionary")) {
-                missionaryAlarm *= 2;
-            }
-            extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + missionaryAlarm);
-        }
-
-        for (Entry<Player, Integer> entry : extraAlarm.entrySet()) {
-            Integer newAlarm = entry.getValue();
-            if (alarm != null) {
-                Player player = entry.getKey();
-                int modifiedAlarm = (int) player.getFeatureContainer()
-                    .applyModifier(newAlarm.intValue(), "model.modifier.nativeAlarmModifier",
-                                   null, getGame().getTurn());
-                Tension oldAlarm = alarm.get(player);
-                if (oldAlarm != null) {
-                    modifiedAlarm -= 4 + oldAlarm.getValue()/100;
-                }
-                // TODO: notify of settlements with changed alarm
-                modifyAlarm(player, modifiedAlarm);
-            }
-        }
-    }
-
 
     private void consumeGoods(GoodsType type, int amount) {
         if (getGoodsCount(type) > 0) {

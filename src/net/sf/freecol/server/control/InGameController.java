@@ -112,6 +112,13 @@ public final class InGameController extends Controller {
 
     private static Logger logger = Logger.getLogger(InGameController.class.getName());
 
+    // TODO: options, spec?
+    // Alarm adjustments.
+    public static final int ALARM_RADIUS = 2;
+    public static final int ALARM_TILE_IN_USE = 2;
+    public static final int ALARM_NEW_MISSIONARY = -100;
+    public static final int ALARM_MISSIONARY_PRESENT = -10;
+
     // Score bonus on declaration of independence.
     public static final int SCORE_INDEPENDENCE_DECLARED = 100;
 
@@ -353,13 +360,12 @@ public final class InGameController extends Controller {
      * @param symmetric If true, change the otherPlayer stance as well.
      * @return A <code>ChangeSet</code> encapsulating the resulting changes.
      */
-    public ChangeSet sendChangeStance(Player player, Stance stance,
-                                      Player otherPlayer, boolean symmetric) {
+    public void changeStance(Player player, Stance stance,
+                             Player otherPlayer, boolean symmetric) {
         ChangeSet cs = new ChangeSet();
         if (csChangeStance(player, stance, otherPlayer, symmetric, cs)) {
             sendToOthers((ServerPlayer) player, cs);
         }
-        return cs;
     }
 
     /**
@@ -615,10 +621,9 @@ public final class InGameController extends Controller {
             }
         }
         
+        ChangeSet cs = new ChangeSet();
         if (newPlayer.isEuropean()) {
-            ChangeSet cs = new ChangeSet();
             csBombardEnemyShips(newPlayer, cs);
-            sendToAll(cs);
 
             yearlyGoodsRemoval(newPlayer);
 
@@ -646,9 +651,119 @@ public final class InGameController extends Controller {
                 t.start();
             }
 
-        }
-        else if (newPlayer.isIndian()) {
-            
+        } else if (newPlayer.isIndian()) {
+            // We do not have to worry about Player level stance
+            // changes driving Stance, as that is delegated to the AI.
+            //
+            // However we want to notify of individual settlements
+            // that change tension level, but there are complex
+            // interactions between settlement and player tensions.
+            // The simple way to do it is just to save all old tension
+            // levels and check if they have changed after applying
+            // all the changes.
+            List<IndianSettlement> allSettlements
+                = newPlayer.getIndianSettlements();
+            java.util.Map<IndianSettlement,
+                java.util.Map<Player, Tension.Level>> oldLevels
+                = new HashMap<IndianSettlement,
+                java.util.Map<Player, Tension.Level>>();
+            for (IndianSettlement settlement : allSettlements) {
+                java.util.Map<Player, Tension.Level> oldLevel
+                    = new HashMap<Player, Tension.Level>();
+                oldLevels.put(settlement, oldLevel);
+                for (Player enemy : getGame().getEuropeanPlayers()) {
+                    Tension alarm = settlement.getAlarm(enemy);
+                    if (alarm != null) oldLevel.put(enemy, alarm.getLevel());
+                }
+            }
+
+            // Do the settlement alarms first.
+            for (IndianSettlement settlement : allSettlements) {
+                java.util.Map<Player, Integer> extra
+                    = new HashMap<Player, Integer>();
+                for (Player enemy : getGame().getEuropeanPlayers()) {
+                    extra.put(enemy, new Integer(0));
+                }
+
+                // Look at the uses of tiles surrounding the settlement.
+                int alarmRadius = settlement.getRadius() + ALARM_RADIUS;
+                int alarm = 0;
+                for (Tile tile: settlement.getTile()
+                         .getSurroundingTiles(alarmRadius)) {
+                    Colony colony = tile.getColony();
+                    if (tile.getFirstUnit() != null) { // Military units
+                        Player enemy =  tile.getFirstUnit().getOwner();
+                        if (enemy.isEuropean()) {
+                            alarm = extra.get(enemy);
+                            for (Unit unit : tile.getUnitList()) {
+                                if (unit.isOffensiveUnit() && !unit.isNaval()) {
+                                    alarm += unit.getType().getOffence();
+                                }
+                            }
+                            extra.put(enemy, alarm);
+                        }
+                    } else if (colony != null) { // Colonies
+                        Player enemy = colony.getOwner();
+                        extra.put(enemy, extra.get(enemy).intValue()
+                                  + ALARM_TILE_IN_USE
+                                  + colony.getUnitCount());
+                    } else if (tile.getOwningSettlement() != null) { // Control
+                        Player enemy = tile.getOwningSettlement().getOwner();
+                        if (enemy != null && enemy.isEuropean()) {
+                            extra.put(enemy, extra.get(enemy).intValue()
+                                      + ALARM_TILE_IN_USE);
+                        }
+                    }
+                }
+                // Missionary helps reducing alarm a bit
+                if (settlement.getMissionary() != null) {
+                    Unit mission = settlement.getMissionary();
+                    int missionAlarm = ALARM_MISSIONARY_PRESENT;
+                    if (mission.hasAbility("model.ability.expertMissionary")) {
+                        missionAlarm *= 2;
+                    }
+                    Player enemy = mission.getOwner();
+                    extra.put(enemy,
+                              extra.get(enemy).intValue() + missionAlarm);
+                }
+                // Apply modifiers, and commit the total change.
+                for (Entry<Player, Integer> entry : extra.entrySet()) {
+                    Player player = entry.getKey();
+                    int change = entry.getValue().intValue();
+                    if (change != 0) {
+                        change = (int) player.getFeatureContainer()
+                            .applyModifier(change,
+                                           "model.modifier.nativeAlarmModifier",
+                                           null, getGame().getTurn());
+                        settlement.modifyAlarm(player, change);
+                    }
+                }
+            }
+
+            // Calm down a bit at the whole-tribe level.
+            for (Player enemy : getGame().getEuropeanPlayers()) {
+                if (newPlayer.getTension(enemy).getValue() > 0) {
+                    int change = -newPlayer.getTension(enemy).getValue()/100
+                        - 4;
+                    newPlayer.modifyTension(enemy, change);
+                }
+            }
+
+            // Now collect the settlements that changed.
+            for (IndianSettlement settlement : allSettlements) {
+                java.util.Map<Player, Tension.Level> oldLevel
+                    = oldLevels.get(settlement);
+                for (Entry<Player, Tension.Level> entry : oldLevel.entrySet()) {
+                    Player enemy = entry.getKey();
+                    Tension.Level newLevel
+                        = settlement.getAlarm(enemy).getLevel();
+                    if (entry.getValue() != newLevel) {
+                        cs.add(See.only(null).perhaps((ServerPlayer) enemy),
+                               settlement);
+                    }
+                }
+            }
+
             for (IndianSettlement indianSettlement: newPlayer.getIndianSettlements()) {
                 if (indianSettlement.checkForNewMissionaryConvert()) {
                     // an Indian brave gets converted by missionary
@@ -698,6 +813,7 @@ public final class InGameController extends Controller {
                 }
             }
         }
+        sendToAll(cs);
         
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
@@ -1018,9 +1134,7 @@ public final class InGameController extends Controller {
                 return;
             }
             monarchActionElement.setAttribute("enemy", enemy.getId());
-            ChangeSet cs = sendChangeStance(serverPlayer, Stance.WAR, enemy,
-                                            true);
-            sendElement(serverPlayer, cs);
+            changeStance(serverPlayer, Stance.WAR, enemy, true);
             // TODO glom onto monarch element.
             break;
             /** TODO: restore
@@ -4457,8 +4571,8 @@ public final class InGameController extends Controller {
             unit.setLocation(null);
             settlement.setMissionary(unit);
             settlement.setConvertProgress(0);
-            cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
-                    IndianSettlement.ALARM_NEW_MISSIONARY));
+            cs.add(See.only(serverPlayer),
+                   settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY));
             tile.updatePlayerExploredTile(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.perhaps().always(serverPlayer), tile);

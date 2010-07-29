@@ -900,15 +900,6 @@ public final class InGameInputHandler extends InputHandler {
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
 
-        /*
-         * Diplomacy messages were sometimes not shown because opponentAttack
-         * messages arrive before setStance messages, so when the setStance
-         * message arrived the player already had the new stance.
-         * So, do not filter like this:
-         *   if (first.getStance(second) == stance) { return null; }
-         * TODO: fix opponentAttack.
-         */
-
         // Does this message involve this player and an other?
         Player other = (player.equals(first)) ? second
             : (player.equals(second)) ? first
@@ -920,9 +911,6 @@ public final class InGameInputHandler extends InputHandler {
 
         try {
             first.setStance(second, stance);
-            if (second.getStance(first) != stance) {
-                second.setStance(first, stance);
-			}
         } catch (IllegalStateException e) {
             logger.log(Level.WARNING, "Illegal stance transition", e);
             return null;

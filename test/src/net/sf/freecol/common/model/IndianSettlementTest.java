@@ -326,31 +326,6 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertFalse(errMsg, indianBrave.getAutomaticEquipment() == null);
     }
 	   
-    public void testWarDeclarationAffectsSettlementAlarm(){
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        game.setMap(map);
-
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
-        Player.makeContact(inca, dutch);
-        
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.player(inca).build();
-        camp.setVisited(dutch);
-	    
-        assertEquals("Inca should be at peace with dutch", Stance.PEACE, inca.getStance(dutch));
-        Tension campAlarm = camp.getAlarm(dutch);
-        assertNotNull("Camp should have had contact with dutch",campAlarm);
-        assertEquals("Camp should be hateful", Tension.Level.HAPPY, campAlarm.getLevel());
-
-        dutch.changeRelationWithPlayer(inca, Stance.WAR);
-	    
-        assertEquals("Inca should be at war with dutch", Stance.WAR, inca.getStance(dutch));
-        campAlarm = camp.getAlarm(dutch);
-        assertEquals("Camp should be hateful", Tension.Level.HATEFUL, campAlarm.getLevel());
-    }
-	
     /*
      * Test settlement adjacent tiles ownership
      * Per Col1 rules, Indian settlements do not own water tiles

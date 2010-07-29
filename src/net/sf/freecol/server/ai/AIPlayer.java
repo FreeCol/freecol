@@ -370,7 +370,7 @@ public abstract class AIPlayer extends AIObject {
         }
         if (newStance != player.getStance(other)) {
             getAIMain().getFreeColServer().getInGameController()
-                .sendChangeStance(player, newStance, other, symmetric);
+                .changeStance(player, newStance, other, symmetric);
         }
         return player.getStance(other);
     }

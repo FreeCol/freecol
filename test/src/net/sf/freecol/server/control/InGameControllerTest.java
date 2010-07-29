@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.SimpleCombatModel;
+import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
 import net.sf.freecol.common.model.Tile;
@@ -174,7 +175,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      initialTensionValue, initialFrenchTension);
 
         // French declare war
-        igc.sendChangeStance(french, Stance.WAR, dutch, true);
+        igc.changeStance(french, Stance.WAR, dutch, true);
 
         // Verify stance
         assertTrue("The Dutch should be at war with the French",
@@ -1487,4 +1488,185 @@ public class InGameControllerTest extends FreeColTestCase {
                    artillery.isDisposed());
     }
 
+    // Test diplomatic trades.
+    private void setPlayersAt(Stance stance,Tension tension) {
+        Game game = getGame();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+
+        // Setup
+        dutch.setStance(french, stance);
+        dutch.setTension(french, new Tension(tension.getValue()));
+        french.setStance(dutch, stance);
+        french.setTension(dutch, new Tension(tension.getValue()));
+
+        // Verify initial conditions
+        Tension.Level expectedTension = tension.getLevel();
+
+        assertEquals("Wrong Dutch player stance with french player",
+                     dutch.getStance(french),stance);
+        assertEquals("Wrong French player stance with dutch player",
+                     french.getStance(dutch),stance);
+        assertEquals("Tension of dutch player towards french player wrong",
+                     expectedTension, dutch.getTension(french).getLevel());
+        assertEquals("Tension of french player towards dutch player wrong",
+                     expectedTension, french.getTension(dutch).getLevel());
+    }
+
+    /**
+     * Verifies conditions of treaty regarding stance and tension of
+     * player1 toward player2.
+     */
+    private void verifyTreatyResults(Player player1, Player player2,
+                                     Stance expectedStance,
+                                     int expectedTension){
+
+        assertFalse(player1 + " player should not be at war",
+                    player1.isAtWar());
+        assertEquals(player1 + " player should be at peace with "
+                     + player2 + " player",
+                     player1.getStance(player2), expectedStance);
+        int player1CurrTension = player1.getTension(player2).getValue();
+        assertEquals(player1 + " player tension values wrong",
+                     expectedTension, player1CurrTension);
+    }
+
+    /**
+     * Tests the implementation of an accepted peace treaty while at
+     * war.
+     */
+    public void testPeaceTreatyFromWarStance() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Tension hateful = new Tension(Tension.Level.HATEFUL.getLimit());
+        Stance initialStance = Stance.WAR;
+        Stance newStance =  Stance.PEACE;
+
+        //setup
+        setPlayersAt(initialStance, hateful);
+
+        int dutchInitialTension = dutch.getTension(french).getValue();
+        int frenchInitialTension = french.getTension(dutch).getValue();
+
+        // Execute peace treaty
+        igc.changeStance(dutch, newStance, french, true);
+
+        // Verify results
+        int dutchExpectedTension = Math.max(0, dutchInitialTension
+            + Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER);
+        int frenchExpectedTension = Math.max(0, frenchInitialTension
+            + Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER);
+
+        verifyTreatyResults(dutch, french, newStance, dutchExpectedTension);
+        verifyTreatyResults(french, dutch, newStance, frenchExpectedTension);
+    }
+
+    /**
+     * Tests the implementation of an accepted peace treaty while at
+     * cease-fire.
+     */
+    public void testPeaceTreatyFromCeaseFireStance() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Tension hateful = new Tension(Tension.Level.HATEFUL.getLimit());
+        Stance initialStance = Stance.CEASE_FIRE;
+        Stance newStance =  Stance.PEACE;
+
+        //setup
+        //Note: the game only allows setting cease fire stance from war stance
+        setPlayersAt(Stance.WAR, hateful);
+        setPlayersAt(initialStance, hateful);
+
+        int dutchInitialTension = dutch.getTension(french).getValue();
+        int frenchInitialTension = french.getTension(dutch).getValue();
+        StanceTradeItem peaceTreaty
+            = new StanceTradeItem(game, dutch, french, newStance);
+
+        // Execute peace treaty
+        igc.changeStance(dutch, newStance, french, true);
+
+        // Verify results
+        int dutchExpectedTension = Math.max(0, dutchInitialTension
+            + Tension.PEACE_TREATY_MODIFIER);
+        int frenchExpectedTension = Math.max(0, frenchInitialTension
+            + Tension.PEACE_TREATY_MODIFIER);
+
+        verifyTreatyResults(dutch, french, newStance, dutchExpectedTension);
+        verifyTreatyResults(french, dutch, newStance, frenchExpectedTension);
+    }
+
+    /**
+     * Tests the implementation of an accepted cease fire treaty
+     */
+    public void testCeaseFireTreaty() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Tension hateful = new Tension(Tension.Level.HATEFUL.getLimit());
+        Stance initialStance = Stance.WAR;
+        Stance newStance =  Stance.CEASE_FIRE;
+
+        //setup
+        setPlayersAt(initialStance,hateful);
+
+        int dutchInitialTension = dutch.getTension(french).getValue();
+        int frenchInitialTension = french.getTension(dutch).getValue();
+
+        // Execute cease-fire treaty
+        igc.changeStance(dutch, newStance, french, true);
+
+        // Verify results
+        int dutchExpectedTension = Math.max(0, dutchInitialTension
+            + Tension.CEASE_FIRE_MODIFIER);
+        int frenchExpectedTension = Math.max(0, frenchInitialTension
+            + Tension.CEASE_FIRE_MODIFIER);
+
+        verifyTreatyResults(dutch, french, newStance, dutchExpectedTension);
+        verifyTreatyResults(french, dutch, newStance, frenchExpectedTension);
+    }
+
+    public void testWarDeclarationAffectsSettlementAlarm() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+        Player.makeContact(inca, dutch);
+
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.player(inca).build();
+        camp.setVisited(dutch);
+
+        assertEquals("Inca should be at peace with dutch",
+                     Stance.PEACE, inca.getStance(dutch));
+        Tension campAlarm = camp.getAlarm(dutch);
+        assertNotNull("Camp should have had contact with Dutch",
+                      campAlarm);
+        assertEquals("Camp should be happy",
+                     Tension.Level.HAPPY, campAlarm.getLevel());
+
+        igc.changeStance(dutch, Stance.WAR, inca, false);
+        assertEquals("Inca should not yet be at war with the Dutch",
+                     Stance.PEACE, inca.getStance(dutch));
+
+        igc.changeStance(dutch, Stance.WAR, inca, true);
+        assertEquals("Inca should be at war with the Dutch",
+                     Stance.WAR, inca.getStance(dutch));
+
+        campAlarm = camp.getAlarm(dutch);
+        assertEquals("Camp should be hateful",
+                     Tension.Level.HATEFUL, campAlarm.getLevel());
+    }
+
 }
+

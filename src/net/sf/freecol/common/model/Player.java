@@ -2660,68 +2660,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Deprecated.  Should be all in the server.
-     */
-    public void changeRelationWithPlayer(Player player,Stance newStance){
-        Stance oldStance = getStance(player);
-
-        // Sanitation
-        if(newStance == oldStance){
-            return;
-        }
-
-        // Set stance
-        setStance(player, newStance);
-
-        // Update tension
-        int modifier = 0;
-        switch(newStance){
-        case UNCONTACTED:
-            throw new IllegalStateException("Attempt to set UNCONTACTED stance");
-        case PEACE:
-            if(oldStance == Stance.WAR){
-                modifier = Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER;
-            }
-            if(oldStance == Stance.CEASE_FIRE){
-                modifier = Tension.PEACE_TREATY_MODIFIER;
-            }
-            break;
-        case CEASE_FIRE:
-            if(oldStance == Stance.WAR){
-                modifier = Tension.CEASE_FIRE_MODIFIER;
-            }
-            break;
-        case ALLIANCE:
-        case WAR:
-            // No tension modifiers.
-            break;
-        }
-        modifyTension(player,modifier);
-
-        if (player.getStance(this) != newStance) {
-            getGame().getModelController().setStance(this, player, newStance);
-            player.setStance(this, newStance);
-
-            if(newStance == Stance.WAR){
-                switch(oldStance){
-                case UNCONTACTED:
-                case PEACE:
-                    modifier = Tension.WAR_MODIFIER;
-                    break;
-                case CEASE_FIRE:
-                    modifier = Tension.RESUME_WAR_MODIFIER;
-                    break;
-                case ALLIANCE:
-                case WAR:
-                    // No tension modifiers.
-                    break;
-                }
-            }
-            player.modifyTension(this, modifier);
-        }
-    }
-
-    /**
      * Gets the price for a recruit in europe.
      *
      * @return The price of a single recruit in {@link Europe}.
@@ -2770,15 +2708,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public void newTurn() {
 
         int newSoL = 0;
-
-        // reducing tension levels if nation is native
-        if (isIndian()) {
-            for (Tension tension1 : tension.values()) {
-                if (tension1.getValue() > 0) {
-                    tension1.modify(-(4 + tension1.getValue() / 100));
-                }
-            }
-        }
 
         // settlements
         ArrayList<Settlement> settlements = new ArrayList<Settlement>(getSettlements());

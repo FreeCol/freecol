@@ -194,6 +194,7 @@ public class IndianDemandMission extends Mission {
                     .getValue();
                 if (accepted) {
                     // TODO: if very happy, the brave should convert
+                    // TODO: Tension change should happen in server
                     tension = -(5 - difficulty) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension <= Tension.Level.HAPPY.getLimit() &&
@@ -206,6 +207,7 @@ public class IndianDemandMission extends Mission {
                         }
                     }
                 } else {
+                    // TODO: Tension change should happen in server
                     tension = (difficulty + 1) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension >= Tension.Level.CONTENT.getLimit()) {

@@ -172,6 +172,7 @@ public class IndianBringGiftMission extends Mission {
                 }
 
                 giftDelivered = true;
+                // TODO: Tension change should happen in server
                 getUnit().getOwner().modifyTension(target.getOwner(), 1);
             }
         }
