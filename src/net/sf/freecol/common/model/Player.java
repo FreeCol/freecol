@@ -1339,10 +1339,17 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Resets this player's "can see"-tiles. This is done by setting all the
-     * tiles within a {@link Unit}s line of sight visible. The other tiles are
-     * made unvisible. <br>
-     * <br>
+     * Resets this player's "can see"-tiles. This is done by setting
+     * all the tiles within each {@link Unit} and {@link Settlement}s
+     * line of sight visible. The other tiles are made invisible.
+     *
+     * Note that tiles must be tested for null as they may be both
+     * valid tiles but yet null during a save game load.
+     *
+     * Note the use of copies of the unit and settlement lists to
+     * avoid nasty surprises due to asynchronous disappearance of
+     * members of either.
+     *
      * Use {@link #invalidateCanSeeTiles} whenever possible.
      * @return <code>true</code> if successful <code>false</code> otherwise
      */
@@ -1353,49 +1360,30 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
         if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
-            for (Tile tile: getGame().getMap().getAllTiles()) {
-                // may be null while loading savegame
-                if (tile == null) {
-                    continue;
+            for (Tile t : getGame().getMap().getAllTiles()) {
+                if (t != null) {
+                    canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
                 }
-                canSeeTiles[tile.getX()][tile.getY()] = hasExplored(tile);
             }
         } else {
-            Iterator<Unit> unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-                if (!(unit.getLocation() instanceof Tile)) {
-                    continue;
-                }
-                Tile unitTile = unit.getTile();
-                if (unitTile == null) {
-                    logger.warning("position == null");
-                }
-                canSeeTiles[unitTile.getX()][unitTile.getY()] = true;
-
-
-                for (Tile t: unit.getTile().getSurroundingTiles(unit.getLineOfSight())) {
-                    // may be null while loading savegame
-                    // can be inside the line of sight, but not yet explored
-                    if(t == null || !hasExplored(t)){
-                        continue;
+            for (Unit unit : getUnits()) {
+                Tile tile = unit.getTile();
+                if (tile != null) {
+                    canSeeTiles[tile.getX()][tile.getY()] = true;
+                    for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
+                        if (t != null) {
+                            canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
+                        }
                     }
-                    canSeeTiles[t.getX()][t.getY()] = true;
                 }
             }
-            for (Settlement settlement : getSettlements()) {
-                Map.Position position = settlement.getTile().getPosition();
-
-                canSeeTiles[position.getX()][position.getY()] = true;
-
-                for (Tile t: settlement.getTile().getSurroundingTiles(settlement.getLineOfSight())) {
-                    // may be null while loading savegame
-                    // can be inside the line of sight, but not yet explored
-                    if(t == null || !hasExplored(t)){
-                        continue;
+            for (Settlement settlement : new ArrayList<Settlement>(getSettlements())) {
+                Tile tile = settlement.getTile();
+                canSeeTiles[tile.getX()][tile.getY()] = true;
+                for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
+                    if (t != null) {
+                        canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
                     }
-                    canSeeTiles[t.getX()][t.getY()] = true;
-
                 }
             }
         }
