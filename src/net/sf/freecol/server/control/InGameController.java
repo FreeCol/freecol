@@ -3959,15 +3959,31 @@ public final class InGameController extends Controller {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
+        ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
+        StringTemplate defenderNation = defenderPlayer.getNationName();
         Settlement settlement = defender.getTile().getSettlement();
+        StringTemplate defenderLocation = defender.getLocation().getLocationNameFor(defenderPlayer);
         EquipmentType equip = defender
             .getBestCombatEquipmentType(defender.getAutomaticEquipment());
+        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
+        StringTemplate attackerNation = attackerPlayer.getNationName();
 
         // Autoequipment is not actually with the unit, it is stored
         // in the settlement of the unit.  Remove it from there.
         for (AbstractGoods goods : equip.getGoodsRequired()) {
             settlement.removeGoods(goods);
         }
+
+        cs.addMessage(See.only((ServerPlayer) defender.getOwner()),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                             "model.unit.unitLoseAutoEquip",
+                             defender)
+                .addStringTemplate("%location%", defenderLocation)
+                .addStringTemplate("%nation%", defenderNation)
+                .addStringTemplate("%unit%", defender.getLabel())
+                .addName("%settlement%", settlement.getNameFor(defenderPlayer))
+                .addStringTemplate("%enemyNation%", attackerNation)
+                .addStringTemplate("%enemyUnit%", attacker.getLabel()));
     }
 
     /**
