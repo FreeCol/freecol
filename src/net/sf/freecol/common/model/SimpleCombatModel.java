@@ -514,6 +514,7 @@ public class SimpleCombatModel extends CombatModel {
                                float r, List<CombatResult> crs) {
         Player loserPlayer = loser.getOwner();
         Tile tile = loser.getTile();
+        boolean attackerWon = crs.get(0) == CombatResult.WIN;
 
         if (loser.isNaval()) {
             // Naval victors get to loot the defenders hold.  Sink the
@@ -576,25 +577,28 @@ public class SimpleCombatModel extends CombatModel {
 
             // Failed to defend a native settlement.
             } else if (settlement instanceof IndianSettlement) {
-                // Defeating the defender of a native settlement with
-                // a mission may yield converts but also may provoke
-                // the burning of all missions.  Native settlements
-                // fall when there are no units present either
-                // in-settlement or on the settlement tile.
+                // Attacking and defeating the defender of a native
+                // settlement with a mission may yield converts but
+                // also may provoke the burning of all missions.
+                // Native settlements fall when there are no units
+                // present either in-settlement or on the settlement
+                // tile.
                 IndianSettlement is = (IndianSettlement) settlement;
                 int lose = 1;
-                if (r < winner.getConvertProbability()) {
-                    if (is.getUnitCount() + tile.getUnitCount() > 1
-                        && is.getMissionary(winnerPlayer) != null) {
-                        crs.add(CombatResult.CAPTURE_CONVERT);
-                        lose++;
-                    }
-                } else if (r >= 1.0f - winner.getBurnProbability()) {
-                    for (IndianSettlement s
-                             : loserPlayer.getIndianSettlements()) {
-                        if (s.getMissionary(winnerPlayer) != null) {
-                            crs.add(CombatResult.BURN_MISSIONS);
-                            break;
+                if (attackerWon) {
+                    if (r < winner.getConvertProbability()) {
+                        if (is.getUnitCount() + tile.getUnitCount() > 1
+                            && is.getMissionary(winnerPlayer) != null) {
+                            crs.add(CombatResult.CAPTURE_CONVERT);
+                            lose++;
+                        }
+                    } else if (r >= 1.0f - winner.getBurnProbability()) {
+                        for (IndianSettlement s
+                                 : loserPlayer.getIndianSettlements()) {
+                            if (s.getMissionary(winnerPlayer) != null) {
+                                crs.add(CombatResult.BURN_MISSIONS);
+                                break;
+                            }
                         }
                     }
                 }

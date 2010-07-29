@@ -218,7 +218,7 @@ public class EquipmentType extends BuildableType {
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         maximumCount = getAttribute(in, "maximum-count", 1);
-        combatLossPriority = getAttribute(in, "combat-loss-priority", 0);
+        combatLossPriority = getAttribute(in, "combat-loss-priority", -1);
         String roleString = getAttribute(in, "role", "default");
         role = Enum.valueOf(Role.class, roleString.toUpperCase(Locale.US));
     }
