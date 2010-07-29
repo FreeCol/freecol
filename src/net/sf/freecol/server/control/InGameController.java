@@ -517,7 +517,7 @@ public final class InGameController extends Controller {
         cs.addDead(serverPlayer);
 
         // Notify everyone.
-        cs.addMessage(See.all(),
+        cs.addMessage(See.all().except(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              ((serverPlayer.isEuropean())
                               ? "model.diplomacy.dead.european"
@@ -1415,6 +1415,11 @@ public final class InGameController extends Controller {
         independent.reinitialiseMarket();
         independent.addHistory(new HistoryEvent(turn,
                 HistoryEvent.EventType.INDEPENDENCE));
+        cs.addMessage(See.only(independent),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "model.player.independence",
+                             independent)
+                .addStringTemplate("%ref%", serverPlayer.getNationName()));
 
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<Unit>();
@@ -1441,16 +1446,22 @@ public final class InGameController extends Controller {
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
             cs.addMessage(See.only(independent),
-                new ModelMessage("model.player.independence.unitsAcquired",
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "model.player.independence.unitsAcquired",
                                  independent)
                     .addStringTemplate("%units%", surrender));
         }
 
-        // Update others with player type.  Again, a pity to have to do
-        // a whole player update.
-        cs.addPartial(See.all().except(independent), independent, "playerType");
+        // Update player type.  Again, a pity to have to do a whole
+        // player update, but a partial update works for other players.
+        cs.addPartial(See.all().except(independent), independent,
+                      "playerType");
         cs.addMessage(See.all().except(independent),
-            new ModelMessage("model.player.independence", serverPlayer));
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "model.player.independence.announce",
+                             independent)
+                .addStringTemplate("%nation%", independent.getNationName())
+                .addStringTemplate("%ref%", serverPlayer.getNationName()));
         cs.add(See.only(independent), independent);
 
         sendToOthers(serverPlayer, cs);

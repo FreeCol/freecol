@@ -703,8 +703,6 @@ public final class FreeColClient {
         Element retireElement = Message.createNewRootElement("retire");
         Element reply = client.ask(retireElement);
         boolean result = reply != null && "true".equals(reply.getAttribute("highScore"));
-        Element endTurnElement = Message.createNewRootElement("endTurn");
-        client.send(endTurnElement);
         return result;
     }
 

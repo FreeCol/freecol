@@ -1257,10 +1257,12 @@ public final class FreeColServer {
      */
     public void loadHighScores() throws IOException, FreeColException {
         highScores = new ArrayList<HighScore>();
+        File hsf = new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE);
+        if (!hsf.exists()) return;
         XMLInputFactory xif = XMLInputFactory.newInstance();
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE));
+            fis = new FileInputStream(hsf);
             XMLStreamReader xsr = xif.createXMLStreamReader(fis, "UTF-8");
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {

@@ -87,19 +87,16 @@ public final class VictoryPanel extends FreeColPanel {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
+        Canvas canvas = getCanvas();
         if (OK.equals(command)) {
-            if(getClient().retire()){
-                getCanvas().showInformationMessage("highscores.new");
-                getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
-            }
+            boolean high = getClient().retire();
+            canvas.showPanel(new ReportHighScoresPanel(canvas), false);
+            canvas.showInformationMessage((high) ? "highscores.yes"
+                                          : "highscores.no");
             getClient().quit();
         } else {
-            if(getClient().retire()){
-                getCanvas().showInformationMessage("highscores.new");
-                getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
-            }
             getClient().continuePlaying();
-            getCanvas().remove(this);
+            canvas.remove(this);
         }
     }
 }
