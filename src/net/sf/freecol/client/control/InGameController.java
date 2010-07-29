@@ -140,6 +140,7 @@ import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
+import net.sf.freecol.common.networking.WorkMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -3638,10 +3639,10 @@ public final class InGameController implements NetworkConstants {
 
         Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
         if (!canvas.showConfirmDialog(tile,
-                                      StringTemplate.template("clearSpeciality.areYouSure")
-                                      .addStringTemplate("%oldUnit%", Messages.getLabel(unit))
-                                      .add("%unit%", newType.getNameKey()),
-                                      "yes", "no")) {
+                StringTemplate.template("clearSpeciality.areYouSure")
+                    .addStringTemplate("%oldUnit%", Messages.getLabel(unit))
+                    .add("%unit%", newType.getNameKey()),
+                "yes", "no")) {
             return;
         }
 
@@ -3821,14 +3822,21 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code>.
      * @param workLocation The <code>WorkLocation</code>.
+     * @return true if worker set to work
      */
     public void work(Unit unit, WorkLocation workLocation) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
         Tile tile = workLocation.getTile();
+        if (tile.hasLostCityRumour()) {
+            canvas.showInformationMessage("tileHasRumour");
+            return;
+        }
         if ((tile.getOwner() != unit.getOwner()
              || tile.getOwningSettlement() != workLocation.getColony())
             && !claimLand(tile, workLocation.getColony(), 0)) {
@@ -3837,17 +3845,31 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Client client = freeColClient.getClient();
-        Element workElement = Message.createNewRootElement("work");
-        workElement.setAttribute("unit", unit.getId());
-        workElement.setAttribute("workLocation", workLocation.getId());
-
-        unit.work(workLocation);
-
-        client.sendAndWait(workElement);
-        if (workLocation instanceof ColonyTile) {
-            ((ColonyTile) workLocation).firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+        // Try to change the work location.
+        FreeColGameObject old = (FreeColGameObject) unit.getLocation();
+        if (askWork(unit, workLocation)) {
+            FreeColGameObject work = (FreeColGameObject) workLocation;
+            old.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
+            work.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
         }
+    }
+
+    /**
+     * Server query-response for changing a work location.
+     *
+     * @param unit The <code>Unit</code> to change the workLocation of.
+     * @param workLocation The <code>WorkLocation</code> to change to.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askWork(Unit unit, WorkLocation workLocation) {
+        Client client = freeColClient.getClient();
+        WorkMessage message = new WorkMessage(unit, workLocation);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**

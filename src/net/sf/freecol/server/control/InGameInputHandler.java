@@ -101,6 +101,7 @@ import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
+import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -280,10 +281,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return equipUnit(connection, element);
             }
         });
-        register("work", new CurrentPlayerNetworkRequestHandler() {
+        register(WorkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return work(connection, element);
+                return new WorkMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("changeWorkType", new CurrentPlayerNetworkRequestHandler() {
@@ -800,52 +801,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getLocation() instanceof Tile) {
             InGameController igc = getFreeColServer().getInGameController();
             igc.sendToOthers(player, unit.getTile());
-        }
-        return null;
-    }
-
-    /**
-     * Handles a "work"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param workElement The element containing the request.
-     */
-    private Element work(Connection connection, Element workElement) {
-        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        WorkLocation workLocation = (WorkLocation) getGame().getFreeColGameObject(workElement.getAttribute("workLocation"));
-        if (unit.getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (workLocation == null) {
-            throw new NullPointerException();
-        }
-        if (!workLocation.canAdd(unit)) {
-            throw new IllegalStateException("Can not add " + unit.toString()
-                                            + " to " + workLocation.toString() + "(" 
-                                            + workLocation.getId() + ")");
-        }
-        InGameController igc = getFreeColServer().getInGameController();
-        if (workLocation instanceof ColonyTile) {
-            Tile tile = ((ColonyTile) workLocation).getWorkTile();
-            Colony colony = workLocation.getColony();
-            if (tile.getOwningSettlement() != colony) {
-                // Claim known free land (because canAdd() succeeded).
-                igc.claimLand(serverPlayer, tile, colony, 0);
-            }
-        }
-
-        Location oldLocation = unit.getLocation();
-        unit.work(workLocation);
-        // For updating the number of colonist:
-        igc.sendToOthers(serverPlayer, unit.getTile());
-        // oldLocation is empty now
-        if (oldLocation instanceof ColonyTile) {
-            igc.sendToOthers(serverPlayer, ((ColonyTile) oldLocation).getWorkTile());
-        }
-        // workLocation is occupied now
-        if (workLocation instanceof ColonyTile) {
-            igc.sendToOthers(serverPlayer, ((ColonyTile) workLocation).getWorkTile());
         }
         return null;
     }

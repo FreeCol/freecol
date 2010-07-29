@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -91,6 +92,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
@@ -5273,14 +5275,31 @@ public final class InGameController extends Controller {
      * @param tile The <code>Tile</code> to claim.
      * @param settlement The <code>Settlement</code> to claim for.
      * @param price The price to pay for the land, which must agree
-     *              with the owner valuation, unless negative which
-     *              denotes stealing.
+     *     with the owner valuation, unless negative which denotes stealing.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element claimLand(ServerPlayer serverPlayer, Tile tile,
                              Settlement settlement, int price) {
         ChangeSet cs = new ChangeSet();
+        csClaimLand(serverPlayer, tile, settlement, price, cs);
 
+        // Others can see the tile.
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Claim land.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> claiming.
+     * @param tile The <code>Tile</code> to claim.
+     * @param settlement The <code>Settlement</code> to claim for.
+     * @param price The price to pay for the land, which must agree
+     *     with the owner valuation, unless negative which denotes stealing.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csClaimLand(ServerPlayer serverPlayer, Tile tile,
+                             Settlement settlement, int price, ChangeSet cs) {
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
         tile.setOwningSettlement(settlement);
@@ -5295,18 +5314,13 @@ public final class InGameController extends Controller {
             owner.modifyGold(price);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         } else if (price < 0 && owner.isIndian()) {
-            ((IndianSettlement) ownerSettlement).makeContactSettlement(serverPlayer);
+            IndianSettlement is = (IndianSettlement) ownerSettlement;
+            is.makeContactSettlement(serverPlayer);
             cs.add(See.only(null).perhaps(serverPlayer),
                    owner.modifyTension(serverPlayer,
-                                       Tension.TENSION_ADD_LAND_TAKEN,
-                                       (IndianSettlement) ownerSettlement));
+                                       Tension.TENSION_ADD_LAND_TAKEN, is));
         }
-
-        // Others can see the tile.
-        sendToOthers(serverPlayer, cs);
-        return cs.build(serverPlayer);
     }
-
 
     /**
      * Accept a diplomatic trade.
@@ -5541,6 +5555,39 @@ public final class InGameController extends Controller {
                                                 true, false);
         reply.appendChild(child);
         return reply;
+    }
+
+    /**
+     * Change work location.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to change the work location of.
+     * @param workLocation The <code>WorkLocation</code> to change to.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element work(ServerPlayer serverPlayer, Unit unit,
+                        WorkLocation workLocation) {
+        ChangeSet cs = new ChangeSet();
+
+        if (workLocation instanceof ColonyTile) {
+            Tile tile = ((ColonyTile) workLocation).getWorkTile();
+            Colony colony = workLocation.getColony();
+            if (tile.getOwningSettlement() != colony) {
+                // Claim known free land (because canAdd() succeeded).
+                csClaimLand(serverPlayer, tile, colony, 0, cs);
+            }
+        }
+
+        // Change the location.
+        Location oldLocation = unit.getLocation();
+        unit.setState(UnitState.IN_COLONY);
+        unit.setLocation(workLocation);
+        cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation(),
+               (FreeColGameObject) oldLocation);
+
+        // Others can see colony change size
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
     }
 
 }

@@ -1926,10 +1926,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *            to work.
      * @exception IllegalStateException If the <code>workLocation</code> is in
      *                another {@link Colony} than this <code>Unit</code>.
+     * Deprecated: should move to the server.  WorkMessage is implemented
+     *     but there are still lots of uses, mostly in the AI.
      */
     public void work(WorkLocation workLocation) {
-        //colonies will be the same if the unit is either on the tile of the colony
-        //or already working in one of the colonies WorkLocations.
+        // Colonies will be the same if the unit is either on the tile
+        // of the colony or already working in one of the colonies
+        // WorkLocations.
         if (workLocation.getColony() != this.getColony()) {
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is in the same 'Colony'.");
         }
@@ -1941,22 +1944,22 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Sets this <code>Unit</code> to work at this <code>TileImprovement</code>
-     * @param improvement a <code>TileImprovement</code> value
-     * @exception IllegalStateException If the <code>TileImprovement</code> is on
-     *                another {@link Tile} than this <code>Unit</code> or is not
-     *                a valid pioneer.
+     * Sets this unit to work at this TileImprovement.
+     *
+     * @param improvement The <code>TileImprovement</code> to work on.
+     * @exception IllegalStateException If the
+     *     <code>TileImprovement</code> is on another {@link Tile}
+     *     than this <code>Unit</code> or is not a valid pioneer.
      */
     public void work(TileImprovement improvement) {
-        
         if (!hasAbility("model.ability.improveTerrain")) {
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
-        } else if (improvement == null){
-            // TODO: Check whether and why improvement can be null here - possible bug in caller?
+        } else if (improvement == null) {
+            // TODO: Check whether and why improvement can be null
+            // here - possible bug in caller?
             throw new IllegalArgumentException("Improvement must not be 'null'.");
         } else {
             TileImprovementType impType = improvement.getType();
-
             // Is this a valid ImprovementType?
             if (impType == null) {
                 throw new IllegalArgumentException("ImprovementType must not be 'null'.");
@@ -1967,9 +1970,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 throw new IllegalArgumentException(impType + " not allowed on "
                                                    + getTile().getType());
             } else {
-                // TODO: This does not check if the tile (not TileType accepts the improvement)
-
-                // Check if there is an existing Improvement of this type
+                // TODO: This does not check if the tile (not TileType
+                // accepts the improvement).  Check if there is an
+                // existing Improvement of this type
                 TileImprovement oldImprovement = getTile().findTileImprovementType(impType);
                 if (oldImprovement == null) {
                     // No improvement found, check if worker can do it
