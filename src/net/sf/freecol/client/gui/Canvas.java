@@ -1478,7 +1478,7 @@ public final class Canvas extends JDesktopPane {
      * @param p The position of the tile to refresh.
      */
     public void refreshTile(Position p) {
-        if (gui.onScreen(p)) refreshTile(p.getX(), p.getY());
+        refreshTile(p.getX(), p.getY());
     }
 
     /**

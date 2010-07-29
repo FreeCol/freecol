@@ -548,7 +548,15 @@ public final class GUI {
                 if (!blinkingMarqueeEnabled) return;
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
                     //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
-                    theFreeColClient.getCanvas().refreshTile(getActiveUnit().getTile());            
+                    Tile tile = getActiveUnit().getTile();
+                    if (tile == null) return;
+                    Position pos = tile.getPosition();
+                    int x = pos.getX();
+                    int y = pos.getY();
+                    if (y >= topRow && y <= bottomRow
+                        && x >= leftColumn && x <= rightColumn) {
+                        freeColClient.getCanvas().refreshTile(x, y);
+                    }
                 }               
             }
         };
@@ -3027,14 +3035,10 @@ public final class GUI {
      * otherwise.
      */
     public boolean onScreen(int x, int y) {
-        if (bottomRow < 0) {
-            positionMap();
-            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 2 < rightColumn;
-        } else {
-            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 2 < rightColumn;
-        }
+        if (bottomRow < 0) positionMap();
+        return y - 2 > topRow && y + 4 < bottomRow
+            && x - 1 > leftColumn && x + 2 < rightColumn;
     }
-
 
     /**
      * Checks if the Tile/Units at the given coordinates are displayed
