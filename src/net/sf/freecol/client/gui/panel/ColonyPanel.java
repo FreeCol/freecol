@@ -41,10 +41,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -175,8 +173,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * The saved size of this panel.
      */
     private static Dimension savedSize = null;
-
-    private Map<String, UnitLabel> unitLabels = new HashMap<String, UnitLabel>();
 
 
     /**
@@ -924,15 +920,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         editable = (colony.getOwner() == getMyPlayer());
     }
 
-    private UnitLabel getUnitLabel(Unit unit) {
-        UnitLabel result = unitLabels.get(unit.getId());
-        if (result == null) {
-            result = new UnitLabel(unit, getCanvas());
-            unitLabels.put(unit.getId(), result);
-        }
-        return result;
-    }
-
     /**
      * This panel shows the content of a carrier in the colony
      */
@@ -1124,19 +1111,23 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public void initialize() {
             
             removeAll();
-            if (colony != null) {
-                Tile colonyTile = colony.getTile();
-                for (Unit unit : colonyTile.getUnitList()) {
-                    // we only deal with land, non-carrier units here
-                    if (!unit.isNaval() && !unit.isCarrier()) {
-                        UnitLabel unitLabel = getUnitLabel(unit);
-                        if (isEditable()) {
-                            unitLabel.setTransferHandler(defaultTransferHandler);
-                            unitLabel.addMouseListener(pressListener);
-                        }
-                        add(unitLabel, false);
-                    }
+            if (colony == null) {
+                return;
+            }
+
+            Tile colonyTile = colony.getTile();
+            for (Unit unit : colonyTile.getUnitList()) {
+            	// we only deal with land, non-carrier units here
+            	if(unit.isNaval() || unit.isCarrier()){
+            		continue;
+            	}
+
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                if (isEditable()) {
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
                 }
+                add(unitLabel, false);
             }
             revalidate();
             repaint();
@@ -1236,20 +1227,22 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             Tile colonyTile = colony.getTile();
             Unit lastCarrier = null;
             for (Unit unit : colonyTile.getUnitList()) {
-                if (unit.isCarrier()) {
-                    lastCarrier = unit;
-                    UnitLabel unitLabel = getUnitLabel(unit);
-                    TradeRoute tradeRoute = unit.getTradeRoute();
-                    if (tradeRoute != null) {
-                        unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))
-                                                      + " (" + tradeRoute.getName() + ")");
-                    }
-                    if (isEditable()) {
-                        unitLabel.setTransferHandler(defaultTransferHandler);
-                        unitLabel.addMouseListener(pressListener);
-                    }
-                    add(unitLabel, false);
+                if(!unit.isCarrier()){
+                    continue;
                 }
+                
+                lastCarrier = unit;
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                TradeRoute tradeRoute = unit.getTradeRoute();
+                if (tradeRoute != null) {
+                    unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))
+                                                  + " (" + tradeRoute.getName() + ")");
+                }
+                if (isEditable()) {
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
+                }
+                add(unitLabel, false);
             }
             revalidate();
             repaint();
@@ -1460,7 +1453,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 UnitLabel unitLabel = null;
                 if (colonyTile.getUnit() != null) {
                     Unit unit = colonyTile.getUnit();
-                    unitLabel = getUnitLabel(unit);
+                    unitLabel = new UnitLabel(unit, getCanvas());
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
