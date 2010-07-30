@@ -426,15 +426,15 @@ public final class InGameController extends Controller {
     /**
      * Remove a standard yearly amount of storable goods, and
      * a random extra amount of a random type.
-     * Send the market and change messages to the player.
-     * This method is public so it can be use in the Market test code.
      *
      * @param serverPlayer The <code>ServerPlayer</code> whose market
      *            is to be updated.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
-        ChangeSet cs = new ChangeSet();
-        List<GoodsType> goodsTypes = getGame().getSpecification().getGoodsTypeList();
+    private void csYearlyGoodsRemoval(ServerPlayer serverPlayer,
+                                      ChangeSet cs) {
+        List<GoodsType> goodsTypes = getGame().getSpecification()
+            .getGoodsTypeList();
         Market market = serverPlayer.getMarket();
 
         // Pick a random type of goods to remove an extra amount of.
@@ -464,6 +464,19 @@ public final class InGameController extends Controller {
 
         // Update the client
         cs.add(See.only(serverPlayer), market);
+    }
+
+    /**
+     * Public version of the yearly goods removal (public so it can be
+     * use in the Market test code).  Sends the market and change
+     * messages to the player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> whose market
+     *            is to be updated.
+     */
+    public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        csYearlyGoodsRemoval(serverPlayer, cs);
         sendElement(serverPlayer, cs);
     }
 
@@ -582,7 +595,7 @@ public final class InGameController extends Controller {
         if (newPlayer.isEuropean()) {
             csBombardEnemyShips(newPlayer, cs);
 
-            yearlyGoodsRemoval(newPlayer);
+            csYearlyGoodsRemoval(newPlayer, cs);
 
             if (newPlayer.getCurrentFather() == null
                 && newPlayer.getSettlements().size() > 0) {
@@ -1454,8 +1467,7 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%newNation%", serverPlayer.getNationName())
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
-        serverPlayer.setStance(refPlayer, Stance.WAR);
-        cs.addStance(See.perhaps(), serverPlayer, Stance.WAR, refPlayer);
+        csChangeStance(serverPlayer, Stance.WAR, refPlayer, false, cs);
 
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
@@ -2560,8 +2572,8 @@ public final class InGameController extends Controller {
 
                     // Now make the contact properly.
                     Player.makeContact(serverPlayer, other);
-                    cs.addStance(See.perhaps(), serverPlayer,
-                                 Stance.PEACE, other);
+                    csChangeStance(serverPlayer, Stance.PEACE, other, true,
+                                   cs);
                 }
                 if (welcomer != null) {
                     cs.addAttribute(See.only(serverPlayer), "welcome",
