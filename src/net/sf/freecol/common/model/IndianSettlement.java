@@ -199,6 +199,18 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Can this native settlement claim a tile?
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @return True if the settlement can claim this tile.
+     */
+    @Override
+    public boolean canClaimTile(Tile tile) {
+        // Natives can only claim land in Col1.
+        return (tile.isLand()) ? super.canClaimTile(tile) : false;
+    }
+
+    /**
      * Gets the name of this <code>Settlement</code> for a particular player.
      *
      * @param player A <code>Player</code> to return the name for.

@@ -598,6 +598,7 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
+      <downgrade unit="model.unit.undead" undead="true"/>
       <downgrade unit="model.unit.freeColonist"/>
       <consumes id="model.goods.food" value="2" />
       <consumes id="model.goods.bells" value="1" />

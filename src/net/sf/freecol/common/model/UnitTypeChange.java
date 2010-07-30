@@ -39,9 +39,20 @@ public class UnitTypeChange extends FreeColObject {
      */
     private UnitType newUnitType;
 
-    public static enum ChangeType { EDUCATION, NATIVES, EXPERIENCE,
-            LOST_CITY, PROMOTION, CREATION, ENTER_COLONY, INDEPENDENCE,
-            CLEAR_SKILL, DEMOTION, CAPTURE }
+    public static enum ChangeType {
+        EDUCATION,
+        NATIVES,
+        EXPERIENCE,
+        LOST_CITY,
+        PROMOTION,
+        CREATION,
+        ENTER_COLONY,
+        INDEPENDENCE,
+        CLEAR_SKILL,
+        DEMOTION,
+        CAPTURE,
+        UNDEAD
+    }
 
     public static final Map<ChangeType, String> tags =
         new EnumMap<ChangeType, String>(ChangeType.class);
@@ -58,6 +69,7 @@ public class UnitTypeChange extends FreeColObject {
         tags.put(ChangeType.CREATION, "creation");
         tags.put(ChangeType.ENTER_COLONY, "enterColony");
         tags.put(ChangeType.INDEPENDENCE, "independence");
+        tags.put(ChangeType.UNDEAD, "undead");
     }
 
     protected int turnsToLearn = 0;

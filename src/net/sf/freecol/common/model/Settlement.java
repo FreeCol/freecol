@@ -28,6 +28,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 import org.w3c.dom.Element;
 
@@ -241,10 +245,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @param tile The <code>Tile</code> to claim.
      * @return True if the settlement can claim this tile.
      */
-   private boolean canClaimTile(Tile tile) {
-        // Indian players do not own water tiles per Col1 rules
-        return (owner.isIndian() && !tile.isLand()) ? false
-            : (getTile().getDistanceTo(tile) > getRadius()) ? false
+    public boolean canClaimTile(Tile tile) {
+        return (getTile().getDistanceTo(tile) > getRadius()) ? false
             : tile.getOwner() == null
             || tile.getOwningSettlement() == null
             || tile.getOwningSettlement() == this;
@@ -254,31 +256,60 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * Claim ownership of a tile for this settlement.
      *
      * @param tile The <code>Tile</code> to claim.
+     * @return True if some aspect of the tile changed.
      */
-    public void claimTile(Tile tile) {
-        tile.setOwningSettlement(this);
-        tile.setOwner(owner);
-        tile.updatePlayerExploredTiles();
+    public boolean claimTile(Tile tile) {
+        boolean change = false;
+        if (tile.getOwningSettlement() != this) {
+            tile.setOwningSettlement(this);
+            change = true;
+        }
+        if (tile.getOwner() != owner) {
+            tile.setOwner(owner);
+            change = true;
+        }
+        if (change) {
+            tile.updatePlayerExploredTiles();
+        }
+        return change;
     }
 
     /**
-     * Claim and explore the surrounding tiles.
-     * Try to be as greedy as possible.
+     * Disclaim ownership of a tile for this settlement.
+     *
+     * @param tile The <code>Tile</code> to disclaim.
+     * @return True if some aspect of the tile changed.
      */
-    private void claimTiles() {
-        Tile settlementTile = getTile();
-
-        settlementTile.setOwningSettlement(this);
-        settlementTile.setOwner(owner);
-        owner.setExplored(settlementTile);
-        settlementTile.updatePlayerExploredTiles();
-        for (Tile tile : settlementTile.getSurroundingTiles(getRadius())) {
-            if (canClaimTile(tile)) {
-                claimTile(tile);
-            }
+    public boolean disclaimTile(Tile tile) {
+        if (tile.getOwningSettlement() == this) {
+            tile.setOwner(null);
+            tile.setOwningSettlement(null);
+            tile.updatePlayerExploredTiles();
+            return true;
         }
-        for (Tile tile : settlementTile.getSurroundingTiles(getLineOfSight())) {
-            owner.setExplored(tile);
+        return false;
+    }
+
+    /**
+     * Claims the surrounding tiles.
+     *
+     * @param greedy Try to be as greedy as possible.
+     */
+    private void claimTiles(boolean greedy) {
+        // Always claim the settlement tile no matter what
+        claimTile(tile);
+
+        // Claim suitable tiles, disclaim ones now owned but ineligible
+        Iterable<Tile> tiles = (greedy) ? tile.getSurroundingTiles(getRadius())
+            : getOwnedTiles();
+        for (Tile t : tiles) {
+            if (t != tile) {
+                if (canClaimTile(t)) {
+                    claimTile(t);
+                } else {
+                    disclaimTile(t);
+                }
+            }
         }
     }
 
@@ -286,8 +317,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * Put a prepared settlement onto the map.
      */
     public void placeSettlement() {
-        claimTiles();
+        claimTiles(true);
         tile.setSettlement(this);
+        for (Tile t : tile.getSurroundingTiles(getLineOfSight())) {
+            owner.setExplored(t);
+        }
         owner.invalidateCanSeeTiles();
     }
 
@@ -313,27 +347,39 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     /**
      * Change the owner of this <code>Settlement</code>.
      *
-     * @param owner The <code>Player</code> that shall own this
+     * @param newOwner The <code>Player</code> that shall own this
      *            <code>Settlement</code>.
      * @see #getOwner
      */
-    public void changeOwner(Player owner) {
+    public void changeOwner(Player newOwner) {
         Player oldOwner = this.owner;        
-        setOwner(owner);
+        setOwner(newOwner);
         
         if (oldOwner.hasSettlement(this)) {
             oldOwner.removeSettlement(this);
         }
-        if (!owner.hasSettlement(this)) {
-            owner.addSettlement(this);
+        if (!newOwner.hasSettlement(this)) {
+            newOwner.addSettlement(this);
         }
         
-        claimTiles();
+        List<Unit> units = getUnitList();
+        units.addAll(getTile().getUnitList());
+        for (Unit u : units) {
+            u.setState(UnitState.ACTIVE);
+            UnitType type = u.getTypeChange((newOwner.isUndead())
+                                            ? ChangeType.UNDEAD
+                                            : ChangeType.CAPTURE, newOwner);
+            if (type != null) u.setType(type);
+            u.setOwner(newOwner);
+        }
+
+        claimTiles(false);
         oldOwner.invalidateCanSeeTiles();
-        owner.invalidateCanSeeTiles();
+        newOwner.invalidateCanSeeTiles();
 
         if (getGame().getFreeColGameObjectListener() != null) {
-            getGame().getFreeColGameObjectListener().ownerChanged(this, oldOwner, owner);
+            getGame().getFreeColGameObjectListener()
+                .ownerChanged(this, oldOwner, newOwner);
         }
     }
 

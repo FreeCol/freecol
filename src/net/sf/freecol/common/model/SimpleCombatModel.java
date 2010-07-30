@@ -514,6 +514,7 @@ public class SimpleCombatModel extends CombatModel {
                                float r, List<CombatResult> crs) {
         Player loserPlayer = loser.getOwner();
         Tile tile = loser.getTile();
+        Player winnerPlayer = winner.getOwner();
         boolean attackerWon = crs.get(0) == CombatResult.WIN;
 
         if (loser.isNaval()) {
@@ -532,7 +533,6 @@ public class SimpleCombatModel extends CombatModel {
             }
 
         } else { // loser is land unit
-            Player winnerPlayer = winner.getOwner();
             Settlement settlement = tile.getSettlement();
             EquipmentType autoEquip = null;
             EquipmentType equip = null;
@@ -630,13 +630,13 @@ public class SimpleCombatModel extends CombatModel {
                         : CombatResult.LOSE_AUTOEQUIP);
 
             // Demote units with a demotion available.
-            } else if (loser.getTypeChange(ChangeType.DEMOTION) != null) {
+            } else if (loser.getTypeChange(ChangeType.DEMOTION, loserPlayer)
+                       != null) {
                 crs.add(CombatResult.DEMOTE_UNIT);
 
             // Capture suitable units if the winner is capable.
             } else if (loser.hasAbility("model.ability.canBeCaptured")
-                       && winner.hasAbility("model.ability.captureUnits")
-                       && loser.getCaptureType(winner) != null) {
+                       && winner.hasAbility("model.ability.captureUnits")) {
                 crs.add(CombatResult.CAPTURE_UNIT);
 
             // Final catch all is just to slaughter.
@@ -647,7 +647,8 @@ public class SimpleCombatModel extends CombatModel {
 
         // Promote great winners or with automatic promotion, if possible.
         if ((great || winner.hasAbility("model.ability.automaticPromotion"))
-            && winner.getTypeChange(ChangeType.PROMOTION) != null) {
+            && winner.getTypeChange(ChangeType.PROMOTION, winnerPlayer)
+            != null) {
             crs.add(CombatResult.PROMOTE_UNIT);
         }
     }

@@ -2510,11 +2510,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         } else {
             // ColonialRegulars only available after independence is declared
-            logger.warning(newUnitType + " is not available to " + owner.getPlayerType() +
-                           " player " + owner.getName());
+            logger.warning("Units of type: " + newUnitType
+                           + " are not available to " + owner.getPlayerType()
+                           + " player " + owner.getName());
         }
-
     }
+
 
     // TODO: make these go away, if possible, private if not
     public boolean isArmed() {
@@ -3597,36 +3598,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Get a type change for this unit.
      *
      * @param change The <code>ChangeType</code> to consider.
-     * @return The resulting new unit type.
+     * @param owner The <code>Player</code> to own this unit after a
+     *    change of type CAPTURE or UNDEAD.
+     * @return The resulting unit type or null if there is no change suitable.
      */
-    public UnitType getTypeChange(ChangeType change) {
-        return getType().getUnitTypeChange(change, getOwner());
-    }
-
-    /**
-     * Gets the type this unit should become when captured by a supplied unit.
-     *
-     * @param captor The capturing <code>Unit</code>.
-     * @return The <code>UnitType</code> to convert this unit to on capture,
-     *     or null if the unit can not be demoted to a type available to the
-     *     capturing player.
-     */
-    public UnitType getCaptureType(Unit captor) {
-        if (captor.isUndead()) return captor.getType(); // Undead just infect
-
-        // Demote all units
-        Player newOwner = captor.getOwner();
-        UnitType type = getType();
-        UnitType downgrade = type.getUnitTypeChange(ChangeType.CAPTURE,
-                                                    newOwner);
-        if (downgrade != null) type = downgrade;
-        // However, not all units might be available
-        while (!type.isAvailableTo(newOwner)) {
-            downgrade = type.getUnitTypeChange(ChangeType.DEMOTION, newOwner);
-            if (downgrade == null) return null; // Fail, have to kill.
-            type = downgrade;
-        }
-        return type;
+    public UnitType getTypeChange(ChangeType change, Player owner) {
+        return getType().getUnitTypeChange(change, owner);
     }
 
     /**

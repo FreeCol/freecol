@@ -371,44 +371,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Change the ownership of a settlement to that of a receiving unit.
-     *
-     * @param settlement The <code>Settlement</code> to change.
-     * @param unit The <code>Unit</code> that takes ownership.
-     */
-    public void changeSettlementOwner(Settlement settlement, Unit unit) {
-        Player newOwner = unit.getOwner();
-        Player oldOwner = settlement.getOwner();
-
-        settlement.changeOwner(newOwner);
-
-        List<Unit> units = settlement.getUnitList();
-        units.addAll(settlement.getTile().getUnitList());
-        for (Unit u : units) {
-            u.setState(UnitState.ACTIVE);
-            UnitType demote = u.getCaptureType(unit);
-            if (demote == null) {
-                // Dispose notification unnecessary, new owner has not
-                // seen this unit yet.
-                u.dispose();
-            } else {
-                u.setType(demote);
-                u.setOwner(newOwner);
-            }
-        }
-
-        if (settlement instanceof Colony) {
-            // Turn off exports
-            Specification spec = getGame().getSpecification();
-            for (GoodsType goodsType : spec.getGoodsTypeList()) {
-                ((Colony) settlement).getExportData(goodsType)
-                    .setExported(false);
-            }
-        }
-    }
-
-
-    /**
      * Ends the turn of the given player.
      * 
      * @param player The player to end the turn of.
@@ -1545,17 +1507,9 @@ public final class InGameController extends Controller {
         if (surrenderUnits.size() > 0) {
             StringTemplate surrender = StringTemplate.label(", ");
             for (Unit u : surrenderUnits) {
-                if (u.getType().hasAbility("model.ability.refUnit")) {
-                    // Make sure the independent player does not end
-                    // up owning any Kings Regulars!
-                    Unit captor = independent.getUnits().get(0);
-                    UnitType downgrade = u.getCaptureType(captor);
-                    if (downgrade == null) {
-                        cs.addDispose(serverPlayer, u.getLocation(), u);
-                        continue;
-                    }
-                    u.setType(downgrade);
-                }
+                UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
+                                                     independent);
+                if (downgrade != null) u.setType(downgrade);
                 u.setOwner(independent);
                 surrender.addStringTemplate(u.getLabel());
                 // Make sure the former owner is notified!
@@ -3424,33 +3378,22 @@ public final class InGameController extends Controller {
         cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
 
         // Hand over the colony
-        changeSettlementOwner(colony, attacker);
+        colony.changeOwner(attackerPlayer);
 
-        // Update colony tiles, former owner must see what happened.
-        csAddOtherSettlementTiles(attacker, colony, colonyPlayer, cs);
-    }
-
-    /**
-     * Add the tiles owned by a settlement to a ChangeSet, except
-     * the settlement tile and an attacker tile.
-     * Used when the settlement is about to change hands or be
-     * destroyed (and the attacker moves in, which is when the omitted
-     * tiles get updated).
-     *
-     * @pamam attacker The <code>Unit</code> that is attacking.
-     * @param settlement The <code>Settlement</code> under attack.
-     * @param former The <code>ServerPlayer</code> that used to own
-     *     the settlement.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private void csAddOtherSettlementTiles(Unit attacker,
-                                           Settlement settlement,
-                                           ServerPlayer former,
-                                           ChangeSet cs) {
-        List<Tile> tiles = settlement.getOwnedTiles();
-        tiles.remove(settlement.getTile());
-        tiles.remove(attacker.getTile());
-        for (Tile t : tiles) cs.add(See.perhaps().always(former), t);
+        // Process all the surrounding tiles
+        int radius = Math.max(colony.getRadius(), colony.getLineOfSight());
+        for (Tile t : colony.getTile().getSurroundingTiles(radius)) {
+            if (t == colony.getTile() || t == attacker.getTile()) {
+                ; // Will be updated when the attacker moves in
+            } else if (t.getOwningSettlement() == colony) {
+                // Tile changed owner
+                cs.add(See.perhaps().always(colonyPlayer), t);
+            } else if (!attackerPlayer.hasExplored(t)) {
+                // New owner has now explored within settlement line of sight.
+                attackerPlayer.setExplored(t);
+                cs.add(See.only(attackerPlayer), t);
+            }
+        }
     }
 
     /**
@@ -3561,10 +3504,12 @@ public final class InGameController extends Controller {
             .getLocationNameFor(winnerPlayer);
 
         // Capture the unit
+        UnitType type = loser.getTypeChange((winnerPlayer.isUndead())
+                                            ? ChangeType.UNDEAD
+                                            : ChangeType.CAPTURE, winnerPlayer);
+        if (type != null) loser.setType(type);
         loser.setOwner(winnerPlayer);
         loser.setLocation(winner.getTile());
-        UnitType downgrade = loser.getCaptureType(winner);
-        loser.setType(downgrade);
 
         // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),
@@ -3720,7 +3665,7 @@ public final class InGameController extends Controller {
         StringTemplate winnerLocation = winner.getLocation()
             .getLocationNameFor(winnerPlayer);
 
-        UnitType type = loser.getTypeChange(ChangeType.DEMOTION);
+        UnitType type = loser.getTypeChange(ChangeType.DEMOTION, loserPlayer);
         if (type == null || type == loser.getType()) {
             logger.warning("Demotion failed, type="
                            + ((type == null) ? "null"
@@ -3789,9 +3734,7 @@ public final class InGameController extends Controller {
         cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
 
         // Dispose of the colony and its contents.
-        // Update all formerly owned tiles.
-        csAddOtherSettlementTiles(attacker, colony, colonyPlayer, cs);
-        cs.addDispose(colonyPlayer, colony.getTile(), colony);
+        csDisposeSettlement(colony, cs);
     }
 
     /**
@@ -3812,8 +3755,7 @@ public final class InGameController extends Controller {
         String settlementName = settlement.getName();
 
         // Destroy the settlement, update settlement tiles.
-        csAddOtherSettlementTiles(attacker, settlement, nativePlayer, cs);
-        cs.addDispose(nativePlayer, settlement.getTile(), settlement);
+        csDisposeSettlement(settlement, cs);
 
         // Calculate the treasure amount.  Larger if Hernan Cortes is
         // present in the congress, from cities, and capitals.
@@ -3865,6 +3807,68 @@ public final class InGameController extends Controller {
                                            HistoryEvent.EventType.DESTROY_NATION)
                           .addStringTemplate("%nation%", nativeNation));
         }
+    }
+
+    /**
+     * Disposes of a settlement and reassign its tiles.
+     *
+     * @param settlement The <code>Settlement</code> under attack.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
+        ServerPlayer owner = (ServerPlayer) settlement.getOwner();
+        HashMap<Settlement, Integer> votes = new HashMap<Settlement, Integer>();
+
+        // Try to reassign the tiles
+        List<Tile> owned = settlement.getOwnedTiles();
+        while (!owned.isEmpty()) {
+            Tile tile = owned.remove(0);
+            votes.clear();
+            for (Tile t : tile.getSurroundingTiles(1)) {
+                // For each lost tile, find any neighbouring
+                // settlements and give them a shout at claiming the tile.
+                // Note that settlements now can own tiles outside
+                // their radius--- if we encounter any of these clean
+                // them up too.
+                Settlement s = t.getOwningSettlement();
+                if (s == null) {
+                    ;
+                } else if (s == settlement) {
+                    // Add this to the tiles to process if its not
+                    // there already.
+                    if (!owned.contains(t)) owned.add(t);
+                } else if (s.canClaimTile(t)) {
+                    // Weight claimant settlements:
+                    //   settlements owned by the same player
+                    //     > settlements owned by same type of player
+                    //     > other settlements
+                    int value = (s.getOwner() == owner) ? 3
+                        : (s.getOwner().isEuropean() == owner.isEuropean()) ? 2
+                        : 1;
+                    if (votes.get(s) != null) value += votes.get(s).intValue();
+                    votes.put(s, new Integer(value));
+                }
+            }
+            Settlement bestClaimant = null;
+            int bestClaim = 0;
+            for (Entry<Settlement, Integer> vote : votes.entrySet()) {
+                if (vote.getValue().intValue() > bestClaim) {
+                    bestClaimant = vote.getKey();
+                    bestClaim = vote.getValue().intValue();
+                }
+            }
+            if (bestClaimant == null) {
+                settlement.disclaimTile(tile);
+            } else {
+                bestClaimant.claimTile(tile);
+            }
+            if (tile != settlement.getTile()) {
+                cs.add(See.perhaps().always(owner), tile);
+            }
+        }
+
+        // Settlement goes away
+        cs.addDispose(owner, settlement.getTile(), settlement);
     }
 
     /**
@@ -4116,7 +4120,8 @@ public final class InGameController extends Controller {
         StringTemplate winnerNation = winnerPlayer.getNationName();
         StringTemplate oldName = winner.getLabel();
 
-        UnitType type = winner.getTypeChange(ChangeType.PROMOTION);
+        UnitType type = winner.getTypeChange(ChangeType.PROMOTION,
+                                             winnerPlayer);
         if (type == null || type == winner.getType()) {
             logger.warning("Promotion failed, type="
                            + ((type == null) ? "null"
@@ -5054,8 +5059,8 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
-        UnitType newType = unit.getType()
-            .getUnitTypeChange(ChangeType.CLEAR_SKILL, serverPlayer);
+        UnitType newType = unit.getTypeChange(ChangeType.CLEAR_SKILL,
+                                              serverPlayer);
         if (newType == null) {
             return Message.clientError("Can not clear unit speciality: "
                                        + unit.getId());
@@ -5388,7 +5393,7 @@ public final class InGameController extends Controller {
             Colony colony = tradeItem.getColony();
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
-                changeSettlementOwner(colony, unit);
+                colony.changeOwner(tradeItem.getDestination());
                 List<FreeColGameObject> tiles = new ArrayList<FreeColGameObject>();
                 tiles.addAll(colony.getOwnedTiles());
                 cs.add(See.perhaps().always(former), tiles);

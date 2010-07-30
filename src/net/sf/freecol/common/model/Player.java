@@ -993,6 +993,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Checks if this player is undead.
+     *
+     * @return True if this player is undead.
+     */
+    public boolean isUndead() {
+        return playerType == PlayerType.UNDEAD;
+    }
+
+    /**
      * Checks if this player is a "royal expeditionary force.
      *
      * @return <code>true</code> is the given nation is a royal expeditionary

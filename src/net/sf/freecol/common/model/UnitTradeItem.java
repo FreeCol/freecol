@@ -61,7 +61,8 @@ public class UnitTradeItem extends TradeItem {
      * @return a <code>boolean</code> value
      */
     public boolean isValid() {
-        return unit.getOwner() == getSource();
+        return unit.getOwner() == getSource()
+            && unit.getType().isAvailableTo(getDestination());
     }
 
     /**

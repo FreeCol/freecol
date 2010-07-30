@@ -434,22 +434,25 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     @Override
     public void changeOwner(Player owner) {
-        // TODO: Move to the server
         super.changeOwner(owner);
-        for (Unit unit : getUnitList()) {
-            unit.setOwner(owner);
-            if (unit.getLocation() instanceof ColonyTile) {
-                ((ColonyTile) unit.getLocation()).getWorkTile().setOwner(owner);
-            }
-        }
-        for (Unit target : tile.getUnitList()) {
-            target.setOwner(getOwner());
-        }
+        // Disable all exports
         for (ExportData exportDatum : exportData.values()) {
             exportDatum.setExported(false);
         }
         // Changing the owner might alter bonuses applied by founding fathers:
         updatePopulation(0);
+    }
+
+    /**
+     * Can this colony claim a tile?
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @return True if the colony can claim this tile.
+     */
+    @Override
+    public boolean canClaimTile(Tile tile) {
+        // Not if there is a rumour.
+        return (tile.hasLostCityRumour()) ? false : super.canClaimTile(tile);
     }
 
     /**
