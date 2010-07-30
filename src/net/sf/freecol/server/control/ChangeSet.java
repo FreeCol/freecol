@@ -795,6 +795,45 @@ public class ChangeSet {
     }
 
     /**
+     * Encapsulate trivial element, which will only have attributes apart
+     * from its name.
+     */
+    private static class TrivialChange extends Change {
+        String name;
+
+        /**
+         * Build a new TrivialChange.
+         *
+         * @param see The visibility of this change.
+         * @param name The name of the element.
+         */
+        TrivialChange(See vis, String name) {
+            super(vis);
+            this.name = name;
+        }
+
+        /**
+         * The sort priority.
+         *
+         * @return 4.  Later.
+         */
+        public int sortPriority() {
+            return 4;
+        }
+
+        /**
+         * Specialize a TrivialChange into an element with the supplied name.
+         *
+         * @param serverPlayer The <code>ServerPlayer</code> to update.
+         * @param doc The owner <code>Document</code>.
+         * @return An element.
+         */
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            return doc.createElement(name);
+        }
+    }
+
+    /**
      * Simple constructor.
      */
     ChangeSet() {
@@ -1005,6 +1044,18 @@ public class ChangeSet {
     public ChangeSet addStance(See see, Player first, Stance stance,
                                Player second) {
         changes.add(new StanceChange(see, first, stance, second));
+        return this;
+    }
+
+    /**
+     * Helper function to add a trivial element to a ChangeSet.
+     *
+     * @param see The visibility of this change.
+     * @param name The name of the element.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addTrivial(See see, String name) {
+        changes.add(new TrivialChange(see, name));
         return this;
     }
 
