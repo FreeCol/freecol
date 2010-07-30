@@ -67,11 +67,6 @@ public class MockModelController implements ModelController {
         return 0;
     }
 
-    public void setStance(Player first, Player second, Stance stance) {
-        // TODO Auto-generated method stub
-		
-    }
-
     public Location setToVacantEntryLocation(Unit unit) {
         // TODO Auto-generated method stub
         return null;

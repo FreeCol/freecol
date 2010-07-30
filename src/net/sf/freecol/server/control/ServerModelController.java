@@ -402,33 +402,6 @@ public class ServerModelController implements ModelController {
     }
 
     /**
-     * Updates stances.
-     * 
-     * @param first The first <code>Player</code>.
-     * @param second The second <code>Player</code>.
-     * @param stance The new stance.
-     */
-    public void setStance(Player first, Player second, Stance stance) {
-        Element element = Message.createNewRootElement("setStance");
-        element.setAttribute("stance", stance.toString());
-        element.setAttribute("first", first.getId());
-        element.setAttribute("second", second.getId());
-
-        Iterator<Player> enemyPlayerIterator = first.getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (!enemyPlayer.equals(first) && enemyPlayer.isConnected()) {
-                try {
-                    enemyPlayer.getConnection().send(element);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                            + enemyPlayer.getConnection());
-                }
-            }
-        }
-    }
-
-    /**
      * Sends an update of the given <code>Tile</code> to the other players.
      * 
      * @param newTile The <code>Tile</code> to be updated.

@@ -208,17 +208,6 @@ public class ClientModelController implements ModelController {
     }
 
     /**
-     * Updates stances.
-     * 
-     * @param first The first <code>Player</code>.
-     * @param second The second <code>Player</code>.
-     * @param stance The new stance.
-     */
-    public void setStance(Player first, Player second, Stance stance) {
-        // Nothing to do.
-    }
-
-    /**
      * Explores the given tiles for the given player.
      * 
      * @param player The <code>Player</code> that should see more tiles.

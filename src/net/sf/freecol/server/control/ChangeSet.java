@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -432,7 +433,7 @@ public class ChangeSet {
 
         /**
          * There are consequences to a move.  If the player can not
-         * vis the unit after the move, it should be removed.
+         * see the unit after the move, it should be removed.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
          * @return A RemoveChange if the unit disappears.
@@ -688,17 +689,48 @@ public class ChangeSet {
 
         /**
          * Should a player perhaps be notified of this stance change?
-         * Yes, if they are one of the players involved in the stance
-         * change, or it is a war.  TODO: more cases.
+         * Yes, if they are the player that initiated the change, the
+         * player the stance change applies to, or it is a war, or
+         * they have enhaced diplomacy reporting.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
          * @return True if the player should be notified.
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return (Player) serverPlayer == first
-                || (Player) serverPlayer == second
-                || stance == Stance.WAR;
+            return (ServerPlayer) first == serverPlayer
+                || (ServerPlayer) second == serverPlayer
+                || stance == Stance.WAR
+                || serverPlayer.hasAbility("model.ability.betterForeignAffairsReport");
+        }
+
+        /**
+         * There are consequences to a stance change.  If it is
+         * visible to a player they should see a message about it,
+         * unless they initiated the change and already know.
+         *
+         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @return A StringChange if there are messages to send.
+         */
+        @Override
+        public List<Change> consequences(ServerPlayer serverPlayer) {
+            List<Change> changes = new ArrayList<Change>();
+            if (!serverPlayer.isAI()
+                && (ServerPlayer) first != serverPlayer) {
+                String sta = stance.toString();
+                ModelMessage m = ((ServerPlayer) second == serverPlayer)
+                    ? new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                       "model.diplomacy." + sta + ".declared",
+                                       first)
+                        .addStringTemplate("%nation%", first.getNationName())
+                    : new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                       "model.diplomacy." + sta + ".others",
+                                       first)
+                        .addStringTemplate("%attacker%", first.getNationName())
+                        .addStringTemplate("%defender%", second.getNationName());
+                changes.add(new StringChange(See.only(serverPlayer), m));
+            }
+            return changes;
         }
 
         /**

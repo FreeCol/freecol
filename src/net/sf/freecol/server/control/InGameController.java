@@ -313,12 +313,16 @@ public final class InGameController extends Controller {
                                    ChangeSet cs) {
         boolean change = false;
         Stance old = player.getStance(otherPlayer);
-        int pmodifier = 0, omodifier = 0;
 
         if (old != stance) {
             try {
-                pmodifier = old.getTensionModifier(stance);
+                int modifier = old.getTensionModifier(stance);
                 player.setStance(otherPlayer, stance);
+                if (modifier != 0) {
+                    cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
+                           player.modifyTension(otherPlayer, modifier));
+                }
+                cs.addStance(See.perhaps(), player, stance, otherPlayer);
                 change = true;
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
@@ -326,31 +330,20 @@ public final class InGameController extends Controller {
         }
         if (symmetric && (old = otherPlayer.getStance(player)) != stance) {
             try {
-                omodifier = old.getTensionModifier(stance);
+                int modifier = old.getTensionModifier(stance);
                 otherPlayer.setStance(player, stance);
+                if (modifier != 0) {
+                    cs.add(See.only(null).perhaps((ServerPlayer) player),
+                           otherPlayer.modifyTension(player, modifier));
+                }
+                cs.addStance(See.perhaps(), otherPlayer, stance, player);
                 change = true;
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }
         }
 
-        // Stance changing players might see settlement alarm changes.
-        if (pmodifier != 0) {
-            cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
-                   player.modifyTension(otherPlayer, pmodifier));
-        }
-        if (omodifier != 0) {
-            cs.add(See.only(null).perhaps((ServerPlayer) player),
-                   otherPlayer.modifyTension(player, omodifier));
-        }
-
-        if (change) {
-            // Everyone might see the stance change if it meets the
-            // stance visibility criteria.
-            cs.addStance(See.perhaps(), player, stance, otherPlayer);
-            return true;
-        }
-        return false;
+        return change;
     }
 
     /**
@@ -3185,13 +3178,26 @@ public final class InGameController extends Controller {
                            true, cs);
             defenderPlayer.setTension(attackerPlayer,
                                       new Tension(Tension.SURRENDERED));
-        } else { // At least one player is native
-            if (result == CombatResult.WIN) {
-                attackerTension -= Tension.TENSION_ADD_MINOR;
-                defenderTension += Tension.TENSION_ADD_MINOR;
-            } else if (result == CombatResult.LOSE) {
-                attackerTension += Tension.TENSION_ADD_MINOR;
-                defenderTension -= Tension.TENSION_ADD_MINOR;
+        } else { // At least one player is non-European
+            if (attackerPlayer.isEuropean()) {
+                csChangeStance(attackerPlayer, Stance.WAR, defenderPlayer,
+                               false, cs);
+            } else if (attackerPlayer.isIndian()) {
+                if (result == CombatResult.WIN) {
+                    attackerTension -= Tension.TENSION_ADD_MINOR;
+                } else if (result == CombatResult.LOSE) {
+                    attackerTension += Tension.TENSION_ADD_MINOR;
+                }
+            }
+            if (defenderPlayer.isEuropean()) {
+                csChangeStance(defenderPlayer, Stance.WAR, attackerPlayer,
+                               false, cs);
+            } else if (defenderPlayer.isIndian()) {
+                if (result == CombatResult.WIN) {
+                    defenderTension += Tension.TENSION_ADD_MINOR;
+                } else if (result == CombatResult.LOSE) {
+                    defenderTension -= Tension.TENSION_ADD_MINOR;
+                }
             }
             if (attackerTension != 0) {
                 cs.add(See.only(null).perhaps(defenderPlayer),

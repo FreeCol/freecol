@@ -900,15 +900,6 @@ public final class InGameInputHandler extends InputHandler {
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
 
-        // Does this message involve this player and an other?
-        Player other = (player.equals(first)) ? second
-            : (player.equals(second)) ? first
-            : null;
-        // Prepare to ignore initial peaceful contacts as these are covered
-        // by `You meet the <nation> nation' message.
-        boolean firstContact = other != null && stance == Stance.PEACE
-            && player.getStance(other) == Stance.UNCONTACTED;
-
         try {
             first.setStance(second, stance);
         } catch (IllegalStateException e) {
@@ -916,34 +907,6 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        // Message processing follows.  The AI is not interested.
-        if (player.isAI()) return null;
-
-        ModelMessage m = null;
-        String sta = stance.toString().toLowerCase();
-        if (other == null) {
-            // If not, always inform about wars, always inform
-            // post-deWitt, generally inform if have met one of the
-            // nations involved.
-            if (stance == Stance.WAR
-                   || player.hasAbility("model.ability.betterForeignAffairsReport")
-                   || player.hasContacted(first)
-                   || player.hasContacted(second)) {
-                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                     "model.diplomacy." + sta + ".others",
-                                     first)
-                    .addStringTemplate("%attacker%", first.getNationName())
-                    .addStringTemplate("%defender%", second.getNationName());
-            }
-        } else {
-            if (!firstContact) {
-                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                     "model.diplomacy." + sta + ".declared",
-                                     first)
-                    .addStringTemplate("%nation%", other.getNationName());
-            }
-        }
-        if (m != null) player.addModelMessage(m);
         return null;
     }
 

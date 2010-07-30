@@ -107,15 +107,6 @@ public interface ModelController {
     public void tileImprovementFinished(Unit unit, TileImprovement improvement);
     
     /**
-     * Updates stances.
-     * @param first The first <code>Player</code>.
-     * @param second The second <code>Player</code>.
-     * @param stance The new stance.
-     */
-    public void setStance(Player first, Player second, Stance stance);
-    
-    
-    /**
     * Returns a pseudo-random int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
     * 
