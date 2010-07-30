@@ -61,6 +61,7 @@ public class DebugAction extends FreeColAction {
     public void actionPerformed(ActionEvent e) {
         if (shouldBeEnabled()) {
             freeColClient.getInGameController().setInDebugMode(true);
+            freeColClient.getConnectController().reconnect();
         }
     }
 }
