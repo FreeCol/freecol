@@ -309,7 +309,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         addMouseListener(new MouseAdapter() {});
 
         setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]",
-                                "[][][][][growprio 200,shrinkprio 10][growprio 150,shrinkprio 50]"));
+                                "[][]0[]0[][growprio 200,shrinkprio 10][growprio 150,shrinkprio 50]"));
 
         add(nameBox, "height 48:, grow");
         add(netProductionPanel, "growx");
@@ -423,7 +423,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         updateProductionPanel();
         updateSoLLabel();
 
-		constructionPanel.setColony(colony);
+        constructionPanel.setColony(colony);
         outsideColonyPanel.setColony(colony);
     }
 
@@ -459,20 +459,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                               Integer.toString(members));
         String royalistNumber = Messages.message("colonyPanel.royalistLabel", "%number%",
                                                  Integer.toString(population - members));
-        /*
-         * TODO : remove compatibility code sometime after 0.9.1
-         *
-         * The string templates were changed from percentages to
-         * absolute numbers shortly before 0.9.0, so that translators
-         * had no chance to catch up.
-         */
-        if (rebelNumber.endsWith("%")) {
-            rebelNumber = rebelNumber.substring(0, rebelNumber.length() - 1);
-        }
-        if (royalistNumber.endsWith("%")) {
-            royalistNumber = royalistNumber.substring(0, royalistNumber.length() - 1);
-        }
-        // end TODO
 
         popLabel.setText(Messages.message("colonyPanel.populationLabel", "%number%",
                                           Integer.toString(population)));
