@@ -73,7 +73,6 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -220,13 +219,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();
-        outsideColonyPanel.setLayout(new GridLayout(0, 8));
 
         inPortPanel = new InPortPanel();
-        inPortPanel.setLayout(new GridLayout(0, 2));
 
         warehousePanel = new WarehousePanel(this);
-        warehousePanel.setLayout(new GridLayout(1, 0));
 
         tilePanel = new TilePanel(this);
 
@@ -234,7 +230,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         cargoPanel = new ColonyCargoPanel(parent);
         cargoPanel.setParentPanel(this);
-        cargoPanel.setLayout(new GridLayout(1, 0));
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -244,9 +239,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                                           ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                           ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         outsideColonyScroll.getVerticalScrollBar().setUnitIncrement( 16 );
-        JScrollPane inPortScroll = new JScrollPane(inPortPanel,
-                                                   ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                   ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane inPortScroll = new JScrollPane(inPortPanel);
         inPortScroll.getVerticalScrollBar().setUnitIncrement( 16 );
         JScrollPane cargoScroll = new JScrollPane(cargoPanel,
                                                   ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -313,21 +306,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {
-            });
+        addMouseListener(new MouseAdapter() {});
 
-        setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]", "[][][][][growprio 200,shrinkprio 10][growprio 150,shrinkprio 50]"));
+        setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]",
+                                "[][][][][growprio 200,shrinkprio 10][growprio 150,shrinkprio 50]"));
 
         add(nameBox, "height 48:, grow");
         add(netProductionPanel, "growx");
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
-        add(constructionPanel, "growx, top");
-        add(inPortScroll, "split 2, grow, height 60:121:");
-        add(cargoScroll, "grow, height 60:121:");
-        add(outsideColonyScroll, "grow, height 60:121:");
-        add(warehouseScroll, "span, height 40:60:80, growx");
+        add(constructionPanel, "grow, top");
+        add(inPortScroll, "span, split 3, grow, sg, height 60:121:");
+        add(cargoScroll, "grow, sg, height 60:121:");
+        add(outsideColonyScroll, "grow, sg, height 60:121:");
+        add(warehouseScroll, "span, height 40:60:, growx");
         add(unloadButton, "span, split 5, align center");
         add(fillButton);
         add(warehouseButton);
@@ -927,6 +920,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         public ColonyCargoPanel(Canvas canvas) {
             super(canvas, true);
+            setLayout(new MigLayout("wrap 4, fill"));
         }
 
         @Override
@@ -949,7 +943,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new MigLayout("wrap 4, gap 0"));
+            setLayout(new MigLayout("fill, wrap 4, gap 0:10:10:push"));
             this.colonyPanel = colonyPanel;
         }
 
@@ -1092,7 +1086,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         private Colony colony;
 
         public OutsideColonyPanel() {
-            super();
+            super(new MigLayout("wrap 5, fill"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("outsideColony")));
         }
@@ -1199,7 +1193,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public final class InPortPanel extends JPanel {
 
         public InPortPanel() {
-            super();
+            super(new MigLayout("wrap 3, fill"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("inPort")));
         }
@@ -1242,7 +1236,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                 }
-                add(unitLabel, false);
+                add(unitLabel);
             }
             revalidate();
             repaint();
@@ -1272,6 +1266,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          */
         public WarehousePanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
+            setLayout(new MigLayout("fill, gap push"));
         }
 
         public void initialize() {
