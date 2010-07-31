@@ -2727,7 +2727,7 @@ public final class GUI {
     * @return The best breaking point or <code>-1</code> if there
     *         are none.
     */
-    public int getBreakingPoint(String string) {
+    public static int getBreakingPoint(String string) {
         int center = string.length() / 2;
         for (int offset = 0; offset < center; offset++) {
             if (string.charAt(center + offset) == ' ') {
