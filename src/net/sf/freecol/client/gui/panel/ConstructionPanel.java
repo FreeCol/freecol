@@ -64,7 +64,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     public ConstructionPanel(final Canvas parent, Colony colony) {
 
         this.parent = parent;
-        setLayout(new MigLayout("fill", "push[]10[]push", "[]"));
+        setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
         setColony(colony);
     }
 
@@ -105,14 +105,12 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             }
         } else {
             String turnsStr = GUI.getTurnsText(colony, buildable);
-            add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))));
+            add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))),
+                "spany");
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
-                                            "%buildable%", Messages.message(buildable.getNameKey()))),
-                "span, align center, flowy, split " + (2 + buildable.getGoodsRequired().size()));
+                                            "%buildable%", Messages.message(buildable.getNameKey()))));
 
-            add(new JLabel(Messages.message("turnsToComplete.long",
-                                            "%number%", turnsStr)),
-                "span, align center");
+            add(new JLabel(Messages.message("turnsToComplete.long", "%number%", turnsStr)));
 
             for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
                 int amountNeeded = requiredGoods.getAmount();
