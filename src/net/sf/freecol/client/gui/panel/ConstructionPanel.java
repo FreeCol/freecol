@@ -64,7 +64,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     public ConstructionPanel(final Canvas parent, Colony colony) {
 
         this.parent = parent;
-        setLayout(new MigLayout("fill", "push[]10[]push", "0[]0"));
+        setLayout(new MigLayout("fill", "push[]10[]push", "[]"));
         setColony(colony);
     }
 
@@ -93,8 +93,16 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
         removeAll();
 
         if (buildable == null) {
-            add(new JLabel(Messages.message(getDefaultLabel())),
-                "span, align center");
+            String clickToBuild = Messages.message(getDefaultLabel());
+            int breakingPoint = GUI.getBreakingPoint(clickToBuild);
+            if (breakingPoint > 0) {
+                add(new JLabel(clickToBuild.substring(0, breakingPoint)),
+                    "span, align center");
+                add(new JLabel(clickToBuild.substring(breakingPoint + 1)),
+                    "span, align center");
+            } else {
+                add(new JLabel(clickToBuild), "span, align center");
+            }
         } else {
             String turnsStr = GUI.getTurnsText(colony, buildable);
             add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))));
