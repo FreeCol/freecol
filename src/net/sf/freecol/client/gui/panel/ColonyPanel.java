@@ -111,17 +111,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private static final int EXIT = 0, BUILDQUEUE = 1, UNLOAD = 2, WAREHOUSE = 4, FILL = 5;
 
-    private final JLabel rebelShield = new JLabel();
-    private final JLabel rebelLabel = new JLabel();
-    private final JLabel bonusLabel = new JLabel();
-    private final JLabel royalistLabel = new JLabel();
-    private final JLabel royalistShield = new JLabel();
-    private final JLabel rebelMemberLabel = new JLabel();
-    private final JLabel popLabel = new JLabel();
-    private final JLabel royalistMemberLabel = new JLabel();
-
     private final JPanel netProductionPanel = new JPanel();
-    private final JPanel populationPanel = new PopulationPanel();
+    private final PopulationPanel populationPanel = new PopulationPanel();
 
     private final JComboBox nameBox;
 
@@ -356,10 +347,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public void initialize(final Colony colony, Unit preSelectedUnit) {
         setColony(colony);
 
-        rebelShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getId()
-                                                                   + ".coat-of-arms.image", 0.5)));
-        royalistShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getRefNation().getId()
-                                                                      + ".coat-of-arms.image", 0.5)));
         // Set listeners and transfer handlers
         outsideColonyPanel.removeMouseListener(releaseListener);
         inPortPanel.removeMouseListener(releaseListener);
@@ -399,7 +386,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         tilePanel.initialize();
 
         updateProductionPanel();
-        updateSoLLabel();
+        populationPanel.update();
 
         constructionPanel.setColony(colony);
         outsideColonyPanel.setColony(colony);
@@ -426,28 +413,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
     }
 
-    /**
-     * Updates the SoL membership label.
-     */
-    private void updateSoLLabel() {
-        int population = getColony().getUnitCount();
-        int members = getColony().getMembers();
-        int rebels = getColony().getSoL();
-        String rebelNumber = Messages.message("colonyPanel.rebelLabel", "%number%",
-                                              Integer.toString(members));
-        String royalistNumber = Messages.message("colonyPanel.royalistLabel", "%number%",
-                                                 Integer.toString(population - members));
-
-        popLabel.setText(Messages.message("colonyPanel.populationLabel", "%number%",
-                                          Integer.toString(population)));
-        rebelLabel.setText(rebelNumber);
-        rebelMemberLabel.setText(Integer.toString(rebels) + "%");
-        bonusLabel.setText(Messages.message("colonyPanel.bonusLabel", "%number%",
-                                            Integer.toString(getColony().getProductionBonus())));
-        royalistLabel.setText(royalistNumber);
-        royalistMemberLabel.setText(Integer.toString(getColony().getTory()) + "%");
-    }
-    
     public void updateInPortPanel() {
         inPortPanel.initialize(null);
     }
@@ -1043,6 +1008,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     public final class PopulationPanel extends JPanel {
 
+        private final JLabel rebelShield = new JLabel();
+        private final JLabel rebelLabel = new JLabel();
+        private final JLabel bonusLabel = new JLabel();
+        private final JLabel royalistLabel = new JLabel();
+        private final JLabel royalistShield = new JLabel();
+        private final JLabel rebelMemberLabel = new JLabel();
+        private final JLabel popLabel = new JLabel();
+        private final JLabel royalistMemberLabel = new JLabel();
+
         public PopulationPanel() {
             setOpaque(true);
             setToolTipText(" ");
@@ -1058,7 +1032,33 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             add(royalistShield, "bottom");
         }
 
-    public JToolTip createToolTip() {
+        public void update() {
+            int population = getColony().getUnitCount();
+            int members = getColony().getMembers();
+            int rebels = getColony().getSoL();
+            String rebelNumber = Messages.message("colonyPanel.rebelLabel", "%number%",
+                                                  Integer.toString(members));
+            String royalistNumber = Messages.message("colonyPanel.royalistLabel", "%number%",
+                                                     Integer.toString(population - members));
+
+            popLabel.setText(Messages.message("colonyPanel.populationLabel", "%number%",
+                                              Integer.toString(population)));
+            rebelLabel.setText(rebelNumber);
+            rebelMemberLabel.setText(Integer.toString(rebels) + "%");
+            bonusLabel.setText(Messages.message("colonyPanel.bonusLabel", "%number%",
+                                                Integer.toString(getColony().getProductionBonus())));
+            royalistLabel.setText(royalistNumber);
+            royalistMemberLabel.setText(Integer.toString(getColony().getTory()) + "%");
+            rebelShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getId()
+                                                                       + ".coat-of-arms.image", 0.5)));
+            royalistShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation()
+                                                                          .getRefNation().getId()
+                                                                          + ".coat-of-arms.image", 0.5)));
+            revalidate();
+            repaint();
+        }
+    
+        public JToolTip createToolTip() {
             return new RebelToolTip(colony, getCanvas());
         }
 
@@ -1652,13 +1652,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (Unit.CARGO_CHANGE.equals(property)) {
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
-            updateSoLLabel();
+            populationPanel.update();
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = getColony().checkForGovMgtChangeMessage();
             if (msg != null) {
                 getCanvas().showInformationMessage(msg);
             }
-            updateSoLLabel();
+            populationPanel.update();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
             FreeColGameObject object = (FreeColGameObject) e.getSource();
             String oldType = (String) e.getOldValue();
