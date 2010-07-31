@@ -121,16 +121,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private final JLabel royalistMemberLabel = new JLabel();
 
     private final JPanel netProductionPanel = new JPanel();
-    private final JPanel populationPanel = new JPanel() {
-            public JToolTip createToolTip() {
-                return new RebelToolTip(colony, getCanvas());
-            }
-
-            @Override
-            public String getUIClassID() {
-                return "PopulationPanelUI";
-            }
-        };
+    private final JPanel populationPanel = new PopulationPanel();
 
     private final JComboBox nameBox;
 
@@ -201,19 +192,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         SwingUtilities.replaceUIInputMap(fillButton, JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
 
         netProductionPanel.setOpaque(false);
-
-        populationPanel.setOpaque(true);
-        populationPanel.setToolTipText(" ");
-        populationPanel.setLayout(new MigLayout("wrap 5, fill, insets 0",
-                                                "[][]:push[center]:push[right][]", ""));
-        populationPanel.add(rebelShield, "bottom");
-        populationPanel.add(rebelLabel, "split 2, flowy");
-        populationPanel.add(rebelMemberLabel);
-        populationPanel.add(popLabel, "split 2, flowy");
-        populationPanel.add(bonusLabel);
-        populationPanel.add(royalistLabel, "split 2, flowy");
-        populationPanel.add(royalistMemberLabel);
-        populationPanel.add(royalistShield, "bottom");
 
         constructionPanel = new ConstructionPanel(parent, colony);
         constructionPanel.setOpaque(true);
@@ -1062,6 +1040,33 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         }
     }
+
+    public final class PopulationPanel extends JPanel {
+
+        public PopulationPanel() {
+            setOpaque(true);
+            setToolTipText(" ");
+            setLayout(new MigLayout("wrap 5, fill, insets 0",
+                                    "[][]:push[center]:push[right][]"));
+            add(rebelShield, "bottom");
+            add(rebelLabel, "split 2, flowy");
+            add(rebelMemberLabel);
+            add(popLabel, "split 2, flowy");
+            add(bonusLabel);
+            add(royalistLabel, "split 2, flowy");
+            add(royalistMemberLabel);
+            add(royalistShield, "bottom");
+        }
+
+    public JToolTip createToolTip() {
+            return new RebelToolTip(colony, getCanvas());
+        }
+
+        @Override
+        public String getUIClassID() {
+            return "PopulationPanelUI";
+        }
+    };
 
     /**
      * A panel that holds UnitLabels that represent Units that are standing in
