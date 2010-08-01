@@ -30,6 +30,7 @@ import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -64,7 +65,9 @@ import net.sf.freecol.client.gui.sound.SoundLibrary;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -173,6 +176,8 @@ public final class FreeColClient {
      */
     private boolean headless;
 
+    private Specification specification;
+
 
     /**
      * Creates a new <code>FreeColClient</code>. Creates the control objects
@@ -195,6 +200,28 @@ public final class FreeColClient {
         }
 
         headless = "true".equals(System.getProperty("java.awt.headless", "false"));
+
+        FreeColDataFile baseData = new FreeColDataFile(new File(FreeCol.getDataDirectory(), "base"));
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+
+         // TODO: fixme! Specification is not yet known at this point
+        final String tc = "freecol";
+   
+        FreeColTcFile tcData = new FreeColTcFile(tc);
+        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        
+        InputStream si = null;
+        try {
+            si = tcData.getSpecificationInputStream();
+            specification = new Specification(si);
+            si.close();
+        } catch (Exception e) {
+            System.err.println("Could not load specification.xml for: " + tc);
+            try {
+                si.close();
+            } catch (Exception ex) {}
+            System.exit(1);
+        }
 
         imageLibrary = new ImageLibrary();
 

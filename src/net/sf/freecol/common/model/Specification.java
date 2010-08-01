@@ -164,7 +164,7 @@ public final class Specification {
      * {@link #getSpecification()} which returns a singleton instance of the
      * Specification class.
      */
-    protected Specification(InputStream in) {
+    public Specification(InputStream in) {
         logger.info("Initializing Specification");
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,

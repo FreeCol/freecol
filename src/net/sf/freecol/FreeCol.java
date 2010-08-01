@@ -41,14 +41,11 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 
@@ -190,10 +187,6 @@ public final class FreeCol {
             System.exit(1);
         }
         
-        if (!initializeResourceFolders()) {
-            System.exit(1);
-        }
-
         if (standAloneServer) {
             startServer();
         } else {
@@ -458,29 +451,6 @@ public final class FreeCol {
     public static InputStream getSpecificationInputStream() throws IOException {
         final FreeColTcFile tcData = new FreeColTcFile(tc);
         return tcData.getSpecificationInputStream();
-    }
-    
-    public static boolean initializeResourceFolders() {
-        FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
-        FreeColTcFile tcData = new FreeColTcFile(tc);
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
-        
-        // This needs to be initialized before ImageLibrary
-        InputStream si = null;
-        try {
-            si = tcData.getSpecificationInputStream();
-            Specification.createSpecification(si);
-        } catch (IOException e) {
-            System.err.println("Could not load specification.xml for: " + tc);
-            return false;
-        } finally {
-            try {
-                si.close();
-            } catch (Exception e) {}
-        }
-
-        return true;
     }
 
     /**
@@ -861,18 +831,9 @@ public final class FreeCol {
                     xs = FreeColServer.createXMLStreamReader(fis);
                     final XMLStreamReader in = xs.getXMLStreamReader();
                     in.nextTag();
-                    final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer"));
-                    final boolean defaultPublicServer;
-                    final String publicServerStr =  in.getAttributeValue(null, "publicServer");
-                    if (publicServerStr != null) {
-                        defaultPublicServer = Boolean.valueOf(publicServerStr).booleanValue();
-                    } else {
-                        defaultPublicServer = false;
-                    }
                     xs.close();
                         
-                    freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer,
-                                                      serverPort, serverName);
+                    freeColServer = new FreeColServer(fis, serverPort, serverName);
                     if (checkIntegrity) {
                         String integrityCheckMsg = "";
                         boolean integrityOK = freeColServer.getIntegrity();
@@ -897,7 +858,7 @@ public final class FreeCol {
                 }
             } else {
                 try {
-                    freeColServer = new FreeColServer(publicServer, false, serverPort, serverName);
+                    freeColServer = new FreeColServer(tc, publicServer, false, serverPort, serverName);
                 } catch (NoRouteToServerException e) {
                     System.out.println(Messages.message("server.noRouteToServer"));
                     System.exit(1);

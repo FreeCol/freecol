@@ -35,79 +35,81 @@ import net.sf.freecol.server.control.PreGameController;
 
 public final class ServerTestHelper {
 
-  private static final String SERVER_NAME = "MyTestServer";
-  private static final int SERVER_PORT = FreeCol.getDefaultPort();
-  private static final String TEST_FILE = "test/data/test.fsg";
+    private static final String SERVER_NAME = "MyTestServer";
+    private static final int SERVER_PORT = FreeCol.getDefaultPort();
+    private static final String TEST_FILE = "test/data/test.fsg";
 
-  public static FreeColServer startServer(boolean publicServer, boolean singlePlayer) {
-    return startServer(publicServer, singlePlayer, SERVER_PORT, SERVER_NAME);
-  }
-
-  public static FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) {
-    FreeColServer server = null;
-    try {
-      server = new FreeColServer(publicServer, singleplayer, port, name);
-    } catch (NoRouteToServerException e) {
-      fail(e.getMessage());
-    } catch (IOException e) {
-      fail(e.getMessage());
+    public static FreeColServer startServer(boolean publicServer, boolean singlePlayer) {
+        return startServer(publicServer, singlePlayer, SERVER_PORT, SERVER_NAME);
     }
-    assertNotNull(server);
-    assertEquals(FreeColServer.GameState.STARTING_GAME, server.getGameState());
-    return server;
-  }
 
-  public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer) {
-    return startServer(file, publicServer, singleplayer, SERVER_PORT, SERVER_NAME);
-  }
-
-  public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer, int port, String name) {
-    FreeColServer server = null;
-    try {
-      server = new FreeColServer(new FreeColSavegameFile(file), publicServer, singleplayer, port, name);
-    } catch (NoRouteToServerException e) {
-      fail(e.getMessage());
-    } catch (FreeColException e) {
-      fail(e.getMessage());
-    } catch (IOException e) {
-      fail(e.getMessage());
+    public static FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) {
+        // TODO: fixme! Pass tc
+        String tc = "freecol";
+        FreeColServer server = null;
+        try {
+            server = new FreeColServer(tc, publicServer, singleplayer, port, name);
+        } catch (NoRouteToServerException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+        assertNotNull(server);
+        assertEquals(FreeColServer.GameState.STARTING_GAME, server.getGameState());
+        return server;
     }
-    assertNotNull(server);
-    assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
-    return server;
-  }
 
-  public static File createRandomSaveGame() {
-    // start a server
-    FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
-
-    // generate a random map
-    Controller c = server.getController();
-    assertNotNull(c);
-    assertTrue(c instanceof PreGameController);
-    PreGameController pgc = (PreGameController) c;
-    try {
-      pgc.startGame();
-    } catch (FreeColException e) {
-      fail();
+    public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer) {
+        return startServer(file, publicServer, singleplayer, SERVER_PORT, SERVER_NAME);
     }
-    assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
-    assertNotNull(server.getGame());
-    assertNotNull(server.getGame().getMap());
 
-    // save the game as a file
-    File file = new File(TEST_FILE);
-    try {
-      server.saveGame(file, "user");
-    } catch (IOException e) {
-      fail(e.toString());
+    public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer, int port, String name) {
+        FreeColServer server = null;
+        try {
+            server = new FreeColServer(new FreeColSavegameFile(file), port, name);
+        } catch (NoRouteToServerException e) {
+            fail(e.getMessage());
+        } catch (FreeColException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+        assertNotNull(server);
+        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
+        return server;
     }
-    assertTrue(file.exists());
 
-    stopServer(server);
+    public static File createRandomSaveGame() {
+        // start a server
+        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
 
-    return file;
-  }
+        // generate a random map
+        Controller c = server.getController();
+        assertNotNull(c);
+        assertTrue(c instanceof PreGameController);
+        PreGameController pgc = (PreGameController) c;
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail();
+        }
+        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
+        assertNotNull(server.getGame());
+        assertNotNull(server.getGame().getMap());
+
+        // save the game as a file
+        File file = new File(TEST_FILE);
+        try {
+            server.saveGame(file, "user");
+        } catch (IOException e) {
+            fail(e.toString());
+        }
+        assertTrue(file.exists());
+
+        stopServer(server);
+
+        return file;
+    }
 
     public static void stopServer(FreeColServer server) {
         // stop the server

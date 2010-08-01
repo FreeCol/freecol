@@ -56,8 +56,10 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -168,6 +170,8 @@ public final class FreeColServer {
     /** Did the integrity check succeed */
     private boolean integrity = false;
 
+    private Specification specification;
+
     /**
      * The high scores on this server.
      */
@@ -200,18 +204,32 @@ public final class FreeColServer {
      *             will be logged by this class).
      * 
      */
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name)
+    public FreeColServer(String tc, boolean publicServer, boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(publicServer, singleplayer, port, name, NationOptions.getDefaults(), null);
+        this(tc, publicServer, singleplayer, port, name, NationOptions.getDefaults(), null);
     }
 
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name,
+    public FreeColServer(String tc, boolean publicServer, boolean singleplayer, int port, String name,
                          NationOptions nationOptions, DifficultyLevel level)
         throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
+
+        FreeColTcFile tcData = new FreeColTcFile(tc);
+        InputStream si = null;
+        try {
+            si = tcData.getSpecificationInputStream();
+            specification = new Specification(si);
+            si.close();
+        } catch (IOException e) {
+            System.err.println("Could not load specification.xml for: " + tc);
+            try {
+                si.close();
+            } catch (Exception ex) {}
+            System.exit(1);
+        }
 
         modelController = new ServerModelController(this);
         game = new ServerGame(modelController);
@@ -244,27 +262,20 @@ public final class FreeColServer {
      * 
      * @param savegame The file where the game data is located.
      * 
-     * @param publicServer This value should be set to <code>true</code> in
-     *            order to appear on the meta server's listing.
-     * 
-     * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
-     *            multiplayer (if <i>false</i>).
      * @param port The TCP port to use for the public socket. That is the port
      *            the clients will connect to.
      * 
      * @param name The name of the server, or <code>null</code> if the default
      *            name should be used.
      * 
-     * @throws IOException if the public socket cannot be created (the exception
+     * @exception IOException if the public socket cannot be created (the exception
      *             will be logged by this class).
      * 
-     * @throws FreeColException if the savegame could not be loaded.
+     * @exception FreeColException if the savegame could not be loaded.
+     * @exception NoRouteToServerException if an error occurs
      */
-    public FreeColServer(final FreeColSavegameFile savegame, boolean publicServer, 
-                         boolean singleplayer, int port, String name)
+    public FreeColServer(final FreeColSavegameFile savegame, int port, String name)
         throws IOException, FreeColException, NoRouteToServerException {
-        this.publicServer = publicServer;
-        this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
         //this.nationOptions = nationOptions;
@@ -694,6 +705,8 @@ public final class FreeColServer {
             xsr.nextTag();
             
             checkSavegameVersion(xsr);
+            singleplayer = FreeColObject.getAttribute(xsr, "singleplayer", true);
+            publicServer =  FreeColObject.getAttribute(xsr, "publicServer", false);
             
             String randomState = xsr.getAttributeValue(null, "randomState");
             if (randomState != null && randomState.length() > 0) {

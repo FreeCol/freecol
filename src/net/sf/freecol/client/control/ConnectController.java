@@ -86,13 +86,13 @@ public final class ConnectController {
     /**
      * Starts a multiplayer server and connects to it.
      *
-     * @param publicServer Should this server be listed at the meta server.
+     * @param tc a <code>String</code> value
      * @param username The name to use when logging in.
      * @param port The port in which the server should listen for new clients.
      * @param nationOptions a <code>NationOptions</code> value
      * @param level a <code>DifficultyLevel</code> value
      */
-    public void startMultiplayerGame(boolean publicServer, String username, int port,
+    public void startMultiplayerGame(String tc, boolean publicServer, String username, int port,
                                      NationOptions nationOptions, DifficultyLevel level) {
 
         freeColClient.setMapEditor(false);
@@ -113,7 +113,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null, nationOptions, level);
+            FreeColServer freeColServer = new FreeColServer(tc, publicServer, false, port, null, nationOptions, level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             freeColClient.getCanvas().errorMessage("server.noRouteToServer");
@@ -130,11 +130,12 @@ public final class ConnectController {
     /**
      * Starts a new singleplayer game by connecting to the server.
      *
+     * @param tc a <code>String</code> value
      * @param username The name to use when logging in.
      * @param nationOptions a <code>NationOptions</code> value
      * @param level a <code>DifficultyLevel</code> value
      */
-    public void startSingleplayerGame(String username, NationOptions nationOptions,
+    public void startSingleplayerGame(String tc, String username, NationOptions nationOptions,
                                       DifficultyLevel level) {
 
         freeColClient.setMapEditor(false);
@@ -158,7 +159,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(false, true, port, null, nationOptions, level);
+            FreeColServer freeColServer = new FreeColServer(tc, false, true, port, null, nationOptions, level);
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
                 freeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
             }
@@ -356,7 +357,7 @@ public final class ConnectController {
         final File theFile = file;
 
         freeColClient.setMapEditor(false);
-        
+
         class ErrorJob implements Runnable {
             private final  String  message;
             ErrorJob( String message ) {
@@ -440,7 +441,7 @@ public final class ConnectController {
                 FreeColServer freeColServer = null;
                 try {
                     final FreeColSavegameFile savegame = new FreeColSavegameFile(theFile);
-                    freeColServer = new FreeColServer(savegame, publicServer, singleplayer, port, name);
+                    freeColServer = new FreeColServer(savegame, port, name);
                     freeColClient.setFreeColServer(freeColServer);
                     final String username = freeColServer.getOwner();
                     freeColClient.setSingleplayer(singleplayer);

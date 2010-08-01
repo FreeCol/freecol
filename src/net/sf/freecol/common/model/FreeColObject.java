@@ -541,7 +541,7 @@ public abstract class FreeColObject {
      * @param defaultValue a <code>boolean</code> value
      * @return an <code>boolean</code> value
      */
-    public boolean getAttribute(XMLStreamReader in, String attributeName, boolean defaultValue) {
+    public static boolean getAttribute(XMLStreamReader in, String attributeName, boolean defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);
         if (attributeString != null) {
             return Boolean.parseBoolean(attributeString);

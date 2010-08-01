@@ -220,6 +220,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
+        final String tc = (String) specificationBox.getSelectedItem();
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
@@ -230,7 +231,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
-                    connectController.startSingleplayerGame(name.getText(), nationOptions, level);
+                    connectController.startSingleplayerGame(tc, name.getText(), nationOptions, level);
                     // getFilename(), getDifficulty());
                     break;
                 case JOIN:
@@ -248,7 +249,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         nationOptions = NationOptions.getDefaults();
                         nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                         level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
-                        connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(),
+                        connectController.startMultiplayerGame(tc, publicServer.isSelected(), name.getText(),
                                                                port, nationOptions, level);
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
