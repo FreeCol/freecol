@@ -44,9 +44,8 @@ public class ActionManager extends OptionGroup {
      * Creates a new <code>ActionManager</code>.
      * 
      * @param freeColClient The main client controller.
-     * @param specification a <code>Specification</code> value
      */
-    public ActionManager(FreeColClient freeColClient, Specification specification) {
+    public ActionManager(FreeColClient freeColClient) {
         super("actionManager");
 
         this.freeColClient = freeColClient;
@@ -88,11 +87,6 @@ public class ActionManager extends OptionGroup {
         add(new FortifyAction(freeColClient));
         add(new GotoAction(freeColClient));
         add(new GotoTileAction(freeColClient));
-        // Initialize ImprovementActions
-        for (ImprovementActionType ia : Specification.getSpecification()
-                 .getImprovementActionTypeList()) {
-            add(new ImprovementAction(freeColClient, ia));
-        }
         add(new LoadAction(freeColClient));
         add(new MapControlsAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));
@@ -141,6 +135,19 @@ public class ActionManager extends OptionGroup {
         add(new WaitAction(freeColClient));
         add(new ZoomInAction(freeColClient));
         add(new ZoomOutAction(freeColClient));
+    }
+
+    /**
+     * Describe <code>addSpecificationActions</code> method here.
+     *
+     * @param specification a <code>Specification</code> value
+     */
+    public void addSpecificationActions(Specification specification) {
+        // Initialize ImprovementActions
+        for (ImprovementActionType ia : Specification.getSpecification()
+                 .getImprovementActionTypeList()) {
+            add(new ImprovementAction(freeColClient, ia));
+        }
     }
 
     /**
