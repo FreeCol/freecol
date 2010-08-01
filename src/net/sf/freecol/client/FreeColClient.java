@@ -288,6 +288,8 @@ public final class FreeColClient {
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();
+            // TODO: fixme! This should happen after specification is loaded!
+            actionManager.addSpecificationActions(Specification.getSpecification());
         }
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
