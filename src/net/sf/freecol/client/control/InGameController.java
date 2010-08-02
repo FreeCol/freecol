@@ -3837,20 +3837,24 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("tileHasRumour");
             return;
         }
+        Colony colony = workLocation.getColony();
         if ((tile.getOwner() != unit.getOwner()
-             || tile.getOwningSettlement() != workLocation.getColony())
-            && !claimLand(tile, workLocation.getColony(), 0)) {
+             || tile.getOwningSettlement() != colony)
+            && !claimLand(tile, colony, 0)) {
             logger.warning("Unit " + unit.getId()
                            + " is unable to claim tile " + tile.toString());
             return;
         }
 
         // Try to change the work location.
-        FreeColGameObject old = (FreeColGameObject) unit.getLocation();
+        FreeColGameObject oldLoc = (FreeColGameObject) unit.getLocation();
+        int oldPop = colony.getUnitCount();
         if (askWork(unit, workLocation)) {
-            FreeColGameObject work = (FreeColGameObject) workLocation;
-            old.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
-            work.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+            int newPop = colony.getUnitCount();
+            if (oldPop != newPop) colony.updatePopulation(newPop - oldPop);
+            FreeColGameObject newLoc = (FreeColGameObject) workLocation;
+            oldLoc.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
+            newLoc.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
         }
     }
 
