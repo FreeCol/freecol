@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -220,7 +221,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        final String tc = (String) specificationBox.getSelectedItem();
+        final String tc = ((String) specificationBox.getSelectedItem()).toLowerCase(Locale.US);
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
