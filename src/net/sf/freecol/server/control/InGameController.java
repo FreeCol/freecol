@@ -738,15 +738,13 @@ public final class InGameController extends Controller {
                 }
             }
             for (ServerPlayer other : natives) {
-                for (IndianSettlement s : other.getIndianSettlements()) {
+                for (IndianSettlement s : other.getIndianSettlementsWithMission(serverPlayer)) {
                     Unit unit = s.getMissionary();
-                    if (unit != null && unit.getOwner() == serverPlayer) {
-                        s.setMissionary(null);
-                        cs.addDispose(serverPlayer, s.getTile(), unit);
-                        cs.add(See.perhaps(), s.getTile());
-                        for (ServerPlayer euro : europeans) {
-                            s.getTile().updatePlayerExploredTile(euro);
-                        }
+                    s.setMissionary(null);
+                    cs.addDispose(serverPlayer, s.getTile(), unit);
+                    cs.add(See.perhaps(), s.getTile());
+                    for (ServerPlayer euro : europeans) {
+                        s.getTile().updatePlayerExploredTile(euro);
                     }
                 }
             }
