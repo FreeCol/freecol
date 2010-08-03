@@ -49,6 +49,28 @@ import org.w3c.dom.Element;
  * Changes to be sent to the client.
  */
 public class ChangeSet {
+
+    // Convenient way to specify the relative priorities of the fixed
+    // change types in one place.
+    private static enum ChangePriority {
+        CHANGE_ATTRIBUTE(-1), // N/A
+        CHANGE_ANIMATION(0),  // Do animations first
+        CHANGE_REMOVE(100),   // Do removes last
+        CHANGE_STANCE(5),     // Do stance before updates
+        CHANGE_STRING(20),    // Do string changes after updates
+        CHANGE_UPDATE(10);    // There are a lot of updates
+
+        private int level;
+
+        ChangePriority(int level) {
+            this.level = level;
+        }
+
+        public int getPriority() {
+            return level;
+        }
+    }
+
     private ArrayList<Change> changes;
 
     private static Comparator<Change> changeComparator
@@ -227,10 +249,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 0.  Animations are first.
+         * @return "CHANGE_ANIMATION".
          */
         public int sortPriority() {
-            return 0;
+            return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
 
         /**
@@ -294,10 +316,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return -1, attributes are special.
+         * @return "CHANGE_ATTRIBUTE", attributes are special.
          */
         public int sortPriority() {
-            return -1;
+            return ChangePriority.CHANGE_ATTRIBUTE.getPriority();
         }
 
         /**
@@ -330,47 +352,6 @@ public class ChangeSet {
         @Override
             public void attachToElement(Element element) {
             element.setAttribute(key, value);
-        }
-    }
-
-    /**
-     * Encapsulate a setDead event.
-     */
-    private static class DeadChange extends Change {
-        private Player player;
-
-        /**
-         * Build a new DeadChange.
-         *
-         * @param see The visibility of this change.
-         * @param player The <code>Player</code> to kill.
-         */
-        DeadChange(See vis, Player player) {
-            super(vis);
-            this.player = player;
-        }
-
-        /**
-         * The sort priority.
-         *
-         * @return 1.  Right after the animations.
-         */
-        public int sortPriority() {
-            return 1;
-        }
-
-        /**
-         * Specialize a DeadChange into an "setDead" element for a
-         * particular player.
-         *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
-         * @return A "setDead" element.
-         */
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("setDead");
-            element.setAttribute("player", player.getId());
-            return element;
         }
     }
 
@@ -414,10 +395,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 0.  Animations are first.
+         * @return "CHANGE_ANIMATION"
          */
         public int sortPriority() {
-            return 0;
+            return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
 
         /**
@@ -496,10 +477,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 2.  Vanilla update.
+         * @return "CHANGE_UPDATE"
          */
         public int sortPriority() {
-            return 2;
+            return ChangePriority.CHANGE_UPDATE.getPriority();
         }
 
         /**
@@ -558,10 +539,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 2.  Special update, but still an update.
+         * @return CHANGE_UPDATE.  Special update, but still an update.
          */
         public int sortPriority() {
-            return 2;
+            return ChangePriority.CHANGE_UPDATE.getPriority();
         }
 
         /**
@@ -614,10 +595,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 100.  Removes are last.
+         * @return "CHANGE_REMOVE"
          */
         public int sortPriority() {
-            return 100;
+            return ChangePriority.CHANGE_REMOVE.getPriority();
         }
 
         /**
@@ -681,10 +662,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 1.  Before the updates.
+         * @return "CHANGE_STANCE"
          */
         public int sortPriority() {
-            return 1;
+            return ChangePriority.CHANGE_STANCE.getPriority();
         }
 
         /**
@@ -770,10 +751,10 @@ public class ChangeSet {
         /**
          * The sort priority.
          *
-         * @return 3.  Messages and history are after the updates.
+         * @return "CHANGE_STRING"
          */
         public int sortPriority() {
-            return 3;
+            return ChangePriority.CHANGE_STRING.getPriority();
         }
 
         /**
@@ -799,26 +780,34 @@ public class ChangeSet {
      * from its name.
      */
     private static class TrivialChange extends Change {
+        int priority;
         String name;
+        String[] attributes;
 
         /**
          * Build a new TrivialChange.
          *
          * @param see The visibility of this change.
          * @param name The name of the element.
+         * @param priority The sort priority of this change.
          */
-        TrivialChange(See vis, String name) {
+        TrivialChange(See vis, String name, int priority, String[] attributes) {
             super(vis);
+            if ((attributes.length & 1) == 1) {
+                throw new IllegalArgumentException("Attributes must be even sized");
+            }
             this.name = name;
+            this.priority = priority;
+            this.attributes = attributes;
         }
 
         /**
          * The sort priority.
          *
-         * @return 4.  Later.
+         * @return priority.
          */
         public int sortPriority() {
-            return 4;
+            return priority;
         }
 
         /**
@@ -829,7 +818,11 @@ public class ChangeSet {
          * @return An element.
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return doc.createElement(name);
+            Element element = doc.createElement(name);
+            for (int i = 0; i < attributes.length; i += 2) {
+                element.setAttribute(attributes[i], attributes[i+1]);
+            }
+            return element;
         }
     }
 
@@ -916,7 +909,7 @@ public class ChangeSet {
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addDead(ServerPlayer serverPlayer) {
-        changes.add(new DeadChange(See.all(), serverPlayer));
+        addTrivial(See.all(), "setDead", 1, "player", serverPlayer.getId());
         return this;
     }
 
@@ -1052,10 +1045,13 @@ public class ChangeSet {
      *
      * @param see The visibility of this change.
      * @param name The name of the element.
+     * @param priority The sort priority for this change.
+     * @param attributes Attributes to add to this trivial change.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addTrivial(See see, String name) {
-        changes.add(new TrivialChange(see, name));
+    public ChangeSet addTrivial(See see, String name, int priority,
+                                String... attributes) {
+        changes.add(new TrivialChange(see, name, priority, attributes));
         return this;
     }
 
