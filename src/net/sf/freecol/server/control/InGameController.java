@@ -298,70 +298,6 @@ public final class InGameController extends Controller {
         return null;
     }
 
-    /**
-     * Change stance and collect changes that need updating.
-     *
-     * @param player The originating <code>Player</code>.
-     * @param stance The new <code>Stance</code>.
-     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
-     * @param symmetric If true, change the otherPlayer stance as well.
-     * @param cs A <code>ChangeSet</code> containing the changes.
-     * @return True if there was a change in stance at all.
-     */
-    private boolean csChangeStance(Player player, Stance stance,
-                                   Player otherPlayer, boolean symmetric,
-                                   ChangeSet cs) {
-        boolean change = false;
-        Stance old = player.getStance(otherPlayer);
-
-        if (old != stance) {
-            try {
-                int modifier = old.getTensionModifier(stance);
-                player.setStance(otherPlayer, stance);
-                if (modifier != 0) {
-                    cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
-                           player.modifyTension(otherPlayer, modifier));
-                }
-                cs.addStance(See.perhaps(), player, stance, otherPlayer);
-                change = true;
-            } catch (IllegalStateException e) { // Catch illegal transitions
-                logger.log(Level.WARNING, "Illegal stance transition", e);
-            }
-        }
-        if (symmetric && (old = otherPlayer.getStance(player)) != stance) {
-            try {
-                int modifier = old.getTensionModifier(stance);
-                otherPlayer.setStance(player, stance);
-                if (modifier != 0) {
-                    cs.add(See.only(null).perhaps((ServerPlayer) player),
-                           otherPlayer.modifyTension(player, modifier));
-                }
-                cs.addStance(See.perhaps(), otherPlayer, stance, player);
-                change = true;
-            } catch (IllegalStateException e) { // Catch illegal transitions
-                logger.log(Level.WARNING, "Illegal stance transition", e);
-            }
-        }
-
-        return change;
-    }
-
-    /**
-     * Change stance and inform all but the originating player.
-     *
-     * @param player The originating <code>Player</code>.
-     * @param stance The new <code>Stance</code>.
-     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
-     * @param symmetric If true, change the otherPlayer stance as well.
-     * @return A <code>ChangeSet</code> encapsulating the resulting changes.
-     */
-    public void changeStance(Player player, Stance stance,
-                             Player otherPlayer, boolean symmetric) {
-        ChangeSet cs = new ChangeSet();
-        if (csChangeStance(player, stance, otherPlayer, symmetric, cs)) {
-            sendToOthers((ServerPlayer) player, cs);
-        }
-    }
 
     /**
      * Ends the turn of the given player.
@@ -419,137 +355,54 @@ public final class InGameController extends Controller {
             && !newPlayer.isAI()
             && (!newPlayer.isConnected() || debugOnlyAITurns > 0)) {
             endTurn(newPlayer);
-            return;
         }
     }
 
     /**
-     * Remove a standard yearly amount of storable goods, and
-     * a random extra amount of a random type.
+     * Checks if anybody has won the game and returns that player.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose market
-     *            is to be updated.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @return The <code>Player</code> who have won the game or <i>null</i>
+     *         if the game is not finished.
      */
-    private void csYearlyGoodsRemoval(ServerPlayer serverPlayer,
-                                      ChangeSet cs) {
-        List<GoodsType> goodsTypes = getGame().getSpecification()
-            .getGoodsTypeList();
-        Market market = serverPlayer.getMarket();
-
-        // Pick a random type of goods to remove an extra amount of.
-        GoodsType removeType;
-        do {
-            int randomGoods = random.nextInt(goodsTypes.size());
-            removeType = goodsTypes.get(randomGoods);
-        } while (!removeType.isStorable());
-
-        // Remove standard amount, and the extra amount.
-        for (GoodsType type : goodsTypes) {
-            if (type.isStorable() && market.hasBeenTraded(type)) {
-                int amount = getGame().getTurn().getNumber() / 10;
-                if (type == removeType && amount > 0) {
-                    amount += random.nextInt(2 * amount + 1);
+    public Player checkForWinner() {
+        List<Player> players = getGame().getPlayers();
+        GameOptions go = getGame().getGameOptions();
+        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
+            for (Player player : players) {
+                if (player.getPlayerType() == PlayerType.INDEPENDENT) {
+                    return player;
                 }
-                if (amount > 0) {
-                    market.addGoodsToMarket(type, -amount);
-                }
-            }
-            if (market.hasPriceChanged(type)) {
-                cs.addMessage(See.only(serverPlayer),
-                              market.makePriceChangeMessage(type));
-                market.flushPriceChange(type);
             }
         }
-
-        // Update the client
-        cs.add(See.only(serverPlayer), market);
-    }
-
-    /**
-     * Public version of the yearly goods removal (public so it can be
-     * use in the Market test code).  Sends the market and change
-     * messages to the player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> whose market
-     *            is to be updated.
-     */
-    public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
-        ChangeSet cs = new ChangeSet();
-        csYearlyGoodsRemoval(serverPlayer, cs);
-        sendElement(serverPlayer, cs);
-    }
-
-    /**
-     * Marks a player dead and remove any leftovers.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to kill.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private ChangeSet csKillPlayer(ServerPlayer serverPlayer, ChangeSet cs) {
-
-        // Mark the player as dead.
-        serverPlayer.setDead(true);
-        cs.addDead(serverPlayer);
-
-        // Notify everyone.
-        cs.addMessage(See.all().except(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             ((serverPlayer.isEuropean())
-                              ? "model.diplomacy.dead.european"
-                              : "model.diplomacy.dead.native"),
-                             serverPlayer)
-                .addStringTemplate("%nation%", serverPlayer.getNationName()));
-
-        // Clean up missions
-        if (serverPlayer.isEuropean()) {
-            List<ServerPlayer> europeans = new ArrayList<ServerPlayer>();
-            List<ServerPlayer> natives = new ArrayList<ServerPlayer>();
-            for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-                if (other.isEuropean()) {
-                    europeans.add(other);
-                } else {
-                    natives.add(other);
-                }
-            }
-            for (ServerPlayer other : natives) {
-                for (IndianSettlement s : other.getIndianSettlements()) {
-                    Unit unit = s.getMissionary();
-                    if (unit != null && unit.getOwner() == serverPlayer) {
-                        s.setMissionary(null);
-                        cs.addDispose(serverPlayer, s.getTile(), unit);
-                        cs.add(See.perhaps(), s.getTile());
-                        for (ServerPlayer euro : europeans) {
-                            s.getTile().updatePlayerExploredTile(euro);
-                        }
+        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
+            Player winner = null;
+            for (Player player : players) {
+                if (!player.isDead() && player.isEuropean()
+                    && !player.isREF()) {
+                    if (winner != null) { // A live European player
+                        winner = null;
+                        break;
                     }
+                    winner = player;
                 }
             }
+            if (winner != null) return winner;
         }
-
-        // Remove settlements.  Update formerly owned tiles.
-        List<Settlement> settlements = serverPlayer.getSettlements();
-        while (!settlements.isEmpty()) {
-            Settlement settlement = settlements.remove(0);
-            for (Tile tile : settlement.getOwnedTiles()) {
-                cs.add(See.perhaps(), tile);
+        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
+            Player winner = null;
+            for (Player player : players) {
+                if (!player.isDead() && !player.isAI()) {
+                    if (winner != null) { // A live human player
+                        winner = null;
+                        break;
+                    }
+                    winner = player;
+                }
             }
-            cs.addDispose(serverPlayer, settlement.getTile(), settlement);
+            if (winner != null) return winner;
         }
-
-        // Remove units
-        List<Unit> units = serverPlayer.getUnits();
-        while (!units.isEmpty()) {
-            Unit unit = units.remove(0);
-            if (unit.getLocation() instanceof Tile) {
-                cs.add(See.perhaps(), unit.getTile());
-            }
-            cs.addDispose(serverPlayer, unit.getLocation(), unit);
-        }
-
-        return cs;
+        return null;
     }
-
 
     /**
      * Sets a new current player and notifies the clients.
@@ -590,7 +443,16 @@ public final class InGameController extends Controller {
                 return nextPlayer();
             }
         }
+
+        newTurn(newPlayer);
+        Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
+        setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
+        sendToAll(setCurrentPlayerElement);
         
+        return newPlayer;
+    }
+
+    private void newTurn(ServerPlayer newPlayer) {
         ChangeSet cs = new ChangeSet();
         if (newPlayer.isEuropean()) {
             csBombardEnemyShips(newPlayer, cs);
@@ -784,43 +646,134 @@ public final class InGameController extends Controller {
             }
         }
         sendToAll(cs);
-        
-        Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
-        setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
-        sendToAll(setCurrentPlayerElement);
-        
-        return newPlayer;
     }
 
-
     /**
-     * Handle a player retiring.
+     * Remove a standard yearly amount of storable goods, and
+     * a random extra amount of a random type.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
-     * @return An element cleaning up the player.
+     * @param serverPlayer The <code>ServerPlayer</code> whose market
+     *            is to be updated.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    public Element retire(ServerPlayer serverPlayer) {
-        FreeColServer freeColServer = getFreeColServer();
-        boolean highScore = freeColServer.newHighScore(serverPlayer);
-        if (highScore) {
-            try {
-                freeColServer.saveHighScores();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to save high scores", e);
-                highScore = false;
+    private void csYearlyGoodsRemoval(ServerPlayer serverPlayer,
+                                      ChangeSet cs) {
+        List<GoodsType> goodsTypes = getGame().getSpecification()
+            .getGoodsTypeList();
+        Market market = serverPlayer.getMarket();
+
+        // Pick a random type of goods to remove an extra amount of.
+        GoodsType removeType;
+        do {
+            int randomGoods = random.nextInt(goodsTypes.size());
+            removeType = goodsTypes.get(randomGoods);
+        } while (!removeType.isStorable());
+
+        // Remove standard amount, and the extra amount.
+        for (GoodsType type : goodsTypes) {
+            if (type.isStorable() && market.hasBeenTraded(type)) {
+                int amount = getGame().getTurn().getNumber() / 10;
+                if (type == removeType && amount > 0) {
+                    amount += random.nextInt(2 * amount + 1);
+                }
+                if (amount > 0) {
+                    market.addGoodsToMarket(type, -amount);
+                }
+            }
+            if (market.hasPriceChanged(type)) {
+                cs.addMessage(See.only(serverPlayer),
+                              market.makePriceChangeMessage(type));
+                market.flushPriceChange(type);
             }
         }
 
-        // Clean up the player.
-        ChangeSet cs = new ChangeSet();
-        csKillPlayer(serverPlayer, cs);
-        cs.addAttribute(See.only(serverPlayer), "highScore",
-                        Boolean.toString(highScore));
-
-        sendToOthers(serverPlayer, cs);
-        return cs.build(serverPlayer);
+        // Update the client
+        cs.add(See.only(serverPlayer), market);
     }
 
+    /**
+     * Public version of the yearly goods removal (public so it can be
+     * use in the Market test code).  Sends the market and change
+     * messages to the player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> whose market
+     *            is to be updated.
+     */
+    public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        csYearlyGoodsRemoval(serverPlayer, cs);
+        sendElement(serverPlayer, cs);
+    }
+
+    /**
+     * Marks a player dead and remove any leftovers.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to kill.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private ChangeSet csKillPlayer(ServerPlayer serverPlayer, ChangeSet cs) {
+
+        // Mark the player as dead.
+        serverPlayer.setDead(true);
+        cs.addDead(serverPlayer);
+
+        // Notify everyone.
+        cs.addMessage(See.all().except(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             ((serverPlayer.isEuropean())
+                              ? "model.diplomacy.dead.european"
+                              : "model.diplomacy.dead.native"),
+                             serverPlayer)
+                .addStringTemplate("%nation%", serverPlayer.getNationName()));
+
+        // Clean up missions
+        if (serverPlayer.isEuropean()) {
+            List<ServerPlayer> europeans = new ArrayList<ServerPlayer>();
+            List<ServerPlayer> natives = new ArrayList<ServerPlayer>();
+            for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+                if (other.isEuropean()) {
+                    europeans.add(other);
+                } else {
+                    natives.add(other);
+                }
+            }
+            for (ServerPlayer other : natives) {
+                for (IndianSettlement s : other.getIndianSettlements()) {
+                    Unit unit = s.getMissionary();
+                    if (unit != null && unit.getOwner() == serverPlayer) {
+                        s.setMissionary(null);
+                        cs.addDispose(serverPlayer, s.getTile(), unit);
+                        cs.add(See.perhaps(), s.getTile());
+                        for (ServerPlayer euro : europeans) {
+                            s.getTile().updatePlayerExploredTile(euro);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Remove settlements.  Update formerly owned tiles.
+        List<Settlement> settlements = serverPlayer.getSettlements();
+        while (!settlements.isEmpty()) {
+            Settlement settlement = settlements.remove(0);
+            for (Tile tile : settlement.getOwnedTiles()) {
+                cs.add(See.perhaps(), tile);
+            }
+            cs.addDispose(serverPlayer, settlement.getTile(), settlement);
+        }
+
+        // Remove units
+        List<Unit> units = serverPlayer.getUnits();
+        while (!units.isEmpty()) {
+            Unit unit = units.remove(0);
+            if (unit.getLocation() instanceof Tile) {
+                cs.add(See.perhaps(), unit.getTile());
+            }
+            cs.addDispose(serverPlayer, unit.getLocation(), unit);
+        }
+
+        return cs;
+    }
 
     private void checkSpanishSuccession() {
         boolean rebelMajority = false;
@@ -969,59 +922,6 @@ public final class InGameController extends Controller {
         }
         logger.info(logMessage);
         return randomFathers;
-    }
-
-    /**
-     * Checks if anybody has won the game and returns that player.
-     * 
-     * @return The <code>Player</code> who have won the game or <i>null</i>
-     *         if the game is not finished.
-     */
-    public Player checkForWinner() {
-        List<Player> players = getGame().getPlayers();
-        GameOptions go = getGame().getGameOptions();
-        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            for (Player player : players) {
-                if (!player.isAI() && player.getPlayerType() == PlayerType.INDEPENDENT) {
-                    return player;
-                }
-            }
-        }
-        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
-            Player winner = null;
-            for (Player player : players) {
-                if (!player.isDead() && player.isEuropean() && !player.isREF()) {
-                    if (winner != null) {
-                        // There is more than one european player alive:
-                        winner = null;
-                        break;
-                    } else {
-                        winner = player;
-                    }
-                }
-            }
-            if (winner != null) {
-                return winner;
-            }
-        }
-        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
-            Player winner = null;
-            for (Player player : players) {
-                if (!player.isDead() && !player.isAI()) {
-                    if (winner != null) {
-                        // There is more than one human player alive:
-                        winner = null;
-                        break;
-                    } else {
-                        winner = player;
-                    }
-                }
-            }
-            if (winner != null) {
-                return winner;
-            }
-        }
-        return null;
     }
 
     /**
@@ -1292,6 +1192,71 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Change stance and collect changes that need updating.
+     *
+     * @param player The originating <code>Player</code>.
+     * @param stance The new <code>Stance</code>.
+     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @param symmetric If true, change the otherPlayer stance as well.
+     * @param cs A <code>ChangeSet</code> containing the changes.
+     * @return True if there was a change in stance at all.
+     */
+    private boolean csChangeStance(Player player, Stance stance,
+                                   Player otherPlayer, boolean symmetric,
+                                   ChangeSet cs) {
+        boolean change = false;
+        Stance old = player.getStance(otherPlayer);
+
+        if (old != stance) {
+            try {
+                int modifier = old.getTensionModifier(stance);
+                player.setStance(otherPlayer, stance);
+                if (modifier != 0) {
+                    cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
+                           player.modifyTension(otherPlayer, modifier));
+                }
+                cs.addStance(See.perhaps(), player, stance, otherPlayer);
+                change = true;
+            } catch (IllegalStateException e) { // Catch illegal transitions
+                logger.log(Level.WARNING, "Illegal stance transition", e);
+            }
+        }
+        if (symmetric && (old = otherPlayer.getStance(player)) != stance) {
+            try {
+                int modifier = old.getTensionModifier(stance);
+                otherPlayer.setStance(player, stance);
+                if (modifier != 0) {
+                    cs.add(See.only(null).perhaps((ServerPlayer) player),
+                           otherPlayer.modifyTension(player, modifier));
+                }
+                cs.addStance(See.perhaps(), otherPlayer, stance, player);
+                change = true;
+            } catch (IllegalStateException e) { // Catch illegal transitions
+                logger.log(Level.WARNING, "Illegal stance transition", e);
+            }
+        }
+
+        return change;
+    }
+
+    /**
+     * Change stance and inform all but the originating player.
+     *
+     * @param player The originating <code>Player</code>.
+     * @param stance The new <code>Stance</code>.
+     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @param symmetric If true, change the otherPlayer stance as well.
+     * @return A <code>ChangeSet</code> encapsulating the resulting changes.
+     */
+    public void changeStance(Player player, Stance stance,
+                             Player otherPlayer, boolean symmetric) {
+        ChangeSet cs = new ChangeSet();
+        if (csChangeStance(player, stance, otherPlayer, symmetric, cs)) {
+            sendToOthers((ServerPlayer) player, cs);
+        }
+    }
+
+    /**
      * All player colonies bombard all available targets.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is bombarding.
@@ -1315,6 +1280,34 @@ public final class InGameController extends Controller {
                 }
             }
         }
+    }
+
+    /**
+     * Handle a player retiring.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
+     * @return An element cleaning up the player.
+     */
+    public Element retire(ServerPlayer serverPlayer) {
+        FreeColServer freeColServer = getFreeColServer();
+        boolean highScore = freeColServer.newHighScore(serverPlayer);
+        if (highScore) {
+            try {
+                freeColServer.saveHighScores();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to save high scores", e);
+                highScore = false;
+            }
+        }
+
+        // Clean up the player.
+        ChangeSet cs = new ChangeSet();
+        csKillPlayer(serverPlayer, cs);
+        cs.addAttribute(See.only(serverPlayer), "highScore",
+                        Boolean.toString(highScore));
+
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
     }
 
     /**
