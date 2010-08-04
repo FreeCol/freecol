@@ -201,7 +201,13 @@ public final class FreeColClient {
 
         headless = "true".equals(System.getProperty("java.awt.headless", "false"));
 
-        FreeColDataFile baseData = new FreeColDataFile(new File(FreeCol.getDataDirectory(), "base"));
+        File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
+        if (!baseDirectory.exists() || !baseDirectory.isDirectory()) {
+            System.err.println("Could not find base data directory: "
+                               + baseDirectory.getName());
+            System.exit(1);            
+        }
+        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
          // TODO: fixme! Specification is not yet known at this point
