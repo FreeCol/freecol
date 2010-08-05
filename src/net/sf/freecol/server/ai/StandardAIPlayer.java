@@ -36,7 +36,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -1455,11 +1454,11 @@ public class StandardAIPlayer extends AIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
 
-        int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
-        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
-        for (int i = 0; i < numberOfUnits; i++) {
-            workerWishes.add(new ArrayList<Wish>());
+        java.util.Map<UnitType, ArrayList<Wish>> workerWishes =
+            new HashMap<UnitType, ArrayList<Wish>>();
+        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+            workerWishes.put(unitType, new ArrayList<Wish>());
         }
         if (getPlayer().isEuropean()) {
             Iterator<AIColony> aIterator = getAIColonyIterator();
@@ -1468,7 +1467,7 @@ public class StandardAIPlayer extends AIPlayer {
                 while (wIterator.hasNext()) {
                     Wish w = wIterator.next();
                     if (w instanceof WorkerWish && w.getTransportable() == null) {
-                        workerWishes.get(((WorkerWish) w).getUnitType().getIndex()).add(w);
+                        workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
                     }
                 }
             }
@@ -1546,7 +1545,7 @@ public class StandardAIPlayer extends AIPlayer {
                  * distance between the unit and the destination of a Wish:
                  */
                 HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
-                for (ArrayList<Wish> al : workerWishes) {
+                for (ArrayList<Wish> al : workerWishes.values()) {
                     for (Wish w : al) {
                         if (!distances.containsKey(w.getDestination())) {
                             distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
@@ -1556,7 +1555,7 @@ public class StandardAIPlayer extends AIPlayer {
 
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
-                ArrayList<Wish> wishList = workerWishes.get(unit.getType().getIndex());
+                ArrayList<Wish> wishList = workerWishes.get(unit.getType());
                 WorkerWish bestWish = null;
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
@@ -1598,12 +1597,11 @@ public class StandardAIPlayer extends AIPlayer {
 
                 // Check if we can find a better site to work than a new colony:
                 if (!fewColonies || colonyTile == null || bestTurns > 10) {
-                    for (int i = 0; i < workerWishes.size(); i++) {
-                        wishList = workerWishes.get(i);
-                        for (int j = 0; j < wishList.size(); j++) {
-                            WorkerWish ww = (WorkerWish) wishList.get(j);
+                    for (List<Wish> wishes : workerWishes.values()) {
+                        for (int j = 0; j < wishes.size(); j++) {
+                            WorkerWish ww = (WorkerWish) wishes.get(j);
                             if (ww.getTransportable() != null) {
-                                wishList.remove(j);
+                                wishes.remove(j);
                                 j--;
                                 continue;
                             }
