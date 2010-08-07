@@ -197,8 +197,10 @@ public final class InGameController implements NetworkConstants {
     /**
      * Opens a dialog where the user should specify the filename and
      * saves the game.
+     *
+     * @return True if the game was saved.
      */
-    public void saveGame() {
+    public boolean saveGame() {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
         String fileName = player.getName() + "_" + Messages.message(player.getNationName())
@@ -208,26 +210,31 @@ public final class InGameController implements NetworkConstants {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
             if (file != null) {
                 FreeCol.setSaveDirectory(file.getParentFile());
-                saveGame(file);
+                return saveGame(file);
             }
         }
+        return false;
     }
 
     /**
      * Saves the game to the given file.
      * 
      * @param file The <code>File</code>.
+     * @return True if the game was saved.
      */
-    public void saveGame(final File file) {
+    public boolean saveGame(final File file) {
         Canvas canvas = freeColClient.getCanvas();
+        boolean result = false;
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         try {
             freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getName());
             canvas.closeStatusPanel();
+            result = true;
         } catch (IOException e) {
             canvas.errorMessage("couldNotSaveGame");
         }
         canvas.requestFocusInWindow();
+        return result;
     }
 
     /**

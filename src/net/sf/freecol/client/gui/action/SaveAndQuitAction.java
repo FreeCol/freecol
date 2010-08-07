@@ -47,10 +47,10 @@ public class SaveAndQuitAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        if (!freeColClient.isMapEditor()) {
-            freeColClient.getInGameController().saveGame();
-        } else {
+        if (freeColClient.isMapEditor()) {
             freeColClient.getMapEditorController().saveGame();
+        } else {
+            if (!freeColClient.getInGameController().saveGame()) return;
         }
         freeColClient.quit();
     }
