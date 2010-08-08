@@ -217,6 +217,11 @@ are the work of the devil!
 \item Make sure that all relevant changes have been committed to the
   branch you are about to release.
 
+\item Merge translations from trunk if the release is not made from
+  trunk, with \verb+ant merge-translations+. Skip this step if the
+  localization files are essentially the same as the ones in trunk (we
+  try to ensure this). Make sure they are up to date, however.
+
 \item Create a copy of the branch you want to release in the tags
   folder. Subversion does not distinguish between tags and
   branches. Example:
@@ -231,9 +236,6 @@ are the work of the devil!
 
 \item Check out the newly created branch and do all further work in that
   new branch.
-
-\item Merge translations from trunk if the release is not made from
-  trunk, with \verb+ant merge-translations+.
 
 \item Change the \verb$FREECOL_VERSION$ constant in FreeCol.java to
   match the release version and commit the change. Start a clean
@@ -254,28 +256,28 @@ are the work of the devil!
   all packages get uploaded. You can use a script similar to this:
 
 \begin{verbatim}
-  #!/bin/sh
+#!/bin/sh
 
-  FREECOL_VERSION=0.9.0-alpha2
-  PREFIX=freecol-$FREECOL_VERSION
-  USERNAME=myUserName
+FREECOL_VERSION=0.9.0-alpha2
+PREFIX=freecol-$FREECOL_VERSION
+USERNAME=myUserName
 
-  cd dist
+cd dist
 
-  sftp $USERNAME,freecol@frs.sourceforge.net <<FILE
-  cd /home/frs/project/f/fr/freecol/freecol
-  mkdir $PREFIX
-  cd $PREFIX
-  put $PREFIX-installer.exe
-  put $PREFIX-installer.jar
-  put $PREFIX-installer-with-sources.jar
-  put $PREFIX-mac.tar.bz2
-  put $PREFIX-src.tar.gz
-  put $PREFIX-src.zip
-  put $PREFIX.tar.gz
-  put $PREFIX.zip
-  exit
-  FILE
+sftp $USERNAME,freecol@frs.sourceforge.net <<FILE
+cd /home/frs/project/f/fr/freecol/freecol
+mkdir $PREFIX
+cd $PREFIX
+put $PREFIX-installer.exe
+put $PREFIX-installer.jar
+put $PREFIX-installer-with-sources.jar
+put $PREFIX-mac.tar.bz2
+put $PREFIX-src.tar.gz
+put $PREFIX-src.zip
+put $PREFIX.tar.gz
+put $PREFIX.zip
+exit
+FILE
 \end{verbatim}
 
 \item Compile the feature list for the news announcement (use the tracker
