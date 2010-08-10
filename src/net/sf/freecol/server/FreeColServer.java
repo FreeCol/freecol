@@ -238,8 +238,7 @@ public final class FreeColServer {
         if (level != null) {
             getSpecification().applyDifficultyLevel(level);
         }
-        // TODO: pass specification
-        mapGenerator = new MapGenerator(random, null);
+        mapGenerator = new MapGenerator(random, specification);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -279,8 +278,7 @@ public final class FreeColServer {
         this.port = port;
         this.name = name;
         //this.nationOptions = nationOptions;
-        // TODO: pass specification
-        mapGenerator = new MapGenerator(random, null);
+        mapGenerator = new MapGenerator(random, getSpecification());
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);

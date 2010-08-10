@@ -144,8 +144,8 @@ public class ActionManager extends OptionGroup {
      */
     public void addSpecificationActions(Specification specification) {
         // Initialize ImprovementActions
-        for (ImprovementActionType ia : Specification.getSpecification()
-                 .getImprovementActionTypeList()) {
+        for (ImprovementActionType ia
+                 : specification.getImprovementActionTypeList()) {
             add(new ImprovementAction(freeColClient, ia));
         }
     }

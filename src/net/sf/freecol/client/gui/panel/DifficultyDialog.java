@@ -75,16 +75,17 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         header.setFont(ResourceManager.getFont("HeaderFont", 48f));
         add(header, "center, wrap 20");
 
+        Specification spec = getSpecification();
         if (showCurrent) {
             level = getGame().getDifficultyLevel();
             if (level == null) {
                 // compatibility code
-                level = getSpecification().getDifficultyLevel(0);
+                level = spec.getDifficultyLevel(0);
             }
             difficultyBox.addItem(Messages.message(level.getId()));
             difficultyBox.setEnabled(false);
         } else {
-            for (DifficultyLevel dLevel : getSpecification().getDifficultyLevels()) {
+            for (DifficultyLevel dLevel : spec.getDifficultyLevels()) {
                 String id = dLevel.getId();
                 if ("model.difficulty.medium".equals(id)) {
                     DEFAULT_INDEX = difficultyBox.getItemCount();
@@ -100,7 +101,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         add(difficultyBox);
 
         // Options:
-        ui = new OptionMapUI(new DifficultyOptionMap(level), false);
+        ui = new OptionMapUI(new DifficultyOptionMap(level, spec), false);
         ui.setOpaque(false);
         optionPanel = new JPanel() {
             @Override
@@ -175,8 +176,10 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
 
     public void itemStateChanged(ItemEvent event) {
         int index = difficultyBox.getSelectedIndex();
-        level = getSpecification().getDifficultyLevel(index);
-        ui = new OptionMapUI(new DifficultyOptionMap(level), (index == CUSTOM_INDEX));
+        Specification spec = getSpecification();
+        level = spec.getDifficultyLevel(index);
+        ui = new OptionMapUI(new DifficultyOptionMap(level, spec),
+                             (index == CUSTOM_INDEX));
         optionPanel.removeAll();
         optionPanel.add(ui);
         revalidate();
@@ -186,8 +189,8 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
 
     private class DifficultyOptionMap extends OptionMap {
 
-        public DifficultyOptionMap(DifficultyLevel level) {
-            super("difficultySettings");
+        public DifficultyOptionMap(DifficultyLevel level, Specification spec) {
+            super("difficultySettings", spec);
             for (AbstractOption option: level.getOptions().values()) {
                 option.setGroup("difficultySettings");
                 add(option);

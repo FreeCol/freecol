@@ -456,8 +456,8 @@ public class ClientOptions extends OptionMap {
      * Creates a new <code>ClientOptions</code>.
      * @param specification a <code>Specification</code> value
      */
-    public ClientOptions() {
-        super(getXMLElementTagName());
+    public ClientOptions(Specification specification) {
+        super(getXMLElementTagName(), specification);
     }
 
     /**
@@ -468,9 +468,10 @@ public class ClientOptions extends OptionMap {
      * 
      * @param element The XML <code>Element</code> from which this object
      *            should be constructed.
+     * @param specification The <code>Specification</code> to use.
      */
-    public ClientOptions(Element element) {
-        super(element, getXMLElementTagName());
+    public ClientOptions(Element element, Specification specification) {
+        super(element, getXMLElementTagName(), specification);
     }
 
     /**

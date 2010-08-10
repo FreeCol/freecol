@@ -35,11 +35,6 @@ import org.w3c.dom.Element;
 */
 public class GameOptions extends OptionMap {
 
-    /**
-     * Describe specification here.
-     */
-    private Specification specification;
-
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "model.option.startingMoney";
 
@@ -97,8 +92,7 @@ public class GameOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public GameOptions(Specification specification) {
-        super(getXMLElementTagName());
-        setSpecification(specification);
+        super(getXMLElementTagName(), specification);
     }
 
 
@@ -113,8 +107,7 @@ public class GameOptions extends OptionMap {
      */
     public GameOptions(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        super(in, getXMLElementTagName());
-        setSpecification(specification);
+        super(in, getXMLElementTagName(), specification);
     }
     
     /**
@@ -127,34 +120,15 @@ public class GameOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public GameOptions(Element e, Specification specification) {
-        super(e, getXMLElementTagName());
-        setSpecification(specification);
+        super(e, getXMLElementTagName(), specification);
     }
 
     /**
-     * Get the <code>Specification</code> value.
-     *
-     * @return a <code>Specification</code> value
+     * Adds the options to this <code>GameOptions</code>.
      */
-    public final Specification getSpecification() {
-        return specification;
-    }
-
-    /**
-     * Set the <code>Specification</code> value.
-     *
-     * @param newSpecification The new Specification value.
-     */
-    public final void setSpecification(final Specification newSpecification) {
-        this.specification = newSpecification;
-    }
-
-    /**
-    * Adds the options to this <code>GameOptions</code>.
-    */
     protected void addDefaultOptions() {
-        Specification spec = Specification.getSpecification();
-        
+        Specification spec = getSpecification();
+
         /* Map options: */
         add(spec.getOptionGroup("gameOptions.map"));
         /* Colony options: */
@@ -171,9 +145,9 @@ public class GameOptions extends OptionMap {
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "gameOptions".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "gameOptions".
+     */
     public static String getXMLElementTagName() {
         return "gameOptions";
     }

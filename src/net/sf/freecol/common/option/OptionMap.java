@@ -42,6 +42,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
+
 import org.w3c.dom.Element;
 
 
@@ -55,6 +57,10 @@ public abstract class OptionMap extends OptionGroup {
     private String xmlTagName;
     private Map<String, Option> values;
    
+    /**
+     * Describe specification here.
+     */
+    private Specification specification;
 
 
     /**
@@ -63,9 +69,10 @@ public abstract class OptionMap extends OptionGroup {
      * @param xmlTagName The tag name that should be used for the parent XML-element
      *           returned by {@link Option#toXMLElement}.
      */
-    public OptionMap(String xmlTagName) {
+    public OptionMap(String xmlTagName, Specification specification) {
         super(xmlTagName);
         this.xmlTagName = xmlTagName;
+        this.specification = specification;
         
         values = new LinkedHashMap<String, Option>();
 
@@ -83,8 +90,8 @@ public abstract class OptionMap extends OptionGroup {
      *           returned by {@link Option#toXMLElement}.
      * @exception XMLStreamException if an error occured during parsing.
      */
-    public OptionMap(XMLStreamReader in, String xmlTagName) throws XMLStreamException {
-        this(xmlTagName);
+    public OptionMap(XMLStreamReader in, String xmlTagName, Specification spec) throws XMLStreamException {
+        this(xmlTagName, spec);
         readFromXML(in);
     }
 
@@ -98,17 +105,35 @@ public abstract class OptionMap extends OptionGroup {
      * @param xmlTagName The tag name that should be used for the parent XML-element
      *           returned by {@link Option#toXMLElement}.
      */
-    public OptionMap(Element element, String xmlTagName) {
-        this(xmlTagName);
+    public OptionMap(Element element, String xmlTagName, Specification spec) {
+        this(xmlTagName, spec);
         readFromXMLElement(element);
     }
 
 
+    /**
+     * Get the <code>Specification</code> value.
+     *
+     * @return a <code>Specification</code> value
+     */
+    public final Specification getSpecification() {
+        return specification;
+    }
 
     /**
-    * Adds the default options to this <code>OptionMap</code>.
-    * Needs to be implemented by subclasses.
-    */
+     * Set the <code>Specification</code> value.
+     *
+     * @param newSpecification The new Specification value.
+     */
+    public final void setSpecification(final Specification newSpecification) {
+        this.specification = newSpecification;
+    }
+
+
+    /**
+     * Adds the default options to this <code>OptionMap</code>.
+     * Needs to be implemented by subclasses.
+     */
     protected abstract void addDefaultOptions();
 
 

@@ -43,11 +43,6 @@ import org.w3c.dom.Element;
 public class MapGeneratorOptions extends OptionMap {
 
     /**
-     * Describe specification here.
-     */
-    private Specification specification;
-
-    /**
      * Option for setting the size of the map. Possible values are:
      * <ul>
      * <li>{@link #MAP_SIZE_SMALL}</li>
@@ -162,8 +157,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public MapGeneratorOptions(Specification specification) {
-        super(getXMLElementTagName());
-        setSpecification(specification);
+        super(getXMLElementTagName(), specification);
     }
 
     /**
@@ -177,8 +171,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @param specification a <code>Specification</code> value
      */
     public MapGeneratorOptions(Element element, Specification specification) {
-        super(element, getXMLElementTagName());
-        setSpecification(specification);
+        super(element, getXMLElementTagName(), specification);
     }
 
     /**
@@ -193,34 +186,16 @@ public class MapGeneratorOptions extends OptionMap {
      */
     public MapGeneratorOptions(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        super(in, getXMLElementTagName());
-        setSpecification(specification);
-    }
-
-    /**
-     * Get the <code>Specification</code> value.
-     *
-     * @return a <code>Specification</code> value
-     */
-    public final Specification getSpecification() {
-        return specification;
-    }
-
-    /**
-     * Set the <code>Specification</code> value.
-     *
-     * @param newSpecification The new Specification value.
-     */
-    public final void setSpecification(final Specification newSpecification) {
-        this.specification = newSpecification;
+        super(in, getXMLElementTagName(), specification);
     }
 
     /**
      * Adds the options to this <code>MapGeneratorOptions</code>.
      */
     protected void addDefaultOptions() {
+        Specification spec = getSpecification();
+
         /* Add options here: */
-        Specification spec = Specification.getSpecification();
         add(spec.getOptionGroup("mapGeneratorOptions.import"));
 
         /* Add additional infos in the labels of map size and land mass options (but only once!) */
@@ -299,7 +274,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of land.
      */
     public int getLandMass() {
-        return Specification.getSpecification().getRangeOption(LAND_MASS).getValue();
+        return getSpecification().getRangeOption(LAND_MASS).getValue();
     }
 
     /**
@@ -317,7 +292,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The value of the land generator.
      */
     public int getLandGeneratorType() {
-        return Specification.getSpecification().getRangeOption(LAND_GEN_TYPE).getValue();
+        return getSpecification().getRangeOption(LAND_GEN_TYPE).getValue();
     }
 
     /**
@@ -326,7 +301,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of rivers.
      */
     public int getNumberOfRivers() {
-        return getLand()/Specification.getSpecification().getRangeOption(RIVER_NUMBER).getValue();
+        return getLand()/getSpecification().getRangeOption(RIVER_NUMBER).getValue();
     }
 
     /**
@@ -335,7 +310,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of mountain tiles.
      */
     public int getNumberOfMountainTiles() {
-        return getLand()/Specification.getSpecification().getRangeOption(MOUNTAIN_NUMBER).getValue();
+        return getLand()/getSpecification().getRangeOption(MOUNTAIN_NUMBER).getValue();
     }
 
     /**
@@ -344,7 +319,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of rumours.
      */
     public int getNumberOfRumours() {
-        return getLand()/Specification.getSpecification().getRangeOption(RUMOUR_NUMBER).getValue();
+        return getLand()/getSpecification().getRangeOption(RUMOUR_NUMBER).getValue();
     }
 
     /**
@@ -353,7 +328,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of settlements.
      */
     public int getNumberOfSettlements() {
-        return getLand()/Specification.getSpecification().getRangeOption(SETTLEMENT_NUMBER).getValue();
+        return getLand()/getSpecification().getRangeOption(SETTLEMENT_NUMBER).getValue();
     }
 
     /**
@@ -362,7 +337,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of forests.
      */
     public int getPercentageOfForests() {
-        return Specification.getSpecification().getRangeOption(FOREST_NUMBER).getValue();
+        return getSpecification().getRangeOption(FOREST_NUMBER).getValue();
     }
 
     /**
@@ -371,7 +346,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of bonus tiles.
      */
     public int getPercentageOfBonusTiles() {
-        return Specification.getSpecification().getRangeOption(BONUS_NUMBER).getValue();
+        return getSpecification().getRangeOption(BONUS_NUMBER).getValue();
     }
 
     /**
@@ -451,7 +426,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The humidity.
      */
     public int getHumidity() {
-        return Specification.getSpecification().getRangeOption(HUMIDITY).getValue();
+        return getSpecification().getRangeOption(HUMIDITY).getValue();
     }
 
     /**
@@ -460,7 +435,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The temperature.
      */
     public int getTemperature() {
-        return Specification.getSpecification().getRangeOption(TEMPERATURE).getValue();
+        return getSpecification().getRangeOption(TEMPERATURE).getValue();
     }
 
     protected boolean isCorrectTagName(String tagName) {

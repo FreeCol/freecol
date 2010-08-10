@@ -290,12 +290,11 @@ public final class FreeColClient {
 
         mapEditor = false;
         
-        clientOptions = new ClientOptions();
+        clientOptions = new ClientOptions(specification);
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();
-            // TODO: fixme! This should happen after specification is loaded!
-            actionManager.addSpecificationActions(Specification.getSpecification());
+            actionManager.addSpecificationActions(specification);
         }
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {

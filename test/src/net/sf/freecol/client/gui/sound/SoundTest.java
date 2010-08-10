@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -50,7 +51,7 @@ public class SoundTest extends FreeColTestCase {
     
     public void testSound() {
         
-        ClientOptions clientOptions = new ClientOptions();
+        ClientOptions clientOptions = new ClientOptions(Specification.getSpecification());
         final AudioMixerOption amo = (AudioMixerOption) clientOptions.getObject(ClientOptions.AUDIO_MIXER);
         final PercentageOption po = (PercentageOption) clientOptions.getObject(ClientOptions.MUSIC_VOLUME);
         po.setValue(10); // 10% volume
