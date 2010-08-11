@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -503,6 +504,18 @@ public class ResourceManager {
      */
     public static FAFile getFAFile(final String resource) {
         final FAFileResource r = getResource(resource, FAFileResource.class);
-        return r.getFAFile();
+        return (r == null) ? null : r.getFAFile();
     }
+
+    /**
+     * Gets an audio resource with the given name.
+     *
+     * @param resource The name of the resource to query.
+     * @return A <code>File</code> containing the audio data.
+     */
+    public static File getAudio(final String resource) {
+        final AudioResource r = getResource(resource, AudioResource.class);
+        return (r == null) ? null : r.getAudio();
+    }
+
 }

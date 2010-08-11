@@ -19,29 +19,29 @@
 
 package net.sf.freecol.client.gui.sound;
 
+import java.awt.Dimension;
 import java.io.File;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
-import net.sf.freecol.client.gui.sound.MusicLibrary;
-import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class SoundTest extends FreeColTestCase {
     
-    MusicLibrary musicLibrary = null;
-    SfxLibrary sfxLibrary = null;
     SoundPlayer soundPlayer = null;
     
-    private void playSound(SoundLibrary library, String id) {
-        Playlist playlist = library.get(id);
-        assertNotNull(playlist);
-        soundPlayer.playOnce(playlist);
+    private void playSound(String id) {
+        File file = ResourceManager.getAudio(id);
+        assertTrue("Sound " + id + " should exist", file != null);
+        soundPlayer.playOnce(file);
         try {
             // just play the beginning of the sound, just to check it works
             Thread.sleep(300);
@@ -50,44 +50,37 @@ public class SoundTest extends FreeColTestCase {
     }
     
     public void testSound() {
-        
+        File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
+        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        ResourceManager.preload(new Dimension(1,1));
+
         ClientOptions clientOptions = new ClientOptions(Specification.getSpecification());
         final AudioMixerOption amo = (AudioMixerOption) clientOptions.getObject(ClientOptions.AUDIO_MIXER);
-        final PercentageOption po = (PercentageOption) clientOptions.getObject(ClientOptions.MUSIC_VOLUME);
+        final PercentageOption po = (PercentageOption) clientOptions.getObject(ClientOptions.AUDIO_VOLUME);
         po.setValue(10); // 10% volume
 
-        File dir = new File(FreeCol.getDataDirectory(), "audio");
-        try {
-            musicLibrary = new MusicLibrary(dir);
-        } catch (FreeColException e) {
-            System.out.println("The music files could not be found.");
-            fail();
-        }
-        try {
-            sfxLibrary = new SfxLibrary(dir);
-        } catch (FreeColException e) {
-            System.out.println("The music files could not be found.");
-            fail();
-        }
-        soundPlayer = new SoundPlayer(amo, po, false, true);
-        playSound(musicLibrary, "aztec");
-        playSound(musicLibrary, "england");
-        playSound(musicLibrary, "fountain");
-        playSound(musicLibrary, "intro");
-        
-        playSound(sfxLibrary, "attack_artillery");
-        playSound(sfxLibrary, "attack_dragoon");
-        playSound(sfxLibrary, "attack_naval");
-        playSound(sfxLibrary, "building_complete");
-        playSound(sfxLibrary, "captured_by_artillery");
-        playSound(sfxLibrary, "illegal_move");
-        playSound(sfxLibrary, "load_cargo");
-        playSound(sfxLibrary, "sell_cargo");
-        playSound(sfxLibrary, "sunk");
-        playSound(sfxLibrary, "anthem_dutch");
-        playSound(sfxLibrary, "anthem_english");
-        playSound(sfxLibrary, "anthem_french");
-        playSound(sfxLibrary, "anthem_spanish");
-    }
-
+        soundPlayer = new SoundPlayer(amo, po);
+        playSound("sound.intro.general");
+        playSound("sound.intro.model.nation.english");
+        playSound("sound.anthem.model.nation.dutch");
+        playSound("sound.anthem.model.nation.english");
+        playSound("sound.anthem.model.nation.french");
+        playSound("sound.anthem.model.nation.spanish");
+        playSound("sound.attack.artillery");
+        //playSound("sound.attack.bombard");
+        //playSound("sound.attack.foot");
+        playSound("sound.attack.mounted");
+        playSound("sound.attack.naval");
+        playSound("sound.meet.model.nation.aztec");
+        playSound("sound.event.buildingComplete");
+        playSound("sound.event.captureColony");
+        //playSound("sound.event.destroySettlement");
+        playSound("sound.event.fountainOfYouth");
+        playSound("sound.event.illegalMove");
+        playSound("sound.event.loadCargo");
+        playSound("sound.event.missionEstablished");
+        playSound("sound.event.sellCargo");
+        playSound("sound.event.shipSunk");
+   }
 }

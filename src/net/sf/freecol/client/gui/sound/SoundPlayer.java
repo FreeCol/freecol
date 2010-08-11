@@ -44,8 +44,10 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
 
 /**
-* Class for playing sound. See the package description for {@link net.sf.freecol.client.gui.sound} for information on how to play sfx/music.
-*/
+ * Class for playing sound. See the package description for
+ * {@link net.sf.freecol.client.gui.sound} for information on how to play
+ * sfx/music.
+ */
 public class SoundPlayer {
 
     private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
@@ -55,7 +57,8 @@ public class SoundPlayer {
     private static final int FADE_UPDATE_MS = 5;
     
     /** The thread-group containing all of the <i>SoundPlayerThreads</i>. */
-    private ThreadGroup soundPlayerThreads = new ThreadGroup("soundPlayerThreads");
+    private ThreadGroup soundPlayerThreads
+        = new ThreadGroup("soundPlayerThreads");
 
     /** Is the sound paused? */
     private boolean soundPaused = false;
@@ -64,10 +67,11 @@ public class SoundPlayer {
     private boolean soundStopped = true;
 
     /**
-    * Should the <i>SoundPlayer</i> play multiple sounds at the same time, or only one?
-    * If it does not allow multiple sounds, then using <i>play</i> will stop the sound
-    * currently playing and play the new instead.
-    */
+     * Should the <i>SoundPlayer</i> play multiple sounds at the same
+     * time, or only one?  If it does not allow multiple sounds, then
+     * using <i>play</i> will stop the sound currently playing and play
+     * the new instead.
+     */
     private boolean multipleSounds;
     
     /**
@@ -75,21 +79,29 @@ public class SoundPlayer {
      */
     private SoundPlayerThread currentSoundPlayerThread;
 
-    /** Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>. */
+    /**
+     * Should the player continue playing after it it finished with a
+     * sound-clip? This is the default used with the <i>play(Playlist
+     * playlist)</i>.
+     */
     private boolean defaultPlayContinues;
 
     /**
-    * This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-    *
-    * @see Playlist
-    */
+     * This is the default repeat-mode for a playlist. Refer to the
+     * field summary of the {@link Playlist}-class to get the
+     * different values.
+     *
+     * @see Playlist
+     */
     private final int defaultRepeatMode;
 
     /**
-    * This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-    *
-    * @see Playlist
-    */
+     * This is the default pick-mode for a playlist. Refer to the
+     * field summary of the {@link Playlist}-class to get the
+     * different values.
+     *
+     * @see Playlist
+     */
     private final int defaultPickMode;
 
     private Mixer mixer;
@@ -98,48 +110,60 @@ public class SoundPlayer {
 
     
     /**
-     * Use this constructor.
+     * Creates a sound player.
      *
      * @param mixerOption The option for setting the mixer used by this
      *       <code>SoundPlayer</code>.
      * @param volume The volume to be used when playing audio.
-
-     * @param multipleSounds Should the <i>SoundPlayer</i> play multiple sounds at the same time,
-     *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
-     *                       stop the sound currently playing and play the new instead.
-     *
-     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
-     *
      */
-    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues) {
-        this(mixerOption, volume, multipleSounds, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
+    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume) {
+        this(mixerOption, volume, false, false,
+             Playlist.REPEAT_ALL, Playlist.FORWARDS);
     }
 
-
-
     /**
-     * Or this.
-     *
+     * Creates a sound player.
      *
      * @param mixerOption The option for setting the mixer used by this
-     *       <code>SoundPlayer</code>.
+     *     <code>SoundPlayer</code>.
+     * @param volume The volume to be used when playing audio.
+     * @param multipleSounds Should the <i>SoundPlayer</i> play
+     *     multiple sounds at the same time, or only one? If it does
+     *     not allow multiple sounds, then using <i>play</i> will stop
+     *     the sound currently playing and play the new instead.
+     * @param defaultPlayContinues Should the player continue playing
+     *     after it it finished with a sound-clip? This is the default
+     *     used with the <i>play(Playlist playlist)</i>.
+     */
+    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume,
+                       boolean multipleSounds, boolean defaultPlayContinues) {
+        this(mixerOption, volume, multipleSounds, defaultPlayContinues,
+             Playlist.REPEAT_ALL, Playlist.FORWARDS);
+    }
+
+    /**
+     * Creates a sound player.
+     *
+     * @param mixerOption The option for setting the mixer used by this
+     *      <code>SoundPlayer</code>.
      * @param volume The volume to be used when playing audio.
      * @param multipleSounds Should the <i>SoundPlayer</i> play multiple
-     *       sounds at the same time, or only one? If it does not allow
-     *       multiple sounds, then using <i>play</i> will stop the sound
-     *       currently playing and play the new instead.
+     *      sounds at the same time, or only one? If it does not allow
+     *      multiple sounds, then using <i>play</i> will stop the sound
+     *      currently playing and play the new instead.
      * @param defaultRepeatMode This is the default repeat-mode for a
-     *       playlist. Refer to the field summary of the
-     *       {@link Playlist}-class to get the different values.
+     *      playlist. Refer to the field summary of the
+     *      {@link Playlist}-class to get the different values.
      * @param defaultPickMode This is the default pick-mode for a playlist.
-     *       Refer to the field summary of the {@link Playlist}-class to
-     *       get the different values.
+     *      Refer to the field summary of the {@link Playlist}-class to
+     *      get the different values.
      * @param defaultPlayContinues Should the player continue playing after
-     *       it it finished with a sound-clip? This is the default used
-     *       with the <i>play(Playlist playlist)</i>.
-     *
+     *      it it finished with a sound-clip? This is the default used
+     *      with the <i>play(Playlist playlist)</i>.
      */
-    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
+    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume,
+                       boolean multipleSounds, boolean defaultPlayContinues,
+                       int defaultRepeatMode, int defaultPickMode) {
         if (mixerOption == null) {
             throw new NullPointerException();
         }
@@ -161,15 +185,15 @@ public class SoundPlayer {
         mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
     }
 
-
-
     /**
      * Plays a playlist using the default play-continues, repeat-mode
      * and pick-mode for this <i>SoundPlayer</i>.
+     *
      * @param playlist The <code>Playlist</code> to be played.
      */
     public void play(Playlist playlist) {
-        play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode, 0);
+        play(playlist, defaultPlayContinues, defaultRepeatMode,
+             defaultPickMode, 0);
     }
     
     /**
@@ -180,11 +204,22 @@ public class SoundPlayer {
      * @param delay A delay before playing the sound (ms).
      */
     public void play(Playlist playlist, int delay) {
-        play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode, delay);
+        play(playlist, defaultPlayContinues, defaultRepeatMode,
+             defaultPickMode, delay);
+    }
+
+    /**
+     * Plays a file once.
+     *
+     * @param file The <code>File</code> to be played.
+     */
+    public void playOnce(File file) {
+        play(new Playlist(file), false, defaultRepeatMode, defaultPickMode, 0);
     }
 
     /**
      * Plays a single random sound from the given playlist.
+     *
      * @param playlist The <code>Playlist</code> to be played.
      */
     public void playOnce(Playlist playlist) {
@@ -202,18 +237,20 @@ public class SoundPlayer {
     }
 
     /**
-    * Plays a playlist.
-    * @param playlist The <code>Playlist</code> to be played.
-    * @param playContinues <code>true</code> if the
-    *       <code>SoundPlayer</code> should continue playing
-    *       after playing the first entry on the playlist.
-    * @param repeatMode The method this <code>PlayList</code>
-    *      should be repeated.
-    * @param pickMode The method to be used for picking
-    *      the songs.
-    * @param delay A delay before playing the sound (ms).
-    */
-    public void play(Playlist playlist, boolean playContinues, int repeatMode, int pickMode, int delay) {
+     * Plays a playlist.
+     *
+     * @param playlist The <code>Playlist</code> to be played.
+     * @param playContinues <code>true</code> if the
+     *     <code>SoundPlayer</code> should continue playing
+     *     after playing the first entry on the playlist.
+     * @param repeatMode The method this <code>PlayList</code>
+     *     should be repeated.
+     * @param pickMode The method to be used for picking
+     *     the songs.
+     * @param delay A delay before playing the sound (ms).
+     */
+    public void play(Playlist playlist, boolean playContinues,
+                     int repeatMode, int pickMode, int delay) {
         if (playlist != null) {
             currentSoundPlayerThread = new SoundPlayerThread(playlist, playContinues, repeatMode, pickMode, delay);
             currentSoundPlayerThread.start();
@@ -222,69 +259,73 @@ public class SoundPlayer {
         }
     }
 
-
-
     /**
-    * Stop playing the sounds.
-    */
+     * Stop playing the sounds.
+     */
     public void stop() {
         soundStopped = true;
         soundPaused = false;
     }
 
-
-
     /**
-    * Are the sounds stopped?
-    * @return <code>true</code> is the sounds are stopped.
-    */
+     * Are the sounds stopped?
+     *
+     * @return <code>true</code> is the sounds are stopped.
+     */
     public boolean isStopped() {
         return soundStopped;
     }
 
-
-
     /**
-    * Pauses all the sounds.
-    */
+     * Pauses all the sounds.
+     */
     public void pause() {
         soundPaused = true;
     }
 
-
-
     /**
-    * Are the sounds paused?
-    * @return <code>true</code> is the sounds are paused.
-    */
+     * Are the sounds paused?
+     *
+     * @return <code>true</code> is the sounds are paused.
+     */
     public boolean isPaused() {
         return soundPaused;
     }
 
-
-
-
-    /** Thread for playing a <i>Playlist</i>. */
+    /**
+     * Thread for playing a <i>Playlist</i>.
+     */
     class SoundPlayerThread extends Thread {
 
-        /** An array containing the currently selected playlist. The numbers in the array is used as an index in the <i>soundFiles</i>-array. */
+        /**
+         * An array containing the currently selected playlist. The
+         * numbers in the array is used as an index in the
+         * <i>soundFiles</i>-array.
+         */
         private Playlist playlist;
 
-        /** Should the <i>SoundPlayer</i> continue to play when it is finished with a sound-clip? */
+        /**
+         * Should the <i>SoundPlayer</i> continue to play when it is
+         * finished with a sound-clip?
+         */
         private boolean playContinues;
 
         /**
-        * This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-        *
-        * @see Playlist
-        */
+         * This is the default repeat-mode for a playlist. Refer to
+         * the field summary of the {@link Playlist}-class to get the
+         * different values.
+         *
+         * @see Playlist
+         */
         private int repeatMode;
 
         /**
-        * This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-        *
-        * @see Playlist
-        */
+         * This is the default pick-mode for a playlist. Refer to the
+         * field summary of the {@link Playlist}-class to get the
+         * different values.
+         *
+         * @see Playlist
+         */
         private int pickMode;
 
         /** Should the sound be played again when it is finished? */
@@ -294,15 +335,21 @@ public class SoundPlayer {
         private int delay;
 
         /**
-        * The constructor to use.
-        *
-        * @param playlist A <i>Playlist</i> containing sound-files.
-        * @param playContinues Should the player continue playing after it it finished with a sound-clip?
-        * @param repeatMode This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-        * @param pickMode This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-        * @param delay A delay before playing the sound (ms).
-        */
-        public SoundPlayerThread(Playlist playlist, boolean playContinues, int repeatMode, int pickMode, int delay) {
+         * The constructor to use.
+         *
+         * @param playlist A <i>Playlist</i> containing sound-files.
+         * @param playContinues Should the player continue playing
+         *     after it it finished with a sound-clip?
+         * @param repeatMode This is the default repeat-mode for a
+         *     playlist. Refer to the field summary of the
+         *     {@link Playlist}-class to get the different values.
+         * @param pickMode This is the default pick-mode for a
+         *     playlist. Refer to the field summary of the
+         *     {@link Playlist}-class to get the different values.
+         * @param delay A delay before playing the sound (ms).
+         */
+        public SoundPlayerThread(Playlist playlist, boolean playContinues,
+                                 int repeatMode, int pickMode, int delay) {
             super(soundPlayerThreads, FreeCol.CLIENT_THREAD+"SoundPlayer");
 
             this.playlist = playlist;
@@ -312,14 +359,13 @@ public class SoundPlayer {
             this.delay = delay;
         }
 
-
         private boolean shouldStopThread() {
             return !multipleSounds && currentSoundPlayerThread != this; 
         }
 
         /**
-        * This thread loads and plays the sound.
-        */
+         * This thread loads and plays the sound.
+         */
         public void run() {
             playlist.setRepeatMode(repeatMode);
             playlist.setPickMode(pickMode);
@@ -344,8 +390,7 @@ public class SoundPlayer {
 
         public void playSound(File file) {
             try {
-                AudioInputStream in= AudioSystem.getAudioInputStream(file);
-                AudioInputStream din = null;
+                AudioInputStream in = AudioSystem.getAudioInputStream(file);
                 if (in != null) {
                     AudioFormat baseFormat = in.getFormat();
                     AudioFormat decodedFormat = new AudioFormat(
@@ -356,8 +401,10 @@ public class SoundPlayer {
                             baseFormat.getChannels() * (16 / 8),
                             baseFormat.getSampleRate(),
                             baseFormat.isBigEndian());
-                    din = AudioSystem.getAudioInputStream(decodedFormat, in);
+                    AudioInputStream din
+                        = AudioSystem.getAudioInputStream(decodedFormat, in);
                     rawplay(decodedFormat, din);
+                    din.close();
                     in.close();
                 }
             } catch (Exception e) {
@@ -366,7 +413,8 @@ public class SoundPlayer {
         }
 
         private void updateVolume(FloatControl c, int volume) {
-            // The gain (in decibels) and volume (in percents) are related via logarithm
+            // The gain (in decibels) and volume (in percents) are
+            // related via logarithm
             // 100% volume = 0dB attenuation
             // 50% volume = -6dB
             // 10% volume = -20dB
@@ -375,57 +423,67 @@ public class SoundPlayer {
             c.setValue(gain);
         }
         
-        private void rawplay(AudioFormat targetFormat,  AudioInputStream din) throws IOException, LineUnavailableException {
-            byte[] data = new byte[8192];
-            SourceDataLine line = getLine(targetFormat);
+        private void rawplay(AudioFormat targetFormat,  AudioInputStream din)
+            throws IOException, LineUnavailableException {
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class,
+                                                   targetFormat);
+            SourceDataLine line = (SourceDataLine) mixer.getLine(info);
             if (line != null) {
+                FloatControl control = null;
+                PropertyChangeListener pcl = null;
+
+                line.open(targetFormat);
                 line.start();
                 
                 // Volume control:
-                final FloatControl c = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-                final PropertyChangeListener pcl = new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent e) {
-                        int v = ((Integer) e.getNewValue()).intValue();
-                        updateVolume(c, v);
-                    }
-                };
-                volume.addPropertyChangeListener(pcl);
-                updateVolume(c, volume.getValue());
+                if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                    control = (FloatControl)
+                        line.getControl(FloatControl.Type.MASTER_GAIN);
+                    final FloatControl c = control;
+                    pcl = new PropertyChangeListener() {
+                            public void propertyChange(PropertyChangeEvent e) {
+                                int v = ((Integer) e.getNewValue()).intValue();
+                                updateVolume(c, v);
+                            }
+                        };
+                    volume.addPropertyChangeListener(pcl);
+                    updateVolume(control, volume.getValue());
+                }
 
                 // Playing audio:
+                byte[] data = new byte[8192];
                 int read = 0;
                 try {
-                    while (read != -1 && !soundStopped && !shouldStopThread()) {
+                    while (!soundStopped && !shouldStopThread()) {
                         try {
                             while (soundPaused) {
                                 Thread.sleep(10);
                             }
                         } catch (InterruptedException e) {}
                         read = din.read(data, 0, data.length);
-                        if (read != -1) {
-                        }
+                        if (read <= 0) break;
+                        line.write(data, 0, read);
                     }
                 } finally {
-                    volume.removePropertyChangeListener(pcl);
+                    if (pcl != null) volume.removePropertyChangeListener(pcl);
                 }
                 
                 // Implements fading down:
                 if (!soundStopped) {
                     long ms = System.currentTimeMillis() + FADE_UPDATE_MS;
                     long fadeStop = System.currentTimeMillis() + MAXIMUM_FADE_MS;
-                    while (read != -1
-                            && !soundStopped 
-                            && System.currentTimeMillis() < fadeStop) {
+                    while (!soundStopped
+                           && System.currentTimeMillis() < fadeStop) {
                         read = din.read(data, 0, data.length);
-                        if (read != -1) {
-                        }
+                        if (read <= 0) break;
+                        line.write(data, 0, read);
                         if (System.currentTimeMillis() > ms) {
                             // decrease the gain toward minimum (-80dB) by 1dB
-                            float currentGain = c.getValue();
+                            float currentGain = control.getValue();
                             float newGain = currentGain - 1f;
-                            if (newGain < c.getMinimum())
-                                newGain = c.getMinimum();
-                            c.setValue(newGain);
+                            if (newGain < control.getMinimum())
+                                newGain = control.getMinimum();
+                            control.setValue(newGain);
                             ms = System.currentTimeMillis() + FADE_UPDATE_MS;
                         }
                     }
@@ -434,16 +492,7 @@ public class SoundPlayer {
                 line.drain();
                 line.stop();
                 line.close();
-                din.close();
-            }             
-        }
-
-        private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException {
-            SourceDataLine sdl = null;
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-            sdl = (SourceDataLine) mixer.getLine(info);
-            sdl.open(audioFormat);
-            return sdl;
+            }
         }
     }
 }

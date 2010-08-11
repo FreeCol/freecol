@@ -43,7 +43,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -426,7 +425,7 @@ public final class InGameController implements NetworkConstants {
 
             // GUI management.
             if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound(player.getNation().getAnthem());
+                freeColClient.playSound("sound.anthem." + player.getNationID());
             }
             displayModelMessages(true);
             nextActiveUnit();
@@ -1194,7 +1193,7 @@ public final class InGameController implements NetworkConstants {
 
         if (askBuildColony(name, unit) && tile.getSettlement() != null) {
             player.invalidateCanSeeTiles();
-            freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
+            freeColClient.playSound("sound.event.buildingComplete");
             gui.setActiveUnit(null);
             gui.setSelectedTile(tile.getPosition());
 
@@ -1529,53 +1528,53 @@ public final class InGameController implements NetworkConstants {
             break;
 
         case MOVE_NO_ACCESS_BEACHED:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit, "move.noAccessBeached",
                                           "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_CONTACT:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit, "move.noAccessContact",
                                           "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_LAND:
             if (!moveDisembark(unit, direction)) {
-                freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+                freeColClient.playSound("sound.event.illegalMove");
             }
             break;
         case MOVE_NO_ACCESS_SETTLEMENT:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit,
                 StringTemplate.template("move.noAccessSettlement")
                 .addStringTemplate("%unit%", Messages.getLabel(unit))
                 .addStringTemplate("%nation%", getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_SKILL:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit,
                 StringTemplate.template("move.noAccessSkill")
                 .addStringTemplate("%unit%", Messages.getLabel(unit)));
             break;
         case MOVE_NO_ACCESS_TRADE:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit,
                 StringTemplate.template("move.noAccessTrade")
                 .addStringTemplate("%nation%", getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_WAR:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit,
                 StringTemplate.template("move.noAccessWar")
                 .addStringTemplate("%nation%", getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_WATER:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             canvas.showInformationMessage(unit,
                 StringTemplate.template("move.noAccessWater")
                 .addStringTemplate("%unit%", Messages.getLabel(unit)));
             break;
         default:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             break;
         }
 
@@ -1734,7 +1733,7 @@ public final class InGameController implements NetworkConstants {
             // Without Brewster, the migrants have already been selected
             // and were updated to the European docks by the server.
             final int migrants = Integer.parseInt(reply.getAttribute("fountainOfYouth"));
-            freeColClient.playMusicOnce("fountain");
+            freeColClient.playSound("sound.event.fountainOfYouth");
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < migrants; i++) {
@@ -1877,7 +1876,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (!unit.canMoveToEurope()) {
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            freeColClient.playSound("sound.event.illegalMove");
             return;
         }
 
@@ -2081,16 +2080,8 @@ public final class InGameController implements NetworkConstants {
      */
     private void attack(Unit unit, Direction direction) {
         String sound = askAttack(unit, direction);
-        if ("ATTACK_ARTILLERY".equals(sound)) {
-            freeColClient.playSound(SoundEffect.ATTACK_ARTILLERY);
-        } else if ("ATTACK_DRAGOON".equals(sound)) {
-            freeColClient.playSound(SoundEffect.ATTACK_DRAGOON);
-        } else if ("ATTACK_NAVAL".equals(sound)) {
-            freeColClient.playSound(SoundEffect.ATTACK_NAVAL);
-        } else if ("CAPTURED_BY_ARTILLERY".equals(sound)) {
-            freeColClient.playSound(SoundEffect.CAPTURED_BY_ARTILLERY);
-        } else if ("SUNK".equals(sound)) {
-            freeColClient.playSound(SoundEffect.SUNK);
+        if (sound != null && !sound.isEmpty()) {
+            freeColClient.playSound(sound);
         }
         freeColClient.getCanvas().refresh();
         nextActiveUnit();
@@ -2397,7 +2388,7 @@ public final class InGameController implements NetworkConstants {
         case ESTABLISH_MISSION:
             if (askMissionary(unit, direction, false)) {
                 if (settlement.getMissionary() == unit) {
-                    freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
+                    freeColClient.playSound("sound.event.missionEstablished");
                 }
                 nextActiveUnit();
             }
@@ -2405,7 +2396,7 @@ public final class InGameController implements NetworkConstants {
         case DENOUNCE_HERESY:
             if (askMissionary(unit, direction, true)) {
                 if (settlement.getMissionary() == unit) {
-                    freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
+                    freeColClient.playSound("sound.event.missionEstablished");
                 }
                 nextModelMessage();
                 nextActiveUnit();
@@ -3241,7 +3232,7 @@ public final class InGameController implements NetworkConstants {
         // Proceed to board
         Location oldLocation = unit.getLocation();
         if (askEmbark(unit, carrier, null) && unit.getLocation() == carrier) {
-            freeColClient.playSound(SoundEffect.LOAD_CARGO);
+            freeColClient.playSound("sound.event.loadCargo");
             if (oldLocation instanceof Tile) {
                 ((Tile) oldLocation).firePropertyChange(Tile.UNIT_CHANGE, unit, null);
             } else if (oldLocation instanceof Europe) {
@@ -3360,7 +3351,7 @@ public final class InGameController implements NetworkConstants {
 
         // Try to load.
         if (loadGoods(goods, colony, carrier)) {
-            freeColClient.playSound(SoundEffect.LOAD_CARGO);
+            freeColClient.playSound("sound.event.loadCargo");
         }
     }
 
@@ -3508,7 +3499,7 @@ public final class InGameController implements NetworkConstants {
         int price = market.costToBuy(type);
         if (askBuyGoods(carrier, type, toBuy)
             && (newAmount = carrier.getGoodsContainer().getGoodsCount(type)) > oldAmount) {
-            freeColClient.playSound(SoundEffect.LOAD_CARGO);
+            freeColClient.playSound("sound.event.loadCargo");
             canvas.updateGoldLabel();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
             for (TransactionListener listener : market.getTransactionListener()) {
@@ -3588,7 +3579,7 @@ public final class InGameController implements NetworkConstants {
                                + " leaving " + Integer.toString(newAmount));
                 return false;
             }
-            freeColClient.playSound(SoundEffect.SELL_CARGO);
+            freeColClient.playSound("sound.event.sellCargo");
             canvas.updateGoldLabel();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
             for (TransactionListener listener : market.getTransactionListener()) {
@@ -4641,10 +4632,11 @@ public final class InGameController implements NetworkConstants {
                         continue;
                     }
                 } else if (message.getMessageType() == ModelMessage.MessageType.BUILDING_COMPLETED) {
-                    freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
+                    freeColClient.playSound("sound.event.buildingComplete");
                 } else if (message.getMessageType() == ModelMessage.MessageType.FOREIGN_DIPLOMACY) {
                     if (message.getId().equals("EventPanel.MEETING_AZTEC")) {
-                        freeColClient.playMusicOnce("aztec");
+                        // TODO: fix this special purpose kludge
+                        freeColClient.playSound("sound.event.meet.model.nation.aztec");
                     }
                 }
                 messageList.add(message);

@@ -59,10 +59,6 @@ import net.sf.freecol.client.gui.WindowedFrame;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.sound.MusicLibrary;
-import net.sf.freecol.client.gui.sound.SfxLibrary;
-import net.sf.freecol.client.gui.sound.SoundLibrary;
-import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -124,13 +120,7 @@ public final class FreeColClient {
 
     private ImageLibrary imageLibrary;
 
-    private MusicLibrary musicLibrary;
-
-    private SfxLibrary sfxLibrary;
-
-    private SoundPlayer musicPlayer;
-
-    private SoundPlayer sfxPlayer;
+    private SoundPlayer soundPlayer;
 
     // Networking:
     /**
@@ -185,13 +175,15 @@ public final class FreeColClient {
      * 
      * @param savegameFile a <code>File</code> value
      * @param size a <code>Dimension</code> value
-     * @param sound a <code>boolean</code> value
+     * @param sound True if sounds should be played
      * @param splashFilename a <code>String</code> value
      * @param showOpeningVideo Display the opening video.
      * @param fontName a <code>String</code> value
      */
-    public FreeColClient(final File savegameFile, Dimension size, final boolean sound,
-                         final String splashFilename, final boolean showOpeningVideo, String fontName) {
+    public FreeColClient(final File savegameFile, Dimension size,
+                         final boolean sound,
+                         final String splashFilename,
+                         final boolean showOpeningVideo, String fontName) {
 
         // Display splash screen:
         JWindow splash = null;
@@ -230,24 +222,7 @@ public final class FreeColClient {
         }
 
         imageLibrary = new ImageLibrary();
-
-        if (sound) {
-            File dir = new File(FreeCol.getDataDirectory(), "audio");
-            try {
-                musicLibrary = new MusicLibrary(dir);
-            } catch (FreeColException e) {
-                logger.warning("Could not load music files from " + dir);
-            }
-
-            try {
-                sfxLibrary = new SfxLibrary(dir);
-            } catch (FreeColException e) {
-                logger.warning("Could not load sfx files from " + dir);
-            }
-        }
-
         windowed = (size != null);
-
         if (size != null && size.width < 0) {
             final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
             size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
@@ -323,7 +298,7 @@ public final class FreeColClient {
         if (!headless) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        startGUI(windowSize, (showOpeningVideo && savegameFile == null));
+                        startGUI(windowSize, sound, (showOpeningVideo && savegameFile == null));
                     }
                 });
         }
@@ -391,24 +366,18 @@ public final class FreeColClient {
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
-    private void startGUI(Dimension innerWindowSize, final boolean showOpeningVideo) {
-        final AudioMixerOption amo = (AudioMixerOption) getClientOptions().getObject(ClientOptions.AUDIO_MIXER);
-        if (musicLibrary != null) {
-            musicPlayer = new SoundPlayer(amo,
-                    (PercentageOption) getClientOptions().getObject(ClientOptions.MUSIC_VOLUME),
-                    false,
-                    true);
-            //playMusic("intro");
+    private void startGUI(Dimension innerWindowSize,
+                          final boolean sound,
+                          final boolean showOpeningVideo) {
+        if (sound) {
+            final ClientOptions opts = getClientOptions();
+            final AudioMixerOption amo
+                = (AudioMixerOption) opts.getObject(ClientOptions.AUDIO_MIXER);
+            final PercentageOption volume
+                = (PercentageOption) opts.getObject(ClientOptions.AUDIO_VOLUME);
+            soundPlayer = new SoundPlayer(amo, volume);
         } else {
-            musicPlayer = null;
-        }
-        if (sfxLibrary != null) {
-            sfxPlayer = new SoundPlayer(amo,
-                    (PercentageOption) getClientOptions().getObject(ClientOptions.SFX_VOLUME),
-                    true,
-                    false);
-        } else {
-            sfxPlayer = null;
+            soundPlayer = null;
         }
         
         if (GraphicsEnvironment.isHeadless()) {
@@ -444,7 +413,7 @@ public final class FreeColClient {
             });
         } else {
             canvas.showMainPanel();
-            playMusic("intro");
+            playSound("sound.intro.general");
         }
         gui.startCursorBlinking();
     }
@@ -883,68 +852,34 @@ public final class FreeColClient {
     }
 
     /**
-     * Plays the music.
-     */
-    public void playMusic(String music) {
-        if (musicPlayer != null) {
-            musicPlayer.play(musicLibrary.get(music));
-        }
-    }
-    
-    /**
-     * Plays a random music from the given playlist.
-     */
-    public void playMusicOnce(String music) {
-        if (musicPlayer != null) {
-            musicPlayer.playOnce(musicLibrary.get(music));
-        }
-    }
-    
-    /**
-     * Plays a random music from the given playlist.
-     * @param delay A delay before playing the sound (ms).
-     */
-    public void playMusicOnce(String music, int delay) {
-        if (musicPlayer != null) {
-            musicPlayer.playOnce(musicLibrary.get(music), delay);
-        }
-    }
-    
-    /**
-     * Plays the given sound effect.
-     * 
-     * @param sound The key sound effect given by {@link SfxLibrary}.
+     * Plays some sound.
+     *
+     * @param sound The sound resource to play.
      */
     public void playSound(String sound) {
-        if (sfxPlayer != null) {
-            sfxPlayer.play(sfxLibrary.get(sound));
-        }
-    }
-
-    /**
-     * Plays the given sound effect.
-     * 
-     * @param sound The key sound effect given by {@link SfxLibrary}.
-     */
-    public void playSound(SoundLibrary.SoundEffect sound) {
-        if (sfxPlayer != null) {
-            sfxPlayer.play(sfxLibrary.get(sound));
+        if (canPlaySound()) {
+            File file = ResourceManager.getAudio(sound);
+            if (file != null) {
+                soundPlayer.playOnce(file);
+            }
+            logger.finest(((file == null) ? "Could not load" : "Playing")
+                          + " sound: " + sound);
         }
     }
     
     /**
-     * Verifies if the client can play music
+     * Verifies if the client can play sounds.
      */
-    public boolean canPlayMusic(){
-        return musicPlayer != null;
+    public boolean canPlaySound() {
+        return soundPlayer != null;
     }
 
     /**
-     * Returns <i>true</i> if this client is logged in to a server or <i>false</i>
-     * otherwise.
+     * Returns <i>true</i> if this client is logged in to a server or
+     * <i>false</i> otherwise.
      * 
-     * @return <i>true</i> if this client is logged in to a server or <i>false</i>
-     *         otherwise.
+     * @return <i>true</i> if this client is logged in to a server or
+     *         <i>false</i> otherwise.
      */
     public boolean isLoggedIn() {
         return loggedIn;

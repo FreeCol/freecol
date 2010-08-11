@@ -2446,7 +2446,7 @@ public final class Canvas extends JDesktopPane {
     public void showOpeningVideoPanel() {
         closeMenus();
         final Video video = ResourceManager.getVideo("Opening.video");
-        boolean muteAudio = !getClient().canPlayMusic();
+        boolean muteAudio = !getClient().canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
         addCentered(vp, MAIN_LAYER);
         vp.play();
@@ -2472,7 +2472,7 @@ public final class Canvas extends JDesktopPane {
                 vp.stop();
                 Canvas.this.remove(vp);
                 showMainPanel();
-                freeColClient.playMusic("intro");
+                freeColClient.playSound("sound.intro.general");
             }
 
             public void keyReleased(KeyEvent e) {}

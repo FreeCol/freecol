@@ -155,8 +155,7 @@
     </optionGroup>
     <optionGroup id="clientOptions.audio">
       <audioMixerOption id="model.option.audioMixer"/>
-      <percentageOption id="model.option.musicVolume" defaultValue="100" previewEnabled="true"/>
-      <percentageOption id="model.option.sfxVolume" defaultValue="100" previewEnabled="true"/>
+      <percentageOption id="model.option.audioVolume" defaultValue="100" previewEnabled="true"/>
     </optionGroup>
     <optionGroup id="clientOptions.other" >
       <!-- Option for autoload emigrants on saling to america. -->

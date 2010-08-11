@@ -174,9 +174,7 @@ public class ClientOptions extends OptionMap {
 
     public static final String AUDIO_MIXER = "model.option.audioMixer";
 
-    public static final String MUSIC_VOLUME = "model.option.musicVolume";
-
-    public static final String SFX_VOLUME = "model.option.sfxVolume";
+    public static final String AUDIO_VOLUME = "model.option.audioVolume";
 
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.

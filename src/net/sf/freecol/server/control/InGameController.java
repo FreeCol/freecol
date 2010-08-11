@@ -2529,6 +2529,8 @@ public final class InGameController extends Controller {
                                 new HistoryEvent(turn,
                                     HistoryEvent.EventType.MEET_NATION)
                                     .addStringTemplate("%nation%", serverPlayer.getNationName()));
+                            cs.addAttribute(See.only(other), "sound",
+                                            "sound.meet." + serverPlayer.getNationID());
                         }
                     } else { // (serverPlayer.isEuropean)
                         // Initialize alarm for native settlements.
@@ -2553,6 +2555,8 @@ public final class InGameController extends Controller {
                             new HistoryEvent(turn,
                                 HistoryEvent.EventType.MEET_NATION)
                                 .addStringTemplate("%nation%", other.getNationName()));
+                        cs.addAttribute(See.only(serverPlayer), "sound",
+                                        "sound.meet." + other.getNationID());
                         // Extra special meeting on first landing!
                         if (other.isIndian()
                             && !serverPlayer.isNewLandNamed()
@@ -2837,12 +2841,22 @@ public final class InGameController extends Controller {
             defenderUnit = (Unit) defender;
             defenderPlayer = (ServerPlayer) defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
+            cs.addAttribute(See.only(attackerPlayer), "sound",
+                (attackerUnit.isNaval())
+                ? "sound.attack.naval"
+                : (attackerUnit.hasAbility("model.ability.bombard"))
+                ? "sound.attack.artillery"
+                : (attackerUnit.isMounted())
+                ? "sound.attack.mounted"
+                : "sound.attack.foot");
         } else if (isBombard) {
             attackerSettlement = (Settlement) attacker;
             attackerTile = attackerSettlement.getTile();
             defenderUnit = (Unit) defender;
             defenderPlayer = (ServerPlayer) defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
+            cs.addAttribute(See.only(attackerPlayer), "sound",
+                            "sound.attack.bombard");
         } else {
             throw new IllegalStateException("Bogus combat");
         }
@@ -3403,6 +3417,8 @@ public final class InGameController extends Controller {
                 cs.add(See.only(attackerPlayer), t);
             }
         }
+        cs.addAttribute(See.only(attackerPlayer), "sound",
+                        "sound.event.captureColony");
     }
 
     /**
@@ -3816,6 +3832,8 @@ public final class InGameController extends Controller {
                                            HistoryEvent.EventType.DESTROY_NATION)
                           .addStringTemplate("%nation%", nativeNation));
         }
+        cs.addAttribute(See.only(attackerPlayer), "sound",
+                        "sound.event.destroySettlement");
     }
 
     /**
@@ -4192,7 +4210,7 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%enemyUnit%", attackerUnit.getLabel())
                       .addStringTemplate("%enemyNation%", attackerNation));
 
-        csSinkShip(ship, cs);
+        csSinkShip(ship, attackerPlayer, cs);
     }
 
     /**
@@ -4222,18 +4240,22 @@ public final class InGameController extends Controller {
                       .addName("%colony%", settlement.getName())
                       .addStringTemplate("%unit%", ship.getLabel()));
 
-        csSinkShip(ship, cs);
+        csSinkShip(ship, attackerPlayer, cs);
     }
 
     /**
      * Sink the ship.
      *
      * @param ship The naval <code>Unit</code> to sink.
+     * @param attackerPlayer The <code>ServerPlayer</code> that attacked.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csSinkShip(Unit ship, ChangeSet cs) {
+    private void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
+                            ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         cs.addDispose(shipPlayer, ship.getLocation(), ship);
+        cs.addAttribute(See.only(attackerPlayer), "sound",
+                        "sound.event.shipSunk");
     }
 
     /**

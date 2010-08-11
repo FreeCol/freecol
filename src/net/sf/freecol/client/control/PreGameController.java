@@ -239,13 +239,13 @@ public final class PreGameController {
         // Unknown nation is not in getPlayers() list.
         addPlayerResources(Nation.UNKNOWN_NATION_ID);
 
+        Player myPlayer = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {
             canvas.closeMainPanel();
             canvas.closeMenus();
             canvas.closeStatusPanel();
             
-            // TODO: Nation specific intro-music:
-            freeColClient.playMusicOnce("england", SoundPlayer.STANDARD_DELAY);
+            freeColClient.playSound("sound.intro." + myPlayer.getNationID());
         }
 
         InGameController inGameController = freeColClient.getInGameController();
@@ -258,22 +258,21 @@ public final class PreGameController {
             freeColClient.getFrame().setJMenuBar(new InGameMenuBar(freeColClient));
         }
 
-        Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
+        Unit activeUnit = myPlayer.getNextActiveUnit();
         //freeColClient.getMyPlayer().updateCrossesRequired();
         gui.setActiveUnit(activeUnit);
         if (activeUnit != null) {
             gui.setFocus(activeUnit.getTile().getPosition());
         } else {
-            gui.setFocus(((Tile) freeColClient.getMyPlayer().getEntryLocation()).getPosition());
+            gui.setFocus(((Tile) myPlayer.getEntryLocation()).getPosition());
         }
 
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
         
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
-            Player player = freeColClient.getMyPlayer();
-            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL, 
-                                                    "tutorial.startGame", player));
+            myPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                                                    "tutorial.startGame", myPlayer));
             // force view of tutorial message
             inGameController.nextModelMessage();
         }
