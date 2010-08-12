@@ -56,12 +56,6 @@ public class FreeColDataFile {
     private static final String FILE_SUFFIX = ".properties";
 
     /**
-       A fake URI scheme for transferring the resource lookup to the
-       locale-specific files.
-    */
-    private static final String localeScheme = "locale:";
-
-    /**
        A fake URI scheme for resources delegating to other resources.
     */
     private static final String resourceScheme = "resource:";
@@ -186,19 +180,7 @@ public class FreeColDataFile {
     
     protected URI getURI(String filename) {
         try {
-            if (filename.startsWith(localeScheme)) {
-                String key = filename.substring(localeScheme.length());
-                if (!Messages.containsKey(key)) {
-                    logger.warning("Localized resource lookup failed: " + key);
-                    return null;
-                }
-                String value = Messages.message(key);
-                if (value.startsWith(localeScheme)) {
-                    logger.warning("Localized resources do not nest: " + key);
-                    return null;
-                }
-                return getURI(value);
-            } else if (filename.startsWith("urn:")) {
+            if (filename.startsWith("urn:")) {
                 return new URI(filename);
             } else if (file.isDirectory()) {
                 return new File(file, filename).toURI();
