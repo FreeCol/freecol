@@ -2530,7 +2530,7 @@ public final class InGameController extends Controller {
                                     HistoryEvent.EventType.MEET_NATION)
                                     .addStringTemplate("%nation%", serverPlayer.getNationName()));
                             cs.addAttribute(See.only(other), "sound",
-                                            "sound.meet." + serverPlayer.getNationID());
+                                            "sound.event.meet." + serverPlayer.getNationID());
                         }
                     } else { // (serverPlayer.isEuropean)
                         // Initialize alarm for native settlements.
@@ -2556,7 +2556,7 @@ public final class InGameController extends Controller {
                                 HistoryEvent.EventType.MEET_NATION)
                                 .addStringTemplate("%nation%", other.getNationName()));
                         cs.addAttribute(See.only(serverPlayer), "sound",
-                                        "sound.meet." + other.getNationID());
+                                        "sound.event.meet." + other.getNationID());
                         // Extra special meeting on first landing!
                         if (other.isIndian()
                             && !serverPlayer.isNewLandNamed()

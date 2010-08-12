@@ -60,6 +60,7 @@ public class AudioResource extends Resource {
             ais.close();
         } catch (Exception e) {
             logger.warning("Not an audio file: " + url.getFile());
+            this.file = null;
         }
     }
 

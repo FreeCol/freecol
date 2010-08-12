@@ -30,6 +30,7 @@ import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
+import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -40,12 +41,20 @@ public class SoundTest extends FreeColTestCase {
     
     private void playSound(String id) {
         File file = ResourceManager.getAudio(id);
-        assertTrue("Sound " + id + " should exist", file != null);
-        soundPlayer.playOnce(file);
-        try {
-            // just play the beginning of the sound, just to check it works
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
+        if (file == null) {
+            // Can not rely on loading a valid sound resource in the
+            // test suite as the requisite ogg-support jars may not be
+            // loaded.  However we can insist that the resource was at
+            // least registered.
+            assertTrue("Resource " + id + " should be present",
+                       ResourceManager.hasResource(id));
+        } else {
+            soundPlayer.playOnce(file);
+            try {
+                // just play the beginning of the sound, just to check it works
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+            }
         }
     }
     
@@ -59,8 +68,8 @@ public class SoundTest extends FreeColTestCase {
         final AudioMixerOption amo = (AudioMixerOption) clientOptions.getObject(ClientOptions.AUDIO_MIXER);
         final PercentageOption po = (PercentageOption) clientOptions.getObject(ClientOptions.AUDIO_VOLUME);
         po.setValue(10); // 10% volume
-
         soundPlayer = new SoundPlayer(amo, po);
+
         playSound("sound.intro.general");
         playSound("sound.intro.model.nation.english");
         playSound("sound.anthem.model.nation.dutch");
@@ -72,7 +81,7 @@ public class SoundTest extends FreeColTestCase {
         //playSound("sound.attack.foot");
         playSound("sound.attack.mounted");
         playSound("sound.attack.naval");
-        playSound("sound.meet.model.nation.aztec");
+        playSound("sound.event.meet.model.nation.aztec");
         playSound("sound.event.buildingComplete");
         playSound("sound.event.captureColony");
         //playSound("sound.event.destroySettlement");
