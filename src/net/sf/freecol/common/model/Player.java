@@ -79,11 +79,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private static final String TENSION_TAG = "tension";
 
-    /**
-     * The index of this player
-     */
-    private int index;
-
 
     /**
      * Constants for describing the stance towards a player.
@@ -549,15 +544,6 @@ public class Player extends FreeColGameObject implements Nameable {
         super(game, id);
     }
 
-    /**
-     * Returns the index of this Player.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getIndex() {
-        return index;
-    }
-	
     /**
      * Get the <code>FeatureContainer</code> value.
      *
@@ -3342,7 +3328,6 @@ public class Player extends FreeColGameObject implements Nameable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getId());
-        out.writeAttribute("index", String.valueOf(index));
         out.writeAttribute("username", name);
         out.writeAttribute("nationID", nationID);
         if (nationType != null) {
@@ -3445,7 +3430,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        index = Integer.parseInt(in.getAttributeValue(null, "index"));
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
         if (!name.equals(UNKNOWN_ENEMY)) {
