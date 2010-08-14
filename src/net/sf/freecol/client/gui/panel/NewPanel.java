@@ -42,6 +42,9 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.io.FreeColModFile.ModInfo;
+import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -89,9 +92,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     };
     private final JComboBox nationalAdvantages = new JComboBox(choices);
 
-    // TODO: read these from mods
-    private final JComboBox specificationBox =
-        new JComboBox(new String[] { "FreeCol", "Colonization" });
+    private final JComboBox specificationBox = new JComboBox();
 
     private final Component[] joinComponents = new Component[] {
         ipLabel, server, port1Label, port1
@@ -119,6 +120,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     public NewPanel(Canvas parent) {
         super(parent);
         this.connectController = getClient().getConnectController();
+
+        for (FreeColTcFile tc : Mods.getAllTCs()) {
+            specificationBox.addItem(tc.getModInfo());
+        }
 
         JButton cancel = new JButton( Messages.message("cancel") );
         JLabel nameLabel = localizedLabel("name");
@@ -221,7 +226,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        final String tc = ((String) specificationBox.getSelectedItem()).toLowerCase(Locale.US);
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
@@ -232,6 +236,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
+                    String tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
                     connectController.startSingleplayerGame(tc, name.getText(), nationOptions, level);
                     // getFilename(), getDifficulty());
                     break;
@@ -250,6 +255,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         nationOptions = NationOptions.getDefaults();
                         nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                         level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
+                        tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
                         connectController.startMultiplayerGame(tc, publicServer.isSelected(), name.getText(),
                                                                port, nationOptions, level);
                     } catch (NumberFormatException e) {

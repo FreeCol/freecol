@@ -94,7 +94,10 @@ public class Messages {
             logger.finest("Loaded message bundle " + fileName + " from messages.");
         }
 
-        for (FreeColModFile fcmf : Mods.getAllMods()) {
+        List<FreeColModFile> allMods = new ArrayList<FreeColModFile>();
+        allMods.addAll(Mods.getAllMods());
+        allMods.addAll(Mods.getAllTCs());
+        for (FreeColModFile fcmf : allMods) {
             for (String fileName : filenames) {
                 try {
                     InputStream is = fcmf.getInputStream(fileName);

@@ -108,4 +108,17 @@ public class Mods {
         mods.addAll(getDirectoryMods(FreeCol.getStandardModsDirectory()));
         return mods;
     }
+
+    /**
+     * Gets all available TCs, a.k.a. rules. TODO: move rules to a
+     * sub-directory and auto-discover rules.
+     *
+     * @return A list of <code>FreeColModFile</code>s contain mods.
+     */
+    public static List<FreeColTcFile> getAllTCs() {
+        List<FreeColTcFile> result = new ArrayList<FreeColTcFile>();
+        result.add(new FreeColTcFile("freecol"));
+        result.add(new FreeColTcFile("classic"));
+        return result;
+    }
 }
