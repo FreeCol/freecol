@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -39,7 +40,6 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -326,6 +326,8 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 recruitCount = inColonyCount - 1;
             }
             // Actually go through and arm our people.
+            EquipmentType muskets = getGame().getSpecification().getEquipmentType("model.equipment.muskets");
+            EquipmentType horses = getGame().getSpecification().getEquipmentType("model.equipment.horses");
             boolean needMuskets = false;
             boolean needHorses = false;
             ui = recruits.iterator();
@@ -376,8 +378,8 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                     }
                 }
             }
-            GoodsType musketType = Specification.getSpecification().getGoodsType("model.goods.muskets");
-            GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
+            GoodsType musketType = getAIMain().getGame().getSpecification().getGoodsType("model.goods.muskets");
+            GoodsType horsesType = getAIMain().getGame().getSpecification().getGoodsType("model.goods.horses");
             if (needMuskets && ac != null) {
                 // Check and see if we have already made a GoodsWish for
                 // here.

@@ -94,7 +94,7 @@ public class ColonyPlan {
     /**
      * Describe profile here.
      */
-    private ColonyProfile profile = new ColonyProfile();
+    private ColonyProfile profile;
 
     
     
@@ -1052,14 +1052,17 @@ public class ColonyPlan {
     }
 
     private void selectProfile() {
+        List<GoodsType> preferredProduction = new ArrayList<GoodsType>();
+        preferredProduction.addAll(getGame().getSpecification().getFoodGoodsTypeList());
+        preferredProduction.addAll(getGame().getSpecification().getLibertyGoodsTypeList());
+        ProfileType type = ProfileType.SMALL;
         int size = colony.getUnitCount();
-        if (size < 4) {
-            profile.setType(ProfileType.SMALL);
-        } else if (size > 8) {
-            profile.setType(ProfileType.LARGE);
+        if (size > 8) {
+            type = ProfileType.LARGE;
         } else if (size > 12) {
-            profile.setType(ProfileType.CAPITAL);
+            type = ProfileType.CAPITAL;
         }
+        profile = new ColonyProfile(type, preferredProduction);
     }
 
     /**

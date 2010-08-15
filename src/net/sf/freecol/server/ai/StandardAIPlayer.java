@@ -43,7 +43,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -374,7 +373,7 @@ public class StandardAIPlayer extends AIPlayer {
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
-            List<GoodsType> goodsTypes = Specification.getSpecification().getGoodsTypeList();
+            List<GoodsType> goodsTypes = getAIMain().getGame().getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
                     averageIncome += getPlayer().getIncomeAfterTaxes(type);
@@ -682,7 +681,7 @@ public class StandardAIPlayer extends AIPlayer {
     private void cheat() {
         logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
-        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
             getPlayer().resetArrears(goodsType);
         }
 
@@ -690,7 +689,7 @@ public class StandardAIPlayer extends AIPlayer {
         if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isEuropean() && !getPlayer().isREF() && getPlayer().isAI()
                 && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
-            List<UnitType> unitTypes = Specification.getSpecification().getUnitTypeList();
+            List<UnitType> unitTypes = getAIMain().getGame().getSpecification().getUnitTypeList();
 
             if (getAIRandom().nextInt(10) == 1) {
                 int price = 0;
@@ -713,8 +712,8 @@ public class StandardAIPlayer extends AIPlayer {
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
                     // TODO: cleanup magic numbers 50 and 1
-                    GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
-                    GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
+                    GoodsType muskets = getAIMain().getGame().getSpecification().getGoodsType("model.goods.muskets");
+                    GoodsType horses = getAIMain().getGame().getSpecification().getGoodsType("model.goods.horses");
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
 
@@ -962,8 +961,8 @@ public class StandardAIPlayer extends AIPlayer {
         boolean colonyHasArmedUnits = false;
         boolean canArmUnit = false;
         
-        EquipmentType musketsEqType = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
-        EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+        EquipmentType musketsEqType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.muskets");
+        EquipmentType horsesEqType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.horses");
         
         // Create comparator to sort units by skill level
         // Prefer unit with less qualifications
@@ -1228,10 +1227,10 @@ public class StandardAIPlayer extends AIPlayer {
      */
     /*
     private void secureColony(Colony colony) {
-        GoodsType musketType = Specification.getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        final EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+        GoodsType musketType = getAIMain().getGame().getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = getAIMain().getGame().getSpecification().getGoodsType("model.goods.horses");
+        final EquipmentType muskets = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.muskets");
+        final EquipmentType horses = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.horses");
 
         Map map = getPlayer().getGame().getMap();
         int olddefenders = 0;
@@ -1457,7 +1456,7 @@ public class StandardAIPlayer extends AIPlayer {
         // Create a datastructure for the worker wishes:
         java.util.Map<UnitType, ArrayList<Wish>> workerWishes =
             new HashMap<UnitType, ArrayList<Wish>>();
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getAIMain().getGame().getSpecification().getUnitTypeList()) {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
         if (getPlayer().isEuropean()) {

@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -229,7 +228,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
             if (id != null && id != "") {
-                possibleFoundingFathers.add(Specification.getSpecification().getFoundingFather(id));
+                possibleFoundingFathers.add(aiMain.getGame().getSpecification().getFoundingFather(id));
             }
         }
 

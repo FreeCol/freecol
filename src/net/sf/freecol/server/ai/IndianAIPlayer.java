@@ -97,12 +97,14 @@ public class IndianAIPlayer extends NewAIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
 
+        /*
         int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
         ArrayList<ArrayList<Wish>> workerWishes = new ArrayList<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < numberOfUnits; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }
+        */
 
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {

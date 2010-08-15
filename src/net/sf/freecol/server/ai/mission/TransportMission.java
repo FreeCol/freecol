@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -1029,7 +1028,7 @@ public class TransportMission extends Mission {
 
         int priceTrained = 0;
         UnitType cheapestTrained = null;
-        List<UnitType> unitTypes = Specification.getSpecification().getUnitTypesTrainedInEurope();
+        List<UnitType> unitTypes = getAIMain().getGame().getSpecification().getUnitTypesTrainedInEurope();
         for (UnitType unitType : unitTypes) {
             int price = europe.getUnitPrice(unitType);
             if (cheapestTrained == null || price < priceTrained) {

@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
@@ -68,8 +67,6 @@ public class PioneeringMission extends Mission {
      */
     
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
-
-    private static final EquipmentType toolsType = Specification.getSpecification().getEquipmentType("model.equipment.tools");
 
     private static enum PioneeringMissionState {GET_TOOLS,IMPROVING};
     
@@ -264,15 +261,15 @@ public class PioneeringMission extends Mission {
         
         while(isValid() && unit.getMovesLeft() > 0){
             switch(state){
-                case GET_TOOLS:
-                    getTools(connection);
-                    break;
-                case IMPROVING:
-                    processImprovementPlan(connection);
-                    break;
-                default:
-                    logger.warning("Unknown state");
-                    invalidateMission = true;
+            case GET_TOOLS:
+                getTools(connection);
+                break;
+            case IMPROVING:
+                processImprovementPlan(connection);
+                break;
+            default:
+                logger.warning("Unknown state");
+                invalidateMission = true;
             }        
         }
     }
@@ -304,7 +301,7 @@ public class PioneeringMission extends Mission {
 
             Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null
-                    && unit.getMoveType(direction).isProgress()) {
+                && unit.getMoveType(direction).isProgress()) {
                 AIMessage.askMove(getAIUnit(), direction);
             }
             
@@ -444,6 +441,7 @@ public class PioneeringMission extends Mission {
         Unit unit = getUnit();
         logger.finest("About to equip " + unit + " in " + colonyWithTools.getName());
         AIColony ac = (AIColony) getAIMain().getAIObject(colonyWithTools);
+        EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
         int amount = toolsType.getMaximumCount();
         for (AbstractGoods materials : toolsType.getGoodsRequired()) {
             int availableAmount = ac.getAvailableGoods(materials.getType());
@@ -474,10 +472,11 @@ public class PioneeringMission extends Mission {
 
 
     private boolean validateColonyWithTools() {
+        EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
         if(colonyWithTools != null){
             if(colonyWithTools.isDisposed() 
-                    || colonyWithTools.getOwner() != getUnit().getOwner()
-                    || !colonyWithTools.canBuildEquipment(toolsType)){
+               || colonyWithTools.getOwner() != getUnit().getOwner()
+               || !colonyWithTools.canBuildEquipment(toolsType)){
                 colonyWithTools = null;
             }
         }
@@ -546,12 +545,12 @@ public class PioneeringMission extends Mission {
         }
         
         switch(state){
-            case GET_TOOLS:
-                validateColonyWithTools();
-                break;
-            case IMPROVING:
-                updateTileImprovementPlan();
-                break;
+        case GET_TOOLS:
+            validateColonyWithTools();
+            break;
+        case IMPROVING:
+            updateTileImprovementPlan();
+            break;
         }        
         return !invalidateMission;
     }
@@ -587,11 +586,13 @@ public class PioneeringMission extends Mission {
             logger.finest("No Improvement plan found, PioneeringMission not valid");
             return false;
         }
-        
+
+        EquipmentType toolsType = aiUnit.getAIMain().getGame().getSpecification()
+            .getEquipmentType("model.equipment.tools");
         boolean unitHasToolsAvail = aiUnit.getUnit().getEquipmentCount(toolsType) > 0;
         if(unitHasToolsAvail){
             logger.finest("Tools equipped, PioneeringMission valid");
-           return true; 
+            return true; 
         }
         
         // Search colony with tools to equip the unit with
@@ -616,6 +617,8 @@ public class PioneeringMission extends Mission {
             return null;
         }
         
+        EquipmentType toolsType = aiu.getAIMain().getGame().getSpecification()
+            .getEquipmentType("model.equipment.tools");
         for(Colony colony : unit.getOwner().getColonies()){
             if(!colony.canBuildEquipment(toolsType)) {
                 continue;
@@ -737,20 +740,20 @@ public class PioneeringMission extends Mission {
      */
     public String getDebuggingInfo() {
         switch(state){
-            case IMPROVING:
-                if(tileImprovementPlan == null){
-                    return "No target";
-                }
-                final String action = tileImprovementPlan.getType().getNameKey();
-                return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
-            case GET_TOOLS:
-                if (colonyWithTools == null) {
-                    return "No target";
-                }
-                return "Getting tools from " + colonyWithTools.getName();
-            default:
-                logger.warning("Unknown state");
-                return "";
+        case IMPROVING:
+            if(tileImprovementPlan == null){
+                return "No target";
+            }
+            final String action = tileImprovementPlan.getType().getNameKey();
+            return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
+        case GET_TOOLS:
+            if (colonyWithTools == null) {
+                return "No target";
+            }
+            return "Getting tools from " + colonyWithTools.getName();
+        default:
+            logger.warning("Unknown state");
+            return "";
         }
     }
 }

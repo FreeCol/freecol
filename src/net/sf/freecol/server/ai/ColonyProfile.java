@@ -19,10 +19,8 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.GoodsType;
 
 public class ColonyProfile {
@@ -42,22 +40,9 @@ public class ColonyProfile {
     };
 
 
-    public ColonyProfile() {
-        this(ProfileType.MEDIUM, null);
-    }
-
     public ColonyProfile(ProfileType type, List<GoodsType> production) {
         this.type = type;
-        if (production == null) {
-            preferredProduction = new ArrayList<GoodsType>();
-            for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
-                if (goodsType.isFoodType() || goodsType.isLibertyType()) {
-                    preferredProduction.add(goodsType);
-                }
-            }
-        } else {
-            preferredProduction = production;
-        }
+        preferredProduction = production;
     }
 
     /**

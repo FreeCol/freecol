@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -181,7 +180,7 @@ public class WorkerWish extends Wish {
         }
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
 
-        unitType = Specification.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+        unitType = getAIMain().getGame().getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
         in.nextTag();
     }

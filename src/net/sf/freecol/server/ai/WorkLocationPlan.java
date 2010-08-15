@@ -27,7 +27,6 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -167,7 +166,7 @@ public class WorkLocationPlan extends ValuedAIObject {
 
             ColonyTile ct = (ColonyTile) workLocation;
             Tile t = ct.getWorkTile();
-            UnitType expertUnitType = Specification.getSpecification().getExpertForProducing(goodsType);
+            UnitType expertUnitType = getAIMain().getGame().getSpecification().getExpertForProducing(goodsType);
 
             int base = t.getMaximumPotential(goodsType, expertUnitType);
 
@@ -190,11 +189,11 @@ public class WorkLocationPlan extends ValuedAIObject {
                    being used while sorting the WorkLocationPlans:
                 */
 
-                if (goodsType == Specification.getSpecification().getGoodsType("model.goods.hammers")) {
+                if (goodsType == getAIMain().getGame().getSpecification().getGoodsType("model.goods.hammers")) {
                     return 16;
-                } else if (goodsType == Specification.getSpecification().getGoodsType("model.goods.bells")) {
+                } else if (goodsType == getAIMain().getGame().getSpecification().getGoodsType("model.goods.bells")) {
                     return 12;
-                } else if (goodsType == Specification.getSpecification().getGoodsType("model.goods.crosses")) {
+                } else if (goodsType == getAIMain().getGame().getSpecification().getGoodsType("model.goods.crosses")) {
                     return 10;
                 } else {
                     return workLocation.getColony().getOwner().getMarket().getSalePrice(goodsType, 1);
@@ -254,7 +253,7 @@ public class WorkLocationPlan extends ValuedAIObject {
     public void readFromXMLElement(Element element) {
         workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
         priority = Integer.parseInt(element.getAttribute("priority"));
-        goodsType = Specification.getSpecification().getGoodsType(element.getAttribute("goodsType"));
+        goodsType = getAIMain().getGame().getSpecification().getGoodsType(element.getAttribute("goodsType"));
     }
 
 

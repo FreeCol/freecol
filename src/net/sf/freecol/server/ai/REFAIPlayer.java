@@ -27,13 +27,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -102,12 +103,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
 
-        int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
-        ArrayList<ArrayList<Wish>> workerWishes = new ArrayList<ArrayList<Wish>>(numberOfUnits);
-        for (int i = 0; i < numberOfUnits; i++) {
-            workerWishes.add(new ArrayList<Wish>());
-        }
+        java.util.Map<UnitType, ArrayList<Wish>> workerWishes = new HashMap<UnitType, ArrayList<Wish>>();
         if (getPlayer().isEuropean()) {
             Iterator<AIColony> aIterator = getAIColonyIterator();
             while (aIterator.hasNext()) {
@@ -115,7 +112,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 while (wIterator.hasNext()) {
                     Wish w = wIterator.next();
                     if (w instanceof WorkerWish && w.getTransportable() == null) {
-                        workerWishes.get(((WorkerWish) w).getUnitType().getIndex()).add(w);
+                        UnitType unitType = ((WorkerWish) w).getUnitType();
+                        ArrayList<Wish> wishes = workerWishes.get(unitType);
+                        if (wishes == null) {
+                            wishes = new ArrayList<Wish>();
+                            workerWishes.put(unitType, wishes);
+                        }
+                        wishes.add(w);
                     }
                 }
             }
@@ -137,6 +140,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 continue;
             }
 
+            EquipmentType toolsType = getGame().getSpecification().getEquipmentType("model.equipment.tools");
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
             } else if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
@@ -155,7 +159,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                  * distance between the unit and the destination of a Wish:
                  */
                 HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
-                for (ArrayList<Wish> al : workerWishes) {
+                for (ArrayList<Wish> al : workerWishes.values()) {
                     for (Wish w : al) {
                         if (!distances.containsKey(w.getDestination())) {
                             distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
@@ -165,7 +169,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
-                ArrayList<Wish> wishList = workerWishes.get(unit.getType().getIndex());
+                ArrayList<Wish> wishList = workerWishes.get(unit.getType());
                 WorkerWish bestWish = null;
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
@@ -207,12 +211,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
                 // Check if we can find a better site to work than a new colony:
                 if (!fewColonies || colonyTile == null || bestTurns > 10) {
-                    for (int i = 0; i < workerWishes.size(); i++) {
-                        wishList = workerWishes.get(i);
-                        for (int j = 0; j < wishList.size(); j++) {
-                            WorkerWish ww = (WorkerWish) wishList.get(j);
+                    for (List<Wish> wishes : workerWishes.values()) {
+                        for (int j = 0; j < wishes.size(); j++) {
+                            WorkerWish ww = (WorkerWish) wishes.get(j);
                             if (ww.getTransportable() != null) {
-                                wishList.remove(j);
+                                wishes.remove(j);
                                 j--;
                                 continue;
                             }

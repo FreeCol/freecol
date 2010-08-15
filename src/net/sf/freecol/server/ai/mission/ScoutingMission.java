@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
@@ -47,7 +46,6 @@ import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
@@ -132,7 +130,7 @@ public class ScoutingMission extends Mission {
         if (getUnit().getRole() != Unit.Role.SCOUT) {
             if (getUnit().getColony() != null) {
                 AIColony colony = (AIColony) getAIMain().getAIObject(getUnit().getColony());
-                for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
+                for (EquipmentType equipment : getAIMain().getGame().getSpecification().getEquipmentTypeList()) {
                     if (equipment.getRole() == Unit.Role.SCOUT && getUnit().canBeEquippedWith(equipment)
                             && colony.canBuildEquipment(equipment)) {
                         Element equipUnitElement = Message.createNewRootElement("equipUnit");

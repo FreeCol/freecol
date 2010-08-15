@@ -69,10 +69,6 @@ public abstract class NewAIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    protected static EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
-    protected static EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
-    protected static EquipmentType toolsType = Specification.getSpecification().getEquipmentType("model.equipment.tools");
-
     /*
      * Stores temporary information for sessions (trading with another player
      * etc).

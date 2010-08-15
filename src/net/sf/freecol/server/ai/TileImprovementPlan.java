@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
@@ -218,7 +217,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        type = Specification.getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
+        type = getAIMain().getGame().getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
         
         final String pioneerStr = in.getAttributeValue(null, "pioneer");

@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
@@ -179,7 +178,7 @@ public class GoodsWish extends Wish {
          }
          setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
          
-         goodsType = Specification.getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
+         goodsType = getAIMain().getGame().getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
 
          final String amountStr = in.getAttributeValue(null, "amountRequested");
          if (amountStr != null) {

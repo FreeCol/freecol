@@ -37,7 +37,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -45,7 +44,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -355,7 +353,7 @@ public class ColonialAIPlayer extends AIPlayer {
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
-            List<GoodsType> goodsTypes = Specification.getSpecification().getGoodsTypeList();
+            List<GoodsType> goodsTypes = getGame().getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
                     averageIncome += getPlayer().getIncomeAfterTaxes(type);
@@ -589,7 +587,7 @@ public class ColonialAIPlayer extends AIPlayer {
     private void cheat() {
         logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
-        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
             getPlayer().resetArrears(goodsType);
         }
         
@@ -597,7 +595,7 @@ public class ColonialAIPlayer extends AIPlayer {
         if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isAI()
                 && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
-            List<UnitType> unitTypes = Specification.getSpecification().getUnitTypeList();
+            List<UnitType> unitTypes = getGame().getSpecification().getUnitTypeList();
             
             if (getAIRandom().nextInt(10) == 1) {
                 int price = 0;
@@ -618,8 +616,8 @@ public class ColonialAIPlayer extends AIPlayer {
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
-                    GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
-                    GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
+                    GoodsType muskets = getGame().getSpecification().getGoodsType("model.goods.muskets");
+                    GoodsType horses = getGame().getSpecification().getGoodsType("model.goods.horses");
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
                     
@@ -789,12 +787,8 @@ public class ColonialAIPlayer extends AIPlayer {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
         
-        int numberOfUnits = Specification.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
-        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
-        for (int i = 0; i < numberOfUnits; i++) {
-            workerWishes.add(new ArrayList<Wish>());
-        }
+        java.util.Map<UnitType, ArrayList<Wish>> workerWishes = new HashMap<UnitType, ArrayList<Wish>>();
 
         Iterator<AIColony> aIterator = getAIColonyIterator();
         while (aIterator.hasNext()) {
@@ -802,7 +796,13 @@ public class ColonialAIPlayer extends AIPlayer {
             while (wIterator.hasNext()) {
                 Wish w = wIterator.next();
                 if (w instanceof WorkerWish && w.getTransportable() == null) {
-                    workerWishes.get(((WorkerWish) w).getUnitType().getIndex()).add(w);
+                    UnitType unitType = ((WorkerWish) w).getUnitType();
+                    ArrayList<Wish> wishes = workerWishes.get(unitType);
+                    if (wishes == null) {
+                        wishes = new ArrayList<Wish>();
+                        workerWishes.put(unitType, wishes);
+                    }
+                    wishes.add(w);
                 }
             }
         }
@@ -853,7 +853,7 @@ public class ColonialAIPlayer extends AIPlayer {
                  * distance between the unit and the destination of a Wish:
                  */
                 HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
-                for (ArrayList<Wish> al : workerWishes) {
+                for (ArrayList<Wish> al : workerWishes.values()) {
                     for (Wish w : al) {
                         if (!distances.containsKey(w.getDestination())) {
                             distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
@@ -863,7 +863,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
-                ArrayList<Wish> wishList = workerWishes.get(unit.getType().getIndex());
+                ArrayList<Wish> wishList = workerWishes.get(unit.getType());
                 WorkerWish bestWish = null;
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
