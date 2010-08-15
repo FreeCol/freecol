@@ -278,7 +278,7 @@ public final class FreeColServer {
         this.port = port;
         this.name = name;
         //this.nationOptions = nationOptions;
-        mapGenerator = new MapGenerator(random, getSpecification());
+        mapGenerator = null;
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -304,6 +304,7 @@ public final class FreeColServer {
             fe.initCause(e);
             throw fe;
         }
+        mapGenerator = new MapGenerator(random, getSpecification());
 
         // Apply the difficulty level
         if (game.getDifficultyLevel() == null) {
