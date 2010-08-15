@@ -3830,18 +3830,20 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Tile tile = workLocation.getTile();
-        if (tile.hasLostCityRumour()) {
-            canvas.showInformationMessage("tileHasRumour");
-            return;
-        }
         Colony colony = workLocation.getColony();
-        if ((tile.getOwner() != unit.getOwner()
-             || tile.getOwningSettlement() != colony)
-            && !claimLand(tile, colony, 0)) {
-            logger.warning("Unit " + unit.getId()
-                           + " is unable to claim tile " + tile.toString());
-            return;
+        if (workLocation instanceof ColonyTile) {
+            Tile tile = ((ColonyTile) workLocation).getWorkTile();
+            if (tile.hasLostCityRumour()) {
+                canvas.showInformationMessage("tileHasRumour");
+                return;
+            }
+            if ((tile.getOwner() != unit.getOwner()
+                 || tile.getOwningSettlement() != colony)
+                && !claimLand(tile, colony, 0)) {
+                logger.warning("Unit " + unit.getId()
+                               + " is unable to claim tile " + tile.toString());
+                return;
+            }
         }
 
         // Try to change the work location.
