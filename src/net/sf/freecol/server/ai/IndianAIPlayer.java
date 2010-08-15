@@ -347,7 +347,7 @@ public class IndianAIPlayer extends NewAIPlayer {
      */
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
+        String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount() + "#" + unit.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
         int price;
         if (sessionRegister.containsKey(goldKey)) {

@@ -509,7 +509,7 @@ public abstract class NewAIPlayer extends AIObject {
      * @param goods The goods which we are going to offer
      */
     public void registerSellGoods(Goods goods) {
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
+        String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + goods.getLocation().getId();
         sessionRegister.put(goldKey, null);
     }
@@ -528,7 +528,7 @@ public abstract class NewAIPlayer extends AIObject {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
+        String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
 

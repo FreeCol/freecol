@@ -121,7 +121,7 @@ public class FreeColGameObjectType extends FreeColObject {
      *
      * @return an <code>int</code> value
      */
-    public final int getIndex() {
+    protected int getIndex() {
         return index;
     }
 

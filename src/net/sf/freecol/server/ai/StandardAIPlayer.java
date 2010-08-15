@@ -503,7 +503,7 @@ public class StandardAIPlayer extends AIPlayer {
      * @param goods The goods which we are going to offer
      */
     public void registerSellGoods(Goods goods) {
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
+        String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + goods.getLocation().getId();
         sessionRegister.put(goldKey, null);
     }
@@ -522,7 +522,7 @@ public class StandardAIPlayer extends AIPlayer {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
+        String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
 
@@ -571,7 +571,7 @@ public class StandardAIPlayer extends AIPlayer {
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
         if (settlement instanceof IndianSettlement) {
-            String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
+            String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount() + "#" + unit.getId();
             String hagglingKey = "tradeHaggling#" + unit.getId();
             int price;
             if (sessionRegister.containsKey(goldKey)) {

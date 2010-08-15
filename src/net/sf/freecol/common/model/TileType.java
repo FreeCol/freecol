@@ -95,6 +95,21 @@ public final class TileType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ retrieval methods
 
+    /**
+     * Returns the index of this FreeColGameObjectType. The index
+     * imposes a total ordering consistent with equals on each class
+     * extending FreeColGameObjectType, but this ordering is nothing
+     * but the order in which the objects of the respective class were
+     * defined. It is guaranteed to remain stable only for a
+     * particular revision of a particular specification.
+     *
+     * @return an <code>int</code> value
+     */
+    @Override
+    public int getIndex() {
+        return super.getIndex();
+    }
+
     public boolean isForested() {
         return forest;
     }
