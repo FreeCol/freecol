@@ -21,7 +21,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
@@ -37,6 +41,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -55,17 +60,21 @@ public final class ReportRequirementsPanel extends ReportPanel {
     /**
      * Records the number of units indexed by colony and unit type.
      */
-    private int[][] unitCount;
+    private Map<Colony, TypeCountMap<UnitType>> unitCount =
+        new HashMap<Colony, TypeCountMap<UnitType>>();
 
     /**
      * Records whether a colony can train a type of unit.
      */
-    private boolean[][] canTrain; 
+    private Map<Colony, Set<UnitType>> canTrain =
+        new HashMap<Colony, Set<UnitType>>();
 
     /**
      * Records surplus production indexed by colony and goods type.
      */
-    private int[][] surplus;
+    private Map<Colony, TypeCountMap<GoodsType>> surplus =
+        new HashMap<Colony, TypeCountMap<GoodsType>>();
+
 
 
     /**
@@ -85,34 +94,33 @@ public final class ReportRequirementsPanel extends ReportPanel {
         JTextPane textPane = getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
 
-        int numberColonies = colonies.size();
-        int numberUnitTypes = getSpecification().numberOfUnitTypes();
-        int numberGoodsTypes = getSpecification().numberOfGoodsTypes();
-        unitCount = new int[numberColonies][numberUnitTypes];
-        canTrain = new boolean[numberColonies][numberUnitTypes];
-        surplus = new int[numberColonies][numberGoodsTypes];
-
         // check which colonies can train which units
         int unitTypeIndex = 0;
         List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
-        for (int colonyIndex = 0; colonyIndex < numberColonies; colonyIndex++) {
-            Colony colony = colonies.get(colonyIndex);
+        for (Colony colony : colonies) {
+            TypeCountMap<UnitType> newUnitCount = new TypeCountMap<UnitType>();
+            Set<UnitType> newCanTrain = new HashSet<UnitType>();
             for (Unit unit : colony.getUnitList()) {
-                unitTypeIndex = unit.getType().getIndex();
-                unitCount[colonyIndex][unitTypeIndex]++;
-                canTrain[colonyIndex][unitTypeIndex] = colony.canTrain(unit.getType());
+                newUnitCount.incrementCount(unit.getType(), 1);
+                if (colony.canTrain(unit.getType())) {
+                    newCanTrain.add(unit.getType());
+                }
             }
+            unitCount.put(colony, newUnitCount);
+            canTrain.put(colony, newCanTrain);
+
+            TypeCountMap<GoodsType> newSurplus = new TypeCountMap<GoodsType>();
             for (GoodsType goodsType : goodsTypes) {
-                surplus[colonyIndex][goodsType.getIndex()] = colony.getProductionNetOf(goodsType);
+                newSurplus.incrementCount(goodsType, colony.getProductionNetOf(goodsType));
             }
+            surplus.put(colony, newSurplus);
         }
 
-        for (int colonyIndex = 0; colonyIndex < numberColonies; colonyIndex++) {
-            Colony colony = colonies.get(colonyIndex);
+        for (Colony colony : colonies) {
 
             // colonyLabel
             try {
-                if (colonyIndex != 0) {
+                if (doc.getLength() > 0) {
                     doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
                 }
                 StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, true));
@@ -121,15 +129,13 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 logger.warning(e.toString());
             }
 
-            boolean[] missingExpertWarning = new boolean[numberUnitTypes];
-            boolean[] badAssignmentWarning = new boolean[numberUnitTypes];
-            boolean[] productionWarning = new boolean[numberGoodsTypes];
-            boolean hasWarning = false;
+            Set<UnitType> missingExpertWarning = new HashSet<UnitType>();
+            Set<UnitType> badAssignmentWarning = new HashSet<UnitType>();
+            Set<GoodsType> productionWarning = new HashSet<GoodsType>();
 
             // check if all unit requirements are met
             for (Unit expert : colony.getUnitList()) {
-                if (expert.getSkillLevel() > 0)
-                {
+                if (expert.getSkillLevel() > 0) {
                     GoodsType production = expert.getWorkType();
                     GoodsType expertise = expert.getType().getExpertProduction();
                     if (production != null && expertise != null && production != expertise) {
@@ -163,11 +169,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                 }
                                 
                                 // let the player know if the two units would be more productive were they to swap roles
-                                int expertIndex = expert.getType().getIndex();
-                                if ((expertProductionNow + nonExpertProductionNow) < (expertProductionPotential + nonExpertProductionPotential) && !badAssignmentWarning[expertIndex]) {
-                                    addBadAssignmentWarning(doc, colonyIndex, expert, nonExpert);
-                                    badAssignmentWarning[expertIndex] = true;
-                                    hasWarning = true;
+                                if ((expertProductionNow + nonExpertProductionNow)
+                                    < (expertProductionPotential + nonExpertProductionPotential)
+                                    && !badAssignmentWarning.contains(expert)) {
+                                    addBadAssignmentWarning(doc, colony, expert, nonExpert);
+                                    badAssignmentWarning.add(expert.getType());
                                 }
                             }
                         }
@@ -179,11 +185,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 if (unit != null) {
                     GoodsType workType = unit.getWorkType();
                     UnitType expert = getSpecification().getExpertForProducing(workType);
-                    int expertIndex = expert.getIndex();
-                    if (unitCount[colonyIndex][expertIndex] == 0 && !missingExpertWarning[expertIndex]) {
-                        addExpertWarning(doc, colonyIndex, workType, expert);
-                        missingExpertWarning[expertIndex] = true;
-                        hasWarning = true;
+                    if (unitCount.get(colony).getCount(expert) == 0
+                        && !missingExpertWarning.contains(expert)) {
+                        addExpertWarning(doc, colony, workType, expert);
+                        missingExpertWarning.add(expert);
                     }
                 }
             } 
@@ -195,26 +200,25 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     // check if this building has no expert producing goods
                     int expertIndex = expert.getIndex();
                     if (building.getFirstUnit() != null &&
-                        !missingExpertWarning[expertIndex] &&
-                        unitCount[colonyIndex][expertIndex] == 0) {
-                        addExpertWarning(doc, colonyIndex, goodsType, expert);
-                        missingExpertWarning[expertIndex] = true;
-                        hasWarning = true;
+                        !missingExpertWarning.contains(expert) &&
+                        unitCount.get(colony).getCount(expert) == 0) {
+                        addExpertWarning(doc, colony, goodsType, expert);
+                        missingExpertWarning.add(expert);
                     }
                 }
                 if (goodsType != null) {
                     // not enough input
-                    int goodsIndex = goodsType.getIndex();
-                    if (building.getProductionNextTurn() < building.getMaximumProduction() &&
-                        !productionWarning[goodsIndex]) {
-                        addProductionWarning(doc, colonyIndex, goodsType, building.getGoodsInputType());
-                        productionWarning[goodsIndex] = true;
-                        hasWarning = true;
+                    if (building.getProductionNextTurn() < building.getMaximumProduction()
+                        && !productionWarning.contains(goodsType)) {
+                        addProductionWarning(doc, colony, goodsType, building.getGoodsInputType());
+                        productionWarning.add(goodsType);
                     }
                 }
             }
 
-            if (!hasWarning) {
+            if (missingExpertWarning.isEmpty()
+                && badAssignmentWarning.isEmpty()
+                && productionWarning.isEmpty()) {
                 try {
                     doc.insertString(doc.getLength(), "\n\n" + Messages.message("report.requirements.met"),
                                      doc.getStyle("regular"));
@@ -233,10 +237,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     }
 
-    private void addBadAssignmentWarning(StyledDocument doc, int colonyIndex, Unit expert, Unit nonExpert) {
+    private void addBadAssignmentWarning(StyledDocument doc, Colony colony, Unit expert, Unit nonExpert) {
         GoodsType expertGoods = expert.getWorkType();
         GoodsType nonExpertGoods = nonExpert.getWorkType();
-        String colonyName = colonies.get(colonyIndex).getName();
+        String colonyName = colony.getName();
         String expertName = Messages.message(expert.getType().getNameKey());
         String nonExpertName = Messages.message(nonExpert.getType().getNameKey());
         String expertProductionName = Messages.message(expertGoods.getWorkingAsKey());
@@ -255,9 +259,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private void addExpertWarning(StyledDocument doc, int colonyIndex, GoodsType goodsType, UnitType workType) {
+    private void addExpertWarning(StyledDocument doc, Colony c, GoodsType goodsType, UnitType workType) {
         String expertName = Messages.message(workType.getNameKey());
-        String colonyName = colonies.get(colonyIndex).getName();
+        String colonyName = c.getName();
         String goods = Messages.message(goodsType.getNameKey());
         String work = Messages.message(goodsType.getWorkingAsKey());
         String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
@@ -269,26 +273,28 @@ public final class ReportRequirementsPanel extends ReportPanel {
             ArrayList<Colony> misusedExperts = new ArrayList<Colony>();
             ArrayList<Colony> severalExperts = new ArrayList<Colony>();
             ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
-            for (int index = 0; index < colonies.size(); index++) {
-			    Colony colony = colonies.get(index);
+            for (Colony colony : colonies) {
                 for (Unit unit : colony.getUnitList()) {
-					GoodsType expertise = unit.getType().getExpertProduction();
-                    if ((unit.getSkillLevel() > 0) && (expertise == goodsType) && (expertise != unit.getWorkType())) {
+                    GoodsType expertise = unit.getType().getExpertProduction();
+                    if ((unit.getSkillLevel() > 0)
+                        && (expertise == goodsType)
+                        && (expertise != unit.getWorkType())) {
                         misusedExperts.add(colony);
                     }
-				}
-                if (unitCount[index][workType.getIndex()] > 1) {
+                }
+                if (unitCount.get(colony).getCount(workType) > 1) {
                     severalExperts.add(colony);
                 }
-                if (canTrain[index][workType.getIndex()]) {
+                if (canTrain.get(colony).contains(workType)) {
                     canTrainExperts.add(colony);
                 }
             }
 
             if (!misusedExperts.isEmpty()) {
-                doc.insertString(doc.getLength(), 
-                        "\n" + Messages.message("report.requirements.misusedExperts", "%unit%", expertName, "%work%", work) + " ", 
-                        doc.getStyle("regular"));
+                doc.insertString(doc.getLength(), "\n"
+                                 + Messages.message("report.requirements.misusedExperts",
+                                                    "%unit%", expertName, "%work%", work) + " ", 
+                                 doc.getStyle("regular"));
                 int lastExpertsIndex = misusedExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {
                     Colony colony = misusedExperts.get(index);
@@ -336,8 +342,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         
     }
 
-    private void addProductionWarning(StyledDocument doc, int colonyIndex, GoodsType output, GoodsType input) {
-        String colonyName = colonies.get(colonyIndex).getName();
+    private void addProductionWarning(StyledDocument doc, Colony colony, GoodsType output, GoodsType input) {
+        String colonyName = colony.getName();
         String newMessage = Messages.message(StringTemplate.template("report.requirements.missingGoods")
                                              .addName("%colony%", colonyName)
                                              .add("%goods%", output.getNameKey())
@@ -348,10 +354,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             ArrayList<Colony> withSurplus = new ArrayList<Colony>();
             ArrayList<Integer> theSurplus = new ArrayList<Integer>();
-            for (int index = 0; index < colonies.size(); index++) {
-                if (surplus[index][input.getIndex()] > 0) {
-                    withSurplus.add(colonies.get(index));
-                    theSurplus.add(new Integer(surplus[index][input.getIndex()]));
+            for (Colony col : colonies) {
+                int amount = surplus.get(col).getCount(input);
+                if (amount > 0) {
+                    withSurplus.add(col);
+                    theSurplus.add(amount);
                 }
             }
 
@@ -361,15 +368,16 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                                   .add("%goods%", input.getNameKey())) + " ",
                                  doc.getStyle("regular"));
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
-                    Colony colony = withSurplus.get(index);
                     String amount = " (" + theSurplus.get(index) + ")";
-                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, amount, false));
+                    StyleConstants.setComponent(doc.getStyle("button"),
+                                                createColonyButton(withSurplus.get(index), amount, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                     doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
                 }
-                Colony colony = withSurplus.get(withSurplus.size() - 1);
+                Colony lastColony = withSurplus.get(withSurplus.size() - 1);
                 String amount = " (" + theSurplus.get(theSurplus.size() - 1) + ")";
-                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, amount, false));
+                StyleConstants.setComponent(doc.getStyle("button"),
+                                            createColonyButton(lastColony, amount, false));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
             }
 
