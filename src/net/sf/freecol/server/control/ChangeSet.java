@@ -43,6 +43,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -52,13 +54,17 @@ public class ChangeSet {
 
     // Convenient way to specify the relative priorities of the fixed
     // change types in one place.
-    private static enum ChangePriority {
+    public static enum ChangePriority {
         CHANGE_ATTRIBUTE(-1), // N/A
         CHANGE_ANIMATION(0),  // Do animations first
         CHANGE_REMOVE(100),   // Do removes last
         CHANGE_STANCE(5),     // Do stance before updates
         CHANGE_STRING(20),    // Do string changes after updates
-        CHANGE_UPDATE(10);    // There are a lot of updates
+        CHANGE_UPDATE(10),    // There are a lot of updates
+        // Symbolic priorities used by various non-fixed types
+        CHANGE_EARLY(1),
+        CHANGE_NORMAL(15),
+        CHANGE_LATE(90);
 
         private int level;
 
@@ -909,7 +915,8 @@ public class ChangeSet {
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addDead(ServerPlayer serverPlayer) {
-        addTrivial(See.all(), "setDead", 1, "player", serverPlayer.getId());
+        addTrivial(See.all(), "setDead", ChangePriority.CHANGE_EARLY,
+                   "player", serverPlayer.getId());
         return this;
     }
 
@@ -1045,13 +1052,13 @@ public class ChangeSet {
      *
      * @param see The visibility of this change.
      * @param name The name of the element.
-     * @param priority The sort priority for this change.
+     * @param cp The <code>ChangePriority</code> for this change.
      * @param attributes Attributes to add to this trivial change.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addTrivial(See see, String name, int priority,
+    public ChangeSet addTrivial(See see, String name, ChangePriority cp,
                                 String... attributes) {
-        changes.add(new TrivialChange(see, name, priority, attributes));
+        changes.add(new TrivialChange(see, name, cp.getPriority(), attributes));
         return this;
     }
 

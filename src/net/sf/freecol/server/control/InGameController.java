@@ -100,6 +100,7 @@ import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -332,10 +333,12 @@ public final class InGameController extends Controller {
         freeColServer.getModelController().clearTaskRegister();
 
         Player winner = checkForWinner();
-        if (winner != null && (!freeColServer.isSingleplayer() || !winner.isAI())) {
-            Element gameEndedElement = Message.createNewRootElement("gameEnded");
-            gameEndedElement.setAttribute("winner", winner.getId());
-            sendToAll(gameEndedElement);
+        if (winner != null
+            && !(freeColServer.isSingleplayer() && winner.isAI())) {
+            ChangeSet cs = new ChangeSet();
+            cs.addTrivial(See.all(), "gameEnded", ChangePriority.CHANGE_NORMAL,
+                          "winner", winner.getId());
+            sendToAll(cs);
             
             // TODO: Remove when the server can properly revert to a pre-game state:
             if (FreeCol.getFreeColClient() == null) {
@@ -423,10 +426,12 @@ public final class InGameController extends Controller {
             if (debugOnlyAITurns > 0) {
                 debugOnlyAITurns--;
             }
-            Element newTurnElement = Message.createNewRootElement("newTurn");
-            sendToAll(newTurnElement);
+            ChangeSet cs = new ChangeSet();
+            cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
+                "turn", Integer.toString(getGame().getTurn().getNumber()));
+            sendToAll(cs);
         }
-        
+
         ServerPlayer newPlayer = (ServerPlayer) getGame().getNextPlayer();
         getGame().setCurrentPlayer(newPlayer);
         if (newPlayer == null) {
@@ -444,16 +449,19 @@ public final class InGameController extends Controller {
             }
         }
 
-        newTurn(newPlayer);
-        Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
-        setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
-        sendToAll(setCurrentPlayerElement);
+        {
+            ChangeSet cs = new ChangeSet();
+            csNewTurn(newPlayer, cs);
+            cs.addTrivial(See.all(), "setCurrentPlayer",
+                          ChangePriority.CHANGE_LATE,
+                          "player", newPlayer.getId());
+            sendToAll(cs);
+        }
         
         return newPlayer;
     }
 
-    private void newTurn(ServerPlayer newPlayer) {
-        ChangeSet cs = new ChangeSet();
+    private void csNewTurn(ServerPlayer newPlayer, ChangeSet cs) {
         if (newPlayer.isEuropean()) {
             csBombardEnemyShips(newPlayer, cs);
 
@@ -645,7 +653,6 @@ public final class InGameController extends Controller {
                 }
             }
         }
-        sendToAll(cs);
     }
 
     /**
