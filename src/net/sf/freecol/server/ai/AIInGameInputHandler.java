@@ -49,6 +49,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 
 /**
  * Handles the network messages that arrives while in the game.
@@ -143,6 +145,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("addMessages")) {
                 } else if (type.equals("addHistory")) {
                 } else if (type.equals("multiple")) {
+                    reply = multiple((DummyConnection) connection, element);
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");
                 }
@@ -318,6 +321,22 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         agreement.setStatus((accept) ? TradeStatus.ACCEPT_TRADE
                             : TradeStatus.REJECT_TRADE);
         return message.toXMLElement();
+    }
+
+    /**
+     * Handle all the children of this element.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    public Element multiple(Connection connection, Element element) {
+        NodeList nodes = element.getChildNodes();
+        Element reply = null;
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            reply = handle(connection, (Element) nodes.item(i));
+        }
+        return reply;
     }
 
     /**
