@@ -34,7 +34,7 @@ public class GameTest extends FreeColTestCase {
 
     public void testGame() throws FreeColException {
 
-        Game game = new ServerGame(new MockModelController());
+        Game game = new ServerGame(new MockModelController(), spec());
         
         game.setMap(getTestMap());
 
@@ -46,7 +46,7 @@ public class GameTest extends FreeColTestCase {
     }
 
     public void testAddPlayer() {
-        Game game = new ServerGame(new MockModelController());
+        Game game = new ServerGame(new MockModelController(), spec());
         NationOptions defaultOptions = NationOptions.getDefaults();
         game.setNationOptions(defaultOptions);
 

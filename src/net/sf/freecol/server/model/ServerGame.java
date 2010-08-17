@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.SimpleCombatModel;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 
 /**
  * The main component of the game model.
@@ -53,8 +54,8 @@ public class ServerGame extends Game {
      * @see net.sf.freecol.server.FreeColServer#FreeColServer(boolean, boolean,
      *      int, String)
      */
-    public ServerGame(ModelController modelController) {
-        super(null);
+    public ServerGame(ModelController modelController, Specification specification) {
+        super(specification);
 
         this.modelController = modelController;
         this.combatModel = new SimpleCombatModel();

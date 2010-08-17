@@ -170,8 +170,6 @@ public final class FreeColServer {
     /** Did the integrity check succeed */
     private boolean integrity = false;
 
-    private Specification specification;
-
     /**
      * The high scores on this server.
      */
@@ -217,12 +215,27 @@ public final class FreeColServer {
         this.port = port;
         this.name = name;
 
+        modelController = new ServerModelController(this);
+        userConnectionHandler = new UserConnectionHandler(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        inGameController = new InGameController(this);
+
         FreeColTcFile tcData = new FreeColTcFile(tc);
         InputStream si = null;
         try {
             si = tcData.getSpecificationInputStream();
-            specification = new Specification(si);
+            Specification specification = new Specification(si);
             si.close();
+
+            game = new ServerGame(modelController, specification);
+            game.setNationOptions(nationOptions);
+            game.setDifficultyLevel(level);
+            if (level != null) {
+                specification.applyDifficultyLevel(level);
+            }
+            mapGenerator = new MapGenerator(random, specification);
         } catch (IOException e) {
             System.err.println("Could not load specification.xml for: " + tc);
             try {
@@ -231,19 +244,6 @@ public final class FreeColServer {
             System.exit(1);
         }
 
-        modelController = new ServerModelController(this);
-        game = new ServerGame(modelController);
-        game.setNationOptions(nationOptions);
-        game.setDifficultyLevel(level);
-        if (level != null) {
-            getSpecification().applyDifficultyLevel(level);
-        }
-        mapGenerator = new MapGenerator(random, specification);
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameInputHandler = new InGameInputHandler(this);
-        inGameController = new InGameController(this);
         try {
             server = new Server(this, port);
             server.start();

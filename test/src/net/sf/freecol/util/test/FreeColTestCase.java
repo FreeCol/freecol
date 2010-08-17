@@ -123,7 +123,7 @@ public class FreeColTestCase extends TestCase {
      * @return A new game with with players for each nation added.
      */
     public static Game getStandardGame() {
-        game = new ServerGame(new MockModelController());
+        game = new ServerGame(new MockModelController(), spec());
         game.setNationOptions(NationOptions.getDefaults());
 
         Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");

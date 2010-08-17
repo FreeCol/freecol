@@ -120,12 +120,21 @@ public class Game extends FreeColGameObject {
     protected CombatModel combatModel;
 
     /**
-     * Minimal constructor, 
-     * Just necessary to call parent constructor
-     * @param game
+     * The Specification this game uses.
      */
-    protected Game(Game game) {
-        super(game);
+    private Specification specification;
+
+
+
+    /**
+     * This constructor is used by the Server to create a new Game
+     * with the given Specification.
+     *
+     * @param specification
+     */
+    protected Game(Specification specification) {
+        super(null);
+        this.specification = specification;
     }
     
     /**

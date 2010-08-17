@@ -45,7 +45,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testWithNoIndians() {
         MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc);
+        Game g = new ServerGame(mmc, spec());
         Specification s = Specification.getSpecification();
 
         // A new game does not have a map yet
@@ -71,7 +71,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testSinglePlayerOnSmallMap() {
         MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc);
+        Game g = new ServerGame(mmc, spec());
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -103,7 +103,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testMapGenerator() {
         MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc);
+        Game g = new ServerGame(mmc, spec());
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -166,7 +166,7 @@ public class MapGeneratorTest extends FreeColTestCase {
      */
     public void testIndianCapital() {
         MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc);
+        Game g = new ServerGame(mmc, spec());
 
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
 
@@ -215,7 +215,7 @@ public class MapGeneratorTest extends FreeColTestCase {
          * Make sure we can import all distributed maps.
          */
         MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc);
+        Game g = new ServerGame(mmc, spec());
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
@@ -235,7 +235,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         MockModelController mmc = new MockModelController();
-        Game game = new ServerGame(mmc);
+        Game game = new ServerGame(mmc, spec());
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
         try {
             gen.createMap(game);
