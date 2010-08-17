@@ -78,4 +78,13 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
         values.putAll(other.values);
     }
 
+    public String toString() {
+        String result = "[" + getClass().getName();
+        for (Map.Entry<T, Integer> entry : values.entrySet()) {
+            result += " [" + entry.getKey().getIndex()
+                + "," + entry.getValue() + "]";
+        }
+        result += "]";
+        return result;
+    }
 }
