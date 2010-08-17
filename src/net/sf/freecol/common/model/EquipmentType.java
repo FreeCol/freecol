@@ -196,6 +196,40 @@ public class EquipmentType extends BuildableType {
             otherType.compatibleEquipment.contains(getId());
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime
+            * result
+            + ((compatibleEquipment == null) ? 0 : compatibleEquipment
+               .hashCode());
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EquipmentType other = (EquipmentType) obj;
+        if (compatibleEquipment == null) {
+            if (other.compatibleEquipment != null)
+                return false;
+        } else if (!compatibleEquipment.equals(other.compatibleEquipment))
+            return false;
+        if (getId() == null) {
+            if (other.getId() != null)
+                return false;
+        } else if (!getId().equals(other.getId()))
+            return false;
+        return true;
+    }
+
     /**
      * Returns true if Equipment of this type grants an offence bonus
      * or a defence bonus.
