@@ -269,7 +269,6 @@ public final class FreeColClient {
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();
-            actionManager.addSpecificationActions(specification);
         }
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
