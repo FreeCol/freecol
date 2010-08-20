@@ -265,7 +265,7 @@ public final class FreeColClient {
 
         mapEditor = false;
         
-        clientOptions = new ClientOptions(specification);
+        clientOptions = new ClientOptions();
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();

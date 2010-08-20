@@ -37,7 +37,6 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.ListOption;
@@ -452,32 +451,29 @@ public class ClientOptions extends OptionMap {
 
     /**
      * Creates a new <code>ClientOptions</code>.
-     * @param specification a <code>Specification</code> value
+     * Unlike other OptionGroup classes, ClientOptions can not supply a
+     * specification as it is needed before the specification is available.
      */
-    public ClientOptions(Specification specification) {
-        super(getXMLElementTagName(), specification);
+    public ClientOptions() {
+        super(getXMLElementTagName(), null);
     }
 
     /**
      * Creates a <code>ClientOptions</code> from an XML representation.
      * 
-     * <br>
-     * <br>
-     * 
      * @param element The XML <code>Element</code> from which this object
      *            should be constructed.
-     * @param specification The <code>Specification</code> to use.
      */
-    public ClientOptions(Element element, Specification specification) {
-        super(element, getXMLElementTagName(), specification);
+    public ClientOptions(Element element) {
+        super(element, getXMLElementTagName(), null);
     }
 
     /**
      * Adds the options to this <code>GameOptions</code>.
      */
     protected void addDefaultOptions() {
-
-        load(new File(new File(FreeCol.getDataDirectory(), "base"), "client-options.xml"), false);
+        load(new File(new File(FreeCol.getDataDirectory(), "base"),
+                      "client-options.xml"), false);
         
         final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
         final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {

@@ -64,7 +64,7 @@ public class SoundTest extends FreeColTestCase {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
         ResourceManager.preload(new Dimension(1,1));
 
-        ClientOptions clientOptions = new ClientOptions(Specification.getSpecification());
+        ClientOptions clientOptions = new ClientOptions();
         final AudioMixerOption amo = (AudioMixerOption) clientOptions.getObject(ClientOptions.AUDIO_MIXER);
         final PercentageOption po = (PercentageOption) clientOptions.getObject(ClientOptions.AUDIO_VOLUME);
         po.setValue(10); // 10% volume
