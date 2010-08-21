@@ -133,8 +133,8 @@ public final class SpecificationTest extends FreeColTestCase {
 
     // Check difficulty levels presence and values
     public void testDifficultyLevels() {
-        Specification spec = Specification.getSpecification();
-        RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
+        assertEquals(6, spec().getDifficultyLevels().size());
+        RangeOption diffOpt = (RangeOption) spec().getOption(GameOptions.DIFFICULTY);
 
         assertTrue(diffOpt.getValue() == 2);
         assertTrue(diffOpt.getItemValues().size() == 5);
@@ -143,16 +143,16 @@ public final class SpecificationTest extends FreeColTestCase {
 
         try {
             // should fail, because it is part of uninitialized server difficulty options
-            option = spec.getIntegerOption("model.option.crossesIncrement");
+            option = spec().getIntegerOption("model.option.crossesIncrement");
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         // initializing server difficulty options
-        spec.applyDifficultyLevel(2);
+        spec().applyDifficultyLevel(2);
       
         // should succeed now
-        option = spec.getIntegerOption("model.option.crossesIncrement");
+        option = spec().getIntegerOption("model.option.crossesIncrement");
         assertNotNull(option);
         assertEquals(10, option.getValue());
     }
