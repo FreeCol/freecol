@@ -97,6 +97,10 @@ public class DifficultyLevel extends FreeColGameObjectType {
 
     }
 
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out);
+    }
+
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
