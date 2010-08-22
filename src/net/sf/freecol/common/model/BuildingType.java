@@ -179,8 +179,12 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         }
         out.writeAttribute("workplaces", Integer.toString(workPlaces));
         out.writeAttribute("basicProduction", Integer.toString(basicProduction));
-        out.writeAttribute("minSkill", Integer.toString(minSkill));
-        out.writeAttribute("maxSkill", Integer.toString(maxSkill));
+        if (minSkill > UNDEFINED) {
+            out.writeAttribute("minSkill", Integer.toString(minSkill));
+        }
+        if (maxSkill < INFINITY) {
+            out.writeAttribute("maxSkill", Integer.toString(maxSkill));
+        }
         out.writeAttribute("sequence", Integer.toString(sequence));
 
         if (consumes != null) {
