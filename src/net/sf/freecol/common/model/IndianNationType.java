@@ -218,8 +218,11 @@ public class IndianNationType extends NationType {
         setSettlementRadius(getAttribute(in, "settlementRadius", parent.getSettlementRadius()));
         setCapitalRadius(getAttribute(in, "capitalRadius", parent.getCapitalRadius()));
 
-        skills.addAll(parent.skills);
-        getFeatureContainer().add(parent.getFeatureContainer());
+        if (parent != this) {
+            skills.addAll(parent.skills);
+            getFeatureContainer().add(parent.getFeatureContainer());
+            getFeatureContainer().replaceSource(parent, this);
+        }
 
     }
 

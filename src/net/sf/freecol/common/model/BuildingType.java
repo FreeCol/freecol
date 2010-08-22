@@ -158,6 +158,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
         if (parent != this) {
             getFeatureContainer().add(parent.getFeatureContainer());
+            getFeatureContainer().replaceSource(parent, this);
         }
     }
 

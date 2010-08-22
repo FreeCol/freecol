@@ -611,6 +611,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             typeChanges.addAll(parent.typeChanges);
             defaultEquipment = parent.defaultEquipment;
             getFeatureContainer().add(parent.getFeatureContainer());
+            getFeatureContainer().replaceSource(parent, this);
             consumption.putAll(parent.consumption);
         }
     }

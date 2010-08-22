@@ -503,4 +503,24 @@ public class FeatureContainer {
         return modifiers.containsKey(key);
     }
 
+    /**
+     * Replaces the source field. This is necessary because objects
+     * may inherit Features from other, abstract objects.
+     *
+     * @param oldSource a <code>FreeColGameObjectType</code> value
+     * @param newSource a <code>FreeColGameObjectType</code> value
+     */
+    public void replaceSource(FreeColGameObjectType oldSource, FreeColGameObjectType newSource) {
+        for (Ability ability : getAbilities()) {
+            if (ability.getSource() == oldSource) {
+                ability.setSource(newSource);
+            }
+        }
+        for (Modifier modifier : getModifiers()) {
+            if (modifier.getSource() == oldSource) {
+                modifier.setSource(newSource);
+            }
+        }
+    }
+
 }
