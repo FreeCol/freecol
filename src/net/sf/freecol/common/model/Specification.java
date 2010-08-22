@@ -1092,7 +1092,7 @@ public final class Specification {
         writeSection(out, "indian-nation-types", indianNationTypes);
         writeSection(out, "nations", nations);
         writeSection(out, "difficultyLevels", difficultyLevels);
-        //writeSection(out, "options", allOptionGroups.values());
+        writeSection(out, "options", allOptionGroups.values());
 
         // End element:
         out.writeEndElement();

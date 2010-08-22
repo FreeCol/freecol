@@ -141,6 +141,14 @@ public class SelectOption extends AbstractOption {
 
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute(VALUE_TAG, getStringValue());
+        out.writeAttribute("localizedLabels", Boolean.toString(localizedLabels));
+
+        for (Map.Entry<Integer, String> entry : itemValues.entrySet()) {
+            out.writeStartElement("selectValue");
+            out.writeAttribute(VALUE_TAG, Integer.toString(entry.getKey()));
+            out.writeAttribute("label", entry.getValue());
+            out.writeEndElement();
+        }
 
         out.writeEndElement();
     }
@@ -154,12 +162,8 @@ public class SelectOption extends AbstractOption {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String localizedLabels = in.getAttributeValue(null, "localizedLabels");
+        localizedLabels = getAttribute(in, "localizedLabels", true);
         final String value = in.getAttributeValue(null, VALUE_TAG);
-
-        if (localizedLabels != null) {
-            this.localizedLabels = localizedLabels.equals("true");
-        }
 
         if (id == null && getId().equals("NO_ID")) {
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");

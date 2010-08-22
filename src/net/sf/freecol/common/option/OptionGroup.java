@@ -98,7 +98,7 @@ public class OptionGroup extends AbstractOption {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         Iterator<Option> oi = options.iterator();
         while (oi.hasNext()) {
             (oi.next()).toXML(out);
