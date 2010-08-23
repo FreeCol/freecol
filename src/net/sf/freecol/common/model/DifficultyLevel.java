@@ -61,8 +61,7 @@ public class DifficultyLevel extends FreeColGameObjectType {
         return levelOptions;
     }
     
-    public void readFromXML(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
 
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         

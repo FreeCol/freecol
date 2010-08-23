@@ -247,50 +247,47 @@ public class EquipmentType extends BuildableType {
         this.militaryEquipment = newMilitaryEquipment;
     }
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
-            throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         maximumCount = getAttribute(in, "maximum-count", 1);
         combatLossPriority = getAttribute(in, "combat-loss-priority", -1);
         String roleString = getAttribute(in, "role", "default");
         role = Enum.valueOf(Role.class, roleString.toUpperCase(Locale.US));
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification)
-            throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String nodeName = in.getLocalName();
-            if ("required-location-ability".equals(nodeName)) {
-                String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                boolean value = getAttribute(in, VALUE_TAG, true);
-                getLocationAbilitiesRequired().put(abilityId, value);
-                specification.addAbility(abilityId);
-                in.nextTag(); // close this element
-            } else if ("compatible-equipment".equals(nodeName)) {
-                String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                compatibleEquipment.add(equipmentId);
-                in.nextTag(); // close this element
-            } else if ("capture-equipment".equals(nodeName)) {
-                captureEquipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                captureEquipmentByIndians = getAttribute(in, "by-indians", false);
-                in.nextTag();
-            } else {
-                FreeColObject object = super.readChild(in, specification);
-                if (object instanceof Modifier) {
-                    Modifier modifier = (Modifier) object;
-                    if (modifier.getId().equals(Modifier.OFFENCE) ||
-                        modifier.getId().equals(Modifier.DEFENCE)) {
-                        militaryEquipment = true;
-                    }
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+        for (Modifier modifier : getFeatureContainer().getModifiers()) {
+            if (modifier.getId().equals(Modifier.OFFENCE) ||
+                modifier.getId().equals(Modifier.DEFENCE)) {
+                militaryEquipment = true;
+                for (AbstractGoods goods : getGoodsRequired()) {
+                    goods.getType().setMilitaryGoods(true);
                 }
+                break;
             }
         }
+    }
 
-        if (militaryEquipment) {
-            for (AbstractGoods goods : getGoodsRequired()) {
-                goods.getType().setMilitaryGoods(true);
-            }
+
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String nodeName = in.getLocalName();
+        if ("required-location-ability".equals(nodeName)) {
+            String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            boolean value = getAttribute(in, VALUE_TAG, true);
+            getLocationAbilitiesRequired().put(abilityId, value);
+            getSpecification().addAbility(abilityId);
+            in.nextTag(); // close this element
+        } else if ("compatible-equipment".equals(nodeName)) {
+            String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            compatibleEquipment.add(equipmentId);
+            in.nextTag(); // close this element
+        } else if ("capture-equipment".equals(nodeName)) {
+            captureEquipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            captureEquipmentByIndians = getAttribute(in, "by-indians", false);
+            in.nextTag();
+        } else {
+            super.readChild(in);
         }
-
     }
 
     /**

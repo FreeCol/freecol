@@ -126,15 +126,15 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     }
 
 
-    public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
         BuildingType parent = (extendString == null) ? this :
-            specification.getBuildingType(extendString);
+            getSpecification().getBuildingType(extendString);
         String upgradeString = in.getAttributeValue(null, "upgradesFrom");
         if (upgradeString == null) {
             level = 1;
         } else {
-            upgradesFrom = specification.getBuildingType(upgradeString);
+            upgradesFrom = getSpecification().getBuildingType(upgradeString);
             upgradesFrom.upgradesTo = this;
             level = upgradesFrom.level + 1;
         }
@@ -143,8 +143,8 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         workPlaces = getAttribute(in, "workplaces", parent.workPlaces);
         basicProduction = getAttribute(in, "basicProduction", parent.basicProduction);
 
-        consumes = specification.getType(in, "consumes", GoodsType.class, parent.consumes);
-        produces = specification.getType(in, "produces", GoodsType.class, parent.produces);
+        consumes = getSpecification().getType(in, "consumes", GoodsType.class, parent.consumes);
+        produces = getSpecification().getType(in, "produces", GoodsType.class, parent.produces);
 
         if (produces != null && basicProduction > 0) {
             productionModifier = new Modifier(produces.getId(), this, basicProduction,

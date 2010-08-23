@@ -134,11 +134,10 @@ public class EuropeanNationType extends NationType {
     }
 
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
-            throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
         EuropeanNationType parent = (extendString == null) ? this :
-            (EuropeanNationType) specification.getNationType(extendString);
+            (EuropeanNationType) getSpecification().getNationType(extendString);
         ref = getAttribute(in, "ref", parent.ref);
 
         if (parent != this) {
@@ -150,26 +149,23 @@ public class EuropeanNationType extends NationType {
         }
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification)
-            throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if ("unit".equals(childName)) {
-                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                String type = in.getAttributeValue(null, "type");
-                Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
-                String useExperts = in.getAttributeValue(null, "expert-starting-units");
-                AbstractUnit unit = new AbstractUnit(type, role, 1);
-                Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
-                if (units == null) {
-                    units = new HashMap<String, AbstractUnit>();
-                    startingUnitMap.put(useExperts, units);
-                }
-                units.put(id, unit);
-                in.nextTag();
-            } else {
-                super.readChild(in, specification);
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if ("unit".equals(childName)) {
+            String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            String type = in.getAttributeValue(null, "type");
+            Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
+            String useExperts = in.getAttributeValue(null, "expert-starting-units");
+            AbstractUnit unit = new AbstractUnit(type, role, 1);
+            Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
+            if (units == null) {
+                units = new HashMap<String, AbstractUnit>();
+                startingUnitMap.put(useExperts, units);
             }
+            units.put(id, unit);
+            in.nextTag();
+        } else {
+            super.readChild(in);
         }
     }
 

@@ -353,7 +353,7 @@ public final class Specification {
                     }
                 } else {
                     T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
-                    object.readFromXML(xsr, specification);
+                    object.readFromXML(xsr);
                     if (!object.isAbstractType() && !result.contains(object)) {
                         result.add(object);
                         object.setIndex(index);

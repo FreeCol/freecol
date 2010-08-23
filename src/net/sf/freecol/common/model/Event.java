@@ -129,26 +129,23 @@ public class Event extends FreeColGameObjectType {
         }
     }
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         value = in.getAttributeValue(null, VALUE_TAG);
         scoreValue = getAttribute(in, "scoreValue", 0);
     }
 
     @Override
-    public FreeColObject readChild(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
         if (Limit.getXMLElementTagName().equals(in.getLocalName())) {
             if (limits == null) {
                 limits = new ArrayList<Limit>();
             }
-            Limit limit = new Limit(specification);
-            limit.readFromXML(in, specification);
+            Limit limit = new Limit(getSpecification());
+            limit.readFromXML(in);
             limits.add(limit);
-            return limit;
         } else {
-            return super.readChild(in, specification);
+            super.readChild(in);
         }
     }
 

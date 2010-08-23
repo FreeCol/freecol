@@ -37,17 +37,14 @@ public final class ImprovementActionType extends FreeColGameObjectType {
 
     private char accelerator;
     
-    private final List<String> names;
-    private final List<TileImprovementType> impTypes;
-    private final List<String> imageIDs;
+    private final List<String> names = new ArrayList<String>();
+    private final List<TileImprovementType> impTypes = new ArrayList<TileImprovementType>();
+    private final List<String> imageIDs = new ArrayList<String>();
     
     // ------------------------------------------------------------ constructors
     
     public ImprovementActionType(String id, Specification specification) {
         super(id, specification);
-        names = new ArrayList<String>();
-        impTypes = new ArrayList<TileImprovementType>();
-        imageIDs = new ArrayList<String>();
     }
 
     // ------------------------------------------------------------ retrieval methods
@@ -70,19 +67,14 @@ public final class ImprovementActionType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
-    public void readFromXML(XMLStreamReader in, Specification specification)
-           throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         accelerator = in.getAttributeValue(null, "accelerator").charAt(0);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             names.add(in.getAttributeValue(null, "name"));
             String t = in.getAttributeValue(null, "tileimprovement-type");
-            impTypes.add(specification.getTileImprovementType(t));
+            impTypes.add(getSpecification().getTileImprovementType(t));
             imageIDs.add(in.getAttributeValue(null, "image-id"));
             in.nextTag(); // close this element
         }

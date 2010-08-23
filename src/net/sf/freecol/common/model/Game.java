@@ -1052,7 +1052,7 @@ public class Game extends FreeColGameObject {
                 in.nextTag();
             } else if (DifficultyLevel.getXMLElementTagName().equals(tagName)) {
                 difficultyLevel = new DifficultyLevel("", specification);
-                difficultyLevel.readFromXML(in, null);
+                difficultyLevel.readFromXML(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
             } else {

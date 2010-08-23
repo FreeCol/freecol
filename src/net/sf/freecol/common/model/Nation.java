@@ -139,13 +139,12 @@ public class Nation extends FreeColGameObjectType {
         this.selectable = newSelectable;
     }
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-        type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        type = getSpecification().getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         String refId = getAttribute(in, "ref", null);
         if (refId != null) {
-            refNation = specification.getNation(refId);
+            refNation = getSpecification().getNation(refId);
         }
         anthem = in.getAttributeValue(null, "anthem");
    }
