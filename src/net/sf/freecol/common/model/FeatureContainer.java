@@ -32,6 +32,13 @@ public class FeatureContainer {
     private Map<String, Set<Ability>> abilities = new HashMap<String, Set<Ability>>();
     private Map<String, Set<Modifier>> modifiers = new HashMap<String, Set<Modifier>>();
 
+    private Specification specification;
+
+
+    public FeatureContainer(Specification specification) {
+        this.specification = specification;
+    }
+
     public Set<Ability> getAbilities() {
         Set<Ability> result = new HashSet<Ability>();
         for (Set<Ability> abilitySet : abilities.values()) {
@@ -80,7 +87,7 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Ability> getAbilitySet(String id, FreeColGameObjectType objectType, Turn turn) {
-        if (Specification.getSpecification().getAbilities(id) == null) {
+        if (specification.getAbilities(id) == null) {
             throw new IllegalArgumentException("Unknown ability key: " + id);
         }
         Set<Ability> abilitySet = abilities.get(id);
@@ -127,7 +134,7 @@ public class FeatureContainer {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id, FreeColGameObjectType objectType, Turn turn) {
-        if (Specification.getSpecification().getAbilities(id) == null) {
+        if (specification.getAbilities(id) == null) {
             throw new IllegalArgumentException("Unknown ability key: " + id);
         }
         Set<Ability> abilitySet = abilities.get(id);
@@ -199,8 +206,8 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType, Turn turn) {
-        if (Specification.getSpecification().getModifiers(id) == null &&
-            Specification.getSpecification().getType(id) == null) {
+        if (specification.getModifiers(id) == null &&
+            specification.getType(id) == null) {
             throw new IllegalArgumentException("Unknown modifier key: " + id);
         }
         Set<Modifier> modifierSet = modifiers.get(id);

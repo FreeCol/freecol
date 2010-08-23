@@ -763,7 +763,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             return 0;
         }
         
-        base = (int) featureContainer.applyModifier(base, goodsType.getId());
+        base = (int) getFeatureContainer().applyModifier(base, goodsType.getId());
         return Math.max(base, 1);
     }
 

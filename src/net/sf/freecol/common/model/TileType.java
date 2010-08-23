@@ -165,7 +165,7 @@ public final class TileType extends FreeColGameObjectType {
      * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
-        return (int) featureContainer.applyModifier(0f, goodsType.getId(), unitType);
+        return (int) getFeatureContainer().applyModifier(0f, goodsType.getId(), unitType);
         /*
         Set<Modifier> result = featureContainer.getModifierSet(goodsType.getId(), unitType);
         if (unitType != null && !result.isEmpty()) {
@@ -182,7 +182,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>Modifier</code> value
      */
     public Set<Modifier> getProductionBonus(GoodsType goodsType) {
-        return featureContainer.getModifierSet(goodsType.getId());
+        return getFeatureContainer().getModifierSet(goodsType.getId());
     }
 
     /**

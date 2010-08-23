@@ -77,6 +77,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         UnitType gardener = new UnitType();
+        gardener.setFeatureContainer(new FeatureContainer(spec()));
         UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
 
         UnitTypeChange.ChangeType creation = UnitTypeChange.ChangeType.CREATION;
@@ -103,6 +104,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         UnitType gardener = new UnitType();
+        gardener.setFeatureContainer(new FeatureContainer(spec()));
         gardener.setSkill(0);
         UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
 

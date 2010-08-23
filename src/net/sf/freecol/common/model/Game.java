@@ -1003,15 +1003,17 @@ public class Game extends FreeColGameObject {
         gameOptions = null;
         citiesOfCibola = new ArrayList<String>(7);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(GameOptions.getXMLElementTagName())
-                || in.getLocalName().equals("game-options")) {
+            String tagName = in.getLocalName();
+            logger.finest("Found tag " + tagName);
+            if (tagName.equals(GameOptions.getXMLElementTagName())
+                || tagName.equals("game-options")) {
                 gameOptions = new GameOptions(in, getSpecification());
-            } else if (in.getLocalName().equals(NationOptions.getXMLElementTagName())) {
+            } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
                     nationOptions = new NationOptions();
                 }
                 nationOptions.readFromXML(in);
-            } else if (in.getLocalName().equals(Player.getXMLElementTagName())) {
+            } else if (tagName.equals(Player.getXMLElementTagName())) {
                 Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (player != null) {
                     player.readFromXML(in);
@@ -1023,7 +1025,7 @@ public class Game extends FreeColGameObject {
                         players.add(player);
                     }
                 }
-            } else if (in.getLocalName().equals(Map.getXMLElementTagName())) {
+            } else if (tagName.equals(Map.getXMLElementTagName())) {
                 String mapId = in.getAttributeValue(null, "ID");
                 map = (Map) getFreeColGameObject(mapId);
                 if (map != null) {
@@ -1032,7 +1034,7 @@ public class Game extends FreeColGameObject {
                     map = new Map(this, mapId);
                     map.readFromXML(in);
                 }
-            } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
+            } else if (tagName.equals(ModelMessage.getXMLElementTagName())) {
                 // 0.9.x save format compatibility.  Remove one day.
                 ModelMessage m = new ModelMessage();
                 m.readFromXML(in);
@@ -1042,26 +1044,26 @@ public class Game extends FreeColGameObject {
                     Player player = (Player) getFreeColGameObjectSafely(owner);
                     player.addModelMessage(m);
                 }
-            } else if (in.getLocalName().equals("citiesOfCibola")) {
+            } else if (tagName.equals("citiesOfCibola")) {
                 // TODO: remove support for old format
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
-            } else if (CIBOLA_TAG.equals(in.getLocalName())) {
+            } else if (CIBOLA_TAG.equals(tagName)) {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
-            } else if (DifficultyLevel.getXMLElementTagName().equals(in.getLocalName())) {
+            } else if (DifficultyLevel.getXMLElementTagName().equals(tagName)) {
                 difficultyLevel = new DifficultyLevel();
                 difficultyLevel.readFromXML(in, null);
-            } else if (MapGeneratorOptions.getXMLElementTagName().equals(in.getLocalName())) {
+            } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
+                logger.warning("Unknown tag: " + tagName + " loading game");
                 in.nextTag();
             }
         }
         // sanity check: we should be on the closing tag
         if (!in.getLocalName().equals(Game.getXMLElementTagName())) {
             logger.warning("Error parsing xml: expecting closing tag </" + Game.getXMLElementTagName() + "> "+
-                           "found instead: " +in.getLocalName());
+                           "found instead: " + in.getLocalName());
         }
         
         if (gameOptions == null) {

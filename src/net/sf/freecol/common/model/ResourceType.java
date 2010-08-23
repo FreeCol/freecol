@@ -50,13 +50,13 @@ public final class ResourceType extends FreeColGameObjectType {
     }
 
     public Set<Modifier> getProductionModifier(GoodsType goodsType, UnitType unitType) {
-        return featureContainer.getModifierSet(goodsType.getId(), unitType);
+        return getFeatureContainer().getModifierSet(goodsType.getId(), unitType);
     }
 
     public GoodsType getBestGoodsType() {
         GoodsType bestType = null;
         float bestValue = 0f;
-        for (Modifier modifier : featureContainer.getModifiers()) {
+        for (Modifier modifier : getFeatureContainer().getModifiers()) {
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
             float value = goodsType.getInitialSellPrice() * modifier.applyTo(100);
             if (bestType == null || value > bestValue) {

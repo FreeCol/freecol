@@ -55,7 +55,8 @@ public class FreeColGameObjectType extends FreeColObject {
     /**
      * Describe featureContainer here.
      */
-    protected FeatureContainer featureContainer = new FeatureContainer();
+    private FeatureContainer featureContainer;
+
 
     public FreeColGameObjectType() {
         // empty constructor
@@ -82,6 +83,9 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     public final void setSpecification(final Specification newSpecification) {
         this.specification = newSpecification;
+        if (featureContainer == null) {
+            featureContainer = new FeatureContainer(newSpecification);
+        }
     }
 
     /**

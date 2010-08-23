@@ -114,7 +114,7 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
         Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
 
-        FeatureContainer featureContainer = new FeatureContainer();
+        FeatureContainer featureContainer = new FeatureContainer(spec());
         featureContainer.addModifier(modifier1);
         featureContainer.addModifier(modifier2);
         featureContainer.addModifier(modifier3);
@@ -191,7 +191,7 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier2.isOutOfDate(new Turn(25)));
         assertTrue(modifier2.appliesTo(frigate, new Turn(25)));
 
-        FeatureContainer featureContainer = new FeatureContainer();
+        FeatureContainer featureContainer = new FeatureContainer(spec());
         featureContainer.addModifier(modifier1);
         featureContainer.addModifier(modifier2);
         Set<Modifier> modifierSet = featureContainer.getModifierSet("test", frigate, new Turn(15));
@@ -215,7 +215,7 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier1.appliesTo(frigate, new Turn(10)));
         assertTrue(modifier1.hasIncrement());
 
-        FeatureContainer featureContainer = new FeatureContainer();
+        FeatureContainer featureContainer = new FeatureContainer(spec());
         featureContainer.addModifier(modifier1);
         featureContainer.addModifier(modifier2);
 

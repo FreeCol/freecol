@@ -44,6 +44,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         FoundingFather father1 = new FoundingFather();
+        father1.setFeatureContainer(new FeatureContainer(spec()));
         Ability ability = new Ability("some.new.ability");
         spec().addAbility(ability);
         father1.addAbility(ability);
@@ -52,6 +53,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(dutch.hasAbility("some.new.ability"));
 
         FoundingFather father2 = new FoundingFather();
+        father2.setFeatureContainer(new FeatureContainer(spec()));
         Modifier modifier = new Modifier("some.new.modifier", father2, 2f, Modifier.Type.ADDITIVE);
         father2.addModifier(modifier);
         spec().addModifier(modifier);
@@ -63,6 +65,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(4f, FeatureContainer.applyModifierSet(2, null, modifierSet));
 
         FoundingFather father3 = new FoundingFather();
+        father3.setFeatureContainer(new FeatureContainer(spec()));
         father3.addModifier(new Modifier("some.new.modifier", father3, 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father3);
 
@@ -70,6 +73,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(6f, dutch.getFeatureContainer().applyModifier(2, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather();
+        father4.setFeatureContainer(new FeatureContainer(spec()));
         Ability ability2 = new Ability("some.new.ability", false);
         assertFalse(ability.equals(ability2));
         assertFalse(ability.hashCode() == ability2.hashCode());
@@ -112,6 +116,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         colony.getUnitList().get(3).setType(servantType);
         
         FoundingFather father = new FoundingFather();
+        father.setFeatureContainer(new FeatureContainer(spec()));
         Map<UnitType, UnitType> upgrades = new HashMap<UnitType, UnitType>();
         upgrades.put(servantType, colonistType);
         upgrades.put(colonistType, statesmanType);
@@ -156,6 +161,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         FoundingFather father = new FoundingFather();
+        father.setFeatureContainer(new FeatureContainer(spec()));
         Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus", -100f, Modifier.Type.PERCENTAGE);
         Scope pressScope = new Scope();
         pressScope.setType("model.building.printingPress");
@@ -452,7 +458,9 @@ public class FoundingFatherTest extends FreeColTestCase {
         for (int index = 0; index < expectedValues.length; index++) {
             assertEquals(index, dutch.getFatherCount());
             assertEquals(expectedValues[index], dutch.getTotalFoundingFatherCost());
-            dutch.addFather(new FoundingFather());
+            FoundingFather father = new FoundingFather();
+            father.setFeatureContainer(new FeatureContainer(spec()));
+            dutch.addFather(father);
         }
 
     }

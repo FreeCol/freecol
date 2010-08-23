@@ -520,6 +520,7 @@ public final class Specification {
             // forward declaration of new type
             try {
                 T result = type.newInstance();
+                result.setSpecification(this);
                 allTypes.put(Id, result);
                 return result;
             } catch(Exception e) {

@@ -195,7 +195,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     public Modifier getProductionModifier(GoodsType goodsType) {
-        Set<Modifier> modifierSet = featureContainer.getModifierSet(goodsType.getId());
+        Set<Modifier> modifierSet = getFeatureContainer().getModifierSet(goodsType.getId());
         if (modifierSet == null || modifierSet.isEmpty()) {
             return null;
         } else {
@@ -234,7 +234,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 }
             } else if (tileType.getProductionOf(goodsType, null) > 0) {
                 // Calculate bonuses from TileImprovementType
-                for (Modifier modifier : featureContainer.getModifiers()) {
+                for (Modifier modifier : getFeatureContainer().getModifiers()) {
                     float change = modifier.applyTo(1);
                     if (modifier.getId().equals(goodsType.getId())) {
                         if (change > 1) {
