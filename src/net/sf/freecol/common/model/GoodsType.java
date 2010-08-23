@@ -30,8 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class GoodsType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private boolean isFarmed;
     private boolean isFood;
     private boolean ignoreLimit;
@@ -82,8 +80,8 @@ public final class GoodsType extends FreeColGameObjectType {
 
     // ----------------------------------------------------------- constructors
 
-    public GoodsType() {
-        setIndex(nextIndex++);
+    public GoodsType(String id, Specification specification) {
+        super(id, specification);
     }
 
     // ----------------------------------------------------------- retriveal methods

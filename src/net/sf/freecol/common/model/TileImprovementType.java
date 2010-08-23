@@ -34,8 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class TileImprovementType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private boolean natural;
     private int magnitude;
     private int addWorkTurns;
@@ -68,8 +66,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ constructors
 
-    public TileImprovementType() {
-        setIndex(nextIndex++);
+    public TileImprovementType(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
     }
 

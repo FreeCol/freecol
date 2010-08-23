@@ -45,6 +45,12 @@ public class Event extends FreeColGameObjectType {
      */
     private List<Limit> limits;
 
+
+
+    public Event(String id, Specification specification) {
+        super(id, specification);
+    }
+
     /**
      * Get the <code>Value</code> value.
      *
@@ -137,7 +143,7 @@ public class Event extends FreeColGameObjectType {
             if (limits == null) {
                 limits = new ArrayList<Limit>();
             }
-            Limit limit = new Limit();
+            Limit limit = new Limit(specification);
             limit.readFromXML(in, specification);
             limits.add(limit);
             return limit;

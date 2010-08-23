@@ -64,6 +64,12 @@ public class IndianNationType extends NationType {
      */
     private List<String> regions = new ArrayList<String>();
 
+
+
+    public IndianNationType(String id, Specification specification) {
+        super(id, specification);
+    }
+
     /**
      * Returns false.
      *

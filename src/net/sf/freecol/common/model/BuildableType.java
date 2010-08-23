@@ -56,6 +56,12 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
 
+
+    public BuildableType(String id, Specification specification) {
+        super(id, specification);
+    }
+
+
     /**
      * Get the <code>GoodsRequired</code> value.
      *
@@ -149,7 +155,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
             if (limits == null) {
                 limits = new ArrayList<Limit>();
             }
-            Limit limit = new Limit();
+            Limit limit = new Limit(specification);
             limit.readFromXML(in, specification);
             if (limit.getLeftHandSide().getType() == null) {
                 limit.getLeftHandSide().setType(getId());

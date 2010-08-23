@@ -35,8 +35,6 @@ import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private boolean forest;
     private boolean water;
     private boolean canSettle;
@@ -89,8 +87,8 @@ public final class TileType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ constructor
 
-    public TileType() {
-        setIndex(nextIndex++);
+    public TileType(String id, Specification specification) {
+        super(id, specification);
     }
 
     // ------------------------------------------------------------ retrieval methods

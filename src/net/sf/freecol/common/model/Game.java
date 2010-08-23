@@ -1051,7 +1051,7 @@ public class Game extends FreeColGameObject {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
             } else if (DifficultyLevel.getXMLElementTagName().equals(tagName)) {
-                difficultyLevel = new DifficultyLevel();
+                difficultyLevel = new DifficultyLevel("", specification);
                 difficultyLevel.readFromXML(in, null);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());

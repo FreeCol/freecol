@@ -56,8 +56,9 @@ public final class Limit extends FreeColGameObjectType {
      */
     private Operand rightHandSide;
 
-    public Limit() {
-        // empty constructor
+
+    public Limit(Specification specification) {
+        super(specification);
     }
 
     public Limit(String id, Operand lhs, Operator op, Operand rhs) {

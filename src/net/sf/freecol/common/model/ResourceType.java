@@ -28,15 +28,13 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class ResourceType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private int minValue;
     private int maxValue;
 
     // ------------------------------------------------------------ constructors
 
-    public ResourceType() {
-        setIndex(nextIndex++);
+    public ResourceType(String id, Specification specification) {
+        super(id, specification);
     }
 
     // ------------------------------------------------------------ retrieval methods

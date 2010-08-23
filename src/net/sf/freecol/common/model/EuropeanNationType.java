@@ -58,10 +58,10 @@ public class EuropeanNationType extends NationType {
     private Map<String, Map<String, AbstractUnit>> startingUnitMap =
         new HashMap<String, Map<String, AbstractUnit>>();
 
-    /**
-     * Constructor.
-     */
-    public EuropeanNationType() {
+
+
+    public EuropeanNationType(String id, Specification specification) {
+        super(id, specification);
         setTypeOfSettlement(SettlementType.SMALL_COLONY);
     }
 

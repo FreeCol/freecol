@@ -33,8 +33,6 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 public final class UnitType extends BuildableType implements Comparable<UnitType> {
 
-    public static int nextIndex = 0;
-
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
 
@@ -128,8 +126,8 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * Creates a new <code>UnitType</code> instance.
      *
      */
-    public UnitType() {
-        setIndex(nextIndex++);
+    public UnitType(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
 

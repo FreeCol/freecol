@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -334,6 +335,7 @@ public final class Specification {
 
         private Class<T> type;
         private List<T> result;
+        private int index = 0;
 
         // Is there really no easy way to capture T?
         public TypeReader(Class<T> type, List<T> listToFill) {
@@ -354,6 +356,8 @@ public final class Specification {
                     object.readFromXML(xsr, specification);
                     if (!object.isAbstractType() && !result.contains(object)) {
                         result.add(object);
+                        object.setIndex(index);
+                        index++;
                     }
                 }
             }
@@ -519,8 +523,8 @@ public final class Specification {
         } else {
             // forward declaration of new type
             try {
-                T result = type.newInstance();
-                result.setSpecification(this);
+                Constructor<T> c = type.getConstructor(String.class, Specification.class);
+                T result = c.newInstance(Id, this);
                 allTypes.put(Id, result);
                 return result;
             } catch(Exception e) {

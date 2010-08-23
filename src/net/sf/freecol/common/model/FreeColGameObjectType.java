@@ -58,12 +58,22 @@ public class FreeColGameObjectType extends FreeColObject {
     private FeatureContainer featureContainer;
 
 
-    public FreeColGameObjectType() {
+    protected FreeColGameObjectType() {
         // empty constructor
     }
 
     public FreeColGameObjectType(String id) {
+        this(id, null);
+    }
+
+    public FreeColGameObjectType(Specification specification) {
+        this(null, specification);
+    }
+
+    public FreeColGameObjectType(String id, Specification specification) {
         setId(id);
+        this.specification = specification;
+        featureContainer = new FeatureContainer(specification);
     }
 
     /**
@@ -83,9 +93,6 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     public final void setSpecification(final Specification newSpecification) {
         this.specification = newSpecification;
-        if (featureContainer == null) {
-            featureContainer = new FeatureContainer(newSpecification);
-        }
     }
 
     /**

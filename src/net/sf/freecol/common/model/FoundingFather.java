@@ -39,8 +39,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class FoundingFather extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-    
     /**
      * The probability of this FoundingFather being offered for selection.
      */
@@ -75,12 +73,9 @@ public class FoundingFather extends FreeColGameObjectType {
      */
     private List<AbstractUnit> units;
 
-    /**
-     * Creates a new <code>FoundingFather</code> instance.
-     *
-     */
-    public FoundingFather() {
-        setIndex(nextIndex++);
+
+    public FoundingFather(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
     }
 
@@ -232,7 +227,7 @@ public class FoundingFather extends FreeColGameObjectType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if (Event.getXMLElementTagName().equals(childName)) {
-                Event event = new Event();
+                Event event = new Event("", specification);
                 event.readFromXML(in, specification);
                 events.add(event);
             } else if ("scope".equals(childName)) {

@@ -32,8 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public final class BuildingType extends BuildableType implements Comparable<BuildingType> {
     
-    private static int nextIndex = 0;
-
     private int level = 1;
     private int workPlaces = 3;
     private int basicProduction = 3;
@@ -46,10 +44,12 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     
-    public BuildingType() {
-        setIndex(nextIndex++);
+
+    public BuildingType(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
+
     
     public BuildingType getUpgradesFrom() {
         return upgradesFrom;

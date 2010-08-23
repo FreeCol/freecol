@@ -43,7 +43,8 @@ public final class ImprovementActionType extends FreeColGameObjectType {
     
     // ------------------------------------------------------------ constructors
     
-    public ImprovementActionType() {
+    public ImprovementActionType(String id, Specification specification) {
+        super(id, specification);
         names = new ArrayList<String>();
         impTypes = new ArrayList<TileImprovementType>();
         imageIDs = new ArrayList<String>();
