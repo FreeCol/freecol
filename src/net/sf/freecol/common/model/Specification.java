@@ -1112,11 +1112,12 @@ public final class Specification {
         while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = xsr.getLocalName();
             if (childName.equals("freecol-specification")) {
+                String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
                 if (id == null) {
                     // don't overwrite id with parent id!
-                    id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                    id = newId;
                 }
-                logger.info("Reading specification " + id);
+                logger.info("Reading specification " + newId);
                 String parentId = xsr.getAttributeValue(null, "extends");
                 if (parentId != null) {
                     FreeColTcFile parent = new FreeColTcFile(parentId);
