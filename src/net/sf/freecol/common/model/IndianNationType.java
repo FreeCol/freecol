@@ -64,12 +64,6 @@ public class IndianNationType extends NationType {
      */
     private List<String> regions = new ArrayList<String>();
 
-
-
-    public IndianNationType(String id, Specification specification) {
-        super(id, specification);
-    }
-
     /**
      * Returns false.
      *
@@ -195,11 +189,12 @@ public class IndianNationType extends NationType {
         return skills;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
 
         String extendString = in.getAttributeValue(null, "extends");
         IndianNationType parent = (extendString == null) ? this :
-            getSpecification().getType(extendString, IndianNationType.class);
+            specification.getType(extendString, IndianNationType.class);
         String valueString = in.getAttributeValue(null, "number-of-settlements");
         if (valueString == null) {
             numberOfSettlements = parent.numberOfSettlements;
@@ -223,37 +218,36 @@ public class IndianNationType extends NationType {
         setSettlementRadius(getAttribute(in, "settlementRadius", parent.getSettlementRadius()));
         setCapitalRadius(getAttribute(in, "capitalRadius", parent.getCapitalRadius()));
 
-        if (parent != this) {
-            skills.addAll(parent.skills);
-            getFeatureContainer().add(parent.getFeatureContainer());
-            getFeatureContainer().replaceSource(parent, this);
-        }
+        skills.addAll(parent.skills);
+        getFeatureContainer().add(parent.getFeatureContainer());
 
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    public void readChildren(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("skill".equals(childName)) {
+                UnitType unitType = specification.getUnitType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+                int probability = getAttribute(in, "probability", 0);
+                skills.add(new RandomChoice<UnitType>(unitType, probability));
+                in.nextTag(); // close this element
+            } else if (Region.getXMLElementTagName().equals(childName)) {
+                regions.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+                in.nextTag(); // close this element
+            } else {
+                super.readChild(in, specification);
+            }
+        }
+
         // sort skill according to probability
         Collections.sort(skills, new Comparator<RandomChoice<UnitType>>() {
                 public int compare(RandomChoice<UnitType> choice1, RandomChoice<UnitType> choice2) {
                     return choice2.getProbability() - choice1.getProbability();
                 }
             });
-    }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("skill".equals(childName)) {
-            UnitType unitType = getSpecification().getUnitType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-            int probability = getAttribute(in, "probability", 0);
-            skills.add(new RandomChoice<UnitType>(unitType, probability));
-            in.nextTag(); // close this element
-        } else if (Region.getXMLElementTagName().equals(childName)) {
-            regions.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-            in.nextTag(); // close this element
-        } else {
-            super.readChild(in);
-        }
+
     }
 
     /**

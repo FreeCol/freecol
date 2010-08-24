@@ -31,6 +31,8 @@ public class Nation extends FreeColGameObjectType {
 	
     public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
+    private static int nextIndex = 0;
+
     /**
      * Describe type here.
      */
@@ -52,11 +54,12 @@ public class Nation extends FreeColGameObjectType {
      */
     private Nation refNation;
 
-
-    public Nation(String id, Specification specification) {
-        super(id, specification);
+    /**
+     * Creates a new Nation instance.
+     */
+    public Nation() {
+        setIndex(nextIndex++);
     }
-
 
     /**
      * Get the <code>Anthem</code> value.
@@ -139,12 +142,13 @@ public class Nation extends FreeColGameObjectType {
         this.selectable = newSelectable;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        type = getSpecification().getNationType(in.getAttributeValue(null, "nation-type"));
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         String refId = getAttribute(in, "ref", null);
         if (refId != null) {
-            refNation = getSpecification().getNation(refId);
+            refNation = specification.getNation(refId);
         }
         anthem = in.getAttributeValue(null, "anthem");
    }

@@ -35,6 +35,8 @@ import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileType extends FreeColGameObjectType {
 
+    private static int nextIndex = 0;
+
     private boolean forest;
     private boolean water;
     private boolean canSettle;
@@ -87,8 +89,8 @@ public final class TileType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ constructor
 
-    public TileType(String id, Specification specification) {
-        super(id, specification);
+    public TileType() {
+        setIndex(nextIndex++);
     }
 
     // ------------------------------------------------------------ retrieval methods
@@ -163,7 +165,7 @@ public final class TileType extends FreeColGameObjectType {
      * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
-        return (int) getFeatureContainer().applyModifier(0f, goodsType.getId(), unitType);
+        return (int) featureContainer.applyModifier(0f, goodsType.getId(), unitType);
         /*
         Set<Modifier> result = featureContainer.getModifierSet(goodsType.getId(), unitType);
         if (unitType != null && !result.isEmpty()) {
@@ -180,7 +182,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>Modifier</code> value
      */
     public Set<Modifier> getProductionBonus(GoodsType goodsType) {
-        return getFeatureContainer().getModifierSet(goodsType.getId());
+        return featureContainer.getModifierSet(goodsType.getId());
     }
 
     /**
@@ -364,7 +366,8 @@ public final class TileType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         basicMoveCost = Integer.parseInt(in.getAttributeValue(null, "basic-move-cost"));
         basicWorkTurns = Integer.parseInt(in.getAttributeValue(null, "basic-work-turns"));
         forest = getAttribute(in, "is-forest", false);
@@ -373,49 +376,50 @@ public final class TileType extends FreeColGameObjectType {
         connected = getAttribute(in, "is-connected", false);
     }
         
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+
         production = new ArrayList<AbstractGoods>();
         resourceType = new ArrayList<RandomChoice<ResourceType>>();
-        super.readChildren(in);
-    }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("gen".equals(childName)) {
-            humidity[0] = getAttribute(in, "humidityMin", 0);
-            humidity[1] = getAttribute(in, "humidityMax", 100);
-            temperature[0] = getAttribute(in, "temperatureMin", -20);
-            temperature[1] = getAttribute(in, "temperatureMax", 40);
-            altitude[0] = getAttribute(in, "altitudeMin", 0);
-            altitude[1] = getAttribute(in, "altitudeMax", 0);
-            in.nextTag(); // close this element
-        } else if ("production".equals(childName)
-                   || "primary-production".equals(childName)
-                   || "secondary-production".equals(childName)) {
-            GoodsType type = getSpecification().getGoodsType(in.getAttributeValue(null, "goods-type"));
-            int amount = Integer.parseInt(in.getAttributeValue(null, VALUE_TAG));
-            AbstractGoods goods = new AbstractGoods(type, amount);
-            String tileProduction = in.getAttributeValue(null, "tile-production");
-            if ("primary-production".equals(childName)) {
-                primaryGoodsMap.put(tileProduction, goods);
-            } else if ("secondary-production".equals(childName)) {
-                secondaryGoodsMap.put(tileProduction, goods);
-            } else {
-                Map<GoodsType, AbstractGoods> oldValue = productionMap.get(tileProduction);
-                if (oldValue == null) {
-                    oldValue = new HashMap<GoodsType, AbstractGoods>();
-                    productionMap.put(tileProduction, oldValue);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("gen".equals(childName)) {
+                humidity[0] = getAttribute(in, "humidityMin", 0);
+                humidity[1] = getAttribute(in, "humidityMax", 100);
+                temperature[0] = getAttribute(in, "temperatureMin", -20);
+                temperature[1] = getAttribute(in, "temperatureMax", 40);
+                altitude[0] = getAttribute(in, "altitudeMin", 0);
+                altitude[1] = getAttribute(in, "altitudeMax", 0);
+                in.nextTag(); // close this element
+            } else if ("production".equals(childName)
+                       || "primary-production".equals(childName)
+                       || "secondary-production".equals(childName)) {
+                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
+                int amount = Integer.parseInt(in.getAttributeValue(null, VALUE_TAG));
+                AbstractGoods goods = new AbstractGoods(type, amount);
+                String tileProduction = in.getAttributeValue(null, "tile-production");
+                if ("primary-production".equals(childName)) {
+                    primaryGoodsMap.put(tileProduction, goods);
+                } else if ("secondary-production".equals(childName)) {
+                    secondaryGoodsMap.put(tileProduction, goods);
+                } else {
+                    Map<GoodsType, AbstractGoods> oldValue = productionMap.get(tileProduction);
+                    if (oldValue == null) {
+                        oldValue = new HashMap<GoodsType, AbstractGoods>();
+                        productionMap.put(tileProduction, oldValue);
+                    }
+                    oldValue.put(type, goods);
                 }
-                oldValue.put(type, goods);
+                in.nextTag(); // close this element
+            } else if ("resource".equals(childName)) {
+                ResourceType type = specification.getResourceType(in.getAttributeValue(null, "type"));
+                int probability = getAttribute(in, "probability", 100);
+                resourceType.add(new RandomChoice<ResourceType>(type, probability));
+                in.nextTag(); // close this element
+            } else {
+                super.readChild(in, specification);
             }
-            in.nextTag(); // close this element
-        } else if ("resource".equals(childName)) {
-            ResourceType type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
-            int probability = getAttribute(in, "probability", 100);
-            resourceType.add(new RandomChoice<ResourceType>(type, probability));
-            in.nextTag(); // close this element
-        } else {
-            super.readChild(in);
         }
     }
 

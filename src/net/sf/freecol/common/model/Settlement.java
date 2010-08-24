@@ -73,7 +73,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     /**
      * Contains the abilities and modifiers of this Colony.
      */
-    private FeatureContainer featureContainer;
+    protected FeatureContainer featureContainer = new FeatureContainer();
 
 
     /**
@@ -102,7 +102,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
                 logger.warning("An unknown type of settlement is already owning the tile.");
             }
         }
-        featureContainer = new FeatureContainer(game.getSpecification());
+
         owner.addSettlement(this);
     }
 
@@ -203,15 +203,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
-    }
-
-    /**
-     * Describe <code>setFeatureContainer</code> method here.
-     *
-     * @param container a <code>FeatureContainer</code> value
-     */
-    protected void setFeatureContainer(FeatureContainer container) {
-        featureContainer = container;
     }
 
     /**

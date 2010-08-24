@@ -166,6 +166,8 @@ public final class FreeColClient {
      */
     private boolean headless;
 
+    private Specification specification;
+
 
     /**
      * Creates a new <code>FreeColClient</code>. Creates the control objects
@@ -200,10 +202,25 @@ public final class FreeColClient {
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
+         // TODO: fixme! Specification is not yet known at this point
         final String tc = "freecol";
+   
         FreeColTcFile tcData = new FreeColTcFile(tc);
         ResourceManager.setTcMapping(tcData.getResourceMapping());
         
+        InputStream si = null;
+        try {
+            si = tcData.getSpecificationInputStream();
+            specification = new Specification(si);
+            si.close();
+        } catch (Exception e) {
+            System.err.println("Could not load specification.xml for: " + tc);
+            try {
+                si.close();
+            } catch (Exception ex) {}
+            System.exit(1);
+        }
+
         imageLibrary = new ImageLibrary();
         windowed = (size != null);
         if (size != null && size.width < 0) {
@@ -252,6 +269,7 @@ public final class FreeColClient {
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();
+            actionManager.addSpecificationActions(specification);
         }
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {

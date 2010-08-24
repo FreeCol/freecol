@@ -58,10 +58,10 @@ public class EuropeanNationType extends NationType {
     private Map<String, Map<String, AbstractUnit>> startingUnitMap =
         new HashMap<String, Map<String, AbstractUnit>>();
 
-
-
-    public EuropeanNationType(String id, Specification specification) {
-        super(id, specification);
+    /**
+     * Constructor.
+     */
+    public EuropeanNationType() {
         setTypeOfSettlement(SettlementType.SMALL_COLONY);
     }
 
@@ -134,10 +134,11 @@ public class EuropeanNationType extends NationType {
     }
 
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
         EuropeanNationType parent = (extendString == null) ? this :
-            (EuropeanNationType) getSpecification().getNationType(extendString);
+            (EuropeanNationType) specification.getNationType(extendString);
         ref = getAttribute(in, "ref", parent.ref);
 
         if (parent != this) {
@@ -145,27 +146,29 @@ public class EuropeanNationType extends NationType {
                 startingUnitMap.put(entry.getKey(), new HashMap<String, AbstractUnit>(entry.getValue()));
             }
             getFeatureContainer().add(parent.getFeatureContainer());
-            getFeatureContainer().replaceSource(parent, this);
         }
     }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("unit".equals(childName)) {
-            String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            String type = in.getAttributeValue(null, "type");
-            Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
-            String useExperts = in.getAttributeValue(null, "expert-starting-units");
-            AbstractUnit unit = new AbstractUnit(type, role, 1);
-            Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
-            if (units == null) {
-                units = new HashMap<String, AbstractUnit>();
-                startingUnitMap.put(useExperts, units);
+    public void readChildren(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("unit".equals(childName)) {
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                String type = in.getAttributeValue(null, "type");
+                Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
+                String useExperts = in.getAttributeValue(null, "expert-starting-units");
+                AbstractUnit unit = new AbstractUnit(type, role, 1);
+                Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
+                if (units == null) {
+                    units = new HashMap<String, AbstractUnit>();
+                    startingUnitMap.put(useExperts, units);
+                }
+                units.put(id, unit);
+                in.nextTag();
+            } else {
+                super.readChild(in, specification);
             }
-            units.put(id, unit);
-            in.nextTag();
-        } else {
-            super.readChild(in);
         }
     }
 

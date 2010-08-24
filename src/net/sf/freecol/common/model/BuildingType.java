@@ -32,6 +32,8 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public final class BuildingType extends BuildableType implements Comparable<BuildingType> {
     
+    private static int nextIndex = 0;
+
     private int level = 1;
     private int workPlaces = 3;
     private int basicProduction = 3;
@@ -44,12 +46,10 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     
-
-    public BuildingType(String id, Specification specification) {
-        super(id, specification);
+    public BuildingType() {
+        setIndex(nextIndex++);
         setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
-
     
     public BuildingType getUpgradesFrom() {
         return upgradesFrom;
@@ -126,15 +126,15 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     }
 
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
         BuildingType parent = (extendString == null) ? this :
-            getSpecification().getBuildingType(extendString);
+            specification.getBuildingType(extendString);
         String upgradeString = in.getAttributeValue(null, "upgradesFrom");
         if (upgradeString == null) {
             level = 1;
         } else {
-            upgradesFrom = getSpecification().getBuildingType(upgradeString);
+            upgradesFrom = specification.getBuildingType(upgradeString);
             upgradesFrom.upgradesTo = this;
             level = upgradesFrom.level + 1;
         }
@@ -143,8 +143,8 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         workPlaces = getAttribute(in, "workplaces", parent.workPlaces);
         basicProduction = getAttribute(in, "basicProduction", parent.basicProduction);
 
-        consumes = getSpecification().getType(in, "consumes", GoodsType.class, parent.consumes);
-        produces = getSpecification().getType(in, "produces", GoodsType.class, parent.produces);
+        consumes = specification.getType(in, "consumes", GoodsType.class, parent.consumes);
+        produces = specification.getType(in, "produces", GoodsType.class, parent.produces);
 
         if (produces != null && basicProduction > 0) {
             productionModifier = new Modifier(produces.getId(), this, basicProduction,
@@ -158,7 +158,6 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
         if (parent != this) {
             getFeatureContainer().add(parent.getFeatureContainer());
-            getFeatureContainer().replaceSource(parent, this);
         }
     }
 
@@ -180,12 +179,8 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         }
         out.writeAttribute("workplaces", Integer.toString(workPlaces));
         out.writeAttribute("basicProduction", Integer.toString(basicProduction));
-        if (minSkill > UNDEFINED) {
-            out.writeAttribute("minSkill", Integer.toString(minSkill));
-        }
-        if (maxSkill < INFINITY) {
-            out.writeAttribute("maxSkill", Integer.toString(maxSkill));
-        }
+        out.writeAttribute("minSkill", Integer.toString(minSkill));
+        out.writeAttribute("maxSkill", Integer.toString(maxSkill));
         out.writeAttribute("sequence", Integer.toString(sequence));
 
         if (consumes != null) {

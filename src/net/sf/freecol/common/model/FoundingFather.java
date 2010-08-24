@@ -39,6 +39,8 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class FoundingFather extends FreeColGameObjectType {
 
+    private static int nextIndex = 0;
+    
     /**
      * The probability of this FoundingFather being offered for selection.
      */
@@ -73,9 +75,12 @@ public class FoundingFather extends FreeColGameObjectType {
      */
     private List<AbstractUnit> units;
 
-
-    public FoundingFather(String id, Specification specification) {
-        super(id, specification);
+    /**
+     * Creates a new <code>FoundingFather</code> instance.
+     *
+     */
+    public FoundingFather() {
+        setIndex(nextIndex++);
         setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
     }
 
@@ -211,7 +216,8 @@ public class FoundingFather extends FreeColGameObjectType {
         this.upgrades = newUpgrades;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         String typeString = in.getAttributeValue(null, "type").toUpperCase(Locale.US);
         type = Enum.valueOf(FoundingFatherType.class, typeString);
 
@@ -221,33 +227,37 @@ public class FoundingFather extends FreeColGameObjectType {
 
     }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if (Event.getXMLElementTagName().equals(childName)) {
-            Event event = new Event(null, getSpecification());
-            event.readFromXML(in);
-            events.add(event);
-        } else if ("scope".equals(childName)) {
-            scopes.add(new Scope(in));
-        } else if ("unit".equals(childName)) {
-            AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
-            if (units == null) {
-                units = new ArrayList<AbstractUnit>();
-            }
-            units.add(unit);
-        } else if ("upgrade".equals(childName)) {
-            UnitType fromType = getSpecification().getUnitType(in.getAttributeValue(null, "from-id"));
-            UnitType toType = getSpecification().getUnitType(in.getAttributeValue(null, "to-id"));
-            if (fromType != null && toType != null) {
-                if (upgrades == null) {
-                    upgrades = new HashMap<UnitType, UnitType>();
+    public void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if (Event.getXMLElementTagName().equals(childName)) {
+                Event event = new Event();
+                event.readFromXML(in, specification);
+                events.add(event);
+            } else if ("scope".equals(childName)) {
+                scopes.add(new Scope(in));
+            } else if ("unit".equals(childName)) {
+                AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
+                if (units == null) {
+                    units = new ArrayList<AbstractUnit>();
                 }
-                upgrades.put(fromType, toType);
+                units.add(unit);
+            } else if ("upgrade".equals(childName)) {
+                UnitType fromType = specification.getUnitType(in.getAttributeValue(null, "from-id"));
+                UnitType toType = specification.getUnitType(in.getAttributeValue(null, "to-id"));
+                if (fromType != null && toType != null) {
+                    if (upgrades == null) {
+                        upgrades = new HashMap<UnitType, UnitType>();
+                    }
+                    upgrades.put(fromType, toType);
+                }
+                in.nextTag();
+            } else {
+                super.readChild(in, specification);
             }
-            in.nextTag();
-        } else {
-            super.readChild(in);
         }
+
     }
 
 

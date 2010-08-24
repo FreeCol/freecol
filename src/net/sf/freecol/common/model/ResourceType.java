@@ -28,13 +28,15 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class ResourceType extends FreeColGameObjectType {
 
+    private static int nextIndex = 0;
+
     private int minValue;
     private int maxValue;
 
     // ------------------------------------------------------------ constructors
 
-    public ResourceType(String id, Specification specification) {
-        super(id, specification);
+    public ResourceType() {
+        setIndex(nextIndex++);
     }
 
     // ------------------------------------------------------------ retrieval methods
@@ -48,13 +50,13 @@ public final class ResourceType extends FreeColGameObjectType {
     }
 
     public Set<Modifier> getProductionModifier(GoodsType goodsType, UnitType unitType) {
-        return getFeatureContainer().getModifierSet(goodsType.getId(), unitType);
+        return featureContainer.getModifierSet(goodsType.getId(), unitType);
     }
 
     public GoodsType getBestGoodsType() {
         GoodsType bestType = null;
         float bestValue = 0f;
-        for (Modifier modifier : getFeatureContainer().getModifiers()) {
+        for (Modifier modifier : featureContainer.getModifiers()) {
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
             float value = goodsType.getInitialSellPrice() * modifier.applyTo(100);
             if (bestType == null || value > bestValue) {
@@ -67,7 +69,8 @@ public final class ResourceType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
         if (hasAttribute(in, "maximum-value")) {
             maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));
             minValue = getAttribute(in, "minimum-value", 0);

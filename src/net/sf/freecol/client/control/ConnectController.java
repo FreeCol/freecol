@@ -281,7 +281,6 @@ public final class ConnectController {
                     mgo = new MapGeneratorOptions(game.getSpecification());
                 }
                 freeColClient.getPreGameController().setMapGeneratorOptions(mgo);
-                freeColClient.getActionManager().addSpecificationActions(game.getSpecification());
                 
                 c.endTransmission(in);
                 

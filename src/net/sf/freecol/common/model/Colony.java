@@ -196,7 +196,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             buildQueue.add(getSpecification().getBuildingType("model.building.warehouse"));
         } else {
             buildQueue.add(getSpecification().getBuildingType("model.building.docks"));
-            getFeatureContainer().addAbility(HAS_PORT);
+            featureContainer.addAbility(HAS_PORT);
         }
         Building building;
         List<BuildingType> buildingTypes = getSpecification().getBuildingTypeList();
@@ -280,7 +280,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public void addBuilding(final Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
-        getFeatureContainer().add(building.getType().getFeatureContainer());
+        featureContainer.add(building.getType().getFeatureContainer());
     }
 
     /**
@@ -292,7 +292,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public boolean removeBuilding(final Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         boolean result = buildingMap.remove(buildingType.getId()) != null;
-        getFeatureContainer().remove(building.getType().getFeatureContainer());
+        featureContainer.remove(building.getType().getFeatureContainer());
         return result;
     }
 
@@ -1559,7 +1559,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         } else if (buildableType.getPopulationRequired() > getUnitCount()) {
             return NoBuildReason.POPULATION_TOO_SMALL;
         } else if (!(buildableType instanceof BuildingType ||
-                     getFeatureContainer().hasAbility("model.ability.build", buildableType, getGame().getTurn()))) {
+                     featureContainer.hasAbility("model.ability.build", buildableType, getGame().getTurn()))) {
             return NoBuildReason.MISSING_BUILD_ABILITY;
         } else {
             java.util.Map<String, Boolean> requiredAbilities = buildableType.getAbilitiesRequired();
@@ -2409,7 +2409,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         /* This will return 0 unless additive modifiers are present.
            This is intentional.
         */
-        return (int) getFeatureContainer().applyModifier(0, "model.modifier.warehouseStorage",
+        return (int) featureContainer.applyModifier(0, "model.modifier.warehouseStorage",
                                                     null, getGame().getTurn());
     }
     
@@ -2468,7 +2468,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return a <code>Modifier</code> value
      */
     public final Set<Modifier> getModifierSet(String id) {
-        Set<Modifier> result = getFeatureContainer().getModifierSet(id, null, getGame().getTurn());
+        Set<Modifier> result = featureContainer.getModifierSet(id, null, getGame().getTurn());
         if (owner != null) { // Null owner happens during dispose.
             result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
         }
@@ -2496,7 +2496,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public boolean hasAbility(String id, FreeColGameObjectType type) {
         HashSet<Ability> colonyAbilities
-            = new HashSet<Ability>(getFeatureContainer().getAbilitySet(id, type, getGame().getTurn()));
+            = new HashSet<Ability>(featureContainer.getAbilitySet(id, type, getGame().getTurn()));
         Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, type, getGame().getTurn());
         colonyAbilities.addAll(playerAbilities);
         return FeatureContainer.hasAbility(colonyAbilities);
@@ -2596,7 +2596,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
             // Don't write other features, they will be added from
             // buildings in readFromXMLImpl().
-            for (Modifier modifier : getFeatureContainer().getModifierSet("model.goods.bells",
+            for (Modifier modifier : featureContainer.getModifierSet("model.goods.bells",
                                                                      null, getGame().getTurn())) {
                 if (Specification.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
                     modifier.toXML(out);
@@ -2655,10 +2655,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         liberty = getAttribute(in, "liberty", 0);
         immigration = getAttribute(in, "immigration", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
-        setFeatureContainer(new FeatureContainer(getSpecification()));
+        featureContainer = new FeatureContainer();
         landLocked = getAttribute(in, "landLocked", true);
         if (!landLocked) {
-            getFeatureContainer().addAbility(HAS_PORT);
+            featureContainer.addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
 
@@ -2705,7 +2705,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
                 Modifier modifier = new Modifier(in, getSpecification());
-                getFeatureContainer().addModifier(modifier);
+                featureContainer.addModifier(modifier);
             } else if ("buildQueue".equals(in.getLocalName())) {
                 // TODO: remove support for old format
                 int size = getAttribute(in, ARRAY_SIZE, 0);

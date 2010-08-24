@@ -56,9 +56,8 @@ public final class Limit extends FreeColGameObjectType {
      */
     private Operand rightHandSide;
 
-
-    public Limit(Specification specification) {
-        super(specification);
+    public Limit() {
+        // empty constructor
     }
 
     public Limit(String id, Operand lhs, Operator op, Operand rhs) {
@@ -255,21 +254,24 @@ public final class Limit extends FreeColGameObjectType {
     }
 
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         operator = Enum.valueOf(Operator.class, in.getAttributeValue(null, "operator"));
     }
 
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("leftHandSide".equals(childName)) {
-            leftHandSide = new Operand();
-            leftHandSide.readFromXMLImpl(in);
-        } else if ("rightHandSide".equals(childName)) {
-            rightHandSide = new Operand();
-            rightHandSide.readFromXMLImpl(in);
-        } else {
-            logger.warning("Unsupported child element: " + childName);
+    public void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if ("leftHandSide".equals(in.getLocalName())) {
+                leftHandSide = new Operand();
+                leftHandSide.readFromXMLImpl(in);
+            } else if ("rightHandSide".equals(in.getLocalName())) {
+                rightHandSide = new Operand();
+                rightHandSide.readFromXMLImpl(in);
+            } else {
+                logger.warning("Unsupported child element: " + in.getLocalName());
+            }
         }
     }
     

@@ -136,23 +136,11 @@ public class SelectOption extends AbstractOption {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out, getXMLElementTagName());
-    }
-
-    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(tag);
+        out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute(VALUE_TAG, getStringValue());
-        out.writeAttribute("localizedLabels", Boolean.toString(localizedLabels));
-
-        for (Map.Entry<Integer, String> entry : itemValues.entrySet()) {
-            out.writeStartElement(getXMLItemElementTagName());
-            out.writeAttribute(VALUE_TAG, Integer.toString(entry.getKey()));
-            out.writeAttribute("label", entry.getValue());
-            out.writeEndElement();
-        }
 
         out.writeEndElement();
     }
@@ -166,8 +154,12 @@ public class SelectOption extends AbstractOption {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        localizedLabels = getAttribute(in, "localizedLabels", true);
+        final String localizedLabels = in.getAttributeValue(null, "localizedLabels");
         final String value = in.getAttributeValue(null, VALUE_TAG);
+
+        if (localizedLabels != null) {
+            this.localizedLabels = localizedLabels.equals("true");
+        }
 
         if (id == null && getId().equals("NO_ID")) {
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
@@ -182,22 +174,22 @@ public class SelectOption extends AbstractOption {
         }
         if (value != null) {
             setValue(Integer.parseInt(value));
+            in.nextTag();
         } else {
             setValue(Integer.parseInt(defaultValue));
-        }
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(getXMLItemElementTagName())) {
-                String label = in.getAttributeValue(null, "label");
-                final String itemValue = in.getAttributeValue(null, VALUE_TAG);
-                if (this.localizedLabels) {
-                    label = Messages.message(label);
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName() == getXMLItemElementTagName()) {
+                    String label = in.getAttributeValue(null, "label");
+                    final String itemValue = in.getAttributeValue(null, VALUE_TAG);
+                    if (this.localizedLabels) {
+                        label = Messages.message(label);
+                    }
+                    itemValues.put(Integer.parseInt(itemValue), label);
+                } else {
+                    throw new XMLStreamException("Unknown child \"" + in.getLocalName() + "\" in a \""
+                            + getXMLElementTagName() + "\". ");
                 }
-                itemValues.put(Integer.parseInt(itemValue), label);
                 in.nextTag();
-            } else {
-                throw new XMLStreamException("Unknown child \"" + in.getLocalName() + "\" in a \""
-                                             + getXMLElementTagName() + "\". ");
             }
         }
     }

@@ -531,7 +531,7 @@ public final class TilePopup extends JPopupMenu {
      */
     private void debugAddNewUnitToTile(Tile tile) {
         List<ChoiceItem<UnitType>> uts = new ArrayList<ChoiceItem<UnitType>>();
-        for (UnitType t : tile.getSpecification().getUnitTypeList()) {
+        for (UnitType t : Specification.getSpecification().getUnitTypeList()) {
             uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString() + ".name"), t));
         }
         UnitType unitChoice = freeColClient.getCanvas()

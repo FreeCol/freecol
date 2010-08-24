@@ -20,8 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -146,14 +144,13 @@ public class SerializationTest extends FreeColTestCase {
     public void testSpecification() throws Exception {
 
         try {
-            String filename = "test/data/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
-            FileWriter sw = new FileWriter(filename);
+            StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter out = xif.createXMLStreamWriter(sw);
             spec().toXMLImpl(out);
             out.close();
-            validator.validate(new StreamSource(new FileReader(filename)));
+            validator.validate(new StreamSource(new StringReader(sw.toString())));
         } catch(SAXParseException e){
             String errMsg = e.getMessage() 
                 + " at line=" + e.getLineNumber() 

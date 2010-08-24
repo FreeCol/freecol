@@ -367,7 +367,6 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         writeAttributes(out);
-        writeChildren(out);
         out.writeEndElement();
     }
 
@@ -405,7 +404,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
             out.writeAttribute("index", Integer.toString(index));
         }
     }
-
+    
     public String toString() {
         return getId() + (getSource() == null ? " " : " (" + getSource().getId() + ") ") +
             type + " " + value;

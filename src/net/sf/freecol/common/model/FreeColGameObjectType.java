@@ -55,25 +55,14 @@ public class FreeColGameObjectType extends FreeColObject {
     /**
      * Describe featureContainer here.
      */
-    private FeatureContainer featureContainer;
+    protected FeatureContainer featureContainer = new FeatureContainer();
 
-
-    protected FreeColGameObjectType() {
+    public FreeColGameObjectType() {
         // empty constructor
     }
 
     public FreeColGameObjectType(String id) {
-        this(id, null);
-    }
-
-    public FreeColGameObjectType(Specification specification) {
-        this(null, specification);
-    }
-
-    public FreeColGameObjectType(String id, Specification specification) {
         setId(id);
-        this.specification = specification;
-        featureContainer = new FeatureContainer(specification);
     }
 
     /**
@@ -250,20 +239,22 @@ public class FreeColGameObjectType extends FreeColObject {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        setSpecification(specification);
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         setAbstractType(getAttribute(in, "abstract", false));
-        readAttributes(in);
-        readChildren(in);
+        readAttributes(in, specification);
+        readChildren(in, specification);
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         // do nothing
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
+            readChild(in, specification);
         }
     }
     
@@ -272,15 +263,18 @@ public class FreeColGameObjectType extends FreeColObject {
      *
      * @param in a <code>XMLStreamReader</code> value
      * @param specification a <code>Specification</code> value
+     * @return a <code>FreeColObject</code> value
      * @exception XMLStreamException if an error occurs
      */
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected FreeColObject readChild(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         String childName = in.getLocalName();
         if (Ability.getXMLElementTagName().equals(childName)) {
             if (getAttribute(in, "delete", false)) {
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 featureContainer.removeAbilities(id);
                 in.nextTag();
+                return null;
             } else {
                 Ability ability = new Ability(in, specification);
                 if (ability.getSource() == null) {
@@ -288,12 +282,14 @@ public class FreeColGameObjectType extends FreeColObject {
                 }
                 addAbility(ability); // Ability close the element
                 specification.addAbility(ability);
+                return ability;
             }
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
             if (getAttribute(in, "delete", false)) {
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 featureContainer.removeModifiers(id);
                 in.nextTag();
+                return null;
             } else {
                 Modifier modifier = new Modifier(in, specification);
                 if (modifier.getSource() == null) {
@@ -304,6 +300,7 @@ public class FreeColGameObjectType extends FreeColObject {
                 }
                 addModifier(modifier); // Modifier close the element
                 specification.addModifier(modifier);
+                return modifier;
             }
         } else {
             logger.warning("Parsing of " + childName + " is not implemented yet");
@@ -311,6 +308,7 @@ public class FreeColGameObjectType extends FreeColObject {
                    !in.getLocalName().equals(childName)) {
                 in.nextTag();
             }
+            return null;
         }
     }
     

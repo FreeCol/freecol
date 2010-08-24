@@ -38,12 +38,14 @@ import net.sf.freecol.common.option.StringOption;
 // TODO: couldn't we just use an OptionGroup?
 public class DifficultyLevel extends FreeColGameObjectType {
 
+    private static int nextIndex = 0;
+
     private final Map<String, AbstractOption> levelOptions =
         new LinkedHashMap<String, AbstractOption>();
 
 
-    public DifficultyLevel(String id, Specification specification) {
-        super(id, specification);
+    public DifficultyLevel() {
+        setIndex(nextIndex++);
     }
 
     public AbstractOption getOption(String Id) throws IllegalArgumentException {
@@ -61,7 +63,8 @@ public class DifficultyLevel extends FreeColGameObjectType {
         return levelOptions;
     }
     
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
 
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         
@@ -92,10 +95,6 @@ public class DifficultyLevel extends FreeColGameObjectType {
             }
         }
 
-    }
-
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out);
     }
 
     public void toXML(XMLStreamWriter out) throws XMLStreamException {

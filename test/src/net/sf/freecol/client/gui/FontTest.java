@@ -63,7 +63,6 @@ public class FontTest extends FreeColTestCase {
         }
     }
 
-    /*
     public void testLiberationSerif() {
 
         File liberationSerif = new File("data/base/resources/fonts/LiberationSerif-Regular.ttf");
@@ -78,6 +77,6 @@ public class FontTest extends FreeColTestCase {
             fail(e.toString());
         }
     }
-    */
+
 
 }

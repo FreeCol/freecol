@@ -23,9 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -148,13 +146,9 @@ public final class Specification {
     private final List<Event> events = new ArrayList<Event>();
     private final List<Modifier> specialModifiers = new ArrayList<Modifier>();
 
-    private final Map<String, ChildReader> readerMap = new HashMap<String, ChildReader>();
-
     private int storableTypes = 0;
 
     private boolean initialized = false;
-
-    private String id;
 
 
     /**
@@ -171,14 +165,6 @@ public final class Specification {
      * Specification class.
      */
     public Specification(InputStream in) {
-        this();
-        initialized = false;
-        load(in);
-        clean();
-        initialized = true;
-    }
-
-    public Specification() {
         logger.info("Initializing Specification");
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
@@ -197,6 +183,15 @@ public final class Specification {
             allTypes.put(source.getId(), source);
         }
 
+        initialized = false;
+        load(in);
+        clean();
+        initialized = true;
+    }
+
+    private void load(InputStream in) {
+
+        Map<String, ChildReader> readerMap = new HashMap<String, ChildReader>();
         readerMap.put("nations",
                       new TypeReader<Nation>(Nation.class, nations));
         readerMap.put("building-types",
@@ -227,13 +222,33 @@ public final class Specification {
         readerMap.put("modifiers", new ModifierReader());
         readerMap.put("options", new OptionReader());
 
-    }
-
-    private void load(InputStream in) {
-
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
-            readFromXMLImpl(xsr);
+            //xsr.nextTag();
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                String childName = xsr.getLocalName();
+                if (childName.equals("freecol-specification")) {
+                    String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                    logger.info("Reading specification " + id);
+                    String parentId = xsr.getAttributeValue(null, "extends");
+                    if (parentId != null) {
+                        FreeColTcFile parent = new FreeColTcFile(parentId);
+                        try {
+                            load(parent.getSpecificationInputStream());
+                        } catch(Exception e) {
+                            logger.warning("Failed to load parent specification " + parentId);
+                        }
+                    }
+                } else {
+                    logger.finest("Found child named " + childName);
+                    ChildReader reader = readerMap.get(childName);
+                    if (reader == null) {
+                        throw new RuntimeException("unexpected: " + childName);
+                    } else {
+                        reader.readChildren(xsr, this);
+                    }
+                }
+            }
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -335,7 +350,6 @@ public final class Specification {
 
         private Class<T> type;
         private List<T> result;
-        private int index = 0;
 
         // Is there really no easy way to capture T?
         public TypeReader(Class<T> type, List<T> listToFill) {
@@ -353,11 +367,9 @@ public final class Specification {
                     }
                 } else {
                     T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
-                    object.readFromXML(xsr);
+                    object.readFromXML(xsr, specification);
                     if (!object.isAbstractType() && !result.contains(object)) {
                         result.add(object);
-                        object.setIndex(index);
-                        index++;
                     }
                 }
             }
@@ -416,15 +428,6 @@ public final class Specification {
 
     // ---------------------------------------------------------- retrieval
     // methods
-
-    /**
-     * Describe <code>getId</code> method here.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getId() {
-        return id;
-    }
 
     /**
      * Registers an Ability as defined.
@@ -523,8 +526,7 @@ public final class Specification {
         } else {
             // forward declaration of new type
             try {
-                Constructor<T> c = type.getConstructor(String.class, Specification.class);
-                T result = c.newInstance(Id, this);
+                T result = type.newInstance();
                 allTypes.put(Id, result);
                 return result;
             } catch(Exception e) {
@@ -1078,7 +1080,8 @@ public final class Specification {
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+        // TODO: use ID to identify different specifications, e.g. "classic"
+        // out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
         // copy the order of section in specification.xml
         writeSection(out, "modifiers", specialModifiers);
@@ -1096,52 +1099,19 @@ public final class Specification {
         writeSection(out, "european-nation-types", REFNationTypes);
         writeSection(out, "indian-nation-types", indianNationTypes);
         writeSection(out, "nations", nations);
-        writeSection(out, "difficultyLevels", difficultyLevels);
-        writeSection(out, "options", allOptionGroups.values());
 
         // End element:
         out.writeEndElement();
 
     }
 
-    private <T extends FreeColObject> void writeSection(XMLStreamWriter out, String section, Collection<T> items)
+    private <T extends FreeColObject> void writeSection(XMLStreamWriter out, String section, List<T> items)
         throws XMLStreamException {
         out.writeStartElement(section);
         for (FreeColObject item : items) {
             item.toXMLImpl(out);
         }
         out.writeEndElement();
-    }
-
-    public void readFromXMLImpl(XMLStreamReader xsr) throws XMLStreamException {
-        while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = xsr.getLocalName();
-            if (childName.equals("freecol-specification")) {
-                String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
-                if (id == null) {
-                    // don't overwrite id with parent id!
-                    id = newId;
-                }
-                logger.info("Reading specification " + newId);
-                String parentId = xsr.getAttributeValue(null, "extends");
-                if (parentId != null) {
-                    FreeColTcFile parent = new FreeColTcFile(parentId);
-                    try {
-                        load(parent.getSpecificationInputStream());
-                    } catch(Exception e) {
-                        logger.warning("Failed to load parent specification " + parentId);
-                    }
-                }
-            } else {
-                logger.finest("Found child named " + childName);
-                ChildReader reader = readerMap.get(childName);
-                if (reader == null) {
-                    throw new RuntimeException("unexpected: " + childName);
-                } else {
-                    reader.readChildren(xsr, this);
-                }
-            }
-        }
     }
 
     public static String getXMLElementTagName() {
