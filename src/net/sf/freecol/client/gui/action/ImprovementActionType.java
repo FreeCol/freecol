@@ -24,9 +24,11 @@ import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.TileImprovementType;
 
 /**
@@ -37,16 +39,14 @@ public final class ImprovementActionType extends FreeColGameObjectType {
 
     private char accelerator;
     
-    private final List<String> names;
-    private final List<TileImprovementType> impTypes;
-    private final List<String> imageIDs;
+    private final List<String> names = new ArrayList<String>();
+    private final List<TileImprovementType> impTypes = new ArrayList<TileImprovementType>();
+    private final List<String> imageIDs = new ArrayList<String>();
     
     // ------------------------------------------------------------ constructors
     
-    public ImprovementActionType() {
-        names = new ArrayList<String>();
-        impTypes = new ArrayList<TileImprovementType>();
-        imageIDs = new ArrayList<String>();
+    public ImprovementActionType(String id, Specification specification) {
+        super(id, specification);
     }
 
     // ------------------------------------------------------------ retrieval methods
@@ -69,21 +69,33 @@ public final class ImprovementActionType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
-    public void readFromXML(XMLStreamReader in, Specification specification)
-           throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        setId(in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG));
         accelerator = in.getAttributeValue(null, "accelerator").charAt(0);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             names.add(in.getAttributeValue(null, "name"));
             String t = in.getAttributeValue(null, "tileimprovement-type");
-            impTypes.add(specification.getTileImprovementType(t));
+            impTypes.add(getSpecification().getTileImprovementType(t));
             imageIDs.add(in.getAttributeValue(null, "image-id"));
             in.nextTag(); // close this element
         }
-    }   
+    }
+
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement("improvementaction-type");
+        out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("accelerator", Character.toString(accelerator));
+
+        for (int index = 0; index < names.size(); index++) {
+            out.writeStartElement("action");
+            out.writeAttribute("name", names.get(index));
+            out.writeAttribute("tileimprovement-type", impTypes.get(index).getId());
+            out.writeAttribute("image-id", imageIDs.get(index));
+            out.writeEndElement();
+        }
+
+        out.writeEndElement();
+    }
+
 }

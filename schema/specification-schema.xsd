@@ -711,7 +711,8 @@
         <xs:element maxOccurs="unbounded" ref="rangeValue"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="defaultValue" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
@@ -744,7 +745,8 @@
         <xs:element maxOccurs="unbounded" ref="selectValue"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="defaultValue" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>

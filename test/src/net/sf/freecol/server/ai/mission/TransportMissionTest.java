@@ -72,7 +72,7 @@ public class TransportMissionTest extends FreeColTestCase {
     
     private Game startServerGame(Map map){
         // Reset import file option value (may have been set by previous tests)
-        ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
         
         // start a server
         server = ServerTestHelper.startServer(false, true);

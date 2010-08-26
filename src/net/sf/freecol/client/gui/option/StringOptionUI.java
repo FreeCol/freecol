@@ -52,15 +52,17 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
     private final StringOption option;
     private String originalValue;
     private JLabel label;
+    private Specification specification;
 
     /**
     * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
     * @param option The <code>StringOption</code> to make a user interface for.
     */
-    public StringOptionUI(final StringOption option, boolean editable) {
+    public StringOptionUI(final StringOption option, boolean editable, Specification specification) {
 
         this.option = option;
         this.originalValue = option.getValue();
+        this.specification = specification;
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -177,34 +179,34 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
             List<FreeColObject> objects = new ArrayList<FreeColObject>();
             switch(option.getGenerateChoices()) {
             case UNITS:
-                objects.addAll(Specification.getSpecification().getUnitTypeList());
+                objects.addAll(specification.getUnitTypeList());
                 break;
             case IMMIGRANTS:
-                for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+                for (UnitType unitType : specification.getUnitTypeList()) {
                     if (unitType.isRecruitable()) {
                         objects.add(unitType);
                     }
                 }
                 break;
             case NAVAL_UNITS:
-                for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+                for (UnitType unitType : specification.getUnitTypeList()) {
                     if (unitType.hasAbility("model.ability.navalUnit")) {
                         objects.add(unitType);
                     }
                 }
                 break;
             case LAND_UNITS:
-                for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
+                for (UnitType unitType : specification.getUnitTypeList()) {
                     if (!unitType.hasAbility("model.ability.navalUnit")) {
                         objects.add(unitType);
                     }
                 }
                 break;
             case BUILDINGS:
-                objects.addAll(Specification.getSpecification().getBuildingTypeList());
+                objects.addAll(specification.getBuildingTypeList());
                 break;
             case FOUNDING_FATHERS:
-                objects.addAll(Specification.getSpecification().getFoundingFathers());
+                objects.addAll(specification.getFoundingFathers());
                 break;
             }
             choices = new ArrayList<String>(objects.size());

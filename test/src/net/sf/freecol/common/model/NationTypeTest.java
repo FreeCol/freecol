@@ -30,7 +30,7 @@ public class NationTypeTest extends FreeColTestCase {
 
     public void testHasType(){
                 
-        Specification s = Specification.getSpecification();
+        Specification s = spec();
                 
         // Make sure that each nation has a type
         for (Nation n : s.getNations()){
@@ -40,7 +40,7 @@ public class NationTypeTest extends FreeColTestCase {
         
     public void testisRef() {
 
-        Specification s = Specification.getSpecification();
+        Specification s = spec();
 
         assertTrue(s.getNationType("model.nationType.trade").isEuropean());
         assertTrue(s.getNationType("model.nationType.default").isEuropean());
@@ -60,7 +60,7 @@ public class NationTypeTest extends FreeColTestCase {
     }
 
     public void testIsREF() {
-        Specification s = Specification.getSpecification();
+        Specification s = spec();
 
         assertFalse(s.getNationType("model.nationType.trade").isREF());
         assertFalse(s.getNationType("model.nationType.default").isREF());

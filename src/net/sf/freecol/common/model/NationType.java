@@ -27,8 +27,6 @@ import net.sf.freecol.common.model.Settlement.SettlementType;
  */
 public abstract class NationType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     /**
      * The type of settlement this Nation has.
      */
@@ -44,11 +42,9 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     private int capitalRadius = 2;
 
-    /**
-     * Sole constructor.
-     */
-    public NationType() {
-        setIndex(nextIndex++);
+
+    public NationType(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
     }
 

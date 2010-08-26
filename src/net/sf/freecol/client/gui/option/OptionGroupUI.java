@@ -32,6 +32,7 @@ import javax.swing.KeyStroke;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
@@ -55,14 +56,22 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     private final ArrayList<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
 
+    private Specification specification;
+
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
      * <code>OptionGroup</code>.
      * 
      * @param option The <code>OptionGroup</code> to make a user interface
      *            for.
+     * @param editable a <code>boolean</code> value
+     * @param level an <code>int</code> value
+     * @param specification a <code>Specification</code> value
      */
-    public OptionGroupUI(OptionGroup option, boolean editable, int level, Map<String, JComponent> optionUIs) {
+    public OptionGroupUI(OptionGroup option, boolean editable, int level, Map<String, JComponent> optionUIs,
+                         Specification specification) {
+
+        this.specification = specification;
         
         setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
 
@@ -150,7 +159,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 optionUIs.put(o.getId(), soi);
             }
         } else if (o instanceof StringOption) {
-            final StringOptionUI soi = new StringOptionUI((StringOption) o, editable);
+            final StringOptionUI soi = new StringOptionUI((StringOption) o, editable, specification);
             if (soi.getLabel().getText().length() > 30) {
                 add(soi.getLabel(), "newline, span 3, right");
             } else {

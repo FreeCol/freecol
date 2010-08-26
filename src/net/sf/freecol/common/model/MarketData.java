@@ -82,6 +82,8 @@ public class MarketData extends FreeColObject {
      */
     private boolean traded;
 
+    private GoodsType goodsType;
+
 
     /**
      * Package constructor: This class is only supposed to be constructed
@@ -98,6 +100,7 @@ public class MarketData extends FreeColObject {
      * @param goodsType a <code>GoodsType</code> value
      */
     public MarketData(GoodsType goodsType) {
+        this.goodsType = goodsType;
         setId(goodsType.getId());
         traded = false;
     }
@@ -289,7 +292,7 @@ public class MarketData extends FreeColObject {
      * @return The goods type for this data.
      */
     public final GoodsType getGoodsType() {
-        return Specification.getSpecification().getGoodsType(getId());
+        return goodsType;
     }
 
     /**

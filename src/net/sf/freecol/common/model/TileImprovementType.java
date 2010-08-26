@@ -34,8 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class TileImprovementType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private boolean natural;
     private int magnitude;
     private int addWorkTurns;
@@ -68,8 +66,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ constructors
 
-    public TileImprovementType() {
-        setIndex(nextIndex++);
+    public TileImprovementType(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
     }
 
@@ -195,7 +193,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     public Modifier getProductionModifier(GoodsType goodsType) {
-        Set<Modifier> modifierSet = featureContainer.getModifierSet(goodsType.getId());
+        Set<Modifier> modifierSet = getFeatureContainer().getModifierSet(goodsType.getId());
         if (modifierSet == null || modifierSet.isEmpty()) {
             return null;
         } else {
@@ -234,7 +232,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 }
             } else if (tileType.getProductionOf(goodsType, null) > 0) {
                 // Calculate bonuses from TileImprovementType
-                for (Modifier modifier : featureContainer.getModifiers()) {
+                for (Modifier modifier : getFeatureContainer().getModifiers()) {
                     float change = modifier.applyTo(1);
                     if (modifier.getId().equals(goodsType.getId())) {
                         if (change > 1) {
@@ -274,46 +272,45 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = getAttribute(in, "movement-cost", 0);
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 
-        requiredImprovementType = specification.getType(in, "required-improvement", 
-                                                        TileImprovementType.class, null);
+        requiredImprovementType = getSpecification().getType(in, "required-improvement", 
+                                                             TileImprovementType.class, null);
 
         zIndex = getAttribute(in, "zIndex", 0);
 
-        expendedEquipmentType = specification.getType(in, "expended-equipment-type", EquipmentType.class, null);
+        expendedEquipmentType = getSpecification().getType(in, "expended-equipment-type",
+                                                           EquipmentType.class, null);
         expendedAmount = getAttribute(in, "expended-amount", 0);
-        deliverGoodsType = specification.getType(in, "deliver-goods-type", GoodsType.class, null);
+        deliverGoodsType = getSpecification().getType(in, "deliver-goods-type", GoodsType.class, null);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
     }
 
 
-    public void readChildren(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
         allowedWorkers = new HashSet<String>();
         tileTypeChange = new HashMap<TileType, TileType>();
+        super.readChildren(in);
+    }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if ("scope".equals(childName)) {
-                scopes.add(new Scope(in));
-            } else if ("worker".equals(childName)) {
-                allowedWorkers.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-                in.nextTag(); // close this element
-            } else if ("change".equals(childName)) {
-                tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
-                                   specification.getTileType(in.getAttributeValue(null, "to")));
-                in.nextTag(); // close this element
-            } else {
-                super.readChild(in, specification);
-            }
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if ("scope".equals(childName)) {
+            scopes.add(new Scope(in));
+        } else if ("worker".equals(childName)) {
+            allowedWorkers.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+            in.nextTag(); // close this element
+        } else if ("change".equals(childName)) {
+            tileTypeChange.put(getSpecification().getTileType(in.getAttributeValue(null, "from")),
+                               getSpecification().getTileType(in.getAttributeValue(null, "to")));
+            in.nextTag(); // close this element
+        } else {
+            super.readChild(in);
         }
     }
 

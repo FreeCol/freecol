@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +42,23 @@ public final class SpecificationTest extends FreeColTestCase {
      */
     public void testLoad() {
 
-    	Specification spec = Specification.getSpecification();
+        Specification spec = null;
+        try {
+            spec = new Specification(new FileInputStream("data/freecol/specification.xml"));
+        } catch(Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     	
     	assertNotNull(spec);
     	
-    	assertEquals(spec, Specification.getSpecification());
     }
 
     /**
      * Test for some typical abilities.
      */
     public void testUnitAbilities() {
-    	Specification spec = Specification.getSpecification();
+    	Specification spec = spec();
 
         UnitType colonist = spec.getUnitType("model.unit.freeColonist");
         assertTrue(colonist.hasAbility("model.ability.foundColony"));
@@ -100,7 +106,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
     public void testFoundingFathers() {
 
-        Specification spec = Specification.getSpecification();
+        Specification spec = spec();
 
         FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
         assertFalse(smith == null);
@@ -121,7 +127,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
     // Check options presence and value
     public void testOptions() {
-        Specification spec = Specification.getSpecification();
+        Specification spec = spec();
 
         //assertTrue(spec.getIntegerOption(GameOptions.STARTING_MONEY).getValue() == 0);
 
@@ -133,33 +139,26 @@ public final class SpecificationTest extends FreeColTestCase {
 
     // Check difficulty levels presence and values
     public void testDifficultyLevels() {
-        Specification spec = Specification.getSpecification();
-        RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
+        assertEquals(6, spec().getDifficultyLevels().size());
+        RangeOption diffOpt = (RangeOption) spec().getOption(GameOptions.DIFFICULTY);
 
         assertTrue(diffOpt.getValue() == 2);
         assertTrue(diffOpt.getItemValues().size() == 5);
 
         IntegerOption option = null;
 
-        try {
-            // should fail, because it is part of uninitialized server difficulty options
-            option = spec.getIntegerOption("model.option.crossesIncrement");
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
-
         // initializing server difficulty options
-        spec.applyDifficultyLevel(2);
+        spec().applyDifficultyLevel(2);
       
         // should succeed now
-        option = spec.getIntegerOption("model.option.crossesIncrement");
+        option = spec().getIntegerOption("model.option.crossesIncrement");
         assertNotNull(option);
         assertEquals(10, option.getValue());
     }
 
     public void testModifiers() {
 
-    	Specification spec = Specification.getSpecification();
+    	Specification spec = spec();
     	
     	// Percentage Modifier
     	BuildingType ironWorks = spec.getBuildingType("model.building.ironWorks");
@@ -182,7 +181,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
     public void testNations() {
 
-        Specification spec = Specification.getSpecification();
+        Specification spec = spec();
 
         List<Nation> europeanNations = spec.getEuropeanNations();
         assertEquals(8, europeanNations.size());
@@ -195,7 +194,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
     public void testNationTypes() {
 
-        Specification spec = Specification.getSpecification();
+        Specification spec = spec();
 
         List<IndianNationType> indianNationTypes = spec.getIndianNationTypes();
         assertEquals(8, indianNationTypes.size());
@@ -208,7 +207,7 @@ public final class SpecificationTest extends FreeColTestCase {
     	String equipmentTypeStr;
     	Map<String,Boolean> abilitiesReq, expectAbilities;
     	@SuppressWarnings("unused")
-        Specification spec = Specification.getSpecification();
+        Specification spec = spec();
 
         Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();
         
@@ -242,7 +241,7 @@ public final class SpecificationTest extends FreeColTestCase {
             equipmentTypeStr = entry.getKey();
             expectAbilities = entry.getValue();
 
-            EquipmentType equipmentType = Specification.getSpecification().getEquipmentType(equipmentTypeStr);
+            EquipmentType equipmentType = spec.getEquipmentType(equipmentTypeStr);
             abilitiesReq = equipmentType.getAbilitiesRequired();
             for (Entry<String, Boolean> ability : expectAbilities.entrySet()) {
                 String key = ability.getKey();

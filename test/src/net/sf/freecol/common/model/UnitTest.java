@@ -412,7 +412,7 @@ public class UnitTest extends FreeColTestCase {
         
         assertTrue("A soldier is a colonist",soldier.isColonist());
         
-        UnitType braveType = Specification.getSpecification().getUnitType("model.unit.brave");
+        UnitType braveType = spec().getUnitType("model.unit.brave");
         Unit brave = new Unit(game, tile2, sioux, braveType, UnitState.ACTIVE);
         assertFalse("A brave is not a colonist", brave.isColonist());
     }
@@ -508,7 +508,7 @@ public class UnitTest extends FreeColTestCase {
         UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
         
         Colony colony = getStandardColony(3);
-        BuildingType churchType = Specification.getSpecification().getBuildingType("model.building.chapel");
+        BuildingType churchType = spec().getBuildingType("model.building.chapel");
         Building church = colony.getBuilding(churchType);
         church.upgrade();
         Unit jesuit = new Unit(game, tile, dutch, missionaryType, UnitState.ACTIVE);
@@ -591,36 +591,36 @@ public class UnitTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player sioux = game.getPlayer("model.nation.sioux");
 
-        TileType plains = Specification.getSpecification().getTileType("model.tile.plains");
+        TileType plains = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plains, true);
         game.setMap(map);
         Tile tile1 = map.getTile(10, 4);
         
-        UnitType farmerType = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+        UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
         Unit farmer = new Unit(game, tile1, dutch, farmerType, UnitState.ACTIVE, farmerType.getDefaultEquipment());
         assertTrue(farmer.canBuildColony());
         
-        UnitType artyType = Specification.getSpecification().getUnitType("model.unit.artillery");
+        UnitType artyType = spec().getUnitType("model.unit.artillery");
         Unit arty = new Unit(game, tile1, dutch, artyType, UnitState.ACTIVE, artyType.getDefaultEquipment());
         assertFalse(arty.canBuildColony());
         
-        UnitType shipType = Specification.getSpecification().getUnitType("model.unit.galleon");
+        UnitType shipType = spec().getUnitType("model.unit.galleon");
         Unit ship = new Unit(game, tile1, dutch, shipType, UnitState.ACTIVE, shipType.getDefaultEquipment());
         assertFalse(ship.canBuildColony());
         
-        UnitType treasureType = Specification.getSpecification().getUnitType("model.unit.treasureTrain");
+        UnitType treasureType = spec().getUnitType("model.unit.treasureTrain");
         Unit treasure = new Unit(game, tile1, dutch, treasureType, UnitState.ACTIVE, treasureType.getDefaultEquipment());
         assertFalse(treasure.canBuildColony());
         
-        UnitType wagonType = Specification.getSpecification().getUnitType("model.unit.wagonTrain");
+        UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
         Unit wagon = new Unit(game, tile1, dutch, wagonType, UnitState.ACTIVE, wagonType.getDefaultEquipment());
         assertFalse(wagon.canBuildColony());
         
-        UnitType indianConvertType = Specification.getSpecification().getUnitType("model.unit.indianConvert");
+        UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
         Unit indianConvert = new Unit(game, tile1, dutch, indianConvertType, UnitState.ACTIVE, indianConvertType.getDefaultEquipment());
         assertFalse(indianConvert.canBuildColony());
         
-        UnitType braveType = Specification.getSpecification().getUnitType("model.unit.brave");
+        UnitType braveType = spec().getUnitType("model.unit.brave");
         @SuppressWarnings("unused")
         Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
         //assertFalse(brave.canBuildColony());
@@ -636,7 +636,7 @@ public class UnitTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
          
-        UnitType indianBraveType = Specification.getSpecification().getUnitType("model.unit.brave");
+        UnitType indianBraveType = spec().getUnitType("model.unit.brave");
         Unit brave = new Unit(game, camp, indianPlayer, indianBraveType, UnitState.ACTIVE,
                               indianBraveType.getDefaultEquipment());
         camp.addOwnedUnit(brave);
@@ -653,14 +653,14 @@ public class UnitTest extends FreeColTestCase {
     }
     
     public void testEquipIndian() {
-        GoodsType toolsType = Specification.getSpecification().getGoodsType("model.goods.tools");
-		GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType musketsType = Specification.getSpecification().getGoodsType("model.goods.muskets");
-        EquipmentType toolsEqType = Specification.getSpecification().getEquipmentType("model.equipment.tools");
-        EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.indian.horses");
-        EquipmentType musketsEqType = Specification.getSpecification().getEquipmentType("model.equipment.indian.muskets");
-        EquipmentType horsesWrongEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
-        EquipmentType musketsWrongEqType = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
+        GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+		GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+        EquipmentType toolsEqType = spec().getEquipmentType("model.equipment.tools");
+        EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.indian.horses");
+        EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.indian.muskets");
+        EquipmentType horsesWrongEqType = spec().getEquipmentType("model.equipment.horses");
+        EquipmentType musketsWrongEqType = spec().getEquipmentType("model.equipment.muskets");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -705,10 +705,10 @@ public class UnitTest extends FreeColTestCase {
     }
 
     public void testEquipIndianNotEnoughReqGoods() {
-		GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType musketsType = Specification.getSpecification().getGoodsType("model.goods.muskets");
-        EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.indian.horses");
-        EquipmentType musketsEqType = Specification.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+		GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+        EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.indian.horses");
+        EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.indian.muskets");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -754,19 +754,19 @@ public class UnitTest extends FreeColTestCase {
         Player indian = game.getPlayer("model.nation.sioux");
         Player european = game.getPlayer("model.nation.dutch");
         Player king = game.getPlayer("model.nation.dutchREF");
-        UnitType regular = Specification.getSpecification().getUnitType("model.unit.kingsRegular");
+        UnitType regular = spec().getUnitType("model.unit.kingsRegular");
         assertTrue(regular.isAvailableTo(king));
         assertFalse(regular.isAvailableTo(indian));
         assertFalse(regular.isAvailableTo(european));
-        UnitType colonial = Specification.getSpecification().getUnitType("model.unit.colonialRegular");
+        UnitType colonial = spec().getUnitType("model.unit.colonialRegular");
         assertFalse(colonial.isAvailableTo(king));
         assertFalse(colonial.isAvailableTo(indian));
         assertFalse(colonial.isAvailableTo(european));
-        UnitType brave = Specification.getSpecification().getUnitType("model.unit.brave");
+        UnitType brave = spec().getUnitType("model.unit.brave");
         assertFalse(brave.isAvailableTo(king));
         assertTrue(brave.isAvailableTo(indian));
         assertFalse(brave.isAvailableTo(european));
-        UnitType undead = Specification.getSpecification().getUnitType("model.unit.undead");
+        UnitType undead = spec().getUnitType("model.unit.undead");
         assertFalse(undead.isAvailableTo(king));
         assertFalse(undead.isAvailableTo(indian));
         assertFalse(undead.isAvailableTo(european));

@@ -1678,7 +1678,7 @@ public final class Canvas extends JDesktopPane {
      * @return a <code>Specification</code> value
      */
     public Specification getSpecification() {
-        return Specification.getSpecification();
+        return freeColClient.getGame().getSpecification();
     }
 
     /**

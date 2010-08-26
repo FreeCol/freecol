@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
@@ -35,10 +36,10 @@ public class GameTest extends FreeColTestCase {
     public void testGame() throws FreeColException {
 
         Game game = new ServerGame(new MockModelController(), spec());
-        
+        game.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
         game.setMap(getTestMap());
 
-        game.addPlayer(new Player(game, "TestPlayer", false, Specification.getSpecification().getNation("model.nation.dutch")));
+        game.addPlayer(new Player(game, "TestPlayer", false, spec().getNation("model.nation.dutch")));
 
         // map tiles are null
         //game.newTurn();
@@ -47,13 +48,13 @@ public class GameTest extends FreeColTestCase {
 
     public void testAddPlayer() {
         Game game = new ServerGame(new MockModelController(), spec());
-        NationOptions defaultOptions = NationOptions.getDefaults();
+        NationOptions defaultOptions = new NationOptions(spec(), Advantages.SELECTABLE);
         game.setNationOptions(defaultOptions);
 
         List<Player> players = new ArrayList<Player>();
 
         int counter = 0;
-        for (Nation n : Specification.getSpecification().getNations()) {
+        for (Nation n : spec().getNations()) {
             if (defaultOptions.getNationState(n) == NationOptions.NationState.NOT_AVAILABLE) {
                 counter++;
             } else {
@@ -70,7 +71,7 @@ public class GameTest extends FreeColTestCase {
 
         Collections.sort(players, Player.playerComparator);
         Collections.sort(game.getPlayers(), Player.playerComparator);
-        assertEquals(Specification.getSpecification().getNations().size() - counter,
+        assertEquals(spec().getNations().size() - counter,
                      game.getPlayers().size());
         assertEquals(players, game.getPlayers());
     }

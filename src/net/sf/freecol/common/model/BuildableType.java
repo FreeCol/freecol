@@ -56,6 +56,12 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
 
+
+    public BuildableType(String id, Specification specification) {
+        super(id, specification);
+    }
+
+
     /**
      * Get the <code>GoodsRequired</code> value.
      *
@@ -138,33 +144,26 @@ public abstract class BuildableType extends FreeColGameObjectType {
         return requiredAbilities;
     }
 
-    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        super.readFromXML(in, specification);
-    }
-
-    protected FreeColObject readChild(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if (Limit.getXMLElementTagName().equals(childName)) {
             if (limits == null) {
                 limits = new ArrayList<Limit>();
             }
-            Limit limit = new Limit();
-            limit.readFromXML(in, specification);
+            Limit limit = new Limit(getSpecification());
+            limit.readFromXML(in);
             if (limit.getLeftHandSide().getType() == null) {
                 limit.getLeftHandSide().setType(getId());
             }
             limits.add(limit);
-            return limit;
         } else if ("required-ability".equals(childName)) {
             String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             boolean value = getAttribute(in, VALUE_TAG, true);
             getAbilitiesRequired().put(abilityId, value);
-            specification.addAbility(abilityId);
+            getSpecification().addAbility(abilityId);
             in.nextTag(); // close this element
-            return new Ability(abilityId, value);
         } else if ("required-goods".equals(childName)) {
-            GoodsType type = specification.getGoodsType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+            GoodsType type = getSpecification().getGoodsType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
             int amount = getAttribute(in, VALUE_TAG, 0);
             AbstractGoods requiredGoods = new AbstractGoods(type, amount);
             if (amount > 0) {
@@ -175,9 +174,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
                 getGoodsRequired().add(requiredGoods);
             }
             in.nextTag(); // close this element
-            return requiredGoods;
         } else {
-            return super.readChild(in, specification);
+            super.readChild(in);
         }
     }
 

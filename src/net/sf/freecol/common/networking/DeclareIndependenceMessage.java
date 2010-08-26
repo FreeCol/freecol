@@ -87,7 +87,7 @@ public class DeclareIndependenceMessage extends Message {
             || countryName == null || countryName.length() == 0) {
             return Message.clientError("Empty nation or country name.");
         }
-        Event event = Specification.getSpecification().getEvent("model.event.declareIndependence");
+        Event event = player.getSpecification().getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
                 return Message.clientError(limit.getDescriptionKey() + " "

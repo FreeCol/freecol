@@ -46,9 +46,11 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
@@ -92,8 +94,8 @@ public final class ConnectController {
      * @param nationOptions a <code>NationOptions</code> value
      * @param level a <code>DifficultyLevel</code> value
      */
-    public void startMultiplayerGame(String tc, boolean publicServer, String username, int port,
-                                     NationOptions nationOptions, DifficultyLevel level) {
+    public void startMultiplayerGame(Specification specification, boolean publicServer, String username, int port,
+                                     Advantages advantages, DifficultyLevel level) {
 
         freeColClient.setMapEditor(false);
 
@@ -113,7 +115,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(tc, publicServer, false, port, null, nationOptions, level);
+            FreeColServer freeColServer = new FreeColServer(specification, publicServer, false, port, null, advantages);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             freeColClient.getCanvas().errorMessage("server.noRouteToServer");
@@ -130,13 +132,11 @@ public final class ConnectController {
     /**
      * Starts a new singleplayer game by connecting to the server.
      *
-     * @param tc a <code>String</code> value
+     * @param specification a <code>Specification</code> value
      * @param username The name to use when logging in.
-     * @param nationOptions a <code>NationOptions</code> value
-     * @param level a <code>DifficultyLevel</code> value
+     * @param advantages an <code>Advantages</code> value
      */
-    public void startSingleplayerGame(String tc, String username, NationOptions nationOptions,
-                                      DifficultyLevel level) {
+    public void startSingleplayerGame(Specification specification, String username, Advantages advantages) {
 
         freeColClient.setMapEditor(false);
         
@@ -159,11 +159,10 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(tc, false, true, port, null, nationOptions, level);
+            FreeColServer freeColServer = new FreeColServer(specification, false, true, port, null, advantages);
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
                 freeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
             }
-            Specification.getSpecification().applyDifficultyLevel(level);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");

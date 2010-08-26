@@ -48,6 +48,6 @@ public class ShowDifficultyAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = freeColClient.getCanvas();
-        canvas.showPanel(new DifficultyDialog(canvas, true));
+        canvas.showPanel(new DifficultyDialog(canvas, freeColClient.getGame().getDifficultyLevel()));
     }
 }

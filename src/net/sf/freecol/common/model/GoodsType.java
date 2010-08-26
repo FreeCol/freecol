@@ -30,8 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class GoodsType extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private boolean isFarmed;
     private boolean isFood;
     private boolean ignoreLimit;
@@ -82,8 +80,8 @@ public final class GoodsType extends FreeColGameObjectType {
 
     // ----------------------------------------------------------- constructors
 
-    public GoodsType() {
-        setIndex(nextIndex++);
+    public GoodsType(String id, Specification specification) {
+        super(id, specification);
     }
 
     // ----------------------------------------------------------- retriveal methods
@@ -360,8 +358,7 @@ public final class GoodsType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    public void readAttributes(XMLStreamReader in, Specification specification) 
-        throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         isFarmed = getAttribute(in, "is-farmed", false);
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
@@ -369,28 +366,24 @@ public final class GoodsType extends FreeColGameObjectType {
         breedingNumber = getAttribute(in, "breeding-number", INFINITY);
         price = getAttribute(in, "price", INFINITY);
 
-        madeFrom = specification.getType(in, "made-from", GoodsType.class, null);
+        madeFrom = getSpecification().getType(in, "made-from", GoodsType.class, null);
         if (madeFrom != null) {
             madeFrom.makes = this;
         }
 
         storable = getAttribute(in, "storable", true);
-        storedAs = specification.getType(in, "stored-as", GoodsType.class, null);
+        storedAs = getSpecification().getType(in, "stored-as", GoodsType.class, null);
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification) 
-        throws XMLStreamException {
-
-        // Only expected child is 'market'
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if ("market".equals(in.getLocalName())) {
-                initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
-                initialPrice = getAttribute(in, "initial-price", 1);
-                priceDiff = getAttribute(in, "price-difference", 1);
-                in.nextTag(); // close this element
-            } else {
-                super.readChild(in, specification);
-            }
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if ("market".equals(childName)) {
+            initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
+            initialPrice = getAttribute(in, "initial-price", 1);
+            priceDiff = getAttribute(in, "price-difference", 1);
+            in.nextTag(); // close this element
+        } else {
+            super.readChild(in);
         }
     }
 

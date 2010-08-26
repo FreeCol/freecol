@@ -40,6 +40,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -166,7 +167,8 @@ public class MapGenerator implements IMapGenerator {
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
             
-            FreeColServer.checkSavegameVersion(xsr);
+            int savegameVersion = FreeColServer.getSavegameVersion(xsr);
+            logger.info("Found savegame version " + savegameVersion);
             
             ArrayList<Object> serverObjects = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -182,8 +184,25 @@ public class MapGenerator implements IMapGenerator {
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
+                    Specification specification = null;
+                    if (savegameVersion < 9) {
+                        // compatibility code
+                        logger.info("Compatibility code: providing fresh specification.");
+                        specification = new FreeColTcFile("freecol").getSpecification();
+                    }
                     game = new ServerGame(null, null, xsr, serverObjects
-                                    .toArray(new FreeColGameObject[serverObjects.size()]));
+                                          .toArray(new FreeColGameObject[serverObjects.size()]), specification);
+                    if (savegameVersion < 9) {
+                        logger.info("Compatibility code: applying difficulty level.");
+                        // Apply the difficulty level
+                        if (game.getDifficultyLevel() == null) {
+                            logger.fine("Difficulty level is null");
+                            game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+                        } else {
+                            logger.fine("Difficulty level is " + game.getDifficultyLevel().getId());
+                            game.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
+                        }
+                    }
                     game.setCurrentPlayer(null);
                     game.checkIntegrity();
                 }

@@ -99,7 +99,7 @@ public class TensionTest extends FreeColTestCase {
             }
             int unitCount = settlement.getGeneratedUnitCount();
             for (int i = 0; i < unitCount; i++) {
-                UnitType unitType = Specification.getSpecification().getUnitType("model.unit.brave");
+                UnitType unitType = spec().getUnitType("model.unit.brave");
                 Unit unit = new Unit(game, settlement, indian, unitType, UnitState.ACTIVE,
                                      unitType.getDefaultEquipment());
                 unit.setIndianSettlement(settlement);
@@ -116,7 +116,7 @@ public class TensionTest extends FreeColTestCase {
             assertEquals(Stance.PEACE, stance);
 
             // create 2 unarmed european units next to the indianSettlement
-            UnitType unitType = Specification.getSpecification().getUnitType("model.unit.hardyPioneer");
+            UnitType unitType = spec().getUnitType("model.unit.hardyPioneer");
             @SuppressWarnings("unused") Unit unit1 = new Unit(game, map.getTile(7, 9), european, unitType, UnitState.ACTIVE);
             @SuppressWarnings("unused") Unit unit2 = new Unit(game, map.getTile(5, 9), european, unitType, UnitState.ACTIVE);
 

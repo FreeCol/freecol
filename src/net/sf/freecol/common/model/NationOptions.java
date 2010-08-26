@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-public class NationOptions extends FreeColObject{
+public class NationOptions extends FreeColObject {
 
     /**
      * The default number of European nations.
@@ -56,6 +56,39 @@ public class NationOptions extends FreeColObject{
      * All nations in the game.
      */
     private Map<Nation, NationState> nations = new HashMap<Nation, NationState>();
+
+    private Specification specification;
+
+
+
+    /**
+     * Describe <code>getDefaults</code> method here.
+     *
+     * @return a <code>NationOptions</code> value
+     */
+    public NationOptions(Specification specification, Advantages advantages) {
+        this.specification = specification;
+        setNationalAdvantages(advantages);
+        if (specification != null) {
+            int counter = 0;
+            Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
+            for (Nation nation : specification.getNations()) {
+                if (nation.getType().isREF()) {
+                    continue;
+                } else if (nation.getType().isEuropean() && nation.isSelectable()) {
+                    if (counter < DEFAULT_NO_OF_EUROPEANS) {
+                        defaultNations.put(nation, NationState.AVAILABLE);
+                        counter++;
+                    } else {
+                        defaultNations.put(nation, NationState.NOT_AVAILABLE);
+                    }
+                } else {
+                    defaultNations.put(nation, NationState.AI_ONLY);
+                }
+            }
+            setNations(defaultNations);
+        }
+    }
 
     /**
      * Get the <code>Nations</code> value.
@@ -113,34 +146,6 @@ public class NationOptions extends FreeColObject{
         this.nations.put(nation, state);
     }
 
-    /**
-     * Describe <code>getDefaults</code> method here.
-     *
-     * @return a <code>NationOptions</code> value
-     */
-    public static final NationOptions getDefaults() {
-        NationOptions result = new NationOptions();
-        result.setNationalAdvantages(Advantages.SELECTABLE);
-        int counter = 0;
-        Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
-        for (Nation nation : Specification.getSpecification().getNations()) {
-            if (nation.getType().isREF()) {
-                continue;
-            } else if (nation.getType().isEuropean() && nation.isSelectable()) {
-                if (counter < DEFAULT_NO_OF_EUROPEANS) {
-                    defaultNations.put(nation, NationState.AVAILABLE);
-                    counter++;
-                } else {
-                    defaultNations.put(nation, NationState.NOT_AVAILABLE);
-                }
-            } else {
-                defaultNations.put(nation, NationState.AI_ONLY);
-            }
-        }
-        result.setNations(defaultNations);
-        return result;
-    }
-
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -161,7 +166,7 @@ public class NationOptions extends FreeColObject{
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals("Nation")) {
                         String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                        Nation nation = Specification.getSpecification().getNation(nationId);
+                        Nation nation = specification.getNation(nationId);
                         NationState state = Enum.valueOf(NationState.class,
                                                          in.getAttributeValue(null, "state"));
                         nations.put(nation, state);

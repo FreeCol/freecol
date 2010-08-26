@@ -62,7 +62,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         super(parent);
         setLayout(new MigLayout("wrap 4, fill"));
 
-        ui = new OptionMapUI(mgo, editable);
+        ui = new OptionMapUI(mgo, editable, getSpecification());
 
         JButton reset = new JButton(Messages.message("reset"));
         reset.setActionCommand("RESET");

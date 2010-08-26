@@ -29,9 +29,13 @@ import java.io.IOException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
+import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public final class ServerTestHelper {
 
@@ -44,11 +48,10 @@ public final class ServerTestHelper {
     }
 
     public static FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) {
-        // TODO: fixme! Pass tc
-        String tc = "freecol";
         FreeColServer server = null;
         try {
-            server = new FreeColServer(tc, publicServer, singleplayer, port, name);
+            // TODO: fixme! Pass tc
+            server = new FreeColServer(FreeColTestCase.spec(), publicServer, singleplayer, port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());
         } catch (IOException e) {

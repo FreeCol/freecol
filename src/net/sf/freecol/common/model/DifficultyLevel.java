@@ -38,14 +38,12 @@ import net.sf.freecol.common.option.StringOption;
 // TODO: couldn't we just use an OptionGroup?
 public class DifficultyLevel extends FreeColGameObjectType {
 
-    private static int nextIndex = 0;
-
     private final Map<String, AbstractOption> levelOptions =
         new LinkedHashMap<String, AbstractOption>();
 
 
-    public DifficultyLevel() {
-        setIndex(nextIndex++);
+    public DifficultyLevel(String id, Specification specification) {
+        super(id, specification);
     }
 
     public AbstractOption getOption(String Id) throws IllegalArgumentException {
@@ -63,8 +61,7 @@ public class DifficultyLevel extends FreeColGameObjectType {
         return levelOptions;
     }
     
-    public void readFromXML(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
 
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         
@@ -80,21 +77,30 @@ public class DifficultyLevel extends FreeColGameObjectType {
             if (IntegerOption.getXMLElementTagName().equals(optionType) ||
                 "integer-option".equals(optionType)) {
                 IntegerOption option = new IntegerOption(in);
-                levelOptions.put(option.getId(), option);
+                addOption(option);
             } else if (BooleanOption.getXMLElementTagName().equals(optionType) ||
                        "boolean-option".equals(optionType)) {
                 BooleanOption option = new BooleanOption(in);
-                levelOptions.put(option.getId(), option);
+                addOption(option);
             } else if (StringOption.getXMLElementTagName().equals(optionType) ||
                        "string-option".equals(optionType)) {
                 StringOption option = new StringOption(in);
-                levelOptions.put(option.getId(), option);
+                addOption(option);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");
                 in.nextTag();
             }
         }
 
+    }
+
+    private void addOption(AbstractOption option) {
+        levelOptions.put(option.getId(), option);
+        getSpecification().addAbstractOption(option);
+    }
+
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out);
     }
 
     public void toXML(XMLStreamWriter out) throws XMLStreamException {

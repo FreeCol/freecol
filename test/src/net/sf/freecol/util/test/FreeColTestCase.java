@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Specification;
@@ -49,6 +50,8 @@ import net.sf.freecol.server.model.ServerGame;
  * individual tests.
  */
 public class FreeColTestCase extends TestCase {
+
+    private static Specification specification;
 
     /**
      * use getGame to access this.
@@ -99,19 +102,16 @@ public class FreeColTestCase extends TestCase {
     }
     
     public static Specification spec() {
-        Specification result = Specification.getSpecification();
-        if (result == null) {
+        if (specification == null) {
             try {
-                Specification.createSpecification(new FileInputStream("data/freecol/specification.xml"));
-                return Specification.getSpecification();
+                specification = new Specification(new FileInputStream("data/freecol/specification.xml"));
+                specification.applyDifficultyLevel("model.difficulty.medium");
             } catch(Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
                 return null;
             }
-        } else {
-            return result;
         }
-
+        return specification;
     }
 
     /**
@@ -124,10 +124,10 @@ public class FreeColTestCase extends TestCase {
      */
     public static Game getStandardGame() {
         game = new ServerGame(new MockModelController(), spec());
-        game.setNationOptions(NationOptions.getDefaults());
+        game.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
-        Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
-        for (Nation n : Specification.getSpecification().getNations()) {
+        spec().applyDifficultyLevel("model.difficulty.medium");
+        for (Nation n : spec().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
                 p = new Player(game, n.getRulerNameKey(), false, n);
@@ -506,10 +506,10 @@ public class FreeColTestCase extends TestCase {
     		UnitType skillToTeach = null;
     		
     		if(skillTaught != null){
-    			skillToTeach = Specification.getSpecification().getUnitType(skillTaught);
+    			skillToTeach = spec().getUnitType(skillTaught);
     		}
     			
-    		UnitType indianBraveType = Specification.getSpecification().getUnitType("model.unit.brave");
+    		UnitType indianBraveType = spec().getUnitType("model.unit.brave");
     		
     		// indianPlayer not set, get default
     		if(indianPlayer == null){

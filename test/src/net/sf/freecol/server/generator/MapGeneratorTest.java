@@ -29,6 +29,8 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Specification;
@@ -46,14 +48,14 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testWithNoIndians() {
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
-        Specification s = Specification.getSpecification();
+        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
 
-        for (Nation n : s.getNations()) {
+        for (Nation n : spec().getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
                 g.addPlayer(new Player(g, n.getType().getNameKey(), false, n));
             }
@@ -72,6 +74,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testSinglePlayerOnSmallMap() {
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
+        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -80,8 +83,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
-        Nation nation = Specification.getSpecification().getNation(
-                                                             "model.nation.dutch");
+        Nation nation = spec().getNation("model.nation.dutch");
 
         g.addPlayer(new Player(g, nation.getType().getNameKey(), false, nation));
 
@@ -105,17 +107,18 @@ public class MapGeneratorTest extends FreeColTestCase {
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
 
+        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
 
         // Apply the difficulty level
-        Specification.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+        //spec().applyDifficultyLevel("model.difficulty.medium");
 
         Vector<Player> players = new Vector<Player>();
 
-        for (Nation n : Specification.getSpecification().getNations()) {
+        for (Nation n : spec().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
                 p = new Player(g, n.getType().getNameKey(), false, n);
@@ -167,12 +170,13 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testIndianCapital() {
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
+        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
 
         Vector<Player> players = new Vector<Player>();
 
-        for (Nation n : Specification.getSpecification().getNations()) {
+        for (Nation n : spec().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
                 p = new Player(g, n.getType().getNameKey(), false, n);
@@ -224,6 +228,7 @@ public class MapGeneratorTest extends FreeColTestCase {
                 try {
                     gen.createMap(g);
                 } catch (FreeColException e) {
+                    e.printStackTrace();
                     fail("Failed to import file " + importFile.getName());
                 }
             }
@@ -232,7 +237,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testRegions() {
         // Reset import file option value (set by previous tests)
-        ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         MockModelController mmc = new MockModelController();
         Game game = new ServerGame(mmc, spec());

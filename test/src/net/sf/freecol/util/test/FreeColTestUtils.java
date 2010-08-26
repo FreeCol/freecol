@@ -34,7 +34,7 @@ public class FreeColTestUtils {
     public static class ColonyBuilder{
         
         // Required parameter
-        static final UnitType colonistType = Specification.getSpecification().getUnitType("model.unit.freeColonist");
+        static final UnitType colonistType = FreeColTestCase.spec().getUnitType("model.unit.freeColonist");
         private Game game;
         
         private HashMap<UnitType,Integer> colonists = new HashMap<UnitType,Integer>();

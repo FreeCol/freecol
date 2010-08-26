@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 
 
 /**
@@ -84,6 +86,18 @@ public class RangeOption extends SelectOption {
         }
 
         setValue(curValue);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXMLImpl(out, getXMLElementTagName());
     }
 
     /**

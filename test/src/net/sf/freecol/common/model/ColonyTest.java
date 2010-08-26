@@ -29,7 +29,7 @@ public class ColonyTest extends FreeColTestCase {
     BuildingType churchType = spec().getBuildingType("model.building.chapel");
     BuildingType townHallType = spec().getBuildingType("model.building.townHall");
     BuildingType carpenterHouseType =  spec().getBuildingType("model.building.carpenterHouse");
-    BuildingType lumberMillType =  Specification.getSpecification().getBuildingType("model.building.lumberMill");
+    BuildingType lumberMillType =  spec().getBuildingType("model.building.lumberMill");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
@@ -273,7 +273,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
-        Specification.getSpecification();
+        spec();
         
         colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
         colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));

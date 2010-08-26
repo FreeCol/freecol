@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -67,6 +68,19 @@ public class FreeColModFile extends FreeColDataFile {
      */
     public InputStream getSpecificationInputStream() throws IOException {
         return getInputStream(SPECIFICATION_FILE);
+    }
+
+    /**
+     * Returns the Specification of this Mod.
+     *
+     * @return a <code>Specification</code> value
+     * @exception IOException if an error occurs
+     */
+    public Specification getSpecification() throws IOException {
+        InputStream si = getInputStream(SPECIFICATION_FILE);
+        Specification specification = new Specification(si);
+        si.close();
+        return specification;
     }
     
     /**

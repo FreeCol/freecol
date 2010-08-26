@@ -106,7 +106,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private Colony colony;
     private int unitCount;
 
-    private FeatureContainer featureContainer = new FeatureContainer();
+    private FeatureContainer featureContainer;
 
     private Map<BuildableType, String> lockReasons = new HashMap<BuildableType, String>();
     private Set<BuildableType> unbuildableTypes = new HashSet<BuildableType>();
@@ -122,6 +122,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         super(parent, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
+        featureContainer = new FeatureContainer(getSpecification());
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (!unitType.getGoodsRequired().isEmpty()) {
@@ -368,7 +369,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     private void updateAllLists() {
         DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
-        featureContainer = new FeatureContainer();
+        featureContainer = new FeatureContainer(getSpecification());
         for (Object type: current.toArray()) {
             if (getMinimumIndex((BuildableType) type) >= 0) {
                 featureContainer.add(((BuildableType) type).getFeatureContainer());

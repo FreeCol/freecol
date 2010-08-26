@@ -48,6 +48,7 @@ import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
+import net.sf.freecol.common.model.Specification;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -233,12 +234,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                                      group.getSelection().getActionCommand());
                 switch(action) {
                 case SINGLE:
-                    NationOptions nationOptions = NationOptions.getDefaults();
-                    nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
-                    DifficultyLevel level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
                     String tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
-                    connectController.startSingleplayerGame(tc, name.getText(), nationOptions, level);
-                    // getFilename(), getDifficulty());
+                    FreeColTcFile tcData = new FreeColTcFile(tc);
+                    Specification specification = tcData.getSpecification();
+                    DifficultyLevel level = getCanvas()
+                        .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
+                    specification.applyDifficultyLevel(level);
+                    Advantages advantages = (Advantages) nationalAdvantages.getSelectedItem();
+                    connectController.startSingleplayerGame(specification, name.getText(), advantages);
                     break;
                 case JOIN:
                     try {
@@ -252,12 +255,15 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case START:
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
-                        nationOptions = NationOptions.getDefaults();
-                        nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
-                        level = getCanvas().showFreeColDialog(new DifficultyDialog(getCanvas(), false));
                         tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
-                        connectController.startMultiplayerGame(tc, publicServer.isSelected(), name.getText(),
-                                                               port, nationOptions, level);
+                        tcData = new FreeColTcFile(tc);
+                        specification = tcData.getSpecification();
+                        level = getCanvas()
+                            .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
+                        specification.applyDifficultyLevel(level);
+                        advantages = (Advantages) nationalAdvantages.getSelectedItem();
+                        connectController.startMultiplayerGame(specification, publicServer.isSelected(), name.getText(),
+                                                               port, advantages, level);
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }

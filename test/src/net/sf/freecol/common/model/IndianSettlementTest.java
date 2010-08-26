@@ -5,8 +5,8 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class IndianSettlementTest extends FreeColTestCase {
-    private static GoodsType musketsType = Specification.getSpecification().getGoodsType("model.goods.muskets");
-    private static GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
+    private static GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+    private static GoodsType horsesType = spec().getGoodsType("model.goods.horses");
     
     /**
      * Changes the ownership of a number of tiles from and around camp1 to camp2.
@@ -36,7 +36,7 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertEquals(1, camp.getUnitCount());
         assertEquals(0, camp.getFoodCount());
 
-        GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         int foodProduced = camp.getProductionOf(foodType);
         int foodConsumed = camp.getFoodConsumption();
         assertTrue("Food Produced should be more the food consumed",foodProduced > foodConsumed);
@@ -51,7 +51,7 @@ public class IndianSettlementTest extends FreeColTestCase {
       public void testDeathByStarvation(){
       Game game = getStandardGame();
 
-      TileType desertType = Specification.getSpecification().getTileType("model.tile.desert");
+      TileType desertType = spec().getTileType("model.tile.desert");
       Map map = getTestMap(desertType);
       game.setMap(map);
         
@@ -72,7 +72,7 @@ public class IndianSettlementTest extends FreeColTestCase {
       assertEquals(initialBravesInCamp, camp1.getUnitCount());
       assertEquals(0, camp1.getFoodCount());
         
-      GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
+      GoodsType foodType = spec().getGoodsType("model.goods.food");
       int foodProduced = camp1.getProductionOf(foodType);
       int foodConsumed = camp1.getFoodConsumption();
       assertTrue("Food Produced should be less than food consumed",foodProduced < foodConsumed);
@@ -89,8 +89,8 @@ public class IndianSettlementTest extends FreeColTestCase {
     */
 	
     public void testHorseBreeding(){
-        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -124,8 +124,8 @@ public class IndianSettlementTest extends FreeColTestCase {
     }
 	
     public void testHorseBreedingNoHorsesAvail(){
-        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -147,12 +147,12 @@ public class IndianSettlementTest extends FreeColTestCase {
     }
 	
     public void testHorseBreedingNoFoodAvail(){
-        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
 		
         Game game = getStandardGame();
 
-        TileType desertType = Specification.getSpecification().getTileType("model.tile.desert");
+        TileType desertType = spec().getTileType("model.tile.desert");
         Map map = getTestMap(desertType);
         game.setMap(map);
         
@@ -190,8 +190,8 @@ public class IndianSettlementTest extends FreeColTestCase {
     }
 	
     public void testEquipBraves(){
-        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType musketsType = Specification.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -201,8 +201,8 @@ public class IndianSettlementTest extends FreeColTestCase {
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
         
         int bravesToEquip = camp.getUnitCount();
-        int horsesReqPerUnit = Specification.getSpecification().getEquipmentType("model.equipment.indian.horses").getAmountRequiredOf(horsesType);
-        int musketsReqPerUnit = Specification.getSpecification().getEquipmentType("model.equipment.indian.muskets").getAmountRequiredOf(musketsType);        
+        int horsesReqPerUnit = spec().getEquipmentType("model.equipment.indian.horses").getAmountRequiredOf(horsesType);
+        int musketsReqPerUnit = spec().getEquipmentType("model.equipment.indian.muskets").getAmountRequiredOf(musketsType);        
         int totalHorsesReq = bravesToEquip * horsesReqPerUnit;
         int totalMusketsReq = bravesToEquip * musketsReqPerUnit;        
         int totalHorsesAvail = totalHorsesReq*2;
@@ -250,8 +250,8 @@ public class IndianSettlementTest extends FreeColTestCase {
     }
 	
     public void testEquipBravesNotEnoughReqGoods(){
-        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
-        GoodsType musketsType = Specification.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -261,8 +261,8 @@ public class IndianSettlementTest extends FreeColTestCase {
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
         
         int bravesToEquip = camp.getUnitCount() - 1;
-        int horsesReqPerUnit = Specification.getSpecification().getEquipmentType("model.equipment.indian.horses").getAmountRequiredOf(horsesType);
-        int musketsReqPerUnit = Specification.getSpecification().getEquipmentType("model.equipment.indian.muskets").getAmountRequiredOf(musketsType);        
+        int horsesReqPerUnit = spec().getEquipmentType("model.equipment.indian.horses").getAmountRequiredOf(horsesType);
+        int musketsReqPerUnit = spec().getEquipmentType("model.equipment.indian.muskets").getAmountRequiredOf(musketsType);        
         int totalHorsesAvail = bravesToEquip * horsesReqPerUnit;
         int totalMusketsAvail = bravesToEquip * musketsReqPerUnit;        
         

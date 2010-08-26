@@ -34,7 +34,7 @@ public class ModelMessageTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
-        GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
+        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
                                             colony, cotton);
@@ -56,7 +56,7 @@ public class ModelMessageTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
-        GoodsType cotton = Specification.getSpecification().getGoodsType("model.goods.cotton");
+        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                             "model.building.warehouseSoonFull",

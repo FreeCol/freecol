@@ -44,6 +44,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.util.XMLStream;
@@ -858,7 +859,9 @@ public final class FreeCol {
                 }
             } else {
                 try {
-                    freeColServer = new FreeColServer(tc, publicServer, false, serverPort, serverName);
+                    FreeColTcFile tcData = new FreeColTcFile(tc);
+                    Specification specification = tcData.getSpecification();
+                    freeColServer = new FreeColServer(specification, publicServer, false, serverPort, serverName);
                 } catch (NoRouteToServerException e) {
                     System.out.println(Messages.message("server.noRouteToServer"));
                     System.exit(1);

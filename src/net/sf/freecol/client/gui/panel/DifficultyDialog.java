@@ -24,6 +24,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -60,14 +62,34 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
     private int DEFAULT_INDEX = 0;
     private int CUSTOM_INDEX = -1;
 
+    /**
+     * We need our own copy of the specification, as the dialog is
+     * used before the game has been started.
+     */
+    private Specification specification;
+
     private final JComboBox difficultyBox = new JComboBox();
+
+
+    public DifficultyDialog(Canvas parent, DifficultyLevel level) {
+        super(parent);
+        specification = getSpecification();
+        List<DifficultyLevel> levels = new ArrayList<DifficultyLevel>(1);
+        levels.add(level);
+        initialize(levels);
+    }
 
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
     */
-    public DifficultyDialog(Canvas parent, boolean showCurrent) {
+    public DifficultyDialog(Canvas parent, Specification specification) {
         super(parent);
+        this.specification = specification;
+        initialize(specification.getDifficultyLevels());
+    }
+
+    private void initialize(List<DifficultyLevel> levels) {
         setLayout(new MigLayout("wrap 1, fill"));
 
         // Header:
@@ -75,33 +97,27 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         header.setFont(ResourceManager.getFont("HeaderFont", 48f));
         add(header, "center, wrap 20");
 
-        Specification spec = getSpecification();
-        if (showCurrent) {
-            level = getGame().getDifficultyLevel();
-            if (level == null) {
-                // compatibility code
-                level = spec.getDifficultyLevel(0);
+        for (DifficultyLevel dLevel : levels) {
+            String id = dLevel.getId();
+            if ("model.difficulty.medium".equals(id)) {
+                DEFAULT_INDEX = difficultyBox.getItemCount();
+                level = dLevel;
+            } else if ("model.difficulty.custom".equals(id)) {
+                CUSTOM_INDEX = difficultyBox.getItemCount();
             }
-            difficultyBox.addItem(Messages.message(level.getId()));
+            difficultyBox.addItem(Messages.message(id));
+        }
+        difficultyBox.setSelectedIndex(DEFAULT_INDEX);
+
+        if (levels.size() == 1) {
             difficultyBox.setEnabled(false);
         } else {
-            for (DifficultyLevel dLevel : spec.getDifficultyLevels()) {
-                String id = dLevel.getId();
-                if ("model.difficulty.medium".equals(id)) {
-                    DEFAULT_INDEX = difficultyBox.getItemCount();
-                    level = dLevel;
-                } else if ("model.difficulty.custom".equals(id)) {
-                    CUSTOM_INDEX = difficultyBox.getItemCount();
-                }
-                difficultyBox.addItem(Messages.message(id));
-            }
-            difficultyBox.setSelectedIndex(DEFAULT_INDEX);
             difficultyBox.addItemListener(this);
         }
         add(difficultyBox);
 
         // Options:
-        ui = new OptionMapUI(new DifficultyOptionMap(level, spec), false);
+        ui = new OptionMapUI(new DifficultyOptionMap(level, specification), false, specification);
         ui.setOpaque(false);
         optionPanel = new JPanel() {
             @Override
@@ -118,7 +134,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         add(scrollPane, "height 100%, width 100%");
 
         // Buttons:
-        if (showCurrent) {
+        if (levels.size() == 1) {
             add(okButton, "newline 20, tag ok");
         } else {
             add(okButton, "newline 20, split 3, tag ok");
@@ -166,7 +182,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
             ui.rollback();
             ui.unregister();
             getCanvas().remove(this);
-            setResponse(getSpecification().getDifficultyLevel(DEFAULT_INDEX));
+            setResponse(specification.getDifficultyLevel(DEFAULT_INDEX));
         } else if (RESET.equals(command)) {
             ui.reset();
         } else {
@@ -176,10 +192,10 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
 
     public void itemStateChanged(ItemEvent event) {
         int index = difficultyBox.getSelectedIndex();
-        Specification spec = getSpecification();
+        Specification spec = specification;
         level = spec.getDifficultyLevel(index);
         ui = new OptionMapUI(new DifficultyOptionMap(level, spec),
-                             (index == CUSTOM_INDEX));
+                             (index == CUSTOM_INDEX), specification);
         optionPanel.removeAll();
         optionPanel.add(ui);
         revalidate();

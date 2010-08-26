@@ -141,6 +141,7 @@ public final class Ability extends Feature {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         writeAttributes(out);
+        writeChildren(out);
         out.writeEndElement();
     }
 

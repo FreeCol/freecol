@@ -33,8 +33,6 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 public final class UnitType extends BuildableType implements Comparable<UnitType> {
 
-    public static int nextIndex = 0;
-
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
 
@@ -128,8 +126,8 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * Creates a new <code>UnitType</code> instance.
      *
      */
-    public UnitType() {
-        setIndex(nextIndex++);
+    public UnitType(String id, Specification specification) {
+        super(id, specification);
         setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
 
@@ -580,11 +578,10 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         return UNDEFINED;
     }
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
-            throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String extendString = in.getAttributeValue(null, "extends");
         UnitType parent = (extendString == null) ? this :
-            specification.getUnitType(extendString);
+            getSpecification().getUnitType(extendString);
         offence = getAttribute(in, "offence", parent.offence);
         defence = getAttribute(in, "defence", parent.defence);
         movement = getAttribute(in, "movement", parent.movement);
@@ -595,7 +592,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         spaceTaken = getAttribute(in, "spaceTaken", parent.spaceTaken);
         maximumAttrition = getAttribute(in, "maximumAttrition", parent.maximumAttrition);
         String skillString = in.getAttributeValue(null, "skillTaught");
-        skillTaught = (skillString == null) ? this : specification.getUnitType(skillString);
+        skillTaught = (skillString == null) ? this : getSpecification().getUnitType(skillString);
 
         recruitProbability = getAttribute(in, "recruitProbability", parent.recruitProbability);
         skill = getAttribute(in, "skill", parent.skill);
@@ -604,63 +601,64 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
 
         price = getAttribute(in, "price", parent.price);
 
-        expertProduction = specification.getType(in, "expert-production", GoodsType.class,
+        expertProduction = getSpecification().getType(in, "expert-production", GoodsType.class,
                                                  parent.expertProduction);
 
         if (parent != this) {
             typeChanges.addAll(parent.typeChanges);
             defaultEquipment = parent.defaultEquipment;
-            getFeatureContainer().add(parent.getFeatureContainer());
             consumption.putAll(parent.consumption);
+            getFeatureContainer().add(parent.getFeatureContainer());
+            if (parent.isAbstractType()) {
+                getFeatureContainer().replaceSource(parent, this);
+            }
         }
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String nodeName = in.getLocalName();
-            if ("downgrade".equals(nodeName)
-                || "upgrade".equals(nodeName)) {
-                if (getAttribute(in, "delete", false)) {
-                    String unitId = in.getAttributeValue(null, "unit");
-                    Iterator<UnitTypeChange> iterator = typeChanges.iterator();
-                    while (iterator.hasNext()) {
-                        if (unitId.equals(iterator.next().getNewUnitType().getId())) {
-                            iterator.remove();
-                            break;
-                        }
-                    }
-                    in.nextTag();
-                } else {
-                    UnitTypeChange change = new UnitTypeChange(in, specification);
-                    if ("downgrade".equals(nodeName)
-                        && change.getChangeTypes().isEmpty()) {
-                        // add default downgrade type
-                        change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
-                    }
-                    typeChanges.add(change);
-                }
-            } else if ("default-equipment".equals(nodeName)) {
-                String equipmentString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                if (equipmentString != null) {
-                    defaultEquipment = specification.getEquipmentType(equipmentString);
-                }
-                in.nextTag(); // close this element
-            } else if ("consumes".equals(nodeName)) {
-                String typeString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                String valueString = in.getAttributeValue(null, VALUE_TAG);
-                if (typeString != null && valueString != null) {
-                    try {
-                        GoodsType type = specification.getGoodsType(typeString);
-                        int amount = Integer.parseInt(valueString);
-                        consumption.incrementCount(type, amount);
-                    } catch(Exception e) {
-                        logger.warning("Failed to parse integer " + valueString);
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String nodeName = in.getLocalName();
+        if ("downgrade".equals(nodeName)
+            || "upgrade".equals(nodeName)) {
+            if (getAttribute(in, "delete", false)) {
+                String unitId = in.getAttributeValue(null, "unit");
+                Iterator<UnitTypeChange> iterator = typeChanges.iterator();
+                while (iterator.hasNext()) {
+                    if (unitId.equals(iterator.next().getNewUnitType().getId())) {
+                        iterator.remove();
+                        break;
                     }
                 }
-                in.nextTag(); // close this element
+                in.nextTag();
             } else {
-                super.readChild(in, specification);
+                UnitTypeChange change = new UnitTypeChange(in, getSpecification());
+                if ("downgrade".equals(nodeName)
+                    && change.getChangeTypes().isEmpty()) {
+                    // add default downgrade type
+                    change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
+                }
+                typeChanges.add(change);
             }
+        } else if ("default-equipment".equals(nodeName)) {
+            String equipmentString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            if (equipmentString != null) {
+                defaultEquipment = getSpecification().getEquipmentType(equipmentString);
+            }
+            in.nextTag(); // close this element
+        } else if ("consumes".equals(nodeName)) {
+            String typeString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            String valueString = in.getAttributeValue(null, VALUE_TAG);
+            if (typeString != null && valueString != null) {
+                try {
+                    GoodsType type = getSpecification().getGoodsType(typeString);
+                    int amount = Integer.parseInt(valueString);
+                    consumption.incrementCount(type, amount);
+                } catch(Exception e) {
+                    logger.warning("Failed to parse integer " + valueString);
+                }
+            }
+            in.nextTag(); // close this element
+        } else {
+            super.readChild(in);
         }
     }
 
@@ -762,7 +760,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
             return 0;
         }
         
-        base = (int) featureContainer.applyModifier(base, goodsType.getId());
+        base = (int) getFeatureContainer().applyModifier(base, goodsType.getId());
         return Math.max(base, 1);
     }
 

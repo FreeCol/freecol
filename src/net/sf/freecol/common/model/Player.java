@@ -330,7 +330,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Contains the abilities and modifiers of this type.
      */
-    private FeatureContainer featureContainer = new FeatureContainer();
+    private FeatureContainer featureContainer;
 
     /**
      * Describe independentNationName here.
@@ -454,6 +454,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         this.name = name;
         this.admin = admin;
+        featureContainer  = new FeatureContainer(game.getSpecification());
         if (newNation != null && newNation.getType() != null) {
             this.nationType = newNation.getType();
             this.nationID = newNation.getId();
@@ -3460,7 +3461,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
-        featureContainer = new FeatureContainer();
+        featureContainer = new FeatureContainer(getSpecification());
         if (nationType != null) {
             featureContainer.add(nationType.getFeatureContainer());
         }

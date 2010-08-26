@@ -20,8 +20,10 @@
 package net.sf.freecol.server.control;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,7 +104,9 @@ public final class PreGameController extends Controller {
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
 
-        for (Entry<Nation, NationState> entry : game.getNationOptions().getNations().entrySet()) {
+        Set<Entry<Nation, NationState>> entries =
+            new HashSet<Entry<Nation, NationState>>(game.getNationOptions().getNations().entrySet());
+        for (Entry<Nation, NationState> entry : entries) {
             if (entry.getValue() != NationState.NOT_AVAILABLE &&
                 game.getPlayer(entry.getKey().getId()) == null) {
                 freeColServer.addAIPlayer(entry.getKey());

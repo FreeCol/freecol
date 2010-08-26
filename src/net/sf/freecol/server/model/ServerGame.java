@@ -82,8 +82,9 @@ public class ServerGame extends Game {
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController,
-                XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {
-        super(null, in);
+                      XMLStreamReader in, FreeColGameObject[] fcgos, Specification specification)
+        throws XMLStreamException {
+        super(specification);
 
         setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;

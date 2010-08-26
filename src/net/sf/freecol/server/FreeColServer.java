@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -117,7 +118,7 @@ public final class FreeColServer {
     /**
      * The save game format used for saving games.
      */
-    public static final int SAVEGAME_VERSION = 8;
+    public static final int SAVEGAME_VERSION = 9;
 
     /**
      * The oldest save game format that can still be loaded.
@@ -202,14 +203,15 @@ public final class FreeColServer {
      *             will be logged by this class).
      * 
      */
-    public FreeColServer(String tc, boolean publicServer, boolean singleplayer, int port, String name)
+    public FreeColServer(Specification specification, boolean publicServer, boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(tc, publicServer, singleplayer, port, name, NationOptions.getDefaults(), null);
+        this(specification, publicServer, singleplayer, port, name, Advantages.SELECTABLE);
     }
 
-    public FreeColServer(String tc, boolean publicServer, boolean singleplayer, int port, String name,
-                         NationOptions nationOptions, DifficultyLevel level)
+    public FreeColServer(Specification specification, boolean publicServer, boolean singleplayer,
+                         int port, String name, Advantages advantages)
         throws IOException, NoRouteToServerException {
+
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
@@ -222,27 +224,9 @@ public final class FreeColServer {
         inGameInputHandler = new InGameInputHandler(this);
         inGameController = new InGameController(this);
 
-        FreeColTcFile tcData = new FreeColTcFile(tc);
-        InputStream si = null;
-        try {
-            si = tcData.getSpecificationInputStream();
-            Specification specification = new Specification(si);
-            si.close();
-
-            game = new ServerGame(modelController, specification);
-            game.setNationOptions(nationOptions);
-            game.setDifficultyLevel(level);
-            if (level != null) {
-                specification.applyDifficultyLevel(level);
-            }
-            mapGenerator = new MapGenerator(random, specification);
-        } catch (IOException e) {
-            System.err.println("Could not load specification.xml for: " + tc);
-            try {
-                si.close();
-            } catch (Exception ex) {}
-            System.exit(1);
-        }
+        game = new ServerGame(modelController, specification);
+        game.setNationOptions(new NationOptions(specification, advantages));
+        mapGenerator = new MapGenerator(random, specification);
 
         try {
             server = new Server(this, port);
@@ -306,20 +290,12 @@ public final class FreeColServer {
         }
         mapGenerator = new MapGenerator(random, getSpecification());
 
-        // Apply the difficulty level
-        if (game.getDifficultyLevel() == null) {
-            getSpecification().applyDifficultyLevel("model.difficulty.medium");
-        } else {
-            getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
-        }
-
         updateMetaServer(true);
         startMetaServerUpdateThread();
     }
 
     public Specification getSpecification() {
-        // TODO: server needs its own copy of the Specification
-        return Specification.getSpecification();
+        return game.getSpecification();
     }
 
     /**
@@ -335,12 +311,12 @@ public final class FreeColServer {
         }
         Timer t = new Timer(true);
         t.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                try {
-                    updateMetaServer();
-                } catch (NoRouteToServerException e) {}
-            }
-        }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
+                public void run() {
+                    try {
+                        updateMetaServer();
+                    } catch (NoRouteToServerException e) {}
+                }
+            }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
     }
 
     /**
@@ -464,7 +440,7 @@ public final class FreeColServer {
                 element.setAttribute("name", name);
             } else {
                 element.setAttribute("name", mc.getSocket().getLocalAddress().getHostAddress() + ":"
-                        + Integer.toString(port));
+                                     + Integer.toString(port));
             }
             element.setAttribute("port", Integer.toString(port));
             element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
@@ -554,7 +530,7 @@ public final class FreeColServer {
         int n = 0;
         for (int i = 0; i < players.size(); i++) {
             if (!((ServerPlayer) players.get(i)).isAI() && !((ServerPlayer) players.get(i)).isDead()
-                    && ((ServerPlayer) players.get(i)).isConnected()) {
+                && ((ServerPlayer) players.get(i)).isConnected()) {
                 n++;
             }
         }
@@ -703,7 +679,8 @@ public final class FreeColServer {
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
             
-            checkSavegameVersion(xsr);
+            int savegameVersion = getSavegameVersion(xsr);
+            logger.info("Found savegame version " + savegameVersion);
             singleplayer = FreeColObject.getAttribute(xsr, "singleplayer", true);
             publicServer =  FreeColObject.getAttribute(xsr, "publicServer", false);
             
@@ -731,8 +708,26 @@ public final class FreeColServer {
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
+                    Specification specification = null;
+                    if (savegameVersion < 9) {
+                        logger.info("Compatibility code: providing fresh specification.");
+                        specification = new FreeColTcFile("freecol").getSpecification();
+                    }
                     game = new ServerGame(null, getModelController(), xsr, serverObjects
-                            .toArray(new FreeColGameObject[0]));
+                                          .toArray(new FreeColGameObject[0]), specification);
+                    if (savegameVersion < 9) {
+                        logger.info("Compatibility code: applying difficulty level.");
+                        // Apply the difficulty level
+                        if (game.getDifficultyLevel() == null) {
+                            logger.fine("Difficulty level is null");
+                            DifficultyLevel level = game.getSpecification().getDifficultyLevel("model.difficulty.medium");
+                            game.getSpecification().applyDifficultyLevel(level);
+                            game.setDifficultyLevel(level);
+                        } else {
+                            logger.fine("Difficulty level is " + game.getDifficultyLevel().getId());
+                            game.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
+                        }
+                    }
                     game.setCurrentPlayer(null);
                     gameState = GameState.IN_GAME;
                     integrity = game.checkIntegrity();
@@ -771,11 +766,11 @@ public final class FreeColServer {
                 ServerPlayer player = (ServerPlayer) playerIterator.next();
                 if (player.isAI()) {
                     DummyConnection theConnection = new DummyConnection(
-                            "Server-Server-" + player.getName(),
-                            getInGameInputHandler());
+                                                                        "Server-Server-" + player.getName(),
+                                                                        getInGameInputHandler());
                     DummyConnection aiConnection = new DummyConnection(
-                            "Server-AI-" + player.getName(),                            
-                            new AIInGameInputHandler(this, player, aiMain));
+                                                                       "Server-AI-" + player.getName(),                            
+                                                                       new AIInGameInputHandler(this, player, aiMain));
                     aiConnection.setOutgoingMessageHandler(theConnection);
                     theConnection.setOutgoingMessageHandler(aiConnection);
                     getServer().addDummyConnection(theConnection);
@@ -806,32 +801,32 @@ public final class FreeColServer {
         }
     }
 
-	public static void checkSavegameVersion(final XMLStreamReader xsr)
-			throws FreeColException {
-		final String version = xsr.getAttributeValue(null, "version");
-		int savegameVersion = 0;
-		try {
-		    savegameVersion = Integer.parseInt(version);
-		} catch(Exception e) {
-		    throw new FreeColException("incompatibleVersions");
-		}
-		if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-		    throw new FreeColException("incompatibleVersions");
-		}
-	}
+    public static int getSavegameVersion(final XMLStreamReader xsr) throws FreeColException {
+        final String version = xsr.getAttributeValue(null, "version");
+        int savegameVersion = 0;
+        try {
+            savegameVersion = Integer.parseInt(version);
+        } catch(Exception e) {
+            throw new FreeColException("incompatibleVersions");
+        }
+        if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
+            throw new FreeColException("incompatibleVersions");
+        }
+        return savegameVersion;
+    }
 	
-	/**
-	 * Removes automatically created save games.
-	 * Call this function to delete the automatically created save games from
-	 * a previous game.
-	 */
-	public static void removeAutosaves(final String prefix) {
-		for (File autosaveFile : FreeCol.getAutosaveDirectory().listFiles()) {
-		    if (autosaveFile.getName().startsWith(prefix)) {
-		        autosaveFile.delete();
-		    }
-		}
-	}
+    /**
+     * Removes automatically created save games.
+     * Call this function to delete the automatically created save games from
+     * a previous game.
+     */
+    public static void removeAutosaves(final String prefix) {
+        for (File autosaveFile : FreeCol.getAutosaveDirectory().listFiles()) {
+            if (autosaveFile.getName().startsWith(prefix)) {
+                autosaveFile.delete();
+            }
+        }
+    }
 
     /**
      * Sets the mode of the game: singleplayer/multiplayer.

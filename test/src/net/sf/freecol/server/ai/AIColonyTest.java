@@ -305,13 +305,13 @@ public class AIColonyTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(1);
         AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
-        final GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
+        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
         int foodSuplus = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
         assertTrue("Setup error, colony does not have food surplus", foodSuplus > 0);
                 
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        final EquipmentType horsesEqType = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+        final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
         Unit scout = new Unit(getGame(), colony.getTile(), colony.getOwner(), colonistType, UnitState.ACTIVE, horsesEqType);
         assertTrue("Scout should be mounted",scout.isMounted());
         
