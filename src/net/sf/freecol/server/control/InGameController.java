@@ -776,11 +776,12 @@ public final class InGameController extends Controller {
      */
     private boolean csSpanishSuccession(ChangeSet cs) {
         Game game = getGame();
-        boolean rebelMajority = false;
         Player weakestAIPlayer = null;
         Player strongestAIPlayer = null;
+        int rebelPlayers = 0;
         for (Player player : game.getEuropeanPlayers()) {
-            if (player.isAI() && !player.isREF()) {
+            if (player.isREF()) continue;
+            if (player.isAI()) {
                 if (weakestAIPlayer == null
                     || weakestAIPlayer.getScore() > player.getScore()) {
                     weakestAIPlayer = player;
@@ -789,14 +790,19 @@ public final class InGameController extends Controller {
                     || strongestAIPlayer.getScore() < player.getScore()) {
                     strongestAIPlayer = player;
                 }
-            } else if (player.getSoL() > 50) {
-                rebelMajority = true;
+            }
+            if (player.getSoL() > 50) {
+                rebelPlayers++;
             }
         }
 
-        if (rebelMajority
+        // Only eliminate the weakest AI if there is at least one
+        // nation with 50% rebels, there is a distinct weakest nation,
+        // and it is not the sole nation with 50% rebels.
+        if (rebelPlayers > 0
             && weakestAIPlayer != null && strongestAIPlayer != null
-            && weakestAIPlayer != strongestAIPlayer) {
+            && weakestAIPlayer != strongestAIPlayer
+            && (weakestAIPlayer.getSoL() <= 50 || rebelPlayers > 1)) {
             for (Player player : game.getPlayers()) {
                 for (IndianSettlement settlement : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
                     Unit missionary = settlement.getMissionary();
