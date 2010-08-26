@@ -412,32 +412,31 @@ public final class InGameController extends Controller {
      * @return The new current player.
      */
     private Player nextPlayer() {
+        ServerGame game = getGame();
+
         if (!isHumanPlayersLeft()) {
-            getGame().setCurrentPlayer(null);
+            game.setCurrentPlayer(null);
             return null;
         }
         
-        if (getGame().isNextPlayerInNewTurn()) {
-            getGame().newTurn();
-            if (getGame().getTurn().getAge() > 1
-                && !getGame().getSpanishSuccession()) {
-                checkSpanishSuccession();
+        if (game.isNextPlayerInNewTurn()) {
+            ChangeSet cs = new ChangeSet();
+            game.newTurn();
+            if (game.getTurn().getAge() > 1 && !game.getSpanishSuccession()) {
+                csSpanishSuccession(cs);
+                game.setSpanishSuccession(true);
             }
             if (debugOnlyAITurns > 0) {
                 debugOnlyAITurns--;
             }
-            ChangeSet cs = new ChangeSet();
             cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
-                "turn", Integer.toString(getGame().getTurn().getNumber()));
+                "turn", Integer.toString(game.getTurn().getNumber()));
             sendToAll(cs);
         }
 
-        ServerPlayer newPlayer = (ServerPlayer) getGame().getNextPlayer();
-        getGame().setCurrentPlayer(newPlayer);
-        if (newPlayer == null) {
-            getGame().setCurrentPlayer(null);
-            return null;
-        }
+        ServerPlayer newPlayer = (ServerPlayer) game.getNextPlayer();
+        game.setCurrentPlayer(newPlayer);
+        if (newPlayer == null) return null;
         
         synchronized (newPlayer) {
             if (newPlayer.checkForDeath()) {
@@ -453,7 +452,7 @@ public final class InGameController extends Controller {
             ChangeSet cs = new ChangeSet();
             csNewTurn(newPlayer, cs);
             cs.addTrivial(See.all(), "setCurrentPlayer",
-                          ChangePriority.CHANGE_LATE,
+                          ChangePriority.CHANGE_NORMAL,
                           "player", newPlayer.getId());
             sendToAll(cs);
         }
@@ -735,24 +734,13 @@ public final class InGameController extends Controller {
 
         // Clean up missions
         if (serverPlayer.isEuropean()) {
-            List<ServerPlayer> europeans = new ArrayList<ServerPlayer>();
-            List<ServerPlayer> natives = new ArrayList<ServerPlayer>();
             for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-                if (other.isEuropean()) {
-                    europeans.add(other);
-                } else {
-                    natives.add(other);
-                }
-            }
-            for (ServerPlayer other : natives) {
                 for (IndianSettlement s : other.getIndianSettlementsWithMission(serverPlayer)) {
                     Unit unit = s.getMissionary();
                     s.setMissionary(null);
                     cs.addDispose(serverPlayer, s.getTile(), unit);
                     cs.add(See.perhaps(), s.getTile());
-                    for (ServerPlayer euro : europeans) {
-                        s.getTile().updatePlayerExploredTile(euro);
-                    }
+                    s.getTile().updatePlayerExploredTiles();
                 }
             }
         }
@@ -780,66 +768,78 @@ public final class InGameController extends Controller {
         return cs;
     }
 
-    private void checkSpanishSuccession() {
+    /**
+     * Checks for an performs the War of Spanish Succession changes.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the Spanish Succession event occurred.
+     */
+    private boolean csSpanishSuccession(ChangeSet cs) {
+        Game game = getGame();
         boolean rebelMajority = false;
         Player weakestAIPlayer = null;
         Player strongestAIPlayer = null;
-        java.util.Map<Player, Element> documentMap = new HashMap<Player, Element>();
-        for (Player player : getGame().getPlayers()) {
-            documentMap.put(player, Message.createNewRootElement("spanishSuccession"));
-            if (player.isEuropean()) {
-                if (player.isAI() && !player.isREF()) {
-                    if (weakestAIPlayer == null
-                        || weakestAIPlayer.getScore() > player.getScore()) {
-                        weakestAIPlayer = player;
-                    }
-                    if (strongestAIPlayer == null
-                        || strongestAIPlayer.getScore() < player.getScore()) {
-                        strongestAIPlayer = player;
-                    }
-                } else if (player.getSoL() > 50) {
-                    rebelMajority = true;
+        for (Player player : game.getEuropeanPlayers()) {
+            if (player.isAI() && !player.isREF()) {
+                if (weakestAIPlayer == null
+                    || weakestAIPlayer.getScore() > player.getScore()) {
+                    weakestAIPlayer = player;
                 }
+                if (strongestAIPlayer == null
+                    || strongestAIPlayer.getScore() < player.getScore()) {
+                    strongestAIPlayer = player;
+                }
+            } else if (player.getSoL() > 50) {
+                rebelMajority = true;
             }
         }
 
         if (rebelMajority
-            && weakestAIPlayer != null
-            && strongestAIPlayer != null
+            && weakestAIPlayer != null && strongestAIPlayer != null
             && weakestAIPlayer != strongestAIPlayer) {
-            documentMap.remove(weakestAIPlayer);
-            for (Element element : documentMap.values()) {
-                element.setAttribute("loser", weakestAIPlayer.getId());
-                element.setAttribute("winner", strongestAIPlayer.getId());
+            for (Player player : game.getPlayers()) {
+                for (IndianSettlement settlement : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
+                    Unit missionary = settlement.getMissionary();
+                    missionary.setOwner(strongestAIPlayer);
+                    settlement.getTile().updatePlayerExploredTiles();
+                    cs.add(See.perhaps()
+                           .always((ServerPlayer)strongestAIPlayer),
+                           settlement);
+                }
             }
             for (Colony colony : weakestAIPlayer.getColonies()) {
                 colony.changeOwner(strongestAIPlayer);
-                for (Entry<Player, Element> entry : documentMap.entrySet()) {
-                    if (entry.getKey().canSee(colony.getTile())) {
-                        entry.getValue().appendChild(colony.toXMLElement(entry.getKey(),
-                                                                         entry.getValue().getOwnerDocument()));
-                    }
+                for (Tile tile : colony.getOwnedTiles()) {
+                    cs.add(See.perhaps(), tile);
                 }
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
                 unit.setOwner(strongestAIPlayer);
-                for (Entry<Player, Element> entry : documentMap.entrySet()) {
-                    if (entry.getKey().canSee(unit.getTile())) {
-                        entry.getValue().appendChild(unit.toXMLElement(entry.getKey(),
-                                                                       entry.getValue().getOwnerDocument()));
-                    }
-                }
+                cs.add(See.perhaps(), unit);
             }
-            for (Entry<Player, Element> entry : documentMap.entrySet()) {
-                try {
-                    ((ServerPlayer) entry.getKey()).getConnection().send(entry.getValue());
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Could not send message to: " + entry.getKey().getName(), e);
+
+            StringTemplate loser = weakestAIPlayer.getNationName();
+            StringTemplate winner = strongestAIPlayer.getNationName();
+            cs.addMessage(See.all(),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "model.diplomacy.spanishSuccession",
+                                 strongestAIPlayer)
+                    .addStringTemplate("%loserNation%", loser)
+                    .addStringTemplate("%nation%", winner));
+            for (Player p : game.getEuropeanPlayers()) {
+                if (p != weakestAIPlayer) {
+                    cs.addHistory((ServerPlayer) p,
+                        new HistoryEvent(game.getTurn(),
+                            HistoryEvent.EventType.SPANISH_SUCCESSION)
+                            .addStringTemplate("%loserNation%", loser)
+                            .addStringTemplate("%nation%", winner));
                 }
             }
             weakestAIPlayer.setDead(true);
-            getGame().setSpanishSuccession(true);
+            cs.addDead((ServerPlayer) weakestAIPlayer);
+            return true;
         }
+        return false;
     }
     
     private boolean isHumanPlayersLeft() {

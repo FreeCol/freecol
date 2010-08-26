@@ -147,8 +147,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = diplomacy(element);
             } else if (type.equals("addPlayer")) {
                 reply = addPlayer(element);
-            } else if (type.equals("spanishSuccession")) {
-                reply = spanishSuccession(element);
             } else if (type.equals("addObject")) {
                 reply = addObject(element);
             } else if (type.equals("multiple")) {
@@ -965,29 +963,6 @@ public final class InGameInputHandler extends InputHandler {
                     .addName("%colony%", colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add(
                             "%goods%", goods.getNameKey())).invokeLater();
         }
-
-        return null;
-    }
-
-    /**
-     * Handles a "spanishSuccession" message
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element spanishSuccession(Element element) {
-        final Player player = getFreeColClient().getMyPlayer();
-        final Player loser = (Player) getGame().getFreeColGameObject(element.getAttribute("loser"));
-        final Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
-        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "model.diplomacy.spanishSuccession", winner).addStringTemplate("%loserNation%", loser.getNationName())
-                .addStringTemplate("%nation%", winner.getNationName()));
-        loser.setDead(true);
-        update(element);
-        player.getHistory().add(
-                new HistoryEvent(player.getGame().getTurn(), HistoryEvent.EventType.SPANISH_SUCCESSION)
-                        .addStringTemplate("%nation%", winner.getNationName()).addStringTemplate("%loserNation%",
-                                loser.getNationName()));
 
         return null;
     }
