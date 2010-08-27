@@ -114,13 +114,11 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 // Therefore most of these messages are useless.
                 if (type.equals("update")) {
                 } else if (type.equals("remove")) {
-                } else if (type.equals("setAI")) {
                 } else if (type.equals("startGame")) {
                 } else if (type.equals("updateGame")) {
                 } else if (type.equals("addPlayer")) {
-                } else if (type.equals("opponentMove")) {
-                } else if (type.equals("opponentAttack")) {
-                } else if (type.equals("attackResult")) {
+                } else if (type.equals("animateMove")) {
+                } else if (type.equals("animateAttack")) {
                 } else if (type.equals("setCurrentPlayer")) {
                     reply = setCurrentPlayer((DummyConnection) connection, element);
                 } else if (type.equals("newTurn")) {
@@ -129,6 +127,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("disconnect")) {
                 } else if (type.equals("logout")) {
                 } else if (type.equals("error")) {
+                } else if (type.equals("setAI")) {
                 } else if (type.equals("chat")) {
                 } else if (type.equals("chooseFoundingFather")) {
                     reply = chooseFoundingFather((DummyConnection) connection, element);
@@ -142,8 +141,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                     reply = indianDemand((DummyConnection) connection, element);
                 } else if (type.equals("diplomacy")) {
                     reply = diplomaticTrade((DummyConnection) connection, element);
-                } else if (type.equals("addMessages")) {
-                } else if (type.equals("addHistory")) {
+                } else if (type.equals("addObject")) {
                 } else if (type.equals("multiple")) {
                     reply = multiple((DummyConnection) connection, element);
                 } else {
