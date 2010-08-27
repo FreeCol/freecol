@@ -1052,8 +1052,12 @@ public final class FreeColServer {
             throw new IllegalStateException("ID must not be empty.");
         }
         obj = game.getFreeColGameObjectSafely(unitId);
-        if (!(obj instanceof Unit)) {
-            throw new IllegalStateException("Not a unit ID: " + unitId);
+        if (obj == null) {
+            throw new IllegalStateException("Not an object: " + unitId);
+        } else if (!(obj instanceof Unit)) {
+            throw new IllegalStateException("Unit expected, "
+                                            + " got " + obj.getClass()
+                                            + ": " + unitId);
         }
         unit = (Unit) obj;
         if (unit.getOwner() != serverPlayer) {
