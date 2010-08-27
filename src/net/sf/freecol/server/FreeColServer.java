@@ -718,15 +718,19 @@ public final class FreeColServer {
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
-                        if (game.getDifficultyLevel() == null) {
-                            logger.fine("Difficulty level is null");
-                            DifficultyLevel level = game.getSpecification().getDifficultyLevel("model.difficulty.medium");
-                            game.getSpecification().applyDifficultyLevel(level);
-                            game.setDifficultyLevel(level);
-                        } else {
-                            logger.fine("Difficulty level is " + game.getDifficultyLevel().getId());
-                            game.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
+                        DifficultyLevel level = game.getDifficultyLevel();
+                        if (level == null) {
+                            try {
+                                int levelIndex = game.getGameOptions().getInteger("model.option.difficulty");
+                                level = game.getSpecification().getDifficultyLevels().get(levelIndex);
+                            } catch(Exception e) {
+                                // no such setting
+                                level = game.getSpecification().getDifficultyLevel("model.difficulty.medium");
+                            }
                         }
+                        logger.fine("Difficulty level is " + level.getId());
+                        game.getSpecification().applyDifficultyLevel(level);
+                        game.setDifficultyLevel(level);
                     }
                     game.setCurrentPlayer(null);
                     gameState = GameState.IN_GAME;

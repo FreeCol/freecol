@@ -496,7 +496,7 @@ public class Game extends FreeColGameObject {
      * @return A vacant nation.
      */
     public Nation getVacantNation() {
-        System.out.println("NationOptions: " + nationOptions);
+        //System.out.println("NationOptions: " + nationOptions);
         for (Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
             if (entry.getValue() == NationState.AVAILABLE) {
                 return entry.getKey();
@@ -930,9 +930,7 @@ public class Game extends FreeColGameObject {
             out.writeAttribute("nextID", Integer.toString(nextId));
         }
 
-        if (specification != null) {
-            specification.toXMLImpl(out);
-        }
+        specification.toXMLImpl(out);
 
         if (citiesOfCibola == null) initializeCitiesOfCibola();
         for (String cityName : citiesOfCibola) {
@@ -985,7 +983,6 @@ public class Game extends FreeColGameObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-
 
         turn = new Turn(getAttribute(in, "turn", 1));
         setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
@@ -1062,7 +1059,9 @@ public class Game extends FreeColGameObject {
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
-                specification = new Specification();
+                if (specification == null) {
+                    specification = new Specification();
+                }
                 specification.readFromXMLImpl(in);
             } else {
                 logger.warning("Unknown tag: " + tagName + " loading game");

@@ -96,7 +96,6 @@ public class DifficultyLevel extends FreeColGameObjectType {
 
     private void addOption(AbstractOption option) {
         levelOptions.put(option.getId(), option);
-        getSpecification().addAbstractOption(option);
     }
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

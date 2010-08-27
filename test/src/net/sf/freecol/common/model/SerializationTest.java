@@ -19,7 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.StringReader;
@@ -142,7 +144,6 @@ public class SerializationTest extends FreeColTestCase {
 
     }
 
-
     public void testSpecification() throws Exception {
 
         try {
@@ -161,6 +162,41 @@ public class SerializationTest extends FreeColTestCase {
             fail(errMsg);
         }
 
+    }
+
+    public void testDifficulty() throws Exception {
+
+        Specification specification1 = null;
+        Specification specification2 = null;
+        try {
+            specification1 = new Specification(new FileInputStream("data/classic/specification.xml"));
+            specification1.applyDifficultyLevel("model.difficulty.veryEasy");
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xif = XMLOutputFactory.newInstance();
+            XMLStreamWriter out = xif.createXMLStreamWriter(sw);
+            specification1.toXMLImpl(out);
+            out.close();
+            specification2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
+
+        assertNotNull(specification1);
+        assertNotNull(specification2);
+
+        DifficultyLevel level1 = specification1.getDifficultyLevel();
+        DifficultyLevel level2 = specification2.getDifficultyLevel();
+        assertNotNull(level1);
+        assertNotNull(level2);
+        assertEquals(level1.getId(), level2.getId());
+
+        try {
+            int increment1 = specification1.getIntegerOption("model.option.crossesIncrement").getValue();
+            int increment2 = specification2.getIntegerOption("model.option.crossesIncrement").getValue();
+            assertEquals(increment1, increment2);
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
     }
 
 }

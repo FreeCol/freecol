@@ -230,6 +230,7 @@ public final class Specification {
 
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
+            xsr.nextTag();
             readFromXMLImpl(xsr);
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
@@ -239,7 +240,9 @@ public final class Specification {
         }
     }
 
-    private void clean() {
+    public void clean() {
+
+        logger.finest("Cleaning up specification.");
 
         Iterator<FreeColGameObjectType> typeIterator = allTypes.values().iterator();
         while (typeIterator.hasNext()) {
@@ -951,6 +954,17 @@ public final class Specification {
         return difficultyLevels;
     }
 
+    public DifficultyLevel getDifficultyLevel() {
+        if (difficultyLevel != null) {
+            for (DifficultyLevel level : difficultyLevels) {
+                if (difficultyLevel.equals(level.getId())) {
+                    return level;
+                }
+            }
+        }
+        return null;
+    }
+
     // -- Limits --
     public List<Event> getEvents() {
         return events;
@@ -1062,9 +1076,7 @@ public final class Specification {
 
         // Add attributes:
         out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
-        if (difficultyLevel != null) {
-            out.writeAttribute("difficultyLevel", difficultyLevel);
-        }
+        out.writeAttribute("difficultyLevel", difficultyLevel);
 
         // copy the order of section in specification.xml
         writeSection(out, "modifiers", specialModifiers);
@@ -1100,35 +1112,37 @@ public final class Specification {
     }
 
     public void readFromXMLImpl(XMLStreamReader xsr) throws XMLStreamException {
+        String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+        if (difficultyLevel == null) {
+            difficultyLevel = xsr.getAttributeValue(null, "difficultyLevel");
+        }
+        logger.info("Difficulty level is " + difficultyLevel);
+        if (id == null) {
+            // don't overwrite id with parent id!
+            id = newId;
+        }
+        logger.info("Reading specification " + newId);
+        String parentId = xsr.getAttributeValue(null, "extends");
+        if (parentId != null) {
+            FreeColTcFile parent = new FreeColTcFile(parentId);
+            try {
+                load(parent.getSpecificationInputStream());
+            } catch(Exception e) {
+                logger.warning("Failed to load parent specification " + parentId);
+            }
+        }
         while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = xsr.getLocalName();
-            if (childName.equals("freecol-specification")) {
-                String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
-                difficultyLevel = xsr.getAttributeValue(null, "difficultyLevel");
-                logger.info("Difficulty level is " + difficultyLevel);
-                if (id == null) {
-                    // don't overwrite id with parent id!
-                    id = newId;
-                }
-                logger.info("Reading specification " + newId);
-                String parentId = xsr.getAttributeValue(null, "extends");
-                if (parentId != null) {
-                    FreeColTcFile parent = new FreeColTcFile(parentId);
-                    try {
-                        load(parent.getSpecificationInputStream());
-                    } catch(Exception e) {
-                        logger.warning("Failed to load parent specification " + parentId);
-                    }
-                }
+            logger.finest("Found child named " + childName);
+            ChildReader reader = readerMap.get(childName);
+            if (reader == null) {
+                throw new RuntimeException("unexpected: " + childName);
             } else {
-                logger.finest("Found child named " + childName);
-                ChildReader reader = readerMap.get(childName);
-                if (reader == null) {
-                    throw new RuntimeException("unexpected: " + childName);
-                } else {
-                    reader.readChildren(xsr, this);
-                }
+                reader.readChildren(xsr, this);
             }
+        }
+        if (difficultyLevel != null) {
+            applyDifficultyLevel(difficultyLevel);
         }
     }
 
