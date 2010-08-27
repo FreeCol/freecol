@@ -318,5 +318,18 @@ public final class SpecificationTest extends FreeColTestCase {
         }
     }
 
+    public void testLoadFragment() {
+        try {
+            Specification specification = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
+            int numberOfUnitTypes = specification.numberOfUnitTypes();
+            specification.loadFragment(new FileInputStream("data/mods/example/specification.xml"));
+            UnitType milkmaid = specification.getUnitType("model.unit.milkmaid");
+            assertEquals(numberOfUnitTypes + 1, specification.numberOfUnitTypes());
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
+
+    }
+
 
 }
