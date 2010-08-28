@@ -1116,6 +1116,7 @@ public class Game extends FreeColGameObject {
                     specification = new Specification();
                 }
                 specification.readFromXMLImpl(in);
+                specification.clean();
             } else {
                 logger.warning("Unknown tag: " + tagName + " loading game");
                 in.nextTag();
