@@ -1950,14 +1950,10 @@ public final class GUI {
 
         GeneralPath path = new GeneralPath();
         path.moveTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-        angle += 144 * deg2rad;
-        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-        angle += 144 * deg2rad;
-        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-        angle += 144 * deg2rad;
-        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
-        angle += 144 * deg2rad;
-        path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        for (int i = 0; i < 4; i++) {
+            angle += 144 * deg2rad;
+            path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        }
         path.closePath();
 
         // draw everything
