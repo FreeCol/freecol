@@ -19,8 +19,8 @@
 
 package net.sf.freecol.common.option;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -38,7 +38,7 @@ public class OptionGroup extends AbstractOption {
 
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
-    private ArrayList<Option> options;
+    private LinkedHashMap<String, Option> options;
 
 
     /**
@@ -48,7 +48,7 @@ public class OptionGroup extends AbstractOption {
      */
     public OptionGroup(String id) {
         super(id);
-        options = new ArrayList<Option>();
+        options = new LinkedHashMap<String, Option>();
     }
     
     /**
@@ -67,7 +67,7 @@ public class OptionGroup extends AbstractOption {
     *               added to this <code>OptionGroup</code>.
     */
     public void add(Option option) {
-        options.add(option);
+        options.put(option.getId(), option);
     }
 
 
@@ -84,7 +84,17 @@ public class OptionGroup extends AbstractOption {
     * @return The <code>Iterator</code>.
     */
     public Iterator<Option> iterator() {
-        return options.iterator();
+        return options.values().iterator();
+    }
+
+    /**
+     * Return the Option with the given id.
+     *
+     * @param id a <code>String</code> value
+     * @return an <code>Option</code> value
+     */
+    public Option getOption(String id) {
+        return options.get(id);
     }
 
     /**
@@ -99,9 +109,8 @@ public class OptionGroup extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        Iterator<Option> oi = options.iterator();
-        while (oi.hasNext()) {
-            (oi.next()).toXML(out);
+        for (Option option : options.values()) {
+            option.toXML(out);
         }
 
         out.writeEndElement();
