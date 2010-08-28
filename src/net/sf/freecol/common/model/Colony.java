@@ -644,7 +644,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
-    @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit newUnit = (Unit) locatable;
@@ -746,7 +745,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
-    @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             for (WorkLocation w : getWorkLocations()) {
@@ -769,7 +767,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @return The number of <code>Unit</code>s in this colony.
      */
-    @Override
     public int getUnitCount() {
         int count = 0;
         if (unitCount != -1) {
@@ -801,12 +798,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return getUnitList().iterator();
     }
 
-    @Override
     public boolean contains(Locatable locatable) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public boolean canAdd(Locatable locatable) {
         if (locatable instanceof Unit && ((Unit) locatable).getOwner() == getOwner()) {
             return true;
