@@ -438,7 +438,7 @@ public class Game extends FreeColGameObject {
             if (o != null) {
                 return o;
             } else {
-                freeColGameObjects.remove(ro);
+                freeColGameObjects.remove(id);
             }
         }
         return null;
