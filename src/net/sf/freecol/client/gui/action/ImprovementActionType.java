@@ -98,4 +98,8 @@ public final class ImprovementActionType extends FreeColGameObjectType {
         out.writeEndElement();
     }
 
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out);
+    }
+
 }
