@@ -19,8 +19,10 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -68,6 +70,23 @@ public class OptionGroup extends AbstractOption {
     */
     public void add(Option option) {
         options.put(option.getId(), option);
+    }
+
+
+    /**
+     * Adds the given <code>Option</code>.
+     * @param option The <code>Option</code> that should be
+     *               added to this <code>OptionGroup</code>.
+     */
+    public void add(OptionGroup group) {
+        List<Option> otherOptions = new ArrayList<Option>(group.options.values());
+        for (Option option : otherOptions) {
+            if (option instanceof OptionGroup) {
+                add((OptionGroup) option);
+            } else {
+                add(option);
+            }
+        }
     }
 
 

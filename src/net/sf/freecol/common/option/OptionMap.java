@@ -55,7 +55,6 @@ public abstract class OptionMap extends OptionGroup {
     private static Logger logger = Logger.getLogger(OptionMap.class.getName());
 
     private String xmlTagName;
-    private Map<String, Option> values;
    
     /**
      * Describe specification here.
@@ -74,8 +73,6 @@ public abstract class OptionMap extends OptionGroup {
         this.xmlTagName = xmlTagName;
         this.specification = specification;
         
-        values = new LinkedHashMap<String, Option>();
-
         addDefaultOptions();
         addToMap(this);
     }
@@ -143,7 +140,7 @@ public abstract class OptionMap extends OptionGroup {
     * @return The <code>Object</code> with the given ID.
     */
     public Option getObject(String id) {
-        return values.get(id);
+        return getOption(id);
     }
 
 
@@ -157,7 +154,7 @@ public abstract class OptionMap extends OptionGroup {
     * @exception NullPointerException if the given <code>Option</code> does not exist.
     */
     public int getInteger(String id) {
-        Option o = values.get(id);
+        Option o = getOption(id);
         if (o instanceof IntegerOption) {
             return ((IntegerOption) o).getValue();
         } else if (o instanceof SelectOption) {
@@ -181,7 +178,7 @@ public abstract class OptionMap extends OptionGroup {
     */
     public boolean getBoolean(String id) {
         try {
-            return ((BooleanOption) values.get(id)).getValue();
+            return ((BooleanOption) getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No boolean value associated with the specified option.");
         }
@@ -198,7 +195,7 @@ public abstract class OptionMap extends OptionGroup {
      */
     public File getFile(String id) {
         try {
-            return ((FileOption) values.get(id)).getValue();
+            return ((FileOption) getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No File associated with the specified option.");
         }
@@ -212,19 +209,11 @@ public abstract class OptionMap extends OptionGroup {
     * @param og The <code>OptionGroup</code> to be added.
     */
     public void addToMap(OptionGroup og) {
-        Iterator<Option> it = og.iterator();
-        while (it.hasNext()) {
-            Option option = it.next();
-            if (option instanceof OptionGroup) {
-                addToMap((OptionGroup) option);
-            } else {
-                values.put(option.getId(), option);
-            }
-        }
+        super.add(og);
     }
 
     public void putOption(Option option) {
-        values.put(option.getId(), option);
+        super.add(option);
     }
 
     /**
@@ -349,12 +338,11 @@ public abstract class OptionMap extends OptionGroup {
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(xmlTagName);
-
-        Iterator<Option> it = values.values().iterator();
-        while (it.hasNext()) {
-            (it.next()).toXML(out);
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        Iterator<Option> iter = iterator();
+        while (iter.hasNext()) {
+            iter.next().toXML(out);
         }
-
         out.writeEndElement();
     }
 
@@ -372,7 +360,7 @@ public abstract class OptionMap extends OptionGroup {
                 final String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 if (idStr != null) {
                     // old protocols:
-                    Option o = getObject(idStr);
+                    Option o = getOption(idStr);
 
                     if (o != null) {
                         o.readFromXML(in);
@@ -386,7 +374,7 @@ public abstract class OptionMap extends OptionGroup {
                                 || !in.getLocalName().equals(ignoredTag));
                     }
                 } else {
-                    Option o = getObject(in.getLocalName());
+                    Option o = getOption(in.getLocalName());
                     if (o != null) {
                         o.readFromXML(in);
                     } else {
@@ -426,11 +414,11 @@ public abstract class OptionMap extends OptionGroup {
     		throw new IllegalArgumentException("Requires an ID");
     	if( newFileValue == null )
     		throw new IllegalArgumentException("Requires a File parameter");
-    	if( values.get(id) == null )
+    	if( getOption(id) == null )
     		throw new IllegalArgumentException("No option with ID=["+ id +"]");
     	
         try {
-            ((FileOption) values.get(id)).setValue(newFileValue);
+            ((FileOption) getOption(id)).setValue(newFileValue);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No File associated with option ["+ id +"].");
         }
