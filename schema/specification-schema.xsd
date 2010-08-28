@@ -630,15 +630,6 @@
   <xs:element name="options">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="integerOption"/>
-        <xs:element ref="booleanOption"/>
-        <xs:element ref="stringOption"/>
-        <xs:element ref="rangeOption"/>
-        <xs:element ref="selectOption"/>
-        <xs:element ref="languageOption"/>
-        <xs:element ref="fileOption"/>
-        <xs:element ref="audioMixerOption"/>
-        <xs:element ref="percentageOption"/>
         <xs:element ref="optionGroup"/>
       </xs:choice>
     </xs:complexType>

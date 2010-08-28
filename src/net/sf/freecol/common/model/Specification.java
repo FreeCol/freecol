@@ -378,47 +378,12 @@ public final class Specification {
 
         public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                AbstractOption option = null;
                 String optionType = xsr.getLocalName();
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                    option = new OptionGroup(xsr);
-                } else if (IntegerOption.getXMLElementTagName().equals(optionType)
-                           || "integer-option".equals(optionType)) {
-                    option = new IntegerOption(xsr);
-                } else if (BooleanOption.getXMLElementTagName().equals(optionType)
-                           || "boolean-option".equals(optionType)) {
-                    option = new BooleanOption(xsr);
-                } else if (StringOption.getXMLElementTagName().equals(optionType)
-                           || "string-option".equals(optionType)) {
-                    option = new StringOption(xsr);
-                } else if (RangeOption.getXMLElementTagName().equals(optionType)
-                           || "range-option".equals(optionType)) {
-                    option = new RangeOption(xsr);
-                } else if (SelectOption.getXMLElementTagName().equals(optionType)
-                           || "select-option".equals(optionType)) {
-                    option = new SelectOption(xsr);
-                } else if (LanguageOption.getXMLElementTagName().equals(optionType)
-                           || "language-option".equals(optionType)) {
-                    option = new LanguageOption(xsr);
-                } else if (FileOption.getXMLElementTagName().equals(optionType)
-                           || "file-option".equals(optionType)) {
-                    option = new FileOption(xsr);
-                } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-                    option = new PercentageOption(xsr);
-                } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-                    option = new AudioMixerOption(xsr);
+                    specification.addOptionGroup(new OptionGroup(xsr));
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");
                     xsr.nextTag();
-                }
-
-                // If the option is valid, add it to Specification options
-                if (option != null) {
-                    if(option instanceof OptionGroup) {
-                        specification.addOptionGroup((OptionGroup) option);
-                    } else {
-                        specification.addAbstractOption(option);
-                    }
                 }
             }
         }

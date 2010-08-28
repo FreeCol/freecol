@@ -1870,8 +1870,8 @@
     </difficultyLevel>
   </difficultyLevels>
   <options>
-    <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
     <optionGroup id="gameOptions.map">
+      <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
       <!-- Enables/disables fog of war -->
       <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
       <!-- Whether to award exploration points or not -->
