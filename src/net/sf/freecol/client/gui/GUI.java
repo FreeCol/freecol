@@ -1898,29 +1898,21 @@ public final class GUI {
         TextSpecification spec;
         TextLayout[] labels = new TextLayout[textSpecs.length];
         TextLayout label;
-        String key = "dynamic.label.";
 
         for (i = 0; i < textSpecs.length; i++) {
             spec = textSpecs[i];
-            if (i > 0) key += '.';
-            key += spec.text + "." + spec.font.getName().replace(' ', '-');
             label = new TextLayout(spec.text, spec.font, g.getFontRenderContext());
             labels[i] = label;
             width = Math.max(width, (int) label.getBounds().getWidth() + hPadding);
             height += (int) (label.getAscent() + label.getDescent());
             if (i > 0) height += linePadding;
         }
-        key += "." + Integer.toHexString(backgroundColor.getRGB());
-
-        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
-        if (image != null) {
-            return image;
-        }
 
         int radius = Math.min(hPadding, vPadding);
 
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
+        g2.scale(lib.getScalingFactor(), lib.getScalingFactor());
         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
@@ -1934,8 +1926,7 @@ public final class GUI {
             labels[i].draw(g2, (float) (width - labels[i].getBounds().getWidth())/2,
                            offset + labels[i].getAscent() + vPadding/2);
         }
-        ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        return bi;
     }
 
 
