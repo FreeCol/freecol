@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,9 +33,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.server.generator.MapGeneratorOptions;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
+
+import net.sf.freecol.common.model.NationOptions.Advantages;
 
 /**
  * The main component of the game model.
@@ -76,7 +78,7 @@ public class Game extends FreeColGameObject {
     protected Player viewOwner = null;
 
     /** Contains references to all objects created in this game. */
-    protected HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
+    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
 
     /**
      * The next available ID, that can be given to a new
@@ -384,11 +386,13 @@ public class Game extends FreeColGameObject {
             throw new IllegalArgumentException("Parameter 'freeColGameObject' must not be 'null'.");
         }
 
-        FreeColGameObject old = freeColGameObjects.put(id, freeColGameObject);
+        final WeakReference<FreeColGameObject> wr = new WeakReference<FreeColGameObject>(freeColGameObject);
+        final FreeColGameObject old = getFreeColGameObjectSafely(id);
         if (old != null) {
             throw new IllegalArgumentException("Replacing FreeColGameObject: " + old.getClass() + " with "
                                                + freeColGameObject.getClass());
         }
+        freeColGameObjects.put(id, wr);
 
         if (freeColGameObjectListener != null) {
             freeColGameObjectListener.setFreeColGameObject(id, freeColGameObject);
@@ -414,8 +418,7 @@ public class Game extends FreeColGameObject {
         if (id == null || id.equals("")) {
             throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
         }
-
-        return freeColGameObjects.get(id);
+        return getFreeColGameObjectSafely(id);
     }
 
     /**
@@ -426,11 +429,19 @@ public class Game extends FreeColGameObject {
      * @return game object with id or null.
      */
     public FreeColGameObject getFreeColGameObjectSafely(String id) {
-        if (id != null && id.length()>0) {
-            return freeColGameObjects.get(id);
-        } else {
+        if (id == null || id.length() == 0) {
             return null;
         }
+        final WeakReference<FreeColGameObject> ro = freeColGameObjects.get(id);
+        if (ro != null) {
+            final FreeColGameObject o = ro.get();
+            if (o != null) {
+                return o;
+            } else {
+                freeColGameObjects.remove(ro);
+            }
+        }
+        return null;
     }
 
     /**
@@ -445,12 +456,15 @@ public class Game extends FreeColGameObject {
         if (id == null || id.equals("")) {
             throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
         }
+        
+        final FreeColGameObject o = getFreeColGameObjectSafely(id);
 
         if (freeColGameObjectListener != null) {
             freeColGameObjectListener.removeFreeColGameObject(id);
         }
 
-        return freeColGameObjects.remove(id);
+        freeColGameObjects.remove(id);
+        return o;
     }
 
     /**
@@ -627,12 +641,52 @@ public class Game extends FreeColGameObject {
      * Gets an <code>Iterator</code> of every registered
      * <code>FreeColGameObject</code>.
      * 
+     * This <code>Iterator</code> should be iterated at least once
+     * in a while since it cleans the <code>FreeColGameObject</code>
+     * cache.
+     * 
      * @return an <code>Iterator</code> containing every registered
      *         <code>FreeColGameObject</code>.
      * @see #setFreeColGameObject
      */
     public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
-        return freeColGameObjects.values().iterator();
+        return new Iterator<FreeColGameObject>() {
+            final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it = freeColGameObjects.entrySet().iterator();
+            FreeColGameObject nextValue = null;
+            
+            public boolean hasNext() {
+                while (nextValue == null) {
+                    if (!it.hasNext()) {
+                        return false;
+                    }
+                    final Entry<String, WeakReference<FreeColGameObject>> entry = it.next();
+                    final WeakReference<FreeColGameObject> wr = entry.getValue();
+                    final FreeColGameObject o = wr.get();
+                    if (o == null) {
+                        final String id = entry.getKey();
+                        if (freeColGameObjectListener != null) {
+                            freeColGameObjectListener.removeFreeColGameObject(id);
+                        }
+                        it.remove();
+                    } else {
+                        nextValue = o;
+                    }
+                }
+                
+                return nextValue != null;
+            }
+
+            public FreeColGameObject next() {
+                hasNext();
+                final FreeColGameObject o = nextValue;
+                nextValue = null;
+                return o;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     /**
@@ -767,8 +821,7 @@ public class Game extends FreeColGameObject {
     public boolean checkIntegrity() {
     	List<String> brokenObjects = new ArrayList<String>();
         boolean ok = true;
-        Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone())
-            .values().iterator();
+        Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
             FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
