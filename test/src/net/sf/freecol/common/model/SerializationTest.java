@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -197,6 +198,35 @@ public class SerializationTest extends FreeColTestCase {
         } catch(Exception e) {
             fail(e.getMessage());
         }
+    }
+
+    public void testGeneratedLists() throws Exception {
+
+        Specification specification1 = null;
+        Specification specification2 = null;
+        try {
+            specification1 = new Specification(new FileInputStream("data/classic/specification.xml"));
+            specification1.applyDifficultyLevel("model.difficulty.veryEasy");
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xif = XMLOutputFactory.newInstance();
+            XMLStreamWriter out = xif.createXMLStreamWriter(sw);
+            specification1.toXMLImpl(out);
+            out.close();
+            specification2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
+
+        List<GoodsType> food1 = specification1.getFoodGoodsTypeList();
+        List<GoodsType> food2 = specification2.getFoodGoodsTypeList();
+        assertEquals(food1.size(), food2.size());
+        assertEquals(food1.get(0).getId(), food2.get(0).getId());
+
+        List<GoodsType> farmed1 = specification1.getFarmedGoodsTypeList();
+        List<GoodsType> farmed2 = specification2.getFarmedGoodsTypeList();
+        assertEquals(farmed1.size(), farmed2.size());
+        assertEquals(farmed1.get(0).getId(), farmed2.get(0).getId());
+
     }
 
 }
