@@ -583,7 +583,6 @@ public class IndianSettlement extends Settlement {
      *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
-    @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (!units.contains(locatable)) {
@@ -610,7 +609,6 @@ public class IndianSettlement extends Settlement {
      *
      * @param locatable The <code>Locatable</code> to remove from this Location.
      */
-    @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (!units.remove(locatable)) {
@@ -629,7 +627,6 @@ public class IndianSettlement extends Settlement {
      *
      * @return The amount of Units at this Location.
      */
-    @Override
     public int getUnitCount() {
         return units.size();
     }
@@ -928,7 +925,6 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return units.contains(locatable);
@@ -938,7 +934,6 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    @Override
     public boolean canAdd(Locatable locatable) {
         return true;
     }
