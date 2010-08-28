@@ -168,15 +168,7 @@ public class ActionManager extends OptionGroup {
      * @return The <code>FreeColAction</code>.
      */
     public FreeColAction getFreeColAction(String id) {
-        Iterator<Option> it = iterator();
-        while (it.hasNext()) {
-            FreeColAction fa = (FreeColAction) it.next();
-            if (fa.getId().equals(id)) {
-                return fa;
-            }
-        }
-
-        return null;
+        return (FreeColAction) getOption(id);
     }
 
     /**
