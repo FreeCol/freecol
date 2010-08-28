@@ -52,7 +52,7 @@ public class DisplayGridAction extends SelectableAction {
      */
     public void actionPerformed(ActionEvent e) {
         boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        ((BooleanOption) freeColClient.getClientOptions().getObject(ClientOptions.DISPLAY_GRID)).setValue(b);
+        ((BooleanOption) freeColClient.getClientOptions().getOption(ClientOptions.DISPLAY_GRID)).setValue(b);
         freeColClient.getCanvas().refresh();
     }
 }

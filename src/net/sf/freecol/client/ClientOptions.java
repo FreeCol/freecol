@@ -515,7 +515,7 @@ public class ClientOptions extends OptionMap {
     public List<FreeColModFile> getActiveMods() {
         final List<FreeColModFile> fcmfs = Mods.getAllMods();
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
-        ListOption<?> options = (ListOption<?>) getObject(ClientOptions.USER_MODS);
+        ListOption<?> options = (ListOption<?>) getOption(ClientOptions.USER_MODS);
         for (Object o : options.getValue()) {
             ModInfo modInfo = (ModInfo) o;
             if (modInfo == null) continue;
@@ -593,7 +593,7 @@ public class ClientOptions extends OptionMap {
      * @return a <code>BooleanOption</code> value
      */
     public BooleanOption getBooleanOption(ModelMessage message) {
-        return (BooleanOption) getObject(message.getMessageType().getOptionName());
+        return (BooleanOption) getOption(message.getMessageType().getOptionName());
     }
 
     protected boolean isCorrectTagName(String tagName) {

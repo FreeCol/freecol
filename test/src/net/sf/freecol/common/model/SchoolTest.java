@@ -1194,7 +1194,7 @@ public class SchoolTest extends FreeColTestCase {
         lumberJack.setStudent(null);
         colonist2.setTeacher(null);
 
-        ((BooleanOption) game.getGameOptions().getObject(GameOptions.ALLOW_STUDENT_SELECTION))
+        ((BooleanOption) game.getGameOptions().getOption(GameOptions.ALLOW_STUDENT_SELECTION))
         .setValue(false);
         criminal1.setWorkType(cotton);
         criminal2.setWorkType(lumber);

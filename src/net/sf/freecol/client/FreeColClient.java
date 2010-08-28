@@ -298,7 +298,7 @@ public final class FreeColClient {
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
             if (!headless) {
-                Option o = clientOptions.getObject(ClientOptions.LANGUAGE);
+                Option o = clientOptions.getOption(ClientOptions.LANGUAGE);
                 o.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent e) {
                             if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
@@ -354,9 +354,9 @@ public final class FreeColClient {
         if (sound) {
             final ClientOptions opts = getClientOptions();
             final AudioMixerOption amo
-                = (AudioMixerOption) opts.getObject(ClientOptions.AUDIO_MIXER);
+                = (AudioMixerOption) opts.getOption(ClientOptions.AUDIO_MIXER);
             final PercentageOption volume
-                = (PercentageOption) opts.getObject(ClientOptions.AUDIO_VOLUME);
+                = (PercentageOption) opts.getOption(ClientOptions.AUDIO_VOLUME);
             soundPlayer = new SoundPlayer(amo, volume);
         } else {
             soundPlayer = null;

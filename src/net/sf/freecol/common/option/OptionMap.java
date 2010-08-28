@@ -135,16 +135,6 @@ public abstract class OptionMap extends OptionGroup {
 
 
     /**
-    * Gets the object identified by the given <code>id</code>.
-    * @param id The ID.
-    * @return The <code>Object</code> with the given ID.
-    */
-    public Option getObject(String id) {
-        return getOption(id);
-    }
-
-
-    /**
     * Gets the integer value of an option.
     *
     * @param id The id of the option.

@@ -1269,9 +1269,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     + player.getName() + " hasn't won the game");
         }
         GameOptions go = getGame().getGameOptions();
-        ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_REF)).setValue(false);
-        ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_EUROPEANS)).setValue(false);
-        ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_HUMANS)).setValue(false);
+        ((BooleanOption) go.getOption(GameOptions.VICTORY_DEFEAT_REF)).setValue(false);
+        ((BooleanOption) go.getOption(GameOptions.VICTORY_DEFEAT_EUROPEANS)).setValue(false);
+        ((BooleanOption) go.getOption(GameOptions.VICTORY_DEFEAT_HUMANS)).setValue(false);
         
         // victory panel is shown after end turn, end turn again to start turn of next player
         final ServerPlayer currentPlayer = (ServerPlayer) getFreeColServer().getGame().getCurrentPlayer();

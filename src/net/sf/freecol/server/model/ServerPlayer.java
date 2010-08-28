@@ -483,7 +483,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             setExplored(tile);
         }
         
-        ((BooleanOption) getGame().getGameOptions().getObject(GameOptions.FOG_OF_WAR)).setValue(false);
+        ((BooleanOption) getGame().getGameOptions().getOption(GameOptions.FOG_OF_WAR)).setValue(false);
         
         resetCanSeeTiles();
     }
