@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -51,7 +53,6 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
     private final OptionMapUI ui;
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -76,6 +77,8 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         // Header:
         add(getDefaultHeader(mgo.getName()), "align center, span");
 
+        JPanel mapPanel = new JPanel();
+        mapPanel.setLayout(new MigLayout("wrap 4, fill"));
         /*
          * TODO: The update should be solved by PropertyEvent.
          */
@@ -109,15 +112,23 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
                             ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
                         }
                     });
-                add(mapButton);
+                mapPanel.add(mapButton);
             }
         }
 
         // Options:
-        add(ui, "newline 20, span, growx");
+        mapPanel.add(ui, "newline 20, span, growx");
+        add(mapPanel, "newline 20, span");
+
+        JScrollPane scrollPane = new JScrollPane(mapPanel,
+                                                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getViewport().setOpaque(false);
+        add(scrollPane, "height 100%, width 100%");
 
         okButton.setEnabled(editable);
-        
+
         // Buttons:
         add(okButton, "newline 20, span, split 3, tag ok");
         add(reset);
