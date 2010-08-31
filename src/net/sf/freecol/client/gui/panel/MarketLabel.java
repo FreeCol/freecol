@@ -62,18 +62,11 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public MarketLabel(GoodsType type, Market market, Canvas parent) {
         super(parent.getImageLibrary().getGoodsImageIcon(type));
         
-        this.type = type;
-        /*
-        if (FreeCol.isInDebugMode()) {
-            setToolTipText(type.getName() + " " + market.getMarketData(type).getAmountInMarket());
-        } else {
-            setToolTipText(type.getName());
-        }
-        */
         if (market == null) {
             throw new NullPointerException();
         }
 
+        this.type = type;
         this.market = market;
         this.parent = parent;
         partialChosen = false;
@@ -175,11 +168,11 @@ public final class MarketLabel extends JLabel implements ActionListener {
             setEnabled(false);
         }
         if (FreeCol.isInDebugMode()) {
-            toolTipText += " " + market.getMarketData(type).getAmountInMarket();
+            toolTipText += " " + market.getAmountInMarket(type);
         }
         setToolTipText(toolTipText);
 
-        super.setText(Integer.toString(market.paidForSale(type)) + "/" + Integer.toString(market.costToBuy(type)));
+        super.setText(Integer.toString(market.getPaidForSale(type)) + "/" + Integer.toString(market.getCostToBuy(type)));
         super.paintComponent(g);
     }
 

@@ -62,7 +62,7 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
 
         if (needToPay) {
             int gold = getMyPlayer().getGold();
-            int price = getMyPlayer().getMarket().costToBuy(goodsType);
+            int price = getMyPlayer().getMarket().getCostToBuy(goodsType);
             available = Math.min(available, gold/price);
         }
 

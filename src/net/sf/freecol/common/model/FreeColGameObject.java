@@ -64,7 +64,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         this.game = game;
 
         if (game != null && game instanceof ServerGame) {
-            setId(getRealXMLElementTagName() + ":" + ((ServerGame)game).getNextID());
+            setDefaultId(game);
         } else if (this instanceof Game) {
             setId("0");
         } else {
@@ -74,7 +74,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         uninitialized = false;
     }
     
-    
+       
     /**
      * Initiates a new <code>FreeColGameObject</code> from an <code>Element</code>.
      *
@@ -131,7 +131,17 @@ abstract public class FreeColGameObject extends FreeColObject {
         
         uninitialized = true;
     }
-    
+
+    /**
+     * Sets the Id from the real type and the next Id in the server.
+     * Split out only to help out a backward compatibility reader.
+     *
+     * @param game The <code>Game</code> this object is in.
+     */
+    protected void setDefaultId(Game game) {
+        setId(getRealXMLElementTagName() + ":"
+              + ((ServerGame)game).getNextID());
+    }
     
     /**
      * Gets the game object this <code>FreeColGameObject</code> belongs to.

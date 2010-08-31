@@ -1163,6 +1163,7 @@ public final class FreeColServer {
         getGame().addPlayer(aiPlayer);
 
         // Send message to all players except to the new player:
+        // TODO: null-destination-player is unnecessarily generous visibility
         Element addNewPlayer = Message.createNewRootElement("addPlayer");
         addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
         getServer().sendToAll(addNewPlayer, theConnection);

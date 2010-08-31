@@ -24,6 +24,7 @@
      0.46: add undead downgrade
      0.47: remove index from player
      0.48: add difficultyLevel attribute for in-game specification
+     0.49: marketData add goods-type attribute and make ID a MarketDataId
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 

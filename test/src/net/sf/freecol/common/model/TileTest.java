@@ -453,8 +453,6 @@ public class TileTest extends FreeColTestCase {
         assertTrue(market.getSalePrice(food, 7) > market.getSalePrice(sugar, 3));
 
         tile1.setType(plains);
-        // make sure 2 cotton is more expensive than 5 food
-        market.getMarketData(cotton).setPaidForSale(3);
 
         // plains produces more food than sugar
         assertEquals(food, tile1.getSortedPotential().get(0).getType());

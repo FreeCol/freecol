@@ -94,6 +94,12 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="MarketDataId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="marketData:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="MonarchId">
     <xs:restriction base="xs:string">
       <xs:pattern value="monarch:([0-9])+" />

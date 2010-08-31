@@ -3496,7 +3496,7 @@ public final class InGameController implements NetworkConstants {
         // Try to purchase.
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         int newAmount;
-        int price = market.costToBuy(type);
+        int price = market.getCostToBuy(type);
         if (askBuyGoods(carrier, type, toBuy)
             && (newAmount = carrier.getGoodsContainer().getGoodsCount(type)) > oldAmount) {
             freeColClient.playSound("sound.event.loadCargo");
@@ -3567,7 +3567,7 @@ public final class InGameController implements NetworkConstants {
         Market market = player.getMarket();
         GoodsType type = goods.getType();
         int amount = goods.getAmount();
-        int price = market.paidForSale(type);
+        int price = market.getPaidForSale(type);
         int tax = player.getTax();
         int carrierAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askSellGoods(goods, carrier)) {

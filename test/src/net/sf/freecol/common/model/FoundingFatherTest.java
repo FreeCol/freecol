@@ -345,31 +345,29 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     public void testDeWitt() {
-
-    	Game game = getGame();
+        Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
-        dutch.setArrears(musketsType);
+        dutch.getMarket().setArrears(musketsType, 1);
 
-        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
-        assertFalse(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
 
         FoundingFather father = spec().getFoundingFather("model.foundingFather.janDeWitt");
         dutch.addFather(father);
 
-        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
-        assertFalse(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
 
         dutch.setStance(french, Player.Stance.WAR);
 
-        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
-        assertFalse(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
 
         dutch.setStance(french, Player.Stance.PEACE);
 
-        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
-        assertTrue(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
-
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertTrue(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
     }
 
     public void testBrebeuf() {

@@ -251,13 +251,12 @@ public class UnitTest extends FreeColTestCase {
         assertTrue(roadImprovement.isComplete());
         assertFalse(clearImprovement.isComplete());
 
-        assertEquals(0, hardyPioneer1.getMovesLeft());
+        assertEquals(3, hardyPioneer1.getMovesLeft());
         assertEquals(-1, hardyPioneer1.getWorkLeft());
         assertEquals(80, hardyPioneer1.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
 
-        // should be zero, but that doesn't work yet
-        assertEquals(3, hardyPioneer2.getMovesLeft());
+        assertEquals(0, hardyPioneer2.getMovesLeft());
         assertEquals(-1, hardyPioneer2.getWorkLeft());
         assertEquals(80, hardyPioneer2.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer2.getState());

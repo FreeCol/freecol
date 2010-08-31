@@ -17,57 +17,71 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Market;
+
+import org.w3c.dom.Element;
+
 
 /**
  * Objects of this class hold the market data for a particular type of
  * good.
  */
-public class MarketData extends FreeColObject {
+public class MarketData extends FreeColGameObject {
 
     /**
-     * Describe costToBuy here.
+     * Bounds on price movements.
+     */
+    public static final int MINIMUM_PRICE = 1;
+    public static final int MAXIMUM_PRICE = 19;
+
+    /**
+     * What type of goods is this.
+     */
+    private GoodsType goodsType;
+
+    /**
+     * Purchase price.
      */
     private int costToBuy;
 
     /**
-     * Describe paidForSale here.
+     * Sale price.
      */
     private int paidForSale;
 
     /**
-     * Describe amountInMarket here.
+     * Amount of this goods in the market.
      */
     private int amountInMarket;
 
     /**
-     * Describe initialPrice here.
+     * The initial price.
      */
     private int initialPrice;
 
     /**
-     * Describe arrears here.
+     * Arrears owed to the crown.
      */
     private int arrears;
 
     /**
-     * Describe sales here.
+     * Total sales.
      */
     private int sales;
 
     /**
-     * Describe incomeBeforeTaxes here.
+     * Total income before taxes.
      */
     private int incomeBeforeTaxes;
 
     /**
-     * Describe incomeAfterTaxes here.
+     * Total income after taxes.
      */
     private int incomeAfterTaxes;
 
@@ -82,27 +96,110 @@ public class MarketData extends FreeColObject {
      */
     private boolean traded;
 
-    private GoodsType goodsType;
-
-
-    /**
-     * Package constructor: This class is only supposed to be constructed
-     * by {@link Market}.
-     * 
-     */
-    public MarketData() {
-        traded = false;
-    }
-    
     /**
      * Creates a new <code>MarketData</code> instance.
      *
      * @param goodsType a <code>GoodsType</code> value
      */
-    public MarketData(GoodsType goodsType) {
+    public MarketData(Game game, GoodsType goodsType) {
+        super(game);
+
         this.goodsType = goodsType;
-        setId(goodsType.getId());
+        paidForSale = goodsType.getInitialSellPrice();
+        costToBuy = goodsType.getInitialBuyPrice();
+        amountInMarket = goodsType.getInitialAmount();
+        initialPrice = goodsType.getInitialSellPrice();
+        arrears = 0;
+        sales = 0;
+        incomeBeforeTaxes = 0;
+        incomeAfterTaxes = 0;
+        oldPrice = costToBuy;
         traded = false;
+    }
+
+    /**
+     * Instantiate a new <code>MarketData</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if an error occured during parsing.
+     */
+    public MarketData(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+
+        readFromXML(in);
+    }
+
+    /**
+     * Instantiates a new <code>MarketData</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public MarketData(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
+    }
+
+    /**
+     * Instantiates a new <code>MarketData</code> with the given
+     * ID. The object should later be initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public MarketData(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
+     * Adjust the prices.  Sets the costToBuy and paidForSale fields
+     * from the amount in the market, initial price and goods-type
+     * specific information.
+     */
+    public void price() {
+        if (!goodsType.isStorable()) return;
+
+        int newSalePrice = Math.round(goodsType.getInitialAmount()
+                                      * initialPrice
+                                      / (float) amountInMarket);
+        int newPrice = newSalePrice + goodsType.getPriceDifference();
+
+        // dirty work-around to limit prices of new world goods
+        // and related manufactured goods
+        if ((goodsType.isNewWorldGoodsType()
+             || (goodsType.getRawMaterial() != null
+                 && goodsType.getRawMaterial().isNewWorldGoodsType()))
+            && newSalePrice > initialPrice + 2) {
+            newSalePrice = initialPrice + 2;
+            newPrice = newSalePrice + goodsType.getPriceDifference();
+        }
+
+        if (newPrice > MAXIMUM_PRICE) {
+            newPrice = MAXIMUM_PRICE;
+            newSalePrice = newPrice - goodsType.getPriceDifference();
+        } else if (newSalePrice < MINIMUM_PRICE) {
+            newSalePrice = MINIMUM_PRICE;
+            newPrice = newSalePrice + goodsType.getPriceDifference();
+        }
+
+        costToBuy = newPrice;
+        paidForSale = newSalePrice;
+    }
+
+    /**
+     * Get the type of goods of this <code>MarketData</code>.
+     *
+     * @return The goods type for this data.
+     */
+    public final GoodsType getGoodsType() {
+        return goodsType;
     }
 
     /**
@@ -210,7 +307,6 @@ public class MarketData extends FreeColObject {
      * @param newSales The new Sales value.
      */
     public final void setSales(final int newSales) {
-        this.traded |= this.sales != newSales;
         this.sales = newSales;
     }
 
@@ -256,7 +352,7 @@ public class MarketData extends FreeColObject {
      * @return The old price.
      */
     public final int getOldPrice() {
-        return (oldPrice != 0) ? oldPrice : costToBuy;
+        return oldPrice;
     }
 
     /**
@@ -287,33 +383,32 @@ public class MarketData extends FreeColObject {
     }
 
     /**
-     * Get the type of goods of this <code>MarketData</code>.
-     *
-     * @return The goods type for this data.
-     */
-    public final GoodsType getGoodsType() {
-        return goodsType;
-    }
-
-    /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
-     * <br><br>
      * 
      * Only attributes visible to the given <code>Player</code> will 
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
      *  
      * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code>
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());
+        out.writeAttribute("goods-type", goodsType.getId());
         out.writeAttribute("amount", Integer.toString(amountInMarket));
         out.writeAttribute("initialPrice", Integer.toString(initialPrice));
         out.writeAttribute("arrears", Integer.toString(arrears));
@@ -326,31 +421,40 @@ public class MarketData extends FreeColObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
-        amountInMarket = Integer.parseInt(in.getAttributeValue(null, "amount"));
-        initialPrice = getAttribute(in, "initialPrice", -1);
-        // support for older savegames
-        if (initialPrice < 0) {
-            initialPrice = getGoodsType().getInitialSellPrice();
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        String goodsTypeStr = in.getAttributeValue(null, "goods-type");
+        if (goodsTypeStr == null) {
+            // TODO: backward compatibility, remove in 0.11.x
+            goodsTypeStr = in.getAttributeValue(null, "ID");
+            setDefaultId(getGame());
+        } else {
+            setId(in.getAttributeValue(null, "ID"));
         }
-        arrears = Integer.parseInt(in.getAttributeValue(null, "arrears"));
-        sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
-        incomeBeforeTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeBeforeTaxes"));
-        incomeAfterTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeAfterTaxes"));
+        if (goodsTypeStr == null) {
+            throw new XMLStreamException("Missing goods-type");
+        }
+        goodsType = getSpecification().getGoodsType(goodsTypeStr);
+        amountInMarket = getAttribute(in, "amount", 0);
+        initialPrice = getAttribute(in, "initialPrice", -1);
+        arrears = getAttribute(in, "arrears", 0);
+        sales = getAttribute(in, "sales", 0);
+        incomeBeforeTaxes = getAttribute(in, "incomeBeforeTaxes", 0);
+        incomeAfterTaxes = getAttribute(in, "incomeAfterTaxes", 0);
         traded = getAttribute(in, "traded", sales != 0);
+        price();
         in.nextTag();
     }
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "marketData"
      */
     public static String getXMLElementTagName() {
         return "marketData";
     }
-
 } 

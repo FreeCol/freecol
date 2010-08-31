@@ -2026,11 +2026,12 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             for (Goods goods : exportGoods) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
-                if (data.isExported() && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
+                if (data.isExported() && (owner.canTrade(goods, Market.Access.CUSTOM_HOUSE))) {
                     int amount = goods.getAmount() - data.getExportLevel();
                     if (amount > 0) {
                         removeGoods(type, amount);
-                        getOwner().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);
+                        getOwner().getMarket().sell(type, amount, owner,
+                                                    Market.Access.CUSTOM_HOUSE);
                     }
                 }
             }
@@ -2067,7 +2068,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 // no need to do anything about bells or crosses
                 continue;
             } else if (getExportData(goodsType).isExported() &&
-                       owner.canTrade(goods, Market.CUSTOM_HOUSE)) {
+                       owner.canTrade(goods, Market.Access.CUSTOM_HOUSE)) {
                 // capacity will never be exceeded
                 continue;
             } else if (goods.getAmount() < getWarehouseCapacity()) {

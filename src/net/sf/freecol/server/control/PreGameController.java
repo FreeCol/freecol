@@ -176,7 +176,7 @@ public final class PreGameController extends Controller {
                         int increase = random.nextInt(3);
                         if (increase > 0) {
                             int newPrice = goodsType.getInitialSellPrice() + increase;
-                            market.getMarketData(goodsType).setInitialPrice(newPrice);
+                            market.setInitialPrice(goodsType, newPrice);
                         }
                     }
                 }
