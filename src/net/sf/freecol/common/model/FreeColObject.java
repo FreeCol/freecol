@@ -267,21 +267,21 @@ public abstract class FreeColObject {
                 StringWriter swe = new StringWriter();
                 pce.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
-                throw new IllegalStateException("ParserConfigurationException");
+                throw new IllegalStateException("ParserConfigurationException: " + pce.getMessage());
             } catch (SAXException se) {
                 StringWriter swe = new StringWriter();
                 se.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
-                throw new IllegalStateException("SAXException");
+                throw new IllegalStateException("SAXException: " + se.getMessage());
             } catch (IOException ie) {
                 StringWriter swe = new StringWriter();
                 ie.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
-                throw new IllegalStateException("IOException");
+                throw new IllegalStateException("IOException: " + ie.getMessage());
             }
         } catch (XMLStreamException e) {
             logger.warning(e.toString());
-            throw new IllegalStateException("XMLStreamException");
+            throw new IllegalStateException("XMLStreamException: " + e.getMessage());
         }
     }
 
