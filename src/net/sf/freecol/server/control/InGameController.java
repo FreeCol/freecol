@@ -306,20 +306,6 @@ public final class InGameController extends Controller {
      * @param player The player to end the turn of.
      */
     public void endTurn(ServerPlayer player) {
-        /* BEGIN FIX
-         * 
-         * TODO: Remove this temporary fix for bug:
-         *       [ 1709196 ] Waiting for next turn (inifinite wait)
-         *       
-         *       This fix can be removed when FIFO ordering of
-         *       of network messages is working correctly.
-         *       (scheduled to be fixed as part of release 0.8.0)
-         */
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {}
-        // END FIX
-        
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer oldPlayer = (ServerPlayer) getGame().getCurrentPlayer();
         
