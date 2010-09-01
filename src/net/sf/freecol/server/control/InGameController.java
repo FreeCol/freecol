@@ -687,14 +687,12 @@ public final class InGameController extends Controller {
                 }
             }
             if (market.hasPriceChanged(type)) {
+                cs.add(See.only(serverPlayer), market.getMarketData(type));
                 cs.addMessage(See.only(serverPlayer),
                               market.makePriceChangeMessage(type));
                 market.flushPriceChange(type);
             }
         }
-
-        // Update the client
-        cs.add(See.only(serverPlayer), market);
     }
 
     /**
@@ -1894,7 +1892,7 @@ public final class InGameController extends Controller {
             cs.addMessage(See.only(serverPlayer),
                           market.makePriceChangeMessage(type));
             market.flushPriceChange(type);
-            cs.add(See.only(serverPlayer), market);
+            cs.add(See.only(serverPlayer), market.getMarketData(type));
         }
         propagateToEuropeanMarkets(type, amount, serverPlayer);
 
@@ -1935,7 +1933,7 @@ public final class InGameController extends Controller {
             cs.addMessage(See.only(serverPlayer),
                           market.makePriceChangeMessage(type));
             market.flushPriceChange(type);
-            cs.add(See.only(serverPlayer), market);
+            cs.add(See.only(serverPlayer), market.getMarketData(type));
         }
         propagateToEuropeanMarkets(type, amount, serverPlayer);
 
