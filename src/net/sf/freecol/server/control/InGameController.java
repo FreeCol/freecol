@@ -325,16 +325,6 @@ public final class InGameController extends Controller {
             cs.addTrivial(See.all(), "gameEnded", ChangePriority.CHANGE_NORMAL,
                           "winner", winner.getId());
             sendToAll(cs);
-            
-            // TODO: Remove when the server can properly revert to a pre-game state:
-            if (FreeCol.getFreeColClient() == null) {
-                new Timer(true).schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        System.exit(0);
-                    }
-                }, 20000);
-            }
             return;
         }
         
