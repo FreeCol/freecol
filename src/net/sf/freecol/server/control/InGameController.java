@@ -315,25 +315,26 @@ public final class InGameController extends Controller {
                 + ((oldPlayer == null) ? "noone" : oldPlayer.getName()) + "'s!");
         }
         
-        player.clearModelMessages();
-        freeColServer.getModelController().clearTaskRegister();
+        for (;;) {
+            player.clearModelMessages();
+            freeColServer.getModelController().clearTaskRegister();
 
-        Player winner = checkForWinner();
-        if (winner != null
-            && !(freeColServer.isSingleplayer() && winner.isAI())) {
-            ChangeSet cs = new ChangeSet();
-            cs.addTrivial(See.all(), "gameEnded", ChangePriority.CHANGE_NORMAL,
-                          "winner", winner.getId());
-            sendToAll(cs);
-            return;
-        }
+            Player winner = checkForWinner();
+            if (winner != null
+                && !(freeColServer.isSingleplayer() && winner.isAI())) {
+                ChangeSet cs = new ChangeSet();
+                cs.addTrivial(See.all(), "gameEnded",
+                              ChangePriority.CHANGE_NORMAL,
+                              "winner", winner.getId());
+                sendToAll(cs);
+                return;
+            }
         
-        ServerPlayer newPlayer = (ServerPlayer) nextPlayer();
-        
-        if (newPlayer != null 
-            && !newPlayer.isAI()
-            && (!newPlayer.isConnected() || debugOnlyAITurns > 0)) {
-            endTurn(newPlayer);
+            // Keep ending turn for non-AI connected players in debug mode.
+            player = (ServerPlayer) nextPlayer();
+            if (player == null
+                || player.isAI()
+                || (player.isConnected() && debugOnlyAITurns <= 0)) break;
         }
     }
 
@@ -385,16 +386,24 @@ public final class InGameController extends Controller {
 
     /**
      * Sets a new current player and notifies the clients.
+     *
      * @return The new current player.
      */
     private Player nextPlayer() {
         ServerGame game = getGame();
 
-        if (!isHumanPlayersLeft()) {
+        boolean human = false;
+        for (Player p : game.getPlayers()) {
+            if (!p.isDead() && !p.isAI() && ((ServerPlayer) p).isConnected()) {
+                human = true;
+                break;
+            }
+        }
+        if (!human) {
             game.setCurrentPlayer(null);
             return null;
         }
-        
+
         if (game.isNextPlayerInNewTurn()) {
             ChangeSet cs = new ChangeSet();
             game.newTurn();
@@ -402,9 +411,7 @@ public final class InGameController extends Controller {
                 csSpanishSuccession(cs);
                 game.setSpanishSuccession(true);
             }
-            if (debugOnlyAITurns > 0) {
-                debugOnlyAITurns--;
-            }
+            if (debugOnlyAITurns > 0) debugOnlyAITurns--;
             cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                 "turn", Integer.toString(game.getTurn().getNumber()));
             sendToAll(cs);
@@ -412,31 +419,37 @@ public final class InGameController extends Controller {
 
         ServerPlayer newPlayer = (ServerPlayer) game.getNextPlayer();
         game.setCurrentPlayer(newPlayer);
-        if (newPlayer == null) return null;
-        
-        synchronized (newPlayer) {
-            if (newPlayer.checkForDeath()) {
+        if (newPlayer != null) {
+            synchronized (newPlayer) {
+                if (newPlayer.checkForDeath()) {
+                    ChangeSet cs = new ChangeSet();
+                    csKillPlayer(newPlayer, cs);
+                    logger.info(newPlayer.getNation() + " is dead.");
+                    sendToAll(cs);
+                    return nextPlayer();
+                }
+            }
+
+            {
                 ChangeSet cs = new ChangeSet();
-                csKillPlayer(newPlayer, cs);
+                csNewTurn(newPlayer, cs);
+                cs.addTrivial(See.all(), "setCurrentPlayer",
+                              ChangePriority.CHANGE_NORMAL,
+                              "player", newPlayer.getId());
                 sendToAll(cs);
-                logger.info(newPlayer.getNation() + " is dead.");
-                return nextPlayer();
             }
         }
-
-        {
-            ChangeSet cs = new ChangeSet();
-            csNewTurn(newPlayer, cs);
-            cs.addTrivial(See.all(), "setCurrentPlayer",
-                          ChangePriority.CHANGE_NORMAL,
-                          "player", newPlayer.getId());
-            sendToAll(cs);
-        }
-        
         return newPlayer;
     }
 
+    /**
+     * Starts a new turn for a player.
+     *
+     * @param newPlayer The <code>ServerPlayer</code> to start a turn for.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
     private void csNewTurn(ServerPlayer newPlayer, ChangeSet cs) {
+        Game game = getGame();
         if (newPlayer.isEuropean()) {
             csBombardEnemyShips(newPlayer, cs);
 
@@ -822,15 +835,6 @@ public final class InGameController extends Controller {
         return false;
     }
     
-    private boolean isHumanPlayersLeft() {
-        for (Player player : getFreeColServer().getGame().getPlayers()) {
-            if (!player.isDead() && !player.isAI() && ((ServerPlayer) player).isConnected()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void chooseFoundingFather(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
         Thread t = new Thread(FreeCol.SERVER_THREAD+"FoundingFather-thread") {
