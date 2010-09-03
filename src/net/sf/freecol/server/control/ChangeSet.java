@@ -43,6 +43,7 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1132,6 +1133,33 @@ public class ChangeSet {
     }
 
     /**
+     * Can two elements be collapsed?
+     * They need to have the same name and attributes.
+     *
+     * @param e1 The first <code>Element</code>.
+     * @param e2 The second <code>Element</code>.
+     * @return True if they can be collapsed.
+     */
+    private static boolean collapseOK(Element e1, Element e2) {
+        if (e1.getTagName() != e2.getTagName()) return false;
+        NamedNodeMap nnm1 = e1.getAttributes();
+        NamedNodeMap nnm2 = e2.getAttributes();
+        if (nnm1.getLength() != nnm2.getLength()) return false;
+        for (int i = 0; i < nnm1.getLength(); i++) {
+            if (nnm1.item(i).getNodeType() != nnm2.item(i).getNodeType()) {
+                return false;
+            }
+            if (nnm1.item(i).getNodeName() != nnm2.item(i).getNodeName()) {
+                return false;
+            }
+            if (nnm1.item(i).getNodeValue() != nnm2.item(i).getNodeValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Collapse adjacent elements in a list with the same tag.
      *
      * @param elements The list of <code>Element</code>s to consider.
@@ -1143,7 +1171,7 @@ public class ChangeSet {
             Element head = elements.remove(0);
             while (!elements.isEmpty()) {
                 Element e = elements.remove(0);
-                if (e.getTagName() == head.getTagName()) {
+                if (collapseOK(head, e)) {
                     collapseElements(head, e);
                 } else {
                     results.add(head);
