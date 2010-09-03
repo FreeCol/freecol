@@ -282,11 +282,23 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Send an element to a specific player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to update.
+     * @param cs A <code>ChangeSet</code> to build an <code>Element</code> with.
+     * @return An <code>Element</code> returned in response to the query.
+     */
+    private Element askElement(ServerPlayer serverPlayer, ChangeSet cs) {
+        return askElement(serverPlayer, cs.build(serverPlayer));
+    }
+
+    /**
      * Ask for a reply from a specific player.
      * Deprecated, please avoid if possible.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
      * @param element An <code>Element</code> containing a query.
+     * @return An <code>Element</code> returned in response to the query.
      */
     public Element askElement(ServerPlayer serverPlayer, Element element) {
         if (element != null && serverPlayer.isConnected()) {
@@ -2681,6 +2693,7 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
      * @param unit The <code>Unit</code> to move to Europe.
+     * @return An <code>Element</code> encapsulating this action.
      */
     public Element moveToEurope(ServerPlayer serverPlayer, Unit unit) {
         Europe europe = serverPlayer.getEurope();
@@ -5443,12 +5456,10 @@ public final class InGameController extends Controller {
         }
 
         // Original player also sees conclusion of diplomacy.
-        // TODO: eliminate the explicit Element hackery
         sendToOthers(serverPlayer, cs);
-        Element element = cs.build(serverPlayer);
-        element.appendChild(new DiplomacyMessage(unit, settlement, agreement)
-                            .toXMLElement());
-        return element;
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+               new DiplomacyMessage(unit, settlement, agreement));
+        return cs.build(serverPlayer);
     }
 
     /**
@@ -5468,11 +5479,9 @@ public final class InGameController extends Controller {
 
         closeTransactionSession(unit, settlement);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-        // TODO: eliminate the explicit Element hackery
-        Element element = cs.build(serverPlayer);
-        element.appendChild(new DiplomacyMessage(unit, settlement, agreement)
-                            .toXMLElement());
-        return element;
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+               new DiplomacyMessage(unit, settlement, agreement));
+        return cs.build(serverPlayer);
     }
 
     /**
@@ -5487,7 +5496,6 @@ public final class InGameController extends Controller {
     public Element diplomaticTrade(ServerPlayer serverPlayer, Unit unit,
                                    Settlement settlement,
                                    DiplomaticTrade agreement) {
-        DiplomacyMessage diplomacy;
         java.util.Map<String,Object> session;
         DiplomaticTrade current;
         ServerPlayer other = (ServerPlayer) settlement.getOwner();
@@ -5504,8 +5512,9 @@ public final class InGameController extends Controller {
             current = (DiplomaticTrade) session.get("agreement");
             current.setStatus(TradeStatus.ACCEPT_TRADE);
 
-            diplomacy = new DiplomacyMessage(unit, settlement, current);
-            sendElement(other, diplomacy.toXMLElement());
+            sendElement(other, new ChangeSet().add(See.only(other),
+                    ChangePriority.CHANGE_LATE,
+                    new DiplomacyMessage(unit, settlement, current)));
             return acceptTrade(serverPlayer, other, unit, settlement, current);
 
         case REJECT_TRADE:
@@ -5516,8 +5525,9 @@ public final class InGameController extends Controller {
             current = (DiplomaticTrade) session.get("agreement");
             current.setStatus(TradeStatus.REJECT_TRADE);
 
-            diplomacy = new DiplomacyMessage(unit, settlement, current);
-            sendElement(other, diplomacy.toXMLElement());
+            sendElement(other, new ChangeSet().add(See.only(other),
+                    ChangePriority.CHANGE_LATE,
+                    new DiplomacyMessage(unit, settlement, current)));
             return rejectTrade(serverPlayer, other, unit, settlement, current);
 
         case PROPOSE_TRADE:
@@ -5528,17 +5538,16 @@ public final class InGameController extends Controller {
             // If the unit is on a carrier we need to update the
             // client with it first as the diplomacy message refers to it.
             // Ask the other player about this proposal.
-            // TODO: eliminate the explicit Element hackery
-            diplomacy = new DiplomacyMessage(unit, settlement, agreement);
-            Element proposal = diplomacy.toXMLElement();
+            ChangeSet cs = new ChangeSet();
+            cs.add(See.only(other), ChangePriority.CHANGE_LATE,
+                   new DiplomacyMessage(unit, settlement, agreement));
             if (!unit.isVisibleTo(other)) {
-                proposal.appendChild(new ChangeSet().add(See.only(other), unit)
-                                     .build(other));
+                cs.add(See.only(other), unit);
             }
-            Element response = askElement(other, proposal);
+            Element response = askElement(other, cs);
 
             // What did they think?
-            diplomacy = (response == null) ? null
+            DiplomacyMessage diplomacy = (response == null) ? null
                 : new DiplomacyMessage(getGame(), response);
             agreement = (diplomacy == null) ? null : diplomacy.getAgreement();
             TradeStatus status = (agreement == null) ? TradeStatus.REJECT_TRADE
@@ -5556,7 +5565,10 @@ public final class InGameController extends Controller {
                 if ((ServerPlayer) agreement.getSender() == serverPlayer
                     && (ServerPlayer) agreement.getRecipient() == other) {
                     session.put("agreement", agreement);
-                    return diplomacy.toXMLElement();
+                    return new ChangeSet().add(See.only(serverPlayer),
+                                               ChangePriority.CHANGE_LATE,
+                                               diplomacy)
+                        .build(serverPlayer);
                 }
                 logger.warning("Trade counter-proposal was incompatible.");
                 // Fall through
