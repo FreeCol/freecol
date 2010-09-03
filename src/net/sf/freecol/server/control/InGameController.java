@@ -1218,10 +1218,10 @@ public final class InGameController extends Controller {
                 }
                 cs.addStance(See.perhaps(), player, stance, otherPlayer);
                 change = true;
-                logger.finest("Stance change " + player.getId()
+                logger.finest("Stance change " + player.getName()
                               + " " + old.toString()
                               + " -> " + stance.toString()
-                              + " wrt " + otherPlayer.getId());
+                              + " wrt " + otherPlayer.getName());
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }
@@ -1236,10 +1236,10 @@ public final class InGameController extends Controller {
                 }
                 cs.addStance(See.perhaps(), otherPlayer, stance, player);
                 change = true;
-                logger.finest("Stance change " + otherPlayer.getId()
+                logger.finest("Stance change " + otherPlayer.getName()
                               + " " + old.toString()
                               + " -> " + stance.toString()
-                              + " wrt " + player.getId());
+                              + " wrt " + player.getName());
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }
@@ -2540,8 +2540,6 @@ public final class InGameController extends Controller {
                                 new HistoryEvent(turn,
                                     HistoryEvent.EventType.MEET_NATION)
                                     .addStringTemplate("%nation%", serverPlayer.getNationName()));
-                            cs.addAttribute(See.only(other), "sound",
-                                            "sound.event.meet." + serverPlayer.getNationID());
                         }
                     } else { // (serverPlayer.isEuropean)
                         // Initialize alarm for native settlements.
@@ -2566,8 +2564,6 @@ public final class InGameController extends Controller {
                             new HistoryEvent(turn,
                                 HistoryEvent.EventType.MEET_NATION)
                                 .addStringTemplate("%nation%", other.getNationName()));
-                        cs.addAttribute(See.only(serverPlayer), "sound",
-                                        "sound.event.meet." + other.getNationID());
                         // Extra special meeting on first landing!
                         if (other.isIndian()
                             && !serverPlayer.isNewLandNamed()
@@ -2588,8 +2584,8 @@ public final class InGameController extends Controller {
                                     welcomer.getId());
                     cs.addAttribute(See.only(serverPlayer), "camps",
                         Integer.toString(welcomer.getNumberOfSettlements()));
-               }
-           }
+                }
+            }
 
             // Check for slowing units.
             Unit slowedBy = getSlowedBy(unit, newTile);

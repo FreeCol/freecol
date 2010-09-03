@@ -898,6 +898,9 @@ public final class InGameInputHandler extends InputHandler {
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
 
+        if (player == first && first.getStance(second) == Stance.UNCONTACTED) {
+            freeColClient.playSound("sound.event.meet." + second.getNationID());
+        }
         try {
             first.setStance(second, stance);
         } catch (IllegalStateException e) {
