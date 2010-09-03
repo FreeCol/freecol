@@ -65,9 +65,10 @@ class BaseCostDecider implements CostDecider {
         switch (unit.getSimpleMoveType(oldTile, newTile, true)) {
         case MOVE_HIGH_SEAS:
             break;
-        case MOVE: case EXPLORE_LOST_CITY_RUMOUR:
+        case MOVE:
             if (!(unit.getLocation() instanceof Unit)) break;
             // // fall through if disembarking
+        case EXPLORE_LOST_CITY_RUMOUR:
         case ATTACK:
         case EMBARK:
         case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
