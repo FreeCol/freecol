@@ -133,8 +133,6 @@ public final class InGameController extends Controller {
 
     public int debugOnlyAITurns = 0;
 
-    private java.util.Map<String,java.util.Map<String, java.util.Map<String,Object>>> transactionSessions;
-    
     public static enum MigrationType {
         NORMAL,     // Unit decided to migrate
         RECRUIT,    // Player is paying
@@ -151,7 +149,6 @@ public final class InGameController extends Controller {
         super(freeColServer);
 
         random = freeColServer.getServerRandom();
-        transactionSessions = new HashMap<String,java.util.Map<String, java.util.Map<String,Object>>>();
     }
 
 
@@ -1569,25 +1566,140 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get a transaction session.  Either the current one if it exists,
-     * or create a fresh one.
+     * Convenience wrapper class for the map that underlies
+     * transaction sessions.
+     */
+    public static class TransactionSession {
+        private static java.util.Map<String, java.util.Map<String,
+            TransactionSession>> transactionSessions
+            = new HashMap<String, java.util.Map<String, TransactionSession>>();
+
+        private java.util.Map<String, Object> session;
+
+        private TransactionSession() {
+            session = new HashMap<String, Object>();
+        }
+
+        public Object get(String id) {
+            return session.get(id);
+        }
+
+        public void put(String id, Object val) {
+            session.put(id, val);
+        }
+
+        /**
+         * Looks up the TransactionSession unique to the specified fcgos in
+         * transactionSessions.
+         *
+         * @param o1 First <code>FreeColGameObject</code>.
+         * @param o2 Second <code>FreeColGameObject</code>.
+         * @return The transaction session, or null if not found.
+         */
+        public static TransactionSession lookup(FreeColGameObject o1,
+                                                FreeColGameObject o2) {
+            java.util.Map<String, TransactionSession> base
+                = transactionSessions.get(o1.getId());
+            return (base == null) ? null : base.get(o2.getId());
+        }
+
+        /**
+         * Create and remember a new TransactionSession unique to the
+         * specified ids.
+         *
+         * @param o1 First <code>FreeColGameObject</code>.
+         * @param o2 Second <code>FreeColGameObject</code>.
+         * @return The transaction session.
+         */
+        public static TransactionSession create(FreeColGameObject o1,
+                                                FreeColGameObject o2) {
+            java.util.Map<String, TransactionSession> base
+                = transactionSessions.get(o1.getId());
+            if (base == null) {
+                base = new HashMap<String, TransactionSession>();
+                transactionSessions.put(o1.getId(), base);
+            } else {
+                if (base.containsKey(o2.getId())) base.remove(o2.getId());
+            }
+            TransactionSession session = new TransactionSession();
+            base.put(o2.getId(), session);
+            return session;
+        }
+
+        /**
+         * Find a TransactionSession unique to the specified ids, or
+         * create and remember a new one.
+         *
+         * @param o1 First <code>FreeColGameObject</code>.
+         * @param o2 Second <code>FreeColGameObject</code>.
+         * @return The transaction session.
+         */
+        public static TransactionSession find(FreeColGameObject o1,
+                                              FreeColGameObject o2) {
+            java.util.Map<String, TransactionSession> base
+                = transactionSessions.get(o1.getId());
+            if (base == null) {
+                base = new HashMap<String, TransactionSession>();
+                transactionSessions.put(o1.getId(), base);
+            }
+            TransactionSession session = base.get(o2.getId());
+            if (session == null) {
+                session = new TransactionSession();
+                base.put(o2.getId(), session);
+            }
+            return session;
+        }
+
+        /**
+         * Remember a TransactionSession (save to transactionSessions).
+         *
+         * @param o1 First <code>FreeColGameObject</code>.
+         * @param o2 Second <code>FreeColGameObject</code>.
+         * @param session The <code>TransactionSession</code> to save.
+         */
+        public static void remember(FreeColGameObject o1,
+                                    FreeColGameObject o2,
+                                    TransactionSession session) {
+            java.util.Map<String, TransactionSession>
+                base = transactionSessions.get(o1.getId());
+            if (base == null) {
+                base = new HashMap<String, TransactionSession>();
+                transactionSessions.put(o1.getId(), base);
+            }
+            base.put(o2.getId(), session);
+        }
+
+        /**
+         * Forget a TransactionSession (remove from transactionSessions).
+         *
+         * @param o1 First <code>FreeColGameObject</code>.
+         * @param o2 Second <code>FreeColGameObject</code>.
+         * @param session The <code>TransactionSession</code> to forget.
+         */
+        public static void forget(FreeColGameObject o1, FreeColGameObject o2) {
+            java.util.Map<String, TransactionSession>
+                base = transactionSessions.get(o1.getId());
+            if (base != null) {
+                base.remove(o2.getId());
+                if (base.isEmpty()) transactionSessions.remove(o1.getId());
+            }
+        }
+    }
+
+    /**
+     * Gets a transaction session with a settlement.
+     * Either the current one if it exists or create a fresh one.
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      * @return A session describing the transaction.
      */
-    public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement) {
-        java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
-        // Check for existing session, return it if present.
-        if (transactionSessions.containsKey(unit.getId())) {
-            unitTransactions = transactionSessions.get(unit.getId());
-            if (unitTransactions.containsKey(settlement.getId())) {
-                return unitTransactions.get(settlement.getId());
-            }
-        }
+    public TransactionSession getTransactionSession(Unit unit, Settlement settlement) {
+        TransactionSession session = TransactionSession.lookup(unit,settlement);
+        if (session != null) return session;
 
         // Session does not exist, create, store, and return it.
-        java.util.Map<String,Object> session = new HashMap<String,Object>();
+        session = TransactionSession.create(unit, settlement);
         // Default values
         session.put("actionTaken", false);
         session.put("unitMoves", unit.getMovesLeft());
@@ -1601,48 +1713,24 @@ public final class InGameController extends Controller {
             // this session.
             session.put("canSell", unit.getSpaceTaken() != 0);
         }
-        session.put("agreement", null);
 
         // Only keep track of human player sessions.
-        if (unit.getOwner().isAI()) {
-            return session;
+        if (!unit.getOwner().isAI()) {
+            TransactionSession.remember(unit, settlement, session);
         }
-        
-        // Save session for tracking
-        // Unit has no open transactions?
-        if (unitTransactions == null) {
-            unitTransactions = new HashMap<String,java.util.Map<String, Object>>();
-            transactionSessions.put(unit.getId(), unitTransactions);
-        }
-        unitTransactions.put(settlement.getId(), session);
         return session;
     }
 
     /**
-     * Close a transaction session.
+     * Close a settlement transaction session.
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      */
     public void closeTransactionSession(Unit unit, Settlement settlement) {
         // Only keep track of human player sessions.
-        if (unit.getOwner().isAI()) {
-            return;
-        }
-
-        if (!transactionSessions.containsKey(unit.getId())) {
-            throw new IllegalStateException("Trying to close a non-existing session (unit)");
-        }
-
-        java.util.Map<String, java.util.Map<String,Object>> unitTransactions
-            = transactionSessions.get(unit.getId());
-        if (!unitTransactions.containsKey(settlement.getId())) {
-            throw new IllegalStateException("Trying to close a non-existing session (settlement)");
-        }
-
-        unitTransactions.remove(settlement.getId());
-        if (unitTransactions.isEmpty()) {
-            transactionSessions.remove(unit.getId());
+        if (!unit.getOwner().isAI()) {
+            TransactionSession.forget(unit, settlement);
         }
     }
     
@@ -1657,13 +1745,11 @@ public final class InGameController extends Controller {
         // AI does not need to send a message to open a session
         if (unit.getOwner().isAI()) return true;
 
-        return transactionSessions.containsKey(unit.getId())
-            && settlement != null
-            && transactionSessions.get(unit.getId()).containsKey(settlement.getId());
+        return TransactionSession.lookup(unit, settlement) != null;
     }
 
     /**
-     * Get the client view of a transaction session, either existing or
+     * Gets a settlement transaction session, either existing or
      * newly opened.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
@@ -1674,7 +1760,7 @@ public final class InGameController extends Controller {
     public Element getTransaction(ServerPlayer serverPlayer, Unit unit,
                                   Settlement settlement) {
         ChangeSet cs = new ChangeSet();
-        java.util.Map<String,Object> session;
+        TransactionSession session;
 
         if (isTransactionSessionOpen(unit, settlement)) {
             session = getTransactionSession(unit, settlement);
@@ -1718,8 +1804,7 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        java.util.Map<String,Object> session
-            = getTransactionSession(unit, settlement);
+        TransactionSession session = getTransactionSession(unit, settlement);
 
         // Restore unit movement if no action taken.
         Boolean actionTaken = (Boolean) session.get("actionTaken");
@@ -1779,8 +1864,7 @@ public final class InGameController extends Controller {
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Proposing to buy without opening a transaction session?!");
         }
-        java.util.Map<String,Object> session
-            = getTransactionSession(unit, settlement);
+        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canBuy")) {
             return Message.clientError("Proposing to buy in a session where buying is not allowed.");
         }
@@ -1813,8 +1897,7 @@ public final class InGameController extends Controller {
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Proposing to sell without opening a transaction session");
         }
-        java.util.Map<String,Object> session
-            = getTransactionSession(unit, settlement);
+        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canSell")) {
             return Message.clientError("Proposing to sell in a session where selling is not allowed.");
         }
@@ -4870,8 +4953,7 @@ public final class InGameController extends Controller {
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to buy without opening a transaction session");
         }
-        java.util.Map<String,Object> session
-            = getTransactionSession(unit, settlement);
+        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canBuy")) {
             return Message.clientError("Trying to buy in a session where buying is not allowed.");
         }
@@ -4929,8 +5011,7 @@ public final class InGameController extends Controller {
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to sell without opening a transaction session");
         }
-        java.util.Map<String,Object> session
-            = getTransactionSession(unit, settlement);
+        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canSell")) {
             return Message.clientError("Trying to sell in a session where selling is not allowed.");
         }
@@ -4981,8 +5062,7 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        java.util.Map<String,Object> session
-            = getTransactionSession(unit, settlement);
+        TransactionSession session = getTransactionSession(unit, settlement);
 
         Tile tile = settlement.getTile();
         moveGoods(goods, settlement);
@@ -5397,7 +5477,7 @@ public final class InGameController extends Controller {
     private Element acceptTrade(ServerPlayer serverPlayer, ServerPlayer other,
                                 Unit unit, Settlement settlement,
                                 DiplomaticTrade agreement) {
-        closeTransactionSession(unit, settlement);
+        TransactionSession.forget(unit, settlement);
 
         ChangeSet cs = new ChangeSet();
 
@@ -5483,7 +5563,7 @@ public final class InGameController extends Controller {
                                 DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
 
-        closeTransactionSession(unit, settlement);
+        TransactionSession.forget(unit, settlement);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                new DiplomacyMessage(unit, settlement, agreement));
@@ -5502,17 +5582,17 @@ public final class InGameController extends Controller {
     public Element diplomaticTrade(ServerPlayer serverPlayer, Unit unit,
                                    Settlement settlement,
                                    DiplomaticTrade agreement) {
-        java.util.Map<String,Object> session;
+        TransactionSession session;
         DiplomaticTrade current;
         ServerPlayer other = (ServerPlayer) settlement.getOwner();
         unit.setMovesLeft(0);
 
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
-            if (!isTransactionSessionOpen(unit, settlement)) {
+            session = TransactionSession.lookup(unit, settlement);
+            if (session == null) {
                 return Message.clientError("Accepting without open session.");
             }
-            session = getTransactionSession(unit, settlement);
             // Act on what was proposed, not what is in the accept
             // message to frustrate tricksy client changing the conditions.
             current = (DiplomaticTrade) session.get("agreement");
@@ -5524,10 +5604,10 @@ public final class InGameController extends Controller {
             return acceptTrade(serverPlayer, other, unit, settlement, current);
 
         case REJECT_TRADE:
-            if (!isTransactionSessionOpen(unit, settlement)) {
+            session = TransactionSession.lookup(unit, settlement);
+            if (session == null) {
                 return Message.clientError("Rejecting without open session.");
             }
-            session = getTransactionSession(unit, settlement);
             current = (DiplomaticTrade) session.get("agreement");
             current.setStatus(TradeStatus.REJECT_TRADE);
 
@@ -5537,8 +5617,8 @@ public final class InGameController extends Controller {
             return rejectTrade(serverPlayer, other, unit, settlement, current);
 
         case PROPOSE_TRADE:
-            session = getTransactionSession(unit, settlement);
             current = agreement;
+            session = TransactionSession.find(unit, settlement);
             session.put("agreement", agreement);
 
             // If the unit is on a carrier we need to update the
