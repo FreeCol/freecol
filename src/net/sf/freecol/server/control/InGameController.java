@@ -1218,6 +1218,10 @@ public final class InGameController extends Controller {
                 }
                 cs.addStance(See.perhaps(), player, stance, otherPlayer);
                 change = true;
+                logger.finest("Stance change " + player.getId()
+                              + " " + old.toString()
+                              + " -> " + stance.toString()
+                              + " wrt " + otherPlayer.getId());
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }
@@ -1232,6 +1236,10 @@ public final class InGameController extends Controller {
                 }
                 cs.addStance(See.perhaps(), otherPlayer, stance, player);
                 change = true;
+                logger.finest("Stance change " + otherPlayer.getId()
+                              + " " + old.toString()
+                              + " -> " + stance.toString()
+                              + " wrt " + player.getId());
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }
@@ -2569,9 +2577,11 @@ public final class InGameController extends Controller {
                     }
 
                     // Now make the contact properly.
-                    Player.makeContact(serverPlayer, other);
-                    csChangeStance(serverPlayer, Stance.PEACE, other, true,
-                                   cs);
+                    csChangeStance(serverPlayer, Stance.PEACE, other, true, cs);
+                    serverPlayer.setTension(other,
+                                            new Tension(Tension.TENSION_MIN));
+                    other.setTension(serverPlayer,
+                                     new Tension(Tension.TENSION_MIN));
                 }
                 if (welcomer != null) {
                     cs.addAttribute(See.only(serverPlayer), "welcome",

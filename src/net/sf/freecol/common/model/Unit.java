@@ -1505,9 +1505,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
                 : MoveType.MOVE_NO_ACCESS_TRADE;
         } else if (settlement instanceof IndianSettlement) {
-            return (allowContact(settlement))
-                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
-                : MoveType.MOVE_NO_ACCESS_CONTACT;
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }
@@ -1526,13 +1526,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else if (settlement instanceof IndianSettlement) {
             UnitType scoutSkill = getSpecification()
                 .getUnitType("model.unit.seasonedScout");
-            if (getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)) {
-                return (allowMoveFrom(from))
-                    ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST
-                    : MoveType.MOVE_NO_ACCESS_WATER;
-            } else {
-                return MoveType.MOVE_NO_ACCESS_SKILL;
-            }
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : (!allowMoveFrom(from))
+                ? MoveType.MOVE_NO_ACCESS_WATER
+                : (!getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)) 
+                ? MoveType.MOVE_NO_ACCESS_SKILL
+                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }
@@ -1549,13 +1549,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (settlement instanceof Colony) {
             return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
         } else if (settlement instanceof IndianSettlement) {
-            if (allowContact(settlement)) {
-                return (allowMoveFrom(from))
-                    ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY
-                    : MoveType.MOVE_NO_ACCESS_WATER;
-            } else {
-                return MoveType.MOVE_NO_ACCESS_CONTACT;
-            }
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : (!allowMoveFrom(from))
+                ? MoveType.MOVE_NO_ACCESS_WATER
+                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }
@@ -1572,9 +1570,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (settlement instanceof Colony) {
             return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
         } else if (settlement instanceof IndianSettlement) {
-            return (allowMoveFrom(from))
-                ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
-                : MoveType.MOVE_NO_ACCESS_WATER;
+            return (!allowMoveFrom(from))
+                ? MoveType.MOVE_NO_ACCESS_WATER
+                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }
