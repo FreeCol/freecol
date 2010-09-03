@@ -152,13 +152,13 @@ public class ChangeSet {
     // Abstract template for all types of Change.
     private abstract static class Change {
 
-        protected See vis;
+        protected See see;
 
         /**
          * Make a new Change.
          */
-        Change(See vis) {
-            this.vis = vis;
+        Change(See see) {
+            this.see = see;
         }
 
         /**
@@ -174,7 +174,7 @@ public class ChangeSet {
          * @return True if this <code>Change</code> should be sent.
          */
         public boolean isNotifiable(ServerPlayer serverPlayer) {
-            return vis.check(serverPlayer, isPerhapsNotifiable(serverPlayer));
+            return see.check(serverPlayer, isPerhapsNotifiable(serverPlayer));
         }
 
         /**
@@ -245,8 +245,8 @@ public class ChangeSet {
          * @param defender The <code>Unit</code> that is defending.
          * @param success Did the attack succeed.
          */
-        AttackChange(See vis, Unit attacker, Unit defender, boolean success) {
-            super(vis);
+        AttackChange(See see, Unit attacker, Unit defender, boolean success) {
+            super(see);
             this.attacker = attacker;
             this.defender = defender;
             this.success = success;
@@ -313,8 +313,8 @@ public class ChangeSet {
          * @param key A key <code>String</code>.
          * @param value The corresponding value as a <code>String</code>.
          */
-        AttributeChange(See vis, String key, String value) {
-            super(vis);
+        AttributeChange(See see, String key, String value) {
+            super(see);
             this.key = key;
             this.value = value;
         }
@@ -356,8 +356,50 @@ public class ChangeSet {
          * @param element The <code>Element</code> to attach to.
          */
         @Override
-            public void attachToElement(Element element) {
+        public void attachToElement(Element element) {
             element.setAttribute(key, value);
+        }
+    }
+
+    /**
+     * Encapsulate a Message.
+     */
+    private static class MessageChange extends Change {
+        private ChangePriority priority;
+        private Message message;
+
+        /**
+         * Build a new MessageChange.
+         *
+         * @param see The visibility of this change.
+         * @param priority The priority of the change.
+         * @param message The <code>Message</code> to add.
+         */
+        MessageChange(See see, ChangePriority priority, Message message) {
+            super(see);
+            this.priority = priority;
+            this.message = message;
+        }
+
+        /**
+         * The sort priority.
+         *
+         * @return The priority.
+         */
+        public int sortPriority() {
+            return priority.getPriority();
+        }
+
+        /**
+         * Specialize a MessageChange to a particular player.
+         *
+         * @param serverPlayer The <code>ServerPlayer</code> to update.
+         * @param doc The owner <code>Document</code>.
+         * @return An element.
+         */
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            Element element = message.toXMLElement();
+            return (Element) doc.importNode(element, true);
         }
     }
 
@@ -390,9 +432,9 @@ public class ChangeSet {
          * @param oldLocation The location from which the unit is moving.
          * @param newTile The <code>Tile</code> to which the unit is moving.
          */
-        MoveChange(See vis, Unit unit, Location oldLocation,
+        MoveChange(See see, Unit unit, Location oldLocation,
                    Tile newTile) {
-            super(vis);
+            super(see);
             this.unit = unit;
             this.oldLocation = oldLocation;
             this.newTile = newTile;
@@ -475,8 +517,8 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param fcgo The <code>FreeColGameObject</code> to update.
          */
-        ObjectChange(See vis, FreeColGameObject fcgo) {
-            super(vis);
+        ObjectChange(See see, FreeColGameObject fcgo) {
+            super(see);
             this.fcgo = fcgo;
         }
 
@@ -536,9 +578,9 @@ public class ChangeSet {
          * @param fcgo The <code>FreeColGameObject</code> to update.
          * @param fields The fields to update.
          */
-        PartialObjectChange(See vis, FreeColGameObject fcgo,
+        PartialObjectChange(See see, FreeColGameObject fcgo,
                             String... fields) {
-            super(vis, fcgo);
+            super(see, fcgo);
             this.fields = fields;
         }
 
@@ -590,9 +632,9 @@ public class ChangeSet {
          * @param loc The <code>Location</code> where the object was.
          * @param objects The <code>FreeColGameObject</code>s to remove.
          */
-        RemoveChange(See vis, Location loc,
+        RemoveChange(See see, Location loc,
                      List<FreeColGameObject> objects) {
-            super(vis);
+            super(see);
             this.tile = (loc instanceof Tile) ? (Tile) loc : null;
             this.fcgo = objects.remove(objects.size() - 1);
             this.contents = objects;
@@ -658,8 +700,8 @@ public class ChangeSet {
          * @param stance The <code>Stance</code> to change to.
          * @param second The <code>Player</code> wrt with to change.
          */
-        StanceChange(See vis, Player first, Stance stance, Player second) {
-            super(vis);
+        StanceChange(See see, Player first, Stance stance, Player second) {
+            super(see);
             this.first = first;
             this.stance = stance;
             this.second = second;
@@ -749,8 +791,8 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param h The <code>HistoryEvent</code> that occurred.
          */
-        StringChange(See vis, StringTemplate template) {
-            super(vis);
+        StringChange(See see, StringTemplate template) {
+            super(see);
             this.template = template;
         }
 
@@ -797,8 +839,8 @@ public class ChangeSet {
          * @param name The name of the element.
          * @param priority The sort priority of this change.
          */
-        TrivialChange(See vis, String name, int priority, String[] attributes) {
-            super(vis);
+        TrivialChange(See see, String name, int priority, String[] attributes) {
+            super(see);
             if ((attributes.length & 1) == 1) {
                 throw new IllegalArgumentException("Attributes must be even sized");
             }
@@ -858,9 +900,9 @@ public class ChangeSet {
      * @param objects The <code>FreeColGameObject</code>s that changed.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet add(See vis, FreeColGameObject... objects) {
+    public ChangeSet add(See see, FreeColGameObject... objects) {
         for (FreeColGameObject o : objects) {
-            changes.add(new ObjectChange(vis, o));
+            changes.add(new ObjectChange(see, o));
         }
         return this;
     }
@@ -872,10 +914,23 @@ public class ChangeSet {
      * @param objects The <code>FreeColGameObject</code>s that changed.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet add(See vis, List<FreeColGameObject> objects) {
+    public ChangeSet add(See see, List<FreeColGameObject> objects) {
         for (FreeColGameObject o : objects) {
-            changes.add(new ObjectChange(vis, o));
+            changes.add(new ObjectChange(see, o));
         }
+        return this;
+    }
+
+    /**
+     * Helper function to add a Message to a ChangeSet.
+     *
+     * @param see The visibility of this change.
+     * @param cp The priority of this change.
+     * @param message The <code>Message</code> to add.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet add(See see, ChangePriority cp, Message message) {
+        changes.add(new MessageChange(see, cp, message));
         return this;
     }
 
@@ -888,9 +943,9 @@ public class ChangeSet {
      * @param success Did the attack succeed?
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addAttack(See vis, Unit unit, Unit defender,
+    public ChangeSet addAttack(See see, Unit unit, Unit defender,
                                boolean success) {
-        changes.add(new AttackChange(vis, unit, defender, success));
+        changes.add(new AttackChange(see, unit, defender, success));
         return this;
     }
 
@@ -902,8 +957,8 @@ public class ChangeSet {
      * @param value The corresponding value as a <code>String</code>.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addAttribute(See vis, String key, String value) {
-        changes.add(new AttributeChange(vis, key, value));
+    public ChangeSet addAttribute(See see, String key, String value) {
+        changes.add(new AttributeChange(see, key, value));
         return this;
     }
 
@@ -977,8 +1032,8 @@ public class ChangeSet {
      * @param message The <code>ModelMessage</code> to add.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addMessage(See vis, ModelMessage message) {
-        changes.add(new StringChange(vis, message));
+    public ChangeSet addMessage(See see, ModelMessage message) {
+        changes.add(new StringChange(see, message));
         return this;
     }
 
@@ -991,8 +1046,8 @@ public class ChangeSet {
      * @param newTile The <code>Tile</code> to which the unit is moving.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addMove(See vis, Unit unit, Location loc, Tile tile) {
-        changes.add(new MoveChange(vis, unit, loc, tile));
+    public ChangeSet addMove(See see, Unit unit, Location loc, Tile tile) {
+        changes.add(new MoveChange(see, unit, loc, tile));
         return this;
     }
 
@@ -1005,9 +1060,9 @@ public class ChangeSet {
      * @param fields The fields to update.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addPartial(See vis, FreeColGameObject fcgo,
+    public ChangeSet addPartial(See see, FreeColGameObject fcgo,
                                 String... fields) {
-        changes.add(new PartialObjectChange(vis, fcgo, fields));
+        changes.add(new PartialObjectChange(see, fcgo, fields));
         return this;
     }
 
@@ -1035,7 +1090,7 @@ public class ChangeSet {
     /**
      * Helper function to add a stance change to a ChangeSet.
      *
-     * @param see The visibility of this change.
+     * @param vis The visibility of this change.
      * @param first The <code>Player</code> changing stance.
      * @param stance The <code>Stance</code> to change to.
      * @param second The <code>Player</code> wrt with to change.
