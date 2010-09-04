@@ -63,6 +63,7 @@ import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
@@ -2080,6 +2081,18 @@ public final class Canvas extends JDesktopPane {
             = new NegotiationDialog(this, unit, settlement, agreement);
         negotiationDialog.initialize();
         return showFreeColDialog(negotiationDialog, unit.getTile());
+    }
+
+    /**
+     * Displays the <code>LootCargoDialog</code>.
+     *
+     * @param winner The <code>Unit</code> that is looting.
+     * @param goods The <code>Goods</code> to select from.
+     * @return The goods to loot.
+     */
+    public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
+        CaptureGoodsDialog dialog = new CaptureGoodsDialog(this, winner, loot);
+        return showFreeColDialog(dialog, winner.getTile());
     }
 
     /**

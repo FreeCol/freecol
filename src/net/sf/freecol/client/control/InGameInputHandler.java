@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -1101,12 +1102,10 @@ public final class InGameInputHandler extends InputHandler {
          * thread when handling other player moves. The former case must be done
          * right now, the latter needs to be queued and waited for.
          */
-        public void invokeSpecial() throws InvocationTargetException {
-            if (SwingUtilities.isEventDispatchThread()) {
-                doWork();
-            } else {
-                this.invokeAndWait();
-            }
+        public Object invokeSpecial() throws InvocationTargetException {
+            return (SwingUtilities.isEventDispatchThread())
+                ? doWork()
+                : invokeAndWait();
         }
 
         /**

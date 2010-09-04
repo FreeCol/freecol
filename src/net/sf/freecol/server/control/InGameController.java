@@ -95,6 +95,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
@@ -1598,9 +1599,21 @@ public final class InGameController extends Controller {
          */
         public static TransactionSession lookup(FreeColGameObject o1,
                                                 FreeColGameObject o2) {
+            return TransactionSession.lookup(o1.getId(), o2.getId());
+        }
+
+        /**
+         * Looks up the TransactionSession unique to the specified ids in
+         * transactionSessions.
+         *
+         * @param id1 First id.
+         * @param id2 Second id.
+         * @return The transaction session, or null if not found.
+         */
+        public static TransactionSession lookup(String id1, String id2) {
             java.util.Map<String, TransactionSession> base
-                = transactionSessions.get(o1.getId());
-            return (base == null) ? null : base.get(o2.getId());
+                = transactionSessions.get(id1);
+            return (base == null) ? null : base.get(id2);
         }
 
         /**
@@ -1674,14 +1687,23 @@ public final class InGameController extends Controller {
          *
          * @param o1 First <code>FreeColGameObject</code>.
          * @param o2 Second <code>FreeColGameObject</code>.
-         * @param session The <code>TransactionSession</code> to forget.
          */
         public static void forget(FreeColGameObject o1, FreeColGameObject o2) {
+            TransactionSession.forget(o1.getId(), o2.getId());
+        }
+
+        /**
+         * Forget a TransactionSession (remove from transactionSessions).
+         *
+         * @param id1 The first id.
+         * @param id2 The second id.
+         */
+        public static void forget(String id1, String id2) {
             java.util.Map<String, TransactionSession>
-                base = transactionSessions.get(o1.getId());
+                base = transactionSessions.get(id1);
             if (base != null) {
-                base.remove(o2.getId());
-                if (base.isEmpty()) transactionSessions.remove(o1.getId());
+                base.remove(id2);
+                if (base.isEmpty()) transactionSessions.remove(id1);
             }
         }
     }
@@ -4057,21 +4079,18 @@ public final class InGameController extends Controller {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
-        List<Goods> capture = loser.getGoodsList();
-
-        // Try to load them
-        int n;
-        for (n = 0; n < capture.size(); n++) {
-            Goods goods = capture.get(n);
-            if (!winner.canAdd(goods)) break;
-            loser.remove(goods);
-            winner.add(goods);
-        }
-
-        if (n < capture.size()) { // Could not load them all
-            // TODO: send the list of goods back, trigger on magic attribute,
-            // run a dialog, and capture again.  Somehow.
+        List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
+        if (capture.size() > 0) {
+            // Ask the client what cargo to loot, remove the cargo
+            // from the loser and save it in a transaction (so it is
+            // safe if the loser is sunk).  igc.lootCargo() will deal
+            // with it.
+            for (Goods g : capture) g.setLocation(null);
+            TransactionSession ts = TransactionSession.create(winner, loser);
+            ts.put("lootCargo", capture);
             loser.getGoodsContainer().removeAll();
+            cs.addAttribute(See.only((ServerPlayer) winner.getOwner()),
+                            "loot", "true");
         }
     }
 
@@ -5731,4 +5750,50 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
+    /**
+     * Loot cargo.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the winner.
+     * @param winner The <code>Unit</code> that looting.
+     * @param loserId The id of the <code>Unit</code> that is looted.
+     * @param loot The <code>Goods</code> to loot.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    @SuppressWarnings("unchecked")
+    public Element lootCargo(ServerPlayer serverPlayer, Unit winner,
+                             String loserId, List<Goods> loot) {
+        TransactionSession ts = TransactionSession.lookup(winner.getId(),
+                                                          loserId);
+        if (ts == null) {
+            return Message.clientError("Bogus looting!");
+        }
+        if (winner.getSpaceLeft() == 0) {
+            return Message.clientError("No space to loot to: "
+                                       + winner.getId());
+        }
+
+        ChangeSet cs = new ChangeSet();
+        List<Goods> available = (ArrayList<Goods>) ts.get("lootCargo");
+        if (loot == null) { // Initial inquiry
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                   new LootCargoMessage(winner, loserId, available));
+        } else {
+            TransactionSession.forget(winner.getId(), loserId);
+            for (Goods g : loot) {
+                if (!available.contains(g)) {
+                    return Message.clientError("Invalid loot: " + g.toString());
+                }
+                available.remove(g);
+                if (!winner.canAdd(g)) {
+                    return Message.clientError("Loot failed: " + g.toString());
+                }
+                winner.add(g);
+            }
+
+            // Others can see cargo capacity change.
+            cs.add(See.perhaps(), winner);
+            sendToOthers(serverPlayer, cs);
+        }
+        return cs.build(serverPlayer);
+    }
 }

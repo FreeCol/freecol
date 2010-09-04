@@ -234,6 +234,26 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         return game;
     }
 
+    @Override
+    public int hashCode() {
+        int value = 19;
+        value = 303 * value + ((getLocation() == null) ? 1 : getLocation().getId().hashCode());
+        value = 303 * value + getType().hashCode();
+        value = 303 * value + getAmount();
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Goods) {
+            Goods g = (Goods) obj;
+            return this.getLocation() == g.getLocation()
+                && this.getType() == g.getType()
+                && this.getAmount() == g.getAmount();
+        }
+        return false;
+    }
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

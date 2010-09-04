@@ -29,13 +29,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -43,126 +42,101 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.StringTemplate;
 
+import net.miginfocom.swing.MigLayout;
+
+
 /**
  * Panel for choosing the goods to capture.
- *
- * @see net.sf.freecol.common.model.SimpleCombatModel#attack
  */
-public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> implements ActionListener {
-    @SuppressWarnings("unused")
+public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
+    implements ActionListener {
+
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
 
+    static final String ALL = "All";
+    static final String NONE = "None";
 
     private JButton allButton;
     private JButton noneButton;
-    private JButton acceptButton;
-    private JList goodsList;
-//    private JLabel spaceLeft;
 
+    private Unit winner;
+    private JList goodsList;
     private int maxCargo;
 
-    public CaptureGoodsDialog(Canvas parent) {
+    /**
+     * Creates a new CaptureGoodsDialog.
+     *
+     * @param parent The parent <code>Canvas</code>.
+     * @param winner The <code>Unit</code> that is looting.
+     * @param loot The <code>Goods</code> to loot.
+     */
+    public CaptureGoodsDialog(Canvas parent, Unit winner, List<Goods> loot) {
         super(parent);
 
-        setBorder(null);
-        setOpaque(false);
+        this.winner = winner;
+        maxCargo = winner.getSpaceLeft();
 
-        allButton = new JButton(Messages.message("all"));
-        noneButton = new JButton(Messages.message("none"));
-        acceptButton = new JButton(Messages.message("accept"));
-//        spaceLeft = new JLabel("");
+        setLayout(new MigLayout("wrap 3"));
+
+        JLabel header = new JLabel(Messages.message("lootCargo.header"));
+        header.setFont(mediumHeaderFont);
+        add(header, "span, align center, wrap 20");
 
         goodsList = new JList();
+        GoodsItem[] goods = new GoodsItem[loot.size()];
+        for (int i = 0; i < loot.size(); i++) {
+            goods[i] = new GoodsItem(loot.get(i));
+        }
+        goodsList.setListData(goods);
         goodsList.setCellRenderer(new CheckBoxRenderer());
-
         goodsList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent me) {
-                int selectedIndex = goodsList.locationToIndex(me.getPoint());
-                if (selectedIndex < 0)
-                    return;
-                GoodsItem item = (GoodsItem) goodsList.getModel().getElementAt(selectedIndex);
-                if (item.isEnabled())
-                    item.setSelected(!item.isSelected());
-                updateComponents();
-            }
-        });
+                public void mouseClicked(MouseEvent me) {
+                    int index = goodsList.locationToIndex(me.getPoint());
+                    if (index < 0) return;
+                    GoodsItem item = (GoodsItem) goodsList.getModel().getElementAt(index);
+                    if (item.isEnabled()) item.setSelected(!item.isSelected());
+                    updateComponents();
+                }
+            });
+        add(goodsList, "span, align center, wrap 20");
 
-        JScrollPane goodsListScroll = new JScrollPane(goodsList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        goodsListScroll.setSize(140, 150);
-        goodsListScroll.setLocation(10, 10);
-
-        allButton.setLocation(10, 170);
-        noneButton.setLocation(10 + 60 + 15, 170);
-        acceptButton.setLocation(35, 10 + 140 + 10 + 20 + 20);
-
-//        spaceLeft.setSize(140,25);
-//        spaceLeft.setLocation(40, 170+20);
-
-        allButton.setSize(65, 20);
-        noneButton.setSize(64, 20);
-        acceptButton.setSize(80, 20);
-        
+        allButton = new JButton(Messages.message(ALL));
+        allButton.addActionListener(this);
         enterPressesWhenFocused(allButton);
-        enterPressesWhenFocused(noneButton);
-        enterPressesWhenFocused(acceptButton);
-
-        add(goodsListScroll);
+        allButton.setMnemonic('a');
+        allButton.setActionCommand(ALL);
         add(allButton);
-        add(noneButton);
-        add(acceptButton);
-//        add(spaceLeft);
-        this.setLayout(null);
-//        this.setSize(200,300);
 
-        allButton.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                for (int i = 0; i < goodsList.getModel().getSize() && i < maxCargo; i++) {
-                    GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
-                    gi.setSelected(true);
-                    updateComponents();
-                }
-            }
-        });
-        noneButton.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                for (int i = 0; i < goodsList.getModel().getSize(); i++) {
-                    GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
-                    gi.setSelected(false);
-                    updateComponents();
-                }
-            }
-        });
+        noneButton = new JButton(Messages.message(NONE));
+        noneButton.addActionListener(this);
+        enterPressesWhenFocused(noneButton);
         noneButton.setMnemonic('n');
-        allButton.setMnemonic('l');
-        acceptButton.setMnemonic('a');
-    }
+        noneButton.setActionCommand(NONE);
+        add(noneButton);
 
-    public void requestFocus() {
-        acceptButton.requestFocus();
+        add(okButton);
+
+        setSize(getPreferredSize());
     }
 
     private void updateComponents() {
         int selectedCount = 0;
         for (int i = 0; i < goodsList.getModel().getSize(); i++) {
             GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
-            if (gi.isSelected())
-                selectedCount++;
+            if (gi.isSelected()) selectedCount++;
         }
 
         if (selectedCount >= maxCargo) {
             allButton.setEnabled(false);
             for (int i = 0; i < goodsList.getModel().getSize(); i++) {
                 GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
-                if (!gi.isSelected())
-                    gi.setEnabled(false);
+                if (!gi.isSelected()) gi.setEnabled(false);
             }
-        }
-        else {
+        } else {
             allButton.setEnabled(true);
             for (int i = 0; i < goodsList.getModel().getSize(); i++) {
                 GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
-                if (!gi.isSelected())
-                    gi.setEnabled(true);
+                if (!gi.isSelected()) gi.setEnabled(true);
             }
         }
 
@@ -170,51 +144,51 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
     }
 
     /**
-     * Inits the dialog.
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests. The response is an ArrayList of Goods.
      *
-     * @param capturedUnit
-     * @param capturingUnit
+     * @param e The incoming ActionEvent.
      */
-    public void initialize(Unit capturedUnit, Unit capturingUnit) {
-        maxCargo = capturingUnit.getType().getSpace();
-        GoodsItem[] goods = new GoodsItem[capturedUnit.getGoodsCount()];
-        if (goods.length > 0) {
-            Iterator<Goods> iter = capturedUnit.getGoodsIterator();
-            for (int i = 0; iter.hasNext(); i++) {
-                Goods g = iter.next();
-                goods[i] = new GoodsItem(g);
-            }
-        }
-        goodsList.setListData(goods);
-
-//            spaceLeft.setText(capturingUnit.getSpaceLeft() + " free");
-    }
-
-    /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests. The response is an ArrayList of Goods.
-    * @param e The incoming ActionEvent.
-    */
+    @Override
     public void actionPerformed(ActionEvent e) {
-        ArrayList<Goods> list = new ArrayList<Goods>(4);
-
-        for (int i = 0; i < goodsList.getModel().getSize(); i++) {
-            GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
-            if(gi.isSelected())
-                list.add(gi.getGoods());
+        String command = e.getActionCommand();
+        if (ALL.equals(command)) {
+            for (int i = 0; i < goodsList.getModel().getSize() && i < maxCargo;
+                 i++) {
+                GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
+                gi.setSelected(true);
+                updateComponents();
+            }
+        } else if (NONE.equals(command)) {
+            for (int i = 0; i < goodsList.getModel().getSize(); i++) {
+                GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
+                gi.setSelected(false);
+                updateComponents();
+            }
+        } else if (OK.equals(command)) {
+            ArrayList<Goods> list = new ArrayList<Goods>();
+            for (int i = 0; i < goodsList.getModel().getSize(); i++) {
+                GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);
+                if (gi.isSelected()) list.add(gi.getGoods());
+            }
+            setResponse(list);
+        } else {
+            logger.warning("Invalid action command: " + command);
         }
-        setResponse(list);
     }
 
-    private class CheckBoxRenderer extends JCheckBox implements ListCellRenderer {
+    private class CheckBoxRenderer extends JCheckBox
+        implements ListCellRenderer {
 
         public CheckBoxRenderer() {
-            setBackground(UIManager.getColor("List.textBackground"));
-            setForeground(UIManager.getColor("List.textForeground"));
+            //setBackground(UIManager.getColor("List.textBackground"));
+            //setForeground(UIManager.getColor("List.textForeground"));
         }
 
-        public Component getListCellRendererComponent(JList listBox, Object obj, int currentindex,
-                                                      boolean isChecked, boolean hasFocus) {
+        public Component getListCellRendererComponent(JList listBox, Object obj,
+                                                      int currentindex,
+                                                      boolean isChecked,
+                                                      boolean hasFocus) {
             setSelected(((GoodsItem) obj).isSelected());
             setText(((GoodsItem) obj).toString());
             setEnabled(((GoodsItem) obj).isEnabled());
@@ -222,7 +196,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
         }
     }
 
-    class GoodsItem extends JCheckBox {
+    private class GoodsItem extends JCheckBox {
         private Goods good;
 
         public GoodsItem(Goods good) {
@@ -234,9 +208,11 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
         }
 
         public String toString() {
-            return Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                                    .add("%goods%", good.getNameKey())
-                                    .addAmount("%amount%", good.getAmount()));
+            StringTemplate template
+                = StringTemplate.template("model.goods.goodsAmount")
+                .add("%goods%", good.getNameKey())
+                .addAmount("%amount%", good.getAmount());
+            return Messages.message(template);
         }
     }
 }

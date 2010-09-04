@@ -83,6 +83,7 @@ import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -220,6 +221,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new UnloadCargoMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(LootCargoMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new LootCargoMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(BuyGoodsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {

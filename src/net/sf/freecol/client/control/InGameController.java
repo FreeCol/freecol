@@ -122,6 +122,7 @@ import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -332,8 +333,12 @@ public final class InGameController implements NetworkConstants {
             return null;
         }
 
-        // Success!
+        // Success!  Do the standard processing.
         if (tag == null || tag.equals(reply.getTagName())) {
+            String sound = reply.getAttribute("sound");
+            if (sound != null && !sound.isEmpty()) {
+                freeColClient.playSound(sound);
+            }
             return reply;
         }
 
@@ -2079,11 +2084,19 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to attack.
      */
     private void attack(Unit unit, Direction direction) {
-        String sound = askAttack(unit, direction);
-        if (sound != null && !sound.isEmpty()) {
-            freeColClient.playSound(sound);
+        Canvas canvas = freeColClient.getCanvas();
+        Unit defender = unit.getTile().getNeighbourOrNull(direction)
+            .getDefendingUnit(unit);
+        String loot = askAttack(unit, direction);
+        if ("true".equals(loot)) {
+            nextModelMessage(); // See the combat message first
+            List<Goods> goods = askLoot(unit, defender);
+            if (goods != null) {
+                goods = canvas.showCaptureGoodsDialog(unit, goods);
+                askLoot(unit, defender, goods);
+            }
         }
-        freeColClient.getCanvas().refresh();
+        canvas.refresh();
         nextActiveUnit();
     }
 
@@ -2101,7 +2114,42 @@ public final class InGameController implements NetworkConstants {
 
         Connection conn = client.getConnection();
         freeColClient.getInGameInputHandler().handle(conn, reply);
-        return reply.getAttribute("sound");
+        return reply.getAttribute("loot");
+    }
+
+    /**
+     * Server query-response for looting (initial query).
+     *
+     * @param winner The <code>Unit</code> that is looting.
+     * @param loser The <code>Unit</code> that is looted.
+     * @return The <code>Goods</code> to loot.
+     */
+    private List<Goods> askLoot(Unit winner, Unit loser) {
+        Client client = freeColClient.getClient();
+        LootCargoMessage message = new LootCargoMessage(winner, loser.getId(),
+                                                        null);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "lootCargo");
+        return (reply == null) ? null
+            : new LootCargoMessage(freeColClient.getGame(), reply).getGoods();
+    }
+
+    /**
+     * Server query-response for looting (request to loot).
+     *
+     * @param winner The <code>Unit</code> that is looting.
+     * @param loser The <code>Unit</code> that is looted.
+     * @return The <code>Goods</code> to loot.
+     */
+    private void askLoot(Unit winner, Unit loser, List<Goods> goods) {
+        Client client = freeColClient.getClient();
+        LootCargoMessage message = new LootCargoMessage(winner, loser.getId(),
+                                                        goods);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+
+        if (reply == null) return;
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
     }
 
     /**
