@@ -1439,7 +1439,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 if (defender != null && owner != defender.getOwner()
                     && !ignoreEnemyUnits) {
                     if (defender.isNaval()) {
-                        return MoveType.MOVE_NO_ACCESS_BEACHED;
+                        return MoveType.ATTACK;
                     } else if (!isOffensiveUnit()) {
                         return MoveType.MOVE_NO_ATTACK_CIVILIAN;
                     } else {

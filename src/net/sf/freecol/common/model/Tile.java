@@ -402,6 +402,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Is the alternate unit a better defender than the current choice.
+     * Prefer if there is no current defender, or if the alternate unit
+     * provides greater defensive power and does not replace a defensive
+     * unit defender with a non-defensive unit.
+     *
+     * @param defender The current defender <code>Unit</code>.
+     * @param defenderPower Its defence power.
+     * @param other An alternate <code>Unit</code>.
+     * @param otherPower Its defence power.
+     * @return True if the other unit should be preferred.
+     */
+    private static boolean betterDefender(Unit defender, float defenderPower,
+                                          Unit other, float otherPower) {
+        return defender == null
+            || (otherPower > defenderPower
+                && !(defender.isDefensiveUnit() && !other.isDefensiveUnit()));
+    }
+
+    /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Tile</code>.
      * <p>If this tile has a settlement, the units inside the settlement 
@@ -414,49 +433,51 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         tile.
      */
     public Unit getDefendingUnit(Unit attacker) {
-        // First, find the strongest defender of this tile, if any
-        Unit tileDefender = null;
-        float defencePower = -1.0f;
+        CombatModel cm = getGame().getCombatModel();
+        Unit defender = null;
+        float defenderPower = -1.0f;
+        float power;
 
-        for (Unit nextUnit : units) {
-            if (isLand() != nextUnit.isNaval()) {
-                // on land tiles, ships are docked in port and cannot defend
-                // on ocean tiles, land units behave as ship cargo and cannot defend
-                float tmpPower = getGame().getCombatModel().getDefencePower(attacker,nextUnit);
-                if (tileDefender == null
-                    || (tmpPower > defencePower
-                        && (!tileDefender.isDefensiveUnit() || nextUnit.isDefensiveUnit()))) {
-                    tileDefender = nextUnit;
-                    defencePower = tmpPower;
+        // Check the units on the tile...
+        for (Unit u : units) {
+            if (isLand() != u.isNaval()) {
+                // On land, ships are normally docked in port and
+                // cannot defend.  Except if beached (see below).
+                // On ocean tiles, land units behave as ship cargo and
+                // cannot defend
+                power = cm.getDefencePower(attacker, u);
+                if (Tile.betterDefender(defender, defenderPower, u, power)) {
+                    defender = u;
+                    defenderPower = power;
                 }
             }
         }
 
-        if ((tileDefender == null || !tileDefender.isDefensiveUnit()) &&
-            getSettlement() != null) {
-            // Then, find the strongest defender working in a settlement, if any
-            Unit settlementDefender;
+        // ...then a settlement defender if any...
+        if ((defender == null || !defender.isDefensiveUnit())
+            && getSettlement() != null) {
+            Unit u = null;
             try {
                 // HACK: The AI is prone to removing all units in a
                 // settlement which causes Colony.getDefendingUnit()
-                // to throw.  Recover by treating settlementDefender
-                // as null, but log in the hope that the AI will be
-                // fixed one day.
-                settlementDefender = settlement.getDefendingUnit(attacker);
+                // to throw.
+                u = settlement.getDefendingUnit(attacker);
+                power = cm.getDefencePower(attacker, u);
+                if (Tile.betterDefender(defender, defenderPower, u, power)) {
+                    defender = u;
+                    defenderPower = power;
+                }
             } catch (IllegalStateException e) {
                 logger.log(Level.WARNING, "No defender", e);
-                return tileDefender;
-            }
-            // Return the strongest of the two units
-            if (settlementDefender != null) {
-                float tmpPower = getGame().getCombatModel()
-                    .getDefencePower(attacker, settlementDefender);
-                if (tmpPower > defencePower) {
-                    return settlementDefender;
-                }
             }
         }
-        return tileDefender;
+
+        // ...finally, if we have failed to find a valid defender
+        // for a land tile, allow a beached naval unit to defend (and
+        // lose) as a last resort.
+        if (defender == null && isLand()) defender = getFirstUnit();
+
+        return defender;
     }
 
     /**

@@ -432,7 +432,9 @@ public class SimpleCombatModel extends CombatModel {
             //   else r < odds.win + (0.2 + 0.7) * (1.0 - odds.win)
             //     = 0.1 * odds.win + 0.9 => loss
             //   else => great loss
-            if (r < odds.win) {
+            // ...and beached ships always lose.
+            if (r < odds.win
+                || (defenderUnit.isNaval() && defenderUnit.getTile().isLand())) {
                 great = r < 0.1f * odds.win; // Great Win
                 crs.add(CombatResult.WIN);
                 resolveAttack(attackerUnit, defenderUnit, great, r / odds.win,
@@ -525,8 +527,7 @@ public class SimpleCombatModel extends CombatModel {
                 && !loser.getGoodsList().isEmpty()) {
                 crs.add(CombatResult.LOOT_SHIP);
             }
-            if (great || tile.getRepairLocation(loserPlayer) == null
-                || tile.isLand()) {
+            if (great || tile.getRepairLocation(loserPlayer) == null) {
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
                 crs.add(CombatResult.DAMAGE_SHIP_ATTACK);
