@@ -3652,6 +3652,7 @@ public final class InGameController extends Controller {
         if (type != null) loser.setType(type);
         loser.setOwner(winnerPlayer);
         loser.setLocation(winner.getTile());
+        loser.setState(UnitState.ACTIVE);
 
         // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),
@@ -4109,6 +4110,7 @@ public final class InGameController extends Controller {
             cs.addAttribute(See.only(winnerPlayer), "loot", "true");
         }
         loser.getGoodsContainer().removeAll();
+        loser.setState(UnitState.ACTIVE);
     }
 
     /**
@@ -4167,9 +4169,13 @@ public final class InGameController extends Controller {
             = loser.getBestCombatEquipmentType(loser.getEquipment());
 
         loser.removeEquipment(equip, 1, true);
-        String messageId = (loser.getEquipment().isEmpty())
-            ? "model.unit.unitDemotedToUnarmed"
-            : loser.getType().getId() + ".demoted";
+        String messageId;
+        if (loser.getEquipment().isEmpty()) {
+            messageId = "model.unit.unitDemotedToUnarmed";
+            loser.setState(UnitState.ACTIVE);
+        } else {
+            messageId = loser.getType().getId() + ".demoted";
+        }
 
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
