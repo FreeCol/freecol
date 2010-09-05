@@ -21,6 +21,8 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -4080,18 +4082,33 @@ public final class InGameController extends Controller {
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
-        if (capture.size() > 0) {
-            // Ask the client what cargo to loot, remove the cargo
-            // from the loser and save it in a transaction (so it is
-            // safe if the loser is sunk).  igc.lootCargo() will deal
-            // with it.
+        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
+        if (capture.size() <= 0) return;
+        if (winnerPlayer.isAI()) {
+            // This should be in the AI code.
+            // Just loot in order of sale value.
+            final Market market = winnerPlayer.getMarket();
+            Collections.sort(capture, new Comparator<Goods>() {
+                    public int compare(Goods g1, Goods g2) {
+                        int p1 = market.getPaidForSale(g1.getType())
+                            * g1.getAmount();
+                        int p2 = market.getPaidForSale(g2.getType())
+                            * g2.getAmount();
+                        return p2 - p1;
+                    }
+                });
+            while (capture.size() > 0) {
+                Goods g = capture.remove(0);
+                if (!winner.canAdd(g)) break;
+                winner.add(g);
+            }
+        } else {
             for (Goods g : capture) g.setLocation(null);
             TransactionSession ts = TransactionSession.create(winner, loser);
             ts.put("lootCargo", capture);
-            loser.getGoodsContainer().removeAll();
-            cs.addAttribute(See.only((ServerPlayer) winner.getOwner()),
-                            "loot", "true");
+            cs.addAttribute(See.only(winnerPlayer), "loot", "true");
         }
+        loser.getGoodsContainer().removeAll();
     }
 
     /**
