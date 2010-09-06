@@ -4512,6 +4512,7 @@ public final class InGameController extends Controller {
             unit.setType(skill);
             if (!settlement.isCapital()) settlement.setLearnableSkill(null);
             Tile tile = settlement.getTile();
+            tile.updatePlayerExploredTile(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), unit, tile);
             break;
@@ -4645,6 +4646,7 @@ public final class InGameController extends Controller {
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
             settlement.setVisited(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
             for (Tile t : tile.getSurroundingTiles(radius)) {
@@ -4992,7 +4994,6 @@ public final class InGameController extends Controller {
     public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
-        settlement.makeContactSettlement(serverPlayer);
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to buy without opening a transaction session");
         }
@@ -5003,6 +5004,8 @@ public final class InGameController extends Controller {
         if (unit.getSpaceLeft() <= 0) {
             return Message.clientError("Unit is full, unable to buy.");
         }
+        settlement.makeContactSettlement(serverPlayer);
+
         // Check that this is the agreement that was made
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
         int returnGold = ai.buyProposition(unit, settlement, goods, amount);
@@ -5021,8 +5024,10 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
 
         Player settlementPlayer = settlement.getOwner();
+        Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        settlement.getTile().updateIndianSettlementInformation(serverPlayer);
+        tile.updatePlayerExploredTile(serverPlayer);
+        tile.updateIndianSettlementInformation(serverPlayer);
         cs.add(See.only(serverPlayer),
             settlement.modifyAlarm(serverPlayer, -amount / 50));
         settlementPlayer.modifyGold(amount);
@@ -5050,7 +5055,6 @@ public final class InGameController extends Controller {
     public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement,
                                     Goods goods, int amount) {
-        settlement.makeContactSettlement(serverPlayer);
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to sell without opening a transaction session");
         }
@@ -5058,6 +5062,7 @@ public final class InGameController extends Controller {
         if (!(Boolean) session.get("canSell")) {
             return Message.clientError("Trying to sell in a session where selling is not allowed.");
         }
+        settlement.makeContactSettlement(serverPlayer);
 
         // Check that the gold is the agreed amount
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
@@ -5077,8 +5082,10 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
                 -settlement.getPrice(goods) / 500));
         serverPlayer.modifyGold(amount);
+        Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        settlement.getTile().updateIndianSettlementInformation(serverPlayer);
+        tile.updatePlayerExploredTile(serverPlayer);
+        tile.updateIndianSettlementInformation(serverPlayer);
         cs.add(See.only(serverPlayer), settlement);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
@@ -5105,10 +5112,12 @@ public final class InGameController extends Controller {
         if (!isTransactionSessionOpen(unit, settlement)) {
             return Message.clientError("Trying to deliverGift without opening a transaction session");
         }
+        TransactionSession session = getTransactionSession(unit, settlement);
+        if (!(Boolean) session.get("canGift")) {
+            return Message.clientError("Trying to deliver gift in a session where gift giving is not allowed.");
+        }
 
         ChangeSet cs = new ChangeSet();
-        TransactionSession session = getTransactionSession(unit, settlement);
-
         Tile tile = settlement.getTile();
         moveGoods(goods, settlement);
         cs.add(See.perhaps(), unit);
@@ -5119,6 +5128,7 @@ public final class InGameController extends Controller {
                    indianSettlement.modifyAlarm(serverPlayer,
                    -indianSettlement.getPrice(goods) / 50));
             indianSettlement.updateWantedGoods();
+            tile.updatePlayerExploredTile(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), settlement);
         }
