@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
@@ -1029,6 +1030,10 @@ public final class InGameInputHandler extends InputHandler {
                 HistoryEvent h = new HistoryEvent();
                 h.readFromXMLElement(e);
                 player.getHistory().add(h);
+            } else if (tag == LastSale.getXMLElementTagName()) {
+                LastSale s = new LastSale();
+                s.readFromXMLElement(e);
+                player.saveSale(s);
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }

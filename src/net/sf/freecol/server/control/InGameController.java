@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
@@ -5082,6 +5083,8 @@ public final class InGameController extends Controller {
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
         session.put("canSell", false);
+        cs.addSale(serverPlayer, settlement, goods.getType(),
+                   (int) Math.round((float) amount / goods.getAmount()));
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, cs);

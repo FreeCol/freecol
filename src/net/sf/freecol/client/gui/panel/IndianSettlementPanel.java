@@ -87,11 +87,14 @@ public final class IndianSettlementPanel extends FreeColPanel {
         }
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
+        String sale;
         add(localizedLabel("indianSettlement.highlyWanted"), "newline");
         if (!visited || wantedGoods.length == 0 || wantedGoods[0] == null) {
             add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
         } else {
-            add(new JLabel(Messages.message(wantedGoods[0].getNameKey()),
+            sale = player.getLastSaleString(settlement, wantedGoods[0]);
+            add(new JLabel(Messages.message(wantedGoods[0].getNameKey())
+                           + ((sale == null) ? "" : " " + sale),
                            canvas.getImageIcon(wantedGoods[0], false),
                            JLabel.CENTER));
         }
@@ -104,13 +107,17 @@ public final class IndianSettlementPanel extends FreeColPanel {
             for (i = 2; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) n++;
             }
-            add(new JLabel(Messages.message(wantedGoods[1].getNameKey()),
+            sale = player.getLastSaleString(settlement, wantedGoods[1]);
+            add(new JLabel(Messages.message(wantedGoods[1].getNameKey())
+                           + ((sale == null) ? "" : " " + sale),
                            canvas.getImageIcon(wantedGoods[1], false),
                            JLabel.CENTER),
                 "split " + Integer.toString(n));
             for (i = 2; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) {
-                    add(new JLabel(Messages.message(wantedGoods[i].getNameKey()),
+                    sale = player.getLastSaleString(settlement,wantedGoods[i]);
+                    add(new JLabel(Messages.message(wantedGoods[i].getNameKey())
+                                   + ((sale == null) ? "" : " " + sale),
                                    canvas.getImageIcon(wantedGoods[i], false),
                                    JLabel.CENTER));
                 }

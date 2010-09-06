@@ -27,7 +27,9 @@ import java.util.List;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
@@ -35,7 +37,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
@@ -60,7 +62,7 @@ public class ChangeSet {
         CHANGE_ANIMATION(0),  // Do animations first
         CHANGE_REMOVE(100),   // Do removes last
         CHANGE_STANCE(5),     // Do stance before updates
-        CHANGE_STRING(20),    // Do string changes after updates
+        CHANGE_OWNED(20),     // Do owned changes after updates
         CHANGE_UPDATE(10),    // There are a lot of updates
         // Symbolic priorities used by various non-fixed types
         CHANGE_EARLY(1),
@@ -686,6 +688,50 @@ public class ChangeSet {
     }
 
     /**
+     * Encapsulate an owned object change.
+     */
+    private static class OwnedChange extends Change {
+
+        private FreeColObject fco;
+
+        /**
+         * Build a new OwnedChange.
+         *
+         * @param see The visibility of this change.
+         * @param fco The <code>FreeColObject</code> to update.
+         */
+        OwnedChange(See vis, FreeColObject fco) {
+            super(vis);
+            this.fco = fco;
+        }
+
+        /**
+         * The sort priority.
+         *
+         * @return "CHANGE_OWNER"
+         */
+        public int sortPriority() {
+            return ChangePriority.CHANGE_OWNED.getPriority();
+        }
+
+        /**
+         * Specialize a OwnedChange into an "addObject" element for a
+         * particular player.
+         *
+         * @param serverPlayer The <code>ServerPlayer</code> to update.
+         * @param doc The owner <code>Document</code>.
+         * @return An "addObject" element.
+         */
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            Element element = doc.createElement("addObject");
+            Element child = fco.toXMLElement(serverPlayer, doc, false, false);
+            child.setAttribute("owner", serverPlayer.getId());
+            element.appendChild(child);
+            return element;
+        }
+    }
+
+    /**
      * Encapsulate a stance change.
      */
     private static class StanceChange extends Change {
@@ -740,7 +786,7 @@ public class ChangeSet {
          * unless they initiated the change and already know.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
-         * @return A StringChange if there are messages to send.
+         * @return A list of changes if there are messages to send.
          */
         @Override
         public List<Change> consequences(ServerPlayer serverPlayer) {
@@ -758,7 +804,7 @@ public class ChangeSet {
                                        first)
                         .addStringTemplate("%attacker%", first.getNationName())
                         .addStringTemplate("%defender%", second.getNationName());
-                changes.add(new StringChange(See.only(serverPlayer), m));
+                changes.add(new OwnedChange(See.only(serverPlayer), m));
             }
             return changes;
         }
@@ -776,50 +822,6 @@ public class ChangeSet {
             element.setAttribute("stance", stance.toString());
             element.setAttribute("first", first.getId());
             element.setAttribute("second", second.getId());
-            return element;
-        }
-    }
-
-    /**
-     * Encapsulate a message or history event.
-     */
-    private static class StringChange extends Change {
-        StringTemplate template;
-
-        /**
-         * Build a new HistoryChange.
-         *
-         * @param see The visibility of this change.
-         * @param h The <code>HistoryEvent</code> that occurred.
-         */
-        StringChange(See see, StringTemplate template) {
-            super(see);
-            this.template = template;
-        }
-
-        /**
-         * The sort priority.
-         *
-         * @return "CHANGE_STRING"
-         */
-        public int sortPriority() {
-            return ChangePriority.CHANGE_STRING.getPriority();
-        }
-
-        /**
-         * Specialize a StringChange into an "addObject" element for a
-         * particular player.
-         *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
-         * @return An "addObject" element.
-         */
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("addObject");
-            Element child = template.toXMLElement(serverPlayer, doc,
-                                                  false, false);
-            child.setAttribute("owner", serverPlayer.getId());
-            element.appendChild(child);
             return element;
         }
     }
@@ -1021,7 +1023,7 @@ public class ChangeSet {
      */
     public ChangeSet addHistory(ServerPlayer serverPlayer,
                                 HistoryEvent history) {
-        changes.add(new StringChange(See.only(serverPlayer), history));
+        changes.add(new OwnedChange(See.only(serverPlayer), history));
         serverPlayer.addHistory(history);
         return this;
     }
@@ -1034,7 +1036,7 @@ public class ChangeSet {
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addMessage(See see, ModelMessage message) {
-        changes.add(new StringChange(see, message));
+        changes.add(new OwnedChange(see, message));
         return this;
     }
 
@@ -1068,6 +1070,24 @@ public class ChangeSet {
     }
 
     /**
+     * Helper function to add a sale change to a ChangeSet.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> making the sale.
+     * @param settlement The <code>Settlement</code> that is buying.
+     * @param type The <code>GoodsType</code> bought.
+     * @param price The per unit price.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addSale(ServerPlayer serverPlayer, Settlement settlement,
+                             GoodsType type, int price) {
+        Game game = settlement.getGame();
+        LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
+        changes.add(new OwnedChange(See.only(serverPlayer), sale));
+        serverPlayer.saveSale(sale);
+        return this;
+    }
+
+    /**
      * Helper function to add a region discovery to a ChangeSet.
      * Also adds the history to all Europeans.
      *
@@ -1081,7 +1101,7 @@ public class ChangeSet {
         Game game = serverPlayer.getGame();
         HistoryEvent h = region.discover(serverPlayer, game.getTurn(), name);
         changes.add(new ObjectChange(See.all(), region));
-        changes.add(new StringChange(See.all(), h));
+        changes.add(new OwnedChange(See.all(), h));
         for (Player p : game.getPlayers()) {
             if (p.isEuropean()) p.addHistory(h);
         }

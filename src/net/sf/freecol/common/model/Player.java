@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Settlement.SettlementType;
@@ -378,6 +379,11 @@ public class Player extends FreeColGameObject implements Nameable {
             return counter2 - counter1;
         }
     };
+
+    /**
+     * The last-sale data.
+     */
+    private HashMap<String, LastSale> lastSales = null;
 
 
     /**
@@ -3164,6 +3170,42 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Saves a LastSale record.
+     *
+     * @param sale The <code>LastSale</code> to save.
+     */
+    public void saveSale(LastSale sale) {
+        if (lastSales == null) lastSales = new HashMap<String, LastSale>();
+        lastSales.put(sale.getId(), sale);
+    }
+
+    /**
+     * Gets the current sales data for a location and goods type.
+     *
+     * @param where The <code>Location</code> of the sale.
+     * @param what The <code>GoodsType</code> sold.
+     *
+     * @return An appropriate <code>LastSaleData</code> record or null.
+     */
+    public LastSale getLastSale(Location where, GoodsType what) {
+        return (lastSales == null) ? null
+            : lastSales.get(LastSale.makeKey(where, what));
+    }
+
+    /**
+     * Gets the last sale price for a location and goods type as a string.
+     *
+     * @param where The <code>Location</code> of the sale.
+     * @param what The <code>GoodsType</code> sold.
+     * @return An abbreviation for the sale price, or null if none found.
+     */
+    public String getLastSaleString(Location where, GoodsType what) {
+        LastSale data = getLastSale(where, what);
+        return (data == null) ? null : String.valueOf(data.getPrice());
+    }
+
+
+    /**
      * An <code>Iterator</code> of {@link Unit}s that can be made active.
      */
     public class UnitIterator implements Iterator<Unit> {
@@ -3376,6 +3418,11 @@ public class Player extends FreeColGameObject implements Nameable {
                     m.toXML(out);
                 }
             }
+            if (lastSales != null) {
+                for (LastSale sale : lastSales.values()) {
+                    sale.toXMLImpl(out);
+                }
+            }
         }
 
         out.writeEndElement();
@@ -3440,6 +3487,7 @@ public class Player extends FreeColGameObject implements Nameable {
         history.clear();
         tradeRoutes.clear();
         modelMessages.clear();
+        lastSales = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
@@ -3477,6 +3525,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 ModelMessage message = new ModelMessage();
                 message.readFromXMLImpl(in);
                 addModelMessage(message);
+            } else if (in.getLocalName().equals(LastSale.getXMLElementTagName())) {
+                LastSale lastSale = new LastSale();
+                lastSale.readFromXMLImpl(in);
+                saveSale(lastSale);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();

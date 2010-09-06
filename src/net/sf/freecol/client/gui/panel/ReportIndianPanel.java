@@ -150,7 +150,9 @@ public final class ReportIndianPanel extends ReportPanel {
                     reportPanel.add(goodsLabel, split);
                     for (int i = 1; i < wantedGoods.length; i++) {
                         if (wantedGoods[i] != null) {
-                            goodsLabel = localizedLabel(wantedGoods[i].getNameKey());
+                            String sale = player.getLastSaleString(settlement, wantedGoods[i]);
+                            goodsLabel = new JLabel(Messages.message(wantedGoods[i].getNameKey())
+                                                    + ((sale == null) ? "" : " " + sale));
                             goodsLabel.setIcon(getLibrary().getScaledGoodsImageIcon(wantedGoods[i], 0.5));
                             reportPanel.add(goodsLabel);
                         }

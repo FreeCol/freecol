@@ -53,14 +53,21 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.Utils;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -95,6 +102,13 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         final Settlement inSettlement = (unit.getTile() != null) ? unit.getTile().getSettlement() : null;
 
+        // Collect the goods the unit is carrying.
+        List<GoodsType> goodsTypeList = new ArrayList<GoodsType>();
+        for (Goods goods : unit.getGoodsList()) {
+            goodsTypeList.add(goods.getType());
+        }
+        final List<GoodsType> goodsTypes = goodsTypeList;
+
         // Search for destinations we can reach:
         getGame().getMap().search(unit, unit.getTile(), new GoalDecider() {
                 public PathNode getGoal() {
@@ -104,7 +118,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 public boolean check(Unit u, PathNode p) {
                     Settlement settlement = p.getTile().getSettlement();
                     if (settlement != null && settlement != inSettlement) {
-                        destinations.add(new Destination(settlement, p.getTurns()));
+                        String extras = (settlement.getOwner() != u.getOwner())
+                            ? getExtras(u, settlement, goodsTypes) : "";
+                        destinations.add(new Destination(settlement, p.getTurns(), extras));
                     }
                     return false;
                 }
@@ -123,12 +139,15 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
             PathNode path = getGame().getMap().findPathToEurope(unit, unit.getTile());
             if (path != null) {
-                destinations.add(0, new Destination(getMyPlayer().getEurope(),
-                                                    path.getTotalTurns()));
+                Europe europe = getMyPlayer().getEurope();
+                destinations.add(0, new Destination(europe, path.getTotalTurns(),
+                                                    getExtras(unit, europe, goodsTypes)));
             } else if (unit.getTile() != null
                        && (unit.getTile().canMoveToEurope()
                            || unit.getTile().isAdjacentToMapEdge())) {
-                destinations.add(0, new Destination(getMyPlayer().getEurope(), 0));
+                Europe europe = getMyPlayer().getEurope();
+                destinations.add(0, new Destination(europe, 0,
+                                                    getExtras(unit, europe, goodsTypes)));
             }
         }
 
@@ -241,6 +260,50 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         filterDestinations();
     }
 
+    /**
+     * Collected extra annotations of interest to a unit proposing to
+     * visit a location.
+     *
+     * @param unit The <code>Unit</code> proposing to visit.
+     * @param loc The <code>Location</code> to visit.
+     * @param goodsTypes A list of goods types the unit is carrying.
+     * @return A string containing interesting annotations about the visit
+     *         or an empty string if nothing is of interest.
+     */
+    private String getExtras(Unit unit, Location loc, List<GoodsType> goodsTypes) {
+        if (loc instanceof Europe && !goodsTypes.isEmpty()) {
+            Market market = unit.getOwner().getMarket();
+            List<String> sales = new ArrayList<String>();
+            for (GoodsType goodsType : goodsTypes) {
+                sales.add(Messages.message(goodsType.getNameKey()) + " "
+                          + Integer.toString(market.getSalePrice(goodsType, 1)));
+            }
+            if (!sales.isEmpty()) {
+                return "[" + Utils.join(", ", sales) + "]";
+            }
+        } else if (loc instanceof Settlement && !goodsTypes.isEmpty()) {
+            List<String> sales = new ArrayList<String>();
+            for (GoodsType goodsType : goodsTypes) {
+                String sale = unit.getOwner().getLastSaleString((Settlement) loc, goodsType);
+                if (sale != null) {
+                    sales.add(Messages.message(goodsType.getNameKey())
+                              + " " + sale);
+                }
+            }
+            if (!sales.isEmpty()) {
+                return "[" + Utils.join(", ", sales) + "]";
+            }
+        } else if (loc instanceof IndianSettlement) {
+            IndianSettlement indianSettlement = (IndianSettlement) loc;
+            UnitType skill = indianSettlement.getLearnableSkill();
+            if (skill != null
+                && unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+                return "[" + Messages.message(skill.getNameKey()) + "]";
+            }
+        }
+        return "";
+    }
+
     private void filterDestinations() {
         DefaultListModel model = (DefaultListModel) destinationList.getModel();
         Object selected = destinationList.getSelectedValue();
@@ -281,10 +344,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private class Destination {
         public Location location;
         public int turns;
+        public String extras;
 
-        public Destination(Location location, int turns) {
+        public Destination(Location location, int turns, String extras) {
             this.location = location;
             this.turns = turns;
+            this.extras = extras;
         }
     }
 
@@ -309,7 +374,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             }
             label.setText(Messages.message("selectDestination.destinationTurns",
                                            "%location%", name,
-                                           "%turns%", String.valueOf(d.turns)));
+                                           "%turns%", String.valueOf(d.turns),
+                                           "%extras%", d.extras));
         }
     }
 
