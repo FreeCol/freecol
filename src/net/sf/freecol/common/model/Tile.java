@@ -462,13 +462,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 // settlement which causes Colony.getDefendingUnit()
                 // to throw.
                 u = settlement.getDefendingUnit(attacker);
+            } catch (IllegalStateException e) {
+                logger.log(Level.WARNING, "No defender", e);
+            }
+            // This routine can be called on the client for the pre-combat
+            // popup where enemy settlement defenders are not visible,
+            // thus u == null is valid.
+            if (u != null) {
                 power = cm.getDefencePower(attacker, u);
                 if (Tile.betterDefender(defender, defenderPower, u, power)) {
                     defender = u;
                     defenderPower = power;
                 }
-            } catch (IllegalStateException e) {
-                logger.log(Level.WARNING, "No defender", e);
             }
         }
 
