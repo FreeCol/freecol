@@ -2172,166 +2172,24 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Returns a type of Lost City Rumour. The type of rumour depends on the
-     * exploring unit, as well as player settings.
+     * Explores a lost city, finding a native burial ground.
      *
-     * @param lostCity The <code>LostCityRumour</code> to investigate.
-     * @param unit The <code>Unit</code> exploring the lost city rumour.
-     * @param difficulty The difficulty level.
-     * @return The type of rumour.
-     * TODO: Move all the magic numbers in here to the specification.
-     *       Also change the logic so that the special events appear a
-     *       fixed number of times throughout the game, according to
-     *       the specification.  Names for the cities of gold is also
-     *       on the wishlist.
+     * @param serverPlayer The <code>ServerPlayer</code> that is exploring.
+     * @param unit The <code>Unit</code> that is exploring.
+     * @param cs A <code>ChangeSet</code> to add changes to.
      */
-    private RumourType getLostCityRumourType(LostCityRumour lostCity,
-                                             Unit unit, int difficulty) {
+    private void csNativeBurialGround(ServerPlayer serverPlayer, Unit unit,
+                                      ChangeSet cs) {
         Tile tile = unit.getTile();
-        Player player = unit.getOwner();
-        RumourType rumour = lostCity.getType();
-        if (rumour != null) {
-            // Filter out failing cases that could only occur if the
-            // type was explicitly set in debug mode.
-            switch (rumour) {
-            case BURIAL_GROUND:
-                if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
-                    rumour = RumourType.NOTHING;
-                }
-                break;
-            case LEARN:
-                if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
-                    rumour = RumourType.NOTHING;
-                }
-                break;
-            default:
-                break;
-            }
-            return rumour;
-        }
-
-        // The following arrays contain percentage values for
-        // "good" and "bad" events when scouting with a non-expert
-        // at the various difficulty levels [0..4] exact values
-        // but generally "bad" should increase, "good" decrease
-        final int BAD_EVENT_PERCENTAGE[]  = { 11, 17, 23, 30, 37 };
-        final int GOOD_EVENT_PERCENTAGE[] = { 75, 62, 48, 33, 17 };
-        // remaining to 100, event NOTHING:   14, 21, 29, 37, 46
-
-        // The following arrays contain the modifiers applied when
-        // expert scout is at work exact values; modifiers may
-        // look slightly "better" on harder levels since we're
-        // starting from a "worse" percentage.
-        final int BAD_EVENT_MOD[]  = { -6, -7, -7, -8, -9 };
-        final int GOOD_EVENT_MOD[] = { 14, 15, 16, 18, 20 };
-
-        // The scouting outcome is based on three factors: level,
-        // expert scout or not, DeSoto or not.  Based on this, we
-        // are going to calculate probabilites for neutral, bad
-        // and good events.
-        boolean isExpertScout = unit.hasAbility("model.ability.expertScout")
-            && unit.hasAbility("model.ability.scoutIndianSettlement");
-        boolean hasDeSoto = player.hasAbility("model.ability.rumoursAlwaysPositive");
-        int percentNeutral;
-        int percentBad;
-        int percentGood;
-        if (hasDeSoto) {
-            percentBad  = 0;
-            percentGood = 100;
-            percentNeutral = 0;
-        } else {
-            // First, get "basic" percentages
-            percentBad  = BAD_EVENT_PERCENTAGE[difficulty];
-            percentGood = GOOD_EVENT_PERCENTAGE[difficulty];
-
-            // Second, apply ExpertScout bonus if necessary
-            if (isExpertScout) {
-                percentBad  += BAD_EVENT_MOD[difficulty];
-                percentGood += GOOD_EVENT_MOD[difficulty];
-            }
-
-            // Third, get a value for the "neutral" percentage,
-            // unless the other values exceed 100 already
-            if (percentBad + percentGood < 100) {
-                percentNeutral = 100 - percentBad - percentGood;
-            } else {
-                percentNeutral = 0;
-            }
-        }
-
-        // Now, the individual events; each section should add up to 100
-        // The NEUTRAL
-        int eventNothing = 100;
-
-        // The BAD
-        int eventVanish = 100;
-        int eventBurialGround = 0;
-        // If the tile not is European-owned, allow burial grounds rumour.
-        if (tile.getOwner() != null && tile.getOwner().isIndian()) {
-            eventVanish = 75;
-            eventBurialGround = 25;
-        }
-
-        // The GOOD
-        int eventLearn    = 30;
-        int eventTrinkets = 30;
-        int eventColonist = 20;
-        // or, if the unit can't learn
-        if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
-            eventLearn    =  0;
-            eventTrinkets = 50;
-            eventColonist = 30;
-        }
-
-        // The SPECIAL
-        // Right now, these are considered "good" events that happen randomly.
-        int eventRuins    = 9;
-        int eventCibola   = 6;
-        int eventFountain = 5;
-
-        // Finally, apply the Good/Bad/Neutral modifiers from
-        // above, so that we end up with a ton of values, some of
-        // them zero, the sum of which should be 10000.
-        eventNothing      *= percentNeutral;
-        eventVanish       *= percentBad;
-        eventBurialGround *= percentBad;
-        eventLearn        *= percentGood;
-        eventTrinkets     *= percentGood;
-        eventColonist     *= percentGood;
-        eventRuins        *= percentGood;
-        eventCibola       *= percentGood;
-        eventFountain     *= percentGood;
-
-        // Add all possible events to a RandomChoice List
-        List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
-        if (eventNothing > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, eventNothing));
-        }
-        if (eventVanish > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, eventVanish));
-        }
-        if (eventBurialGround > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, eventBurialGround));
-        }
-        if (eventLearn > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.LEARN, eventLearn));
-        }
-        if (eventTrinkets > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, eventTrinkets));
-        }
-        if (eventColonist > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, eventColonist));
-        }
-        if (eventRuins > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.RUINS, eventRuins));
-        }
-        if (eventCibola > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.CIBOLA, eventCibola));
-        }
-        if (eventFountain > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
-        }
-        return RandomChoice.getWeightedRandom(random, choices);
+        Player indianPlayer = tile.getOwner();
+        cs.add(See.only(serverPlayer),
+               indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit()));
+        cs.add(See.only(serverPlayer), indianPlayer);
+        cs.addMessage(See.only(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                             "lostCityRumour.BurialGround",
+                             serverPlayer, unit)
+                .addStringTemplate("%nation%", indianPlayer.getNationName()));
     }
 
     /**
@@ -2347,25 +2205,64 @@ public final class InGameController extends Controller {
         LostCityRumour lostCity = tile.getLostCityRumour();
         if (lostCity == null) return;
 
-        Specification specification = getGame().getSpecification();
-        int difficulty = specification.getRangeOption("model.option.difficulty").getValue();
-        int dx = 10 - difficulty;
         Game game = unit.getGame();
+        Specification specification = game.getSpecification();
+        int difficulty = specification.getRangeOption("model.option.difficulty")
+            .getValue();
+        int dx = 10 - difficulty;
         UnitType unitType;
         Unit newUnit = null;
         List<UnitType> treasureUnitTypes = null;
 
-        switch (getLostCityRumourType(lostCity, unit, difficulty)) {
+        RumourType rumour = lostCity.getType();
+        if (rumour == null) {
+            rumour = lostCity.chooseType(unit, difficulty, random);
+        } else {
+            // Filter out failing cases that could only occur if the
+            // type was explicitly set in debug mode.
+            switch (rumour) {
+            case BURIAL_GROUND: case MOUNDS:
+                if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
+                    rumour = RumourType.NOTHING;
+                }
+                break;
+            case LEARN:
+                if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
+                    rumour = RumourType.NOTHING;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        // Mounds are a special case that degrade to other cases.
+        boolean mounds = rumour == RumourType.MOUNDS;
+        if (mounds) {
+            boolean done = false;
+            boolean burial = false;
+            while (!done) {
+                rumour = lostCity.chooseType(unit, difficulty, random);
+                switch (rumour) {
+                case EXPEDITION_VANISHES: case NOTHING: case TRIBAL_CHIEF:
+                case RUINS:
+                    done = true;
+                    break;
+                case BURIAL_GROUND:
+                    if (!burial) {
+                        csNativeBurialGround(serverPlayer, unit, cs);
+                        burial = true;
+                    }
+                    break;
+                default:
+                    ; // unacceptable result for mounds
+                }
+            }
+        }
+
+        switch (rumour) {
         case BURIAL_GROUND:
-            Player indianPlayer = tile.getOwner();
-            cs.add(See.only(serverPlayer),
-                   indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit()));
-            cs.add(See.only(serverPlayer), indianPlayer);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 "lostCityRumour.BurialGround",
-                                 serverPlayer, unit)
-                    .addStringTemplate("%nation%", indianPlayer.getNationName()));
+            csNativeBurialGround(serverPlayer, unit, cs);
             break;
         case EXPEDITION_VANISHES:
             cs.addDispose(serverPlayer, tile, unit);
@@ -2377,11 +2274,13 @@ public final class InGameController extends Controller {
         case NOTHING:
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 "lostCityRumour.Nothing",
+                                 ((mounds) ? "lostCityRumour.moundsNothing"
+                                  : "lostCityRumour.Nothing"),
                                  serverPlayer, unit));
             break;
         case LEARN:
-            List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
+            List<UnitType> learntUnitTypes = unit.getType()
+                .getUnitTypesLearntInLostCity();
             StringTemplate oldName = unit.getLabel();
             unit.setType(learntUnitTypes.get(random.nextInt(learntUnitTypes.size())));
             cs.addMessage(See.only(serverPlayer),
@@ -2398,7 +2297,8 @@ public final class InGameController extends Controller {
                           "gold", "score");
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 "lostCityRumour.TribalChief",
+                                 ((mounds) ? "lostCityRumour.moundsTrinkets"
+                                  : "lostCityRumour.TribalChief"),
                                  serverPlayer, unit)
                     .addAmount("%money%", chiefAmount));
             break;
@@ -2486,7 +2386,7 @@ public final class InGameController extends Controller {
                                       serverPlayer, unit));
             }
             break;
-        case NO_SUCH_RUMOUR:
+        case NO_SUCH_RUMOUR: case MOUNDS:
         default:
             throw new IllegalStateException("No such rumour.");
         }

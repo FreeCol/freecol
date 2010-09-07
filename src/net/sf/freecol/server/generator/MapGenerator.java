@@ -277,6 +277,8 @@ public class MapGenerator implements IMapGenerator {
             }
             // END TODO
 
+            int difficulty = map.getGame().getSpecification()
+                .getRangeOption("model.option.difficulty").getValue();
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
                     Position p = new Position(random.nextInt(map.getWidth()), 
@@ -293,7 +295,12 @@ public class MapGenerator implements IMapGenerator {
                             && t.getSettlement() == null
                             && t.getUnitCount() == 0) { 
                         counter++;
-                        t.add(new LostCityRumour(t.getGame(), t));
+                        LostCityRumour r = new LostCityRumour(t.getGame(), t);
+                        if (r.chooseType(null, difficulty, random)
+                            == LostCityRumour.RumourType.MOUNDS) {
+                            r.setType(LostCityRumour.RumourType.MOUNDS);
+                        }
+                        t.add(r);
                         break;
                     }
                 }

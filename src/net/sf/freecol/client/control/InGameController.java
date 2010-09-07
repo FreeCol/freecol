@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
@@ -1917,8 +1918,12 @@ public final class InGameController implements NetworkConstants {
     private void moveExplore(Unit unit, Direction direction) {
         // Confirm exploration.
         Canvas canvas = freeColClient.getCanvas();
-        if (canvas.showConfirmDialog(unit.getTile(),
-                                     "exploreLostCityRumour.text",
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
+        String messageId = (tile.getLostCityRumour().getType()
+                            == LostCityRumour.RumourType.MOUNDS)
+            ? "exploreMoundsRumour.text"
+            : "exploreLostCityRumour.text";
+        if (canvas.showConfirmDialog(unit.getTile(), messageId,
                                      "exploreLostCityRumour.yes",
                                      "exploreLostCityRumour.no")) {
             moveMove(unit, direction);
