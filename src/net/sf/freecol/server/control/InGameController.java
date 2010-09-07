@@ -2703,6 +2703,22 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Move a unit to America.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to move to America.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element moveToAmerica(ServerPlayer serverPlayer, Unit unit) {
+        ChangeSet cs = new ChangeSet();
+        unit.setState(UnitState.TO_AMERICA);
+        cs.add(See.only(serverPlayer), serverPlayer.getEurope());
+
+        // Only the player can see this.
+        return cs.build(serverPlayer);
+    }
+
+    /**
      * Move a unit to Europe.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.

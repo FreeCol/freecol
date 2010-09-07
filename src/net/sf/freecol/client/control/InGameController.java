@@ -127,6 +127,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
+import net.sf.freecol.common.networking.MoveToAmericaMessage;
 import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -1866,6 +1867,58 @@ public final class InGameController implements NetworkConstants {
         } else {
             moveMove(unit, direction);
         }
+    }
+
+    /**
+     * Moves the specified unit to America.
+     *
+     * @param unit The <code>Unit</code> to be moved to America.
+     */
+    public void moveToAmerica(Unit unit) {
+        final Canvas canvas = freeColClient.getCanvas();
+        final Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+        if (!(unit.getLocation() instanceof Europe)) {
+            freeColClient.playSound("sound.event.illegalMove");
+            return;
+        }
+
+        // Ask for autoload emigrants
+        final ClientOptions co = canvas.getClient().getClientOptions();
+        if (co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
+            int spaceLeft = unit.getSpaceLeft();
+            for (Unit u : new ArrayList<Unit>(unit.getLocation().getUnitList())) {
+                if (!u.isNaval()) {
+                    if (u.getType().getSpaceTaken() > spaceLeft) break;
+                    boardShip(u, unit);
+                    spaceLeft -= u.getType().getSpaceTaken();
+                }
+            }
+        }
+
+        if (askMoveToAmerica(unit)) {
+            nextActiveUnit();
+        }
+    }
+
+    /**
+     * Server query-response for moving to America.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askMoveToAmerica(Unit unit) {
+        Client client = freeColClient.getClient();
+        MoveToAmericaMessage message = new MoveToAmericaMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**
@@ -4218,49 +4271,6 @@ public final class InGameController implements NetworkConstants {
          */
         if (unit.getDestination() != null)
             setDestination(unit, null);
-    }
-
-    /**
-     * Moves the specified unit to America.
-     * 
-     * @param unit The unit to be moved to America.
-     */
-    public void moveToAmerica(Unit unit) {
-        final Canvas canvas = freeColClient.getCanvas();
-        final Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        final Client client = freeColClient.getClient();
-        final ClientOptions co = canvas.getClient().getClientOptions();
-
-        // Ask for autoload emigrants
-        if (unit.getLocation() instanceof Europe) {
-            final boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
-            if (autoload) {
-                int spaceLeft = unit.getSpaceLeft();
-                List<Unit> unitsInEurope = new ArrayList<Unit>(unit.getLocation().getUnitList());
-                for (Unit possiblePassenger : unitsInEurope) {
-                    if (possiblePassenger.isNaval()) {
-                        continue;
-                    }
-                    if (possiblePassenger.getType().getSpaceTaken() <= spaceLeft) {
-                        boardShip(possiblePassenger, unit);
-                        spaceLeft -= possiblePassenger.getType().getSpaceTaken();
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        unit.moveToAmerica();
-
-        Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
-        moveToAmericaElement.setAttribute("unit", unit.getId());
-
-        client.sendAndWait(moveToAmericaElement);
     }
 
     /**

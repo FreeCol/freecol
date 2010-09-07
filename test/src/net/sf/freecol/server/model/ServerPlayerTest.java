@@ -251,7 +251,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // While source moving from America, target in Europe
         cotton.setLocation(privateer1);
         assertEquals(europe, privateer1.getLocation());
-        privateer1.moveToAmerica();
+        igc.moveToAmerica(dutch, privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
@@ -269,7 +269,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source in Europe, target moving to America
         privateer1.setLocation(europe);
-        privateer2.moveToAmerica();
+        igc.moveToAmerica(dutch, privateer2);
         cotton.setLocation(privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
@@ -279,7 +279,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source moving to America, target moving to America
         cotton.setLocation(privateer1);
-        privateer1.moveToAmerica();
+        igc.moveToAmerica(dutch, privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
@@ -308,7 +308,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // While source moving to America, target moving from America
         cotton.setLocation(privateer1);
-        privateer1.moveToAmerica();
+        igc.moveToAmerica(dutch, privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
@@ -409,7 +409,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Unit colonist = new Unit(game, galleon, dutch, colonistType, UnitState.SENTRY);
         assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
         assertEquals("Galleon should have a colonist onboard",1,galleon.getUnitCount());
-        galleon.moveToAmerica();
+        InGameController igc = (InGameController) server.getController();
+        igc.moveToAmerica(dutch, galleon);
 
         assertFalse("Should not be game over, units between new world and europe",
                     dutch.checkForDeath());

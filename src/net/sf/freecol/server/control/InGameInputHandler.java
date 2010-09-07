@@ -87,6 +87,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
+import net.sf.freecol.common.networking.MoveToAmericaMessage;
 import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -241,16 +242,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new SellGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
+        register(MoveToAmericaMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new MoveToAmericaMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
         register(MoveToEuropeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new MoveToEuropeMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register("moveToAmerica", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return moveToAmerica(connection, element);
             }
         });
         register(AbandonColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -746,22 +747,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             unit.setTradeRoute(tradeRoute);
         }
-        return null;
-    }
-
-    /**
-     * Handles a "moveToAmerica"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param moveToAmericaElement The element containing the request.
-     */
-    private Element moveToAmerica(Connection connection, Element moveToAmericaElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(moveToAmericaElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        unit.moveToAmerica();
         return null;
     }
 

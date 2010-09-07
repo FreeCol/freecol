@@ -2901,22 +2901,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Moves this unit to america.
-     * 
-     * @exception IllegalStateException If the move is illegal.
-     */
-    public void moveToAmerica() {
-        if (!(getLocation() instanceof Europe)) {
-            throw new IllegalStateException("A unit can only be moved to america from europe.");
-        }
-
-        setState(UnitState.TO_AMERICA);
-
-        logger.info(toString() + " moving to America");
-        
-    }
-
-    /**
      * Check if this unit can build a colony on the tile where it is located.
      * 
      * @return <code>true</code> if this unit can build a colony on the tile
