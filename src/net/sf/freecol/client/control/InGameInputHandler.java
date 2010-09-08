@@ -953,7 +953,7 @@ public final class InGameInputHandler extends InputHandler {
             colony.removeGoods(goods);
 
             // JACOB_FUGGER does not protect against new boycotts
-            freeColClient.getMyPlayer().setArrears(goods);
+            freeColClient.getMyPlayer().setBoycott(goods.getType());
 
             String messageID = goods.getType().getId() + ".destroyed";
             if (!Messages.containsKey(messageID)) {

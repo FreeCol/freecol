@@ -959,7 +959,7 @@ public final class InGameController extends Controller {
                         serverPlayer.setTax(oldTax); // player hasn't accepted, restoring tax
                         Element removeGoodsElement = Message.createNewRootElement("removeGoods");
                         colony.removeGoods(goods);
-                        serverPlayer.setArrears(goods);
+                        serverPlayer.setBoycott(goods.getType());
                         colony.getFeatureContainer().addModifier(Modifier
                                                                  .createTeaPartyModifier(getGame().getTurn()));
                         removeGoodsElement.appendChild(goods.toXMLElement(serverPlayer, removeGoodsElement
@@ -5746,6 +5746,32 @@ public final class InGameController extends Controller {
             cs.add(See.perhaps(), winner);
             sendToOthers(serverPlayer, cs);
         }
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Pay arrears.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param type The <code>GoodsType</code> to pay the arrears for.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element payArrears(ServerPlayer serverPlayer, GoodsType type) {
+        int arrears = serverPlayer.getArrears(type);
+        if (arrears <= 0) {
+            return Message.clientError("No arrears for pay for: " + type.getId());
+        } else if (serverPlayer.getGold() < arrears) {
+            return Message.clientError("Not enough gold to pay arrears for: "
+                                       + type.getId());
+        }
+
+        ChangeSet cs = new ChangeSet();
+        Market market = serverPlayer.getMarket();
+        serverPlayer.modifyGold(-arrears);
+        market.setArrears(type, 0);
+        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.add(See.only(serverPlayer), market.getMarketData(type));
+        // Arrears payment is private.
         return cs.build(serverPlayer);
     }
 }

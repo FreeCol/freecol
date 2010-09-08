@@ -93,6 +93,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -427,10 +428,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return payForBuilding(connection, element);
             }
         });
-        register("payArrears", new CurrentPlayerNetworkRequestHandler() {
+        register(PayArrearsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return payArrears(connection, element);
+                return new PayArrearsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("setGoodsLevels", new CurrentPlayerNetworkRequestHandler() {
@@ -1006,25 +1007,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
         colony.payForBuilding();
-        return null;
-    }
-
-    /**
-     * Handles a "payArrears"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param payArrearsElement The element containing the request.
-     */
-    private Element payArrears(Connection connection, Element payArrearsElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        GoodsType goodsType = getGame().getSpecification().getGoodsType(payArrearsElement.getAttribute("goodsType"));
-        int arrears = player.getArrears(goodsType);
-        if (player.getGold() < arrears) {
-            throw new IllegalStateException("Not enough gold to pay tax arrears!");
-        } else {
-            player.modifyGold(-arrears);
-            player.resetArrears(goodsType);
-        }
         return null;
     }
 

@@ -682,7 +682,7 @@ public class StandardAIPlayer extends AIPlayer {
         logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
         for (GoodsType goodsType : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
-            getPlayer().resetArrears(goodsType);
+            getPlayer().getMarket().setArrears(goodsType, 0);
         }
 
         //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)

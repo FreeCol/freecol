@@ -1604,7 +1604,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             } else if (eventId.equals("model.event.boycottsLifted")) {
                 for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                    resetArrears(goodsType);
+                    getMarket().setArrears(goodsType, 0);
                 }
             } else if (eventId.equals("model.event.freeBuilding")) {
                 BuildingType type = getSpecification().getBuildingType(event.getValue());
@@ -2851,46 +2851,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the arrears for a type of goods.
+     * Puts a tax boycott on a type of goods.
      *
      * @param goodsType a <code>GoodsType</code> value
      */
-    public void setArrears(GoodsType goodsType) {
+    public void setBoycott(GoodsType goodsType) {
         Specification spec = getSpecification();
         Market market = getMarket();
         market.setArrears(goodsType, market.getPaidForSale(goodsType)
             * spec.getIntegerOption("model.option.arrearsFactor").getValue());
-    }
-
-    /**
-     * Sets the arrears for these goods.
-     *
-     * @param goods The goods.
-     */
-    public void setArrears(Goods goods) {
-        setArrears(goods.getType());
-    }
-
-    /**
-     * Resets the arrears for this type of goods to zero.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     */
-    public void resetArrears(GoodsType goodsType) {
-        getMarket().setArrears(goodsType, 0);
-    }
-
-    /**
-     * Resets the arrears for these goods to zero. This is the same as calling:
-     * <br>
-     * <br>
-     * <code>resetArrears(goods.getType());</code>
-     *
-     * @param goods The goods to reset the arrears for.
-     * @see #resetArrears(GoodsType)
-     */
-    public void resetArrears(Goods goods) {
-        resetArrears(goods.getType());
     }
 
     /**

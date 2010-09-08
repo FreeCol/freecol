@@ -132,6 +132,7 @@ import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -4429,43 +4430,59 @@ public final class InGameController implements NetworkConstants {
      * Pays the tax arrears on this type of goods.
      * 
      * @param goods The goods for which to pay arrears.
+     * @return True if the arrears were paid.
      */
-    public void payArrears(Goods goods) {
-        payArrears(goods.getType());
+    public boolean payArrears(Goods goods) {
+        return payArrears(goods.getType());
     }
 
     /**
      * Pays the tax arrears on this type of goods.
      * 
      * @param type The type of goods for which to pay arrears.
+     * @return True if the arrears were paid.
      */
-    public void payArrears(GoodsType type) {
+    public boolean payArrears(GoodsType type) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
+        }
 
         int arrears = player.getArrears(type);
-        if (player.getGold() >= arrears) {
-            if (canvas.showConfirmDialog(null, "model.europe.payArrears",
-                                         "ok", "cancel",
-                                         "%replace%", String.valueOf(arrears))) {
-                player.modifyGold(-arrears);
-                canvas.updateGoldLabel();
-                player.resetArrears(type);
-                // send to server
-                Element payArrearsElement = Message.createNewRootElement("payArrears");
-                payArrearsElement.setAttribute("goodsType", type.getId());
-                client.sendAndWait(payArrearsElement);
-            }
-        } else {
+        if (arrears <= 0) return false;
+        if (player.getGold() < arrears) {
             canvas.showInformationMessage("model.europe.cantPayArrears",
                                           "%amount%", String.valueOf(arrears));
+            return false;
         }
+        if (canvas.showConfirmDialog(null,
+                                     "model.europe.payArrears",
+                                     "ok", "cancel",
+                                     "%replace%", String.valueOf(arrears))
+            && askPayArrears(type) && player.canTrade(type)) {
+            canvas.updateGoldLabel();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Server query-response for tax paying arrears.
+     *
+     * @param type The <code>GoodsType</code> to pay the arrears for.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askPayArrears(GoodsType type) {
+        Client client = freeColClient.getClient();
+        PayArrearsMessage message = new PayArrearsMessage(type);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**
