@@ -84,6 +84,9 @@ public class DebugMenu extends JMenu {
     }
 
     private void buildDebugMenu() {
+        final Player player = freeColClient.getMyPlayer();
+        final Player serverPlayer = (Player) freeColClient.getFreeColServer()
+            .getGame().getFreeColGameObject(player.getId());
 
         this.setOpaque(false);
         this.setMnemonic(KeyEvent.VK_D);
@@ -100,7 +103,7 @@ public class DebugMenu extends JMenu {
         debugFixMenu.add(crossBug);
         crossBug.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    freeColClient.getMyPlayer().updateImmigrationRequired();
+                    player.updateImmigrationRequired();
                     if (freeColClient.getFreeColServer() != null) {
                         Iterator<Player> pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
                         while (pi.hasNext()) {
@@ -156,7 +159,6 @@ public class DebugMenu extends JMenu {
                     if (freeColClient.getFreeColServer() != null) {
                         freeColClient.getFreeColServer().revealMapForAllPlayers();
                     }
-
                     reveal.setEnabled(false);
                 }
             });
@@ -216,30 +218,15 @@ public class DebugMenu extends JMenu {
 
         setupSkipTurnsMenuItem();
 
-        if (freeColClient.getFreeColServer() != null) {
-            final JMenuItem giveBells = new JMenuItem("Adds 100 bells to each Colony");
-            giveBells.setOpaque(false);
-            giveBells.setMnemonic(KeyEvent.VK_B);
-            this.add(giveBells);
-            giveBells.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        for (Colony c : freeColClient.getMyPlayer().getColonies()) {
-                            c.addLiberty(100);
-                            Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getId());
-                            sc.addLiberty(100);
-                        }
-                    }
-                });
-        }
-
-        final JMenuItem addFather = new JMenuItem("Add Founding Father");
+        final String fatherTitle = Messages.message("menuBar.debug.addFoundingFather");
+        final JMenuItem addFather = new JMenuItem(fatherTitle);
         addFather.setOpaque(false);
         addFather.setMnemonic(KeyEvent.VK_F);
         this.add(addFather);
         addFather.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Player player = freeColClient.getMyPlayer();
-                    List<ChoiceItem<FoundingFather>> fathers = new ArrayList<ChoiceItem<FoundingFather>>();
+                    List<ChoiceItem<FoundingFather>> fathers
+                        = new ArrayList<ChoiceItem<FoundingFather>>();
                     for (FoundingFather father : freeColClient.getGame().getSpecification().getFoundingFathers()) {
                         if (!player.hasFather(father)) {
                             fathers.add(new ChoiceItem<FoundingFather>(Messages.message(father.getNameKey()),
@@ -247,35 +234,64 @@ public class DebugMenu extends JMenu {
                         }
                     }
                     ChoiceDialog<FoundingFather> choiceDialog =
-                        new ChoiceDialog<FoundingFather>(freeColClient.getCanvas(),
-                                                         "Select Founding Father", "Cancel", fathers);
-                    FoundingFather fatherToAdd = freeColClient.getCanvas()
-                        .showFreeColDialog(choiceDialog, null);
+                        new ChoiceDialog<FoundingFather>(canvas, fatherTitle,
+                                                         "Cancel", fathers);
+                    FoundingFather fatherToAdd
+                        = canvas.showFreeColDialog(choiceDialog, null);
                     player.addFather(fatherToAdd);
-                    Player serverPlayer = (Player) freeColClient.getFreeColServer().getGame().
-                        getFreeColGameObject(player.getId());
                     serverPlayer.addFather(fatherToAdd);
                 }
             });
 
-        final JMenuItem addCrosses = new JMenuItem("Add Immigration");
+        final String goldTitle = Messages.message("menuBar.debug.addGold");
+        final JMenuItem addGold = new JMenuItem(goldTitle);
+        addGold.setOpaque(false);
+        this.add(addGold);
+        addGold.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String response
+                        = canvas.showInputDialog(null, goldTitle,
+                                                 Integer.toString(1000),
+                                                 "ok", "cancel", true);
+                    int gold = Integer.parseInt(response);
+                    player.modifyGold(gold);
+                    serverPlayer.modifyGold(gold);
+                }
+            });
+
+        final String immigrationTitle = Messages.message("menuBar.debug.addImmigration");
+        final JMenuItem addCrosses = new JMenuItem(immigrationTitle);
         addCrosses.setOpaque(false);
         // addCrosses.setMnemonic(KeyEvent.VK_????);
         this.add(addCrosses);
         addCrosses.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String response = freeColClient.getCanvas()
-                        .showInputDialog(null, "menuBar.debug.addImmigration",
-                                         Integer.toString(100),
-                                         "ok", "cancel", true);
-                    Player player = freeColClient.getMyPlayer();
+                    String response
+                        = canvas.showInputDialog(null, immigrationTitle,
+                                                 Integer.toString(100),
+                                                 "ok", "cancel", true);
                     int crosses = Integer.parseInt(response);
-                    Player serverPlayer = (Player) freeColClient.getFreeColServer()
-                        .getGame().getFreeColGameObject(player.getId());
                     player.incrementImmigration(crosses);
                     serverPlayer.incrementImmigration(crosses);
                 }
             });
+
+        if (freeColClient.getFreeColServer() != null) {
+            final JMenuItem giveBells
+                = new JMenuItem(Messages.message("menuBar.debug.addLiberty"));
+            giveBells.setOpaque(false);
+            giveBells.setMnemonic(KeyEvent.VK_B);
+            this.add(giveBells);
+            giveBells.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        for (Colony c : player.getColonies()) {
+                            c.addLiberty(100);
+                            Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getId());
+                            sc.addLiberty(100);
+                        }
+                    }
+                });
+        }
 
         // random number generator
         final JMenuItem rng = new JMenuItem("Step random number generator");
@@ -289,8 +305,7 @@ public class DebugMenu extends JMenu {
                     while (more) {
                         int val = freeColClient.getGame().getModelController()
                             .getRandom("step" + n++, 100);
-                        more = freeColClient.getCanvas()
-                            .showConfirmDialog(null,
+                        more = canvas.showConfirmDialog(null,
                                 "menuBar.debug.stepRandomNumberGenerator",
                                 "more", "ok",
                                 "%value%", Integer.toString(val));
@@ -397,7 +412,7 @@ public class DebugMenu extends JMenu {
                     if (freeColClient.getFreeColServer() != null) {
                         net.sf.freecol.server.ai.AIMain aiMain = freeColClient.getFreeColServer().getAIMain();
                         net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) aiMain
-                            .getAIObject(freeColClient.getMyPlayer().getId());
+                            .getAIObject(player.getId());
                         ap.setDebuggingConnection(freeColClient.getClient().getConnection());
                         ap.startWorking();
                         freeColClient.getConnectController().reconnect();
@@ -418,14 +433,12 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     boolean problemDetected = false;
                     Map serverMap = freeColClient.getFreeColServer().getGame().getMap();
-                    Player myServerPlayer = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(
-                                                                                                                     freeColClient.getMyPlayer().getId());
                     for (Tile t: serverMap.getAllTiles()) {
-                        if (myServerPlayer.canSee(t)) {
+                        if (serverPlayer.canSee(t)) {
                             Iterator<Unit> unitIterator = t.getUnitIterator();
                             while (unitIterator.hasNext()) {
                                 Unit u = unitIterator.next();
-                                if (u.isVisibleTo(myServerPlayer)) {
+                                if (u.isVisibleTo(serverPlayer)) {
                                     if (freeColClient.getGame().getFreeColGameObject(u.getId()) == null) {
                                         System.out.println("Unsynchronization detected: Unit missing on client-side");
                                         System.out.println(Messages.message(Messages.getLabel(u))
@@ -553,7 +566,6 @@ public class DebugMenu extends JMenu {
                         return;
                     }
 
-                    Canvas canvas = freeColClient.getCanvas();
                     String response = canvas.showInputDialog(null, "How many turns should be skipped:",
                              Integer.toString(10), "ok", "cancel", true);
                     if(response == null){
