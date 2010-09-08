@@ -286,7 +286,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     public class Stop {
 
-        private String locationId;
+        private Location location;
 
         private ArrayList<GoodsType> cargo = new ArrayList<GoodsType>();
 
@@ -298,7 +298,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
 
         public Stop(Location location) {
-            this.locationId = location.getId();
+            this.location = location;
         }
 
         /**
@@ -307,12 +307,13 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * @param other
          */
         private Stop(Stop other) {
-            this.locationId = other.locationId;
+            this.location = other.location;
             this.cargo = new ArrayList<GoodsType>(other.cargo);
         }
 
         private Stop(XMLStreamReader in) throws XMLStreamException {
-            locationId = in.getAttributeValue(null, "location");
+            String locationId = in.getAttributeValue(null, "location");
+            location = (Location) getGame().getFreeColGameObject(locationId);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(CARGO_TAG)) {
                     String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
@@ -354,8 +355,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * @return a <code>Location</code> value
          */
         public final Location getLocation() {
-            Game g = getGame();
-            return g != null ? (Location) g.getFreeColGameObject(locationId) : null;
+            return location;
         }
 
         /**
@@ -393,7 +393,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
             out.writeStartElement(getStopXMLElementTagName());
-            out.writeAttribute("location", this.locationId);
+            out.writeAttribute("location", this.location.getId());
             for (GoodsType cargoType : cargo) {
                 out.writeStartElement(CARGO_TAG);
                 out.writeAttribute(ID_ATTRIBUTE_TAG, cargoType.getId());

@@ -19,8 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -36,6 +42,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -44,6 +51,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
@@ -51,7 +59,9 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
@@ -130,6 +140,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         cargoPanel = new CargoPanel();
         cargoPanel.setTransferHandler(cargoHandler);
 
+        stopList.setCellRenderer(new StopRenderer());
+        stopList.setFixedCellHeight(48);
         stopList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 updateButtons();
@@ -179,7 +191,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
         });
 
-        setLayout(new MigLayout("wrap 3", "[][fill][fill]", ""));
+        setLayout(new MigLayout("wrap 3", "[fill][fill][fill]", ""));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             "span, align center");
@@ -363,8 +375,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      */
     public class CargoPanel extends JPanel {
 
-        // private Stop stop;
-
         public CargoPanel() {
             super();
             setOpaque(false);
@@ -409,10 +419,15 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         CargoLabel newLabel = new CargoLabel(label.getType());
                         cargoPanel.add(newLabel);
                         cargoPanel.revalidate();
-                        Stop stop = (Stop) stopList.getSelectedValue();
-                        if (stop != null) {
-                            stop.addCargo(label.getType());
-                            stop.setModified(true);
+                        int selectedIndex = stopList.getSelectedIndex();
+                        if (selectedIndex >= 0) {
+                            for (int index = selectedIndex; index < listModel.size(); index++) {
+                                Stop stop = (Stop) listModel.getElementAt(index);
+                                stop.addCargo(label.getType());
+                                stop.setModified(true);
+                            }
+                            stopList.revalidate();
+                            stopList.repaint();
                         }
                     }
                     return true;
@@ -431,17 +446,22 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
                 if (source.getParent() instanceof CargoPanel) {
                     cargoPanel.remove(label);
-                    Stop stop = (Stop) stopList.getSelectedValue();
-                    if (stop != null) {
-                        ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
-                        for (int index = 0; index < cargo.size(); index++) {
-                            if (cargo.get(index) == label.getType()) {
-                                cargo.remove(index);
-                                stop.setModified(true);
-                                break;
+                    int selectedIndex = stopList.getSelectedIndex();
+                    if (selectedIndex >= 0) {
+                        for (int stopIndex = selectedIndex; stopIndex < listModel.size(); stopIndex++) {
+                            Stop stop = (Stop) listModel.getElementAt(stopIndex);
+                            ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
+                            for (int index = 0; index < cargo.size(); index++) {
+                                if (cargo.get(index) == label.getType()) {
+                                    cargo.remove(index);
+                                    stop.setModified(true);
+                                    break;
+                                }
                             }
+                            stop.setCargo(cargo);
                         }
-                        stop.setCargo(cargo);
+                        stopList.revalidate();
+                        stopList.repaint();
                     }
                     cargoPanel.revalidate();
                     cargoPanel.repaint();
@@ -482,4 +502,76 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * exportLevel.getModel()).getNumber().intValue();
      *  } }
      */
+
+    private class StopRenderer implements ListCellRenderer {
+    
+        private final SelectedComponent SELECTED_COMPONENT = new SelectedComponent();
+        private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
+
+
+        /**
+         * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
+         * 
+         * @param list The <code>JList</code>.
+         * @param value The list cell.
+         * @param index The index in the list.
+         * @param isSelected <code>true</code> if the given list cell is selected.
+         * @param hasFocus <code>false</code> if the given list cell has the focus.
+         * @return The <code>ListCellRenderer</code>
+         */
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                      boolean isSelected, boolean hasFocus) {
+
+            JPanel panel = (isSelected ? SELECTED_COMPONENT : NORMAL_COMPONENT);
+            panel.removeAll();
+            panel.setForeground(list.getForeground());
+            panel.setFont(list.getFont());
+            Stop stop = (Stop) value;
+            Location location = stop.getLocation();
+            JLabel icon, name;
+            if (location instanceof Europe) {
+                Europe europe = (Europe) location;
+                Image image = getLibrary().getCoatOfArmsImage(europe.getOwner().getNation(), 0.5);
+                icon = new JLabel(new ImageIcon(image));
+                name = localizedLabel(europe.getNameKey());
+            } else {
+                Colony colony = (Colony) location;
+                icon = new JLabel(new ImageIcon(getLibrary().getSettlementImage(colony, 0.5)));
+                name = new JLabel(colony.getName());
+            }
+            panel.add(icon, "spany");
+            panel.add(name, "span, wrap");
+            for (GoodsType cargo : stop.getCargo()) {
+                panel.add(new JLabel(new ImageIcon(getLibrary().getGoodsImage(cargo, 0.5))));
+            }
+            return panel;
+        }
+
+        private class NormalComponent extends JPanel {
+
+            public NormalComponent() {
+                super(new MigLayout("", "[80][]"));
+                setOpaque(false);
+            }
+        }
+
+        private class SelectedComponent extends NormalComponent {
+
+            public void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                Composite oldComposite = g2d.getComposite();
+                Color oldColor = g2d.getColor();
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.setComposite(oldComposite);
+                g2d.setColor(oldColor);
+            
+                super.paintComponent(g);
+            }
+        }
+    
+
+    }
+
 }
