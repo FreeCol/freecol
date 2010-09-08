@@ -584,7 +584,7 @@ public final class ImageLibrary {
 
             // TODO: Put it in specification
             if (colony.isUndead()) {
-                return getSettlementImage(SettlementType.UNDEAD);
+                return getSettlementImage(SettlementType.UNDEAD, scale);
             } else {
                 int stockadeLevel = 0;
                 if (colony.getStockade() != null) {
@@ -594,30 +594,30 @@ public final class ImageLibrary {
                 switch(stockadeLevel) {
                 case 0:
                     if (unitCount <= 3) {
-                        return getSettlementImage(SettlementType.SMALL_COLONY);
+                        return getSettlementImage(SettlementType.SMALL_COLONY, scale);
                     } else if (unitCount <= 7) {
-                        return getSettlementImage(SettlementType.MEDIUM_COLONY);
+                        return getSettlementImage(SettlementType.MEDIUM_COLONY, scale);
                     } else {
-                        return getSettlementImage(SettlementType.LARGE_COLONY);
+                        return getSettlementImage(SettlementType.LARGE_COLONY, scale);
                     }
                 case 1:
                     if (unitCount > 7) {
-                        return getSettlementImage(SettlementType.LARGE_STOCKADE);
+                        return getSettlementImage(SettlementType.LARGE_STOCKADE, scale);
                     } else if (unitCount > 3) {
-                        return getSettlementImage(SettlementType.MEDIUM_STOCKADE);
+                        return getSettlementImage(SettlementType.MEDIUM_STOCKADE, scale);
                     } else {
-                        return getSettlementImage(SettlementType.SMALL_STOCKADE);
+                        return getSettlementImage(SettlementType.SMALL_STOCKADE, scale);
                     }
                 case 2:
                     if (unitCount > 7) {
-                        return getSettlementImage(SettlementType.LARGE_FORT);
+                        return getSettlementImage(SettlementType.LARGE_FORT, scale);
                     } else {
-                        return getSettlementImage(SettlementType.MEDIUM_FORT);
+                        return getSettlementImage(SettlementType.MEDIUM_FORT, scale);
                     }
                 case 3:
-                    return getSettlementImage(SettlementType.LARGE_FORTRESS);
+                    return getSettlementImage(SettlementType.LARGE_FORTRESS, scale);
                 default:
-                    return getSettlementImage(SettlementType.SMALL_COLONY);
+                    return getSettlementImage(SettlementType.SMALL_COLONY, scale);
                 }
             }
 
