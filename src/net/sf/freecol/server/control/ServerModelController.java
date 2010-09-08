@@ -475,8 +475,9 @@ public class ServerModelController implements ModelController {
      */
     public TradeRoute getNewTradeRoute(Player player) {
         Game game = freeColServer.getGame();
-        String name = "";
-        return new TradeRoute(game, name, player);
+        TradeRoute t = new TradeRoute(game, "", player);
+        taskRegister.put(t.getId(), new TaskEntry(t.getId(), game.getTurn().getNumber(), true, t));
+        return t;
     }
 
     /**
