@@ -76,11 +76,11 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
         this.winner = winner;
         maxCargo = winner.getSpaceLeft();
 
-        setLayout(new MigLayout("wrap 3"));
+        setLayout(new MigLayout("wrap 1", "[center]", "[]20[]20[]"));
 
         JLabel header = new JLabel(Messages.message("lootCargo.header"));
         header.setFont(mediumHeaderFont);
-        add(header, "span, align center, wrap 20");
+        add(header);
 
         goodsList = new JList();
         GoodsItem[] goods = new GoodsItem[loot.size()];
@@ -98,23 +98,23 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
                     updateComponents();
                 }
             });
-        add(goodsList, "span, align center, wrap 20");
+        add(goodsList);
 
         allButton = new JButton(Messages.message(ALL));
         allButton.addActionListener(this);
         enterPressesWhenFocused(allButton);
         allButton.setMnemonic('a');
         allButton.setActionCommand(ALL);
-        add(allButton);
 
         noneButton = new JButton(Messages.message(NONE));
         noneButton.addActionListener(this);
         enterPressesWhenFocused(noneButton);
         noneButton.setMnemonic('n');
         noneButton.setActionCommand(NONE);
-        add(noneButton);
 
-        add(okButton);
+        add(allButton, "span, split 3");
+        add(noneButton, "tag cancel");
+        add(okButton, "tag ok");
 
         setSize(getPreferredSize());
     }
@@ -189,9 +189,10 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
                                                       int currentindex,
                                                       boolean isChecked,
                                                       boolean hasFocus) {
-            setSelected(((GoodsItem) obj).isSelected());
-            setText(((GoodsItem) obj).toString());
-            setEnabled(((GoodsItem) obj).isEnabled());
+            GoodsItem item = (GoodsItem) obj;
+            setSelected(item.isSelected());
+            setText(item.toString());
+            setEnabled(item.isEnabled());
             return this;
         }
     }
