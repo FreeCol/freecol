@@ -61,7 +61,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      */
     public MapGeneratorOptionsDialog(Canvas parent, MapGeneratorOptions mgo, boolean editable) {
         super(parent);
-        setLayout(new MigLayout("wrap 4, fill"));
+        setLayout(new MigLayout("wrap 1"));
 
         ui = new OptionMapUI(mgo, editable, getSpecification());
 
@@ -75,10 +75,10 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         setSize(750, 500);
 
         // Header:
-        add(getDefaultHeader(mgo.getName()), "align center, span");
+        add(getDefaultHeader(mgo.getName()), "align center");
 
         JPanel mapPanel = new JPanel();
-        mapPanel.setLayout(new MigLayout("wrap 4, fill"));
+        mapPanel.setLayout(new MigLayout("", "", "[nogrid][]"));
         /*
          * TODO: The update should be solved by PropertyEvent.
          */
@@ -117,8 +117,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         }
 
         // Options:
-        mapPanel.add(ui, "newline 20, span, growx");
-        add(mapPanel, "newline 20, span");
+        mapPanel.add(ui, "newline 20");
 
         JScrollPane scrollPane = new JScrollPane(mapPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -130,7 +129,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         okButton.setEnabled(editable);
 
         // Buttons:
-        add(okButton, "newline 20, span, split 3, tag ok");
+        add(okButton, "newline 20, split 3, tag ok");
         add(reset);
         add(cancelButton, "tag cancel");
 
