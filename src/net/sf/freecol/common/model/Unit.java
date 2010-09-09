@@ -471,7 +471,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public final void setTradeRoute(final TradeRoute newTradeRoute) {
         this.tradeRoute = newTradeRoute;
         if (newTradeRoute != null) {
-            ArrayList<Stop> stops = newTradeRoute.getStops();
+            List<Stop> stops = newTradeRoute.getStops();
             if (stops.size() > 0) {
                 setDestination(newTradeRoute.getStops().get(0).getLocation());
                 currentStop = 0;
@@ -516,7 +516,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (tradeRoute == null) {
             currentStop = -1;
         } else {
-            ArrayList<Stop> stops = tradeRoute.getStops();
+            List<Stop> stops = tradeRoute.getStops();
             if (stops == null || stops.size() == 0) {
                 currentStop = -1;
             } else {

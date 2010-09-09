@@ -624,7 +624,7 @@ public final class InGameController implements NetworkConstants {
     private void unloadUnitAtStop(Unit unit) {
         Colony colony = unit.getColony();
         Stop stop = unit.getStop();
-        final ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
+        final List<GoodsType> goodsTypesToLoad = stop.getCargo();
 
         // Unload everything that is on the carrier but not listed to
         // be loaded at this stop.

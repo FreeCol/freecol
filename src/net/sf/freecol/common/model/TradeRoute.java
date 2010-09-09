@@ -39,8 +39,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     public static final TradeRoute NO_TRADE_ROUTE = new TradeRoute();
 
-    // private static final Logger logger =
-    // Logger.getLogger(TradeRoute.class.getName());
+    // private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
 
     /**
      * The name of this trade route.
@@ -69,7 +68,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     /**
      * A list of stops.
      */
-    private ArrayList<Stop> stops = new ArrayList<Stop>();
+    private List<Stop> stops = new ArrayList<Stop>();
 
     /**
      * Creates a new <code>TradeRoute</code> instance.
@@ -214,15 +213,15 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     }
 
     public List<Unit> getAssignedUnits(){
-    	List<Unit> list = new ArrayList<Unit>();
-    	
-    	for(Unit unit : owner.getUnits()){
-    		if(unit.getTradeRoute() == this){
-    			list.add(unit);
-    		}
-    	}
-    	
-    	return list;
+        List<Unit> list = new ArrayList<Unit>();
+        
+        for(Unit unit : owner.getUnits()){
+            if(unit.getTradeRoute() == this){
+                list.add(unit);
+            }
+        }
+        
+        return list;
     }
     
     /**
@@ -230,7 +229,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      * 
      * @return an <code>ArrayList<Stop></code> value
      */
-    public final ArrayList<Stop> getStops() {
+    public final List<Stop> getStops() {
         return stops;
     }
 
@@ -239,7 +238,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      * 
      * @param newStops The new Stops value.
      */
-    public final void setStops(final ArrayList<Stop> newStops) {
+    public final void setStops(final List<Stop> newStops) {
         this.stops = newStops;
     }
 
@@ -288,7 +287,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         private Location location;
 
-        private ArrayList<GoodsType> cargo = new ArrayList<GoodsType>();
+        private List<GoodsType> cargo = new ArrayList<GoodsType>();
 
         /**
          * Whether the stop has been modified. This is of interest only to the
@@ -363,7 +362,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * 
          * @return a cloned <code>ArrayList<Integer></code> value
          */
-        public final ArrayList<GoodsType> getCargo() {
+        public final List<GoodsType> getCargo() {
             return cargo;
         }
 
@@ -372,7 +371,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * 
          * @param cargo and arraylist of cargo values.
          */
-        public final void setCargo(ArrayList<GoodsType> cargo) {
+        public final void setCargo(List<GoodsType> cargo) {
             this.cargo.clear();
             this.cargo.addAll(cargo);
         }
@@ -380,12 +379,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         public void addCargo(GoodsType newCargo) {
             cargo.add(newCargo);
         }
-
-        /*
-          public void addCargo(int newCargoIndex) {
-          cargo.add(getSpecification().getGoodsType(newCargoIndex));
-          }
-        */
 
         public String toString() {
             return (getLocation() == null) ? "invalid stop" : getLocation().toString();
@@ -450,25 +443,25 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     }
     
     public static boolean isStopValid(Unit unit, Stop stop){
-    	return TradeRoute.isStopValid(unit.getOwner(), stop);
+        return TradeRoute.isStopValid(unit.getOwner(), stop);
     }
     
     public static boolean isStopValid(Player player, Stop stop){
-    	if(stop == null){
-    		return false;
-    	}
-    	
-    	Location location = stop.getLocation();
-    	
-    	if(location == null){
-    		return false;
-    	}
-    	
-    	if (((FreeColGameObject) location).isDisposed()) {
-          return false;
-    	}
-    	   
-    	return true;
+        if(stop == null){
+            return false;
+        }
+        
+        Location location = stop.getLocation();
+        
+        if(location == null){
+            return false;
+        }
+        
+        if (((FreeColGameObject) location).isDisposed()) {
+            return false;
+        }
+           
+        return true;
     }
 
     /**

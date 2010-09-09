@@ -4790,7 +4790,7 @@ public final class InGameController extends Controller {
      * @return True if the unit should load or unload cargo at the stop.
      */
     private boolean hasWorkAtStop(Unit unit, Stop stop) {
-        ArrayList<GoodsType> stopGoods = stop.getCargo();
+        List<GoodsType> stopGoods = stop.getCargo();
         int cargoSize = stopGoods.size();
         for (Goods goods : unit.getGoodsList()) {
             GoodsType type = goods.getType();
@@ -4831,7 +4831,7 @@ public final class InGameController extends Controller {
         int current = unit.validateCurrentStop();
         if (current < 0) return null; // No valid stop.
 
-        ArrayList<Stop> stops = unit.getTradeRoute().getStops();
+        List<Stop> stops = unit.getTradeRoute().getStops();
         int next = current;
         for (;;) {
             if (++next >= stops.size()) next = 0;

@@ -118,7 +118,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public TradeRouteInputDialog(final Canvas parent, TradeRoute newRoute) {
@@ -153,23 +153,29 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             public void actionPerformed(ActionEvent e) {
                 int startIndex = -1;
                 int endIndex = -1;
-                if (destinationSelector.getSelectedIndex() == 0 ) {   // All colonies + Europe
+                if (destinationSelector.getSelectedIndex() == 0 ) {
+                    // All colonies + Europe
                     startIndex = 1;
-                    endIndex = destinationSelector.getItemCount() - 1;  // will use inverted order
+                    endIndex = destinationSelector.getItemCount() - 1;
                 } else {
-                    startIndex = destinationSelector.getSelectedIndex();  // just 1 colony
+                    // just 1 colony
+                    startIndex = destinationSelector.getSelectedIndex();
                     endIndex = startIndex;
                 }
+                List<GoodsType> cargo = new ArrayList<GoodsType>();
+                for (Component comp : cargoPanel.getComponents()) {
+                    CargoLabel label = (CargoLabel) comp;
+                    cargo.add(label.getType());
+                }
+                int maxIndex = stopList.getMaxSelectionIndex();
                 for (int i = startIndex; i <= endIndex; i++) {
-                    Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i) );
-                    for (Component comp : cargoPanel.getComponents()) {
-                        CargoLabel label = (CargoLabel) comp;
-                        stop.addCargo(label.getType());
-                    }
-                    if (stopList.getSelectedIndex() == -1) {
+                    Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i));
+                    stop.setCargo(cargo);
+                    if (maxIndex < 0) {
                         listModel.addElement(stop);
                     } else {
-                        listModel.add(stopList.getSelectedIndex() + 1, stop);
+                        maxIndex++;
+                        listModel.add(maxIndex, stop);
                     }
                 }
             }
@@ -178,32 +184,40 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         // button for deleting Stop
         removeStopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                listModel.removeElement(stopList.getSelectedValue());
+                int count = 0;
+                for (int index : stopList.getSelectedIndices()) {
+                    listModel.remove(index - count);
+                    count++;
+                }
             }
         });
 
         // TODO: allow reordering of stops
-        stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         stopList.setDragEnabled(true);
         stopList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                cargoPanel.initialize((Stop) stopList.getSelectedValue());
+                if (!e.getValueIsAdjusting()) {
+                    int[] indices = stopList.getSelectedIndices();
+                    if (indices.length > 0) {
+                        cargoPanel.initialize((Stop) listModel.get(indices[0]));
+                    }
+                }
             }
         });
 
-        setLayout(new MigLayout("wrap 3", "[fill][fill][fill]", ""));
+        setLayout(new MigLayout("wrap 4", "[fill]", ""));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             "span, align center");
         add(tradeRouteView, "span 1 5, grow");
         add(nameLabel);
-        add(tradeRouteName);        
+        add(tradeRouteName, "span");
         add(destinationLabel);
         add(destinationSelector);
+        add(addStopButton);
+        add(removeStopButton, "skip 2");
         add(goodsPanel, "span");
         add(cargoPanel, "span, height 80:");
-        add(addStopButton);
-        add(removeStopButton);
         add(ok, "newline 20, span, split 2, tag ok");
         add(cancel, "tag cancel");
 
@@ -254,7 +268,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * otherwise.
      */
     public void updateButtons() {
-        if (stopList.getSelectedIndex() == -1) {
+        if (stopList.getSelectedIndices().length == 0) {
             removeStopButton.setEnabled(false);
         } else {
             removeStopButton.setEnabled(true);
@@ -264,29 +278,29 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     public void requestFocus() {
         ok.requestFocus();
     }
-    
+
     private boolean verifyNewTradeRoute(){
     	// Verify that it has at least two stops
-    	if(listModel.getSize() < 2){
-    		 getCanvas().errorMessage("traderouteDialog.notEnoughStops");
-    		 return false;
+    	if (listModel.getSize() < 2) {
+            getCanvas().errorMessage("traderouteDialog.notEnoughStops");
+            return false;
     	}
     	
     	Player player = getCanvas().getClient().getMyPlayer();
         for (int index = 0; index < listModel.getSize(); index++) {
-            Stop stop = (Stop) listModel.getElementAt(index);
-            if(!TradeRoute.isStopValid(player, stop)){
+            Stop stop = (Stop) listModel.get(index);
+            if (!TradeRoute.isStopValid(player, stop)) {
             	return false;
             }
         }
-        
+
     	return true;
     }
 
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -294,20 +308,18 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-            	
-            	if(! verifyNewTradeRoute())
-            		break;
-            	
-                getCanvas().remove(this);
-                originalRoute.setName(tradeRouteName.getText());
-                ArrayList<Stop> stops = new ArrayList<Stop>();
-                for (int index = 0; index < listModel.getSize(); index++) {
-                    stops.add((Stop) listModel.getElementAt(index));
+            	if (verifyNewTradeRoute()) {            	
+                    getCanvas().remove(this);
+                    originalRoute.setName(tradeRouteName.getText());
+                    ArrayList<Stop> stops = new ArrayList<Stop>();
+                    for (int index = 0; index < listModel.getSize(); index++) {
+                        stops.add((Stop) listModel.get(index));
+                    }
+                    originalRoute.setStops(stops);
+                    // TODO: update trade routes only if they have been modified
+                    getController().updateTradeRoute(originalRoute);
+                    setResponse(new Boolean(true));
                 }
-                originalRoute.setStops(stops);
-                // TODO: update trade routes only if they have been modified
-                getController().updateTradeRoute(originalRoute);
-                setResponse(new Boolean(true));
                 break;
             case CANCEL:
                 getCanvas().remove(this);
@@ -324,7 +336,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     /**
      * Special label for goods type.
-     * 
+     *
      * TODO: clean this up for 0.7.0 -- The GoodsLabel needs to be modified so
      * that it can act as a GoodsTypeLabel (like this label), an
      * AbstractGoodsLabel and a CargoLabel (its current function).
@@ -369,7 +381,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     /**
      * Panel for the cargo the carrier is supposed to take on board at a certain
      * stop.
-     * 
+     *
      * TODO: create a single cargo panel for this purpose and the use in the
      * ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
      */
@@ -397,7 +409,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     /**
      * TransferHandler for CargoLabels.
-     * 
+     *
      * TODO: check whether this could/should be folded into the
      * DefaultTransferHandler.
      */
@@ -419,16 +431,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         CargoLabel newLabel = new CargoLabel(label.getType());
                         cargoPanel.add(newLabel);
                         cargoPanel.revalidate();
-                        int selectedIndex = stopList.getSelectedIndex();
-                        if (selectedIndex >= 0) {
-                            for (int index = selectedIndex; index < listModel.size(); index++) {
-                                Stop stop = (Stop) listModel.getElementAt(index);
-                                stop.addCargo(label.getType());
-                                stop.setModified(true);
-                            }
-                            stopList.revalidate();
-                            stopList.repaint();
+                        int[] indices = stopList.getSelectedIndices();
+                        for (int index : indices) {
+                            Stop stop = (Stop) listModel.get(index);
+                            stop.addCargo(label.getType());
+                            stop.setModified(true);
                         }
+                        stopList.revalidate();
+                        stopList.repaint();
                     }
                     return true;
                 } catch (UnsupportedFlavorException ufe) {
@@ -446,23 +456,21 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
                 if (source.getParent() instanceof CargoPanel) {
                     cargoPanel.remove(label);
-                    int selectedIndex = stopList.getSelectedIndex();
-                    if (selectedIndex >= 0) {
-                        for (int stopIndex = selectedIndex; stopIndex < listModel.size(); stopIndex++) {
-                            Stop stop = (Stop) listModel.getElementAt(stopIndex);
-                            ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
-                            for (int index = 0; index < cargo.size(); index++) {
-                                if (cargo.get(index) == label.getType()) {
-                                    cargo.remove(index);
-                                    stop.setModified(true);
-                                    break;
-                                }
+                    int[] indices = stopList.getSelectedIndices();
+                    for (int stopIndex : indices) {
+                        Stop stop = (Stop) listModel.get(stopIndex);
+                        ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
+                        for (int index = 0; index < cargo.size(); index++) {
+                            if (cargo.get(index) == label.getType()) {
+                                cargo.remove(index);
+                                stop.setModified(true);
+                                break;
                             }
-                            stop.setCargo(cargo);
                         }
-                        stopList.revalidate();
-                        stopList.repaint();
+                        stop.setCargo(cargo);
                     }
+                    stopList.revalidate();
+                    stopList.repaint();
                     cargoPanel.revalidate();
                     cargoPanel.repaint();
                 }
@@ -483,35 +491,15 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
     }
 
-    /*
-     * public class StopPanel extends JPanel {
-     * 
-     * private Location location; private ArrayList<Integer> goods = new
-     * ArrayList<Integer>(); private final JComboBox destinationBox; private
-     * final JPanel goodsPanel; private final
-     * 
-     * public void saveSettings() { if (export.isSelected() !=
-     * colony.getExports(goodsType)) {
-     * getController().setExports(colony,
-     * goodsType, export.isSelected()); colony.setExports(goodsType,
-     * export.isSelected()); } colony.getLowLevel()[goodsType] =
-     * ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
-     * colony.getHighLevel()[goodsType] = ((SpinnerNumberModel)
-     * highLevel.getModel()).getNumber().intValue();
-     * colony.getExportLevel()[goodsType] = ((SpinnerNumberModel)
-     * exportLevel.getModel()).getNumber().intValue();
-     *  } }
-     */
-
     private class StopRenderer implements ListCellRenderer {
-    
+
         private final SelectedComponent SELECTED_COMPONENT = new SelectedComponent();
         private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
 
 
         /**
          * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
-         * 
+         *
          * @param list The <code>JList</code>.
          * @param value The list cell.
          * @param index The index in the list.
@@ -566,11 +554,11 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 g2d.setComposite(oldComposite);
                 g2d.setColor(oldColor);
-            
+
                 super.paintComponent(g);
             }
         }
-    
+
 
     }
 
