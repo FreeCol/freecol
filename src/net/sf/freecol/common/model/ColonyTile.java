@@ -264,7 +264,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (getUnit() != null) {
             for (WorkLocation wl : getColony().getWorkLocations()) {
                 if (wl != this && wl.canAdd(getUnit())) {
-                    getUnit().work(wl);
+                    getUnit().setLocation(wl);
                     break;
                 }
             }
@@ -341,53 +341,44 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
 
     /**
-    * Add the specified <code>Locatable</code> to this <code>WorkLocation</code>.
-    * @param locatable The <code>Locatable</code> that shall be added to this <code>WorkLocation</code>.
-    */
-    public void add(Locatable locatable) {
-        if (isColonyCenterTile() || unit != null) {
-            throw new IllegalStateException("Other unit present while adding a unit to ColonyTile:" + getId());
+     * Add the specified locatable to this colony tile.
+     *
+     * @param locatable The <code>Locatable</code> to add.
+     */
+    public void add(final Locatable locatable) {
+        if (isColonyCenterTile()) {
+            throw new IllegalStateException("Can not add to colony center");
+        } else if (unit != null) {
+            throw new IllegalStateException("Can not add to occupied tile");
+        } else if (getWorkTile().getOwningSettlement() != null
+                   && getWorkTile().getOwningSettlement() != getColony()) {
+            throw new IllegalStateException("Can not add to tile owned by another colony");
+        } else if (!canAdd(locatable)) {
+            throw new IllegalStateException("Can not add " + locatable
+                                            + " to " + toString());
         }
 
-        if (!canAdd(locatable)) {
-            if (getWorkTile().getOwningSettlement() != null && getWorkTile().getOwningSettlement() != getColony()) {
-                throw new IllegalArgumentException("Cannot add locatable to this location: another colony claims this land!");
-            }
-            throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
-        }
-
-        Unit u = (Unit) locatable;
-        u.removeAllEquipment(false);
-        u.setState(Unit.UnitState.IN_COLONY);
-
-        // Find a teacher if available.
-        Unit potentialTeacher = getColony().findTeacher(u);
-        if (potentialTeacher != null) {
-            potentialTeacher.setStudent(u);
-            u.setTeacher(potentialTeacher);
-        }
-
-        setUnit(u);
+        final Unit unit = (Unit) locatable;
+        setUnit(unit);
+        unit.setState(Unit.UnitState.IN_COLONY);
     }
     
-
     /**
-    * Remove the specified <code>Locatable</code> from this <code>WorkLocation</code>.
-    * @param locatable The <code>Locatable</code> that shall be removed from this <code>WorkLocation</code>.
-    */
-    public void remove(Locatable locatable) {
-        if (getUnit() == null) {
+     * Remove the specified locatable from this colony tile.
+     *
+     * @param locatable The <code>Locatable</code> to be removed.
+     */
+    public void remove(final Locatable locatable) {
+        if (getUnit() == null || !getUnit().equals(locatable)) {
             return;
         }
 
-        if (!getUnit().equals(locatable)) {
-            return;
-        }
-
-        Unit oldUnit = getUnit();
-        oldUnit.setMovesLeft(0);
+        final Unit unit = getUnit();
         setUnit(null);
+        unit.setMovesLeft(0);
+        unit.setState(Unit.UnitState.ACTIVE);
     }
+
 
     public List<Unit> getUnitList() {
         if(getUnit() == null) {

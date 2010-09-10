@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -36,7 +35,6 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.GUI;
@@ -57,7 +55,6 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -86,7 +83,6 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -95,7 +91,6 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.AttackMessage;
@@ -112,11 +107,12 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
-import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
+import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
@@ -144,6 +140,7 @@ import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.networking.WorkMessage;
+import net.sf.freecol.common.option.BooleanOption;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -586,13 +583,9 @@ public final class InGameController implements NetworkConstants {
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
-        GoodsContainer container = colony.getGoodsContainer();
-        int oldAmount = container.getGoodsCount(type);
-        int newAmount;
-        if (askLoadCargo(goods, carrier)
-            && (newAmount = container.getGoodsCount(type)) != oldAmount) {
+        if (askLoadCargo(goods, carrier) && goods.getLocation() == carrier) {
             carrier.firePropertyChange(Unit.CARGO_CHANGE, null, goods);
-            colony.firePropertyChange(type.getId(), oldAmount, newAmount);
+            fireColonyChanges(colony, -1, null, null);
             return true;
         }
         return false;
@@ -719,8 +712,6 @@ public final class InGameController implements NetworkConstants {
             return sellGoods(goods);
         }
         GoodsType type = goods.getType();
-        int colonyAmount = (colony == null) ? 0
-            : colony.getGoodsContainer().getGoodsCount(type);
         int amount = goods.getAmount();
         int carrierAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askUnloadCargo(goods)) {
@@ -734,9 +725,7 @@ public final class InGameController implements NetworkConstants {
             }
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
             if (colony != null) {
-                newAmount = colony.getGoodsContainer().getGoodsCount(type);
-                colony.firePropertyChange(type.getId(), colonyAmount,
-                                          newAmount);
+                fireColonyChanges(colony, -1, null, null);
             }
             return true;
         }
@@ -995,6 +984,36 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
+    /**
+     * Fire any property changes resulting from actions within a
+     * colony.
+     *
+     * @param colony The <code>Colony</code> that may have changed.
+     * @param oldPop The old population (or negative if unchanged).
+     * @param unit A <code>Unit</code> that may have moved.
+     * @param oldLoc The old <code>Location</code> of the unit.
+     */
+    private void fireColonyChanges(Colony colony, int oldPop, Unit unit,
+                                   Location oldLoc) {
+        if (oldPop >= 0) {
+            int newPop = colony.getUnitCount();
+            if (oldPop != newPop) {
+                colony.updatePopulation(newPop - oldPop);
+            }
+        }
+        colony.getGoodsContainer().fireChanges();
+        if (unit != null) {
+            Location newLoc = unit.getLocation();
+            if (oldLoc != newLoc) {
+                // Note: exploiting the accident that Building.UNIT_CHANGE
+                // == ColonyTile.UNIT_CHANGE
+                FreeColGameObject oldFcgo = (FreeColGameObject) oldLoc;
+                oldFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
+                FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
+                newFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+            }
+        }
+    }
 
     // Public user actions that may require interactive confirmation
     // before requesting an update from the server.
@@ -3859,67 +3878,70 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Equips or unequips a <code>Unit</code> with a certain type of
-     * <code>Goods</code>.
+     * Change the amount of equipment a unit has.
      *
      * @param unit The <code>Unit</code>.
-     * @param type an <code>EquipmentType</code> value
-     * @param amount How many of these goods the unit should have.
+     * @param type The <code>EquipmentType</code> to equip with.
+     * @param amount How to change the amount of equipment the unit has.
      */
     public void equipUnit(Unit unit, EquipmentType type, int amount) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
-        if (amount == 0) {
-            // no changes
-            return;
-        }
+        if (amount == 0) return; // no change
 
-        Client client = freeColClient.getClient();
-        Player myPlayer = freeColClient.getMyPlayer();
-
-        Unit carrier = null;
-        if (unit.isOnCarrier()) {
-            carrier = (Unit) unit.getLocation();
-            if (!leaveShip(unit)) return;
-        }
-
-        Element equipUnitElement = Message.createNewRootElement("equipUnit");
-        equipUnitElement.setAttribute("unit", unit.getId());
-        equipUnitElement.setAttribute("type", type.getId());
-        equipUnitElement.setAttribute("amount", Integer.toString(amount));
-
-        if (amount > 0) {
-            for (AbstractGoods requiredGoods : type.getGoodsRequired()) {
-                GoodsType goodsType = requiredGoods.getType();
-                if (unit.isInEurope()) {
-                    if (!myPlayer.canTrade(goodsType)) {
-                        payArrears(goodsType);
-                        if (!myPlayer.canTrade(goodsType)) {
-                            return; // The user cancelled the action.
-                        }
-                    }
+        List<AbstractGoods> requiredGoods = type.getGoodsRequired();
+        HashMap<GoodsType, Integer> savedGoods = null;
+        Colony colony = null;
+        if (unit.isInEurope()) {
+            for (AbstractGoods goods : requiredGoods) {
+                GoodsType goodsType = goods.getType();
+                if (!player.canTrade(goodsType) && !payArrears(goodsType)) {
+                    return; // payment failed for some reason
                 }
             }
-            unit.equipWith(type, amount);
         } else {
-            unit.removeEquipment(type, -amount);
+            colony = unit.getColony();
+            if (colony == null) {
+                throw new IllegalStateException("Equip unit not in settlement/Europe");
+            }
         }
 
-        freeColClient.getCanvas().updateGoldLabel();
-
-        client.sendAndWait(equipUnitElement);
-
-        if (unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building
-            || unit.getLocation() instanceof ColonyTile) {
-            putOutsideColony(unit);
-        } else if (unit.getLocation() instanceof Tile) {
-            unit.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
-        } else if (carrier != null) {
-            boardShip(unit, carrier);
+        int oldPop = (colony == null) ? -1 : colony.getUnitCount();
+        Location oldLoc = unit.getLocation();
+        int oldAmount = unit.getEquipmentCount(type);
+        int newAmount;
+        if (askEquipUnit(unit, type, amount)
+            && (newAmount = unit.getEquipmentCount(type)) != oldAmount) {
+            unit.firePropertyChange(Unit.EQUIPMENT_CHANGE,
+                                    oldAmount, newAmount);
+            if (colony != null) {
+                fireColonyChanges(colony, oldPop, unit, oldLoc);
+            }
+            canvas.updateGoldLabel();
         }
+    }
+
+    /**
+     * Server query-response for equipping a unit.
+     *
+     * @param unit The <code>Unit</code> to equip on.
+     * @param type The <code>EquipmentType</code> to equip with.
+     * @param amount The amount of equipment.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askEquipUnit(Unit unit, EquipmentType type, int amount) {
+        Client client = freeColClient.getClient();
+        EquipUnitMessage message = new EquipUnitMessage(unit, type, amount);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**
@@ -3954,14 +3976,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Try to change the work location.
-        FreeColGameObject oldLoc = (FreeColGameObject) unit.getLocation();
+        Location oldLoc = unit.getLocation();
         int oldPop = colony.getUnitCount();
-        if (askWork(unit, workLocation)) {
-            int newPop = colony.getUnitCount();
-            if (oldPop != newPop) colony.updatePopulation(newPop - oldPop);
-            FreeColGameObject newLoc = (FreeColGameObject) workLocation;
-            oldLoc.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
-            newLoc.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+        if (askWork(unit, workLocation)
+            && unit.getLocation() == workLocation) {
+            fireColonyChanges(colony, oldPop, unit, oldLoc);
         }
     }
 

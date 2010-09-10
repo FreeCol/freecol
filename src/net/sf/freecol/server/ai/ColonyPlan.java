@@ -1013,7 +1013,7 @@ public class ColonyPlan {
                 return;
             }
             
-            u.work(factory);
+            u.setLocation(factory);
             u.setWorkType(producedGoods);
             producers.remove(u);
         }

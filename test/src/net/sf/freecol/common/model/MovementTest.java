@@ -190,16 +190,16 @@ public class MovementTest extends FreeColTestCase {
 
         Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT, colonist.getMoveType(tile1));
-        colonist.equipWith(horses, true);
+        colonist.changeEquipment(horses, 1);
         assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT, colonist.getMoveType(tile1));
-        colonist.equipWith(muskets, true);
+        colonist.changeEquipment(muskets, 1);
         assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
 
         Unit brave = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(indianHorses, true);
+        brave.changeEquipment(indianHorses, 1);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(indianMuskets, true);
+        brave.changeEquipment(indianMuskets, 1);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
 
     }
@@ -229,61 +229,43 @@ public class MovementTest extends FreeColTestCase {
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_CONTACT, colonist.getMoveType(tile1));
         Player.makeContact(french, inca);
         assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST, colonist.getMoveType(tile1));
-        colonist.equipWith(horses, true);
+        colonist.changeEquipment(horses, 1);
         assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT, colonist.getMoveType(tile1));
-        colonist.equipWith(muskets, true);
+        colonist.changeEquipment(muskets, 1);
         assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
 
         Unit brave = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(indianHorses, true);
+        brave.changeEquipment(indianHorses, 1);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(indianMuskets, true);
+        brave.changeEquipment(indianMuskets, 1);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
 
     }
 
-    public void testEquipWith() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
-    	
-        Colony colony = getStandardColony(6);
-        BuildingType churchType = spec().getBuildingType("model.building.chapel");
-        assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
-
-        Building church = colony.getBuilding(churchType);
-        church.upgrade();
-        assertTrue(colony.hasAbility("model.ability.dressMissionary"));
-
-        Iterator<Unit> units = colony.getUnitIterator();
-        Unit colonist = units.next();
-        // make sure the unit has all moves left
-        colonist.newTurn();
-        assertEquals(colonist.getInitialMovesLeft(), colonist.getMovesLeft());
-
-        colonist.equipWith(spec().getEquipmentType("model.equipment.missionary"));
-        assertEquals(0, colonist.getMovesLeft());
-        
-    }
-
-    public void testRemoveEquipment() {
-
+    public void testToggleHorses() {
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         tile1.setExploredBy(dutch, true);
-        Unit scout = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
-        scout.equipWith(horses, true);
+        Unit scout = new Unit(game, tile1, dutch, colonistType,
+                              UnitState.ACTIVE);
 
         // make sure unit has all moves left
         scout.newTurn();
         assertEquals(scout.getInitialMovesLeft(), scout.getMovesLeft());
 
-        scout.removeAllEquipment(true);
-        assertEquals(0, scout.getMovesLeft());
-        
+        int colonistMoves = scout.getMovesLeft();
+        scout.changeEquipment(horses, 1);
+        scout.newTurn();
+        assertTrue("Scout should have more moves than a colonist",
+                   scout.getMovesLeft() > colonistMoves);
+
+        scout.changeEquipment(horses, -1);
+        scout.newTurn();
+        assertEquals(scout.getMovesLeft(), colonistMoves);
     }
 
 }

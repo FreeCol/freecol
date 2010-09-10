@@ -169,6 +169,10 @@ public abstract class AIPlayer extends AIObject {
         }
     }
 
+    protected AIUnit getAIUnit(Unit unit) {
+        return (AIUnit) getAIMain().getAIObject(unit);
+    }
+
     /**
      * 
      * Sets the <code>Connection</code> to be used while communicating with

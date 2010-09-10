@@ -76,6 +76,7 @@ import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
+import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -284,10 +285,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return trainUnitInEurope(connection, element);
             }
         });
-        register("equipUnit", new CurrentPlayerNetworkRequestHandler() {
+        register(EquipUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return equipUnit(connection, element);
+                return new EquipUnitMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(WorkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -769,35 +770,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.train(unit);
         return reply;
-    }
-
-    /**
-     * Handles a "equipUnit"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param workElement The element containing the request.
-     */
-    private Element equipUnit(Connection connection, Element workElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        String typeString = workElement.getAttribute("type");
-        EquipmentType type = getGame().getSpecification().getEquipmentType(typeString);
-        int amount = Integer.parseInt(workElement.getAttribute("amount"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-
-        if (amount > 0) {
-            unit.equipWith(type, amount);
-        } else {
-            unit.removeEquipment(type, -amount);
-        }
-
-        if (unit.getLocation() instanceof Tile) {
-            InGameController igc = getFreeColServer().getInGameController();
-            igc.sendToOthers(player, unit.getTile());
-        }
-        return null;
     }
 
     /**

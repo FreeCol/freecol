@@ -47,6 +47,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
+
 public class AIColonyTest extends FreeColTestCase {	
 
     final int fullStock = 100;
@@ -62,6 +63,22 @@ public class AIColonyTest extends FreeColTestCase {
         super.tearDown();
     }
         
+    private Game start(Map map) {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        server.setMapGenerator(new MockMapGenerator(map));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+        return game;
+    }
+
     // creates the special map for the tests
     // map will have: 
     //    - a colony in (5,8) (built after)
@@ -84,30 +101,12 @@ public class AIColonyTest extends FreeColTestCase {
      * Tests worker allocation regarding building tasks
      */
     public void testBuildersAllocation() {
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-        
-        Map map = buildMap(true);
-        
-        server.setMapGenerator(new MockMapGenerator(map));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        Game game = server.getGame();
-        
-        FreeColTestCase.setGame(game);
-        
+        Game game = start(buildMap(true));
         AIMain aiMain = server.getAIMain();
 
         //the number needs to be high to ensure allocation
         Colony colony = getStandardColony(6);
+        game.setCurrentPlayer(colony.getOwner());
 
         final BuildingType warehouse = spec().getBuildingType("model.building.warehouse");
         final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
@@ -144,30 +143,12 @@ public class AIColonyTest extends FreeColTestCase {
      *does not have tiles that provide the raw materials for the build
      */
     public void testBuildersAllocNoRawMatTiles() {
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-        
-        Map map = buildMap(false);
-        
-        server.setMapGenerator(new MockMapGenerator(map));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        Game game = server.getGame();
-        
-        FreeColTestCase.setGame(game);
-        
+        Game game = start(buildMap(false));
         AIMain aiMain = server.getAIMain();
 
         //the number needs to be high to ensure allocation
         Colony colony = getStandardColony(6);
+        game.setCurrentPlayer(colony.getOwner());
 
         // we need to ensure that there arent tiles with production of the raw materials
         // if this fails, the type of the tile in buildMap() must be changed to meet this
@@ -230,33 +211,14 @@ public class AIColonyTest extends FreeColTestCase {
      * Tests expert allocation regarding raw materials where there are plenty already in stock
      */
     public void testExpertAllocColonyHasEnoughRawMat() {
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-        
         final TileType forestType = spec().getTileType("model.tile.coniferForest");
-        Map map = getTestMap(forestType);
-        
-        server.setMapGenerator(new MockMapGenerator(map));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        Game game = server.getGame();
-        
-        FreeColTestCase.setGame(game);
-        
+        Game game = start(getTestMap(forestType));
         AIMain aiMain = server.getAIMain();
-
         
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         final UnitType lumberJackType = spec().getUnitType("model.unit.expertLumberJack");
         Colony colony = builder.addColonist(lumberJackType).build();
+        game.setCurrentPlayer(colony.getOwner());
         
         ServerPlayer player = (ServerPlayer) colony.getOwner();
         assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
@@ -281,30 +243,12 @@ public class AIColonyTest extends FreeColTestCase {
     }
     
     public void testCheckConditionsForHorseBreed(){
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-        
-        Map map = getTestMap();
-        
-        server.setMapGenerator(new MockMapGenerator(map));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        Game game = server.getGame();
-        
-        FreeColTestCase.setGame(game);
-        
+        Game game = start(getTestMap());
         AIMain aiMain = server.getAIMain();
 
         Colony colony = getStandardColony(1);
         AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
+        game.setCurrentPlayer(colony.getOwner());
         final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
         int foodSuplus = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
@@ -324,12 +268,12 @@ public class AIColonyTest extends FreeColTestCase {
     }
 
     public void testBestUnitForWorkLocation() {
-
-        Game game = getGame();
         final TileType savannahType = spec().getTileType("model.tile.savannah");
-        Map map = getTestMap(savannahType);
-        game.setMap(map);
+        Game game = start(getTestMap(savannahType));
+        AIMain aiMain = server.getAIMain();
+
         Colony colony = getStandardColony();
+        game.setCurrentPlayer(colony.getOwner());
         Player dutch = getGame().getPlayer("model.nation.dutch");
         ColonyTile colonyTile = colony.getColonyTiles().get(0);
 

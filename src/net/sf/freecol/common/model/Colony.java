@@ -654,7 +654,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                    + " in " + getName());
                     newUnit.putOutsideColony();
                 } else {
-                    newUnit.work(occupation.workLocation);
+                    newUnit.setLocation(occupation.workLocation);
                     if (occupation.workType != null) {
                         newUnit.setWorkType(occupation.workType);
                     }

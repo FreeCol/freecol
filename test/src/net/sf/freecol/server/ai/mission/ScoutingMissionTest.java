@@ -76,8 +76,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
             builder.player(player1).settlementTile(settlementTile).build();
 
             Tile unitTile = map.getTile(2, 2);
-            Unit scout = new Unit(game, unitTile, player2, scoutType, UnitState.ACTIVE);
-            scout.equipWith(horsesEqType);
+            Unit scout = new Unit(game, unitTile, player2, scoutType,
+                                  UnitState.ACTIVE, horsesEqType);
             
             // Setup mission
             // this will call AIPlayer.giveNormalMissions() and set the scout mission
@@ -94,7 +94,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
             assertTrue("Scouting mission should be valid",unitMission.isValid());
 
             // Simulate unit losing horses
-            scout.removeAllEquipment(true);
+            scout.changeEquipment(horsesEqType, -1);
             
             // Verify that mission no longer valid
             assertFalse("Scouting mission should no longer be valid",unitMission.isValid());

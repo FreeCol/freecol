@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -712,22 +713,17 @@ public class StandardAIPlayer extends AIPlayer {
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
                     // TODO: cleanup magic numbers 50 and 1
-                    GoodsType muskets = getAIMain().getGame().getSpecification().getGoodsType("model.goods.muskets");
-                    GoodsType horses = getAIMain().getGame().getSpecification().getGoodsType("model.goods.horses");
+                    Specification spec = getAIMain().getGame().getSpecification();
+                    GoodsType muskets = spec.getGoodsType("model.goods.muskets");
+                    GoodsType horses = spec.getGoodsType("model.goods.horses");
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
 
                     sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
-                    Element equipMusketsElement = Message.createNewRootElement("equipUnit");
-                    equipMusketsElement.setAttribute("unit", unit.getId());
-                    equipMusketsElement.setAttribute("type", "model.equipment.muskets");
-                    equipMusketsElement.setAttribute("amount", Integer.toString(1));
-                    sendAndWaitSafely(equipMusketsElement);
-                    Element equipHorsesElement = Message.createNewRootElement("equipUnit");
-                    equipHorsesElement.setAttribute("unit", unit.getId());
-                    equipHorsesElement.setAttribute("type", "model.equipment.horses");
-                    equipHorsesElement.setAttribute("amount", Integer.toString(1));
-                    sendAndWaitSafely(equipHorsesElement);
+                    EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
+                    EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
+                    AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);
+                    AIMessage.askEquipUnit(getAIUnit(unit), musketsEq, 1);
                 }
             }
             if (getAIRandom().nextInt(40) == 21) {
@@ -951,9 +947,56 @@ public class StandardAIPlayer extends AIPlayer {
                 if(settlement != is){
                     is.tradeGoodsWithSetlement(settlement);
                 }
-                is.equipBraves();
+                equipBraves(is);
                 secureIndianSettlement(is);
             }
+        }
+    }
+
+    /**
+     * Equips braves with horses and muskets.
+     * Keeps some for the settlement defense
+     */
+    public void equipBraves(IndianSettlement is) {
+        Specification spec = getGame().getSpecification();
+        GoodsType armsType = spec.getGoodsType("model.goods.muskets");
+        GoodsType horsesType = spec.getGoodsType("model.goods.horses");
+        EquipmentType armsEqType = spec.getEquipmentType("model.equipment.indian.muskets");
+        EquipmentType horsesEqType = spec.getEquipmentType("model.equipment.indian.horses");
+
+        int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
+        int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
+        int armsAvail = is.getGoodsCount(armsType);
+        int horsesAvail = is.getGoodsCount(horsesType);
+
+        for (Unit brave : is.getUnitList()) {
+            if (armsAvail < musketsToArmIndian) {
+                break;
+            }
+            if (brave.isArmed()) {
+                continue;
+            }
+            logger.info("Equipping brave with muskets");
+            AIMessage.askEquipUnit(getAIUnit(brave), armsEqType, 1);
+            if (!brave.isArmed()) {
+                logger.warning("Brave has not been armed");
+            }
+            armsAvail = is.getGoodsCount(armsType);
+        }
+
+        for (Unit brave : is.getUnitList()) {
+            if (horsesAvail < horsesToMountIndian) {
+                break;
+            }
+            if (brave.isMounted()) {
+                continue;
+            }
+            logger.info("Equipping brave with horses");
+            AIMessage.askEquipUnit(getAIUnit(brave), horsesEqType, 1);
+            if (!brave.isMounted()) {
+                logger.warning("Brave has not mounted");
+            }
+            horsesAvail = is.getGoodsCount(horsesType);
         }
     }
 
@@ -1006,7 +1049,7 @@ public class StandardAIPlayer extends AIPlayer {
             boolean isMounted = unit.isMounted();
             // arming unit with equipment from colony stock
             if(canArmUnit){
-                unit.equipWith(musketsEqType);
+                AIMessage.askEquipUnit(getAIUnit(unit), musketsEqType, 1);
                 colonyHasArmedUnits = true;
                 if(!isMounted){
                     unmountedSoldiers.add(unit);
@@ -1026,7 +1069,7 @@ public class StandardAIPlayer extends AIPlayer {
         
             Collections.sort(unarmedColonists, comp);
             Unit unit = unarmedColonists.get(0);
-            unit.equipWith(musketsEqType);
+            AIMessage.askEquipUnit(getAIUnit(unit), musketsEqType, 1);
             if(!unit.isMounted()){
                 unmountedSoldiers.add(unit);
             }
@@ -1051,7 +1094,7 @@ public class StandardAIPlayer extends AIPlayer {
         while(unmountedSoldiers.size() > 0 
                 && colony.canBuildEquipment(horsesEqType)){
             Unit soldier = unmountedSoldiers.remove(0);
-            soldier.equipWith(horsesEqType);
+            AIMessage.askEquipUnit(getAIUnit(soldier), horsesEqType, 1);
         }
     }
     
@@ -1096,7 +1139,7 @@ public class StandardAIPlayer extends AIPlayer {
         
             // found other non expert soldier, take equipment from it
             Unit otherSoldier = armedNonExpertSoldiers.remove(0);
-            unit.switchEquipmentWith(otherSoldier);
+            switchEquipmentWith(unit, otherSoldier);
             unit.setState(UnitState.ACTIVE);
             otherSoldier.setState(UnitState.ACTIVE);
             ((AIUnit)getAIMain().getAIObject(unit)).setMission(null);
@@ -1127,7 +1170,7 @@ public class StandardAIPlayer extends AIPlayer {
             Location loc = unitInside.getLocation();
             
             unitInside.putOutsideColony();
-            unit.switchEquipmentWith(unitInside);
+            switchEquipmentWith(unit, unitInside);
             unit.setLocation(loc);
             unit.setState(UnitState.IN_COLONY);
             unitInside.setState(UnitState.ACTIVE);
@@ -1135,7 +1178,49 @@ public class StandardAIPlayer extends AIPlayer {
             ((AIUnit)getAIMain().getAIObject(unitInside)).setMission(null);   
         }
     }
-    
+
+    /**
+     * Remove all equipment on a unit.
+     *
+     * @param unit The <code>Unit</code> to remove equipment from.
+     */
+    public void removeAllEquipment(Unit unit) {
+        AIUnit aiUnit = getAIUnit(unit);
+        for (EquipmentType type : new ArrayList<EquipmentType>(unit.getEquipment().keySet())) {
+            AIMessage.askEquipUnit(aiUnit, type, -unit.getEquipmentCount(type));
+        }
+    }
+
+    /**
+     * Switches equipment between colonists
+     */
+    public void switchEquipmentWith(Unit unit1, Unit unit2){
+        if(!unit1.isColonist() || !unit2.isColonist()){
+            throw new IllegalArgumentException("Both units need to be colonists to switch equipment");
+        }
+
+        if(unit1.getTile() != unit2.getTile()){
+            throw new IllegalStateException("Units can only switch equipment in the same location");
+        }
+
+        if(unit1.getTile().getSettlement() == null){
+            throw new IllegalStateException("Units can only switch equipment in a settlement");
+        }
+
+        // TODO: use the TypeCountMap that getEquipment() returns and
+        // swap the counts as well.
+        List<EquipmentType> equipList1 = new ArrayList<EquipmentType>(unit1.getEquipment().keySet());
+        List<EquipmentType> equipList2 = new ArrayList<EquipmentType>(unit2.getEquipment().keySet());
+        removeAllEquipment(unit1);
+        removeAllEquipment(unit2);
+        for(EquipmentType equip : equipList2){
+            AIMessage.askEquipUnit(getAIUnit(unit1), equip, 1);
+        }
+        for(EquipmentType equip : equipList1){
+            AIMessage.askEquipUnit(getAIUnit(unit2), equip, 1);
+        }
+    }
+
 
     /**
      * Takes the necessary actions to secure an indian settlement

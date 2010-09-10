@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -616,22 +617,15 @@ public class ColonialAIPlayer extends AIPlayer {
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
-                    GoodsType muskets = getGame().getSpecification().getGoodsType("model.goods.muskets");
-                    GoodsType horses = getGame().getSpecification().getGoodsType("model.goods.horses");
+                    Specification spec = getGame().getSpecification();
+                    GoodsType muskets = spec.getGoodsType("model.goods.muskets");
+                    GoodsType horses = spec.getGoodsType("model.goods.horses");
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
                     
                     sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
-                    Element equipMusketsElement = Message.createNewRootElement("equipUnit");
-                    equipMusketsElement.setAttribute("unit", unit.getId());
-                    equipMusketsElement.setAttribute("type", "model.equipment.muskets");
-                    equipMusketsElement.setAttribute("amount", Integer.toString(50));
-                    sendAndWaitSafely(equipMusketsElement);
-                    Element equipHorsesElement = Message.createNewRootElement("equipUnit");
-                    equipHorsesElement.setAttribute("unit", unit.getId());
-                    equipHorsesElement.setAttribute("type", "model.equipment.horses");
-                    equipHorsesElement.setAttribute("amount", Integer.toString(50));
-                    sendAndWaitSafely(equipHorsesElement);
+                    AIMessage.askEquipUnit(getAIUnit(unit), spec.getEquipmentType("model.equipment.horses"), 1);
+                    AIMessage.askEquipUnit(getAIUnit(unit), spec.getEquipmentType("model.equipment.muskets"), 1);
                 }
             }
             if (getAIRandom().nextInt(40) == 21) {

@@ -279,7 +279,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @throws IllegalStateException If the <code>player</code> cannot afford
      *                               to buy the goods.
      */
-    public void buy(GoodsType goodsType, int amount, Player player) {
+    public void buy(GoodsType goodsType, int amount, Player player)
+        throws IllegalStateException {
         int price = getBidPrice(goodsType, amount);
         if (price > player.getGold()) {
             throw new IllegalStateException("Player " + player.getName()

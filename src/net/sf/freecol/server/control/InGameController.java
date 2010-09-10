@@ -21,6 +21,7 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -57,6 +58,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianNationType;
@@ -1971,29 +1973,31 @@ public final class InGameController extends Controller {
     /**
      * Buy goods in Europe.
      *
+     * Do not update the container or player in the ChangeSet, this
+     * routine is called from equipUnit where other unit updates can
+     * happen.
+     *
      * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param unit The <code>Unit</code> to carry the goods.
+     * @param container The <code>GoodsContainer</code> to carry the goods.
      * @param type The <code>GoodsType</code> to buy.
      * @param amount The amount of goods to buy.
-     * @return An <code>Element</code> encapsulating this action.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @throws IllegalStateException If the <code>player</code> cannot afford
+     *                               to buy the goods.
      */
-    public Element buyGoods(ServerPlayer serverPlayer, Unit unit,
-                            GoodsType type, int amount) {
-        ChangeSet cs = new ChangeSet();
-        Market market = serverPlayer.getMarket();
-
+    private void csBuy(ServerPlayer serverPlayer, GoodsContainer container,
+                       GoodsType type, int amount, ChangeSet cs)
+        throws IllegalStateException {
         // FIXME: market.buy() should be here in the controller, but
         // there are two cases remaining that are hard to move still.
         //
-        // 1. There is a shortcut buying of equipment in Europe in
-        // Unit.equipWith().
+        // 1. Shortcut for buying in Europe FIXED
         // 2. Also for the goods required for a building in
         // Colony.payForBuilding().  This breaks the pattern implemented
         // here as there is no unit involved.
+        Market market = serverPlayer.getMarket();
         market.buy(type, amount, serverPlayer);
-        unit.getGoodsContainer().addGoods(type, amount);
-        cs.add(See.only(serverPlayer), unit);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        container.addGoods(type, amount);
         if (market.hasPriceChanged(type)) {
             // This type of goods has changed price, so we will update
             // the market and send a message as well.
@@ -2003,9 +2007,60 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), market.getMarketData(type));
         }
         propagateToEuropeanMarkets(type, amount, serverPlayer);
+    }
 
+    /**
+     * Buy goods in Europe.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
+     * @param unit The <code>Unit</code> to carry the goods.
+     * @param type The <code>GoodsType</code> to buy.
+     * @param amount The amount of goods to buy.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element buyGoods(ServerPlayer serverPlayer, Unit unit,
+                            GoodsType type, int amount) {
+        ChangeSet cs = new ChangeSet();
+        csBuy(serverPlayer, unit.getGoodsContainer(), type, amount, cs);
+        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.add(See.only(serverPlayer), unit);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
+    }
+
+    /**
+     * Sell goods in Europe.
+     * Do not update the unit in the ChangeSet, this routine gets
+     * called from equipUnit where more unit changes happen.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is selling.
+     * @param unit The <code>Unit</code> carrying the goods.
+     * @param type The <code>GoodsType</code> to sell.
+     * @param amount The amount of goods to sell.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csSell(ServerPlayer serverPlayer, Unit unit, GoodsType type,
+                        int amount, ChangeSet cs) {
+        // FIXME: market.sell() should be in the controller, but the
+        // following cases will have to wait.
+        //
+        // 1. Unit.dumpEquipment FIXED.
+        // 2. Colony.exportGoods() is in the newTurn mess.
+        // Its also still in MarketTest, which needs to be moved to
+        // ServerPlayerTest where it also is already.
+        Market market = serverPlayer.getMarket();
+        market.sell(type, amount, serverPlayer);
+        unit.getGoodsContainer().addGoods(type, -amount);
+        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        if (market.hasPriceChanged(type)) {
+            // This type of goods has changed price, so update the
+            // market and send a message as well.
+            cs.addMessage(See.only(serverPlayer),
+                          market.makePriceChangeMessage(type));
+            market.flushPriceChange(type);
+            cs.add(See.only(serverPlayer), market.getMarketData(type));
+        }
+        propagateToEuropeanMarkets(type, amount, serverPlayer);
     }
 
     /**
@@ -2020,31 +2075,8 @@ public final class InGameController extends Controller {
     public Element sellGoods(ServerPlayer serverPlayer, Unit unit,
                              GoodsType type, int amount) {
         ChangeSet cs = new ChangeSet();
-        Market market = serverPlayer.getMarket();
-
-        // FIXME: market.sell() should be in the controller, but the
-        // following cases will have to wait.
-        //
-        // 1. Unit.dumpEquipment() gets called from a few places.
-        // 2. Colony.exportGoods() is in the newTurn mess.
-        // Its also still in MarketTest, which needs to be moved to
-        // ServerPlayerTest where it also is already.
-        //
-        // Try to sell.
-        market.sell(type, amount, serverPlayer);
-        unit.getGoodsContainer().addGoods(type, -amount);
+        csSell(serverPlayer, unit, type, amount, cs);
         cs.add(See.only(serverPlayer), unit);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so update the
-            // market and send a message as well.
-            cs.addMessage(See.only(serverPlayer),
-                          market.makePriceChangeMessage(type));
-            market.flushPriceChange(type);
-            cs.add(See.only(serverPlayer), market.getMarketData(type));
-        }
-        propagateToEuropeanMarkets(type, amount, serverPlayer);
-
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }
@@ -3509,36 +3541,37 @@ public final class InGameController extends Controller {
                                     EquipmentType equip, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        EquipmentType newEquip = equip;
-        if (winnerPlayer.isIndian() != loserPlayer.isIndian()) {
-            // May need to change the equipment type if the attacker is
-            // native and the defender is not, or vice-versa.
-            newEquip = equip.getCaptureEquipment(winnerPlayer.isIndian());
-        }
+        if ((equip = winner.canCaptureEquipment(equip, loser)) != null) {
+            // TODO: what if winner captures equipment that is
+            // incompatible with their current equipment?
+            // Currently, can-not-happen, so ignoring the return from
+            // changeEquipment.  Beware.
+            winner.changeEquipment(equip, 1);
 
-        winner.equipWith(newEquip, true);
+            // Currently can not capture equipment back so this only
+            // makes sense for native players, and the message is
+            // native specific.
+            if (winnerPlayer.isIndian()) {
+                StringTemplate winnerNation = winnerPlayer.getNationName();
+                cs.addMessage(See.only(loserPlayer),
+                              new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                               "model.unit.equipmentCaptured",
+                                               winnerPlayer)
+                              .addStringTemplate("%nation%", winnerNation)
+                              .add("%equipment%", equip.getNameKey()));
 
-        // Currently can not capture equipment back so this only makes sense
-        // for native players, and the message is native specific.
-        if (winnerPlayer.isIndian()) {
-            cs.addMessage(See.only(loserPlayer),
-                          new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                           "model.unit.equipmentCaptured",
-                                           winnerPlayer)
-                          .addStringTemplate("%nation%", winnerPlayer.getNationName())
-                          .add("%equipment%", newEquip.getNameKey()));
-
-            // TODO: Immediately transferring the captured goods back
-            // to a potentially remote settlement is pretty dubious.
-            // Apparently Col1 did it, but its a CHEAT nonetheless.
-            // Better would be to give the capturing unit a return-home-
-            // -with-plunder mission.
-            IndianSettlement settlement = winner.getIndianSettlement();
-            if (settlement != null) {
-                for (AbstractGoods goods : newEquip.getGoodsRequired()) {
-                    settlement.addGoods(goods);
+                // TODO: Immediately transferring the captured goods
+                // back to a potentially remote settlement is pretty
+                // dubious.  Apparently Col1 did it, but its a CHEAT
+                // nonetheless.  Better would be to give the capturing
+                // unit a return-home- -with-plunder mission.
+                IndianSettlement settlement = winner.getIndianSettlement();
+                if (settlement != null) {
+                    for (AbstractGoods goods : equip.getGoodsRequired()) {
+                        settlement.addGoods(goods);
+                    }
+                    cs.add(See.only(winnerPlayer), settlement);
                 }
-                cs.add(See.only(winnerPlayer), settlement);
             }
         }
     }
@@ -4085,7 +4118,12 @@ public final class InGameController extends Controller {
         EquipmentType equip
             = loser.getBestCombatEquipmentType(loser.getEquipment());
 
-        loser.removeEquipment(equip, 1, true);
+        // Remove the equipment, accounting for possible loss of
+        // mobility due to horses going away.
+        loser.changeEquipment(equip, -1);
+        loser.setMovesLeft(Math.min(loser.getMovesLeft(),
+                                    loser.getInitialMovesLeft()));
+
         String messageId;
         if (loser.getEquipment().isEmpty()) {
             messageId = "model.unit.unitDemotedToUnarmed";
@@ -4351,10 +4389,8 @@ public final class InGameController extends Controller {
         EquipmentType equip;
         while ((equip = loser.getBestCombatEquipmentType(loser.getEquipment()))
                != null) {
-            loser.removeEquipment(equip, 1, true);
-            if ((equip = winner.canCaptureEquipment(equip, loser)) != null) {
-                csCaptureEquipment(winner, loser, equip, cs);
-            }
+            loser.changeEquipment(equip, -loser.getEquipmentCount(equip));
+            csCaptureEquipment(winner, loser, equip, cs);
         }
 
         // Destroy unit.
@@ -4888,6 +4924,9 @@ public final class InGameController extends Controller {
             throw new IllegalStateException("New location with null GoodsContainer.");
         }
 
+        oldLoc.getGoodsContainer().saveState();
+        if (loc != null) loc.getGoodsContainer().saveState();
+
         oldLoc.remove(goods);
         goods.setLocation(null);
 
@@ -5093,9 +5132,14 @@ public final class InGameController extends Controller {
         }
 
         // Only have to update the carrier location, as that *must*
-        // include the original location of the goods.
-        cs.add(See.only(serverPlayer),
-               (FreeColGameObject) unit.getLocation());
+        // include the original location of the goods.  If it is a
+        // settlement, better still just update the goods container.
+        Location loc = unit.getLocation();
+        if (loc instanceof Settlement) {
+            cs.add(See.only(serverPlayer), loc.getGoodsContainer());
+        } else {
+            cs.add(See.only(serverPlayer), (FreeColGameObject) loc);
+        }
         cs.add(See.perhaps().except(serverPlayer), unit);
 
         // Others might see capacity change.
@@ -5116,12 +5160,14 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Location loc;
+        Settlement settlement = null;
         if (unit.isInEurope()) { // Must be a dump of boycotted goods
             loc = null;
         } else if (unit.getTile() == null) {
             return Message.clientError("Unit not on the map.");
         } else if (unit.getTile().getSettlement() instanceof Colony) {
-            loc = unit.getTile().getSettlement();
+            settlement = unit.getTile().getSettlement();
+            loc = settlement;
         } else { // Dump of goods onto a tile
             loc = null;
         }
@@ -5131,8 +5177,8 @@ public final class InGameController extends Controller {
             unit.setMovesLeft(0);
         }
 
-        if (loc instanceof Settlement) {
-            cs.add(See.only(serverPlayer), (FreeColGameObject) loc);
+        if (settlement != null) {
+            cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
         }
         // Always update unit, to show goods are gone.
         cs.add(See.perhaps(), unit);
@@ -5502,7 +5548,7 @@ public final class InGameController extends Controller {
             if (goods != null) {
                 moveGoods(goods, settlement);
                 cs.add(See.only(serverPlayer), unit);
-                cs.add(See.only(other), settlement);
+                cs.add(See.only(other), settlement.getGoodsContainer());
             }
             Unit newUnit = tradeItem.getUnit();
             if (newUnit != null) {
@@ -5680,22 +5726,34 @@ public final class InGameController extends Controller {
     public Element work(ServerPlayer serverPlayer, Unit unit,
                         WorkLocation workLocation) {
         ChangeSet cs = new ChangeSet();
+        Colony colony = workLocation.getColony();
+        colony.getGoodsContainer().saveState();
 
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
-            Colony colony = workLocation.getColony();
             if (tile.getOwningSettlement() != colony) {
                 // Claim known free land (because canAdd() succeeded).
                 csClaimLand(serverPlayer, tile, colony, 0, cs);
             }
         }
 
+        // Remove any unit equipment
+        boolean containerDirty = false;
+        if (!unit.getEquipment().isEmpty()) {
+            csRemoveEquipment(serverPlayer, unit, colony,
+                new HashSet<EquipmentType>(unit.getEquipment().keySet()), 0,
+                cs);
+            containerDirty = true;
+        }
+
         // Change the location.
-        Location oldLocation = unit.getLocation();
+        // We could avoid updating the whole tile if we knew that this
+        // was definitely a move between locations and no student/teacher
+        // interaction occurred.
+        Location oldLoc = unit.getLocation();
         unit.setState(UnitState.IN_COLONY);
         unit.setLocation(workLocation);
-        cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation(),
-               (FreeColGameObject) oldLocation);
+        cs.add(See.perhaps(), colony.getTile());
 
         // Others can see colony change size
         sendToOthers(serverPlayer, cs);
@@ -5774,4 +5832,136 @@ public final class InGameController extends Controller {
         // Arrears payment is private.
         return cs.build(serverPlayer);
     }
+
+
+    /**
+     * Remove equipment from a unit.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to equip.
+     * @param settlement The <code>Settlement</code> where the unit is
+     *     (may be null if the unit is in Europe).
+     * @param remove A collection of <code>EquipmentType</code> to remove.
+     * @param amount Override the amount of equipment to remove.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csRemoveEquipment(ServerPlayer serverPlayer, Unit unit,
+                                   Settlement settlement,
+                                   Collection<EquipmentType> remove,
+                                   int amount, ChangeSet cs) {
+        for (EquipmentType e : remove) {
+            int a = (amount > 0) ? amount : unit.getEquipmentCount(e);
+            for (AbstractGoods goods : e.getGoodsRequired()) {
+                GoodsType goodsType = goods.getType();
+                int n = goods.getAmount() * a;
+                if (unit.isInEurope()) {
+                    csSell(serverPlayer, unit, goodsType, n, cs);
+                } else if (settlement != null) {
+                    settlement.addGoods(goodsType, n);
+                }
+            }
+            // Removals can not cause incompatible-equipment trouble
+            unit.changeEquipment(e, -a);
+        }
+    }
+
+    /**
+     * Equip a unit.
+     * Currently the unit is either in Europe or in a settlement.
+     * Might one day allow the unit to be on a tile co-located with
+     * an equipment-bearing wagon.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to equip.
+     * @param type The <code>EquipmentType</code> to equip with.
+     * @param amount The change in the amount of equipment.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element equipUnit(ServerPlayer serverPlayer, Unit unit,
+                             EquipmentType type, int amount) {
+        Settlement settlement = (unit.getTile() == null) ? null
+            : unit.getTile().getSettlement();
+        GoodsContainer container = null;
+        boolean tileDirty = false;
+        if (unit.isInEurope()) {
+            // Refuse to trade in boycotted goods
+            for (AbstractGoods goods : type.getGoodsRequired()) {
+                GoodsType goodsType = goods.getType();
+                if (!serverPlayer.canTrade(goodsType)) {
+                    return Message.clientError("No equip of " + type.getId()
+                                               + " due to boycott of "
+                                               + goodsType.getId());
+                }
+            }
+            // Will need a fake container to contain the goods to buy
+            // in Europe.
+            container = new GoodsContainer(getGame(), null);
+        } else if (settlement != null) {
+            // Equipping a unit at work in a colony should remove the unit
+            // from the work location.
+            if (unit.getLocation() instanceof WorkLocation) {
+                unit.setLocation(settlement.getTile());
+                tileDirty = true;
+            }
+            settlement.getGoodsContainer().saveState();
+        }
+
+        ChangeSet cs = new ChangeSet();
+        List<EquipmentType> remove = null;
+        // Process adding equipment first, so as to settle what has to
+        // be removed.
+        if (amount > 0) {
+            for (AbstractGoods goods : type.getGoodsRequired()) {
+                GoodsType goodsType = goods.getType();
+                int n = amount * goods.getAmount();
+                if (unit.isInEurope()) {
+                    try {
+                        csBuy(serverPlayer, container, goodsType, n, cs);
+                    } catch (IllegalStateException e) {
+                        return Message.clientError(e.getMessage());
+                    }
+                } else if (settlement != null) {
+                    if (settlement.getGoodsCount(goodsType) < n) {
+                        return Message.clientError("Failed to equip: "
+                            + unit.getId()
+                            + " not enough " + goodsType
+                            + " in settlement " + settlement.getId());
+                    }
+                    settlement.removeGoods(goodsType, n);
+                }
+            }
+            remove = unit.changeEquipment(type, amount);
+            amount = 0; // 0 => all, now
+        } else if (amount < 0) {
+            remove = new ArrayList<EquipmentType>();
+            remove.add(type);
+            amount = -amount;
+        } else {
+            return null; // Nothing to do.
+        }
+
+        // Now do removal of equipment.
+        csRemoveEquipment(serverPlayer, unit, settlement, remove, amount, cs);
+
+        // Nothing for others to see except if the settlement population
+        // changes.
+        // If in Europe, we can get away with just updating the unit
+        // as csSell will have added sales changes.  In a settlement,
+        // the goods container will always be dirty, but the whole tile
+        // will only need to be updated if the unit moved into it.
+        unit.setMovesLeft(0);
+        if (unit.isInEurope()) {
+            cs.add(See.only(serverPlayer), unit);
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        } else if (settlement != null) {
+            if (tileDirty) {
+                cs.add(See.perhaps(), settlement.getTile());
+            } else {
+                cs.add(See.only(serverPlayer), unit,
+                       settlement.getGoodsContainer());
+            }
+        }
+        return cs.build(serverPlayer);
+    }
+
 }

@@ -23,17 +23,22 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.AttackMessage;
+import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
+import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -50,15 +55,30 @@ public class AIMessage {
      * Send a message to the server.
      *
      * @param connection The <code>Connection</code> to use
-     *         when communicating with the server.
+     *     when communicating with the server.
      * @param message The <code>Message</code> to send.
-     * @return True if the message was sent, and a non-error reply returned.
+     * @return True if the message was sent, and a non-null, non-error
+     *     reply returned.
      */
-    private static boolean sendMessage(Connection connection, Message message) {
+    private static boolean sendMessage(Connection connection,
+                                       Message message) {
         if (connection != null && message != null) {
             try {
-                Element reply = connection.ask(message.toXMLElement());
-                return reply != null && !"error".equals(reply.getTagName());
+                Element request = message.toXMLElement();
+                Element reply = connection.ask(request);
+                if (reply == null) {
+                    return false;
+                } else if ("error".equals(reply.getTagName())) {
+                    String msgID = reply.getAttribute("messageID");
+                    String msg = reply.getAttribute("message");
+                    String logMessage = "AIMessage." + request.getTagName()
+                        + " error,"
+                        + " messageID: " + ((msgID == null) ? "(null)" : msgID)
+                        + " message: " + ((msg == null) ? "(null)" : msg);
+                    logger.warning(logMessage);
+                    return false;
+                }
+                return true;
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not send \""
                            + message.getType() + "\"-message!", e);
@@ -68,10 +88,17 @@ public class AIMessage {
     }
 
 
-    public static void askAttack(AIUnit aiUnit, Direction direction) {
+    /**
+     * An AIUnit attacks in the given direction.
+     *
+     * @param aiUnit The <code>AIUnit</code> to attack with.
+     * @param direction The <code>Direction</code> to attack in.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askAttack(AIUnit aiUnit, Direction direction) {
         AIPlayer owner = aiUnit.getOwner();
-        sendMessage(owner.getConnection(),
-                    new AttackMessage(aiUnit.getUnit(), direction));
+        return sendMessage(owner.getConnection(),
+                           new AttackMessage(aiUnit.getUnit(), direction));
     }
 
 
@@ -80,11 +107,12 @@ public class AIMessage {
      *
      * @param aiUnit The <code>AIUnit</code> to move.
      * @param direction The <code>Direction</code> to move the unit.
+     * @return True if the message was sent, and a non-error reply returned.
      */
-    public static void askMove(AIUnit aiUnit, Direction direction) {
+    public static boolean askMove(AIUnit aiUnit, Direction direction) {
         AIPlayer owner = aiUnit.getOwner();
-        sendMessage(owner.getConnection(),
-                    new MoveMessage(aiUnit.getUnit(), direction));
+        return sendMessage(owner.getConnection(),
+                           new MoveMessage(aiUnit.getUnit(), direction));
     }
 
     /**
@@ -93,13 +121,31 @@ public class AIMessage {
      * @param aiUnit The <code>AIUnit</code> establishing the mission.
      * @param direction The <code>Direction</code> to move the unit.
      * @param denounce Is this a denunciation?
+     * @return True if the message was sent, and a non-error reply returned.
      */
-    public static void askEstablishMission(AIUnit aiUnit, Direction direction,
-                                           boolean denounce) {
+    public static boolean askEstablishMission(AIUnit aiUnit,
+                                              Direction direction,
+                                              boolean denounce) {
         AIPlayer owner = aiUnit.getOwner();
-        sendMessage(owner.getConnection(),
-                    new MissionaryMessage(aiUnit.getUnit(), direction,
-                                          denounce));
+        return sendMessage(owner.getConnection(),
+                           new MissionaryMessage(aiUnit.getUnit(), direction,
+                                                 denounce));
+    }
+
+    /**
+     * Change the equipment of a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to equip.
+     * @param type The <code>EquipmentType</code> to equip with.
+     * @param amount The amount to change the equipment by.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askEquipUnit(AIUnit aiUnit, EquipmentType type,
+                                       int amount) {
+        AIPlayer owner = aiUnit.getOwner();
+        return sendMessage(owner.getConnection(),
+                           new EquipUnitMessage(aiUnit.getUnit(), type,
+                                                amount));
     }
 
     /**
@@ -107,9 +153,24 @@ public class AIMessage {
      *
      * @param aiPlayer The <code>AIPlayer</code> granting independence.
      * @param player The <code>Player</code> gaining independence.
+     * @return True if the message was sent, and a non-error reply returned.
      */
-    public static void askGiveIndependence(AIPlayer aiPlayer, Player player) {
-        sendMessage(aiPlayer.getConnection(),
-                    new GiveIndependenceMessage(player));
+    public static boolean askGiveIndependence(AIPlayer aiPlayer,
+                                              Player player) {
+        return sendMessage(aiPlayer.getConnection(),
+                           new GiveIndependenceMessage(player));
+    }
+
+    /**
+     * Set a unit to work in a work location.
+     *
+     * @param aiUnit The <code>AIUnit</code> to work.
+     * @param workLocation The <code>WorkLocation</code> to work in.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askWork(AIUnit aiUnit, WorkLocation workLocation) {
+        AIPlayer owner = aiUnit.getOwner();
+        return sendMessage(owner.getConnection(),
+                           new WorkMessage(aiUnit.getUnit(), workLocation));
     }
 }

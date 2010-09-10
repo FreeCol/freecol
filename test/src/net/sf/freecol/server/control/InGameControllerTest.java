@@ -84,6 +84,7 @@ public class InGameControllerTest extends FreeColTestCase {
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
     GoodsType musketType = spec().getGoodsType("model.goods.muskets");
     GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+    GoodsType toolsType = spec().getGoodsType("model.goods.tools");
     EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
@@ -911,13 +912,10 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit pioneer = new Unit(game, tile1, dutch, colonistType,
-                                UnitState.ACTIVE);
+                                UnitState.ACTIVE, tools);
         Unit soldier = new Unit(game, tile2, french, veteranType,
-                                UnitState.ACTIVE);
-        soldier.equipWith(muskets, true);
-        soldier.equipWith(horses, true);
+                                UnitState.ACTIVE, muskets, horses);
         soldier.setMovesLeft(1);
-        pioneer.equipWith(tools, true);
 
         // Soldier wins and kills the pioneer
         crs = fakeAttackResult(CombatResult.WIN, soldier, pioneer);
@@ -945,13 +943,10 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit scout = new Unit(game, tile1, dutch, colonistType,
-                              UnitState.ACTIVE);
+                              UnitState.ACTIVE, horses);
         Unit soldier = new Unit(game, tile2, french, veteranType,
-                                UnitState.ACTIVE);
-        soldier.equipWith(horses, true);
-        soldier.equipWith(muskets, true);
+                                UnitState.ACTIVE, horses, muskets);
         scout.setMovesLeft(1);
-        scout.equipWith(horses, true);
 
         // Soldier wins and kills the scout
         crs = fakeAttackResult(CombatResult.WIN, soldier, scout);
@@ -1005,11 +1000,9 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit unit = new Unit(game, tile1, dutch, pettyCriminalType,
-                             UnitState.ACTIVE);
+                             UnitState.ACTIVE, muskets);
         Unit soldier = new Unit(game, tile2, french, colonistType,
-                                UnitState.ACTIVE);
-        unit.equipWith(muskets, true);
-        soldier.equipWith(muskets, true);
+                                UnitState.ACTIVE, muskets);
         // Enable automatic promotion
         dutch.getFeatureContainer()
             .addAbility(new Ability("model.ability.automaticPromotion"));
@@ -1026,7 +1019,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      unit.getType(), indenturedServantType);
 
         // Servant -> Colonist
-        soldier.equipWith(muskets, true);
+        soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
         assertTrue("Servant promotion failed", crs.size() == 3
                    && crs.get(0) == CombatResult.WIN
@@ -1038,7 +1031,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      unit.getType(), colonistType);
 
         // Colonist -> Veteran
-        soldier.equipWith(muskets, true);
+        soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
         assertTrue("Colonist promotion failed", crs.size() == 3
                    && crs.get(0) == CombatResult.WIN
@@ -1065,7 +1058,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      .getUnitTypeChange(ChangeType.PROMOTION, dutch));
 
         // Veteran -> Colonial Regular
-        soldier.equipWith(muskets, true);
+        soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
         assertTrue("Veteran promotion failed", crs.size() == 3
                    && crs.get(0) == CombatResult.WIN
@@ -1077,7 +1070,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      unit.getType(), colonialType);
 
         // No further promotion should work
-        soldier.equipWith(muskets, true);
+        soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
         assertTrue("Colonial Regular over-promotion failed",
                    crs.size() == 2
@@ -1111,7 +1104,7 @@ public class InGameControllerTest extends FreeColTestCase {
                                 UnitState.ACTIVE);
         assertTrue("Soldier should be capturable",
                    soldier.hasAbility("model.ability.canBeCaptured"));
-        soldier.equipWith(muskets, true);
+        soldier.changeEquipment(muskets, 1);
         assertFalse("Armed soldier should not be capturable",
                     soldier.hasAbility("model.ability.canBeCaptured"));
 
@@ -1145,11 +1138,9 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit soldier1 = new Unit(game, tile1, dutch, colonistType,
-                                 UnitState.ACTIVE);
-        soldier1.equipWith(muskets, true);
+                                 UnitState.ACTIVE, muskets);
         Unit soldier2 = new Unit(game, tile2, french, colonistType,
-                                 UnitState.ACTIVE);
-        soldier2.equipWith(muskets, true);
+                                 UnitState.ACTIVE, muskets);
 
         // Soldier loses and loses muskets
         crs = fakeAttackResult(CombatResult.LOSE, soldier1, soldier2);
@@ -1197,17 +1188,14 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit dragoon = new Unit(game, tile1, dutch, colonistType,
-                                UnitState.ACTIVE);
-        dragoon.equipWith(muskets, true);
-        dragoon.equipWith(horses, true);
+                                UnitState.ACTIVE, horses, muskets);
         dragoon.newTurn();
         assertEquals("Dragoon has 12 moves",
                      12, dragoon.getInitialMovesLeft());
         assertEquals("Dragoon has 12 moves left",
                      12, dragoon.getMovesLeft());
         Unit soldier = new Unit(game, tile2, french, colonistType,
-                                UnitState.ACTIVE);
-        soldier.equipWith(muskets, true);
+                                UnitState.ACTIVE, muskets);
 
         // Dragoon loses and loses horses
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, soldier);
@@ -1284,9 +1272,7 @@ public class InGameControllerTest extends FreeColTestCase {
             .skillToTeach(null);
         IndianSettlement settlement2 = builder.build();
         Unit dragoon = new Unit(game, tile1, dutch, colonistType,
-                                UnitState.ACTIVE);
-        dragoon.equipWith(muskets, true);
-        dragoon.equipWith(horses, true);
+                                UnitState.ACTIVE, horses, muskets);
         Unit brave = new Unit(game, tile2, inca, braveType, UnitState.ACTIVE);
         brave.setIndianSettlement(settlement1);
 
@@ -1368,11 +1354,9 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit scout = new Unit(game, tile1, dutch, colonistType,
-                              UnitState.ACTIVE);
-        scout.equipWith(horses, true);
+                              UnitState.ACTIVE, horses);
         Unit soldier = new Unit(game, tile2, french, colonistType,
-                                UnitState.ACTIVE);
-        soldier.equipWith(muskets, true);
+                                UnitState.ACTIVE, muskets);
 
         // Scout loses and is slaughtered
         crs = fakeAttackResult(CombatResult.LOSE, scout, soldier);
@@ -1400,11 +1384,9 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
         Unit soldier1 = new Unit(game, tile1, dutch, veteranType,
-                                 UnitState.ACTIVE);
-        soldier1.equipWith(muskets, true);
+                                 UnitState.ACTIVE, muskets);
         Unit soldier2 = new Unit(game, tile2, french, colonistType,
-                                 UnitState.ACTIVE);
-        soldier2.equipWith(muskets, true);
+                                 UnitState.ACTIVE, muskets);
         assertEquals("Veterans should become colonists on capture",
                      colonistType, veteranType
                      .getUnitTypeChange(ChangeType.CAPTURE, dutch));
@@ -1432,7 +1414,7 @@ public class InGameControllerTest extends FreeColTestCase {
                    && crs.get(1) == CombatResult.CAPTURE_UNIT);
         igc.combat((ServerPlayer) dutch, soldier1, soldier2, crs);
 
-        assertEquals("Soldier1 should not be a colonist",
+        assertEquals("Soldier1 should be a colonist",
                      colonistType, soldier1.getType());
         assertEquals("Soldier1 should be French",
                      french, soldier1.getOwner());
@@ -1457,8 +1439,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit artillery = new Unit(game, tile1, dutch, artilleryType,
                                   UnitState.ACTIVE);
         Unit soldier = new Unit(game, tile2, french, colonistType,
-                                UnitState.ACTIVE);
-        soldier.equipWith(muskets, true);
+                                UnitState.ACTIVE, muskets);
         assertEquals("Artillery should demote to damaged artillery",
                      damagedArtilleryType, artilleryType
                      .getUnitTypeChange(ChangeType.DEMOTION, dutch));
@@ -1666,6 +1647,96 @@ public class InGameControllerTest extends FreeColTestCase {
         campAlarm = camp.getAlarm(dutch);
         assertEquals("Camp should be hateful",
                      Tension.Level.HATEFUL, campAlarm.getLevel());
+    }
+
+    public void testEquipIndian() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
+        ServerPlayer indian = (ServerPlayer) camp.getOwner();
+        int horsesReqPerUnit = indianHorses.getAmountRequiredOf(horsesType);
+        int musketsReqPerUnit = indianMuskets.getAmountRequiredOf(musketType);
+        int toolsReqPerUnit = tools.getAmountRequiredOf(toolsType);
+
+        // Setup
+        camp.addGoods(horsesType,horsesReqPerUnit);
+        camp.addGoods(musketType,musketsReqPerUnit);
+        camp.addGoods(toolsType,toolsReqPerUnit);
+
+        assertEquals("Initial number of horses in Indian camp not as expected",horsesReqPerUnit,camp.getGoodsCount(horsesType));
+        assertEquals("Initial number of muskets in Indian camp not as expected",musketsReqPerUnit,camp.getGoodsCount(musketType));
+        assertEquals("Initial number of tools in Indian camp not as expected",toolsReqPerUnit,camp.getGoodsCount(toolsType));
+
+        Unit brave = camp.getUnitList().get(0);
+        assertFalse("Brave should not be equiped with tools",
+                    brave.canBeEquippedWith(tools));
+        assertTrue("Brave should not be mounted",
+                   !brave.isMounted());
+        assertTrue("Brave should not be armed",
+                   !brave.isArmed());
+        assertTrue("Indian should be able to be armed with Indian muskets",
+                   brave.canBeEquippedWith(indianMuskets));
+        assertFalse("Indian should not be able to equip with muskets",
+                    brave.canBeEquippedWith(muskets));
+        assertTrue("Indian should be able to mount Indian horses",
+                   brave.canBeEquippedWith(indianHorses));
+        assertFalse("Indian should not be able to equip with horses",
+                    brave.canBeEquippedWith(horses));
+
+        // Mount and arm the brave
+        igc.equipUnit(indian, brave, indianHorses, 1);
+        igc.equipUnit(indian, brave, indianMuskets, 1);
+
+        // Verify results
+        assertTrue("Brave should be mounted",
+                   brave.isMounted());
+        assertTrue("Brave should be armed",
+                   brave.isArmed());
+        assertEquals("No muskets should remain in camp",
+                     0, camp.getGoodsCount(musketType));
+        assertEquals("No horses should remain in camp",
+                     0, camp.getGoodsCount(horsesType));
+    }
+
+    public void testEquipIndianNotEnoughReqGoods() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
+        ServerPlayer indian = (ServerPlayer) camp.getOwner();
+
+        int horsesAvail = indianHorses.getAmountRequiredOf(horsesType) / 2;
+        int musketsAvail = indianMuskets.getAmountRequiredOf(musketType) / 2;
+
+        // Setup
+        camp.addGoods(horsesType,horsesAvail);
+        camp.addGoods(musketType,musketsAvail);
+
+        assertEquals("Initial number of horses in Indian camp not as expected",horsesAvail,camp.getGoodsCount(horsesType));
+        assertEquals("Initial number of muskets in Indian camp not as expected",musketsAvail,camp.getGoodsCount(musketType));
+
+        Unit brave = camp.getUnitList().get(0);
+        assertTrue("Initial brave should not be mounted",
+                   !brave.isMounted());
+        assertTrue("Initial brave should not be armed",
+                   !brave.isArmed());
+
+        // Try to mount and arm the brave
+        igc.equipUnit(indian, brave, indianHorses, 1);
+        igc.equipUnit(indian, brave, indianMuskets, 1);
+
+        // Verify results
+        assertTrue("Final brave should not be armed",
+                   !brave.isArmed());
+        assertEquals("The muskets should not have been touched",
+                     musketsAvail, camp.getGoodsCount(musketType));
+        assertTrue("Final brave should not be mounted",
+                   !brave.isMounted());
+        assertEquals("The horses should not have been touched",
+                     horsesAvail, camp.getGoodsCount(horsesType));
     }
 
 }

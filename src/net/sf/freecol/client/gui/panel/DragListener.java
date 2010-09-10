@@ -430,6 +430,7 @@ public final class DragListener extends MouseAdapter {
 
     private boolean addEquipmentItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
+        final InGameController igc = canvas.getClient().getInGameController();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
         if (tempUnit.getEquipment().size() > 1) {
@@ -439,8 +440,7 @@ public final class DragListener extends MouseAdapter {
                         Map<EquipmentType, Integer> equipment =
                             new HashMap<EquipmentType, Integer>(tempUnit.getEquipment().getValues());
                         for (Map.Entry<EquipmentType, Integer> entry: equipment.entrySet()) {
-                            canvas.getClient().getInGameController()
-                                .equipUnit(tempUnit, entry.getKey(), -entry.getValue());
+                            igc.equipUnit(tempUnit, entry.getKey(), -entry.getValue());
                         }
                         unitLabel.updateIcon();
                     }
@@ -463,8 +463,7 @@ public final class DragListener extends MouseAdapter {
                 final EquipmentType type = equipmentType; 
                 newItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            canvas.getClient().getInGameController()
-                                .equipUnit(tempUnit, type, -items);
+                            igc.equipUnit(tempUnit, type, -items);
                             unitLabel.updateIcon();
                         }
                     });
@@ -517,8 +516,7 @@ public final class DragListener extends MouseAdapter {
                     final EquipmentType type = equipmentType; 
                     newItem.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                canvas.getClient().getInGameController()
-                                    .equipUnit(tempUnit, type, items);
+                                igc.equipUnit(tempUnit, type, items);
                                 unitLabel.updateIcon();
                             }
                         });
@@ -533,10 +531,9 @@ public final class DragListener extends MouseAdapter {
             JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.dragoon"));
             newItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        canvas.getClient().getInGameController()
-                            .equipUnit(tempUnit, horseType, 1);
-                        canvas.getClient().getInGameController()
-                            .equipUnit(tempUnit, musketType, 1);
+                        igc.equipUnit(tempUnit, horseType, 1);
+                        igc.equipUnit(tempUnit, musketType, 1);
+                        unitLabel.updateIcon();
                     }
                 });
             menu.add(newItem);

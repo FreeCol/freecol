@@ -1073,50 +1073,6 @@ public class IndianSettlement extends Settlement {
             removeGoods(type, amount);
         }
     }
-    /**
-     * Equips braves with horses and muskets.
-     * Keeps some for the settlement defense
-     */
-    public void equipBraves() {
-    	GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
-    	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-    	EquipmentType armsEqType = getSpecification().getEquipmentType("model.equipment.indian.muskets");
-    	EquipmentType horsesEqType = getSpecification().getEquipmentType("model.equipment.indian.horses");
-    	
-    	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
-    	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
-    	
-    	int armsAvail = getGoodsCount(armsType);
-    	int horsesAvail = getGoodsCount(horsesType);
-    	
-    	for(Unit brave : getUnitList()){
-    		logger.finest("Muskets available=" + getGoodsCount(armsType));
-    		if(armsAvail < musketsToArmIndian){
-    			break;
-    		}
-    		if(brave.isArmed()){
-    			continue;
-    		}
-    		logger.info("Equiping brave with muskets");
-    		brave.equipWith(armsEqType);
-    		if(!brave.isArmed()){
-    			logger.warning("Brave has NOT been armed");
-    		}	
-    		armsAvail = getGoodsCount(armsType);
-    	}
-
-    	for(Unit brave : getUnitList()){	
-    		if(horsesAvail < horsesToMountIndian){
-    			break;
-    		}
-    		if(brave.isMounted()){
-    			continue;
-    		}
-    		logger.info("Equiping brave with horses");
-    		brave.equipWith(horsesEqType);
-    		horsesAvail = getGoodsCount(horsesType);
-    	}
-    }
     
     /**
      * Dispose of this native settlement.

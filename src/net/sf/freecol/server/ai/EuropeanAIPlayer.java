@@ -335,12 +335,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 Unit u = (ui.next());
                 if (!u.isArmed() && u.canBeEquippedWith(muskets)) {
                     recruitCount--;
-                    Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                    equipUnitElement.setAttribute("unit", u.getId());
-                    equipUnitElement.setAttribute("type", muskets.getId());
-                    equipUnitElement.setAttribute("amount", "1");
-                    u.equipWith(muskets);
-                    sendAndWaitSafely(equipUnitElement);
+                    AIMessage.askEquipUnit(getAIUnit(u), muskets, 1);
                     Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
                     putOutsideColonyElement.setAttribute("unit", u.getId());
                     u.putOutsideColony();
@@ -354,11 +349,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                     }
                     olddefenders++;
                     if (!u.isMounted() && u.canBeEquippedWith(horses)) {
-                        equipUnitElement = Message.createNewRootElement("equipUnit");
-                        equipUnitElement.setAttribute("unit", u.getId());
-                        equipUnitElement.setAttribute("type", horses.getId());
-                        equipUnitElement.setAttribute("amount", "1");
-                        sendAndWaitSafely(equipUnitElement);
+                        AIMessage.askEquipUnit(getAIUnit(u), horses, 1);
                     } else {
                         needHorses = true;
                     }

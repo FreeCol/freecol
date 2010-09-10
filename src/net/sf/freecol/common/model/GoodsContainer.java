@@ -418,6 +418,21 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
+     * Fire property changes for all goods that have seen level changes
+     * since the last saveState().
+     */
+    public void fireChanges() {
+        for (GoodsType type : getSpecification().getGoodsTypeList()) {
+            int oldCount = getOldGoodsCount(type);
+            int newCount = getGoodsCount(type);
+            if (oldCount != newCount) {
+                firePropertyChange(type.getId(), oldCount, newCount);
+            }
+        }
+        oldStoredGoods.clear();
+    }
+
+    /**
      * Removes goods exceeding limit and reports on goods exceeding levels.
      *
      */
@@ -501,7 +516,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         out.writeAttribute("ID", getId());
         writeStorage(out, STORED_GOODS_TAG, storedGoods);
-        writeStorage(out, OLD_STORED_GOODS_TAG, storedGoods);
+        writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
         out.writeEndElement();
     }
 

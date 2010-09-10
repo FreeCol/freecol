@@ -332,7 +332,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         final GoodsType clothType = spec().getGoodsType("model.goods.cloth");
         final GoodsType foodType = spec().getGoodsType("model.goods.food");
 
-        u.work(colTile);
+        u.setLocation(colTile);
         u.setWorkType(cottonType);
         
         ColonyPlan plan = new ColonyPlan(aiMain,colony);        

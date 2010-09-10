@@ -74,8 +74,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
             ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
             Tile unitTile = map.getTile(2, 2);
-            Unit colonist = new Unit(game, unitTile, player, colonistType, UnitState.ACTIVE);
-            colonist.equipWith(toolsEqType,true);
+            Unit colonist = new Unit(game, unitTile, player, colonistType, UnitState.ACTIVE, toolsEqType);
             
             // Setup mission
             AIUnit aiUnit = (AIUnit) aiMain.getAIObject(colonist);

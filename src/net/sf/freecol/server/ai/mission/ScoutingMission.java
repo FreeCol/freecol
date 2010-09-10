@@ -133,17 +133,10 @@ public class ScoutingMission extends Mission {
                 for (EquipmentType equipment : getAIMain().getGame().getSpecification().getEquipmentTypeList()) {
                     if (equipment.getRole() == Unit.Role.SCOUT && getUnit().canBeEquippedWith(equipment)
                             && colony.canBuildEquipment(equipment)) {
-                        Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                        equipUnitElement.setAttribute("unit", getUnit().getId());
-                        equipUnitElement.setAttribute("type", equipment.getId());
-                        equipUnitElement.setAttribute("amount", "1");
-                        try {
-                            connection.ask(equipUnitElement);
-                            scoutEquipment = equipment;
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"equipUnit\"-message!");
+                        AIMessage.askEquipUnit(getAIUnit(), equipment, 1);
+                        if (getUnit().getEquipmentCount(equipment) > 0) {
+                            return;
                         }
-                        return;
                     }
                 }
                 valid = false;
@@ -216,18 +209,11 @@ public class ScoutingMission extends Mission {
 
         if (isTarget(getUnit().getTile(), getUnit(), scoutEquipment) && getUnit().getColony() != null) {
             if (scoutEquipment != null) {
-                Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                equipUnitElement.setAttribute("unit", getUnit().getId());
-                equipUnitElement.setAttribute("type", scoutEquipment.getId());
-                equipUnitElement.setAttribute("amount", "0");
-                try {
-                    connection.ask(equipUnitElement);
+                AIMessage.askEquipUnit(getAIUnit(), scoutEquipment,
+                                       -getUnit().getEquipmentCount(scoutEquipment));
+                if (getUnit().getEquipmentCount(scoutEquipment) == 0) {
                     scoutEquipment = null;
-                } catch (IOException e) {
-                    logger.warning("Could not send \"equipUnit (0)\"-message!");
-                    return;
                 }
-                debugAction = "Awaiting 52 horses";
             }
         }
     }

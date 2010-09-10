@@ -481,19 +481,19 @@ public class UnitTest extends FreeColTestCase {
         
         Player dutch = game.getPlayer("model.nation.dutch");
         Unit wagonTrain = new Unit(game, colony.getTile(), dutch, spec().getUnitType("model.unit.wagonTrain"),
-                UnitState.ACTIVE);
+                                   UnitState.ACTIVE);
         int initialMoves = wagonTrain.getInitialMovesLeft();
         assertEquals("Setup error, unit has wrong initial moves", initialMoves, wagonTrain.getMovesLeft());
         assertTrue("Setup error, unit should not carry anything", wagonTrain.getGoodsCount() == 0);
         
         Goods tooManyGoods = colony.goodsContainer.getGoods(foodType);
         try{
-        	wagonTrain.add(tooManyGoods);
-        	fail("Should have thrown an IllegalStateException");
+            wagonTrain.add(tooManyGoods);
+            fail("Should have thrown an IllegalStateException");
         }
         catch(IllegalStateException e){
-        	assertTrue("Unit should not carry anything", wagonTrain.getGoodsCount() == 0);
-        	assertEquals("Unit moves should not have been modified", initialMoves, wagonTrain.getMovesLeft());
+            assertTrue("Unit should not carry anything", wagonTrain.getGoodsCount() == 0);
+            assertEquals("Unit moves should not have been modified", initialMoves, wagonTrain.getMovesLeft());
         }
     }
         
@@ -514,7 +514,7 @@ public class UnitTest extends FreeColTestCase {
         Unit colonist = new Unit(game, colony, dutch, colonistType, UnitState.ACTIVE);
         // check abilities
         assertFalse(colonist.hasAbility("model.ability.missionary"));
-        colonist.equipWith(spec().getEquipmentType("model.equipment.missionary"));
+        colonist.changeEquipment(spec().getEquipmentType("model.equipment.missionary"), 1);
         assertTrue(colonist.hasAbility("model.ability.missionary"));
         assertFalse(colonist.hasAbility("model.ability.expertMissionary"));
         assertTrue(jesuit.hasAbility("model.ability.missionary"));
@@ -553,7 +553,7 @@ public class UnitTest extends FreeColTestCase {
         
         EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
         assertTrue(colonist.canBeEquippedWith(horses));
-        colonist.equipWith(horses, true);
+        colonist.changeEquipment(horses, 1);
         assertEquals(2, colonist.getLineOfSight());
         
         // with Hernando De Soto, land units should see further 
@@ -621,7 +621,7 @@ public class UnitTest extends FreeColTestCase {
         
         UnitType braveType = spec().getUnitType("model.unit.brave");
         @SuppressWarnings("unused")
-        Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
+            Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
         //assertFalse(brave.canBuildColony());
     }
 
@@ -649,101 +649,6 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Brave wasnt disposed properly",brave.isDisposed());
         assertEquals("Brave wasnt removed from camp",1, camp.getUnitCount());
         assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
-    }
-    
-    public void testEquipIndian() {
-        GoodsType toolsType = spec().getGoodsType("model.goods.tools");
-		GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-        EquipmentType toolsEqType = spec().getEquipmentType("model.equipment.tools");
-        EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.indian.horses");
-        EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.indian.muskets");
-        EquipmentType horsesWrongEqType = spec().getEquipmentType("model.equipment.horses");
-        EquipmentType musketsWrongEqType = spec().getEquipmentType("model.equipment.muskets");
-        
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        game.setMap(map);
-        
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.build();
-        
-        int horsesReqPerUnit = horsesEqType.getAmountRequiredOf(horsesType);
-        int musketsReqPerUnit = musketsEqType.getAmountRequiredOf(musketsType);        
-        int toolsReqPerUnit = toolsEqType.getAmountRequiredOf(toolsType);
-        
-        // Setup
-        camp.addGoods(horsesType,horsesReqPerUnit);
-        camp.addGoods(musketsType,musketsReqPerUnit);
-        camp.addGoods(toolsType,toolsReqPerUnit);
-     
-        assertEquals("Initial number of horses in Indian camp not as expected",horsesReqPerUnit,camp.getGoodsCount(horsesType));
-        assertEquals("Initial number of muskets in Indian camp not as expected",musketsReqPerUnit,camp.getGoodsCount(musketsType));
-        assertEquals("Initial number of tools in Indian camp not as expected",toolsReqPerUnit,camp.getGoodsCount(toolsType));
-
-        Unit brave = camp.getUnitList().get(0);
-        
-        assertFalse("Brave should not be equiped with tools",brave.canBeEquippedWith(toolsEqType));
-        
-        assertTrue("Brave should not be mounted",!brave.isMounted());
-        assertTrue("Brave should not be armed",!brave.isArmed());
-        assertTrue("Indian should be able to be armed",brave.canBeEquippedWith(musketsEqType));
-        assertFalse("Indian should not be able to equip with " + musketsWrongEqType,brave.canBeEquippedWith(musketsWrongEqType));
-        assertTrue("Indian should be able to be mounted",brave.canBeEquippedWith(horsesEqType));
-        assertFalse("Indian should not be able to equip with " + horsesWrongEqType,brave.canBeEquippedWith(horsesWrongEqType));
-        
-        // Execute
-        brave.equipWith(musketsEqType);
-        brave.equipWith(horsesEqType);
-        
-        // Verify results
-        assertTrue("Brave should be mounted",brave.isMounted());
-        assertTrue("Brave should be armed",brave.isArmed());
-        assertEquals("No muskets should remain in camp",0,camp.getGoodsCount(musketsType));
-        assertEquals("No horses should remain in camp",0,camp.getGoodsCount(horsesType));
-    }
-
-    public void testEquipIndianNotEnoughReqGoods() {
-		GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-        EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.indian.horses");
-        EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.indian.muskets");
-        
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        game.setMap(map);
-        
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.build();
-        
-        int horsesAvail = horsesEqType.getAmountRequiredOf(horsesType) / 2;
-        int musketsAvail = musketsEqType.getAmountRequiredOf(musketsType) / 2;        
-        
-        // Setup
-        camp.addGoods(horsesType,horsesAvail);
-        camp.addGoods(musketsType,musketsAvail);
-     
-        assertEquals("Initial number of horses in Indian camp not as expected",horsesAvail,camp.getGoodsCount(horsesType));
-        assertEquals("Initial number of muskets in Indian camp not as expected",musketsAvail,camp.getGoodsCount(musketsType));
-
-        Unit brave = camp.getUnitList().get(0);
-        assertTrue("Inicial brave should not be mounted",!brave.isMounted());
-        assertTrue("Inicial brave should not be armed",!brave.isArmed());
-        
-        // Execute and verify
-        try{
-        	brave.equipWith(musketsEqType);
-        	fail("Exception not thrown when trying to arm unit without enough required goods");
-        } catch(IllegalStateException e){}
-        assertTrue("Final brave should not be armed",!brave.isArmed());
-        assertEquals("The muskets should not have been touched",musketsAvail,camp.getGoodsCount(musketsType));
-        
-        try{
-        	brave.equipWith(horsesEqType);
-        	fail("Exception not thrown when trying to mount unit without enough required goods");
-        } catch(IllegalStateException e){}
-        assertTrue("Final brave should not be mounted",!brave.isMounted());
-        assertEquals("The horses should not have been touched",horsesAvail,camp.getGoodsCount(horsesType));
     }
     
     
@@ -796,31 +701,32 @@ public class UnitTest extends FreeColTestCase {
 
     }
     
-    public void testEquipmentChange(){
-        Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap();
-        game.setMap(map);
+    public void testChangeEquipment() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
-        Tile unitTile = map.getTile(6, 8);
-        
-        Unit unit = new Unit(game, unitTile, dutch, colonistType, UnitState.ACTIVE);
-        
-        assertFalse("Soldier should not have muskets",unit.getEquipmentCount(musketsType) > 0);
-        assertFalse("Soldier should not have horses",unit.getEquipmentCount(horsesType) > 0);
-        assertFalse("Soldier should not have tools",unit.getEquipmentCount(toolsType) > 0);
-        unit.equipWith(musketsType, 50, true);
-        unit.equipWith(horsesType, 50, true);
-        assertTrue("Soldier should be equiped with muskets",unit.getEquipmentCount(musketsType) > 0);
-        assertTrue("Soldier should be equiped with horses",unit.getEquipmentCount(horsesType) > 0);
-        assertFalse("Soldier should not have tools",unit.getEquipmentCount(toolsType) > 0);
-        
-        unit.equipWith(toolsType, 50, true);
-        assertFalse("Soldier should no longer have muskets",unit.getEquipmentCount(musketsType) > 0);
-        assertFalse("Soldier should no longer have horses",unit.getEquipmentCount(horsesType) > 0);
-        assertTrue("Soldier should be equiped with tools",unit.getEquipmentCount(toolsType) > 0);
+        Colony colony = getStandardColony(6);
+        BuildingType churchType = spec().getBuildingType("model.building.chapel");
+        assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
+
+        Building church = colony.getBuilding(churchType);
+        church.upgrade();
+        assertTrue(colony.hasAbility("model.ability.dressMissionary"));
+
+        Unit colonist = colony.getRandomUnit();
+        EquipmentType missionaryEquipmentType = spec().getEquipmentType("model.equipment.missionary");
+        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
+        assertEquals(0, colonist.getEquipmentCount(missionaryEquipmentType));
+        assertTrue(colonist.changeEquipment(missionaryEquipmentType, 1).isEmpty());
+        assertEquals(1, colonist.getEquipmentCount(missionaryEquipmentType));
+        assertEquals(0, colonist.getEquipmentCount(muskets));
+        List<EquipmentType> remove = colonist.changeEquipment(muskets, 1);
+        assertTrue(remove.size() == 1
+                   && remove.get(0) == missionaryEquipmentType);
+        assertEquals(1, colonist.getEquipmentCount(muskets));
+        assertEquals(1, colonist.getEquipmentCount(missionaryEquipmentType));
     }
-    
+
     public void testUnitLocationAfterBuildingColony() {
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -918,11 +824,11 @@ public class UnitTest extends FreeColTestCase {
         colonist.modifyExperience(10);
         assertTrue("Colonist should some initial experience",colonist.getExperience() > 0);
 
-        colonist.equipWith(musketsType,true);
+        colonist.changeEquipment(musketsType, 1);
         assertTrue("Colonist should have lost all experience, different role",colonist.getExperience() == 0);
         
         colonist.modifyExperience(10);
-        colonist.equipWith(horsesType,true);
+        colonist.changeEquipment(horsesType, 1);
         assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
     }
 
@@ -1020,96 +926,7 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Dutch player should have no units",dutch.getUnits().size() == 0);
         assertTrue("French player should have 2 units",french.getUnits().size() == 2);
     }
-    
-    public void testSwitchEquipmentWith(){
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        game.setMap(map);
-        
-        Colony colony1 = getStandardColony(1);
-        Tile col1Tile = colony1.getTile();
-        Tile otherTile = col1Tile.getAdjacentTile(Direction.N);
-        
-        Unit insideUnit1 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, toolsType);
-        Unit insideUnit2 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsType, horsesType);
-        Unit insideUnit3 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE);
-        Unit artillery = new Unit(game, col1Tile, colony1.getOwner(), artilleryType, UnitState.ACTIVE);
-        
-        Unit outsideUnit1 = new Unit(game, otherTile, colony1.getOwner(), colonistType, UnitState.ACTIVE, toolsType);
-        Unit outsideUnit2 = new Unit(game, otherTile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsType, horsesType);
-        
-        boolean exceptionThrown = false;
-        try{
-            insideUnit1.switchEquipmentWith(artillery);
-        }
-        catch(IllegalArgumentException e){
-            exceptionThrown = true;
-        }
-        if(!exceptionThrown){
-            fail("Colonist must not change equipment with a unit not also a colonist");
-        }
-        
-        exceptionThrown = false;
-        try{
-            outsideUnit1.switchEquipmentWith(outsideUnit2);
-        }
-        catch(IllegalStateException e){
-            exceptionThrown = true;
-        }
-        if(!exceptionThrown){
-            fail("Colonists must not change equipment outside a settlement");
-        }
-        
-        exceptionThrown = false;
-        try{
-            insideUnit1.switchEquipmentWith(outsideUnit1);
-        }
-        catch(IllegalStateException e){
-            exceptionThrown = true;
-        }
-        if(!exceptionThrown){
-            fail("Colonists must not change equipment when in diferent locations");
-        }
-        
-        insideUnit1.switchEquipmentWith(insideUnit2);
-        assertFalse("Unit1 should not have tools",insideUnit1.getEquipmentCount(toolsType) == 1);
-        assertTrue("Unit1 should now have horses",insideUnit1.getEquipmentCount(horsesType) == 1);
-        assertTrue("Unit1 should now have muskets",insideUnit1.getEquipmentCount(musketsType) == 1);
-        
-        assertTrue("Unit2 should now have tools",insideUnit2.getEquipmentCount(toolsType) == 1);
-        assertFalse("Unit2 should not have horses",insideUnit2.getEquipmentCount(horsesType) == 1);
-        assertFalse("Unit2 should not have muskets",insideUnit2.getEquipmentCount(musketsType) == 1);
-        
-        insideUnit3.switchEquipmentWith(insideUnit1);
-        assertTrue("Unit1 should not have equipment",insideUnit1.getEquipment().isEmpty());
-        assertTrue("Unit3 should now have horses",insideUnit3.getEquipmentCount(horsesType) == 1);
-        assertTrue("Unit3 should now have muskets",insideUnit3.getEquipmentCount(musketsType) == 1);
-    }
-    
-    public void testSwitchEquipmentWithUnitHavingSomeAlredy(){
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        game.setMap(map);
-        
-        Colony colony1 = getStandardColony(1);
-        Tile col1Tile = colony1.getTile();
-        
-        Unit insideUnit1 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsType);
-        Unit insideUnit2 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsType, horsesType);
 
-
-        assertEquals("Unit1 should not have horses",0,insideUnit1.getEquipmentCount(horsesType));
-        assertEquals("Unit1 should have muskets",1,insideUnit1.getEquipmentCount(musketsType));
-        
-        assertEquals("Unit2 should have horses",1,insideUnit2.getEquipmentCount(horsesType));
-        assertEquals("Unit2 should have muskets",1,insideUnit2.getEquipmentCount(musketsType));
-        insideUnit1.switchEquipmentWith(insideUnit2);
-        assertEquals("Unit1 should now have horses",1,insideUnit1.getEquipmentCount(horsesType));
-        assertEquals("Unit1 should now have muskets",1,insideUnit1.getEquipmentCount(musketsType));
-        
-        assertEquals("Unit2 should not have horses",0,insideUnit2.getEquipmentCount(horsesType));
-        assertEquals("Unit2 should have muskets",1,insideUnit2.getEquipmentCount(musketsType));
-    }
 
     public void testGetMovesAsString() {
 

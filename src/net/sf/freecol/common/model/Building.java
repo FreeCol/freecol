@@ -292,6 +292,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
+     * Returns the unit type being an expert in this <code>Building</code>.
+     *
+     * @return The UnitType.
+     */
+    public UnitType getExpertUnitType() {
+        return getSpecification().getExpertForProducing(getGoodsOutputType());
+    }
+
+    /**
      * Checks if the specified <code>Locatable</code> may be added to this
      * <code>WorkLocation</code>.
      * 
@@ -328,91 +337,54 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
 
     /**
-     * Adds the specified <code>Locatable</code> to this
-     * <code>WorkLocation</code>.
+     * Adds the specified locatable to this building.
      * 
-     * @param locatable The <code>Locatable</code> that shall be added to this
-     *            <code>WorkLocation</code>.
+     * @param locatable The <code>Locatable</code> to add.
      */
     public void add(final Locatable locatable) {
         if (!canAdd(locatable)) {
-            throw new IllegalStateException("Cannot add " + locatable + " to " + toString());
-        } else if (!units.contains(locatable)) {
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
-            } 
-            final Unit unit = (Unit) locatable;
+            throw new IllegalStateException("Can not add " + locatable
+                                            + " to " + toString());
+        }
+        if (units.contains(locatable)) return;
 
-            unit.removeAllEquipment(false);
-            unit.setState(Unit.UnitState.IN_COLONY);
+        final Unit unit = (Unit) locatable;
+        if (units.equals(Collections.emptyList())) {
+            units = new ArrayList<Unit>();
+        }
+        units.add(unit);
+        unit.setState(Unit.UnitState.IN_COLONY);
 
-            Unit potentialStudent = unit.getStudent();
-            if (buildingType.hasAbility("model.ability.teach")) {
-                if (potentialStudent == null) {
-                    potentialStudent = findStudent(unit);
-                    if (potentialStudent != null) {
-                        unit.setStudent(potentialStudent);
-                        potentialStudent.setTeacher(unit);
-                    }
-                }
-            } else {
-                if (potentialStudent != null) {
-                    potentialStudent.setTeacher(null);
-                    unit.setStudent(null);
-                } else {
-                    if (unit.getTeacher() == null) {
-                        Unit potentialTeacher = getColony().findTeacher(unit);
-                        if (potentialTeacher != null) {
-                            potentialTeacher.setStudent(unit);
-                            unit.setTeacher(potentialTeacher);
-                        }
-                    }
-                }
-            }
-            units.add(unit);
-            firePropertyChange(Building.UNIT_CHANGE,null,unit);
-            // TODO: can we cheaply report the real change?
-            GoodsType output = getGoodsOutputType();
-            if (output != null) {
-                firePropertyChange(output.getId(),
-                                   new AbstractGoods(output, 0),
-                                   new AbstractGoods(output, 1));
+        if (buildingType.hasAbility("model.ability.teach")) {
+            Unit student = unit.getStudent();
+            if (student == null && (student = findStudent(unit)) != null) {
+                unit.setStudent(student);
+                student.setTeacher(unit);
             }
         }
     }
 
-
     /**
-     * Returns the unit type being an expert in this <code>Building</code>.
+     * Removes the specified locatable from this building.
      * 
-     * @return The UnitType.
-     */
-    public UnitType getExpertUnitType() {
-        return getSpecification().getExpertForProducing(getGoodsOutputType());
-    }
-
-    /**
-     * Removes the specified <code>Locatable</code> from this
-     * <code>WorkLocation</code>.
-     * 
-     * @param locatable The <code>Locatable</code> that shall be removed from
-     *            this <code>WorkLocation</code>.
+     * @param locatable The <code>Locatable</code> to remove.
      */
     public void remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Can only remove units from building.");
         }
-        Unit unit = (Unit) locatable;
-        
+
+        final Unit unit = (Unit) locatable;
         if (units.remove(unit)) {
             unit.setMovesLeft(0);
-            firePropertyChange(Building.UNIT_CHANGE,unit,null);
-            // TODO: can we cheaply report the real change?
-            GoodsType output = getGoodsOutputType();
-            if (output != null) {
-                firePropertyChange(output.getId(),
-                                   new AbstractGoods(output, 1),
-                                   new AbstractGoods(output, 0));
+            unit.setState(Unit.UnitState.ACTIVE);
+
+            if (buildingType.hasAbility("model.ability.teach")) {
+                Unit student = unit.getStudent();
+                if (student != null) {
+                    student.setTeacher(null);
+                    unit.setStudent(null);
+                }
             }
         }
     }

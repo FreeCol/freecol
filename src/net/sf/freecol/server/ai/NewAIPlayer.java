@@ -127,6 +127,10 @@ public abstract class NewAIPlayer extends AIObject {
         readFromXML(in);
     }
 
+    protected AIUnit getAIUnit(Unit unit) {
+        return (AIUnit) getAIMain().getAIObject(unit);
+    }
+
     /**
      *
      * Tells this <code>AIPlayer</code> to make decisions. The

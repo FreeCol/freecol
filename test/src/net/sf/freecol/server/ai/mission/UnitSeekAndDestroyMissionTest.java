@@ -88,8 +88,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile2 = map.getTile(2, 1);
-        Unit defender = new Unit(game, tile2, player2, veteranType, UnitState.ACTIVE);
-        defender.equipWith(muskets, true);
+        Unit defender = new Unit(game, tile2, player2, veteranType,
+                                 UnitState.ACTIVE, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
@@ -129,8 +129,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile defenderTile = map.getTile(2, 1);
-        Unit defender = new Unit(game, defenderTile, player2, veteranType, UnitState.ACTIVE);
-        defender.equipWith(muskets, true);
+        Unit defender = new Unit(game, defenderTile, player2, veteranType,
+                                 UnitState.ACTIVE, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);

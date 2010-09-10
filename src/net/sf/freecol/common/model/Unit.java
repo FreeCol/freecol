@@ -36,10 +36,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -1917,31 +1920,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Sets this <code>Unit</code> to work in the specified
-     * <code>WorkLocation</code>.
-     * 
-     * @param workLocation The place where this <code>Unit</code> shall be out
-     *            to work.
-     * @exception IllegalStateException If the <code>workLocation</code> is in
-     *                another {@link Colony} than this <code>Unit</code>.
-     * Deprecated: should move to the server.  WorkMessage is implemented
-     *     but there are still lots of uses, mostly in the AI.
-     */
-    public void work(WorkLocation workLocation) {
-        // Colonies will be the same if the unit is either on the tile
-        // of the colony or already working in one of the colonies
-        // WorkLocations.
-        if (workLocation.getColony() != this.getColony()) {
-            throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is in the same 'Colony'.");
-        }
-        if (workLocation.getTile().getOwner() != getOwner()) {
-            throw new IllegalStateException("Can only set a 'Unit' to a 'WorkLocation' owned by the same player.");
-        }
-        setState(UnitState.IN_COLONY);
-        setLocation(workLocation);
-    }
-
-    /**
      * Sets this unit to work at this TileImprovement.
      *
      * @param improvement The <code>TileImprovement</code> to work on.
@@ -2008,8 +1986,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void setLocation(Location newLocation) {
 
-        Colony oldColony = this.getColony();
         Location oldLocation = location;
+        Colony oldColony = this.getColony();
+        Colony newColony = null;
         
         if (location != null) {
             location.remove(this);
@@ -2017,64 +1996,55 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         location = newLocation;
         if (newLocation != null) {
             newLocation.add(this);
+            newColony = newLocation.getColony();
         }
+        getOwner().setExplored(this);
 
-        // Units in WorkLocations get counted twice
-        if (oldLocation instanceof WorkLocation) {
-            if (!(newLocation instanceof WorkLocation)) {
-                getOwner().modifyScore(-getType().getScoreValue());
-                if (oldColony != null) {
-                    // this should always be the case, except possibly for unit tests
-                    oldColony.updatePopulation(-1);
-                    setState(UnitState.ACTIVE);
-                }
+        // Ugly hooks that should be moved to WorkLocation.add/remove
+        // if there was one.
+        if (oldLocation instanceof WorkLocation
+            && !(newLocation instanceof WorkLocation)) {
+            getOwner().modifyScore(-getType().getScoreValue());
+            oldColony.updatePopulation(-1);
+
+            if (teacher != null) {
+                teacher.setStudent(null);
+                teacher = null;
             }
-        } else if (newLocation instanceof WorkLocation) {
+        }
+        if (newLocation instanceof WorkLocation
+            && !(oldLocation instanceof WorkLocation)) {
             // entering colony
             UnitType newType = unitType.getUnitTypeChange(ChangeType.ENTER_COLONY, owner);
             if (newType == null) {
                 getOwner().modifyScore(getType().getScoreValue());
             } else {
-                Colony colony = newLocation.getColony();
                 String oldName = unitType.getId() + ".name";
                 getOwner().modifyScore(-getType().getScoreValue());
                 setType(newType);
                 getOwner().modifyScore(getType().getScoreValue() * 2);
                 String newName = newType.getId() + ".name";
-                colony.firePropertyChange(ColonyChangeEvent.UNIT_TYPE_CHANGE.toString(),
-                                          oldName, newName);
+                newColony.firePropertyChange(ColonyChangeEvent.UNIT_TYPE_CHANGE.toString(),
+                                             oldName, newName);
             }
-            newLocation.getColony().updatePopulation(1);
+            newColony.updatePopulation(1);
             if (getState() != UnitState.IN_COLONY) {
                 logger.warning("Adding unit " + getId() + " with state==" + getState()
                                + " (should be IN_COLONY) to WorkLocation in "
                                + newLocation.getColony().getName() + ". Fixing: ");
                 setState(UnitState.IN_COLONY);
             }
-        }
-                
-        // Reset training when changing/leaving colony
-        if (!Utils.equals(oldColony, getColony())){
-            setTurnsOfTraining(0);
+
+            // Find a teacher if available.
+            Unit potentialTeacher = newColony.findTeacher(this);
+            if (potentialTeacher != null) {
+                potentialTeacher.setStudent(this);
+                this.setTeacher(potentialTeacher);
+            }
         }
 
-        if (student != null &&
-            !(newLocation instanceof Building &&
-              ((Building) newLocation).getType().hasAbility("model.ability.teach"))) {
-            // teacher has left school
-            student.setTeacher(null);
-            student = null;
-        }
-
-        if (newLocation instanceof WorkLocation) {
-            removeAllEquipment(false);
-        } else if (teacher != null) {
-            teacher.setStudent(null);
-            teacher = null;
-        }
-
-        if (!getOwner().isIndian()) {
-            getOwner().setExplored(this);
+        if (newColony != oldColony) {
+            setTurnsOfTraining(0); // Reset training when leaving colony
         }
     }
 
@@ -2169,161 +2139,27 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Describe <code>equipWith</code> method here.
+     * Changes the equipment a unit has and returns a list of equipment
+     * it still has but needs to drop due to the changed equipment being
+     * incompatible.
      *
-     * @param equipmentType an <code>EquipmentType</code> value
+     * @param type The <code>EquipmentType</code> to change.
+     * @param amount The amount to change by (may be negative).
+     * @return A list of equipment types that the unit must now drop.
      */
-    public void equipWith(EquipmentType equipmentType) {
-        equipWith(equipmentType, 1, false);
-    }
-
-    /**
-     * Describe <code>equipWith</code> method here.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @param amount an <code>int</code> value
-     */
-    public void equipWith(EquipmentType equipmentType, int amount) {
-        equipWith(equipmentType, amount, false);
-    }
-
-    /**
-     * Describe <code>equipWith</code> method here.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @param asResultOfCombat a <code>boolean</code> value
-     */
-    public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
-        equipWith(equipmentType, 1, asResultOfCombat);
-    }
-
-    /**
-     * Equip this unit with the given EquipmentType, provided that all
-     * requirements are met, and that the EquipmentType can be built
-     * at this location or is present as a result of combat.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @param amount an <code>int</code> value
-     * @param asResultOfCombat a <code>boolean</code> value
-     * @see #canBeEquippedWith
-     */
-    public void equipWith(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
-        if (equipmentType == null) {
-            throw new IllegalArgumentException("EquipmentType is 'null'.");
-        } else if (amount < 1) {
-            throw new IllegalArgumentException("Amount must be a positive integer.");
-        }
-        if (!canBeEquippedWith(equipmentType)) {
-            logger.fine("Unable to equip unit " + getId() + " with " + equipmentType);
-            return;
-        }
-        if (!(asResultOfCombat || 
-              (getColony() != null && getColony().canBuildEquipment(equipmentType)) ||
-              (isInEurope() && getOwner().getEurope().canBuildEquipment(equipmentType)) ||
-              (getIndianSettlement() != null))) {
-            logger.fine("Unable to build equipment " + equipmentType);
-            return;
-        }
-        if (!asResultOfCombat) {
-            setMovesLeft(0);
-            if (getColony() != null) {
-                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    int requiredAmount = amount * goods.getAmount();
-                    if(getColony().getGoodsCount(goods.getType()) < requiredAmount){
-                        throw new IllegalStateException("Not enough goods to equip");
-                    }
-                    getColony().removeGoods(goods.getType(), requiredAmount);
-                }
-            } else if (isInEurope()) {
-                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    int requiredAmount = amount * goods.getAmount();
-                    getOwner().getMarket().buy(goods.getType(), requiredAmount, getOwner());
-                }
-            } else if(getIndianSettlement() != null) {
-                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {                    
-                    int requiredAmount = amount * goods.getAmount();
-                    if(getIndianSettlement().getGoodsCount(goods.getType()) < requiredAmount){
-                        throw new IllegalStateException("Not enough goods to equip");
-                    }
-                    getIndianSettlement().removeGoods(goods.getType(), requiredAmount);
+    public List<EquipmentType> changeEquipment(EquipmentType type, int amount) {
+        List<EquipmentType> result = new ArrayList<EquipmentType>();
+        equipment.incrementCount(type, amount);
+        if (amount > 0) {
+            for (EquipmentType oldType
+                     : new HashSet<EquipmentType>(equipment.keySet())) {
+                if (!oldType.isCompatibleWith(type)) {
+                    result.add(oldType);
                 }
             }
         }
-        equipment.incrementCount(equipmentType, amount);
-        Set<EquipmentType> equipmentTypes = equipment.keySet();
-        // We are changing the set, so we need to create a copy for iteration, to avoid
-        //a ConcurrentModificationException being thrown
-        Set<EquipmentType> eqLst = new HashSet<EquipmentType>(equipmentTypes);
-        for (EquipmentType oldEquipment : eqLst) {
-            if (!oldEquipment.isCompatibleWith(equipmentType)) {
-                dumpEquipment(oldEquipment, equipment.getCount(oldEquipment), asResultOfCombat);
-                equipmentTypes.remove(oldEquipment);
-            }
-        }
         setRole();
-        firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
-    }
-    
-    public void removeEquipment(EquipmentType equipmentType) {
-        int amount = getEquipmentCount(equipmentType);
-        
-        removeEquipment(equipmentType, amount, false);
-    }
-
-    /**
-     * Describe <code>removeEquipment</code> method here.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @param amount an <code>int</code> value
-     */
-    public void removeEquipment(EquipmentType equipmentType, int amount) {
-        removeEquipment(equipmentType, amount, false);
-    }
-
-    /**
-     * Describe <code>removeEquipment</code> method here.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @param amount an <code>int</code> value
-     * @param asResultOfCombat a <code>boolean</code> value
-     */
-    public void removeEquipment(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
-        dumpEquipment(equipmentType, amount, asResultOfCombat);
-        equipment.incrementCount(equipmentType, -amount);
-        if (asResultOfCombat) {
-            // loss of horses reduces movement
-            setMovesLeft(Math.min(movesLeft, getInitialMovesLeft()));
-        } else {
-            setMovesLeft(0);
-        }
-        setRole();
-        firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
-    }
-
-    public void removeAllEquipment(boolean asResultOfCombat) {
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            dumpEquipment(equipmentType, equipment.getCount(equipmentType), asResultOfCombat);
-        }
-        equipment.clear();
-        setMovesLeft(0);
-        setRole();
-        firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
-    }
-
-    private void dumpEquipment(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
-        if (!asResultOfCombat) {
-            // the equipment is returned to storage in the form of goods
-            if (getColony() != null) {
-                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    getColony().addGoods(goods.getType(), amount * goods.getAmount());
-                }
-            } else if (isInEurope()) {
-                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    getOwner().getMarket().sell(goods.getType(), amount * goods.getAmount(), getOwner());
-                }
-            }
-        }
-        // else in case of a lost battle, the equipment is just destroyed
+        return result;
     }
 
     /**
@@ -2336,34 +2172,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return equipment.getCount(equipmentType);
     }
 
-    /**
-     * Switches equipment between colonists
-     */
-    public void switchEquipmentWith(Unit unit){
-        if(!isColonist() || !unit.isColonist()){
-            throw new IllegalArgumentException("Both units need to be colonists to switch equipment");
-        }
-        
-        if(getTile() != unit.getTile()){
-            throw new IllegalStateException("Units can only switch equipment in the same location");
-        }
-        
-        if(getTile().getSettlement() == null){
-            throw new IllegalStateException("Units can only switch equipment in a settlement");
-        }
-        
-        List<EquipmentType> equipList = new ArrayList<EquipmentType>(getEquipment().keySet());
-        List<EquipmentType> otherEquipList = new ArrayList<EquipmentType>(unit.getEquipment().keySet());
-        removeAllEquipment(false);
-        unit.removeAllEquipment(false);
-        for(EquipmentType equip : otherEquipList){
-            equipWith(equip);
-        }
-        for(EquipmentType equip : equipList){
-            unit.equipWith(equip);
-        }
-    }
-    
     /**
      * Checks if this <code>Unit</code> is located in Europe. That is; either
      * directly or onboard a carrier which is in Europe.
@@ -3879,6 +3687,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             goodsContainer = new GoodsContainer(getGame(), this);
         }
 
+        setRole();
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
     }

@@ -454,15 +454,7 @@ public class PioneeringMission extends Mission {
         }
 
         logger.finest("Equipping " + unit + " at=" + colonyWithTools.getName() + " amount=" + amount);
-        Element equipUnitElement = Message.createNewRootElement("equipUnit");
-        equipUnitElement.setAttribute("unit", unit.getId());
-        equipUnitElement.setAttribute("type", toolsType.getId());
-        equipUnitElement.setAttribute("amount", Integer.toString(amount));
-        try {
-            connection.sendAndWait(equipUnitElement);
-        } catch (Exception e) {
-            logger.warning("Could not send equip message.");
-        }
+        AIMessage.askEquipUnit(getAIUnit(), toolsType, amount);
         
         // Unit is now equipped, get to work
         if(unit.getEquipmentCount(toolsType) > 0){

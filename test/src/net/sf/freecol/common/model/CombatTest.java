@@ -76,10 +76,7 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(french, true);
 
         Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
-        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
-
-        soldier.equipWith(muskets, true);
-        soldier.equipWith(horses, true);
+        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE, muskets, horses);
         soldier.setMovesLeft(1);
 
         Modifier bigMovementPenalty = spec().getModifiers(SimpleCombatModel.BIG_MOVEMENT_PENALTY)
@@ -346,10 +343,7 @@ public class CombatTest extends FreeColTestCase {
         french.setStance(dutch, Player.Stance.WAR);
 
         Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
-        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
-
-        soldier.equipWith(muskets, true);
-        soldier.equipWith(horses, true);
+        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE, muskets, horses);
 
         assertEquals(tile1, colonist.getLocation());
         assertEquals(tile2, soldier.getLocation());
