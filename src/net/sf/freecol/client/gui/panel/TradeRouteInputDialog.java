@@ -81,6 +81,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private static final int OK = 0, CANCEL = 1;
 
+    public static final DataFlavor STOP_FLAVOR = new DataFlavor(Stop.class, "Stop");
+
     private TradeRoute originalRoute;
 
     private final JButton ok = new JButton(Messages.message("ok"));
@@ -192,8 +194,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
         });
 
-        // TODO: allow reordering of stops
         stopList.setDragEnabled(true);
+        stopList.setTransferHandler(new StopHandler());
         stopList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
@@ -484,6 +486,99 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
             for (int i = 0; i < flavors.length; i++) {
                 if (flavors[i].equals(DefaultTransferHandler.flavor)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public class StopTransferable implements Transferable {
+
+        private List<Stop> stops;
+
+        public StopTransferable(List<Stop> stops) {
+            this.stops = stops;
+        }
+
+        public Object getTransferData(DataFlavor flavor) {
+            return stops;
+        }
+
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[] { STOP_FLAVOR };
+        }
+
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return flavor == STOP_FLAVOR;
+        }
+    }
+
+    /*
+     * TransferHandler for Stops.
+     */
+    public class StopHandler extends TransferHandler {
+
+        protected Transferable createTransferable(JComponent c) {
+            JList list = (JList) c;
+            DefaultListModel model = (DefaultListModel) list.getModel();
+            List<Stop> stops = new ArrayList<Stop>();
+            for (int index : list.getSelectedIndices()) {
+                stops.add((Stop) model.get(index));
+            }
+            return new StopTransferable(stops);
+        }
+
+        public int getSourceActions(JComponent c) {
+            return MOVE;
+        }
+
+        public boolean importData(JComponent target, Transferable data) {
+            if (canImport(target, data.getTransferDataFlavors())) {
+                try {
+                    List stops = (List) data.getTransferData(STOP_FLAVOR);
+                    if (target instanceof JList) {
+                        JList list = (JList) target;
+                        DefaultListModel model = (DefaultListModel) list.getModel();
+                        int index = list.getMaxSelectionIndex();
+                        for (Object o : stops) {
+                            Stop stop = originalRoute.new Stop((Stop) o);
+                            if (index < 0) {
+                                model.addElement(stop);
+                            } else {
+                                index++;
+                                model.add(index, stop);
+                            }
+                        }
+                    }
+                    return true;
+                } catch (UnsupportedFlavorException ufe) {
+                    logger.warning(ufe.toString());
+                } catch (IOException ioe) {
+                    logger.warning(ioe.toString());
+                }
+            }
+
+            return false;
+        }
+
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            try {
+                if (source instanceof JList && action == MOVE) {
+                    JList stopList = (JList) source;
+                    DefaultListModel listModel = (DefaultListModel) stopList.getModel();
+                    for (Object o : (List) data.getTransferData(STOP_FLAVOR)) {
+                        listModel.removeElement(o);
+                    }
+                }
+            } catch (Exception e) {
+                logger.warning(e.toString());
+            }
+        }
+
+        public boolean canImport(JComponent c, DataFlavor[] flavors) {
+            for (int i = 0; i < flavors.length; i++) {
+                if (flavors[i].equals(STOP_FLAVOR)) {
                     return true;
                 }
             }

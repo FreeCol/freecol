@@ -305,7 +305,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * 
          * @param other
          */
-        private Stop(Stop other) {
+        public Stop(Stop other) {
             this.location = other.location;
             this.cargo = new ArrayList<GoodsType>(other.cargo);
         }
