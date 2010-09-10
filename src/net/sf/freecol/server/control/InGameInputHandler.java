@@ -95,6 +95,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.PayArrearsMessage;
+import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -423,10 +424,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new ClaimLandMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
+        register(PayForBuildingMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return payForBuilding(connection, element);
+                return new PayForBuildingMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(PayArrearsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -964,22 +965,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                       .toXMLElement(player, updateElement.getOwnerDocument()));
         }
         return updateElement;
-    }
-
-    /**
-     * Handles a "payForBuilding"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param payForBuildingElement The element containing the request.
-     */
-    private Element payForBuilding(Connection connection, Element payForBuildingElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) getGame().getFreeColGameObject(payForBuildingElement.getAttribute("colony"));
-        if (colony.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        colony.payForBuilding();
-        return null;
     }
 
     /**

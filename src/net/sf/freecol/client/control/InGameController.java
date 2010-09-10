@@ -129,6 +129,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.PayArrearsMessage;
+import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -4343,28 +4344,44 @@ public final class InGameController implements NetworkConstants {
      */
     public void payForBuilding(Colony colony) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
-
-        if (!canvas.showConfirmDialog(null, "payForBuilding.text",
-                                      "payForBuilding.yes", "payForBuilding.no",
-                                      "%replace%", Integer.toString(colony.getPriceForBuilding()))) {
-            return;
-        }
-
         if (!colony.canPayToFinishBuilding()) {
             canvas.errorMessage("notEnoughGold");
             return;
         }
+        int price = colony.getPriceForBuilding();
+        if (!canvas.showConfirmDialog(null, "payForBuilding.text",
+                                      "payForBuilding.yes", "payForBuilding.no",
+                                      "%replace%", Integer.toString(price))) {
+            return;
+        }
 
-        Element payForBuildingElement = Message.createNewRootElement("payForBuilding");
-        payForBuildingElement.setAttribute("colony", colony.getId());
+        if (askPayForBuilding(colony) && colony.getPriceForBuilding() == 0) {
+            String pc = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
+            List<BuildableType> queue = colony.getBuildQueue();
+            colony.firePropertyChange(pc, null, queue);
+        }
+    }
 
-        colony.payForBuilding();
+    /**
+     * Server query-response for paying for a building.
+     *
+     * @param colony The <code>Colony</code> that is building.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askPayForBuilding(Colony colony) {
+        Client client = freeColClient.getClient();
+        PayForBuildingMessage message = new PayForBuildingMessage(colony);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
 
-        freeColClient.getClient().sendAndWait(payForBuildingElement);
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
 

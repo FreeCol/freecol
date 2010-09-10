@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -1952,6 +1953,8 @@ public final class InGameController extends Controller {
      */
     private void propagateToEuropeanMarkets(GoodsType type, int amount,
                                             ServerPlayer serverPlayer) {
+        if (!type.isStorable()) return;
+
         // Propagate 5-30% of the original change.
         final int lowerBound = 5; // TODO: make into game option?
         final int upperBound = 30;// TODO: make into game option?
@@ -1972,10 +1975,9 @@ public final class InGameController extends Controller {
 
     /**
      * Buy goods in Europe.
-     *
      * Do not update the container or player in the ChangeSet, this
-     * routine is called from equipUnit where other unit updates can
-     * happen.
+     * routine is called from equipUnit and payForBuilding where other
+     * unit updates can happen.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is buying.
      * @param container The <code>GoodsContainer</code> to carry the goods.
@@ -1988,13 +1990,8 @@ public final class InGameController extends Controller {
     private void csBuy(ServerPlayer serverPlayer, GoodsContainer container,
                        GoodsType type, int amount, ChangeSet cs)
         throws IllegalStateException {
-        // FIXME: market.buy() should be here in the controller, but
-        // there are two cases remaining that are hard to move still.
-        //
-        // 1. Shortcut for buying in Europe FIXED
-        // 2. Also for the goods required for a building in
-        // Colony.payForBuilding().  This breaks the pattern implemented
-        // here as there is no unit involved.
+        // FIXME: market.buy() should be here in the controller.
+        // Do when we fix csSell.
         Market market = serverPlayer.getMarket();
         market.buy(type, amount, serverPlayer);
         container.addGoods(type, amount);
@@ -5964,4 +5961,41 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
+    /**
+     * Pay for a building.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
+     * @param colony The <code>Colony</code> that is building.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element payForBuilding(ServerPlayer serverPlayer, Colony colony) {
+        BuildableType build = colony.getCurrentlyBuilding();
+        if (build == null) {
+            return Message.clientError("Colony " + colony.getId()
+                                       + " is not building anything!");
+        }
+        HashMap<GoodsType, Integer> required
+            = colony.getGoodsForBuilding(build);
+        int price = colony.priceGoodsForBuilding(required);
+        if (price > serverPlayer.getGold()) {
+            return Message.clientError("Insufficient funds to pay for build.");
+        }
+
+        ChangeSet cs = new ChangeSet();
+        GoodsContainer container = colony.getGoodsContainer();
+        for (GoodsType type : required.keySet()) {
+            int amount = required.get(type);
+            if (type.isStorable()) {
+                csBuy(serverPlayer, container, type, amount, cs);
+            } else {
+                container.addGoods(type, amount);
+            }
+        }
+
+        // Nothing to see for others, colony internal.
+        serverPlayer.modifyGold(-price);
+        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.add(See.only(serverPlayer), container);
+        return cs.build(serverPlayer);
+    }
 }

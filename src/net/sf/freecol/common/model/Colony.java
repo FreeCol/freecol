@@ -1751,59 +1751,57 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Returns the price for the remaining hammers and tools for the
-     * {@link Building} given.
+     * Gets the price for the remaining resources to build a given buildable.
      * 
-     * @param buildableType a <code>BuildableType</code> value
+     * @param type The <code>BuildableType</code> to build.
      * @return The price.
      * @see #payForBuilding
      */
-    public int getPriceForBuilding(BuildableType buildableType) {
-        // Any changes in this method should also be reflected in
-        // "payForBuilding()"
+    public int getPriceForBuilding(BuildableType type) {
+        return priceGoodsForBuilding(getGoodsForBuilding(type));
+    }
+
+    /**
+     * Gets a price for a map of resources to build a given buildable.
+     *
+     * @param required The map of resources required.
+     * @return The price.
+     * @see #payForBuilding
+     */
+    public int priceGoodsForBuilding(HashMap<GoodsType, Integer> required) {
         int price = 0;
-        for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-            GoodsType requiredGoodsType = goodsRequired.getType();
-            int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
-            if (remaining > 0) {
-                if (requiredGoodsType.isStorable()) {
-                    price += (getOwner().getMarket().getBidPrice(requiredGoodsType, remaining) * 110) / 100;
-                } else {
-                    price += requiredGoodsType.getPrice() * remaining;
-                }
+        Market market = getOwner().getMarket();
+        for (GoodsType goodsType : required.keySet()) {
+            int amount = required.get(goodsType);
+            if (goodsType.isStorable()) {
+                // TODO: magic number!
+                price += (market.getBidPrice(goodsType, amount) * 110) / 100;
+            } else {
+                price += goodsType.getPrice() * amount;
             }
         }
         return price;
     }
 
     /**
-     * Buys the remaining hammers and tools for the {@link Building} that is
-     * currently being built.
-     * 
-     * @exception IllegalStateException If the owner of this <code>Colony</code>
-     *                has an insufficient amount of gold.
-     * @see #getPriceForBuilding
+     * Gets a map of the types of goods and amount thereof required to
+     * finish a buildable in this colony.
+     *
+     * @param type The <code>BuildableType</code> to build.
+     * @return The map to completion.
      */
-    public void payForBuilding() {
-        // Any changes in this method should also be reflected in
-        // "getPriceForBuilding()"
-        if (!canPayToFinishBuilding()) {
-            throw new IllegalStateException("Not enough gold.");
-        }
-        for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
-            GoodsType requiredGoodsType = goodsRequired.getType();
-            int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
+    public HashMap<GoodsType, Integer> getGoodsForBuilding(BuildableType type) {
+        HashMap<GoodsType, Integer> result = new HashMap<GoodsType, Integer>();
+        for (AbstractGoods goods : type.getGoodsRequired()) {
+            GoodsType goodsType = goods.getType();
+            int remaining = goods.getAmount() - getGoodsCount(goodsType);
             if (remaining > 0) {
-                if (requiredGoodsType.isStorable()) {
-                    getOwner().getMarket().buy(requiredGoodsType, remaining, getOwner());
-                } else {
-                    getOwner().modifyGold(-remaining * requiredGoodsType.getPrice());
-                }
-                addGoods(requiredGoodsType, remaining);
+                result.put(goodsType, new Integer(remaining));
             }
         }
+        return result;
     }
-    
+
     /**
      * Check if the owner can buy the remaining hammers and tools for 
      * the {@link Building} that is currently being built.
@@ -1827,14 +1825,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @see #getPriceForBuilding
      */
     public boolean canPayToFinishBuilding(BuildableType buildableType) {
-        if (buildableType == null){
-            return false;
-        }
-        
-        if (getPriceForBuilding(buildableType) > getOwner().getGold()) {
-            return false;
-        }
-        return true;
+        return buildableType != null
+            && getPriceForBuilding(buildableType) <= getOwner().getGold();
     }
 
     /**
