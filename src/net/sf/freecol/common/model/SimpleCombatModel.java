@@ -297,8 +297,8 @@ public class SimpleCombatModel extends CombatModel {
             Settlement settlement = (Settlement) defender;
             Player defenderPlayer = settlement.getOwner();
             result.add(UNKNOWN_DEFENCE_MODIFIER);
-            result.addAll(settlement.getFeatureContainer()
-                          .getModifierSet(Modifier.DEFENCE, type));
+            //result.addAll(settlement.getFeatureContainer()
+            //              .getModifierSet(Modifier.DEFENCE, type));
             result.addAll(defenderPlayer
                           .getModifierSet(Modifier.SETTLEMENT_DEFENCE, type));
             if (settlement.isCapital()) {
