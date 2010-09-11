@@ -4364,6 +4364,7 @@ public final class InGameController implements NetworkConstants {
             String pc = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
             List<BuildableType> queue = colony.getBuildQueue();
             colony.firePropertyChange(pc, null, queue);
+            fireColonyChanges(colony, -1, null, null);
         }
     }
 
