@@ -200,8 +200,7 @@ public final class FreeColClient {
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
-        final String tc = "freecol";
-        FreeColTcFile tcData = new FreeColTcFile(tc);
+        FreeColTcFile tcData = new FreeColTcFile("classic");
         ResourceManager.setTcMapping(tcData.getResourceMapping());
         
         imageLibrary = new ImageLibrary();
