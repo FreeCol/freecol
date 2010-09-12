@@ -139,9 +139,17 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
         cellRenderer = getCellRenderer();
 
+        // remove previous listeners
+        for (ItemListener listener : compact.getItemListeners()) {
+            compact.removeItemListener(listener);
+        }
         compact.setText(Messages.message("colonyPanel.compactView"));
         compact.addItemListener(this);
 
+        // remove previous listeners
+        for (ItemListener listener : showAll.getItemListeners()) {
+            showAll.removeItemListener(listener);
+        }
         showAll.setText(Messages.message("colonyPanel.showAll"));
         showAll.addItemListener(this);
 
