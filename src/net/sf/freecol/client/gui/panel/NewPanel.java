@@ -122,8 +122,11 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         super(parent);
         this.connectController = getClient().getConnectController();
 
-        for (FreeColTcFile tc : Mods.getAllTCs()) {
+        for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc.getModInfo());
+            if (FreeCol.DEFAULT_TC.equals(tc.getId())) {
+                specificationBox.setSelectedItem(tc.getModInfo());
+            }
         }
 
         JButton cancel = new JButton( Messages.message("cancel") );

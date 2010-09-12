@@ -37,8 +37,8 @@ import net.sf.freecol.common.model.Specification;
  */
 public class FreeColModFile extends FreeColDataFile {
     
-    private static final String SPECIFICATION_FILE = "specification.xml";
-    private static final String MOD_DESCRIPTOR_FILE = "mod.xml";
+    public static final String SPECIFICATION_FILE = "specification.xml";
+    public static final String MOD_DESCRIPTOR_FILE = "mod.xml";
     public static final String[] FILE_ENDINGS = new String[] {".fmd", ".zip"};
 
     private String id;

@@ -110,15 +110,21 @@ public class Mods {
     }
 
     /**
-     * Gets all available TCs, a.k.a. rules. TODO: move rules to a
-     * sub-directory and auto-discover rules.
+     * Gets all available rules.
      *
      * @return A list of <code>FreeColModFile</code>s contain mods.
      */
-    public static List<FreeColTcFile> getAllTCs() {
+    public static List<FreeColTcFile> getRuleSets() {
         List<FreeColTcFile> result = new ArrayList<FreeColTcFile>();
-        result.add(new FreeColTcFile("freecol"));
-        result.add(new FreeColTcFile("classic"));
+        File directory = FreeColTcFile.getRulesDirectory();
+        for (File dir : directory.listFiles()) {
+            if (dir.isDirectory()) {
+                File modDescription = new File(dir, FreeColModFile.MOD_DESCRIPTOR_FILE);
+                if (modDescription.exists()) {
+                    result.add(new FreeColTcFile(dir));
+                }
+            }
+        }
         return result;
     }
 }

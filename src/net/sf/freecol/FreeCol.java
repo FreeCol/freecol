@@ -74,6 +74,7 @@ public final class FreeCol {
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
+    public static final String DEFAULT_TC = "freecol";
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
@@ -83,7 +84,6 @@ public final class FreeCol {
     private static final String MIN_JDK_VERSION = "1.5";
 
     private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
-    private static final String DEFAULT_TC = "freecol";
 
     private static boolean  windowed = false,
                             sound = true,

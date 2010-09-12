@@ -44,7 +44,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         Specification spec = null;
         try {
-            spec = new Specification(new FileInputStream("data/freecol/specification.xml"));
+            spec = new FreeColTcFile("freecol").getSpecification();
         } catch(Exception e) {
             e.printStackTrace();
             fail();

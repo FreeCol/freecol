@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.server.model.ServerGame;
 
 /**
@@ -104,7 +105,8 @@ public class FreeColTestCase extends TestCase {
     public static Specification spec() {
         if (specification == null) {
             try {
-                specification = new Specification(new FileInputStream("data/freecol/specification.xml"));
+                FreeColTcFile tc = new FreeColTcFile("freecol");
+                specification = tc.getSpecification();
                 specification.applyDifficultyLevel("model.difficulty.medium");
             } catch(Exception e) {
                 e.printStackTrace();

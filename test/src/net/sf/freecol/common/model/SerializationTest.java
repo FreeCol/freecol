@@ -37,6 +37,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.xml.sax.SAXException;
@@ -170,7 +171,7 @@ public class SerializationTest extends FreeColTestCase {
         Specification specification1 = null;
         Specification specification2 = null;
         try {
-            specification1 = new Specification(new FileInputStream("data/classic/specification.xml"));
+            specification1 = new FreeColTcFile("classic").getSpecification();
             specification1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
@@ -205,7 +206,7 @@ public class SerializationTest extends FreeColTestCase {
         Specification specification1 = null;
         Specification specification2 = null;
         try {
-            specification1 = new Specification(new FileInputStream("data/classic/specification.xml"));
+            specification1 = new FreeColTcFile("classic").getSpecification();
             specification1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();

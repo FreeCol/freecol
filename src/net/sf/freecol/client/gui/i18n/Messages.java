@@ -96,7 +96,7 @@ public class Messages {
 
         List<FreeColModFile> allMods = new ArrayList<FreeColModFile>();
         allMods.addAll(Mods.getAllMods());
-        allMods.addAll(Mods.getAllTCs());
+        allMods.addAll(Mods.getRuleSets());
         for (FreeColModFile fcmf : allMods) {
             for (String fileName : filenames) {
                 try {

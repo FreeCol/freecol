@@ -32,15 +32,27 @@ import net.sf.freecol.common.resources.ResourceMapping;
  * A Total Conversion (TC).
  */
 public class FreeColTcFile extends FreeColModFile {
+
+    public static final String DIRECTORY = "rules";
     
     /**
      * Opens the given file for reading.
+     * 
+     * @param id The file to load.
+     * @throws IOException if thrown while opening the file.
+     */
+    public FreeColTcFile(final File file) {
+        super(file);
+    }
+
+    /**
+     * Opens the file with the given name for reading.
      * 
      * @param id The id of the TC to load.
      * @throws IOException if thrown while opening the file.
      */
     public FreeColTcFile(final String id) {
-        super(new File(FreeCol.getDataDirectory(), id));
+        super(new File(getRulesDirectory(), id));
     }
 
     /**
@@ -48,14 +60,12 @@ public class FreeColTcFile extends FreeColModFile {
      */
     @Override
     public ResourceMapping getResourceMapping() {
-        //Specification.createSpecification(getSpecificationInputStream());
         ResourceMapping result;
         try {
             final ModDescriptor info = getModDescriptor();
             if (info.getParent() != null) {
                 final FreeColTcFile parentTcData = new FreeColTcFile(info.getParent());
                 result = parentTcData.getResourceMapping();
-                //result.addAll(Specification.getSpecification().getDefaultMapping());
             } else {
                 result = new ResourceMapping();
             }
@@ -140,6 +150,10 @@ public class FreeColTcFile extends FreeColModFile {
             map.add(key, ResourceFactory.createResource(getURI(path)));
         }
         return map;
+    }
+
+    public static File getRulesDirectory() {
+        return new File(FreeCol.getDataDirectory(), DIRECTORY);
     }
 
 }

@@ -13,6 +13,7 @@
     <property name="freecol.name" value="freecol"/>
     <property environment="env"/>  
     <property name="freecol.data.dir" value="${basedir}/data"/>
+    <property name="freecol.rules.dir" value="${basedir}/data/rules"/>
     <property name="freecol.src.dir" value="${basedir}/src"/>
     <property name="freecol.build.dir" value="${basedir}/build"/>
     <property name="freecol.packaging.dir" value="${basedir}/packaging"/>
@@ -648,17 +649,17 @@
       <echo message="Validating freecol/specification.xml."/>
       <schemavalidate
          noNamespaceFile="schema/specification-schema.xsd"
-         file="data/freecol/specification.xml">
+         file="${freecol.rules.dir}/freecol/specification.xml">
       </schemavalidate>
       <echo message="Validating classic/specification.xml."/>
       <schemavalidate
          noNamespaceFile="schema/specification-schema.xsd"
-         file="data/classic/specification.xml">
+         file="${freecol.rules.dir}/classic/specification.xml">
       </schemavalidate>
       <echo message="Validating testing/specification.xml."/>
       <schemavalidate
          noNamespaceFile="schema/specification-schema.xsd"
-         file="data/testing/specification.xml">
+         file="${freecol.rules.dir}/testing/specification.xml">
       </schemavalidate>
     </target>
 
