@@ -296,14 +296,18 @@ public class SimpleCombatModel extends CombatModel {
             UnitType type = attackerUnit.getType();
             Settlement settlement = (Settlement) defender;
             Player defenderPlayer = settlement.getOwner();
-            result.add(UNKNOWN_DEFENCE_MODIFIER);
-            //result.addAll(settlement.getFeatureContainer()
-            //              .getModifierSet(Modifier.DEFENCE, type));
-            result.addAll(defenderPlayer
-                          .getModifierSet(Modifier.SETTLEMENT_DEFENCE, type));
-            if (settlement.isCapital()) {
+            if (settlement.getFeatureContainer() == null) {
+                // Client can not see inside the settlement
+                result.add(UNKNOWN_DEFENCE_MODIFIER);
+            } else {
+                result.addAll(settlement.getFeatureContainer()
+                              .getModifierSet(Modifier.DEFENCE, type));
                 result.addAll(defenderPlayer
-                              .getModifierSet(Modifier.CAPITAL_DEFENCE, type));
+                              .getModifierSet(Modifier.SETTLEMENT_DEFENCE, type));
+                if (settlement.isCapital()) {
+                    result.addAll(defenderPlayer
+                                  .getModifierSet(Modifier.CAPITAL_DEFENCE, type));
+                }
             }
 
         } else if (combatIsBombard(attacker, defender)) {
