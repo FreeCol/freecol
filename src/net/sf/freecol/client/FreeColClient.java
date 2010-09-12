@@ -279,7 +279,7 @@ public final class FreeColClient {
         if (!headless) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        startGUI(windowSize, sound, (showOpeningVideo && savegameFile == null));
+                        startGUI(windowSize, sound, showOpeningVideo, savegameFile != null);
                     }
                 });
         }
@@ -349,7 +349,8 @@ public final class FreeColClient {
      */
     private void startGUI(Dimension innerWindowSize,
                           final boolean sound,
-                          final boolean showOpeningVideo) {
+                          final boolean showOpeningVideo,
+                          final boolean loadGame) {
         if (sound) {
             final ClientOptions opts = getClientOptions();
             final AudioMixerOption amo
@@ -386,14 +387,16 @@ public final class FreeColClient {
         changeWindowedMode(windowed);
 
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
-        if (showOpeningVideo) {
+        if (showOpeningVideo && !loadGame) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     canvas.showOpeningVideoPanel();
                 }
             });
         } else {
-            canvas.showMainPanel();
+            if (!loadGame) {
+                canvas.showMainPanel();
+            }
             playSound("sound.intro.general");
         }
         gui.startCursorBlinking();
