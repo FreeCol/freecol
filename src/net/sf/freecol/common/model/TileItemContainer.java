@@ -593,6 +593,35 @@ public class TileItemContainer extends FreeColGameObject {
         out.writeEndElement();
     }
 
+    public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame,
+                      PlayerExploredTile pet) 
+        throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("tile", tile.getId());
+
+        if (pet != null) {
+            List<TileItem> petItems = new ArrayList<TileItem>();
+            petItems.addAll(pet.getImprovements());
+            if (pet.getResource() != null) {
+                petItems.add(pet.getResource());
+            }
+            if (pet.getLostCityRumour() != null) {
+                petItems.add(pet.getLostCityRumour());
+            }
+            Collections.sort(petItems, tileItemComparator);
+
+            for (TileItem item : petItems) {
+                item.toXML(out, player, showAll, toSavedGame);
+            }
+        }
+
+        out.writeEndElement();
+    }
+
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.

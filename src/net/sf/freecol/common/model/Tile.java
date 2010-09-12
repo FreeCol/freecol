@@ -1975,14 +1975,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         } else {
             if (tileItemContainer != null) {
-                TileItemContainer newTileItemContainer = null;
-                if (pet != null) {
-                    newTileItemContainer = new TileItemContainer(getGame(), this, pet);
-                } else {
-                    newTileItemContainer = new TileItemContainer(getGame(), this);                
-                }
-                newTileItemContainer.setFakeID(tileItemContainer.getId());
-                newTileItemContainer.toXML(out, player, showAll, toSavedGame);
+                tileItemContainer.toXML(out, player, showAll, toSavedGame, pet);
             }
         }
 
