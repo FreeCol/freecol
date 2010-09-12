@@ -1001,6 +1001,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return new Position(x, y);
     }
 
+    // TODO: this is used only to update false Tiles, a practice that
+    // should be killed with fire.
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     /**
      * Check if the tile type is suitable for a <code>Settlement</code>,
      * either by a <code>Colony</code> or an <code>IndianSettlement</code>.

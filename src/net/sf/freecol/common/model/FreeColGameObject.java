@@ -392,6 +392,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      *
      * @param newID the unique ID of this object,
      */
+    @Deprecated
     public void setFakeID(String newID) {
         super.setId(newID);
     }
