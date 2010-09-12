@@ -515,8 +515,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());
-        writeStorage(out, STORED_GOODS_TAG, storedGoods);
-        writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
+        if (showAll || toSavedGame || player == getOwner()) {
+            writeStorage(out, STORED_GOODS_TAG, storedGoods);
+            writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
+        }
         out.writeEndElement();
     }
 

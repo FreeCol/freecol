@@ -3521,9 +3521,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else {
             if (canCarryGoods()) {
                 out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
-                GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
-                emptyGoodsContainer.setFakeID(goodsContainer.getId());
-                emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+                goodsContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
