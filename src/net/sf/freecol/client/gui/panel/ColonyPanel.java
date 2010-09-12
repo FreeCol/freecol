@@ -376,9 +376,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         nameBox.setEnabled(isEditable());
 
         // update all the subpanels
-        cargoPanel.removeAll();
-        warehousePanel.removeAll();
-        tilePanel.removeAll();
+        cargoPanel.setCarrier(null);
 
         inPortPanel.initialize(preSelectedUnit);
         warehousePanel.initialize();
@@ -736,6 +734,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
             buildingsPanel.removePropertyChangeListeners();
             tilePanel.removePropertyChangeListeners();
+            cargoPanel.setCarrier(null);
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
                 getController().nextModelMessage();
@@ -886,6 +885,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * the buildings of the colony.
          */
         public void initialize() {
+            removePropertyChangeListeners();
             removeAll();
 
             MouseAdapter mouseAdapter = new MouseAdapter() {
@@ -910,7 +910,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
         
         public void update(){
-        	initialize();
+            initialize();
         }
 
         public void removePropertyChangeListeners() {
@@ -1350,6 +1350,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void initialize() {
+            removePropertyChangeListeners();
             Tile tile = getColony().getTile();
             tiles[0][0] = tile.getNeighbourOrNull(Direction.N);
             tiles[0][1] = tile.getNeighbourOrNull(Direction.NE);
@@ -1374,6 +1375,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
             }
         }
+
         public void removePropertyChangeListeners() {
             for (Component component : getComponents()) {
                 if (component instanceof ASingleTilePanel) {
