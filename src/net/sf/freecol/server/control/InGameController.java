@@ -4921,6 +4921,7 @@ public final class InGameController extends Controller {
             throw new IllegalStateException("New location with null GoodsContainer.");
         }
 
+        // Save state of the goods container/s, allowing simpler updates.
         oldLoc.getGoodsContainer().saveState();
         if (loc != null) loc.getGoodsContainer().saveState();
 
@@ -5129,15 +5130,16 @@ public final class InGameController extends Controller {
         }
 
         // Only have to update the carrier location, as that *must*
-        // include the original location of the goods.  If it is a
-        // settlement, better still just update the goods container.
-        Location loc = unit.getLocation();
-        if (loc instanceof Settlement) {
-            cs.add(See.only(serverPlayer), loc.getGoodsContainer());
+        // include the original location of the goods, but if it is in
+        // a colony it is better still just to update the goods
+        // containers.
+        Colony colony = unit.getColony();
+        if (colony != null) {
+            cs.add(See.only(serverPlayer), colony.getGoodsContainer());
+            cs.add(See.only(serverPlayer), unit.getGoodsContainer());
         } else {
-            cs.add(See.only(serverPlayer), (FreeColGameObject) loc);
+            cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation());
         }
-        cs.add(See.perhaps().except(serverPlayer), unit);
 
         // Others might see capacity change.
         sendToOthers(serverPlayer, cs);
@@ -5891,8 +5893,8 @@ public final class InGameController extends Controller {
                 }
             }
             // Will need a fake container to contain the goods to buy
-            // in Europe.
-            container = new GoodsContainer(getGame(), null);
+            // in Europe.  Units may not necessarily have one.
+            container = new GoodsContainer(getGame(), serverPlayer.getEurope());
         } else if (settlement != null) {
             // Equipping a unit at work in a colony should remove the unit
             // from the work location.

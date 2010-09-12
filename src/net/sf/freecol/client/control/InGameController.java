@@ -584,8 +584,20 @@ public final class InGameController implements NetworkConstants {
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
-        if (askLoadCargo(goods, carrier) && goods.getLocation() == carrier) {
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, null, goods);
+        int amount = goods.getAmount();
+        GoodsContainer container = carrier.getGoodsContainer();
+        int oldAmount = container.getGoodsCount(type);
+        int newAmount;
+        if (askLoadCargo(goods, carrier)
+            && (newAmount = container.getGoodsCount(type)) != oldAmount) {
+            if (newAmount != oldAmount + amount) {
+                logger.warning("Bogus load of " + goods.toString()
+                               + " from " + colony.getId()
+                               + " to " + carrier.toString()
+                               + " with initial count " + Integer.toString(oldAmount)
+                               + " result " + Integer.toString(newAmount));
+            }
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
             fireColonyChanges(colony, -1, null, null);
             return true;
         }
@@ -714,17 +726,18 @@ public final class InGameController implements NetworkConstants {
         }
         GoodsType type = goods.getType();
         int amount = goods.getAmount();
-        int carrierAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        if (askUnloadCargo(goods)) {
-            int newAmount = carrier.getGoodsContainer().getGoodsCount(type);
-            if (newAmount != carrierAmount - amount) {
+        GoodsContainer container = carrier.getGoodsContainer();
+        int oldAmount = container.getGoodsCount(type);
+        int newAmount;
+        if (askUnloadCargo(goods)
+            && (newAmount = container.getGoodsCount(type)) != oldAmount) {
+            if (newAmount != oldAmount - amount) {
                 logger.warning("Bogus unload of " + goods.toString()
                                + " from " + carrier.toString()
-                               + " with initial count " + Integer.toString(carrierAmount)
+                               + " with initial count " + Integer.toString(oldAmount)
                                + " leaving " + Integer.toString(newAmount));
-                return false;
             }
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
             if (colony != null) {
                 fireColonyChanges(colony, -1, null, null);
             }
