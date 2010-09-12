@@ -84,25 +84,6 @@ public class TileItemContainer extends FreeColGameObject {
 
 
 
-    public TileItemContainer(Game game, Tile tile, PlayerExploredTile pet) {
-        super(game);
-
-        if (tile == null) {
-            throw new IllegalArgumentException("Tile must not be 'null'.");
-        }
-
-        this.tile = tile;
-
-        tileItems.addAll(pet.getImprovements());
-        if (pet.getResource() != null) {
-            tileItems.add(pet.getResource());
-        }
-        if (pet.getLostCityRumour() != null) {
-            tileItems.add(pet.getLostCityRumour());
-        }
-        Collections.sort(tileItems, tileItemComparator);
-    }
-
     /**
      * Initiates a new <code>TileItemContainer</code> from an <code>Element</code>.
      *
