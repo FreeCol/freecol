@@ -2599,16 +2599,12 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
                 out.writeEndElement();
             }
-            goodsContainer.toXML(out, player, showAll, toSavedGame);
         } else if (player.canSee(getTile())) {
             out.writeAttribute("owner", owner.getId());
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
             if (getStockade() != null) {
                 getStockade().toXML(out, player, showAll, toSavedGame);
             }
-            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
-            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
-            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             out.writeAttribute("owner", pet.getOwner().getId());
             out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
@@ -2616,10 +2612,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (getStockade() != null) {
                 getStockade().toXML(out, player, showAll, toSavedGame);
             }
-            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
-            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
-            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
         }
+        goodsContainer.toXML(out, player, showAll, toSavedGame);
         // End element:
         out.writeEndElement();
     }

@@ -1203,6 +1203,8 @@ public class IndianSettlement extends Settlement {
 
         // attributes end here
         
+        goodsContainer.toXML(out, player, showAll, toSavedGame);
+
         if (full) {
             Iterator<Player> playerIterator = visitedBy.iterator();
             while (playerIterator.hasNext()) {
@@ -1228,7 +1230,6 @@ public class IndianSettlement extends Settlement {
                 }
                 out.writeEndElement();
             }
-            goodsContainer.toXML(out, player, showAll, toSavedGame);
             for (Unit unit : ownedUnits) {
                 out.writeStartElement(OWNED_UNITS_TAG_NAME);
                 out.writeAttribute(ID_ATTRIBUTE, unit.getId());
@@ -1251,12 +1252,6 @@ public class IndianSettlement extends Settlement {
                 pet.getMissionary().toXML(out, player, showAll, toSavedGame);
                 out.writeEndElement();
             }
-        }
-
-        if (!full) {
-            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
-            emptyGoodsContainer.setFakeID(goodsContainer.getId());
-            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
         }
 
         out.writeEndElement();
