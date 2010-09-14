@@ -91,12 +91,13 @@ public final class CostDeciders {
 
     /**
      * A <code>CostDecider</code> that costs unit moves normally while
-     * avoiding other player settlements and units.
+     * avoiding other player settlements and units, and does not explore
+     * if it is trading.
      */
     private static class AvoidSettlementsAndBlockingUnitsCostDecider
         extends BaseCostDecider {
         @Override
-            public int getCost(Unit unit, Tile oldTile, Tile newTile,
+        public int getCost(Unit unit, Tile oldTile, Tile newTile,
                                int movesLeft, int turns) {
             int cost = super.getCost(unit, oldTile, newTile,
                                      movesLeft, turns);
@@ -120,6 +121,10 @@ public final class CostDeciders {
                     // An enemy ship in land tile without a settlement
                     // is blocking the path:
                     cost += Math.max(0, 20 - turns * 4);
+                } else if (unit.getTradeRoute() != null
+                           && unit.getMoveType(newTile)
+                           == Unit.MoveType.EXPLORE_LOST_CITY_RUMOUR) {
+                    return ILLEGAL_MOVE;
                 }
             }
             return cost;

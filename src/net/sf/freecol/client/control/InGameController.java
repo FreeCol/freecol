@@ -922,9 +922,7 @@ public final class InGameController implements NetworkConstants {
                 break;
             case EXPLORE_LOST_CITY_RUMOUR:
                 moveExplore(unit, path.getDirection());
-                if (unit.isDisposed())
-                    return;
-                break;
+                return;
             case MOVE_HIGH_SEAS:
                 if (destination instanceof Europe) {
                     moveToEurope(unit);
