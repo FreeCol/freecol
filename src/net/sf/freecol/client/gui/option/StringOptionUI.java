@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -33,9 +32,6 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.StringOption;
 
@@ -52,17 +48,15 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
     private final StringOption option;
     private String originalValue;
     private JLabel label;
-    private Specification specification;
 
     /**
     * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
     * @param option The <code>StringOption</code> to make a user interface for.
     */
-    public StringOptionUI(final StringOption option, boolean editable, Specification specification) {
+    public StringOptionUI(final StringOption option, boolean editable) {
 
         this.option = option;
         this.originalValue = option.getValue();
-        this.specification = specification;
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -70,7 +64,7 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
         label = new JLabel(name, JLabel.LEFT);
         label.setToolTipText(text);
 
-        List<String> choices = generateChoices(option);
+        List<String> choices = option.getChoices();
 
         setModel(new DefaultComboBoxModel(choices.toArray(new String[choices.size()])));
         setSelectedItem(option.getValue());
@@ -165,59 +159,6 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
         } else {
             setSelectedItem(option.getValue());
         }
-    }
-
-    private List<String> generateChoices(StringOption option) {
-        List<String> choices;
-        if (option.getGenerateChoices() == null) {
-            choices = option.getChoices();
-            if (choices == null || choices.isEmpty()) {
-                choices = new ArrayList<String>();
-                choices.add(option.getValue());
-            }
-        } else {
-            List<FreeColObject> objects = new ArrayList<FreeColObject>();
-            switch(option.getGenerateChoices()) {
-            case UNITS:
-                objects.addAll(specification.getUnitTypeList());
-                break;
-            case IMMIGRANTS:
-                for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (unitType.isRecruitable()) {
-                        objects.add(unitType);
-                    }
-                }
-                break;
-            case NAVAL_UNITS:
-                for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (unitType.hasAbility("model.ability.navalUnit")) {
-                        objects.add(unitType);
-                    }
-                }
-                break;
-            case LAND_UNITS:
-                for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (!unitType.hasAbility("model.ability.navalUnit")) {
-                        objects.add(unitType);
-                    }
-                }
-                break;
-            case BUILDINGS:
-                objects.addAll(specification.getBuildingTypeList());
-                break;
-            case FOUNDING_FATHERS:
-                objects.addAll(specification.getFoundingFathers());
-                break;
-            }
-            choices = new ArrayList<String>(objects.size());
-            for (FreeColObject object : objects) {
-                choices.add(object.getId());
-            }
-            if (option.addNone()) {
-                choices.add(0, StringOption.NONE);
-            }
-        }
-        return choices;
     }
 
     private class ChoiceRenderer extends FreeColComboBoxRenderer {

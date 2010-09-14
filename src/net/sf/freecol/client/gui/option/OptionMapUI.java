@@ -32,7 +32,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
@@ -73,10 +72,9 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * <code>editable == true</code>.
      * 
      * @param option The <code>OptionMap</code> to make a user interface for.
-     * @param specification a <code>Specification</code> value
      */
-    public OptionMapUI(OptionMap option, Specification specification) {
-        this(option, true, specification);
+    public OptionMapUI(OptionMap option) {
+        this(option, true);
     }
 
     /**
@@ -85,7 +83,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * 
      * @param option The <code>OptionMap</code> to make a user interface for.
      */
-    public OptionMapUI(OptionMap option, boolean editable, Specification specification) {
+    public OptionMapUI(OptionMap option, boolean editable) {
         super(new BorderLayout());
 
         JPanel northPanel = new JPanel();
@@ -102,7 +100,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             Option o = it.next();
 
             if (o instanceof OptionGroup) {
-                OptionGroupUI c = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs, specification);
+                OptionGroupUI c = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs);
                 c.setOpaque(true);
                 optionUpdaters.add(c);
                 JScrollPane scroll = new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -177,7 +175,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     optionUIs.put(o.getId(), c);
                 }
             } else if (o instanceof StringOption) {
-                final StringOptionUI soi = new StringOptionUI((StringOption) o, editable, specification);
+                final StringOptionUI soi = new StringOptionUI((StringOption) o, editable);
                 if (soi.getLabel().getText().length() > 30) {
                     northPanel.add(soi.getLabel(), "newline, span 3, right");
                 } else {

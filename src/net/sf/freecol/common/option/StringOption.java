@@ -29,6 +29,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.UnitType;
+
 /**
  * Represents an option that can be either <i>true</i>
  * or <i>false</i>.
@@ -147,6 +151,57 @@ public class StringOption extends AbstractOption {
     public final void setGenerateChoices(final Generate newGenerateChoices) {
         this.generateChoices = newGenerateChoices;
     }
+
+    public void generateChoices(Specification specification) {
+        if (generateChoices == null) {
+            if (choices == null || choices.isEmpty()) {
+                choices = new ArrayList<String>();
+                choices.add(getValue());
+            }
+        } else {
+            List<FreeColObject> objects = new ArrayList<FreeColObject>();
+            switch(generateChoices) {
+            case UNITS:
+                objects.addAll(specification.getUnitTypeList());
+                break;
+            case IMMIGRANTS:
+                for (UnitType unitType : specification.getUnitTypeList()) {
+                    if (unitType.isRecruitable()) {
+                        objects.add(unitType);
+                    }
+                }
+                break;
+            case NAVAL_UNITS:
+                for (UnitType unitType : specification.getUnitTypeList()) {
+                    if (unitType.hasAbility("model.ability.navalUnit")) {
+                        objects.add(unitType);
+                    }
+                }
+                break;
+            case LAND_UNITS:
+                for (UnitType unitType : specification.getUnitTypeList()) {
+                    if (!unitType.hasAbility("model.ability.navalUnit")) {
+                        objects.add(unitType);
+                    }
+                }
+                break;
+            case BUILDINGS:
+                objects.addAll(specification.getBuildingTypeList());
+                break;
+            case FOUNDING_FATHERS:
+                objects.addAll(specification.getFoundingFathers());
+                break;
+            }
+            choices = new ArrayList<String>(objects.size() + (addNone ? 1 : 0));
+            if (addNone) {
+                choices.add(StringOption.NONE);
+            }
+            for (FreeColObject object : objects) {
+                choices.add(object.getId());
+            }
+        }
+    }
+
 
     /**
      * This method writes an XML-representation of this object to

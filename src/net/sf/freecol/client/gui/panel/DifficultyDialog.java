@@ -117,7 +117,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         add(difficultyBox);
 
         // Options:
-        ui = new OptionMapUI(new DifficultyOptionMap(level, specification), false, specification);
+        ui = new OptionMapUI(new DifficultyOptionMap(level, specification), false);
         ui.setOpaque(false);
         optionPanel = new JPanel() {
             @Override
@@ -194,8 +194,7 @@ public final class DifficultyDialog extends FreeColDialog<DifficultyLevel> imple
         int index = difficultyBox.getSelectedIndex();
         Specification spec = specification;
         level = spec.getDifficultyLevel(index);
-        ui = new OptionMapUI(new DifficultyOptionMap(level, spec),
-                             (index == CUSTOM_INDEX), specification);
+        ui = new OptionMapUI(new DifficultyOptionMap(level, spec), (index == CUSTOM_INDEX));
         optionPanel.removeAll();
         optionPanel.add(ui);
         revalidate();

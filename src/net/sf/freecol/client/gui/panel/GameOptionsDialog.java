@@ -107,7 +107,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(getGame().getGameOptions(), editable, getSpecification());
+        ui = new OptionMapUI(getGame().getGameOptions(), editable);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);

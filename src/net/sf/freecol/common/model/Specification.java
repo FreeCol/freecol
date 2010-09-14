@@ -315,6 +315,14 @@ public final class Specification {
             }
         }
 
+        for (DifficultyLevel level : difficultyLevels) {
+            for (Option option : level.getOptions().values()) {
+                if (option instanceof StringOption) {
+                    ((StringOption) option).generateChoices(this);
+                }
+            }
+        }
+
         if (difficultyLevel != null) {
             applyDifficultyLevel(difficultyLevel);
         }
