@@ -1905,6 +1905,30 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Finds the nearest settlement to this tile.
+     *
+     * @param owner If non-null, the settlement should be owned by this player.
+     * @param radius The maximum radius of the search.
+     * @return The nearest settlement, or null if none.
+     */
+    public Settlement getNearestSettlement(Player owner, int radius) {
+        if (radius <= 0) radius = INFINITY;
+        Map map = getGame().getMap();
+        Iterator<Position> iter = map.getCircleIterator(getPosition(), true,
+                                                        radius);
+        while (iter.hasNext()) {
+            Tile t = map.getTile(iter.next());
+            if (t == this) continue;
+            Settlement settlement = t.getSettlement();
+            if (settlement != null
+                && (owner == null || settlement.getOwner() == owner)) {
+                return settlement;
+            }
+        }
+        return null;
+    }
+
+    /**
      * This method writes an XML-representation of this object to the given
      * stream.
      * 

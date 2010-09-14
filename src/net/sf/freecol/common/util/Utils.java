@@ -20,6 +20,8 @@
 package net.sf.freecol.common.util;
 
 import java.util.List;
+import java.util.Random;
+
 
 /**
  * Collection of small static helper methods.
@@ -77,5 +79,16 @@ public class Utils {
      */
     public static String getUserDirectory() {
     	return System.getProperty("user.home");
+    }
+
+    /**
+     * Gets a random member of a list.
+     *
+     * @param list The list.
+     * @param random A random number source.
+     * @return A random member from the list.
+     */
+    public static <T> T getRandomMember(List<T> list, Random random) {
+        return list.get(random.nextInt(list.size()));
     }
 }

@@ -104,6 +104,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.ChangeSet;
@@ -128,6 +129,9 @@ public final class InGameController extends Controller {
     public static final int ALARM_TILE_IN_USE = 2;
     public static final int ALARM_NEW_MISSIONARY = -100;
     public static final int ALARM_MISSIONARY_PRESENT = -10;
+
+    // How far to search for a colony to add an Indian convert to.
+    public static final int MAX_CONVERT_DISTANCE = 10;
 
     // Score bonus on declaration of independence.
     public static final int SCORE_INDEPENDENCE_DECLARED = 100;
@@ -460,6 +464,9 @@ public final class InGameController extends Controller {
 
     /**
      * Starts a new turn for a player.
+     * Carefully do any random number generation outside of any
+     * threads that start so as to keep random number generation
+     * deterministic.
      *
      * @param newPlayer The <code>ServerPlayer</code> to start a turn for.
      * @param cs A <code>ChangeSet</code> to update.
@@ -472,8 +479,17 @@ public final class InGameController extends Controller {
             csYearlyGoodsRemoval(newPlayer, cs);
 
             if (newPlayer.getCurrentFather() == null
+                && newPlayer.getPlayerType() == PlayerType.COLONIAL
                 && newPlayer.getSettlements().size() > 0) {
-                chooseFoundingFather(newPlayer);
+                final ServerPlayer threadPlayer = newPlayer;
+                final List<FoundingFather> ffs
+                    = getRandomFoundingFathers(newPlayer);
+                Thread t = new Thread(FreeCol.SERVER_THREAD+"FoundingFather") {
+                        public void run() {
+                            chooseFoundingFather(threadPlayer, ffs);
+                        }
+                    };
+                t.start();
             }
 
             if (newPlayer.getMonarch() != null && newPlayer.isConnected()) {
@@ -483,7 +499,7 @@ public final class InGameController extends Controller {
                 final MonarchAction action
                     = (choices == null) ? MonarchAction.NO_ACTION
                     : RandomChoice.getWeightedRandom(random, choices);
-                Thread t = new Thread("monarchAction") {
+                Thread t = new Thread(FreeCol.SERVER_THREAD+"monarchAction") {
                         public void run() {
                             try {
                                 monarchAction(player, action);
@@ -515,7 +531,7 @@ public final class InGameController extends Controller {
                 java.util.Map<Player, Tension.Level> oldLevel
                     = new HashMap<Player, Tension.Level>();
                 oldLevels.put(settlement, oldLevel);
-                for (Player enemy : getGame().getEuropeanPlayers()) {
+                for (Player enemy : game.getEuropeanPlayers()) {
                     Tension alarm = settlement.getAlarm(enemy);
                     if (alarm != null) oldLevel.put(enemy, alarm.getLevel());
                 }
@@ -525,7 +541,7 @@ public final class InGameController extends Controller {
             for (IndianSettlement settlement : allSettlements) {
                 java.util.Map<Player, Integer> extra
                     = new HashMap<Player, Integer>();
-                for (Player enemy : getGame().getEuropeanPlayers()) {
+                for (Player enemy : game.getEuropeanPlayers()) {
                     extra.put(enemy, new Integer(0));
                 }
 
@@ -578,14 +594,14 @@ public final class InGameController extends Controller {
                         change = (int) player.getFeatureContainer()
                             .applyModifier(change,
                                            "model.modifier.nativeAlarmModifier",
-                                           null, getGame().getTurn());
+                                           null, game.getTurn());
                         settlement.modifyAlarm(player, change);
                     }
                 }
             }
 
             // Calm down a bit at the whole-tribe level.
-            for (Player enemy : getGame().getEuropeanPlayers()) {
+            for (Player enemy : game.getEuropeanPlayers()) {
                 if (newPlayer.getTension(enemy).getValue() > 0) {
                     int change = -newPlayer.getTension(enemy).getValue()/100
                         - 4;
@@ -608,51 +624,27 @@ public final class InGameController extends Controller {
                 }
             }
 
-            for (IndianSettlement indianSettlement: newPlayer.getIndianSettlements()) {
-                if (indianSettlement.checkForNewMissionaryConvert()) {
-                    // an Indian brave gets converted by missionary
-                    Unit missionary = indianSettlement.getMissionary();
-                    ServerPlayer european = (ServerPlayer) missionary.getOwner();
-                    // search for a nearby colony
-                    Tile settlementTile = indianSettlement.getTile();
-                    Tile targetTile = null;
-                    Iterator<Position> ffi = getGame().getMap().getFloodFillIterator(settlementTile.getPosition());
-                    while (ffi.hasNext()) {
-                        Tile t = getGame().getMap().getTile(ffi.next());
-                        if (settlementTile.getDistanceTo(t) > IndianSettlement.MAX_CONVERT_DISTANCE) {
-                            break;
-                        }
-                        if (t.getSettlement() != null && t.getSettlement().getOwner() == european) {
-                            targetTile = t;
-                            break;
-                        }
-                    }
-        
-                    if (targetTile != null) {
-                        
-                        List<UnitType> converts = getGame().getSpecification().getUnitTypesWithAbility("model.ability.convert");
-                        if (converts.size() > 0) {
-                            // perform the conversion from brave to convert in the server
-                            Unit brave = indianSettlement.getUnitIterator().next();
-                            String nationId = brave.getOwner().getNationID();
-                            brave.dispose();
-                            ModelController modelController = getGame().getModelController();
-                            int random = modelController.getRandom(indianSettlement.getId() + "getNewConvertType", converts.size());
-                            UnitType unitType = converts.get(random);
-                            Unit unit = modelController.createUnit(indianSettlement.getId() + "newTurn100missionary", targetTile,
-                                                                   european, unitType);
-                            // and send update information to the client
-                            try {
-                                Element updateElement = Message.createNewRootElement("newConvert");
-                                updateElement.setAttribute("nation", nationId);
-                                updateElement.setAttribute("colonyTile", targetTile.getId());
-                                updateElement.appendChild(unit.toXMLElement(european,updateElement.getOwnerDocument()));
-                                european.getConnection().send(updateElement);
-                                logger.info("New convert created for " + european.getName() + " with ID=" + unit.getId());
-                            } catch (IOException e) {
-                                logger.log(Level.WARNING, "Could not send message to: " + european.getName(), e);
-                            }
-                        }
+            // Check for braves converted by missionaries
+            List<UnitType> converts = game.getSpecification()
+                .getUnitTypesWithAbility("model.ability.convert");
+            StringTemplate nation = newPlayer.getNationName();
+            for (IndianSettlement settlement : allSettlements) {
+                if (settlement.checkForNewMissionaryConvert()) {
+                    Unit missionary = settlement.getMissionary();
+                    ServerPlayer other = (ServerPlayer) missionary.getOwner();
+                    Settlement colony = settlement.getTile()
+                        .getNearestSettlement(other, MAX_CONVERT_DISTANCE);
+                    if (colony != null && converts.size() > 0) {
+                        Unit brave = settlement.getFirstUnit();
+                        brave.setOwner(other);
+                        brave.setType(Utils.getRandomMember(converts, random));
+                        brave.setLocation(colony.getTile());
+                        cs.add(See.perhaps(), colony.getTile(), settlement);
+                        cs.addMessage(See.only(other),
+                            new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                             "model.colony.newConvert", brave)
+                                .addStringTemplate("%nation%", nation)
+                                .addName("%colony%", colony.getName()));
                     }
                 }
             }
@@ -673,13 +665,12 @@ public final class InGameController extends Controller {
             .getGoodsTypeList();
         Market market = serverPlayer.getMarket();
 
-        // Pick a random type of goods to remove an extra amount of.
+        // Pick a random type of storable goods to remove an extra amount of.
         GoodsType removeType;
-        do {
-            int randomGoods = random.nextInt(goodsTypes.size());
-            removeType = goodsTypes.get(randomGoods);
-        } while (!removeType.isStorable());
-
+        for (;;) {
+            removeType = Utils.getRandomMember(goodsTypes, random);
+            if (removeType.isStorable()) break;
+        }
         // Remove standard amount, and the extra amount.
         for (GoodsType type : goodsTypes) {
             if (type.isStorable() && market.hasBeenTraded(type)) {
@@ -851,39 +842,34 @@ public final class InGameController extends Controller {
         return false;
     }
     
-    private void chooseFoundingFather(ServerPlayer player) {
-        final ServerPlayer nextPlayer = player;
-        Thread t = new Thread(FreeCol.SERVER_THREAD+"FoundingFather-thread") {
-                public void run() {
-                    List<FoundingFather> randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
-                    boolean atLeastOneChoice = false;
-                    Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
-                    for (FoundingFather father : randomFoundingFathers) {
-                        chooseFoundingFatherElement.setAttribute(father.getType().toString(),
-                                                                 father.getId());
-                        atLeastOneChoice = true;
-                    }
-                    if (!atLeastOneChoice) {
-                        nextPlayer.setCurrentFather(null);
-                    } else {
-                        Connection conn = nextPlayer.getConnection();
-                        if (conn != null) {
-                            try {
-                                Element reply = conn.ask(chooseFoundingFatherElement);
-                                FoundingFather father = getGame().getSpecification().
-                                    getFoundingFather(reply.getAttribute("foundingFather"));
-                                if (!randomFoundingFathers.contains(father)) {
-                                    throw new IllegalArgumentException();
-                                }
-                                nextPlayer.setCurrentFather(father);
-                            } catch (IOException e) {
-                                logger.log(Level.WARNING, "Could not send message to: " + nextPlayer.getName(), e);
-                            }
-                        }
-                    }
-                }
-            };
-        t.start();
+    /**
+     * Handles the choice of a new random founding father.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is choosing.
+     * @param ffs A list of <code>FoundingFather</code>s to choose from.
+     * @return The <code>FoundingFather</code> chosen.
+     */
+    private void chooseFoundingFather(ServerPlayer serverPlayer,
+                                      List<FoundingFather> ffs) {
+        if (ffs.isEmpty()) return;
+
+        List<String> attributes = new ArrayList<String>();
+        for (FoundingFather father : ffs) {
+            attributes.add(father.getType().toString());
+            attributes.add(father.getId());
+        }
+        ChangeSet cs = new ChangeSet();
+        cs.addTrivial(See.only(serverPlayer), "chooseFoundingFather",
+                      ChangePriority.CHANGE_NORMAL,
+                      attributes.toArray(new String[0]));
+        Element reply = askElement(serverPlayer, cs.build(serverPlayer));
+        FoundingFather father = getGame().getSpecification()
+            .getFoundingFather(reply.getAttribute("foundingFather"));
+        if (ffs.contains(father)) {
+            serverPlayer.setCurrentFather(father);
+        } else {
+            logger.warning("Bogus father chosen: " + father.getId());
+        }
     }
 
     /**
@@ -900,7 +886,7 @@ public final class InGameController extends Controller {
         int age = getGame().getTurn().getAge();
         EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
             = new EnumMap<FoundingFatherType,
-            List<RandomChoice<FoundingFather>>>(FoundingFatherType.class);
+                List<RandomChoice<FoundingFather>>>(FoundingFatherType.class);
         for (FoundingFather father : spec.getFoundingFathers()) {
             if (!player.hasFather(father) && father.isAvailableTo(player)) {
                 FoundingFatherType type = father.getType();
@@ -920,9 +906,9 @@ public final class InGameController extends Controller {
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
             if (rc != null) {
-                FoundingFather father = RandomChoice.getWeightedRandom(random, rc);
-                randomFathers.add(father);
-                logMessage += ":" + father.getNameKey();
+                FoundingFather f = RandomChoice.getWeightedRandom(random, rc);
+                randomFathers.add(f);
+                logMessage += ":" + f.getNameKey();
             }
         }
         logger.info(logMessage);
@@ -933,7 +919,7 @@ public final class InGameController extends Controller {
      * Performs the monarchs actions.
      * 
      * @param serverPlayer The <code>ServerPlayer</code> whose monarch
-     *            is acting.
+     *     is acting.
      * @param action The monarch action.
      */
     private void monarchAction(ServerPlayer serverPlayer, MonarchAction action) {
@@ -2241,7 +2227,8 @@ public final class InGameController extends Controller {
         int dx = 10 - difficulty;
         UnitType unitType;
         Unit newUnit = null;
-        List<UnitType> treasureUnitTypes = null;
+        List<UnitType> treasureUnitTypes
+            = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
 
         RumourType rumour = lostCity.getType();
         if (rumour == null) {
@@ -2308,10 +2295,10 @@ public final class InGameController extends Controller {
                                  serverPlayer, unit));
             break;
         case LEARN:
-            List<UnitType> learntUnitTypes = unit.getType()
-                .getUnitTypesLearntInLostCity();
             StringTemplate oldName = unit.getLabel();
-            unit.setType(learntUnitTypes.get(random.nextInt(learntUnitTypes.size())));
+            List<UnitType> learnTypes = unit.getType().getUnitTypesLearntInLostCity();
+            unitType = Utils.getRandomMember(learnTypes, random);
+            unit.setType(unitType);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  "lostCityRumour.Learn",
@@ -2332,9 +2319,9 @@ public final class InGameController extends Controller {
                     .addAmount("%money%", chiefAmount));
             break;
         case COLONIST:
-            List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
-            newUnit = new Unit(game, tile, serverPlayer,
-                               newUnitTypes.get(random.nextInt(newUnitTypes.size())),
+            List<UnitType> foundTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
+            unitType = Utils.getRandomMember(foundTypes, random);
+            newUnit = new Unit(game, tile, serverPlayer, unitType,
                                UnitState.ACTIVE);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -2345,11 +2332,9 @@ public final class InGameController extends Controller {
             String cityName = game.getCityOfCibola();
             if (cityName != null) {
                 int treasureAmount = random.nextInt(dx * 600) + dx * 300;
-                if (treasureUnitTypes == null) {
-                    treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
-                }
-                unitType = treasureUnitTypes.get(random.nextInt(treasureUnitTypes.size()));
-                newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
+                unitType = Utils.getRandomMember(treasureUnitTypes, random);
+                newUnit = new Unit(game, tile, serverPlayer, unitType,
+                                   UnitState.ACTIVE);
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -2372,11 +2357,9 @@ public final class InGameController extends Controller {
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
                               "gold", "score");
             } else {
-                if (treasureUnitTypes == null) {
-                    treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
-                }
-                unitType = treasureUnitTypes.get(random.nextInt(treasureUnitTypes.size()));
-                newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
+                unitType = Utils.getRandomMember(treasureUnitTypes, random);
+                newUnit = new Unit(game, tile, serverPlayer, unitType,
+                                   UnitState.ACTIVE);
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             cs.addMessage(See.only(serverPlayer),
@@ -2431,8 +2414,7 @@ public final class InGameController extends Controller {
      * @return An <code>EventPanel</code> key, or null if none appropriate.
      */
     private String getContactKey(Player player, Player other) {
-        String key = "EventPanel.MEETING_"
-            + Messages.message(other.getNationName()).toUpperCase();
+        String key = "EventPanel.MEETING_" + other.getNationNameKey();
         if (!Messages.containsKey(key)) {
             if (other.isEuropean()) {
                 key = (player.hasContactedEuropeans()) ? null
@@ -2634,7 +2616,6 @@ public final class InGameController extends Controller {
             // Check for region discovery
             Region region = newTile.getDiscoverableRegion();
             if (serverPlayer.isEuropean() && region != null) {
-                HistoryEvent h = null;
                 if (region.isPacific()) {
                     cs.addAttribute(See.only(serverPlayer),
                                     "discoverPacific", "true");
@@ -2653,7 +2634,6 @@ public final class InGameController extends Controller {
                                         Messages.message(region.getLabel()));
                     }
                 }
-                if (h != null) cs.addHistory(serverPlayer, h);
             }
         }
     }
@@ -3497,7 +3477,7 @@ public final class InGameController extends Controller {
         StringTemplate convertNation = natives.getOwner().getNationName();
         List<UnitType> converts = getGame().getSpecification()
             .getUnitTypesWithAbility("model.ability.convert");
-        UnitType type = converts.get(random.nextInt(converts.size()));
+        UnitType type = Utils.getRandomMember(converts, random);
         Unit convert = natives.getLastUnit();
 
         cs.addMessage(See.only(attackerPlayer),
@@ -3596,8 +3576,8 @@ public final class InGameController extends Controller {
         UnitType type = loser.getTypeChange((winnerPlayer.isUndead())
                                             ? ChangeType.UNDEAD
                                             : ChangeType.CAPTURE, winnerPlayer);
-        if (type != null) loser.setType(type);
         loser.setOwner(winnerPlayer);
+        if (type != null) loser.setType(type);
         loser.setLocation(winner.getTile());
         loser.setState(UnitState.ACTIVE);
 
@@ -3867,7 +3847,7 @@ public final class InGameController extends Controller {
         // Make the treasure train.
         List<UnitType> unitTypes = getGame().getSpecification()
             .getUnitTypesWithAbility("model.ability.carryTreasure");
-        UnitType type = unitTypes.get(random.nextInt(unitTypes.size()));
+        UnitType type = Utils.getRandomMember(unitTypes, random);
         Unit train = new Unit(game, tile, attackerPlayer, type,
                               UnitState.ACTIVE);
         train.setTreasureAmount(treasure);
@@ -4634,6 +4614,9 @@ public final class InGameController extends Controller {
                                    IndianSettlement settlement) {
         // Determine result
         Unit missionary = settlement.getMissionary();
+        if (missionary == null) {
+            return Message.clientError("Denouncing null missionary");
+        }
         ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
         double denounce = random.nextDouble() * enemy.getImmigration()
             / (serverPlayer.getImmigration() + 1);
@@ -4653,10 +4636,18 @@ public final class InGameController extends Controller {
         // Denounce failed
         Player owner = settlement.getOwner();
         settlement.makeContactSettlement(serverPlayer);
+        cs.add(See.only(serverPlayer), settlement);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.noDenounce",
                              serverPlayer, unit)
+                .addStringTemplate("%nation%", owner.getNationName()));
+        cs.addMessage(See.only(enemy),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "indianSettlement.mission.enemyDenounce",
+                             enemy, settlement)
+                .addStringTemplate("%enemy%", serverPlayer.getNationName())
+                .addName("%settlement%", settlement.getNameFor(enemy))
                 .addStringTemplate("%nation%", owner.getNationName()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject) unit.getLocation());
@@ -4685,17 +4676,17 @@ public final class InGameController extends Controller {
         if (missionary != null) {
             enemy = (ServerPlayer) missionary.getOwner();
             settlement.setMissionary(null);
-            tile.updatePlayerExploredTile(serverPlayer);
-            tile.updateIndianSettlementInformation(serverPlayer);
+            tile.updatePlayerExploredTiles();
+            tile.updateIndianSettlementInformation(enemy);
 
             // Inform the enemy of loss of mission
-            cs.add(See.perhaps().always(enemy), settlement.getTile());
+            cs.add(See.only(enemy), settlement);
             cs.addDispose(enemy, settlement.getTile(), missionary);
             cs.addMessage(See.only(enemy),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "indianSettlement.mission.denounced",
                                  settlement)
-                    .addStringTemplate("%settlement%", settlement.getLocationNameFor(enemy)));
+                    .addName("%settlement%", settlement.getNameFor(enemy)));
         }
 
         // Result depends on tension wrt this settlement.
@@ -4714,7 +4705,7 @@ public final class InGameController extends Controller {
             settlement.setConvertProgress(0);
             cs.add(See.only(serverPlayer),
                    settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY));
-            tile.updatePlayerExploredTile(serverPlayer);
+            tile.updatePlayerExploredTiles();
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.perhaps().always(serverPlayer), tile);
             break;
@@ -4773,7 +4764,7 @@ public final class InGameController extends Controller {
             cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         } else {
             // Success.  Raise the tension for the native player with respect
-            // to the european player.  Let resulting stance changes happen
+            // to the European player.  Let resulting stance changes happen
             // naturally in the AI player turn/s.
             cs.add(See.only(null).perhaps(enemyPlayer),
                    nativePlayer.modifyTension(enemyPlayer,
@@ -5278,12 +5269,10 @@ public final class InGameController extends Controller {
         }
 
         UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
-        if (skill == null) {
-            // Seasoned Scout
-            Specification spec = getGame().getSpecification();
-            List<UnitType> unitList
-                = spec.getUnitTypesWithAbility("model.ability.expertScout");
-            return unitList.get(random.nextInt(unitList.size()));
+        if (skill == null) { // Seasoned Scout
+            List<UnitType> scouts = getGame().getSpecification()
+                .getUnitTypesWithAbility("model.ability.expertScout");
+            return Utils.getRandomMember(scouts, random);
         }
         return skill;
     }

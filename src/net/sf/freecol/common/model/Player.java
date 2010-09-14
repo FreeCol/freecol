@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -1933,6 +1934,16 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public String getNationID() {
         return nationID;
+    }
+
+    /**
+     * Gets a nation name suitable for use in message IDs.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getNationNameKey() {
+        return nationID.substring(nationID.lastIndexOf('.')+1)
+            .toUpperCase(Locale.US);
     }
 
     /**

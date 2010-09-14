@@ -143,8 +143,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = removeGoods(element);
             } else if (type.equals("setStance")) {
                 reply = setStance(element);
-            } else if (type.equals("newConvert")) {
-                reply = newConvert(element);
             } else if (type.equals("diplomacy")) {
                 reply = diplomacy(element);
             } else if (type.equals("addPlayer")) {
@@ -555,29 +553,6 @@ public final class InGameInputHandler extends InputHandler {
         reply.setAttribute("foundingFather", foundingFather.getId());
         getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
         return reply;
-    }
-
-    /**
-     * Handles a "newConvert"-request.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element newConvert(Element element) {
-        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colonyTile"));
-        Colony colony = tile.getColony();
-        Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
-
-        Element unitElement = (Element) element.getFirstChild();
-        Unit convert = new Unit(getGame(), unitElement);
-        tile.add(convert);
-        ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                                "model.colony.newConvert", convert)
-            .add("%nation%", nation.getNameKey())
-            .addName("%colony%", colony.getName());
-
-        getFreeColClient().getMyPlayer().addModelMessage(message);
-        return null;
     }
 
     /**

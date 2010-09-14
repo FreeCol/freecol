@@ -50,7 +50,6 @@ public class IndianSettlement extends Settlement {
 
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
 
-    public static final int MAX_CONVERT_DISTANCE = 10;
     public static final int MAX_HORSES_PER_TURN = 2;
     public static final int TALES_RADIUS = 6;
 
