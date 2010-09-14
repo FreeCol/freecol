@@ -1855,16 +1855,11 @@ public class Map extends FreeColGameObject {
             region.toXML(out);
         }
 
-        // TODO: remove fake tile creation
-        Tile hiddenTile = new Tile(getGame(), null, -1, -1);
         for (Tile tile: getAllTiles()) {
-
             if (showAll || player.hasExplored(tile)) {
                 tile.toXML(out, player, showAll, toSavedGame);
             } else {
-                hiddenTile.setFakeID(tile.getId());
-                hiddenTile.setPosition(tile.getX(), tile.getY());
-                hiddenTile.toXML(out, player, showAll, toSavedGame);
+                tile.toXMLMinimal(out);
             }
         }
 

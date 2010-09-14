@@ -1895,6 +1895,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
 
+    public void toXMLMinimal(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute("x", Integer.toString(x));
+        out.writeAttribute("y", Integer.toString(y));
+        out.writeAttribute("style", Integer.toString(style));
+        out.writeEndElement();
+    }
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.

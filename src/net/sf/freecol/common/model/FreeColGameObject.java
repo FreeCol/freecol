@@ -386,19 +386,6 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     
     /**
-     * Sets the ID of this object for temporary use with
-     * <code>toXMLElement</code>. This method does not
-     * register the object.
-     *
-     * @param newID the unique ID of this object,
-     */
-    @Deprecated
-    public void setFakeID(String newID) {
-        super.setId(newID);
-    }
-
-    
-    /**
      * Checks if this object has the specified ID.
      *
      * @param id The ID to check against.
