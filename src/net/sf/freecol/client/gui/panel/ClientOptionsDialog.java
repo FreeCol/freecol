@@ -108,7 +108,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(getClient().getClientOptions(), getSpecification());
+        ui = new OptionMapUI(getClient().getClientOptions(), null);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);
