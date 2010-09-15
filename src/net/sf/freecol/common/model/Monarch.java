@@ -257,9 +257,6 @@ public final class Monarch extends FreeColGameObject implements Named {
                     enemies.add(enemy);
                     break;
                 }
-                System.err.println("ENEMY? " + enemy.getNationName()
-                                   + " stance=" + player.getStance(enemy)
-                                   + " " + ((enemies.contains(enemy)) ? "Y" : "N"));
             }
         }
         return enemies;
