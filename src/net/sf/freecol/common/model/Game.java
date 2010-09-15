@@ -1112,9 +1112,7 @@ public class Game extends FreeColGameObject {
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
-                if (specification == null) {
-                    specification = new Specification();
-                }
+                specification = new Specification();
                 specification.readFromXMLImpl(in);
                 specification.clean();
             } else {
