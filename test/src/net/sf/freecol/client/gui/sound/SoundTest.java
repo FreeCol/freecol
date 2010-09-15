@@ -70,26 +70,9 @@ public class SoundTest extends FreeColTestCase {
         po.setValue(10); // 10% volume
         soundPlayer = new SoundPlayer(amo, po);
 
+        // these sounds are base resources, and should be enough for a test
         playSound("sound.intro.general");
-        playSound("sound.intro.model.nation.english");
-        playSound("sound.anthem.model.nation.dutch");
-        playSound("sound.anthem.model.nation.english");
-        playSound("sound.anthem.model.nation.french");
-        playSound("sound.anthem.model.nation.spanish");
-        playSound("sound.attack.artillery");
-        //playSound("sound.attack.bombard");
-        //playSound("sound.attack.foot");
-        playSound("sound.attack.mounted");
-        playSound("sound.attack.naval");
-        playSound("sound.event.meet.model.nation.aztec");
-        playSound("sound.event.buildingComplete");
-        playSound("sound.event.captureColony");
-        //playSound("sound.event.destroySettlement");
-        playSound("sound.event.fountainOfYouth");
         playSound("sound.event.illegalMove");
-        playSound("sound.event.loadCargo");
-        playSound("sound.event.missionEstablished");
-        playSound("sound.event.sellCargo");
-        playSound("sound.event.shipSunk");
+        // other sounds require loading a rule set
    }
 }
