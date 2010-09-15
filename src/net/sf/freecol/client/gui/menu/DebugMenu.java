@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -60,6 +61,8 @@ import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.control.InGameController;
+
 
 public class DebugMenu extends JMenu {
 
@@ -240,6 +243,28 @@ public class DebugMenu extends JMenu {
                         = canvas.showFreeColDialog(choiceDialog, null);
                     player.addFather(fatherToAdd);
                     serverPlayer.addFather(fatherToAdd);
+                }
+            });
+
+        final String monarchTitle = Messages.message("menuBar.debug.runMonarch");
+        final JMenuItem runMonarch = new JMenuItem(monarchTitle);
+        runMonarch.setOpaque(false);
+        runMonarch.setMnemonic(KeyEvent.VK_F);
+        this.add(runMonarch);
+        runMonarch.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    List<ChoiceItem<MonarchAction>> actions
+                        = new ArrayList<ChoiceItem<MonarchAction>>();
+                    for (MonarchAction action : MonarchAction.values()) {
+                        actions.add(new ChoiceItem<MonarchAction>(action));
+                    }
+                    ChoiceDialog<MonarchAction> choiceDialog
+                        = new ChoiceDialog<MonarchAction>(canvas, monarchTitle,
+                                                          "Cancel", actions);
+                    MonarchAction action
+                        = canvas.showFreeColDialog(choiceDialog, null);
+                    freeColClient.getFreeColServer().getInGameController()
+                        .setMonarchAction(serverPlayer, action);
                 }
             });
 
@@ -554,32 +579,35 @@ public class DebugMenu extends JMenu {
         skipTurnsMenuItem.setOpaque(false);
         skipTurnsMenuItem.setMnemonic(KeyEvent.VK_S);
         this.add(skipTurnsMenuItem);
-        if (freeColClient.getFreeColServer() == null){
+        if (freeColClient.getFreeColServer() == null) {
             skipTurnsMenuItem.setEnabled(false);
             return;
         }
         skipTurnsMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    boolean isSkipping = freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns != 0;
-                    if(isSkipping){
-                        freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = 0;
+                    InGameController igc = freeColClient.getFreeColServer()
+                        .getInGameController();
+                    boolean isSkipping = igc.getSkippedTurns() > 0;
+                    if (isSkipping) {
+                        igc.setSkippedTurns(0);
                         return;
                     }
 
-                    String response = canvas.showInputDialog(null, "How many turns should be skipped:",
+                    String response = canvas.showInputDialog(null,
+                             "How many turns should be skipped:",
                              Integer.toString(10), "ok", "cancel", true);
-                    if(response == null){
-                    	return;
-                    }
+                    if (response == null) return;
                     int skipTurns = Integer.parseInt(response);
-                    freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = skipTurns;
+                    igc.setSkippedTurns(skipTurns);
                     freeColClient.getInGameController().endTurn();
                 }
             });
         this.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
-                    boolean skippingTurns = freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns != 0;
-                    String skipMenuItemStr = (skippingTurns)? "Stop skipping" : "Skip turns";
+                    boolean skippingTurns = freeColClient.getFreeColServer()
+                        .getInGameController().getSkippedTurns() > 0;
+                    String skipMenuItemStr = (skippingTurns)? "Stop skipping"
+                        : "Skip turns";
                     skipTurnsMenuItem.setText(skipMenuItemStr);
                 }
             });

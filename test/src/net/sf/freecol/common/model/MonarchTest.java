@@ -54,7 +54,7 @@ public class MonarchTest extends FreeColTestCase {
 
         // grace period has not yet expired
         List<RandomChoice<MonarchAction>> choices = dutch.getMonarch().getActionChoices();
-        assertNull(choices);
+        assertTrue(choices.isEmpty());
 
         game.setTurn(new Turn(100));
         dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
@@ -75,7 +75,7 @@ public class MonarchTest extends FreeColTestCase {
 
         dutch.setPlayerType(Player.PlayerType.REBEL);
         choices = dutch.getMonarch().getActionChoices();
-        assertNull(choices);
+        assertTrue(choices.isEmpty());
 
     }
 

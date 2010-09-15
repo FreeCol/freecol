@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
@@ -53,6 +54,7 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
@@ -139,8 +141,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = setAI(element);
             } else if (type.equals("monarchAction")) {
                 reply = monarchAction(element);
-            } else if (type.equals("removeGoods")) {
-                reply = removeGoods(element);
             } else if (type.equals("setStance")) {
                 reply = setStance(element);
             } else if (type.equals("diplomacy")) {
@@ -749,113 +749,83 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element monarchAction(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
+        Game game = getGame();
+        Specification spec = game.getSpecification();
         Player player = freeColClient.getMyPlayer();
         Monarch monarch = player.getMonarch();
-        final MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
-        Element reply;
+        final MonarchAction action
+            = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
+        String amount, addition;
 
         switch (action) {
+        case NO_ACTION:
+            break;
+
         case RAISE_TAX:
-            boolean force = Boolean.parseBoolean(element.getAttribute("force"));
-            final int amount = new Integer(element.getAttribute("amount")).intValue();
-            if (force) {
-                freeColClient.getMyPlayer().setTax(amount);
-                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                        "model.monarch.forceTaxRaise", player).addName("%replace%", String.valueOf(amount)));
-                reply = null;
+            amount = element.getAttribute("amount");
+            GoodsType type = spec.getGoodsType(element.getAttribute("goods"));
+            String goods = Messages.message(type.getLabel(true));
+            if (new ShowMonarchPanelSwingTask(action,
+                                              "%replace%", amount,
+                                              "%goods%", goods)
+                .confirm()) {
+                element.setAttribute("accepted", String.valueOf(true));
             } else {
-                reply = Message.createNewRootElement("acceptTax");
-                if (new ShowMonarchPanelSwingTask(action, "%replace%", element.getAttribute("amount"), "%goods%",
-                        element.getAttribute("goods")).confirm()) {
-                    freeColClient.getMyPlayer().setTax(amount);
-                    reply.setAttribute("accepted", String.valueOf(true));
-                    new UpdateMenuBarSwingTask().invokeLater();
-                } else {
-                    reply.setAttribute("accepted", String.valueOf(false));
-                }
+                element.setAttribute("accepted", String.valueOf(false));
             }
-            return reply;
+            new UpdateMenuBarSwingTask().invokeLater();
+            return element;
+
         case LOWER_TAX:
-
-            final int newTax = new Integer(element.getAttribute("amount")).intValue();
-            final int difference = freeColClient.getMyPlayer().getTax() - newTax;
-
-            freeColClient.getMyPlayer().setTax(newTax);
-            new ShowMonarchPanelSwingTask(action, "%difference%", String.valueOf(difference), "%newTax%", String
-                    .valueOf(newTax)).confirm();
+            amount = element.getAttribute("amount");
+            int diff = player.getTax() - Integer.parseInt(amount);
+            new ShowMonarchPanelSwingTask(action,
+                                          "%difference%", String.valueOf(diff),
+                                          "%newTax%", amount)
+                .confirm();
             break;
-        case ADD_TO_REF:
-            Element additionElement = Message.getChildElement(element, "addition");
-            NodeList childElements = additionElement.getChildNodes();
-            ArrayList<AbstractUnit> units = new ArrayList<AbstractUnit>();
-            ArrayList<String> unitNames = new ArrayList<String>();
-            for (int index = 0; index < childElements.getLength(); index++) {
-                AbstractUnit unit = new AbstractUnit();
-                unit.readFromXMLElement((Element) childElements.item(index));
-                units.add(unit);
-                unitNames.add(unit.getNumber() + " "
-                        + Messages.message(Messages.getLabel(unit)));
-            }
-            monarch.addToREF(units);
-            new ShowMonarchPanelSwingTask(action, "%addition%", Utils.join(" " + Messages.message("and") + " ",
-                    unitNames)).confirm();
+
+        case WAIVE_TAX:
+            new ShowMonarchPanelSwingTask(action).confirm();
             break;
+
+        case ADD_TO_REF: case SUPPORT_LAND: case SUPPORT_SEA:
+            addition = element.getAttribute("addition");
+            new ShowMonarchPanelSwingTask(action,
+                                          "%addition%", addition)
+                .confirm();
+            break;
+
         case DECLARE_WAR:
-            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
-            new ShowMonarchPanelSwingTask(action, "%nation%", Messages.message(enemy.getNationName())).confirm();
+            String nation = element.getAttribute("nation");
+            String nationName
+                = Messages.message(((Player) game.getFreeColGameObject(nation))
+                                   .getNationName());
+            new ShowMonarchPanelSwingTask(action,
+                                          "%nation%", nationName)
+                .confirm();
             break;
-        case SUPPORT_LAND:
-        case SUPPORT_SEA:
-        case ADD_UNITS:
-            NodeList unitList = element.getChildNodes();
-            for (int i = 0; i < unitList.getLength(); i++) {
-                Element unitElement = (Element) unitList.item(i);
-                Unit newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (newUnit == null) {
-                    newUnit = new Unit(getGame(), unitElement);
-                } else {
-                    newUnit.readFromXMLElement(unitElement);
-                }
-                player.getEurope().add(newUnit);
-            }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    Canvas canvas = getFreeColClient().getCanvas();
-                    if (!canvas.isShowingSubPanel()
-                            && (action == MonarchAction.ADD_UNITS || !canvas.showFreeColDialog(new MonarchPanel(canvas,
-                                    action)))) {
-                        canvas.showEuropePanel();
-                    }
-                }
-            });
-            break;
+
         case OFFER_MERCENARIES:
-            reply = Message.createNewRootElement("hireMercenaries");
-            Element mercenaryElement = Message.getChildElement(element, "mercenaries");
-            childElements = mercenaryElement.getChildNodes();
-            ArrayList<String> mercenaries = new ArrayList<String>();
-            for (int index = 0; index < childElements.getLength(); index++) {
-                AbstractUnit unit = new AbstractUnit();
-                unit.readFromXMLElement((Element) childElements.item(index));
-                mercenaries.add(unit.getNumber() + " "
-                        + Messages.message(Messages.getLabel(unit)));
-            }
-            if (new ShowMonarchPanelSwingTask(action, "%gold%", element.getAttribute("price"), "%mercenaries%", Utils
-                    .join(" " + Messages.message("and") + " ", mercenaries)).confirm()) {
-                int price = new Integer(element.getAttribute("price")).intValue();
-                freeColClient.getMyPlayer().modifyGold(-price);
+            amount = element.getAttribute("amount");
+            addition = element.getAttribute("addition");
+            if (new ShowMonarchPanelSwingTask(action,
+                                              "%gold%", amount,
+                                              "%mercenaries%", addition)
+                .confirm()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         freeColClient.getCanvas().updateGoldLabel();
                     }
                 });
-                reply.setAttribute("accepted", String.valueOf(true));
+                element.setAttribute("accepted", String.valueOf(true));
             } else {
-                reply.setAttribute("accepted", String.valueOf(false));
+                element.setAttribute("accepted", String.valueOf(false));
             }
-            return reply;
-        case NO_ACTION:
-            // Nothing to do here, obviously.
+            return element;
+
+        default:
+            logger.warning("Bogus action: " + action);
             break;
         }
         return null;
@@ -902,46 +872,6 @@ public final class InGameInputHandler extends InputHandler {
             getGame().addPlayer(newPlayer);
         } else {
             getGame().getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
-        }
-
-        return null;
-    }
-
-    /**
-     * Handles a "removeGoods"-request.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element removeGoods(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
-
-        NodeList nodeList = element.getChildNodes();
-        Element goodsElement = (Element) nodeList.item(0);
-
-        if (goodsElement == null) {
-            // player has no colony or nothing to trade
-            new ShowMonarchPanelSwingTask(MonarchAction.WAIVE_TAX).confirm();
-        } else {
-            final Goods goods = new Goods(getGame(), goodsElement);
-            final Colony colony = (Colony) goods.getLocation();
-            colony.removeGoods(goods);
-
-            // JACOB_FUGGER does not protect against new boycotts
-            freeColClient.getMyPlayer().setBoycott(goods.getType());
-
-            String messageID = goods.getType().getId() + ".destroyed";
-            if (!Messages.containsKey(messageID)) {
-                if (colony.isLandLocked()) {
-                    messageID = "model.monarch.colonyGoodsParty.landLocked";
-                } else {
-                    messageID = "model.monarch.colonyGoodsParty.harbour";
-                }
-            }
-            colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(getGame().getTurn()));
-            new ShowModelMessageSwingTask(new ModelMessage(ModelMessage.MessageType.WARNING, messageID, colony)
-                    .addName("%colony%", colony.getName()).addName("%amount%", String.valueOf(goods.getAmount())).add(
-                            "%goods%", goods.getNameKey())).invokeLater();
         }
 
         return null;

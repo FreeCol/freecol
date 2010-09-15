@@ -66,6 +66,12 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             okText = "model.monarch.acceptTax";
             cancelText = "model.monarch.rejectTax";
             break;
+        case LOWER_TAX:
+            messageID = "model.monarch.lowerTax";
+            break;
+        case WAIVE_TAX:
+            messageID = "model.monarch.waiveTax";
+            break;
         case ADD_TO_REF:
             messageID = "model.monarch.addToREF";
             break;
@@ -79,12 +85,6 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         case SUPPORT_LAND:
             messageID = "model.monarch.supportLand";
             cancelText = "display";
-            break;
-        case LOWER_TAX:
-            messageID = "model.monarch.lowerTax";
-            break;
-        case WAIVE_TAX:
-            messageID = "model.monarch.waiveTax";
             break;
         case OFFER_MERCENARIES:
             messageID = "model.monarch.offerMercenaries";

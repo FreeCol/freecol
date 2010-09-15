@@ -35,8 +35,10 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
+
 
 /**
  * This class implements the player's monarch, whose functions prior
@@ -82,14 +84,13 @@ public final class Monarch extends FreeColGameObject implements Named {
     public static enum MonarchAction {
         NO_ACTION,
         RAISE_TAX,
-        ADD_TO_REF,
-        DECLARE_WAR,
-        SUPPORT_SEA,
-        SUPPORT_LAND,
-        OFFER_MERCENARIES,
         LOWER_TAX,
         WAIVE_TAX,
-        ADD_UNITS
+        ADD_TO_REF,
+        DECLARE_WAR,
+        SUPPORT_LAND,
+        SUPPORT_SEA,
+        OFFER_MERCENARIES
     }
 
 
@@ -112,10 +113,11 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.player = player;
         this.name = name;
 
-        int number = getSpecification().getIntegerOption("model.option.refStrength")
+        Specification spec = getSpecification();
+        int number = spec.getIntegerOption("model.option.refStrength")
             .getValue() + 3;
 
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : spec.getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility("model.ability.navalUnit")) {
                     navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
@@ -177,6 +179,25 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
+     * Gets the sea support status.
+     *
+     * @return Gets the sea support status.
+     */
+    public boolean getSupportSea() {
+        return supportSea;
+    }
+
+    /**
+     * Sets the sea support status.
+     *
+     * @param seaSupport The new sea support status.
+     */
+    public void setSupportSea(boolean supportSea) {
+        this.supportSea = supportSea;
+    }
+
+
+    /**
      * Return the name key of this Monarch.
      *
      * @return a <code>String</code> value
@@ -214,6 +235,64 @@ public final class Monarch extends FreeColGameObject implements Named {
         return landUnits;
     }
 
+    /**
+     * Gets the maximum tax rate in this game.
+     */
+    private int taxMaximum() {
+        return getSpecification().getIntegerOption("model.option.maximumTax")
+            .getValue();
+    }
+
+    /**
+     * Collects a list of potential enemies for this player.
+     */
+    public List<Player> collectPotentialEnemies() {
+        List<Player> enemies = new ArrayList<Player>();
+        // Benjamin Franklin puts an end to the monarch's interference
+        if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
+            for (Player enemy : getGame().getEuropeanPlayers()) {
+                if (enemy.isREF()) continue;
+                switch (player.getStance(enemy)) {
+                case PEACE: case CEASE_FIRE:
+                    enemies.add(enemy);
+                    break;
+                }
+                System.err.println("ENEMY? " + enemy.getNationName()
+                                   + " stance=" + player.getStance(enemy)
+                                   + " " + ((enemies.contains(enemy)) ? "Y" : "N"));
+            }
+        }
+        return enemies;
+    }
+
+    /**
+     * Checks if a specified action is valid at present.
+     *
+     * @param action The <code>MonarchAction</code> to check.
+     */
+    public boolean actionIsValid(MonarchAction action) {
+        switch (action) {
+        case NO_ACTION:
+            return true;
+        case RAISE_TAX:
+            return player.getTax() < taxMaximum();
+        case LOWER_TAX:
+            return player.getTax() > MINIMUM_TAX_RATE + 10;
+        case WAIVE_TAX:
+            return true;
+        case ADD_TO_REF:
+            return true;
+        case DECLARE_WAR:
+            return !collectPotentialEnemies().isEmpty();
+        case SUPPORT_SEA:
+            return player.getAttackedByPrivateers() && !getSupportSea();
+        case SUPPORT_LAND: case OFFER_MERCENARIES:
+            return player.isAtWar();
+        default:
+            throw new IllegalArgumentException("Bogus monarch action: "
+                                               + action);
+        }
+    }
 
     /**
      * Builds a weighted list of monarch actions.
@@ -221,77 +300,61 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A weighted list of monarch actions.
      */
     public List<RandomChoice<MonarchAction>> getActionChoices() {
-        int dx = getSpecification().getIntegerOption("model.option.monarchMeddling")
-            .getValue() + 1;
+        List<RandomChoice<MonarchAction>> choices
+            = new ArrayList<RandomChoice<MonarchAction>>();
+        int dx = 1 + getSpecification()
+            .getIntegerOption("model.option.monarchMeddling").getValue();
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
 
-        // nothing happens during the first few turns, nor after the
-        // revolution
+        // Nothing happens during the first few turns, nor after the
+        // revolution begins.
         if (turn < grace || player.getPlayerType() != PlayerType.COLONIAL) {
-            return null;
+            return choices;
         }
 
-        boolean canDeclareWar = false;
-        boolean atWar = false;
-        // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
-            for (Player enemy : getGame().getPlayers()) {
-                if (!enemy.isEuropean() || enemy.isREF()) {
-                    continue;
+        if (actionIsValid(MonarchAction.NO_ACTION)) {
+            // The more time has passed, the less likely the monarch
+            // will do nothing.
+            choices.add(new RandomChoice<MonarchAction>(MonarchAction.NO_ACTION,
+                    Math.max(200 - turn, 100)));
+        }
+
+        if (actionIsValid(MonarchAction.RAISE_TAX)) {
+            choices.add(new RandomChoice<MonarchAction>(MonarchAction.RAISE_TAX,
+                    10 + dx));
+        }
+
+        if (actionIsValid(MonarchAction.LOWER_TAX)) {
+            choices.add(new RandomChoice<MonarchAction>(MonarchAction.LOWER_TAX,
+                    10 - dx));
+        }
+
+        if (actionIsValid(MonarchAction.ADD_TO_REF)) {
+            choices.add(new RandomChoice<MonarchAction>(MonarchAction.ADD_TO_REF,
+                    10 + dx));
+        }
+
+        if (actionIsValid(MonarchAction.DECLARE_WAR)) {
+            choices.add(new RandomChoice<MonarchAction>(MonarchAction.DECLARE_WAR,
+                    5 + dx));
+        }
+
+        if (actionIsValid(MonarchAction.SUPPORT_LAND)) {
+            if (player.getGold() < MINIMUM_PRICE) {
+                if (dx < 3) {
+                    choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_LAND,
+                            3 - dx));
                 }
-                switch (player.getStance(enemy)) {
-                case UNCONTACTED:
-                    break;
-                case WAR:
-                    atWar = true;
-                    break;
-                case PEACE: case CEASE_FIRE:
-                    canDeclareWar = true;
-                    break;
-                case ALLIANCE:
-                    // we can neither have nor declare war.
-                    break;
-                }
+            } else {
+                choices.add(new RandomChoice<MonarchAction>(MonarchAction.OFFER_MERCENARIES,
+                            6 - dx));
             }
         }
 
-        /* The probabilities of these actions. */
-        List<RandomChoice<MonarchAction>> choices = new ArrayList<RandomChoice<MonarchAction>>();
-
-        // the more time has passed, the less likely the monarch will
-        // do nothing
-        choices.add(new RandomChoice<MonarchAction>(MonarchAction.NO_ACTION, Math.max(200 - turn, 100)));
-
-        if (player.getTax() < getSpecification()
-            .getIntegerOption("model.option.maximumTax").getValue()) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.RAISE_TAX, 10 + dx));
-        }
-
-        choices.add(new RandomChoice<MonarchAction>(MonarchAction.ADD_TO_REF, 10 + dx));
-
-        if (canDeclareWar) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.DECLARE_WAR, 5 + dx));
-        }
-
-        // provide no more than one frigate
-        if (player.getAttackedByPrivateers() && !supportSea) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_SEA, 6 - dx));
-        }
-
-        if (atWar) {
-            // disable for the moment
-            //MonarchAction.SUPPORT_LAND = 6 - dx;
-            if (player.getGold() > MINIMUM_PRICE) {
-                choices.add(new RandomChoice<MonarchAction>(MonarchAction.OFFER_MERCENARIES, 6 - dx));
-            }
-        }
-
-        if (player.getTax() > MINIMUM_TAX_RATE + 10) {
-            // Play it safe: we don't want to lower the rate below the
-            // minimum tax rate, since it might actually be raised by
-            // getNewTax() in that case.
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.LOWER_TAX, 10 - dx));
+        if (actionIsValid(MonarchAction.SUPPORT_SEA)) {
+            choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_SEA,
+                                                        6 - dx));
         }
 
         return choices;
@@ -305,17 +368,13 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The new tax rate.
      */
     public int raiseTax(Random random) {
-        Specification spec = getSpecification();
-        int taxAdjustment = spec.getIntegerOption("model.option.taxAdjustment")
-            .getValue();
-        int taxMax = spec.getIntegerOption("model.option.maximumTax")
-            .getValue();
+        int taxAdjustment = getSpecification()
+            .getIntegerOption("model.option.taxAdjustment").getValue();
         int turn = getGame().getTurn().getNumber();
         int oldTax = player.getTax();
-
         int adjust = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
         adjust = random.nextInt(5 + turn/adjust) + 1;
-        return Math.min(oldTax + adjust, taxMax);
+        return Math.min(oldTax + adjust, taxMaximum());
     }
 
     /**
@@ -325,16 +384,13 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The new tax rate.
      */
     public int lowerTax(Random random) {
-        Specification spec = getSpecification();
-        int taxAdjustment = spec.getIntegerOption("model.option.taxAdjustment")
-            .getValue();
+        int taxAdjustment = getSpecification()
+            .getIntegerOption("model.option.taxAdjustment").getValue();
         int oldTax = player.getTax();
-
         int adjust = Math.max(1, 10 - taxAdjustment); // 5-10
         adjust = random.nextInt(adjust) + 1;
         return Math.max(oldTax - adjust, Monarch.MINIMUM_TAX_RATE);
     }
-
 
     /**
      * Returns units to be added to the Royal Expeditionary Force.
@@ -344,13 +400,15 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public List<AbstractUnit> addToREF(Random random) {
         ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
-        if (capacity < spaceRequired) {
-            AbstractUnit unit = navalUnits.get(random.nextInt(navalUnits.size()));
+        // Preserve some extra naval capacity so that not all the REF
+        // navy is completely loaded
+        if (capacity < spaceRequired + 15) {
+            AbstractUnit unit = Utils.getRandomMember(navalUnits, random);
             result.add(new AbstractUnit(unit.getId(), unit.getRole(), 1));
         } else {
-            int number = random.nextInt(3) + 1;
-            AbstractUnit unit = landUnits.get(random.nextInt(landUnits.size()));
-            result.add(new AbstractUnit(unit.getId(), unit.getRole(), number));
+            AbstractUnit unit = Utils.getRandomMember(landUnits, random);
+            result.add(new AbstractUnit(unit.getId(), unit.getRole(),
+                                        random.nextInt(3) + 1));
         }
         return result;
     }
@@ -384,36 +442,71 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
     }
 
-
     /**
-     * Returns the nation of another player to declare war on.
+     * Gets a additions to the colonial forces.
      *
      * @param random The <code>Random</code> number source to use.
-     * @return The enemy nation.
+     * @param sea If the addition should be a naval unit.
+     * @return An addition to the colonial forces.
      */
-    public Player declareWar(Random random) {
-        ArrayList<Player> europeanPlayers = new ArrayList<Player>();
-        for (Player enemy : getGame().getPlayers()) {
-            if (enemy == player) {
-                continue;
-            } else if (!player.hasContacted(enemy)) {
-                continue;
-            } else if (!enemy.isEuropean() || enemy.isREF()) {
-                continue;
-            }
-            Stance stance = player.getStance(enemy);
-            if (stance == Stance.PEACE || stance == Stance.CEASE_FIRE) {
-                europeanPlayers.add(enemy);
+    public List<AbstractUnit> getSupport(Random random, boolean naval) {
+        Specification spec = getSpecification();
+        List<AbstractUnit> support = new ArrayList<AbstractUnit>();
+        List<UnitType> navalTypes = new ArrayList<UnitType>();
+        List<UnitType> bombardTypes = new ArrayList<UnitType>();
+        List<UnitType> mountedTypes = new ArrayList<UnitType>();
+        for (UnitType unitType : spec.getUnitTypeList()) {
+            if (unitType.hasAbility("model.ability.supportUnit")) {
+                if (unitType.hasAbility("model.ability.navalUnit")) {
+                    navalTypes.add(unitType);
+                } else if (unitType.hasAbility("model.ability.bombard")) {
+                    bombardTypes.add(unitType);
+                } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                    mountedTypes.add(unitType);
+                }
             }
         }
-        if (europeanPlayers.size() > 0) {
-            int randomInt = random.nextInt(europeanPlayers.size());
-            Player enemy = europeanPlayers.get(randomInt);
-            return enemy;
+        if (naval) {
+            support.add(new AbstractUnit(Utils.getRandomMember(navalTypes, random),
+                                         Role.DEFAULT, 1));
+            setSupportSea(true);
+            return support;
         }
-        return null;
-    }
 
+        int difficulty = spec.getRangeOption("model.option.difficulty")
+            .getValue();
+        switch (difficulty) {
+        case 0:
+            support.add(new AbstractUnit(Utils.getRandomMember(bombardTypes, random),
+                                         Role.DEFAULT, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.DRAGOON, 2));
+            break;
+        case 1:
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.DRAGOON, 2));
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.SOLDIER, 1));
+            break;
+        case 2:
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.DRAGOON, 2));
+            break;
+        case 3:
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.DRAGOON, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.SOLDIER, 1));
+            break;
+        case 4:
+            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
+                                         Role.SOLDIER, 1));
+            break;
+        default:
+            break;
+        }
+        return support;
+    }
 
     /**
      * Returns units available as mercenaries.
@@ -422,139 +515,66 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A troop of mercenaries.
      */
     public List<AbstractUnit> getMercenaries(Random random) {
-        List<AbstractUnit> mercenaries = new ArrayList<AbstractUnit>();
+        Specification spec = getSpecification();
         List<UnitType> unitTypes = new ArrayList<UnitType>();
-
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : spec.getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.mercenaryUnit")) {
                 unitTypes.add(unitType);
             }
         }
+
+        int mercPrice = spec.getIntegerOption("model.option.mercenaryPrice")
+            .getValue();
+        List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
         int gold = player.getGold();
         int price = 0;
         int limit = unitTypes.size();
         UnitType unitType = null;
+        AbstractUnit au;
         for (int count = 0; count < limit; count++) {
-            int index = random.nextInt(unitTypes.size());
-            unitType = unitTypes.get(index);
+            unitType = Utils.getRandomMember(unitTypes, random);
             if (unitType.hasAbility("model.ability.canBeEquipped")) {
-                int newPrice = getPrice(unitType, Role.DRAGOON);
                 for (int number = 3; number > 0; number--) {
-                    if (price + newPrice * number <= gold) {
-                        mercenaries.add(new AbstractUnit(unitType, Role.DRAGOON, number));
-                        price += newPrice * number;
+                    au = new AbstractUnit(unitType, Role.DRAGOON, number);
+                    int newPrice = player.getPrice(au) * mercPrice / 100;
+                    if (price + newPrice <= gold) {
+                        mercs.add(au);
+                        price += newPrice;
                         break;
                     }
                 }
-                newPrice = getPrice(unitType, Role.SOLDIER);
                 for (int number = 3; number > 0; number--) {
-                    if (price + newPrice * number <= gold) {
-                        mercenaries.add(new AbstractUnit(unitType, Role.SOLDIER, number));
-                        price += newPrice * number;
+                    au = new AbstractUnit(unitType, Role.SOLDIER, number);
+                    int newPrice = player.getPrice(au) * mercPrice / 100;
+                    if (price + newPrice <= gold) {
+                        mercs.add(au);
+                        price += newPrice;
                         break;
                     }
                 }
             } else {
-                int newPrice = getPrice(unitType, Role.DEFAULT);
                 for (int number = 3; number > 0; number--) {
-                    if (price + newPrice * number <= gold) {
-                        mercenaries.add(new AbstractUnit(unitType, Role.DEFAULT, number));
-                        price += newPrice * number;
+                    au = new AbstractUnit(unitType, Role.DEFAULT, number);
+                    int newPrice = player.getPrice(au) * mercPrice / 100;;
+                    if (price + newPrice <= gold) {
+                        mercs.add(au);
+                        price += newPrice;
                         break;
                     }
                 }
             }
-            unitTypes.remove(index);
+            unitTypes.remove(unitType);
         }
 
-        if (price == 0 && unitType != null) {
-            if (unitType.hasAbility("model.ability.canBeEquipped")) {
-                mercenaries.add(new AbstractUnit(unitType, Role.SOLDIER, 1));
-            } else {
-                mercenaries.add(new AbstractUnit(unitType, Role.DEFAULT, 1));
-            }
+        /* Try to always return something, even if it is not affordable */
+        if (mercs.isEmpty() && unitType != null) {
+            Role role = (unitType.hasAbility("model.ability.canBeEquipped"))
+                ? Role.SOLDIER
+                : Role.DEFAULT;
+            mercs.add(new AbstractUnit(unitType, role, 1));
         }
-
-        return mercenaries;
+        return mercs;
     }
-
-    /**
-     * Returns the price for the given units.
-     *
-     * @param units The units to get a price for.
-     * @param rebate Whether to grant a rebate.
-     * @return The price fo the units.
-     */
-    public int getPrice(List<AbstractUnit> units, boolean rebate) {
-        int price = 0;
-        for (AbstractUnit unit : units) {
-            int newPrice = getPrice(unit.getUnitType(getSpecification()), unit.getRole());
-            price += newPrice * unit.getNumber();
-        }
-        if (price > player.getGold() && rebate) {
-            return player.getGold();
-        } else {
-            return price;
-        }
-    }
-
-    private int getPrice(UnitType unitType, Role role) {
-        if (unitType.hasPrice()) {
-            int price = player.getEurope().getUnitPrice(unitType);
-            if (Role.SOLDIER.equals(role)) {
-                price += getEquipmentPrice(getSpecification().getEquipmentType("model.equipment.muskets"));
-            } else if (Role.DRAGOON.equals(role)) {
-                price += getEquipmentPrice(getSpecification().getEquipmentType("model.equipment.muskets"));
-                price += getEquipmentPrice(getSpecification().getEquipmentType("model.equipment.horses"));
-            }
-            return price * getSpecification()
-                .getIntegerOption("model.option.mercenaryPrice").getValue() / 100;
-        } else {
-            return INFINITY;
-        }
-    }
-
-    private int getEquipmentPrice(EquipmentType equipment) {
-        int price = 0;
-        for (AbstractGoods goods : equipment.getGoodsRequired()) {
-            price += player.getMarket().getBidPrice(goods.getType(), goods.getAmount());
-        }
-        return price;
-    }
-
-
-    /**
-     * Returns an addition to the colonial forces.
-     *
-     * @return An addition to the colonial forces.
-     */
-    /*
-    public int[] supportLand() {
-        int[] units = new int[NUMBER_OF_TYPES];
-        switch (player.getDifficulty()) {
-        case Player.VERY_EASY:
-            units[ARTILLERY] = 1;
-            units[DRAGOON] = 2;
-            break;
-        case Player.EASY:
-            units[DRAGOON] = 2;
-            units[INFANTRY] = 1;
-            break;
-        case Player.MEDIUM:
-            units[DRAGOON] = 2;
-            break;
-        case Player.HARD:
-            units[DRAGOON] = 1;
-            units[INFANTRY] = 1;
-            break;
-        case Player.VERY_HARD:
-            units[INFANTRY] = 1;
-            break;
-        }
-        return units;
-    }
-    */
-
 
     /**
      * This method writes an XML-representation of this object to
@@ -642,8 +662,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * This method should be overwritten by any sub-class, preferably
-     * with the name of the class with the first letter in lower case.
      *
      * @return "monarch".
      */

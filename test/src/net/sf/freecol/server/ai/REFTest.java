@@ -74,45 +74,11 @@ public class REFTest extends FreeColTestCase {
 
         assertNotNull("InGameController is null",igc);
 
-        // Create player
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        ServerPlayer refPlayer = igc.createREFPlayer(player1);
-
-        assertNotNull("REF player is null",refPlayer);
-        assertNotNull("Player ref is null",player1.getREFPlayer());
-        assertEquals("REF player should be player1 ref", refPlayer, player1.getREFPlayer());        
-    }
-	
-    public void testCreateREFUnits() {
         UnitType soldierType = spec().getUnitType("model.unit.kingsRegular");
         UnitType artilleryType = spec().getUnitType("model.unit.artillery");
 
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-
-        Map map = getTestMap();
-
-        server.setMapGenerator(new MockMapGenerator(map));
-
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-
-        Game game = server.getGame();
-
-        c = server.getController();
-        InGameController igc = (InGameController) c;
-
         // Create player
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        ServerPlayer refPlayer = igc.createREFPlayer(player1);
-
         List <AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch().getREF();
         int soldiersBeforeIndependence = 0;
         int dragoonsBeforeIndependence = 0;
@@ -145,8 +111,15 @@ public class REFTest extends FreeColTestCase {
             fail("Unkown REF unit: " +  unit.toString());
         }
 
+        ServerPlayer refPlayer = igc.createREFPlayer(player1);
+
+        assertNotNull("REF player is null",refPlayer);
+        assertNotNull("Player ref is null",player1.getREFPlayer());
+        assertEquals("REF player should be player1 ref", refPlayer, player1.getREFPlayer());
+
+
         // Execute
-        List<Unit> refUnitsAfterIndependence = igc.createREFUnits(player1, refPlayer);
+        List<Unit> refUnitsAfterIndependence = refPlayer.getUnits();
 
         // Get results
         int soldiersAfterIndependence = 0;

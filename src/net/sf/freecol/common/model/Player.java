@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -1155,6 +1156,30 @@ public class Player extends FreeColGameObject implements Nameable {
     public void removeUnit(final Unit oldUnit) {
         if (oldUnit != null) {
             units.remove(oldUnit.getId());
+        }
+    }
+
+    /**
+     * Gets the price to this player for a proposed unit.
+     *
+     * @param au The proposed <code>AbstractUnit</code>.
+     * @return The price for the unit.
+     */
+    public int getPrice(AbstractUnit au) {
+        Specification spec = getSpecification();
+        UnitType unitType = au.getUnitType(spec);
+        if (unitType.hasPrice()) {
+            Role role = au.getRole();
+            int price = getEurope().getUnitPrice(unitType);
+            for (EquipmentType equip : au.getEquipment(spec)) {
+                for (AbstractGoods goods : equip.getGoodsRequired()) {
+                    price += getMarket().getBidPrice(goods.getType(),
+                                                     goods.getAmount());
+                }
+            }
+            return price * au.getNumber();
+        } else {
+            return INFINITY;
         }
     }
 
@@ -2859,18 +2884,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getArrears(Goods goods) {
         return getArrears(goods.getType());
-    }
-
-    /**
-     * Puts a tax boycott on a type of goods.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     */
-    public void setBoycott(GoodsType goodsType) {
-        Specification spec = getSpecification();
-        Market market = getMarket();
-        market.setArrears(goodsType, market.getPaidForSale(goodsType)
-            * spec.getIntegerOption("model.option.arrearsFactor").getValue());
     }
 
     /**

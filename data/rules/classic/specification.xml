@@ -736,6 +736,7 @@
       <default-equipment id="model.equipment.muskets"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
+      <ability id="model.ability.supportUnit" value="true"/>
       <modifier id="model.modifier.offence" type="percentage" value="50"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <upgrade unit="model.unit.colonialRegular" promotion="true" independence="true"/>
@@ -862,6 +863,7 @@
       <required-goods id="model.goods.hammers" value="512"/>
       <required-goods id="model.goods.tools" value="200"/>
       <ability id="model.ability.captureGoods" value="true"/>
+      <ability id="model.ability.supportUnit" value="true"/>
     </unit-type>
     <unit-type id="model.unit.galleon" extends="ship" offence="0" defence="10" movement="18"
                lineOfSight="2" space="6" spaceTaken="64" hitPoints="6" price="3000" scoreValue="5">
@@ -896,6 +898,7 @@
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
+      <ability id="model.ability.supportUnit" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
       <downgrade unit="model.unit.damagedArtillery" demotion="true"/>
     </unit-type>
