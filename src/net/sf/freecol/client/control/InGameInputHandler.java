@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.Utils;
 
@@ -753,36 +754,35 @@ public final class InGameInputHandler extends InputHandler {
         Specification spec = game.getSpecification();
         Player player = freeColClient.getMyPlayer();
         Monarch monarch = player.getMonarch();
-        final MonarchAction action
-            = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
-        String amount, addition;
+        MonarchActionMessage message = new MonarchActionMessage(game, element);
+        final MonarchAction action = message.getAction();
+        boolean accept;
+        String amount;
+        String additions;
 
         switch (action) {
         case NO_ACTION:
             break;
 
         case RAISE_TAX:
-            amount = element.getAttribute("amount");
-            GoodsType type = spec.getGoodsType(element.getAttribute("goods"));
-            String goods = Messages.message(type.getLabel(true));
-            if (new ShowMonarchPanelSwingTask(action,
-                                              "%replace%", amount,
-                                              "%goods%", goods)
-                .confirm()) {
-                element.setAttribute("accepted", String.valueOf(true));
-            } else {
-                element.setAttribute("accepted", String.valueOf(false));
-            }
+            amount = Integer.toString(message.getAmount());
+            GoodsType goodsType = message.getGoodsType(game);
+            String goods = Messages.message(goodsType.getLabel(true));
+            accept = new ShowMonarchPanelSwingTask(action,
+                                                   "%replace%", amount,
+                                                   "%goods%", goods).confirm();
+            element.setAttribute("accepted", String.valueOf(accept));
             new UpdateMenuBarSwingTask().invokeLater();
             return element;
 
         case LOWER_TAX:
-            amount = element.getAttribute("amount");
-            int diff = player.getTax() - Integer.parseInt(amount);
+            int newTax = message.getAmount();
+            amount = Integer.toString(newTax);
+            String diff = Integer.toString(player.getTax() - newTax);
             new ShowMonarchPanelSwingTask(action,
-                                          "%difference%", String.valueOf(diff),
-                                          "%newTax%", amount)
-                .confirm();
+                                          "%difference%", diff,
+                                          "%newTax%", amount).confirm();
+            new UpdateMenuBarSwingTask().invokeLater();
             break;
 
         case WAIVE_TAX:
@@ -790,37 +790,32 @@ public final class InGameInputHandler extends InputHandler {
             break;
 
         case ADD_TO_REF: case SUPPORT_LAND: case SUPPORT_SEA:
-            addition = element.getAttribute("addition");
+            additions = unitListSummary(message.getAdditions());
             new ShowMonarchPanelSwingTask(action,
-                                          "%addition%", addition)
-                .confirm();
+                                          "%addition%", additions).confirm();
             break;
 
         case DECLARE_WAR:
-            String nation = element.getAttribute("nation");
-            String nationName
-                = Messages.message(((Player) game.getFreeColGameObject(nation))
-                                   .getNationName());
+            Player enemy = message.getEnemy(game);
+            String nationName = Messages.message(enemy.getNationName());
             new ShowMonarchPanelSwingTask(action,
-                                          "%nation%", nationName)
-                .confirm();
+                                          "%nation%", nationName).confirm();
             break;
 
         case OFFER_MERCENARIES:
-            amount = element.getAttribute("amount");
-            addition = element.getAttribute("addition");
-            if (new ShowMonarchPanelSwingTask(action,
-                                              "%gold%", amount,
-                                              "%mercenaries%", addition)
-                .confirm()) {
+            amount = Integer.toString(message.getAmount());
+            additions = unitListSummary(message.getAdditions());
+            accept = new ShowMonarchPanelSwingTask(action,
+                                                   "%gold%", amount,
+                                                   "%mercenaries%", additions)
+                .confirm();
+            element.setAttribute("accepted", String.valueOf(accept));
+            if (accept) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         freeColClient.getCanvas().updateGoldLabel();
                     }
                 });
-                element.setAttribute("accepted", String.valueOf(true));
-            } else {
-                element.setAttribute("accepted", String.valueOf(false));
             }
             return element;
 
@@ -829,6 +824,21 @@ public final class InGameInputHandler extends InputHandler {
             break;
         }
         return null;
+    }
+
+    /**
+     * Summarizes a list of units to a string.
+     *
+     * @param unitList The list of <code>AbstractUnit</code>s to summarize.
+     * @return A summary.
+     */
+    private String unitListSummary(List<AbstractUnit> unitList) {
+        ArrayList<String> unitNames = new ArrayList<String>();
+        for (AbstractUnit au : unitList) {
+            unitNames.add(au.getNumber() + " "
+                          + Messages.message(Messages.getLabel(au)));
+        }
+        return Utils.join(" " + Messages.message("and") + " ", unitNames);
     }
 
     /**
