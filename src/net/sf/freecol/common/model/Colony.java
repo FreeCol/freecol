@@ -1333,7 +1333,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 if (unit.getExperience() > 0) {
                     expertProduction = unit.getWorkType();
                     if (expertProduction != null && expertProduction.isFarmed()) {
-                        ColonyTile colonyTile = getVacantColonyTileFor(unit, true, expertProduction);
+                        ColonyTile colonyTile = getVacantColonyTileFor(unit, false, expertProduction);
                         if (colonyTile != null) {
                             return new Occupation(colonyTile, expertProduction);
                         }
