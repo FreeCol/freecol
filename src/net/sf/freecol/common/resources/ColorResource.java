@@ -71,7 +71,11 @@ public class ColorResource extends Resource {
      */
     public static Color getColor(String colorName) {
         if (colorName.startsWith("0x") || colorName.startsWith("0X")) {
-            return new Color(Integer.decode(colorName));
+            boolean hasAlpha = false;
+            if (colorName.length()>8) {
+               hasAlpha = true;
+            }
+            return new Color(Integer.decode(colorName),hasAlpha);
         } else {
             try {
                 Field field = Color.class.getField(colorName);

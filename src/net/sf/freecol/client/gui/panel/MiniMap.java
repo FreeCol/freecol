@@ -211,7 +211,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (freeColClient.getGame() == null
             || freeColClient.getGame().getMap() == null) {
             return;
-        }        
+        }
+        Image back = ResourceManager.getImage("MiniMap.back");
         Image skin = ResourceManager.getImage("MiniMap.skin");
         
     	Color newBackground = ResourceManager.getColor("miniMapBackground.color");
@@ -220,6 +221,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (skin == null) {
             paintMap(graphics, getWidth(), getHeight());
         } else {
+            graphics.drawImage(back, 0, 0, null);
             graphics.translate(mapWindow.x, mapWindow.y);
             paintMap(graphics, MAP_WIDTH, MAP_HEIGHT);
             graphics.translate(-mapWindow.x, -mapWindow.y);
@@ -250,8 +252,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         g.setRenderingHint(RenderingHints.KEY_RENDERING,
                            RenderingHints.VALUE_RENDER_QUALITY);
  	  	
-        /* Fill the rectangle with solid black */
-        g.setColor(Color.BLACK);
+        /* Fill the rectangle with background color */
+        g.setColor(ResourceManager.getColor("miniMapBackground.color"));
         g.fillRect(0, 0, width, height);
 
         if (freeColClient.getGUI() == null || freeColClient.getGUI().getFocus() == null) {
@@ -381,7 +383,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 miniRectY = miniRectHeight / 2;
             }
 
-            g.setColor(Color.WHITE);
+            g.setColor(ResourceManager.getColor("miniMapBorder.color"));
             /* Use Math max and min to prevent the rect from being larger than the minimap. */
             int miniRectMaxX = Math.max(miniRectX - miniRectWidth / 2, 0);
             int miniRectMaxY = Math.max(miniRectY - miniRectHeight / 2, 0);
@@ -394,11 +396,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             if(miniRectMaxY + miniRectMinHeight > height - 1) {
                 miniRectMaxY = height - miniRectMinHeight - 1;
             }
-            /* Draw the white rect. */
+            /* Draw the rect. */
             g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
-            /* Draw an additional white rect, if the whole map is shown on the minimap */
+            /* Draw an additional rect, if the whole map is shown on the minimap */
             if (adjustX > 0 && adjustY > 0) {
-                g.setColor(Color.WHITE);
+                g.setColor(ResourceManager.getColor("miniMapBorder.color"));
                 g.drawRect(0, 0, width - 1, height - 1);
             }
         }
