@@ -42,6 +42,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
@@ -158,57 +159,49 @@ public class IndianDemandMission extends Mission {
 
                 Player enemy = target.getOwner();
                 Goods goods = selectGoods(target);
+                int gold = 0;
+                int oldGoods = (goods == null) ? 0
+                    : unit.getGoodsContainer().getGoodsCount(goods.getType());
+                int oldGold = unit.getOwner().getGold();
                 if (goods == null) {
-                    if (enemy.getGold() == 0) {
-                        // give up
+                    if (enemy.getGold() <= 0) {
                         completed = true;
                         return;
                     }
-                    demandElement.setAttribute("gold", String.valueOf(enemy.getGold() / 20));
-                } else {
-                    demandElement.appendChild(goods.toXMLElement(null, demandElement.getOwnerDocument()));
+                    gold = enemy.getGold() / 20;
                 }
-                if (!unit.isVisibleTo(enemy)) {
-                    demandElement.appendChild(unit.toXMLElement(enemy, demandElement.getOwnerDocument()));
-                }
+                AIMessage.askIndianDemand(getAIUnit(), target, goods, gold);
 
-                Element reply = null;
-                try {
-                    reply = connection.ask(demandElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send \"demand\"-message!");
-                }
-                if (reply == null) {
-                    completed = true;
-                    return;
-                }
-
-                boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
-                int tension = 0;
-                int unitTension = unit.getOwner().getTension(enemy).getValue();
-                if (unit.getIndianSettlement() != null) {
-                    unitTension += unit.getIndianSettlement().getOwner().getTension(enemy).getValue();
-                }
-                int difficulty = getAIMain().getGame().getSpecification().getIntegerOption("model.option.nativeDemands")
-                    .getValue();
+                int unitTension = (unit.getIndianSettlement() == null) ? 0
+                    : unit.getIndianSettlement().getAlarm(enemy).getValue();
+                unitTension = Math.max(unitTension,
+                        unit.getOwner().getTension(enemy).getValue());
+                boolean accepted = (goods != null
+                    && unit.getGoodsContainer().getGoodsCount(goods.getType())
+                                    > oldGoods)
+                    || (gold > 0 && unit.getOwner().getGold() > oldGold);
                 if (accepted) {
-                    // TODO: if very happy, the brave should convert
-                    // TODO: Tension change should happen in server
-                    tension = -(5 - difficulty) * 50;
-                    unit.getOwner().modifyTension(enemy, tension);
-                    if (unitTension <= Tension.Level.HAPPY.getLimit() &&
-                        (goods == null || goods.getType().isFoodType())) {
-                        DeliverGiftMessage message = new DeliverGiftMessage(getUnit(), target, getUnit().getGoodsIterator().next());
-                        try {
-                            connection.sendAndWait(message.toXMLElement());
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"deliverGift\"-message!");
+                    if (unitTension <= Tension.Level.HAPPY.getLimit()) {
+                        Goods gift = null;
+                        if (goods == null) {
+                            List<Goods> carried = unit.getGoodsList();
+                            if (!carried.isEmpty()) {
+                                gift = Utils.getRandomMember(carried,
+                                                             getAIRandom());
+                            }
+                        } else {
+                            for (Goods g : unit.getGoodsList()) {
+                                if (g.getType() != goods.getType()) {
+                                    gift = g;
+                                    break;
+                                }
+                            }
+                        }
+                        if (gift != null) {
+                            AIMessage.askDeliverGift(getAIUnit(), target, gift);
                         }
                     }
                 } else {
-                    // TODO: Tension change should happen in server
-                    tension = (difficulty + 1) * 50;
-                    unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension >= Tension.Level.CONTENT.getLimit()) {
                         // if we didn't get what we wanted, attack
                         AIMessage.askAttack(getAIUnit(), r);

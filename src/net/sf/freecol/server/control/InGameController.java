@@ -104,6 +104,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
@@ -5103,8 +5104,9 @@ public final class InGameController extends Controller {
                 }
             } else if (loc.getTile() == null) {
                 throw new IllegalStateException("Carrier not on the map.");
-            } else if (oldLoc instanceof IndianSettlement) {
-                // Can not be co-located when buying from natives.
+            } else if (oldLoc instanceof Settlement) {
+                // Can not be co-located when buying from natives, or
+                // when natives are demanding goods from a colony.
             } else if (loc.getTile() != oldLoc.getTile()) {
                 throw new IllegalStateException("Goods and carrier not co-located.");
             }
@@ -6198,4 +6200,62 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), container);
         return cs.build(serverPlayer);
     }
+
+    /**
+     * Indians making demands of a colony.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
+     * @param unit The <code>Unit</code> making the demands.
+     * @param colony The <code>Colony</code> that is demanded of.
+     * @param goods The <code>Goods</code> being demanded.
+     * @param gold The amount of gold being demanded.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element indianDemand(ServerPlayer serverPlayer, Unit unit,
+                                Colony colony, Goods goods, int gold) {
+        ServerPlayer receiver = (ServerPlayer) colony.getOwner();
+        if (!receiver.isConnected()) {
+            return Message.clientError("No connection to colony owner");
+        }
+        boolean accepted;
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(receiver), ChangePriority.CHANGE_NORMAL,
+               new IndianDemandMessage(unit, colony, goods, gold));
+        try {
+            Element reply = askElement(receiver, cs);
+            accepted = Boolean.valueOf(reply.getAttribute("accepted"))
+                .booleanValue();
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
+
+        cs = new ChangeSet();
+        int difficulty = getGame().getSpecification()
+            .getIntegerOption("model.option.nativeDemands").getValue();
+        if (accepted) {
+            if (goods != null) {
+                GoodsContainer colonyContainer = colony.getGoodsContainer();
+                colonyContainer.saveState();
+                GoodsContainer unitContainer = unit.getGoodsContainer();
+                unitContainer.saveState();
+                moveGoods(goods, unit);
+                cs.add(See.only(receiver), colonyContainer);
+                cs.add(See.only(serverPlayer), unitContainer);
+            } else {
+                receiver.modifyGold(-gold);
+                serverPlayer.modifyGold(gold);
+                cs.addPartial(See.only(receiver), receiver, "gold");
+            }
+            cs.add(See.only(null).perhaps(receiver),
+                   serverPlayer.modifyTension(receiver, -(5 - difficulty) * 50));
+        } else {
+            cs.add(See.only(null).perhaps(receiver),
+                   serverPlayer.modifyTension(receiver, (difficulty + 1) * 50));
+        }
+
+        // Receiver certainly sees things happen.
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
+    }
+
 }

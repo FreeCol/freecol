@@ -81,6 +81,7 @@ import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
+import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
@@ -412,10 +413,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new DeliverGiftMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("indianDemand", new CurrentPlayerNetworkRequestHandler() {
+        register(IndianDemandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return indianDemand(connection, element);
+                return new IndianDemandMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(ClaimLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -1127,62 +1128,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(unit.toXMLElement(player,reply.getOwnerDocument()));
         }
         return reply;
-    }
-
-    /**
-     * Handles an "indianDemand"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element indianDemand(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Colony colony = (Colony) getGame().getFreeColGameObject(element.getAttribute("colony"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
-        }
-        if (colony == null) {
-            throw new IllegalArgumentException("Could not find 'Colony' with specified ID: "
-                    + element.getAttribute("colony"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.getTile().getDistanceTo(colony.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to colony!");
-        }
-        ServerPlayer receiver = (ServerPlayer) colony.getOwner();
-        if (receiver.isConnected()) {
-            int gold = 0;
-            Goods goods = null;
-            Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
-            if (goodsElement == null) {
-                gold = Integer.parseInt(element.getAttribute("gold"));
-            } else {
-                goods = new Goods(getGame(), goodsElement);
-            }
-            try {
-                Element reply = receiver.getConnection().ask(element);
-                boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
-                if (accepted) {
-                    if (goods == null) {
-                        receiver.modifyGold(-gold);
-                    } else {
-                        colony.getGoodsContainer().removeGoods(goods);
-                    }
-                }
-                return reply;
-            } catch (IOException e) {
-                logger.warning("Could not send \"demand\"-message!");
-            }
-        }
-        return null;
     }
 
     /**
