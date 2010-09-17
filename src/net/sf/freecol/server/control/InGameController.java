@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
@@ -52,6 +53,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -516,9 +518,11 @@ public final class InGameController extends Controller {
 
             csYearlyGoodsRemoval(serverPlayer, cs);
 
-            if (serverPlayer.getCurrentFather() == null
-                && serverPlayer.getPlayerType() == PlayerType.COLONIAL
-                && serverPlayer.getSettlements().size() > 0) {
+            FoundingFather father = serverPlayer.checkFoundingFather();
+            if (father != null) {
+                csAddFoundingFather(serverPlayer, father, cs);
+            }
+            if (serverPlayer.canRecruitFoundingFather()) {
                 final ServerPlayer threadPlayer = serverPlayer;
                 final List<FoundingFather> ffs
                     = getRandomFoundingFathers(serverPlayer);
@@ -736,6 +740,165 @@ public final class InGameController extends Controller {
     public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
         csYearlyGoodsRemoval(serverPlayer, cs);
+        sendElement(serverPlayer, cs);
+    }
+
+    /**
+     * Adds a founding father to a players continental congress.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to add to.
+     * @param father The <code>FoundingFather</code> to add.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csAddFoundingFather(ServerPlayer serverPlayer,
+                                    FoundingFather father, ChangeSet cs) {
+        Game game = getGame();
+        Specification spec = game.getSpecification();
+        Europe europe = serverPlayer.getEurope();
+        boolean europeDirty = false;
+
+        serverPlayer.addFather(father);
+
+        cs.addMessage(See.only(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
+                             "model.player.foundingFatherJoinedCongress",
+                             serverPlayer)
+                      .add("%foundingFather%", father.getNameKey())
+                      .add("%description%", father.getDescriptionKey()));
+        cs.addHistory(serverPlayer,
+            new HistoryEvent(getGame().getTurn(),
+                             HistoryEvent.EventType.FOUNDING_FATHER)
+                      .add("%father%", father.getNameKey()));
+
+        List<AbstractUnit> units = father.getUnits();
+        if (units != null && !units.isEmpty()) {
+            createUnits(father.getUnits(), serverPlayer);
+            cs.add(See.only(serverPlayer), europe);
+            europeDirty = true;
+        }
+
+        java.util.Map<UnitType, UnitType> upgrades = father.getUpgrades();
+        if (upgrades != null) {
+            for (Unit u : serverPlayer.getUnits()) {
+                UnitType newType = upgrades.get(u.getType());
+                if (newType != null) {
+                    u.setType(newType);
+                    cs.add(See.perhaps(), u);
+                }
+            }
+        }
+
+        for (Ability ability : father.getFeatureContainer().getAbilities()) {
+            if ("model.ability.addTaxToBells".equals(ability.getId())) {
+                // Provoke a tax/liberty recalculation
+                serverPlayer.setTax(serverPlayer.getTax());
+            }
+        }
+
+        for (Event event : father.getEvents()) {
+            String eventId = event.getId();
+            if (eventId.equals("model.event.resetNativeAlarm")) {
+                for (Player p : game.getPlayers()) {
+                    if (!p.isEuropean() && p.hasContacted(serverPlayer)) {
+                        p.setTension(serverPlayer,
+                                     new Tension(Tension.TENSION_MIN));
+                        for (IndianSettlement is : p.getIndianSettlements()) {
+                            if (is.hasContactedSettlement(serverPlayer)) {
+                                is.setAlarm(serverPlayer,
+                                            new Tension(Tension.TENSION_MIN));
+                                cs.add(See.only(serverPlayer), is);
+                            }
+                        }
+                    }
+                }
+
+            } else if (eventId.equals("model.event.boycottsLifted")) {
+                Market market = serverPlayer.getMarket();
+                for (GoodsType goodsType : spec.getGoodsTypeList()) {
+                    if (market.getArrears(goodsType) > 0) {
+                        market.setArrears(goodsType, 0);
+                        cs.add(See.only(serverPlayer),
+                               market.getMarketData(goodsType));
+                    }
+                }
+
+            } else if (eventId.equals("model.event.freeBuilding")) {
+                BuildingType type = spec.getBuildingType(event.getValue());
+                for (Colony colony : serverPlayer.getColonies()) {
+                    if (colony.canBuild(type)) {
+                        colony.addBuilding(new Building(game, colony, type));
+                        colony.getBuildQueue().remove(type);
+                        cs.add(See.only(serverPlayer), colony);
+                    }
+                }
+
+            } else if (eventId.equals("model.event.seeAllColonies")) {
+                for (Tile t : game.getMap().getAllTiles()) {
+                    Colony colony = t.getColony();
+                    if (colony != null
+                        && (ServerPlayer) colony.getOwner() != serverPlayer) {
+                        if (!t.isExploredBy(serverPlayer)) {
+                            t.setExploredBy(serverPlayer, true);
+                            cs.add(See.only(serverPlayer), t);
+                        }
+                        for (Tile x : t.getSurroundingTiles(1)) {
+                            if (!x.isExploredBy(serverPlayer)) {
+                                x.setExploredBy(serverPlayer, true);
+                                cs.add(See.only(serverPlayer), x);
+                            }
+                        }
+                    }
+                }
+
+            } else if (eventId.equals("model.event.increaseSonsOfLiberty")) {
+                int value = Integer.parseInt(event.getValue());
+                GoodsType bells = spec.getLibertyGoodsTypeList().get(0);
+                for (Colony colony : serverPlayer.getColonies()) {
+                    int requiredLiberty = ((colony.getSoL() + value)
+                                           * Colony.LIBERTY_PER_REBEL
+                                           * colony.getUnitCount()) / 100;
+                    GoodsContainer container = colony.getGoodsContainer();
+                    container.saveState();
+                    colony.addGoods(bells, requiredLiberty
+                                    - colony.getGoodsCount(bells));
+                    cs.add(See.only(serverPlayer), container);
+                }
+
+            } else if (eventId.equals("model.event.newRecruits")
+                       && europe != null) {
+                List<RandomChoice<UnitType>> recruits
+                    = serverPlayer.generateRecruitablesList();
+                FeatureContainer fc = serverPlayer.getFeatureContainer();
+                boolean changed = false;
+                for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
+                    if (!fc.hasAbility("model.ability.canRecruitUnit",
+                                       europe.getRecruitable(i))) {
+                        UnitType newType
+                            = RandomChoice.getWeightedRandom(random, recruits);
+                        europe.setRecruitable(i, newType);
+                        changed = true;
+                    }
+                }
+                if (!europeDirty && changed) {
+                    cs.add(See.only(serverPlayer), europe);
+                }
+            }
+        }
+        // Alas, have to update the whole player to get the father in.
+        cs.add(See.only(serverPlayer), serverPlayer);
+    }
+
+    /**
+     * Public version of csAddFoundingFather so it can be used in the
+     * test code and DebugMenu.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> who gains a father.
+     * @param father The <code>FoundingFather</code> to add.
+     */
+    public void addFoundingFather(ServerPlayer serverPlayer,
+                                  FoundingFather father) {
+        ChangeSet cs = new ChangeSet();
+        csAddFoundingFather(serverPlayer, father, cs);
         sendElement(serverPlayer, cs);
     }
 
@@ -2155,7 +2318,10 @@ public final class InGameController extends Controller {
         }
 
         // Replace the recruit we used.
-        europe.setRecruitable(index, serverPlayer.generateRecruitable());
+        List<RandomChoice<UnitType>> recruits
+            = serverPlayer.generateRecruitablesList();
+        europe.setRecruitable(index,
+            RandomChoice.getWeightedRandom(random, recruits));
         cs.add(See.only(serverPlayer), europe);
 
         // Return an informative message only if this was an ordinary

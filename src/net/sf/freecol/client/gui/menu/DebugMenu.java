@@ -62,6 +62,7 @@ import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerPlayer;
 
 
 public class DebugMenu extends JMenu {
@@ -239,10 +240,14 @@ public class DebugMenu extends JMenu {
                     ChoiceDialog<FoundingFather> choiceDialog =
                         new ChoiceDialog<FoundingFather>(canvas, fatherTitle,
                                                          "Cancel", fathers);
-                    FoundingFather fatherToAdd
+                    FoundingFather father
                         = canvas.showFreeColDialog(choiceDialog, null);
-                    player.addFather(fatherToAdd);
-                    serverPlayer.addFather(fatherToAdd);
+                    if (father != null) {
+                        InGameController igc = freeColClient.getFreeColServer()
+                            .getInGameController();
+                        igc.addFoundingFather((ServerPlayer) serverPlayer,
+                                              father);
+                    }
                 }
             });
 

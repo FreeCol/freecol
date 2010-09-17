@@ -26,13 +26,16 @@ import java.util.List;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -72,6 +75,7 @@ public class InGameControllerTest extends FreeColTestCase {
     UnitType kingsRegularType = spec().getUnitType("model.unit.kingsRegular");
     UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
     UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
+    UnitType statesmanType = spec().getUnitType("model.unit.elderStatesman");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
@@ -1739,5 +1743,120 @@ public class InGameControllerTest extends FreeColTestCase {
                      horsesAvail, camp.getGoodsCount(horsesType));
     }
 
-}
+    public void testAddFatherUnits() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
+        assertTrue(dutch.getUnits().isEmpty());
+        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
+        units.add(new AbstractUnit(colonistType, Unit.Role.DEFAULT, 1));
+        units.add(new AbstractUnit(statesmanType, Unit.Role.DEFAULT, 1));
+        FoundingFather father = new FoundingFather("father", spec());
+        father.setUnits(units);
+        igc.addFoundingFather(dutch, father);
+
+        assertEquals(2, dutch.getUnits().size());
+        assertEquals(statesmanType, dutch.getUnits().get(0).getType());
+        assertEquals(colonistType, dutch.getUnits().get(1).getType());
+    }
+
+    public void testAddFatherUpgrades() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+        Colony colony = getStandardColony(4);
+
+        colony.getUnitList().get(0).setType(colonistType);
+        colony.getUnitList().get(1).setType(colonistType);
+        colony.getUnitList().get(2).setType(colonistType);
+        colony.getUnitList().get(3).setType(indenturedServantType);
+
+        FoundingFather father = new FoundingFather("father", spec());
+        java.util.Map<UnitType, UnitType> upgrades = new HashMap<UnitType, UnitType>();
+        upgrades.put(indenturedServantType, colonistType);
+        upgrades.put(colonistType, statesmanType);
+        father.setUpgrades(upgrades);
+        igc.addFoundingFather((ServerPlayer) colony.getOwner(), father);
+
+        assertEquals(statesmanType, colony.getUnitList().get(0).getType());
+        assertEquals(statesmanType, colony.getUnitList().get(1).getType());
+        assertEquals(statesmanType, colony.getUnitList().get(2).getType());
+        assertEquals(colonistType, colony.getUnitList().get(3).getType());
+
+    }
+
+    public void testAddFatherBuildingEvent() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+        BuildingType press = spec().getBuildingType("model.building.printingPress");
+        Colony colony = getStandardColony(4);
+        assertEquals(null, colony.getBuilding(press));
+
+        FoundingFather father = new FoundingFather("father", spec());
+        List<Event> events = new ArrayList<Event>();
+        Event event = new Event("model.event.freeBuilding", spec());
+        event.setValue("model.building.printingPress");
+        events.add(event);
+        father.setEvents(events);
+        igc.addFoundingFather((ServerPlayer) colony.getOwner(), father);
+
+        assertTrue(colony.getBuilding(press) != null);
+    }
+
+    public void testPocahontas() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
+        Player indian = camp.getOwner();
+        Player.makeContact(indian, player);
+        camp.makeContactSettlement(player);
+
+        assertEquals("Initially, camp should be happy",
+            camp.getAlarm(player).getLevel(), Tension.Level.HAPPY);
+        igc.changeStance(indian, Stance.WAR, player, true);
+        assertEquals("Camp should be hateful if war occurs",
+            camp.getAlarm(player).getLevel(), Tension.Level.HATEFUL);
+
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.pocahontas");
+        igc.addFoundingFather((ServerPlayer) player, father);
+        assertEquals("Pocahontas should make all happy again",
+            camp.getAlarm(player).getLevel(), Tension.Level.HAPPY);
+    }
+
+    public void testLaSalle() {
+        Game game = start(getTestMap());
+        InGameController igc = (InGameController) server.getController();
+
+        Colony colony = getStandardColony(2);
+        Player player = colony.getOwner();
+        assertEquals(2, colony.getUnitCount());
+
+        // the colony has no stockade initially
+        BuildingType stockadeType = spec().getBuildingType("model.building.stockade");
+        Building b = colony.getBuilding(stockadeType);
+        assertNull(b);
+
+        // adding LaSalle should have no effect when population is 2
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.laSalle");
+        assertEquals("model.building.stockade", father.getEvents().get(0).getValue());
+        igc.addFoundingFather((ServerPlayer) player, father);
+        b = colony.getBuilding(stockadeType);
+        assertNull(b);
+
+        // increasing population to 3 should give access to stockade
+        Unit unit = new Unit(getGame(), colony.getTile(), player,
+                             colonistType, UnitState.ACTIVE);
+        // set the unit as a farmer in the colony
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        unit.setWorkType(foodType);
+        unit.setLocation(colony.getVacantColonyTileFor(unit, true, foodType));
+
+        b = colony.getBuilding(stockadeType);
+        assertNotNull(b);
+    }
+
+}

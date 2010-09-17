@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -376,6 +377,38 @@ public class ServerPlayer extends Player implements ServerModelObject {
     
     public void setRemainingEmigrants(int emigrants) {
         remainingEmigrants = emigrants;
+    }
+
+    /**
+     * Checks whether the current founding father has been recruited.
+     *
+     * @return The new founding father, or null if none available or ready.
+     */
+    public FoundingFather checkFoundingFather() {
+        FoundingFather father = null;
+        if (currentFather != null) {
+            int extraLiberty = getRemainingFoundingFatherCost();
+            if (extraLiberty <= 0) {
+                boolean overflow = getGameOptions()
+                    .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
+                setLiberty((overflow) ? -extraLiberty : 0);
+                father = currentFather;
+                currentFather = null;
+            }
+        }
+        return father;
+    }
+
+    /**
+     * Checks whether to start recruiting a founding father.
+     *
+     * @return True if a new father should be chosen.
+     */
+    public boolean canRecruitFoundingFather() {
+        return getPlayerType() == PlayerType.COLONIAL
+            && canHaveFoundingFathers()
+            && currentFather == null
+            && !getSettlements().isEmpty();
     }
 
     /**

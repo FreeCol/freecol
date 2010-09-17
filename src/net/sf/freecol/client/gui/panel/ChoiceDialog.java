@@ -127,8 +127,10 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            setResponse(((ChoiceItem<T>) choiceList.getSelectedValue()).getObject());
+        ChoiceItem<T> item;
+        if (OK.equals(command)
+            && (item = (ChoiceItem<T>) choiceList.getSelectedValue()) != null) {
+            setResponse(item.getObject());
         } else {
             super.actionPerformed(event);
         }

@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -38,10 +39,12 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.IMapGenerator;
@@ -157,6 +160,8 @@ public final class PreGameController extends Controller {
                 // Recruits may be determined by the difficulty level,
                 // or generated randomly.
                 Europe europe = player.getEurope();
+                List<RandomChoice<UnitType>> recruits
+                    = player.generateRecruitablesList();
                 for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                     String optionId = "model.option.recruitable.slot" + index;
                     if (getGame().getSpecification().hasOption(optionId)) {
@@ -167,7 +172,8 @@ public final class PreGameController extends Controller {
                             continue;
                         }
                     }
-                    europe.setRecruitable(index, player.generateRecruitable());
+                    europe.setRecruitable(index,
+                        RandomChoice.getWeightedRandom(random, recruits));
                 }
 
                 Market market = player.getMarket();

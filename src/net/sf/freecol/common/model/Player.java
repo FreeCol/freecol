@@ -294,7 +294,7 @@ public class Player extends FreeColGameObject implements Nameable {
     // any founding fathers in this Player's congress
     final private Set<FoundingFather> allFathers = new HashSet<FoundingFather>();
 
-    private FoundingFather currentFather;
+    protected FoundingFather currentFather;
 
     /** The current tax rate for this player. */
     private int tax = 0;
@@ -1513,6 +1513,16 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Add a founding father to the congress.
+     *
+     * @param father The <code>FoundingFather</code> to add.
+     */
+    public void addFather(FoundingFather father) {
+        allFathers.add(father);
+        featureContainer.add(father.getFeatureContainer());
+    }
+
+    /**
      * Sets this players liberty bell production to work towards recruiting
      * <code>father</code> to its congress.
      *
@@ -1566,115 +1576,6 @@ public class Player extends FreeColGameObject implements Nameable {
             previous += 2 * (index + 2);
         }
         return previous * base + count;
-    }
-
-    /**
-     * Adds a founding father to this player's continental congress.
-     *
-     * @param father a <code>FoundingFather</code> value
-     * @see FoundingFather
-     */
-    public void addFather(FoundingFather father) {
-        ModelController mc = getGame().getModelController();
-
-        allFathers.add(father);
-
-        addModelMessage(new ModelMessage("model.player.foundingFatherJoinedCongress", this)
-                        .add("%foundingFather%", father.getNameKey())
-                        .add("%description%", father.getDescriptionKey()));
-        history.add(new HistoryEvent(getGame().getTurn(), HistoryEvent.EventType.FOUNDING_FATHER)
-                    .add("%father%", father.getNameKey()));
-        featureContainer.add(father.getFeatureContainer());
-
-        List<AbstractUnit> units = father.getUnits();
-        if (units != null) {
-            // TODO: make use of armed, mounted, etc.
-            for (int index = 0; index < units.size(); index++) {
-                AbstractUnit unit = units.get(index);
-                String uniqueID = getId() + "newTurn" + father.getId() + index;
-                mc.createUnit(uniqueID, getEurope(), this, getSpecification().getUnitType(unit.getId()));
-            }
-        }
-
-        java.util.Map<UnitType, UnitType> upgrades = father.getUpgrades();
-        if (upgrades != null) {
-            Iterator<Unit> unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-                UnitType newType = upgrades.get(unit.getType());
-                if (newType != null) {
-                    unit.setType(newType);
-                }
-            }
-        }
-
-        for (Ability ability : father.getFeatureContainer().getAbilities()) {
-            if ("model.ability.addTaxToBells".equals(ability.getId())) {
-                updateAddTaxToLiberty();
-            }
-        }
-
-        for (Event event : father.getEvents()) {
-            String eventId = event.getId();
-            if (eventId.equals("model.event.resetNativeAlarm")) {
-                // reduce indian tension and alarm
-                for (Player player : getGame().getPlayers()) {
-                    if (!player.isEuropean() && player.hasContacted(this)) {
-                        player.setTension(this, new Tension(Tension.TENSION_MIN));
-                        for (IndianSettlement is : player.getIndianSettlements()) {
-                            if (is.hasContactedSettlement(this)) {
-                                is.setAlarm(this, new Tension(Tension.TENSION_MIN));
-                            }
-                        }
-                    }
-                }
-            } else if (eventId.equals("model.event.boycottsLifted")) {
-                for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                    getMarket().setArrears(goodsType, 0);
-                }
-            } else if (eventId.equals("model.event.freeBuilding")) {
-                BuildingType type = getSpecification().getBuildingType(event.getValue());
-                for (Colony colony : getColonies()) {
-                    if (colony.canBuild(type)) {
-                        // Need to use a `special' taskID to avoid collision
-                        // with other building tasks that complete this turn.
-                        String taskIDplus = colony.getId() + "buildBuilding" + father.getId();
-                        Building building = mc.createBuilding(taskIDplus, colony, type);
-                        colony.addBuilding(building);
-                        colony.getBuildQueue().remove(type);
-                    }
-                }
-            } else if (eventId.equals("model.event.seeAllColonies")) {
-                exploreAllColonies();
-            } else if (eventId.equals("model.event.increaseSonsOfLiberty")) {
-                int value = Integer.parseInt(event.getValue());
-                GoodsType bells = getSpecification().getLibertyGoodsTypeList().get(0);
-                for (Colony colony : getColonies()) {
-                    /*
-                     * The number of liberty to be generated in order to get the
-                     * appropriate SoL is determined by the formula: int
-                     * membership = ... in "colony.updateSoL()":
-                     */
-                    int requiredLiberty = ((colony.getSoL() + value) * Colony.LIBERTY_PER_REBEL *
-                                           colony.getUnitCount()) / 100;
-                    colony.addGoods(bells, requiredLiberty - colony.getGoodsCount(bells));
-                }
-            } else if (eventId.equals("model.event.newRecruits")) {
-                // TODO: when this goes into the server, bring
-                // generateRecruitable() et al with it as this is the last
-                // client-side user.
-                Europe europe = getEurope();
-                if (europe != null) {
-                    FeatureContainer fc = getFeatureContainer();
-                    for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                        if (!fc.hasAbility("model.ability.canRecruitUnit",
-                                           europe.getRecruitable(i))) {
-                            europe.setRecruitable(i, generateRecruitable());
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -2099,18 +2000,6 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         return recruitables;
-    }
-
-    /**
-     * Generates a random unit type recruitable by this player.
-     *
-     * @return A random recruitable unit type.
-     */
-    public UnitType generateRecruitable() {
-        List<RandomChoice<UnitType>> recruitables = generateRecruitablesList();
-        ModelController mc = getGame().getModelController();
-        int totalProbability = RandomChoice.getTotalProbability(recruitables);
-        return RandomChoice.select(recruitables, mc.getRandom("recruit." + getId(), totalProbability));
     }
 
     /**
@@ -2733,20 +2622,26 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the current amount of liberty this <code>Player</code> has.
      *
-     * @return This player's number of liberty earned towards the current Founding
-     *         Father.
+     * @return This player's number of liberty earned towards the
+     *     current Founding Father.
      * @see #incrementLiberty
      */
     public int getLiberty() {
-        if (!canHaveFoundingFathers()) {
-            return 0;
-        }
-        return liberty;
+        return (canHaveFoundingFathers()) ? liberty : 0;
     }
 
     /**
-     * Returns how many total liberty will be produced if no colonies are lost and
-     * nothing unexpected happens.
+     * Sets the current amount of liberty this player has.
+     *
+     * @param liberty The new amount of liberty.
+     */
+    public void setLiberty(int liberty) {
+        this.liberty = liberty;
+    }
+
+    /**
+     * Returns how many total liberty will be produced if no colonies
+     * are lost and nothing unexpected happens.
      *
      * @return Total number of liberty this <code>Player</code>'s
      *         <code>Colony</code>s will make.
@@ -2786,18 +2681,6 @@ public class Player extends FreeColGameObject implements Nameable {
          * their Magellan bonus the turn Magellan joins the congress.
          */
         if (isEuropean()) {
-            if (!hasAbility("model.ability.independenceDeclared") &&
-                getLiberty() >= getTotalFoundingFatherCost() &&
-                currentFather != null) {
-                // do this first, as the addition of the founding
-                // father will change the return value of
-                // getTotalFoundingFatherCost()
-                liberty -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ?
-                    getTotalFoundingFatherCost() : liberty;
-                addFather(currentFather);
-                currentFather = null;
-            }
-
             // CO: since the pioneer already finishes faster, changing
             // it at both locations would double the bonus.
             /**
@@ -2836,34 +2719,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 unit.newTurn();
             }
         }
-    }
-
-    private void exploreAllColonies() {
-        // explore all tiles surrounding colonies
-        ArrayList<Tile> tiles = new ArrayList<Tile>();
-        for (Tile tile: getGame().getMap().getAllTiles()) {
-            // no colony, move on
-            if (tile.getColony() == null) {
-                continue;
-            }
-            // Do not resend ours
-            // Not only is unnecessary, it will override players current info
-            //and create desynchronizations
-            if(tile.getColony().getOwner() == this){
-                continue;
-            }
-
-            tiles.add(tile);
-            for (Tile addTile: tile.getSurroundingTiles(1)) {
-                    // Do not send already explored tiles
-                    // also avoids sending info that may desynchronize the client
-                    if(addTile.isExploredBy(this)){
-                        continue;
-                    }
-                    tiles.add(addTile);
-                }
-            }
-        getGame().getModelController().exploreTiles(this, tiles);
     }
 
     /**
@@ -2961,14 +2816,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new tax.
      */
     public void setTax(int amount) {
-        if (amount != tax) {
-            tax = amount;
-            updateAddTaxToLiberty();
-        }
-    }
+        tax = amount;
 
-    private void updateAddTaxToLiberty() {
-        Set<Modifier> libertyBonus = featureContainer.getModifierSet("model.goods.bells");
+        Set<Modifier> libertyBonus
+            = featureContainer.getModifierSet("model.goods.bells");
         for (Ability ability : featureContainer.getAbilitySet("model.ability.addTaxToBells")) {
             FreeColGameObjectType source = ability.getSource();
             if (source != null) {
@@ -3491,9 +3342,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 for (int index = 0; index < length; index++) {
                     String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
                     FoundingFather father = getSpecification().getFoundingFather(fatherId);
-                    allFathers.add(father);
-                    // add only features, no other effects
-                    featureContainer.add(father.getFeatureContainer());
+                    addFather(father);
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(STANCE_TAG)) {
