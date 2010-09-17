@@ -345,15 +345,11 @@ public final class TileType extends FreeColGameObjectType {
             .getValue();
         primaryGoods = getPrimaryGoods(tileProduction);
         secondaryGoods = getSecondaryGoods(tileProduction);
-        // remove old modifiers
-        if (production != null) {
-            for (AbstractGoods goods : production) {
-                Modifier oldModifier = new Modifier(goods.getType().getId(), this, goods.getAmount(),
-                                                    Modifier.Type.ADDITIVE);
-                getFeatureContainer().removeModifier(oldModifier);
-            }
-        }
         production = getProduction(tileProduction);
+        // remove old modifiers
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+            getFeatureContainer().removeModifiers(goodsType.getId());
+        }
         // add new modifiers
         for (AbstractGoods goods : production) {
             addModifier(new Modifier(goods.getType().getId(), this, goods.getAmount(),
