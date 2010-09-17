@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -163,16 +164,9 @@ public class IndianBringGiftMission extends Mission {
             if (r != null && 
                 getUnit().getTile().getNeighbourOrNull(r) == target.getTile()) {
                 // We have arrived.
-                DeliverGiftMessage message = new DeliverGiftMessage(getUnit(), target, getUnit().getGoodsIterator().next());
-                try {
-                    connection.sendAndWait(message.toXMLElement());
-                } catch (IOException e) {
-                    logger.warning("Could not send \"deliverGift\"-message!");
-                }
-
+                AIMessage.askDeliverGift(getAIUnit(), target,
+                                         getUnit().getGoodsIterator().next());
                 giftDelivered = true;
-                // TODO: Tension change should happen in server
-                getUnit().getOwner().modifyTension(target.getOwner(), 1);
             }
         }
 
