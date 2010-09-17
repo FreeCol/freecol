@@ -461,41 +461,42 @@ public final class InGameController extends Controller {
             return null;
         }
 
+        ChangeSet cs = new ChangeSet();
+        // Check for new turn.
         if (game.isNextPlayerInNewTurn()) {
-            ChangeSet cs = new ChangeSet();
-            game.newTurn();
-            if (game.getTurn().getAge() > 1 && !game.getSpanishSuccession()) {
-                csSpanishSuccession(cs);
-                game.setSpanishSuccession(true);
-            }
-            if (debugOnlyAITurns > 0) debugOnlyAITurns--;
+            game.setTurn(game.getTurn().next());
             cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                 "turn", Integer.toString(game.getTurn().getNumber()));
-            sendToAll(cs);
+            logger.info("Turn is now " + game.getTurn().toString());
+
+            // TODO: player.newTurn must move to the server.
+            for (Player player : game.getPlayers()) {
+                logger.info("Calling newTurn for player " + player.getName());
+                player.newTurn();
+            }
+
+            if (game.getTurn().getAge() > 1 && !game.getSpanishSuccession()) {
+                csSpanishSuccession(cs);
+            }
+            if (debugOnlyAITurns > 0) debugOnlyAITurns--;
         }
 
-        ServerPlayer newPlayer = (ServerPlayer) game.getNextPlayer();
+        // Find the next player, removing ones that are now dead.
+        ServerPlayer newPlayer;
+        while ((newPlayer = (ServerPlayer) game.getNextPlayer()) != null
+               && newPlayer.checkForDeath()) {
+            csKillPlayer(newPlayer, cs);
+            logger.info(newPlayer.getNation() + " is dead.");
+        }
         game.setCurrentPlayer(newPlayer);
-        if (newPlayer != null) {
-            synchronized (newPlayer) {
-                if (newPlayer.checkForDeath()) {
-                    ChangeSet cs = new ChangeSet();
-                    csKillPlayer(newPlayer, cs);
-                    logger.info(newPlayer.getNation() + " is dead.");
-                    sendToAll(cs);
-                    return nextPlayer();
-                }
-            }
 
-            {
-                ChangeSet cs = new ChangeSet();
-                csNewTurn(newPlayer, cs);
-                cs.addTrivial(See.all(), "setCurrentPlayer",
-                              ChangePriority.CHANGE_NORMAL,
-                              "player", newPlayer.getId());
-                sendToAll(cs);
-            }
-        }
+        // Do "new turn"-like actions that need to wait until right
+        // before the player is about to move.
+        csStartTurn(newPlayer, cs);
+        cs.addTrivial(See.all(), "setCurrentPlayer", ChangePriority.CHANGE_LATE,
+                      "player", newPlayer.getId());
+        sendToAll(cs);
+
         return newPlayer;
     }
 
@@ -508,19 +509,19 @@ public final class InGameController extends Controller {
      * @param newPlayer The <code>ServerPlayer</code> to start a turn for.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csNewTurn(ServerPlayer newPlayer, ChangeSet cs) {
+    private void csStartTurn(ServerPlayer serverPlayer, ChangeSet cs) {
         Game game = getGame();
-        if (newPlayer.isEuropean()) {
-            csBombardEnemyShips(newPlayer, cs);
+        if (serverPlayer.isEuropean()) {
+            csBombardEnemyShips(serverPlayer, cs);
 
-            csYearlyGoodsRemoval(newPlayer, cs);
+            csYearlyGoodsRemoval(serverPlayer, cs);
 
-            if (newPlayer.getCurrentFather() == null
-                && newPlayer.getPlayerType() == PlayerType.COLONIAL
-                && newPlayer.getSettlements().size() > 0) {
-                final ServerPlayer threadPlayer = newPlayer;
+            if (serverPlayer.getCurrentFather() == null
+                && serverPlayer.getPlayerType() == PlayerType.COLONIAL
+                && serverPlayer.getSettlements().size() > 0) {
+                final ServerPlayer threadPlayer = serverPlayer;
                 final List<FoundingFather> ffs
-                    = getRandomFoundingFathers(newPlayer);
+                    = getRandomFoundingFathers(serverPlayer);
                 Thread t = new Thread(FreeCol.SERVER_THREAD+"FoundingFather") {
                         public void run() {
                             chooseFoundingFather(threadPlayer, ffs);
@@ -529,11 +530,11 @@ public final class InGameController extends Controller {
                 t.start();
             }
 
-            Monarch monarch = newPlayer.getMonarch();
+            Monarch monarch = serverPlayer.getMonarch();
             if (monarch != null) {
                 MonarchAction action;
                 if (debugMonarchAction != null
-                    && newPlayer == debugMonarchPlayer) {
+                    && serverPlayer == debugMonarchPlayer) {
                     action = debugMonarchAction;
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
@@ -541,10 +542,10 @@ public final class InGameController extends Controller {
                     action = RandomChoice.getWeightedRandom(random,
                             monarch.getActionChoices());
                 }
-                if (action != null) monarchAction(newPlayer, action);
+                if (action != null) monarchAction(serverPlayer, action);
             }
 
-        } else if (newPlayer.isIndian()) {
+        } else if (serverPlayer.isIndian()) {
             // We do not have to worry about Player level stance
             // changes driving Stance, as that is delegated to the AI.
             //
@@ -555,7 +556,7 @@ public final class InGameController extends Controller {
             // levels and check if they have changed after applying
             // all the changes.
             List<IndianSettlement> allSettlements
-                = newPlayer.getIndianSettlements();
+                = serverPlayer.getIndianSettlements();
             java.util.Map<IndianSettlement,
                 java.util.Map<Player, Tension.Level>> oldLevels
                 = new HashMap<IndianSettlement,
@@ -635,10 +636,10 @@ public final class InGameController extends Controller {
 
             // Calm down a bit at the whole-tribe level.
             for (Player enemy : game.getEuropeanPlayers()) {
-                if (newPlayer.getTension(enemy).getValue() > 0) {
-                    int change = -newPlayer.getTension(enemy).getValue()/100
+                if (serverPlayer.getTension(enemy).getValue() > 0) {
+                    int change = -serverPlayer.getTension(enemy).getValue()/100
                         - 4;
-                    newPlayer.modifyTension(enemy, change);
+                    serverPlayer.modifyTension(enemy, change);
                 }
             }
 
@@ -660,7 +661,7 @@ public final class InGameController extends Controller {
             // Check for braves converted by missionaries
             List<UnitType> converts = game.getSpecification()
                 .getUnitTypesWithAbility("model.ability.convert");
-            StringTemplate nation = newPlayer.getNationName();
+            StringTemplate nation = serverPlayer.getNationName();
             for (IndianSettlement settlement : allSettlements) {
                 if (settlement.checkForNewMissionaryConvert()) {
                     Unit missionary = settlement.getMissionary();
@@ -796,12 +797,11 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Checks for an performs the War of Spanish Succession changes.
+     * Checks for and performs the War of Spanish Succession changes.
      *
      * @param cs A <code>ChangeSet</code> to update.
-     * @return True if the Spanish Succession event occurred.
      */
-    private boolean csSpanishSuccession(ChangeSet cs) {
+    private void csSpanishSuccession(ChangeSet cs) {
         Game game = getGame();
         Player weakestAIPlayer = null;
         Player strongestAIPlayer = null;
@@ -870,9 +870,9 @@ public final class InGameController extends Controller {
             }
             weakestAIPlayer.setDead(true);
             cs.addDead((ServerPlayer) weakestAIPlayer);
-            return true;
+            game.setSpanishSuccession(true);
+            cs.addPartial(See.all(), game, "spanishSuccession");
         }
-        return false;
     }
     
     /**

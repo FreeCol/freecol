@@ -940,6 +940,13 @@ public class Game extends FreeColGameObject {
         return specification;
     }
 
+    /**
+     * Need to overwrite behavior of equals inherited from FreeColGameObject,
+     * since two games are not the same if the have the same id.
+     */
+    public boolean equals(Object o) {
+        return this == o;
+    }
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -1135,20 +1142,37 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Partial writer, so that simple updates can be brief.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException If there are problems writing the stream.
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * Partial reader, so that simple updates can be brief.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException If there are problems reading the stream.
+     */
+    @Override
+    protected void readFromXMLPartialImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
      * Returns the tag name of the root element representing this object.
      * 
      * @return the tag name.
      */
     public static String getXMLElementTagName() {
         return "game";
-    }
-    
-    /**
-     * Need to overwrite behavior of equals inherited from FreeColGameObject,
-     * since two games are not the same if the have the same id.
-     */
-    public boolean equals(Object o) {
-        return this == o;
     }
     
 }
