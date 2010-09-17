@@ -2306,6 +2306,7 @@ public final class InGameController extends Controller {
             break;
         case RECRUIT:
             serverPlayer.modifyGold(-europe.getRecruitPrice());
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
             europe.increaseRecruitmentDifficulty();
             // Fall through
         case NORMAL:
