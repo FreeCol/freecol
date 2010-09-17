@@ -42,6 +42,12 @@ public class OptionGroup extends AbstractOption {
 
     private LinkedHashMap<String, Option> options;
 
+    /**
+     * Describe optionGroups here.
+     */
+    private List<OptionGroup> optionGroups = new ArrayList<OptionGroup>();
+
+
 
     /**
      * Creates a new <code>OptionGroup</code>.
@@ -87,6 +93,7 @@ public class OptionGroup extends AbstractOption {
                 add(option);
             }
         }
+        optionGroups.add(group);
     }
 
 
@@ -114,6 +121,15 @@ public class OptionGroup extends AbstractOption {
      */
     public Option getOption(String id) {
         return options.get(id);
+    }
+
+    /**
+     * Get the <code>OptionGroups</code> value.
+     *
+     * @return a <code>List<OptionGroup></code> value
+     */
+    public final List<OptionGroup> getOptionGroups() {
+        return optionGroups;
     }
 
     /**
