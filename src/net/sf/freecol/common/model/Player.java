@@ -955,8 +955,9 @@ public class Player extends FreeColGameObject implements Nameable {
         // default name will be filled in.
         if (settlementNames == null) return ASSIGN_SETTLEMENT_NAME;
 
-        if (!settlementNames.isEmpty()) {
-            return settlementNames.remove(0);
+        while (!settlementNames.isEmpty()) {
+            String name = settlementNames.remove(0);
+            if (game.getSettlement(name) == null) return name;
         }
 
         // Fallback method
