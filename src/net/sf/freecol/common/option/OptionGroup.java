@@ -21,8 +21,6 @@ package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -40,13 +38,7 @@ public class OptionGroup extends AbstractOption {
 
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
-    private LinkedHashMap<String, Option> options;
-
-    /**
-     * Describe optionGroups here.
-     */
-    private List<OptionGroup> optionGroups = new ArrayList<OptionGroup>();
-
+    private ArrayList<Option> options;
 
 
     /**
@@ -56,7 +48,7 @@ public class OptionGroup extends AbstractOption {
      */
     public OptionGroup(String id) {
         super(id);
-        options = new LinkedHashMap<String, Option>();
+        options = new ArrayList<Option>();
     }
     
     /**
@@ -75,25 +67,7 @@ public class OptionGroup extends AbstractOption {
     *               added to this <code>OptionGroup</code>.
     */
     public void add(Option option) {
-        options.put(option.getId(), option);
-    }
-
-
-    /**
-     * Adds the given <code>Option</code>.
-     * @param option The <code>Option</code> that should be
-     *               added to this <code>OptionGroup</code>.
-     */
-    public void add(OptionGroup group) {
-        List<Option> otherOptions = new ArrayList<Option>(group.options.values());
-        for (Option option : otherOptions) {
-            if (option instanceof OptionGroup) {
-                add((OptionGroup) option);
-            } else {
-                add(option);
-            }
-        }
-        optionGroups.add(group);
+        options.add(option);
     }
 
 
@@ -110,26 +84,7 @@ public class OptionGroup extends AbstractOption {
     * @return The <code>Iterator</code>.
     */
     public Iterator<Option> iterator() {
-        return options.values().iterator();
-    }
-
-    /**
-     * Return the Option with the given id.
-     *
-     * @param id a <code>String</code> value
-     * @return an <code>Option</code> value
-     */
-    public Option getOption(String id) {
-        return options.get(id);
-    }
-
-    /**
-     * Get the <code>OptionGroups</code> value.
-     *
-     * @return a <code>List<OptionGroup></code> value
-     */
-    public final List<OptionGroup> getOptionGroups() {
-        return optionGroups;
+        return options.iterator();
     }
 
     /**
@@ -144,8 +99,9 @@ public class OptionGroup extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        for (Option option : options.values()) {
-            option.toXML(out);
+        Iterator<Option> oi = options.iterator();
+        while (oi.hasNext()) {
+            (oi.next()).toXML(out);
         }
 
         out.writeEndElement();

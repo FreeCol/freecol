@@ -64,9 +64,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
         String[] strings = option.getItemValues().values().toArray(new String[0]);
 
         setModel(new DefaultComboBoxModel(strings));
-        if (option.getValue() >= 0 && option.getValue() < strings.length) {
-            setSelectedIndex(option.getValue());
-        }
+        setSelectedIndex(option.getValue());
         
         setEnabled(editable);
         addActionListener(new ActionListener () {
