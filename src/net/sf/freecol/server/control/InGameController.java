@@ -5532,6 +5532,8 @@ public final class InGameController extends Controller {
         unit.setState(UnitState.IN_COLONY);
         unit.setLocation(settlement);
         unit.setMovesLeft(0);
+        csRemoveEquipment(serverPlayer, unit, settlement,
+            new HashSet<EquipmentType>(unit.getEquipment().keySet()), 0, cs);
 
         // Update with settlement tile, and newly owned tiles.
         List<FreeColGameObject> tiles = new ArrayList<FreeColGameObject>();
