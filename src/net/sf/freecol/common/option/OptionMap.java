@@ -29,8 +29,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
@@ -74,7 +72,6 @@ public abstract class OptionMap extends OptionGroup {
         this.specification = specification;
         
         addDefaultOptions();
-        //addToMap(this);
     }
 
     /**
@@ -189,28 +186,6 @@ public abstract class OptionMap extends OptionGroup {
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No File associated with the specified option.");
         }
-    }
-
-    /**
-    * Adds the <code>Option</code>s from the given <code>OptionGroup</code>
-    * to the <code>Map</code>. This is done recursively if the specified
-    * group has any sub-groups.
-    * 
-    * @param og The <code>OptionGroup</code> to be added.
-    */
-    public void addToMap(OptionGroup og) {
-        /*
-        Iterator<Option> it = og.iterator();
-        while (it.hasNext()) {
-            Option option = it.next();
-            if (option instanceof OptionGroup) {
-                addToMap((OptionGroup) option);
-            } else {
-                values.put(option.getId(), option);
-            }
-        }
-        */
-        add(og);
     }
 
     /**
@@ -333,6 +308,8 @@ public abstract class OptionMap extends OptionGroup {
      *      to the stream.
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        // This method is identical to the superclass method,
+        // EXCEPT FOR the tag name
         // Start element:
         out.writeStartElement(xmlTagName);
 

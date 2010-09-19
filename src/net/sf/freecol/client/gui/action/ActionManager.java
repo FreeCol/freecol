@@ -52,7 +52,6 @@ public class ActionManager extends OptionGroup {
 
         initializeActions();
         freeColClient.getClientOptions().add(this);
-        freeColClient.getClientOptions().addToMap(this);
     }
 
 
