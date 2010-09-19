@@ -20,7 +20,10 @@
 package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -38,7 +41,9 @@ public class OptionGroup extends AbstractOption {
 
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
-    private ArrayList<Option> options;
+    private List<Option> options = new ArrayList<Option>();
+
+    private Map<String, Option> optionMap = new HashMap<String, Option>();
 
 
     /**
@@ -48,7 +53,6 @@ public class OptionGroup extends AbstractOption {
      */
     public OptionGroup(String id) {
         super(id);
-        options = new ArrayList<Option>();
     }
     
     /**
@@ -67,15 +71,41 @@ public class OptionGroup extends AbstractOption {
     *               added to this <code>OptionGroup</code>.
     */
     public void add(Option option) {
-        options.add(option);
+        String id = option.getId();
+        if (optionMap.containsKey(id)) {
+            for (int index = 0; index < options.size(); index++) {
+                if (id.equals(options.get(index).getId())) {
+                    options.remove(index);
+                    options.add(index, option);
+                    break;
+                }
+            }
+        } else {
+            options.add(option);
+        }
+        optionMap.put(id, option);
+        if (option instanceof OptionGroup) {
+            for (Option o : ((OptionGroup) option).getOptions()) {
+                optionMap.put(o.getId(), o);
+            }
+        }
     }
 
+
+    private List<Option> getOptions() {
+        return options;
+    }
+
+    public Option getOption(String id) {
+        return optionMap.get(id);
+    }
 
     /**
     * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
     */
     public void removeAll() {
         options.clear();
+        optionMap.clear();
     }
 
 
@@ -115,7 +145,7 @@ public class OptionGroup extends AbstractOption {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        if(id != null){
+        if (id != null) {
             setId(id);
         }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

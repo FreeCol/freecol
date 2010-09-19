@@ -64,7 +64,12 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
         String[] strings = option.getItemValues().values().toArray(new String[0]);
 
         setModel(new DefaultComboBoxModel(strings));
-        setSelectedIndex(option.getValue());
+        if (option.getValue() < strings.length) {
+            setSelectedIndex(option.getValue());
+        } else {
+            // TODO: fix this. It happens only for the option "difficulty level"
+            logger.warning("SelectOption " + option.getId() + " has invalid value.");
+        }
         
         setEnabled(editable);
         addActionListener(new ActionListener () {
