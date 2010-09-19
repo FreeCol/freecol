@@ -443,7 +443,8 @@ public class SimpleCombatModel extends CombatModel {
                 crs.add(CombatResult.WIN);
                 resolveAttack(attackerUnit, defenderUnit, great, r / odds.win,
                               crs);
-            } else if (r < 0.8f * odds.win + 0.2f && defenderUnit.isNaval()) {
+            } else if (r < 0.8f * odds.win + 0.2f
+                       && defenderUnit.hasAbility("model.ability.evadeAttack")) {
                 crs.add(CombatResult.NO_RESULT);
                 crs.add(CombatResult.EVADE_ATTACK);
             } else {
