@@ -726,6 +726,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             // remove property listeners
             if (colony != null) {
                 colony.removePropertyChangeListener(this);
+                colony.getTile().removePropertyChangeListener(this);
                 colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE, outsideColonyPanel);
                 colony.getGoodsContainer().removePropertyChangeListener(warehousePanel);
             }
@@ -734,6 +735,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
             buildingsPanel.removePropertyChangeListeners();
             tilePanel.removePropertyChangeListeners();
+            constructionPanel.removePropertyChangeListeners();
             cargoPanel.setCarrier(null);
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
