@@ -39,12 +39,12 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
-import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -91,9 +91,11 @@ public final class MapControls {
         ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(SentryAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.id)));
-        for (ImprovementActionType iaType : freeColClient.getGame().getSpecification()
-                 .getImprovementActionTypeList()) {
-            ubList.add(new UnitButton(am.getFreeColAction(iaType.getId())));
+        for (TileImprovementType type : freeColClient.getGame().getSpecification()
+                 .getTileImprovementTypeList()) {
+            if (!type.isNatural()) {
+                ubList.add(new UnitButton(am.getFreeColAction(type.getShortId() + "Action")));
+            }
         }
         ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.id)));

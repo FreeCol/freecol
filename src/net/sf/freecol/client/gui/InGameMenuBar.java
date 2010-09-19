@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.TileImprovementType;
 
 /**
  * This is the menu bar used in-game.
@@ -189,11 +190,12 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(BuildColonyAction.id));
         // Insert all Improvements here:
-        for (ImprovementActionType iaType : freeColClient.getGame().getSpecification()
-                 .getImprovementActionTypeList()) {
-            menu.add(getMenuItem(iaType.getId()));
+        for (TileImprovementType type : freeColClient.getGame().getSpecification()
+                 .getTileImprovementTypeList()) {
+            if (!type.isNatural()) {
+                menu.add(getMenuItem(type.getShortId() + "Action"));
+            }
         }
-
         menu.addSeparator();
 
         menu.add(getMenuItem(LoadAction.id));

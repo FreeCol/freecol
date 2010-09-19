@@ -132,6 +132,17 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return scopes;
     }
 
+    /**
+     * Return an ID of an appropriate action.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getShortId() {
+        int index = getId().lastIndexOf('.') + 1;
+        return getId().substring(index);
+    }
+
+
     public boolean isWorkerTypeAllowed(UnitType unitType) {
         return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getId());
     }

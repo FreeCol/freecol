@@ -565,33 +565,6 @@
     </tileimprovement-type>
   </tileimprovement-types>
 
-  <!--
-      For each improvement-action, there is a single accelerator. So in the event that two improvement-types
-      share the same accelerator, like Plow and RemoveForest. The valid TileTypes for the actions are
-      referenced from the Improvement List above, so the onus is on the person modifying to declare the
-      previous section.
-      All actions sharing an accelerator should be mutually exclusive, but the first action takes priority
-      during checking. If the first action cannot be performed, the second and subsequent actions will be
-      considered.
-      Structure:
-      <improvementaction-type id="plowAction" accelerator='P'>
-        <action tileimprovement-type="model.improvement.plow" name="model.improvement.plow.action" image-id="5"/>
-        <action tileimprovement-type="model.improvement.clearForest" name="model.improvement.clearForest.action" image-id="4"/>
-      </improvementaction-type>
-      Notes:
-      image-id is the reference for the unit-button index in ImageLibrary.java
-      Keep the ids in alphabetical order. Not mandatory, but neater.
-      -->
-  <improvementaction-types>
-    <improvementaction-type id="impPlowAction" accelerator="P">
-      <action tileimprovement-type="model.improvement.plow" name="model.improvement.plow.action" image-id="plow"/>
-      <action tileimprovement-type="model.improvement.clearForest" name="model.improvement.clearForest.action" image-id="clear"/>
-    </improvementaction-type>
-    <improvementaction-type id="impRoadAction" accelerator="R">
-      <action tileimprovement-type="model.improvement.road" name="model.improvement.road.action" image-id="road"/>
-    </improvementaction-type>
-  </improvementaction-types>
-
   <unit-types>
     <!-- ATTENTION: skillTaught can NOT be inherited because it defaults to the unit type itself! -->
     <unit-type id="colonist" abstract="true" offence="0" defence="1" movement="3" lineOfSight="1">

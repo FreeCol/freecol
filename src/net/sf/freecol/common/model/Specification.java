@@ -40,7 +40,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -118,8 +117,6 @@ public final class Specification {
     private final List<TileType> tileTypeList = new ArrayList<TileType>();
 
     private final List<TileImprovementType> tileImprovementTypeList = new ArrayList<TileImprovementType>();
-
-    private final List<ImprovementActionType> improvementActionTypeList = new ArrayList<ImprovementActionType>();
 
     private final List<UnitType> unitTypeList = new ArrayList<UnitType>();
     private final List<UnitType> unitTypesTrainedInEurope = new ArrayList<UnitType>();
@@ -209,8 +206,6 @@ public final class Specification {
                       new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
         readerMap.put("goods-types",
                       new TypeReader<GoodsType>(GoodsType.class, goodsTypeList));
-        readerMap.put("improvementaction-types",
-                      new TypeReader<ImprovementActionType>(ImprovementActionType.class, improvementActionTypeList));
         readerMap.put("indian-nation-types",
                       new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
         readerMap.put("resource-types",
@@ -807,15 +802,6 @@ public final class Specification {
         return getType(id, TileImprovementType.class);
     }
 
-    // -- Improvement Actions --
-    public List<ImprovementActionType> getImprovementActionTypeList() {
-        return improvementActionTypeList;
-    }
-
-    public ImprovementActionType getImprovementActionType(String id) {
-        return getType(id, ImprovementActionType.class);
-    }
-
     // -- Units --
     public List<UnitType> getUnitTypeList() {
         return unitTypeList;
@@ -1065,7 +1051,6 @@ public final class Specification {
         writeSection(out, "tile-types", tileTypeList);
         writeSection(out, "equipment-types", equipmentTypes);
         writeSection(out, "tileimprovement-types", tileImprovementTypeList);
-        writeSection(out, "improvementaction-types", improvementActionTypeList);
         writeSection(out, "unit-types", unitTypeList);
         writeSection(out, "building-types", buildingTypeList);
         writeSection(out, "founding-fathers", foundingFathers);
@@ -1115,7 +1100,18 @@ public final class Specification {
             logger.finest("Found child named " + childName);
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
-                throw new RuntimeException("unexpected: " + childName);
+                if ("improvementaction-types".equals(childName)) {
+                    // TODO: remove compatibility code
+                    logger.finest("Found improvementaction-types.");
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        // skip children
+                        while ("action".equals(xsr.getLocalName())) {
+                            xsr.nextTag();
+                        }
+                    }
+                } else {
+                    throw new RuntimeException("unexpected: " + childName);
+                }
             } else {
                 reader.readChildren(xsr, this);
             }

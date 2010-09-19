@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -143,9 +144,10 @@ public class ActionManager extends OptionGroup {
      */
     public void addSpecificationActions(Specification specification) {
         // Initialize ImprovementActions
-        for (ImprovementActionType ia
-                 : specification.getImprovementActionTypeList()) {
-            add(new ImprovementAction(freeColClient, ia));
+        for (TileImprovementType type : specification.getTileImprovementTypeList()) {
+            if (!type.isNatural()) {
+                add(new ImprovementAction(freeColClient, type));
+            }
         }
     }
 
