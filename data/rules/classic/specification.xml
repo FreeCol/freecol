@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.45 -->
+<!-- specification version 0.50 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -1659,146 +1659,150 @@
     </difficultyLevel>
   </difficultyLevels>
   <options>
-    <optionGroup id="gameOptions.map">
-      <!-- Enables/disables fog of war -->
-      <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
-      <!-- Whether to award exploration points or not -->
-      <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
-      <!-- The number of turns it takes to sail between Europe and the New World -->
-      <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+    <optionGroup id="gameOptions">
+      <optionGroup id="gameOptions.map">
+        <!-- Enables/disables fog of war -->
+        <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
+        <!-- Whether to award exploration points or not -->
+        <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
+        <!-- The number of turns it takes to sail between Europe and the New World -->
+        <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+      </optionGroup>
+      <optionGroup id="gameOptions.colony">
+        <!-- Does the Custom House sell boycotted goods -->
+        <booleanOption id="model.option.customIgnoreBoycott" defaultValue="true"/>
+        <!-- Whether experts have connections, producing without raw materials in factories -->
+        <booleanOption id="model.option.expertsHaveConnections" defaultValue="true"/>
+        <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
+        <!-- Whether to educate the least skilled unit first -->
+        <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
+      </optionGroup>
+      <optionGroup id="gameOptions.victoryConditions">
+        <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
+        <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
+        <!-- Victory condition: Should a player who first defeats all other european players win the game? -->
+        <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
+        <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
+        <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
+      </optionGroup>
+      <optionGroup id="gameOptions.difficultySettings">
+        <rangeOption id="model.option.difficulty" defaultValue="2" localizedLabels="true">
+          <rangeValue label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
+          <rangeValue label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
+          <rangeValue label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
+          <rangeValue label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
+          <rangeValue label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
+        </rangeOption>
+      </optionGroup>
     </optionGroup>
-    <optionGroup id="gameOptions.colony">
-      <!-- Does the Custom House sell boycotted goods -->
-      <booleanOption id="model.option.customIgnoreBoycott" defaultValue="true"/>
-      <!-- Whether experts have connections, producing without raw materials in factories -->
-      <booleanOption id="model.option.expertsHaveConnections" defaultValue="true"/>
-      <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
-      <!-- Whether to educate the least skilled unit first -->
-      <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
-    </optionGroup>
-    <optionGroup id="gameOptions.victoryConditions">
-      <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
-      <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
-      <!-- Victory condition: Should a player who first defeats all other european players win the game? -->
-      <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
-      <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
-      <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
-    </optionGroup>
-    <optionGroup id="gameOptions.difficultySettings">
-      <rangeOption id="model.option.difficulty" defaultValue="2" localizedLabels="true">
-        <rangeValue label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
-        <rangeValue label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
-        <rangeValue label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
-        <rangeValue label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
-        <rangeValue label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
-      </rangeOption>
-    </optionGroup>
-    <optionGroup id="mapGeneratorOptions.import" >
-      <!-- Option for setting a file to be imported (map etc). -->
-      <fileOption id="model.option.importFile"/>
-      <!-- Option for using the terrain imported from a file. -->
-      <booleanOption id="model.option.importTerrain" defaultValue="true"/>
-      <!-- Option for using the bonuses imported from a file. -->
-      <booleanOption id="model.option.importBonuses" defaultValue="false"/>
-      <!-- Option for using the lost city rumours imported from a file. -->
-      <booleanOption id="model.option.importRumours" defaultValue="false"/>
-      <!-- Option for using the settlements imported from a file. -->
-      <booleanOption id="model.option.importSettlements" defaultValue="false"/>
-    </optionGroup>
-    <optionGroup id="mapGeneratorOptions.landGenerator" >
-      <!-- Option for setting the size of the map -->
-      <rangeOption id="model.option.mapSize" defaultValue="1" localizedLabels="true">
-        <rangeValue label="small" value="0"/>
-        <rangeValue label="medium" value="1"/>
-        <rangeValue label="large" value="2"/>
-        <rangeValue label="veryLarge" value="3"/>
-        <rangeValue label="huge" value="4"/>
-      </rangeOption>
-      <!-- Option for setting the land mass of the map -->
-      <rangeOption id="model.option.landMass" defaultValue="25" localizedLabels="true">
-        <rangeValue label="small" value="15"/>
-        <rangeValue label="medium" value="25"/>
-        <rangeValue label="large" value="30"/>
-        <rangeValue label="veryLarge" value="35"/>
-        <rangeValue label="huge" value="40"/>
-      </rangeOption>
-      <!-- Option for setting the type of land generator to be used -->
-      <rangeOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
-        <rangeValue label="Classic" value="0"/>
-        <rangeValue label="Continent" value="1"/>
-        <rangeValue label="Archipelago" value="2"/>
-        <rangeValue label="Islands" value="3"/>
-      </rangeOption>
-    </optionGroup>
-    <optionGroup id="mapGeneratorOptions.terrainGenerator" >
-      <!-- Option for setting the number of rivers on the map
-           The value indicates the number of land tile per river tile -->
-      <rangeOption id="model.option.riverNumber" defaultValue="10" localizedLabels="true">
-        <rangeValue label="small" value="20"/>
-        <rangeValue label="medium" value="10"/>
-        <rangeValue label="large" value="9"/>
-        <rangeValue label="veryLarge" value="8"/>
-        <rangeValue label="huge" value="7"/>
-      </rangeOption>
-      <!-- Option for setting the number of mountains on the map
-           The value indicates the number of land tile per mountain tile -->
-      <rangeOption id="model.option.mountainNumber" defaultValue="10" localizedLabels="true">
-        <rangeValue label="small" value="20"/>
-        <rangeValue label="medium" value="10"/>
-        <rangeValue label="large" value="9"/>
-        <rangeValue label="veryLarge" value="8"/>
-        <rangeValue label="huge" value="7"/>
-      </rangeOption>
-      <!-- Option for setting the number of rumours on the map
-           The value indicates the number of land tile per rumour tile -->
-      <rangeOption id="model.option.rumourNumber" defaultValue="35" localizedLabels="true">
-        <rangeValue label="small" value="50"/>
-        <rangeValue label="medium" value="35"/>
-        <rangeValue label="large" value="30"/>
-        <rangeValue label="veryLarge" value="25"/>
-        <rangeValue label="huge" value="20"/>
-      </rangeOption>
-      <!-- Option for setting the number of settlements on the map
-           The value indicates the number of land tile per sttlement tile -->
-      <rangeOption id="model.option.settlementNumber" defaultValue="14" localizedLabels="true">
-        <rangeValue label="small" value="20"/>
-        <rangeValue label="medium" value="14"/>
-        <rangeValue label="large" value="12"/>
-        <rangeValue label="veryLarge" value="10"/>
-        <rangeValue label="huge" value="8"/>
-      </rangeOption>
-      <!-- Option for setting the percentage of forests on the map -->
-      <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
-        <rangeValue label="small" value="10"/>
-        <rangeValue label="medium" value="30"/>
-        <rangeValue label="large" value="50"/>
-        <rangeValue label="veryLarge" value="70"/>
-        <rangeValue label="huge" value="90"/>
-      </rangeOption>
-      <!-- Option for setting the percentage of bonus tiles on the map -->
-      <rangeOption id="model.option.bonusNumber" defaultValue="10" localizedLabels="true">
-        <rangeValue label="small" value="5"/>
-        <rangeValue label="medium" value="10"/>
-        <rangeValue label="large" value="13"/>
-        <rangeValue label="veryLarge" value="17"/>
-        <rangeValue label="huge" value="20"/>
-      </rangeOption>
-      <!-- Option for setting the humidity of the map -->
-      <rangeOption id="model.option.humidity" defaultValue="40" localizedLabels="true">
-        <rangeValue label="veryDry" value="25"/>
-        <rangeValue label="dry" value="35"/>
-        <rangeValue label="normal" value="40"/>
-        <rangeValue label="wet" value="55"/>
-        <rangeValue label="veryWet" value="60"/>
-      </rangeOption>
-      <!-- Option for setting the temperature of the map -->
-      <rangeOption id="model.option.temperature" defaultValue="2" localizedLabels="true">
-        <rangeValue label="cold" value="0"/>
-        <rangeValue label="chilly" value="1"/>
-        <rangeValue label="temperate" value="2"/>
-        <rangeValue label="warm" value="3"/>
-        <rangeValue label="hot" value="4"/>
-      </rangeOption>
+    <optionGroup id="mapGeneratorOptions">
+      <optionGroup id="mapGeneratorOptions.import" >
+        <!-- Option for setting a file to be imported (map etc). -->
+        <fileOption id="model.option.importFile"/>
+        <!-- Option for using the terrain imported from a file. -->
+        <booleanOption id="model.option.importTerrain" defaultValue="true"/>
+        <!-- Option for using the bonuses imported from a file. -->
+        <booleanOption id="model.option.importBonuses" defaultValue="false"/>
+        <!-- Option for using the lost city rumours imported from a file. -->
+        <booleanOption id="model.option.importRumours" defaultValue="false"/>
+        <!-- Option for using the settlements imported from a file. -->
+        <booleanOption id="model.option.importSettlements" defaultValue="false"/>
+      </optionGroup>
+      <optionGroup id="mapGeneratorOptions.landGenerator" >
+        <!-- Option for setting the size of the map -->
+        <rangeOption id="model.option.mapSize" defaultValue="1" localizedLabels="true">
+          <rangeValue label="small" value="0"/>
+          <rangeValue label="medium" value="1"/>
+          <rangeValue label="large" value="2"/>
+          <rangeValue label="veryLarge" value="3"/>
+          <rangeValue label="huge" value="4"/>
+        </rangeOption>
+        <!-- Option for setting the land mass of the map -->
+        <rangeOption id="model.option.landMass" defaultValue="25" localizedLabels="true">
+          <rangeValue label="small" value="15"/>
+          <rangeValue label="medium" value="25"/>
+          <rangeValue label="large" value="30"/>
+          <rangeValue label="veryLarge" value="35"/>
+          <rangeValue label="huge" value="40"/>
+        </rangeOption>
+        <!-- Option for setting the type of land generator to be used -->
+        <rangeOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
+          <rangeValue label="Classic" value="0"/>
+          <rangeValue label="Continent" value="1"/>
+          <rangeValue label="Archipelago" value="2"/>
+          <rangeValue label="Islands" value="3"/>
+        </rangeOption>
+      </optionGroup>
+      <optionGroup id="mapGeneratorOptions.terrainGenerator" >
+        <!-- Option for setting the number of rivers on the map
+             The value indicates the number of land tile per river tile -->
+        <rangeOption id="model.option.riverNumber" defaultValue="10" localizedLabels="true">
+          <rangeValue label="small" value="20"/>
+          <rangeValue label="medium" value="10"/>
+          <rangeValue label="large" value="9"/>
+          <rangeValue label="veryLarge" value="8"/>
+          <rangeValue label="huge" value="7"/>
+        </rangeOption>
+        <!-- Option for setting the number of mountains on the map
+             The value indicates the number of land tile per mountain tile -->
+        <rangeOption id="model.option.mountainNumber" defaultValue="10" localizedLabels="true">
+          <rangeValue label="small" value="20"/>
+          <rangeValue label="medium" value="10"/>
+          <rangeValue label="large" value="9"/>
+          <rangeValue label="veryLarge" value="8"/>
+          <rangeValue label="huge" value="7"/>
+        </rangeOption>
+        <!-- Option for setting the number of rumours on the map
+             The value indicates the number of land tile per rumour tile -->
+        <rangeOption id="model.option.rumourNumber" defaultValue="35" localizedLabels="true">
+          <rangeValue label="small" value="50"/>
+          <rangeValue label="medium" value="35"/>
+          <rangeValue label="large" value="30"/>
+          <rangeValue label="veryLarge" value="25"/>
+          <rangeValue label="huge" value="20"/>
+        </rangeOption>
+        <!-- Option for setting the number of settlements on the map
+             The value indicates the number of land tile per sttlement tile -->
+        <rangeOption id="model.option.settlementNumber" defaultValue="14" localizedLabels="true">
+          <rangeValue label="small" value="20"/>
+          <rangeValue label="medium" value="14"/>
+          <rangeValue label="large" value="12"/>
+          <rangeValue label="veryLarge" value="10"/>
+          <rangeValue label="huge" value="8"/>
+        </rangeOption>
+        <!-- Option for setting the percentage of forests on the map -->
+        <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
+          <rangeValue label="small" value="10"/>
+          <rangeValue label="medium" value="30"/>
+          <rangeValue label="large" value="50"/>
+          <rangeValue label="veryLarge" value="70"/>
+          <rangeValue label="huge" value="90"/>
+        </rangeOption>
+        <!-- Option for setting the percentage of bonus tiles on the map -->
+        <rangeOption id="model.option.bonusNumber" defaultValue="10" localizedLabels="true">
+          <rangeValue label="small" value="5"/>
+          <rangeValue label="medium" value="10"/>
+          <rangeValue label="large" value="13"/>
+          <rangeValue label="veryLarge" value="17"/>
+          <rangeValue label="huge" value="20"/>
+        </rangeOption>
+        <!-- Option for setting the humidity of the map -->
+        <rangeOption id="model.option.humidity" defaultValue="40" localizedLabels="true">
+          <rangeValue label="veryDry" value="25"/>
+          <rangeValue label="dry" value="35"/>
+          <rangeValue label="normal" value="40"/>
+          <rangeValue label="wet" value="55"/>
+          <rangeValue label="veryWet" value="60"/>
+        </rangeOption>
+        <!-- Option for setting the temperature of the map -->
+        <rangeOption id="model.option.temperature" defaultValue="2" localizedLabels="true">
+          <rangeValue label="cold" value="0"/>
+          <rangeValue label="chilly" value="1"/>
+          <rangeValue label="temperate" value="2"/>
+          <rangeValue label="warm" value="3"/>
+          <rangeValue label="hot" value="4"/>
+        </rangeOption>
+      </optionGroup>
     </optionGroup>
   </options>
 </freecol-specification>

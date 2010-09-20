@@ -615,9 +615,13 @@ public final class Specification {
         // Add the options of the group
         Iterator<Option> iter = optionGroup.iterator();
 
-        while(iter.hasNext()){
+        while(iter.hasNext()) {
             Option option = iter.next();
-            addAbstractOption((AbstractOption) option);
+            if (option instanceof OptionGroup) {
+                addOptionGroup((OptionGroup) option);
+            } else {
+                addAbstractOption((AbstractOption) option);
+            }
         }
     }
 
