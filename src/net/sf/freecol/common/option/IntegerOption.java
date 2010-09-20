@@ -34,8 +34,18 @@ public class IntegerOption extends AbstractOption {
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
     private int value;
-    private int minimumValue;
-    private int maximumValue;
+    private int minimumValue = Integer.MIN_VALUE;
+    private int maximumValue = Integer.MAX_VALUE;
+
+    /**
+     * Creates a new <code>IntegerOption</code>.
+     * 
+     * @param id The identifier for this option. This is used when the object
+     *            should be found in an {@link OptionGroup}.
+     */
+    public IntegerOption(String id) {
+        super(id);
+    }
 
     /**
      * Creates a new  <code>IntegerOption</code>.
@@ -102,6 +112,37 @@ public class IntegerOption extends AbstractOption {
             firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue), Integer.valueOf(value));
         }
         isDefined = true;
+    }
+
+
+    /**
+     * Gets a <code>String</code> representation of the current value.
+     * 
+     * This method can be overwritten by subclasses to allow a custom save
+     * value, since this method is used by {@link #toXML(XMLStreamWriter)}.
+     * 
+     * @return The String value of the Integer.
+     * @see #setValue(String)
+     */
+    protected String getStringValue() {
+        return Integer.toString(value);
+    }
+
+    /**
+     * Converts the given <code>String</code> to an Integer and calls
+     * {@link #setValue(int)}.
+     * 
+     * <br>
+     * <br>
+     * 
+     * This method can be overwritten by subclasses to allow a custom save
+     * value, since this method is used by {@link #readFromXML(XMLStreamReader)}.
+     * 
+     * @param value The String value of the Integer.
+     * @see #getStringValue()
+     */
+    protected void setValue(String value) {
+        setValue(Integer.parseInt(value));
     }
 
     /**

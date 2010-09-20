@@ -113,25 +113,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             if (!o.getId().equals(Option.NO_ID)) {
                 optionUIs.put(o.getId(), soi);
             }
-        } else if (o instanceof IntegerOption) {
-            final IntegerOptionUI iou = new IntegerOptionUI((IntegerOption) o, editable);
-            if (iou.getLabel().getText().length() > 30) {
-                add(iou.getLabel(), "newline, span 3, right");
-            } else {
-                add(iou.getLabel(), "right");
-            }
-            add(iou);
-            optionUpdaters.add(iou);
-            if (!o.getId().equals(Option.NO_ID)) {
-                optionUIs.put(o.getId(), iou);
-            }
-        } else if (o instanceof FileOption) {
-            final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
-            add(iou, "newline, span");
-            optionUpdaters.add(iou);
-            if (!o.getId().equals(Option.NO_ID)) {
-                optionUIs.put(o.getId(), iou);
-            }
         } else if (o instanceof RangeOption) {
             final RangeOptionUI soi = new RangeOptionUI((RangeOption) o, editable);
             add(soi, "newline, span");
@@ -150,6 +131,25 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             optionUpdaters.add(soi);
             if (!o.getId().equals(Option.NO_ID)) {
                 optionUIs.put(o.getId(), soi);
+            }
+        } else if (o instanceof IntegerOption) {
+            final IntegerOptionUI iou = new IntegerOptionUI((IntegerOption) o, editable);
+            if (iou.getLabel().getText().length() > 30) {
+                add(iou.getLabel(), "newline, span 3, right");
+            } else {
+                add(iou.getLabel(), "right");
+            }
+            add(iou);
+            optionUpdaters.add(iou);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), iou);
+            }
+        } else if (o instanceof FileOption) {
+            final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
+            add(iou, "newline, span");
+            optionUpdaters.add(iou);
+            if (!o.getId().equals(Option.NO_ID)) {
+                optionUIs.put(o.getId(), iou);
             }
         } else if (o instanceof StringOption) {
             final StringOptionUI soi = new StringOptionUI((StringOption) o, editable);

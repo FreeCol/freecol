@@ -41,12 +41,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * option strings have already been localized (because they do not use the
  * default keys, for example).
  */
-public class SelectOption extends AbstractOption {
+public class SelectOption extends IntegerOption {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectOption.class.getName());
-
-    private int value;
 
     protected boolean localizedLabels = false;
 
@@ -65,66 +63,12 @@ public class SelectOption extends AbstractOption {
     }
 
     /**
-     * Gets the current value of this <code>SelectOption</code>.
-     * 
-     * @return The value.
-     */
-    public int getValue() {
-        return value;
-    }
-
-    /**
-     * Sets the value of this <code>SelectOption</code>.
-     * 
-     * @param value The value to be set.
-     */
-    public void setValue(int value) {
-        final int oldValue = this.value;
-        this.value = value;
-
-        if (value != oldValue) {
-            firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue), Integer.valueOf(value));
-        }
-        isDefined = true;
-    }
-
-    /**
      * Gets the range values of this <code>RangeOption</code>.
      * 
      * @return The value.
      */
     public Map<Integer, String> getItemValues() {
         return itemValues;
-    }
-
-    /**
-     * Gets a <code>String</code> representation of the current value.
-     * 
-     * This method can be overwritten by subclasses to allow a custom save
-     * value, since this method is used by {@link #toXML(XMLStreamWriter)}.
-     * 
-     * @return The String value of the Integer.
-     * @see #setValue(String)
-     */
-    protected String getStringValue() {
-        return Integer.toString(value);
-    }
-
-    /**
-     * Converts the given <code>String</code> to an Integer and calls
-     * {@link #setValue(int)}.
-     * 
-     * <br>
-     * <br>
-     * 
-     * This method can be overwritten by subclasses to allow a custom save
-     * value, since this method is used by {@link #readFromXML(XMLStreamReader)}.
-     * 
-     * @param value The String value of the Integer.
-     * @see #getStringValue()
-     */
-    protected void setValue(String value) {
-        setValue(Integer.parseInt(value));
     }
 
     /**

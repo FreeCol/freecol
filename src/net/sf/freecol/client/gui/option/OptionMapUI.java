@@ -143,8 +143,15 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
-            } else if (o instanceof IntegerOption) {
-                IntegerOptionUI c = new IntegerOptionUI((IntegerOption) o, editable);
+            } else if (o instanceof RangeOption) {
+                RangeOptionUI c = new RangeOptionUI((RangeOption) o, editable);
+                northPanel.add(c, "newline, span");
+                optionUpdaters.add(c);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), c);
+                }
+            } else if (o instanceof SelectOption) {
+                SelectOptionUI c = new SelectOptionUI((SelectOption) o, editable);
                 if (c.getLabel().getText().length() > 30) {
                     northPanel.add(c.getLabel(), "newline, span 3, right");
                 } else {
@@ -155,15 +162,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
-            } else if (o instanceof RangeOption) {
-                RangeOptionUI c = new RangeOptionUI((RangeOption) o, editable);
-                northPanel.add(c, "newline, span");
-                optionUpdaters.add(c);
-                if (!o.getId().equals(Option.NO_ID)) {
-                    optionUIs.put(o.getId(), c);
-                }
-            } else if (o instanceof SelectOption) {
-                SelectOptionUI c = new SelectOptionUI((SelectOption) o, editable);
+            } else if (o instanceof IntegerOption) {
+                IntegerOptionUI c = new IntegerOptionUI((IntegerOption) o, editable);
                 if (c.getLabel().getText().length() > 30) {
                     northPanel.add(c.getLabel(), "newline, span 3, right");
                 } else {
