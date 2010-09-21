@@ -429,22 +429,21 @@ public class SimpleCombatModel extends CombatModel {
             //   r < 0.1 * odds.win  => great win
             //   else r < odds.win   => win
             // Within the odds.win <= r < 1.0 range, partition the first
-            // 20% to be evasions (only if naval defender of course), the
-            // next 70% to be ordinary losses, and the rest great losses.
+            // 20% to be evasions (if defender has the evadeAttack ability),
+            // the next 70% to be ordinary losses, and the rest great losses.
             //   r < odds.win + 0.2 * (1.0 - odds.win) = 0.8 * odds.win + 0.2
             //     => evade
             //   else r < odds.win + (0.2 + 0.7) * (1.0 - odds.win)
             //     = 0.1 * odds.win + 0.9 => loss
             //   else => great loss
             // ...and beached ships always lose.
-            if (r < odds.win
-                || (defenderUnit.isNaval() && defenderUnit.getTile().isLand())) {
+            if (r < odds.win || isBeached(defenderUnit)) {
                 great = r < 0.1f * odds.win; // Great Win
                 crs.add(CombatResult.WIN);
                 resolveAttack(attackerUnit, defenderUnit, great, r / odds.win,
                               crs);
             } else if (r < 0.8f * odds.win + 0.2f
-                       && defenderUnit.hasAbility("model.ability.evadeAttack")) {
+                    && defenderUnit.hasAbility("model.ability.evadeAttack")) {
                 crs.add(CombatResult.NO_RESULT);
                 crs.add(CombatResult.EVADE_ATTACK);
             } else {
@@ -532,7 +531,8 @@ public class SimpleCombatModel extends CombatModel {
                 && !loser.getGoodsList().isEmpty()) {
                 crs.add(CombatResult.LOOT_SHIP);
             }
-            if (great || tile.getRepairLocation(loserPlayer) == null) {
+            if (great || tile.getRepairLocation(loserPlayer) == null
+                || isBeached(loser)) {
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
                 crs.add(CombatResult.DAMAGE_SHIP_ATTACK);
@@ -670,6 +670,17 @@ public class SimpleCombatModel extends CombatModel {
                              FreeColGameObject defender) {
         return attacker.hasAbility("model.ability.ambushBonus")
             || defender.hasAbility("model.ability.ambushPenalty");
+    }
+
+    /**
+     * Is a unit a beached ship?
+     *
+     * @param unit The <code>Unit</code> to test.
+     * @return True if the unit is a beached ship.
+     */
+    private boolean isBeached(Unit unit) {
+        return unit.isNaval() && unit.getTile().isLand()
+            && unit.getTile().getSettlement() == null;
     }
 
 }
