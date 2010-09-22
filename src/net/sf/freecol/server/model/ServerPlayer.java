@@ -21,8 +21,10 @@
 package net.sf.freecol.server.model;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -33,16 +35,25 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.ChangePriority;
+import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.model.ServerTurn;
 
 
 /**
@@ -51,7 +62,7 @@ import net.sf.freecol.common.option.BooleanOption;
 * That is: pointers to this player's
 * {@link Connection} and {@link Socket}
 */
-public class ServerPlayer extends Player implements ServerModelObject {
+public class ServerPlayer extends Player implements ServerModelObject, ServerTurn {
     
     private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
 
@@ -142,6 +153,33 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Gets the socket of this player.
+     * @return The <code>Socket</code>.
+     */
+    public Socket getSocket() {
+        return socket;
+    }
+
+    /**
+     * Gets the connection of this player.
+     *
+     * @return The <code>Connection</code>.
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /**
+     * Sets the connection of this player.
+     *
+     * @param connection The <code>Connection</code>.
+     */
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+        connected = (connection != null);
+    }
+
+    /**
      * Checks if this player has died.
      *
      * @return <i>true</i> if this player should die.
@@ -171,9 +209,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return true;
 
         case ROYAL: // Still alive if there are rebels to quell
-            Iterator<Player> players = getGame().getPlayerIterator();
-            while (players.hasNext()) {
-                Player enemy = players.next();
+            for (Player enemy : getGame().getPlayers()) {
                 if (enemy.getREFPlayer() == (Player) this
                     && enemy.getPlayerType() == PlayerType.REBEL) {
                     return false;
@@ -181,11 +217,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
 
             // Still alive if there are units not in Europe
-            Iterator<Unit> units = getUnitIterator();
-            while (units.hasNext()) {
-                if (!units.next().isInEurope()) {
-                    return false;
-                }
+            for (Unit u : getUnits()) {
+                if (!u.isInEurope()) return false;
             }
 
             // Otherwise, the REF has been defeated and gone home.
@@ -306,34 +339,30 @@ public class ServerPlayer extends Player implements ServerModelObject {
          * We already checked that it has (or can buy) a carrier to
          * transport them to New World
          */
-        Iterator<Unit> unitIterator = getEurope().getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-            if (unit.isCarrier()) {
+        for (Unit eu : getEurope().getUnitList()) {
+            if (eu.isCarrier()) {
                 /*
                  * The carrier has colonist units on board
                  */
-                for(Unit u : unit.getUnitList()){
-                    if(u.isColonist()){
-                        return false;
-                    }
+                for (Unit u : eu.getUnitList()) {
+                    if (u.isColonist()) return false;
                 }
 
                 // The carrier has units or goods that can be sold.
-                if(unit.getGoodsCount() > 0){
+                if (eu.getGoodsCount() > 0) {
                     logger.info(getName() + " has goods to sell");
                     return false;
                 }
                 continue;
             }
-            if (unit.isColonist()){
+            if (eu.isColonist()) {
                 logger.info(getName() + " has colonist unit waiting in port");
                 return false;
             }
         }
 
         // No colonists, check if has gold to train or recruit one.
-        int goldToRecruit =  getEurope().getRecruitPrice();
+        int goldToRecruit = getEurope().getRecruitPrice();
 
         /*
          * Find the cheapest colonist, either by recruiting or training
@@ -430,19 +459,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
     */
     public void resetExploredTiles(Map map) {
         if (map != null) {
-            Iterator<Unit> unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-
+            for (Unit unit : getUnits()) {
                 setExplored(unit.getTile());
 
                 int radius;
                 if (unit.getColony() != null) {
-                    radius = 2;
+                    radius = 2; // TODO: magic number
                 } else {
                     radius = unit.getLineOfSight();
                 }
-
 
                 for (Tile tile: unit.getTile().getSurroundingTiles(radius)) {
                     setExplored(tile);
@@ -521,39 +546,169 @@ public class ServerPlayer extends Player implements ServerModelObject {
         resetCanSeeTiles();
     }
 
-
     /**
-     * Gets the socket of this player.
-     * @return The <code>Socket</code>.
+     * Propagate an European market change to the other European markets.
+     *
+     * @param type The type of goods that was traded.
+     * @param amount The amount of goods that was traded.
+     * @param random A <code>Random</code> number source.
      */
-    public Socket getSocket() {
-        return socket;
+    private void propagateToEuropeanMarkets(GoodsType type, int amount,
+                                            Random random) {
+        if (!type.isStorable()) return;
+
+        // Propagate 5-30% of the original change.
+        final int lowerBound = 5; // TODO: make into game option?
+        final int upperBound = 30;// TODO: make into game option?
+        amount *= random.nextInt(upperBound - lowerBound + 1) + lowerBound;
+        amount /= 100;
+        if (amount == 0) return;
+
+        // Do not need to update the clients here, these changes happen
+        // while it is not their turn.
+        for (Player other : getGame().getEuropeanPlayers()) {
+            Market market;
+            if ((ServerPlayer) other != this
+                && (market = other.getMarket()) != null) {
+                market.addGoodsToMarket(type, amount);
+            }
+        }
     }
 
+    /**
+     * Buy goods in Europe.
+     * Do not update the container or player in the ChangeSet, this
+     * routine is called from higher level routines where other updates
+     * happen.
+     *
+     * @param container The <code>GoodsContainer</code> to carry the goods.
+     * @param type The <code>GoodsType</code> to buy.
+     * @param amount The amount of goods to buy.
+     * @param random A <code>Random</code> number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @throws IllegalStateException If the <code>player</code> cannot afford
+     *                               to buy the goods.
+     */
+    public void csBuy(GoodsContainer container, GoodsType type, int amount,
+                      Random random, ChangeSet cs)
+        throws IllegalStateException {
+        Market market = getMarket();
+        int price = market.getBidPrice(type, amount);
+        if (price > getGold()) {
+            throw new IllegalStateException("Player " + getName()
+                + " tried to buy " + Integer.toString(amount)
+                + " " + type.toString()
+                + " for " + Integer.toString(price)
+                + " but has " + Integer.toString(getGold()) + " gold.");
+        }
+        modifyGold(-price);
+        market.modifySales(type, -amount);
+        market.modifyIncomeBeforeTaxes(type, -price);
+        market.modifyIncomeAfterTaxes(type, -price);
+        int marketAmount = -(int) getFeatureContainer()
+            .applyModifier(amount, "model.modifier.tradeBonus",
+                           type, getGame().getTurn());
+        market.addGoodsToMarket(type, marketAmount);
+        propagateToEuropeanMarkets(type, marketAmount, random);
+
+        container.addGoods(type, amount);
+        if (market.hasPriceChanged(type)) {
+            // This type of goods has changed price, so we will update
+            // the market and send a message as well.
+            cs.addMessage(See.only(this),
+                          market.makePriceChangeMessage(type));
+            market.flushPriceChange(type);
+            cs.add(See.only(this), market.getMarketData(type));
+        }
+    }
 
     /**
-     * Gets the connection of this player.
-     * @return The <code>Connection</code>.
+     * Sell goods in Europe.
+     * Do not update the container or player in the ChangeSet, this
+     * routine is called from higher level routines where other updates
+     * happen.
+     *
+     * @param container The <code>GoodsContainer</code> carrying the goods.
+     * @param type The <code>GoodsType</code> to sell.
+     * @param amount The amount of goods to sell.
+     * @param random A <code>Random</code> number source.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    public Connection getConnection() {
-        return connection;
+    public void csSell(GoodsContainer container, GoodsType type, int amount,
+                       Random random, ChangeSet cs) {
+        Market market = getMarket();
+        int tax = getTax();
+        int incomeBeforeTaxes = market.getSalePrice(type, amount);
+        int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
+        modifyGold(incomeAfterTaxes);
+        market.modifySales(type, amount);
+        market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
+        market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
+        int marketAmount = (int) getFeatureContainer()
+            .applyModifier(amount, "model.modifier.tradeBonus",
+                           type, getGame().getTurn());
+        market.addGoodsToMarket(type, marketAmount);
+        propagateToEuropeanMarkets(type, amount, random);
+
+        container.addGoods(type, -amount);
+        if (market.hasPriceChanged(type)) {
+            // This type of goods has changed price, so update the
+            // market and send a message as well.
+            cs.addMessage(See.only(this),
+                          market.makePriceChangeMessage(type));
+            market.flushPriceChange(type);
+            cs.add(See.only(this), market.getMarketData(type));
+        }
     }
-    
-    
+
     /**
-     * Sets the connection of this player.
-     * @param connection The <code>Connection</code>.
+     * New turn for this player.
+     *
+     * @param random A <code>Random</code> number source.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-        connected = (connection != null);
+    public void csNewTurn(Random random, ChangeSet cs) {
+        logger.finest("ServerPlayer.csNewTurn, for " + toString());
+
+        /* Disabled for now
+        // Settlements
+        List<Settlement> settlements
+            = new ArrayList<Settlement>(getSettlements());
+        int newSoL = 0;
+        for (Settlement settlement : settlements) {
+            ((ServerSettlement) settlement).csNewTurn(random, cs);
+            newSoL += settlement.getSoL();
+        }
+        int numberOfColonies = settlements.size();
+        if (numberOfColonies > 0) {
+            newSoL = newSoL / numberOfColonies;
+            if (oldSoL / 10 != newSoL / 10) {
+                cs.addMessage(See.only(this),
+                    new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
+                                     (newSoL > oldSoL)
+                                     ? "model.player.SoLIncrease"
+                                     : "model.player.SoLDecrease", this)
+                              .addAmount("%oldSoL%", oldSoL)
+                              .addAmount("%newSoL%", newSoL));
+            }
+            oldSoL = newSoL; // Remember SoL for check changes at next turn.
+        }
+
+        // Europe.
+        ServerEurope europe = (ServerEurope) getEurope();
+        if (europe != null) europe.csNewTurn(random, cs);
+
+        // Units.
+        for (Unit unit : new ArrayList<Unit>(getUnits())) {
+            ((ServerUnit) unit).csNewTurn(random, cs);
+        }
+        */
     }
-    
-    public void toServerAdditionElement(XMLStreamWriter out) throws XMLStreamException {
+
+    public void toServerAdditionElement(XMLStreamWriter out)
+        throws XMLStreamException {
         out.writeStartElement(getServerAdditionXMLElementTagName());
-
         out.writeAttribute("ID", getId());
-        
         out.writeEndElement();
     }
     
@@ -571,17 +726,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
         in.nextTag();
     }
     
-    
-    /**
-    * Returns the tag name of the root element representing this object.
-    * @return the tag name.
-    */
-    public static String getServerAdditionXMLElementTagName() {
-        return "serverPlayer";
-    }
-    
     @Override
     public String toString() {
         return "ServerPlayer[name="+getName()+",serverID=" + serverID + ",conn=" + connection + "]";
+    }
+    
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "serverPlayer"
+     */
+    public static String getServerAdditionXMLElementTagName() {
+        return "serverPlayer";
     }
 }

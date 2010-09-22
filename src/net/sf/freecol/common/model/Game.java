@@ -612,18 +612,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Checks if the next player is in a new turn.
-     * 
-     * @return <code>true</code> if changing to the <code>Player</code>
-     *         given by {@link #getNextPlayer()} would increase the current
-     *         number of turns by one.
-     */
-    public boolean isNextPlayerInNewTurn() {
-        return (players.indexOf(currentPlayer) > players.indexOf(getNextPlayer())
-                || currentPlayer == getNextPlayer());
-    }
-
-    /**
      * Gets the first player in this game.
      * 
      * @return the <code>Player</code> that was first added to this

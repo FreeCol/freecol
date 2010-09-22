@@ -243,12 +243,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     }
 
     /**
-     * A traderoute does not do anything on a new turn.
-     */
-    public void newTurn() {
-    }
-
-    /**
      * Clone the trade route and return a deep copy.
      * <p>
      * The copied trade route has no reference back to the original and can

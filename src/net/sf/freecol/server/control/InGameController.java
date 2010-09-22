@@ -74,6 +74,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Market.Access;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
@@ -465,22 +466,8 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        // Check for new turn.
         if (game.isNextPlayerInNewTurn()) {
-            game.setTurn(game.getTurn().next());
-            cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
-                "turn", Integer.toString(game.getTurn().getNumber()));
-            logger.info("Turn is now " + game.getTurn().toString());
-
-            // TODO: player.newTurn must move to the server.
-            for (Player player : game.getPlayers()) {
-                logger.info("Calling newTurn for player " + player.getName());
-                player.newTurn();
-            }
-
-            if (game.getTurn().getAge() > 1 && !game.getSpanishSuccession()) {
-                csSpanishSuccession(cs);
-            }
+            game.csNewTurn(random, cs);
             if (debugOnlyAITurns > 0) debugOnlyAITurns--;
         }
 
@@ -960,85 +947,6 @@ public final class InGameController extends Controller {
         return cs;
     }
 
-    /**
-     * Checks for and performs the War of Spanish Succession changes.
-     *
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private void csSpanishSuccession(ChangeSet cs) {
-        Game game = getGame();
-        Player weakestAIPlayer = null;
-        Player strongestAIPlayer = null;
-        int rebelPlayers = 0;
-        for (Player player : game.getEuropeanPlayers()) {
-            if (player.isREF()) continue;
-            if (player.isAI()) {
-                if (weakestAIPlayer == null
-                    || weakestAIPlayer.getScore() > player.getScore()) {
-                    weakestAIPlayer = player;
-                }
-                if (strongestAIPlayer == null
-                    || strongestAIPlayer.getScore() < player.getScore()) {
-                    strongestAIPlayer = player;
-                }
-            }
-            if (player.getSoL() > 50) {
-                rebelPlayers++;
-            }
-        }
-
-        // Only eliminate the weakest AI if there is at least one
-        // nation with 50% rebels, there is a distinct weakest nation,
-        // and it is not the sole nation with 50% rebels.
-        if (rebelPlayers > 0
-            && weakestAIPlayer != null && strongestAIPlayer != null
-            && weakestAIPlayer != strongestAIPlayer
-            && (weakestAIPlayer.getSoL() <= 50 || rebelPlayers > 1)) {
-            for (Player player : game.getPlayers()) {
-                for (IndianSettlement settlement : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
-                    Unit missionary = settlement.getMissionary();
-                    missionary.setOwner(strongestAIPlayer);
-                    settlement.getTile().updatePlayerExploredTiles();
-                    cs.add(See.perhaps()
-                           .always((ServerPlayer)strongestAIPlayer),
-                           settlement);
-                }
-            }
-            for (Colony colony : weakestAIPlayer.getColonies()) {
-                colony.changeOwner(strongestAIPlayer);
-                for (Tile tile : colony.getOwnedTiles()) {
-                    cs.add(See.perhaps(), tile);
-                }
-            }
-            for (Unit unit : weakestAIPlayer.getUnits()) {
-                unit.setOwner(strongestAIPlayer);
-                cs.add(See.perhaps(), unit);
-            }
-
-            StringTemplate loser = weakestAIPlayer.getNationName();
-            StringTemplate winner = strongestAIPlayer.getNationName();
-            cs.addMessage(See.all(),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "model.diplomacy.spanishSuccession",
-                                 strongestAIPlayer)
-                    .addStringTemplate("%loserNation%", loser)
-                    .addStringTemplate("%nation%", winner));
-            for (Player p : game.getEuropeanPlayers()) {
-                if (p != weakestAIPlayer) {
-                    cs.addHistory((ServerPlayer) p,
-                        new HistoryEvent(game.getTurn(),
-                            HistoryEvent.EventType.SPANISH_SUCCESSION)
-                            .addStringTemplate("%loserNation%", loser)
-                            .addStringTemplate("%nation%", winner));
-                }
-            }
-            weakestAIPlayer.setDead(true);
-            cs.addDead((ServerPlayer) weakestAIPlayer);
-            game.setSpanishSuccession(true);
-            cs.addPartial(See.all(), game, "spanishSuccession");
-        }
-    }
-    
     /**
      * Handles the choice of a new random founding father.
      *
@@ -2136,69 +2044,6 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
-
-    /**
-     * Propagate an European market change to the other European markets.
-     *
-     * @param type The type of goods that was traded.
-     * @param amount The amount of goods that was traded.
-     * @param serverPlayer The player that performed the trade.
-     */
-    private void propagateToEuropeanMarkets(GoodsType type, int amount,
-                                            ServerPlayer serverPlayer) {
-        if (!type.isStorable()) return;
-
-        // Propagate 5-30% of the original change.
-        final int lowerBound = 5; // TODO: make into game option?
-        final int upperBound = 30;// TODO: make into game option?
-        amount *= random.nextInt(upperBound - lowerBound + 1) + lowerBound;
-        amount /= 100;
-        if (amount == 0) return;
-
-        // Do not need to update the clients here, these changes happen
-        // while it is not their turn, and they will get a fresh copy
-        // of the altered market in the update sent in nextPlayer above.
-        Market market;
-        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-            if (other.isEuropean() && (market = other.getMarket()) != null) {
-                market.addGoodsToMarket(type, amount);
-            }
-        }
-    }
-
-    /**
-     * Buy goods in Europe.
-     * Do not update the container or player in the ChangeSet, this
-     * routine is called from equipUnit and payForBuilding where other
-     * unit updates can happen.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param container The <code>GoodsContainer</code> to carry the goods.
-     * @param type The <code>GoodsType</code> to buy.
-     * @param amount The amount of goods to buy.
-     * @param cs A <code>ChangeSet</code> to update.
-     * @throws IllegalStateException If the <code>player</code> cannot afford
-     *                               to buy the goods.
-     */
-    private void csBuy(ServerPlayer serverPlayer, GoodsContainer container,
-                       GoodsType type, int amount, ChangeSet cs)
-        throws IllegalStateException {
-        // FIXME: market.buy() should be here in the controller.
-        // Do when we fix csSell.
-        Market market = serverPlayer.getMarket();
-        market.buy(type, amount, serverPlayer);
-        container.addGoods(type, amount);
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so we will update
-            // the market and send a message as well.
-            cs.addMessage(See.only(serverPlayer),
-                          market.makePriceChangeMessage(type));
-            market.flushPriceChange(type);
-            cs.add(See.only(serverPlayer), market.getMarketData(type));
-        }
-        propagateToEuropeanMarkets(type, amount, serverPlayer);
-    }
-
     /**
      * Buy goods in Europe.
      *
@@ -2210,47 +2055,16 @@ public final class InGameController extends Controller {
      */
     public Element buyGoods(ServerPlayer serverPlayer, Unit unit,
                             GoodsType type, int amount) {
+        if (!serverPlayer.canTrade(type, Access.EUROPE)) {
+            return Message.clientError("Can not trade boycotted goods");
+        }
         ChangeSet cs = new ChangeSet();
-        csBuy(serverPlayer, unit.getGoodsContainer(), type, amount, cs);
+        GoodsContainer container = unit.getGoodsContainer();
+        serverPlayer.csBuy(container, type, amount, random, cs);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        cs.add(See.only(serverPlayer), unit);
+        cs.add(See.only(serverPlayer), container);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
-    }
-
-    /**
-     * Sell goods in Europe.
-     * Do not update the unit in the ChangeSet, this routine gets
-     * called from equipUnit where more unit changes happen.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is selling.
-     * @param unit The <code>Unit</code> carrying the goods.
-     * @param type The <code>GoodsType</code> to sell.
-     * @param amount The amount of goods to sell.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private void csSell(ServerPlayer serverPlayer, Unit unit, GoodsType type,
-                        int amount, ChangeSet cs) {
-        // FIXME: market.sell() should be in the controller, but the
-        // following cases will have to wait.
-        //
-        // 1. Unit.dumpEquipment FIXED.
-        // 2. Colony.exportGoods() is in the newTurn mess.
-        // Its also still in MarketTest, which needs to be moved to
-        // ServerPlayerTest where it also is already.
-        Market market = serverPlayer.getMarket();
-        market.sell(type, amount, serverPlayer);
-        unit.getGoodsContainer().addGoods(type, -amount);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so update the
-            // market and send a message as well.
-            cs.addMessage(See.only(serverPlayer),
-                          market.makePriceChangeMessage(type));
-            market.flushPriceChange(type);
-            cs.add(See.only(serverPlayer), market.getMarketData(type));
-        }
-        propagateToEuropeanMarkets(type, amount, serverPlayer);
     }
 
     /**
@@ -2264,9 +2078,15 @@ public final class InGameController extends Controller {
      */
     public Element sellGoods(ServerPlayer serverPlayer, Unit unit,
                              GoodsType type, int amount) {
+        if (!serverPlayer.canTrade(type, Access.EUROPE)) {
+            return Message.clientError("Can not trade boycotted goods");
+        }
         ChangeSet cs = new ChangeSet();
-        csSell(serverPlayer, unit, type, amount, cs);
-        cs.add(See.only(serverPlayer), unit);
+        GoodsContainer container = unit.getGoodsContainer();
+        container.saveState();
+        serverPlayer.csSell(container, type, amount, random, cs);
+        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.add(See.only(serverPlayer), container);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }
@@ -6057,7 +5877,12 @@ public final class InGameController extends Controller {
                 GoodsType goodsType = goods.getType();
                 int n = goods.getAmount() * a;
                 if (unit.isInEurope()) {
-                    csSell(serverPlayer, unit, goodsType, n, cs);
+                    if (serverPlayer.canTrade(goodsType, Access.EUROPE)) {
+                        serverPlayer.csSell(unit.getGoodsContainer(), goodsType,
+                                            n, random, cs);
+                    } else {
+                        unit.getGoodsContainer().removeGoods(goodsType, n);
+                    }
                 } else if (settlement != null) {
                     settlement.addGoods(goodsType, n);
                 }
@@ -6118,7 +5943,7 @@ public final class InGameController extends Controller {
                 int n = amount * goods.getAmount();
                 if (unit.isInEurope()) {
                     try {
-                        csBuy(serverPlayer, container, goodsType, n, cs);
+                        serverPlayer.csBuy(container, goodsType, n, random, cs);
                     } catch (IllegalStateException e) {
                         return Message.clientError(e.getMessage());
                     }
@@ -6191,7 +6016,8 @@ public final class InGameController extends Controller {
         for (GoodsType type : required.keySet()) {
             int amount = required.get(type);
             if (type.isStorable()) {
-                csBuy(serverPlayer, container, type, amount, cs);
+                // TODO: should also check canTrade(type, Access.?)
+                serverPlayer.csBuy(container, type, amount, random, cs);
             } else {
                 container.addGoods(type, amount);
             }

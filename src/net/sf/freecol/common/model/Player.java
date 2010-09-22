@@ -287,7 +287,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /** True if player has been attacked by privateers. */
     private boolean attackedByPrivateers = false;
 
-    private int oldSoL;
+    // SoL from last turn.
+    protected int oldSoL;
 
     private boolean dead = false;
 

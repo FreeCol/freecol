@@ -765,6 +765,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Sets the experience of this <code>Unit</code> at its current workType.
+     *
+     * @param experience The new experience of this <code>Unit</code>
+     *         at its current workType.
+     * @see #modifyExperience
+     */
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
+    /**
      * Modifies the experience of this <code>Unit</code> at its current
      * workType.
      * 
@@ -774,6 +785,24 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void modifyExperience(int value) {
         experience += value;
+    }
+
+    /**
+     * Gets the attrition of this unit.
+     *
+     * @return The attrition of this unit.
+     */
+    public int getAttrition() {
+        return attrition;
+    }
+
+    /**
+     * Sets the attrition of this unit.
+     *
+     * @param attrition The new attrition of this unit.
+     */
+    public void setAttrition(int attrition) {
+        this.attrition = attrition;
     }
 
     /**
