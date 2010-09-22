@@ -80,42 +80,19 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
     private String serverID;
 
 
-
     /**
-    * Creates a new <code>ServerPlayer</code>.
-    *
-    * @param game The <code>Game</code> this object belongs to.
-    * @param name The player name.
-    * @param admin Whether the player is the game administrator or not.
-    * @param socket The socket to the player's client.
-    * @param connection The <code>Connection</code> for the above mentioned socket.
-    */
-    public ServerPlayer(Game game, String name, boolean admin, Socket socket, Connection connection) {
-        super(game, name, admin);
-
-        this.socket = socket;
-        this.connection = connection;
-
-        resetExploredTiles(getGame().getMap());
-        resetCanSeeTiles();
-
-        connected = (connection != null);
-    }
-
-    /**
-    * Creates a new <code>ServerPlayer</code>.
-    *
-    * @param game The <code>Game</code> this object belongs to.
-    * @param name The player name.
-    * @param admin Whether the player is the game administrator or not.
-    * @param ai Whether this is an AI player.
-    * @param socket The socket to the player's client.
-    * @param connection The <code>Connection</code> for the above mentioned socket.
-    * @param nation The nation of the <code>Player</code>.
-    */
-    public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection,
-                        Nation nation) {
-        super(game, name, admin, ai, nation);
+     * Creates a new <code>ServerPlayer</code>.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param name The player name.
+     * @param admin Whether the player is the game administrator or not.
+     * @param nation The nation of the <code>Player</code>.
+     * @param socket The socket to the player's client.
+     * @param connection The <code>Connection</code> for the socket.
+     */
+    public ServerPlayer(Game game, String name, boolean admin, Nation nation,
+                        Socket socket, Connection connection) {
+        super(game, name, admin, nation);
 
         this.socket = socket;
         this.connection = connection;

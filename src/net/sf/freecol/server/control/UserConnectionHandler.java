@@ -221,6 +221,8 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             return;
         }
 
+        // TODO: is this still needed?  If game is null, the code above
+        // should NPE, several times.
         // Wait until the game has been created:
         int timeOut = 20000;
         while (freeColServer.getGame() == null) {
@@ -236,21 +238,22 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             }
         }
 
-        if (!freeColServer.getGame().canAddNewPlayer()) {
+        if (!game.canAddNewPlayer()) {
             Message.createError(out, "server.maximumPlayers", "Sorry, the maximum number of players reached.");
             return;
         }
 
-        if (freeColServer.getGame().playerNameInUse(username)) {
+        if (game.playerNameInUse(username)) {
             Message.createError(out, "server.usernameInUse", "The specified username is already in use.");
             return;
         }
 
 
         // Create and add the new player:
-        boolean admin = (freeColServer.getGame().getPlayers().size() == 0);
-        ServerPlayer newPlayer = new ServerPlayer(freeColServer.getGame(), username, admin, 
-                                                  connection.getSocket(), connection);
+        boolean admin = game.getPlayers().size() == 0;
+        ServerPlayer newPlayer
+            = new ServerPlayer(game, username, admin, game.getVacantNation(),
+                               connection.getSocket(), connection);
 
         freeColServer.getGame().addPlayer(newPlayer);
 
@@ -279,9 +282,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
         // Successful login:
         server.addConnection(connection);
-
-        return;
-
     }
     
     /**

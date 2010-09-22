@@ -424,26 +424,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      *
-     * Creates a new <code>Player</code> with specified name.
-     *
-     *
-     *
-     * @param game The <code>Game</code> this <code>Player</code> belongs
-     *            to.
-     *
-     * @param name The name that this player will use.
-     *
-     * @param admin 'true' if this Player is an admin,
-     *
-     * 'false' otherwise.
-     *
-     */
-    public Player(Game game, String name, boolean admin) {
-        this(game, name, admin, game.getVacantNation());
-    }
-
-    /**
-     *
      * Creates a new (human) <code>Player</code> with specified name.
      *
      * @param game The <code>Game</code> this <code>Player</code> belongs
