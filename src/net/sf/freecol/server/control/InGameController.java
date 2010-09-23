@@ -6087,4 +6087,34 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
+
+    /**
+     * Train a unit in Europe.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
+     * @param type The <code>UnitType</code> to train.
+     */
+    public Element trainUnitInEurope(ServerPlayer serverPlayer, UnitType type) {
+        Europe europe = serverPlayer.getEurope();
+        if (europe == null) {
+            return Message.clientError("No Europe to train in.");
+        }
+        int price = europe.getUnitPrice(type);
+        if (price <= 0) {
+            return Message.clientError("Bogus price: " + price);
+        } else if (price > serverPlayer.getGold()) {
+            return Message.clientError("Not enough gold to train " + type);
+        }
+
+        new Unit(getGame(), europe, serverPlayer, type, UnitState.ACTIVE);
+        serverPlayer.modifyGold(-price);
+        europe.increasePrice(type, price);
+
+        // Only visible in Europe
+        ChangeSet cs = new ChangeSet();
+        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.add(See.only(serverPlayer), europe);
+        return cs.build(serverPlayer);
+    }
+
 }

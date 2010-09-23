@@ -376,44 +376,16 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
-     * Train or purchase a unit in Europe.
-     * 
-     * @param unit The trained unit.
-     * @exception IllegalArgumentException if <code>unit == null</code>.
-     * @exception IllegalArgumentException if the unit to be trained doesn't
-     *                have price
-     * @exception IllegalStateException if the player recruiting the unit cannot
-     *                afford the price.
-     */
-    public void train(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        }
-
-        int price = getUnitPrice(unit.getType());
-        if (price <= 0) {
-            throw new IllegalArgumentException("Unit price must be a positive integer.");
-        } else if (getUnitPrice(unit.getType()) > unit.getOwner().getGold()) {
-            throw new IllegalStateException("Not enough gold to train " + unit.toString() + ".");
-        }
-
-        unit.getOwner().modifyGold(-price);
-        increasePrice(unit, price);
-        unit.setLocation(this);
-        firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
-    }
-
-    /**
-     * Increases the price for a unit, if needed.  Applicable to both trained
-     * and purchased units.
+     * Increases the price for a unit.
      *
-     * @param unit The unit, trained or purchased
+     * @param unitType The <code>UnitType</code>, trained or purchased
      * @param price The current price of the unit
      */
-    private void increasePrice(Unit unit, int price) {
+    public void increasePrice(UnitType unitType, int price) {
         Specification spec = getSpecification();
         String baseOption = "model.option.priceIncreasePerType";
-        String name = unit.getType().getId().substring(unit.getType().getId().lastIndexOf('.'));
+        String name
+            = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
         String option = (spec.getBooleanOption(baseOption).getValue()) 
             ? "model.option.priceIncrease" + name
             : "model.option.priceIncrease";
@@ -421,7 +393,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             ? spec.getIntegerOption(option).getValue()
             : 0;
         if (increase != 0) {
-            unitPrices.put(unit.getType(), new Integer(price + increase));
+            unitPrices.put(unitType, new Integer(price + increase));
         }
     }
 

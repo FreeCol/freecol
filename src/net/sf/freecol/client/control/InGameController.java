@@ -138,6 +138,7 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
+import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.networking.WorkMessage;
@@ -4311,41 +4312,45 @@ public final class InGameController implements NetworkConstants {
      * @param unitType The type of unit to be trained.
      */
     public void trainUnitInEurope(UnitType unitType) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        Game game = freeColClient.getGame();
+        if (game.getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
-        Game game = freeColClient.getGame();
-        Player myPlayer = freeColClient.getMyPlayer();
-        Europe europe = myPlayer.getEurope();
-
-        if (myPlayer.getGold() < europe.getUnitPrice(unitType)) {
+        Europe europe = player.getEurope();
+        if (player.getGold() < europe.getUnitPrice(unitType)) {
             canvas.errorMessage("notEnoughGold");
             return;
         }
 
-        Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-        trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
-
-        Element reply = client.ask(trainUnitInEuropeElement);
-        if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-            Element unitElement = (Element) reply.getFirstChild();
-            Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-            if (unit == null) {
-                unit = new Unit(game, unitElement);
-            } else {
-                unit.readFromXMLElement(unitElement);
-            }
-            europe.train(unit);
-        } else {
-            logger.warning("Could not train unit in europe.");
-            return;
+        int count = europe.getUnitCount();
+        if (askTrainUnitInEurope(unitType) && europe.getUnitCount() > count) {
+            canvas.updateGoldLabel();
+            europe.firePropertyChange(Europe.UNIT_CHANGE, count,
+                                      europe.getUnitCount());
         }
-        canvas.updateGoldLabel();
     }
+
+    /**
+     * Server query-response for training a unit in Europe.
+     *
+     * @param type The <code>UnitType</code> to train.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askTrainUnitInEurope(UnitType type) {
+        Client client = freeColClient.getClient();
+        TrainUnitInEuropeMessage message = new TrainUnitInEuropeMessage(type);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Buys the remaining hammers and tools for the {@link Building} currently

@@ -105,6 +105,7 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
+import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.networking.WorkMessage;
@@ -281,10 +282,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new EmigrateUnitMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("trainUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
+        register(TrainUnitInEuropeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return trainUnitInEurope(connection, element);
+                return new TrainUnitInEuropeMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(EquipUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -754,24 +755,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setTradeRoute(tradeRoute);
         }
         return null;
-    }
-
-    /**
-     * Handles a "trainUnitInEurope"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param trainUnitInEuropeElement The element containing the request.
-     */
-    private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Europe europe = player.getEurope();
-        String unitId = trainUnitInEuropeElement.getAttribute("unitType");
-        UnitType unitType = getGame().getSpecification().getUnitType(unitId);
-        Unit unit = new Unit(getGame(), europe, player, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
-        Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
-        reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
-        europe.train(unit);
-        return reply;
     }
 
     /**
