@@ -3876,7 +3876,7 @@ public final class InGameController extends Controller {
         if (settlement.isCapital()) treasure = (treasure * 3) / 2;
 
         // Make the treasure train.
-        List<UnitType> unitTypes = getGame().getSpecification()
+        List<UnitType> unitTypes = game.getSpecification()
             .getUnitTypesWithAbility("model.ability.carryTreasure");
         UnitType type = Utils.getRandomMember(unitTypes, random);
         Unit train = new Unit(game, tile, attackerPlayer, type,
@@ -3902,7 +3902,7 @@ public final class InGameController extends Controller {
                                        HistoryEvent.EventType.DESTROY_SETTLEMENT)
                       .addStringTemplate("%nation%", nativeNation)
                       .addName("%settlement%", settlementName));
-        if (nativePlayer.getNumberOfSettlements() == 0) {
+        if (nativePlayer.checkForDeath()) {
             cs.addHistory(attackerPlayer,
                           new HistoryEvent(game.getTurn(),
                                            HistoryEvent.EventType.DESTROY_NATION)
@@ -4392,6 +4392,13 @@ public final class InGameController extends Controller {
                       .addStringTemplate("%enemyNation%", winnerNation)
                       .addStringTemplate("%enemyUnit%", winner.getLabel())
                       .addStringTemplate("%location%", loserLocation));
+        if (loserPlayer.isIndian() && loserPlayer.checkForDeath()) {
+            StringTemplate nativeNation = loserPlayer.getNationName();
+            cs.addHistory(winnerPlayer,
+                new HistoryEvent(getGame().getTurn(),
+                                 HistoryEvent.EventType.DESTROY_NATION)
+                          .addStringTemplate("%nation%", nativeNation));
+        }
 
         // Transfer equipment, do not generate messages for the loser.
         EquipmentType equip;
