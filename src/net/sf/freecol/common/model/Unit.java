@@ -1562,7 +1562,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (!allowMoveFrom(from))
                 ? MoveType.MOVE_NO_ACCESS_WATER
-                : (!getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)) 
+                : (!getType().canBeUpgraded(null, ChangeType.NATIVES)) 
                 ? MoveType.MOVE_NO_ACCESS_SKILL
                 : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
         } else {

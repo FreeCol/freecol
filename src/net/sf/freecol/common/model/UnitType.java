@@ -511,7 +511,9 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * is null, return true if the UnitType can be upgraded to any
      * other UnitType by the given means of education.
      *
-     * @param newType the UnitType to learn
+     * @param newType The UnitType to learn (may be null in the case
+     *     of attempting to move to a native settlement when the skill
+     *     taught there is still unknown).
      * @param changeType an <code>ChangeType</code> value
      * @return <code>true</code> if can learn the given UnitType
      */
