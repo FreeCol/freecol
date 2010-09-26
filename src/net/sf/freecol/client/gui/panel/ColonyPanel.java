@@ -1353,6 +1353,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         public void initialize() {
             removePropertyChangeListeners();
+            removeAll();
             Tile tile = getColony().getTile();
             tiles[0][0] = tile.getNeighbourOrNull(Direction.N);
             tiles[0][1] = tile.getNeighbourOrNull(Direction.NE);
