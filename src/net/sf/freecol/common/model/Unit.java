@@ -2284,12 +2284,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         Player oldOwner = this.owner;
         
         // safeguard
-        if(oldOwner == owner){
+        if (oldOwner == owner) {
             return;
-        }
-        
-        if(oldOwner == null){
+        } else if (oldOwner == null) {
             logger.warning("Unit " + getId() + " had no previous owner");
+        }
+
+        // Clear trade route and goto orders if changing owner.
+        if (getTradeRoute() != null) {
+            setTradeRoute(null);
+        }
+        if (getDestination() != null) {
+            setDestination(null);
         }
 
         // This need to be set right away
