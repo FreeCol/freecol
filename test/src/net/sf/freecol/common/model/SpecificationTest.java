@@ -125,18 +125,6 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(smith.hasAbility("model.ability.buildFactory"));
     }
 
-    // Check options presence and value
-    public void testOptions() {
-        Specification spec = spec();
-
-        //assertTrue(spec.getIntegerOption(GameOptions.STARTING_MONEY).getValue() == 0);
-
-        assertFalse(spec.getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
-        assertFalse(spec.getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
-        assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
-        assertTrue(spec.getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).getValue());
-    }
-
     // Check difficulty levels presence and values
     public void testDifficultyLevels() {
         assertEquals(6, spec().getDifficultyLevels().size());

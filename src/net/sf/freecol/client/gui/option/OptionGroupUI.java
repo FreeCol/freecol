@@ -80,7 +80,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     private void addOptionUI(Option o, boolean editable, int level, Map<String, JComponent> optionUIs) {
         if (o instanceof OptionGroup) {
-            add(new JLabel(o.getName()), "span, split 2");
+            add(new JLabel(o.getName()), "newline 20, span, split 2");
             add(new JSeparator(), "growx");
             Iterator<Option> it = ((OptionGroup) o).iterator();
             while (it.hasNext()) {

@@ -91,4 +91,19 @@ public class GameTest extends FreeColTestCase {
         assertEquals(Turn.Season.AUTUMN, Turn.getSeason(310));
     }
 
+    public void testGameOptions() {
+        assertNotNull(spec().getOptionGroup("gameOptions"));
+        assertNotNull(spec().getOptionGroup("gameOptions.map"));
+        assertNotNull(spec().getOptionGroup("gameOptions.colony"));
+        assertNotNull(spec().getOption("model.option.fogOfWar"));
+        assertNotNull(spec().getOption("model.option.allowStudentSelection"));
+        assertNotNull(spec().getOption(GameOptions.CUSTOM_IGNORE_BOYCOTT));
+
+        Game game = getStandardGame();
+        //assertNotNull(spec().getOption("model.option.fogOfWar"));
+        //assertNotNull(spec().getOption("model.option.allowStudentSelection"));
+        assertFalse(game.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT));
+
+    }
+
 }

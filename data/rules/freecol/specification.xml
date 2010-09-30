@@ -75,14 +75,16 @@
   </nations>
 
   <options>
-    <optionGroup id="gameOptions.colony">
-      <!-- Does the Custom House sell boycotted goods -->
-      <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
-      <!-- Whether experts have connections, producing without raw materials in factories -->
-      <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
-      <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
-      <!-- Whether to educate the least skilled unit first -->
-      <booleanOption id="model.option.allowStudentSelection" defaultValue="true"/>
+    <optionGroup id="gameOptions">
+      <optionGroup id="gameOptions.colony">
+        <!-- Does the Custom House sell boycotted goods -->
+        <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
+        <!-- Whether experts have connections, producing without raw materials in factories -->
+        <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
+        <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
+        <!-- Whether to educate the least skilled unit first -->
+        <booleanOption id="model.option.allowStudentSelection" defaultValue="true"/>
+      </optionGroup>
     </optionGroup>
   </options>
 </freecol-specification>

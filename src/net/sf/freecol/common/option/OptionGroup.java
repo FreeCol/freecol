@@ -85,8 +85,15 @@ public class OptionGroup extends AbstractOption {
         }
         optionMap.put(id, option);
         if (option instanceof OptionGroup) {
-            for (Option o : ((OptionGroup) option).getOptions()) {
-                optionMap.put(o.getId(), o);
+            addOptionGroup((OptionGroup) option);
+        }
+    }
+
+    private void addOptionGroup(OptionGroup group) {
+        for (Option option : group.getOptions()) {
+            optionMap.put(option.getId(), option);
+            if (option instanceof OptionGroup) {
+                addOptionGroup((OptionGroup) option);
             }
         }
     }
@@ -152,7 +159,13 @@ public class OptionGroup extends AbstractOption {
             AbstractOption option = null;
             String optionType = in.getLocalName();
             if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                option = new OptionGroup(in);
+                OptionGroup optionGroup = (OptionGroup) getOption(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+                if (optionGroup == null) {
+                    optionGroup = new OptionGroup(in);
+                } else {
+                    optionGroup.readFromXML(in);
+                }
+                option = optionGroup;
             } else if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
                 option = new IntegerOption(in);
             } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {

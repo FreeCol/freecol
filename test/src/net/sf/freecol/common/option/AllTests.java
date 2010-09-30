@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -17,20 +17,17 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common;
+package net.sf.freecol.common.option;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
-		//$JUnit-BEGIN$
-		suite.addTest(net.sf.freecol.common.option.AllTests.suite());
-		suite.addTest(net.sf.freecol.common.model.AllTests.suite());
-		//$JUnit-END$
-		return suite;
-	}
+    public static Test suite() {
+	TestSuite suite = new TestSuite("Test for net.sf.freecol.common.option");
+        suite.addTestSuite(OptionTest.class);
+        return suite;
+    }
 
 }

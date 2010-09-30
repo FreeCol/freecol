@@ -127,17 +127,7 @@ public class GameOptions extends OptionMap {
      * Adds the options to this <code>GameOptions</code>.
      */
     protected void addDefaultOptions() {
-        Specification spec = getSpecification();
-
-        /* Map options: */
-        add(spec.getOptionGroup("gameOptions.map"));
-        /* Colony options: */
-        add(spec.getOptionGroup("gameOptions.colony"));
-        /* Victory Conditions */
-        add(spec.getOptionGroup("gameOptions.victoryConditions"));
-        /* Difficulty settings */
-        //add(spec.getOptionGroup("gameOptions.difficultySettings"));
-
+        add(getSpecification().getOptionGroup("gameOptions"));
     }
 
     protected boolean isCorrectTagName(String tagName) {

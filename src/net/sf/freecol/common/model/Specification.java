@@ -383,7 +383,14 @@ public final class Specification {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String optionType = xsr.getLocalName();
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                    specification.addOptionGroup(new OptionGroup(xsr));
+                    String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                    OptionGroup group = allOptionGroups.get(id);
+                    if (group == null) {
+                        group = new OptionGroup(xsr);
+                    } else {
+                        group.readFromXML(xsr);
+                    }
+                    specification.addOptionGroup(group);
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");
                     xsr.nextTag();

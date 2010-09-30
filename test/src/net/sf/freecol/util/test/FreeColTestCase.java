@@ -104,17 +104,23 @@ public class FreeColTestCase extends TestCase {
     
     public static Specification spec() {
         if (specification == null) {
-            try {
-                FreeColTcFile tc = new FreeColTcFile("freecol");
-                specification = tc.getSpecification();
-                specification.applyDifficultyLevel("model.difficulty.medium");
-            } catch(Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+            specification = getSpecification("freecol");
         }
         return specification;
     }
+
+    public static Specification getSpecification(String name) {
+        try {
+            FreeColTcFile tc = new FreeColTcFile(name);
+            specification = tc.getSpecification();
+            specification.applyDifficultyLevel("model.difficulty.medium");
+            return specification;
+        } catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     /**
      * Returns a new game, with all players set.
