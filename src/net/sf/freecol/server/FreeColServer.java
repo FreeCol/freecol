@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -118,7 +117,7 @@ public final class FreeColServer {
     /**
      * The save game format used for saving games.
      */
-    public static final int SAVEGAME_VERSION = 9;
+    public static final int SAVEGAME_VERSION = 10;
 
     /**
      * The oldest save game format that can still be loaded.
@@ -576,15 +575,6 @@ public final class FreeColServer {
         try {
             XMLStreamWriter xsw;
             fos = new JarOutputStream(new FileOutputStream(file));
-            fos.putNextEntry(new JarEntry("specification.xml"));
-            InputStream in = FreeCol.getSpecificationInputStream();
-            int len;
-            byte[] buf = new byte[1024];
-            while ((len = in.read(buf)) > 0) {
-                fos.write(buf, 0, len);
-            }
-            fos.closeEntry();
-            in.close();
             if (image != null) {
                 fos.putNextEntry(new JarEntry("thumbnail.png"));
                 ImageIO.write(image, "png", fos);
