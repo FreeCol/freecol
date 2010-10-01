@@ -2123,10 +2123,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owner.addSettlement(settlement);
         }
 
-        // compatibility mode
-        if (needsRumour) {
-            add(new LostCityRumour(getGame(), this));
+        // 0.9.x compatibility code
+        // work-around for bug #3065488
+        if (settlement instanceof IndianSettlement) {
+            Unit missionary = ((IndianSettlement) settlement).getMissionary();
+            if (missionary != null) {
+                PlayerExploredTile pet = playerExploredTiles.get(missionary.getOwner());
+                if (pet != null) {
+                    pet.setMissionary(missionary);
+                }
+            }
         }
+        // end of work-around
 
     }
 
