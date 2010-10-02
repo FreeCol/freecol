@@ -22,7 +22,10 @@ package net.sf.freecol.common.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -132,15 +135,26 @@ public abstract class FreeColObject {
      * Debugging tool, dump object XML to System.err.
      */
     public void dumpObject() {
+        save(null);
+    }
+
+    /**
+     * Writes the object to the given file.
+     * 
+     * @param file the save file
+     */
+    public void save(File file) {
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         XMLStreamWriter xsw = null;
         try {
-            xsw = xof.createXMLStreamWriter(System.err, "UTF-8");
+            OutputStream out = (file == null) ? System.err : new FileOutputStream(file);
+            xsw = xof.createXMLStreamWriter(out, "UTF-8");
+            xsw.writeStartDocument("UTF-8", "1.0");
             this.toXML(xsw, null, true, true);
-            System.err.println();
+            xsw.writeEndDocument();
             xsw.flush();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to dump object", e);
+            logger.log(Level.WARNING, "Exception while writing object.", e);
         } finally {
             try {
                 if (xsw != null) {
@@ -151,7 +165,7 @@ public abstract class FreeColObject {
             }
         }
     }
-
+    
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

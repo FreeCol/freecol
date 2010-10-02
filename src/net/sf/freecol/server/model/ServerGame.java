@@ -70,7 +70,6 @@ public class ServerGame extends Game implements ServerTurn {
 
         this.modelController = modelController;
         this.combatModel = new SimpleCombatModel();
-        gameOptions = new GameOptions(getSpecification());
         currentPlayer = null;
     }
 

@@ -532,7 +532,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public Unit findStudent(final Unit teacher) {
         Unit student = null;
         GoodsType expertProduction = teacher.getType().getExpertProduction();
-        boolean leastSkilled = !getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
+        boolean leastSkilled = !getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
         int skill = leastSkilled ? INFINITY : UNDEFINED;
         for (Unit potentialStudent : getColony().getUnitList()) {
             /**
@@ -743,7 +743,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                     maximumGoodsInput = availableGoodsInput;
                 }
                 if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
-                    getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+                    getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                     int minimumGoodsInput = 0;
                     for (Unit unit: units) {
                         if (unit.getType() == getExpertUnitType()) {

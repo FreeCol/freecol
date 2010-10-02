@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -1129,10 +1130,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Can't continue playing! Player "
                     + player.getName() + " hasn't won the game");
         }
-        GameOptions go = getGame().getGameOptions();
-        ((BooleanOption) go.getOption(GameOptions.VICTORY_DEFEAT_REF)).setValue(false);
-        ((BooleanOption) go.getOption(GameOptions.VICTORY_DEFEAT_EUROPEANS)).setValue(false);
-        ((BooleanOption) go.getOption(GameOptions.VICTORY_DEFEAT_HUMANS)).setValue(false);
+        Specification spec = getGame().getSpecification();
+        spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF).setValue(false);
+        spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS).setValue(false);
+        spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS).setValue(false);
         
         // victory panel is shown after end turn, end turn again to start turn of next player
         final ServerPlayer currentPlayer = (ServerPlayer) getFreeColServer().getGame().getCurrentPlayer();

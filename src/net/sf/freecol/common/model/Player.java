@@ -453,13 +453,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 error.printStackTrace();
             }
             if (nationType.isEuropean()) {
-                /*
-                 * Setting the amount of gold to
-                 * "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"
-                 *
-                 * just before starting the game. See
-                 * "net.sf.freecol.server.control.PreGameController".
-                 */
                 gold = 0;
                 europe = new Europe(game, this);
                 if (!nationType.isREF()) {
@@ -1392,7 +1385,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return false;
         }
         canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
-        if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
+        if (!getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
             for (Tile t : getGame().getMap().getAllTiles()) {
                 if (t != null) {
                     canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
@@ -1933,7 +1926,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return;
         }
 
-        int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)
+        int cost = getSpecification().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)
             ? immigrationRequired : immigration;
 
         if (cost > immigration) {
@@ -2745,7 +2738,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return true;
         }
         if (access == Market.Access.CUSTOM_HOUSE) {
-            if (getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
+            if (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
                 return true;
             }
             if (hasAbility("model.ability.customHouseTradesWithForeignCountries")) {

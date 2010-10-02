@@ -73,7 +73,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * 
      * @param option The <code>OptionMap</code> to make a user interface for.
      */
-    public OptionMapUI(OptionMap option) {
+    public OptionMapUI(OptionGroup option) {
         this(option, true);
     }
 
@@ -83,7 +83,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      * 
      * @param option The <code>OptionMap</code> to make a user interface for.
      */
-    public OptionMapUI(OptionMap option, boolean editable) {
+    public OptionMapUI(OptionGroup option, boolean editable) {
         super(new BorderLayout());
 
         JPanel northPanel = new JPanel();

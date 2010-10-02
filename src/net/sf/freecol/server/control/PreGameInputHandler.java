@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -110,9 +111,10 @@ public final class PreGameInputHandler extends InputHandler {
         if (!player.isAdmin()) {
             throw new IllegalStateException();
         }
-        getFreeColServer().getGame().getGameOptions().readFromXMLElement((Element) element.getChildNodes().item(0));
+        OptionGroup gameOptions = getFreeColServer().getGame().getSpecification().getOptionGroup("gameOptions");
+        gameOptions.readFromXMLElement((Element) element.getChildNodes().item(0));
         Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
-        updateGameOptionsElement.appendChild(getFreeColServer().getGame().getGameOptions().toXMLElement(
+        updateGameOptionsElement.appendChild(gameOptions.toXMLElement(
                 updateGameOptionsElement.getOwnerDocument()));
         getFreeColServer().getServer().sendToAll(updateGameOptionsElement, connection);
         return null;

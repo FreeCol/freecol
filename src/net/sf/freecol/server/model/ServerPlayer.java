@@ -395,7 +395,7 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
         if (currentFather != null) {
             int extraLiberty = getRemainingFoundingFatherCost();
             if (extraLiberty <= 0) {
-                boolean overflow = getGameOptions()
+                boolean overflow = getSpecification()
                     .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
                 setLiberty((overflow) ? -extraLiberty : 0);
                 father = currentFather;
@@ -518,7 +518,7 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
             setExplored(tile);
         }
         
-        ((BooleanOption) getGame().getGameOptions().getOption(GameOptions.FOG_OF_WAR)).setValue(false);
+        getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR).setValue(false);
         
         resetCanSeeTiles();
     }

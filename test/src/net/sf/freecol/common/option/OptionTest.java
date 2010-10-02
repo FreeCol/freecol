@@ -31,6 +31,11 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class OptionTest extends FreeColTestCase {
 
     public void testGameOptions() {
+        assertNotNull(spec().getOptionGroup("gameOptions"));
+        assertNotNull(spec().getOptionGroup("gameOptions.map"));
+        assertNotNull(spec().getOptionGroup("gameOptions.colony"));
+        assertNotNull(spec().getOption("model.option.fogOfWar"));
+        assertNotNull(spec().getOption("model.option.allowStudentSelection"));
         OptionGroup gameOptions = spec().getOptionGroup("gameOptions");
         assertNotNull(gameOptions);
         assertTrue(gameOptions.iterator().hasNext());
@@ -42,7 +47,6 @@ public class OptionTest extends FreeColTestCase {
         assertFalse(spec().getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
         assertTrue(spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).getValue());
     }
-
 
 
 }

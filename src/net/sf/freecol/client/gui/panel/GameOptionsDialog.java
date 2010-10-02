@@ -25,6 +25,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -39,6 +40,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.option.OptionMap;
 
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
@@ -101,13 +103,13 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         setCancelComponent(cancel);
 
         // Header:
-        header = getDefaultHeader(getGame().getGameOptions().getName());
+        header = getDefaultHeader(Messages.message("gameOptions"));
         add(header, BorderLayout.NORTH);
 
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(getGame().getGameOptions(), editable);
+        ui = new OptionMapUI(getSpecification().getOptionGroup("gameOptions"), editable);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);
@@ -181,7 +183,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
                 File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
                 if (saveFile != null) {
                     ui.updateOption();
-                    getGame().getGameOptions().save(saveFile);
+                    getGame().getSpecification().getOptionGroup("gameOptions").save(saveFile);
                 }
                 break;
             case LOAD:
@@ -192,7 +194,13 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
                                                                FreeColDialog.getGameOptionsFileFilter()
                                                            });
                 if (loadFile != null) {
-                    getGame().getGameOptions().load(loadFile);
+                    try {
+                        FileInputStream in = new FileInputStream(loadFile);
+                        getGame().getSpecification().loadFragment(in);
+                        in.close();
+                    } catch(Exception e) {
+                        logger.warning("Failed to load game options from " + loadFile.getName());
+                    }
                 }
                 break;
             case RESET:

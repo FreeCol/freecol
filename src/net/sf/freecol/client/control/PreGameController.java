@@ -31,7 +31,6 @@ import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
@@ -40,6 +39,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.resources.ChipResource;
@@ -191,8 +191,8 @@ public final class PreGameController {
     */
     public void sendGameOptions() {
         Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
-        updateGameOptionsElement.appendChild(freeColClient.getGame().getGameOptions().toXMLElement(updateGameOptionsElement.getOwnerDocument()));
-
+        OptionGroup gameOptions = freeColClient.getGame().getSpecification().getOptionGroup("gameOptions");
+        updateGameOptionsElement.appendChild(gameOptions.toXMLElement(updateGameOptionsElement.getOwnerDocument()));
         freeColClient.getClient().send(updateGameOptionsElement);        
     }
 

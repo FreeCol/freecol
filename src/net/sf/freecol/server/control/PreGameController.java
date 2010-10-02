@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.StringOption;
@@ -118,13 +119,16 @@ public final class PreGameController extends Controller {
         Collections.sort(game.getPlayers(), Player.playerComparator);
         
         // Save the old GameOptions as possibly set by clients..
-        // TODO: This might not be the best way to do it, the createMap should not really use the entire loadGame method
-        Element oldGameOptions = game.getGameOptions().toXMLElement(Message.createNewRootElement("oldGameOptions").getOwnerDocument());
+        // TODO: This might not be the best way to do it, the
+        // createMap should not really use the entire loadGame method
+        OptionGroup gameOptions = game.getSpecification().getOptionGroup("gameOptions");
+        Element oldGameOptions = gameOptions.toXMLElement(Message.createNewRootElement("oldGameOptions")
+                                                          .getOwnerDocument());
         
         // Make the map:
         mapGenerator.createMap(game);
         // Restore the GameOptions that may have been overwritten by loadGame in createMap
-        game.getGameOptions().readFromXMLElement(oldGameOptions);
+        gameOptions.readFromXMLElement(oldGameOptions);
         
         // Inform the clients:
         sendUpdatedGame();        

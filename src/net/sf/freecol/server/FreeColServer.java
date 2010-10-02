@@ -711,7 +711,7 @@ public final class FreeColServer {
                         DifficultyLevel level = game.getDifficultyLevel();
                         if (level == null) {
                             try {
-                                int levelIndex = game.getGameOptions().getInteger("model.option.difficulty");
+                                int levelIndex = game.getSpecification().getInteger("model.option.difficulty");
                                 level = game.getSpecification().getDifficultyLevels().get(levelIndex);
                             } catch(Exception e) {
                                 // no such setting

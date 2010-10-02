@@ -407,15 +407,15 @@ public final class InGameController extends Controller {
      */
     public Player checkForWinner() {
         List<Player> players = getGame().getPlayers();
-        GameOptions go = getGame().getGameOptions();
-        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
+        Specification spec = getGame().getSpecification();
+        if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
             for (Player player : players) {
                 if (player.getPlayerType() == PlayerType.INDEPENDENT) {
                     return player;
                 }
             }
         }
-        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
+        if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             Player winner = null;
             for (Player player : players) {
                 if (!player.isDead() && player.isEuropean()
@@ -429,7 +429,7 @@ public final class InGameController extends Controller {
             }
             if (winner != null) return winner;
         }
-        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
+        if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             Player winner = null;
             for (Player player : players) {
                 if (!player.isDead() && !player.isAI()) {

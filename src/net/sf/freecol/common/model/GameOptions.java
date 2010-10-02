@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 * {@link #addDefaultOptions()} and each option should be given an unique
 * identifier (defined as a constant in this class).
 */
-public class GameOptions extends OptionMap {
+public class GameOptions {
 
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "model.option.startingMoney";
@@ -87,59 +87,5 @@ public class GameOptions extends OptionMap {
      */
     public static final String DIFFICULTY = "model.option.difficulty";
     
-    /**
-     * Creates a new <code>GameOptions</code>.
-     * @param specification a <code>Specification</code> value
-     */
-    public GameOptions(Specification specification) {
-        super(getXMLElementTagName(), specification);
-    }
-
-
-    /**
-     * Creates an <code>GameOptions</code> from an XML representation.
-     *
-     * <br><br>
-     *
-     * @param in The input stream containing the XML.
-     * @param specification a <code>Specification</code> value
-     * @exception XMLStreamException if an error occured during parsing.
-     */
-    public GameOptions(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-        super(in, getXMLElementTagName(), specification);
-    }
-    
-    /**
-     * Creates an <code>GameOptions</code> from an XML representation.
-     *
-     * <br><br>
-     *
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     * @param specification a <code>Specification</code> value
-     */
-    public GameOptions(Element e, Specification specification) {
-        super(e, getXMLElementTagName(), specification);
-    }
-
-    /**
-     * Adds the options to this <code>GameOptions</code>.
-     */
-    protected void addDefaultOptions() {
-        add(getSpecification().getOptionGroup("gameOptions"));
-    }
-
-    protected boolean isCorrectTagName(String tagName) {
-        return getXMLElementTagName().equals(tagName);
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     * @return "gameOptions".
-     */
-    public static String getXMLElementTagName() {
-        return "gameOptions";
-    }
 
 }

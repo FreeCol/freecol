@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
@@ -186,8 +187,9 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     private Element updateGameOptions(Element element) {
         Game game = getFreeColClient().getGame();
 
-        Element mgoElement = (Element) element.getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
-        game.getGameOptions().readFromXMLElement(mgoElement);
+        Element mgoElement = (Element) element.getElementsByTagName("gameOptions").item(0);
+        OptionGroup gameOptions = game.getSpecification().getOptionGroup("gameOptions");
+        gameOptions.readFromXMLElement(mgoElement);
 
         getFreeColClient().getCanvas().getStartGamePanel().updateGameOptions();
 

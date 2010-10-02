@@ -691,6 +691,41 @@ public final class Specification {
         return (StringOption) getOption(Id);
     }
 
+    /**
+     * Gets the integer value of an option.
+     *
+     * @param id The id of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no integer
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public int getInteger(String id) {
+        try {
+            return ((IntegerOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No integer value associated with the specified option.");
+        }
+    }
+
+    /**
+     * Gets the boolean value of an option.
+     *
+     * @param id The id of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no boolean
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public boolean getBoolean(String id) {
+        try {
+            return ((BooleanOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No boolean value associated with the specified option.");
+        }
+    }
+    
+
     // -- Buildings --
     public List<BuildingType> getBuildingTypeList() {
         return buildingTypeList;
@@ -1112,8 +1147,7 @@ public final class Specification {
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
                 if ("improvementaction-types".equals(childName)) {
-                    // TODO: remove compatibility code
-                    logger.finest("Found improvementaction-types.");
+                    // TODO: remove compatibility code after 0.10.0
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         // skip children
                         while ("action".equals(xsr.getLocalName())) {

@@ -1681,7 +1681,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         
         // consume the goods
         for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
-            if (getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
+            if (getSpecification().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
                 goodsRequired.getType().isStorable()) {
                 removeGoods(goodsRequired);
             } else {

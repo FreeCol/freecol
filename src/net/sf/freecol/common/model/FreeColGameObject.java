@@ -166,21 +166,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
     }
 
-
-
-
-    /**
-     * Gets the <code>GameOptions</code> that is associated with the 
-     * {@link Game} owning this <code>FreeColGameObject</code>.
-     * 
-     * @return The same <code>GameOptions</code>-object as returned
-     *       by <code>getGame().getGameOptions()</code>.
-     */
-    public GameOptions getGameOptions() {
-        return game.getGameOptions();
-    }
-
-    
     /**
      * Sets the game object this <code>FreeColGameObject</code> belongs to.
      * @param game The <code>game</code>.

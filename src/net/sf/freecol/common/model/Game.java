@@ -34,6 +34,10 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -63,8 +67,6 @@ public class Game extends FreeColGameObject {
     protected List<Player> players = new ArrayList<Player>();
 
     private Map map;
-
-    protected GameOptions gameOptions;
 
     protected MapGeneratorOptions mapGeneratorOptions;
 
@@ -845,14 +847,6 @@ public class Game extends FreeColGameObject {
 
 
     /**
-     * Gets the <code>GameOptions</code> that is associated with this
-     * {@link Game}.
-     */
-    public GameOptions getGameOptions() {
-        return gameOptions;
-    }
-
-    /**
      * Gets the <code>MapGeneratorOptions</code> that is associated with this
      * {@link Game}.
      */
@@ -986,7 +980,6 @@ public class Game extends FreeColGameObject {
             out.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
             out.writeEndElement();
         }
-        gameOptions.toXML(out);
         nationOptions.toXML(out);
         if (mapGeneratorOptions != null) {
             mapGeneratorOptions.toXML(out);
@@ -1051,14 +1044,14 @@ public class Game extends FreeColGameObject {
             currentPlayer = null;
         }
 
-        gameOptions = null;
         citiesOfCibola = new ArrayList<String>(7);
+        OptionGroup gameOptions = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tagName = in.getLocalName();
             logger.finest("Found tag " + tagName);
-            if (tagName.equals(GameOptions.getXMLElementTagName())
-                || tagName.equals("game-options")) {
-                gameOptions = new GameOptions(in, getSpecification());
+            if (tagName.equals("gameOptions") || tagName.equals("game-options")) {
+                // TODO: remove 0.9.x compatibility code
+                gameOptions = new OptionGroup(in);
             } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
                     nationOptions = new NationOptions(specification, Advantages.SELECTABLE);
@@ -1121,12 +1114,36 @@ public class Game extends FreeColGameObject {
                            "found instead: " + in.getLocalName());
         }
         
-        if (gameOptions == null) {
-            gameOptions = new GameOptions(getSpecification());
-        }
         if (mapGeneratorOptions == null) {
             mapGeneratorOptions = new MapGeneratorOptions(getSpecification());
         }
+
+        // TODO: remove compatibility code post 0.10.0
+        if (gameOptions != null) {
+            Iterator<Option> iterator = gameOptions.iterator();
+            while (iterator.hasNext()) {
+                Option opt = iterator.next();
+                if (opt instanceof IntegerOption) {
+                    IntegerOption option = (IntegerOption) opt;
+                    IntegerOption otherOption = specification.getIntegerOption(option.getId());
+                    if (otherOption == null) {
+                        specification.addAbstractOption(option);
+                    } else {
+                        otherOption.setValue(option.getValue());
+                    }
+                } else if (opt instanceof BooleanOption) {
+                    BooleanOption option = (BooleanOption) opt;
+                    BooleanOption otherOption = specification.getBooleanOption(option.getId());
+                    if (otherOption == null) {
+                        specification.addAbstractOption(option);
+                    } else {
+                        otherOption.setValue(option.getValue());
+                    }
+                }
+            }
+        }
+        // end compatibility code
+
     }
 
     /**

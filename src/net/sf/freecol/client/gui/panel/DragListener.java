@@ -327,7 +327,7 @@ public final class DragListener extends MouseAdapter {
         Unit unit = unitLabel.getUnit();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         
-        if (unit.getGame().getGameOptions().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
+        if (unit.getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : unit.getColony().getTeachers()) {
                 if (unit.canBeStudent(teacher) && (unit.getLocation() instanceof WorkLocation)) {
                     JMenuItem menuItem = null;

@@ -267,34 +267,6 @@ public abstract class OptionMap extends OptionGroup {
     }
     
     /**
-     * Writes the options to the given file.
-     * 
-     * @param saveFile The file where the client options should be written.
-     * @see ClientOptions
-     */
-    public void save(File saveFile) {
-        XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        XMLStreamWriter xsw = null;
-        try {
-            xsw = xof.createXMLStreamWriter(new FileOutputStream(saveFile));
-            xsw.writeStartDocument("UTF-8", "1.0");
-            toXML(xsw);
-            xsw.writeEndDocument();
-            xsw.flush();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while storing options.", e);
-        } finally {
-            try {
-                if (xsw != null) {
-                    xsw.close();
-                }
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception while closing stream.", e);
-            }
-        }
-    }
-    
-    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *  
