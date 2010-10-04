@@ -245,6 +245,8 @@ are the work of the devil!
 \item Call \verb+ant dist+ in order to build all packages. It might be
   necessary to increase the memory available for ant, for example by
   setting the environment variable \verb+ANT_OPTS="-Xms256m -Xmx256m"+.
+  Errors in language packs only apply to the installer and need not
+  delay the overall release.
 
 \item Install one of the generated packages and verify that you can play
   normally for at least five turns. Other good tests include loading a
@@ -283,10 +285,8 @@ FILE
 \item Compile the feature list for the news announcement (use the tracker
   and/or run the previous version for comparison).
 
-\item Update the release number in the "Version"-mambot.
-
-  (http://www.freecol.org/administrator > Mambots > Site Mambots >
-  Version)
+\item Update the release number in the "Version"-mambot at
+  http://www.freecol.org/administrator > Mambots > Site Mambots > Version.
 
 \item Publish/unpublish "Download Unstable Version" in the main menu
   (this page should only be displayed if the unstable version is the
@@ -316,12 +316,17 @@ The following items can be omitted for unstable releases:
 
 \begin{itemize}
 
-\item Trackers: Rename the group "Added (Trunk)"/"Added (x.y,z-branch)" to
-  Added (FreeCol x.y.z). Rename the group "Fixed (x.y,z-branch)"/
-  "Fixed (Trunk)" to Fixed (FreeCol x.y.z). Create new groups with the
-  names you just renamed from. Change the links on "Tracker > Admin >
-  Bugs/Feature... > Preferences". Add redirects for "bugtracker/x.y.z"
-  and "featuretracker/x.y.z". Create a new group for "In x.y.z".
+\item Rename the bug tracking group "Fixed (major.minor.x-branch)"/
+  "Fixed (Trunk)" to Fixed (FreeCol major.minor.number) and create a
+  replacement group "Fixed (major.minor.x)".
+
+\item Rename the feature tracking group "Added (Trunk)"/"Added
+  (major.minor.x-branch)" to Added (FreeCol major.minor.number) and
+  create a replacement group "Added (major.minor.x)".
+
+\item Change the links on "Tracker > Admin > Bugs/Feature... >
+  Preferences". Add redirects for "bugtracker/x.y.z" and
+  "featuretracker/x.y.z". Create a new group for "In x.y.z".
 
 \item Regenerate the documentation (with \verb+ant manual+) and
   JavaDoc (with \verb+ant javadoc+) and update JavaDoc and User
