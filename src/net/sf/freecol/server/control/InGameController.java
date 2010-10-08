@@ -5885,10 +5885,7 @@ public final class InGameController extends Controller {
                 int n = goods.getAmount() * a;
                 if (unit.isInEurope()) {
                     if (serverPlayer.canTrade(goodsType, Access.EUROPE)) {
-                        serverPlayer.csSell(unit.getGoodsContainer(), goodsType,
-                                            n, random, cs);
-                    } else {
-                        unit.getGoodsContainer().removeGoods(goodsType, n);
+                        serverPlayer.csSell(null, goodsType, n, random, cs);
                     }
                 } else if (settlement != null) {
                     settlement.addGoods(goodsType, n);

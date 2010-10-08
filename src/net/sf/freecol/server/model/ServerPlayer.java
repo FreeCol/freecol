@@ -605,7 +605,8 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
      * routine is called from higher level routines where other updates
      * happen.
      *
-     * @param container The <code>GoodsContainer</code> carrying the goods.
+     * @param container An optional <code>GoodsContainer</code>
+     *     carrying the goods.
      * @param type The <code>GoodsType</code> to sell.
      * @param amount The amount of goods to sell.
      * @param random A <code>Random</code> number source.
@@ -627,7 +628,7 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
         market.addGoodsToMarket(type, marketAmount);
         propagateToEuropeanMarkets(type, amount, random);
 
-        container.addGoods(type, -amount);
+        if (container != null) container.addGoods(type, -amount);
         if (market.hasPriceChanged(type)) {
             // This type of goods has changed price, so update the
             // market and send a message as well.
