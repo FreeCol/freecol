@@ -99,7 +99,7 @@ public class OptionGroup extends AbstractOption {
     }
 
 
-    private List<Option> getOptions() {
+    public List<Option> getOptions() {
         return options;
     }
 
@@ -182,6 +182,8 @@ public class OptionGroup extends AbstractOption {
                 option = new PercentageOption(in);
             } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
                 option = new AudioMixerOption(in);
+            } else if (StringOption.getXMLElementTagName().equals(optionType)) {
+                option = new StringOption(in);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");
                 in.nextTag();

@@ -195,7 +195,7 @@ public class MapGenerator implements IMapGenerator {
                             game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
                         } else {
                             logger.fine("Difficulty level is " + game.getDifficultyLevel().getId());
-                            game.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
+                            //game.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
                         }
                     }
                     game.setCurrentPlayer(null);

@@ -136,7 +136,6 @@ public final class Specification {
 
     private final List<EquipmentType> equipmentTypes = new ArrayList<EquipmentType>();
 
-    private final List<DifficultyLevel> difficultyLevels = new ArrayList<DifficultyLevel>();
     private final List<Event> events = new ArrayList<Event>();
     private final List<Modifier> specialModifiers = new ArrayList<Modifier>();
 
@@ -195,8 +194,6 @@ public final class Specification {
                       new TypeReader<Nation>(Nation.class, nations));
         readerMap.put("building-types",
                       new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
-        readerMap.put("difficultyLevels",
-                      new TypeReader<DifficultyLevel>(DifficultyLevel.class, difficultyLevels));
         readerMap.put("european-nation-types",
                       new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
         readerMap.put("equipment-types",
@@ -218,6 +215,7 @@ public final class Specification {
                       new TypeReader<UnitType>(UnitType.class, unitTypeList));
         readerMap.put("modifiers", new ModifierReader());
         readerMap.put("options", new OptionReader());
+
 
     }
 
@@ -310,10 +308,13 @@ public final class Specification {
             }
         }
 
-        for (DifficultyLevel level : difficultyLevels) {
-            for (Option option : level.getOptions().values()) {
-                if (option instanceof StringOption) {
-                    ((StringOption) option).generateChoices(this);
+        for (Option group : getOptionGroup("difficultyLevels").getOptions()) {
+            if (group instanceof OptionGroup) {
+                OptionGroup difficultyLevel = (OptionGroup) group;
+                for (Option option : difficultyLevel.getOptions()) {
+                    if (option instanceof StringOption) {
+                        ((StringOption) option).generateChoices(this);
+                    }
                 }
             }
         }
@@ -382,15 +383,18 @@ public final class Specification {
         public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String optionType = xsr.getLocalName();
+                String recursiveString = xsr.getAttributeValue(null, "recursive");
+                boolean recursive = "false".equals(recursiveString) ? false : true;
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
                     String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
                     OptionGroup group = allOptionGroups.get(id);
                     if (group == null) {
                         group = new OptionGroup(xsr);
+                        allOptionGroups.put(id, group);
                     } else {
                         group.readFromXML(xsr);
                     }
-                    specification.addOptionGroup(group);
+                    specification.addOptionGroup(group, recursive);
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");
                     xsr.nextTag();
@@ -614,18 +618,19 @@ public final class Specification {
      * Adds an <code>OptionGroup</code> to the specification
      *
      * @param optionGroup <code>OptionGroup</code> to add
+     * @param recursive a <code>boolean</code> value
      */
-    public void addOptionGroup(OptionGroup optionGroup) {
-        // Add the option group
-        allOptionGroups.put(optionGroup.getId(), optionGroup);
-
+    private void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
         // Add the options of the group
         Iterator<Option> iter = optionGroup.iterator();
 
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             Option option = iter.next();
             if (option instanceof OptionGroup) {
-                addOptionGroup((OptionGroup) option);
+                allOptionGroups.put(option.getId(), (OptionGroup) option);
+                if (recursive) {
+                    addOptionGroup((OptionGroup) option, true);
+                }
             } else {
                 addAbstractOption((AbstractOption) option);
             }
@@ -961,28 +966,18 @@ public final class Specification {
     }
 
     // -- DifficultyLevels --
-    public List<DifficultyLevel> getDifficultyLevels() {
-        return difficultyLevels;
-    }
-
-    public DifficultyLevel getDifficultyLevel() {
-        if (difficultyLevel != null) {
-            for (DifficultyLevel level : difficultyLevels) {
-                if (difficultyLevel.equals(level.getId())) {
-                    return level;
-                }
+    public List<OptionGroup> getDifficultyLevels() {
+        List<OptionGroup> result = new ArrayList<OptionGroup>();
+        for (Option option : allOptionGroups.get("difficultyLevels").getOptions()) {
+            if (option instanceof OptionGroup) {
+                result.add((OptionGroup) option);
             }
         }
-        return null;
+        return result;
     }
 
-    // -- Limits --
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public Event getEvent(String id) {
-        return getType(id, Event.class);
+    public OptionGroup getDifficultyLevel() {
+        return (OptionGroup) allOptionGroups.get("difficultyLevels").getOption(difficultyLevel);
     }
 
     /**
@@ -991,8 +986,8 @@ public final class Specification {
      * @param id a <code>String</code> value
      * @return a <code>DifficultyLevel</code> value
      */
-    public DifficultyLevel getDifficultyLevel(String id) {
-        return getType(id, DifficultyLevel.class);
+    public OptionGroup getDifficultyLevel(String id) {
+        return allOptionGroups.get(id);
     }
 
     /**
@@ -1001,8 +996,8 @@ public final class Specification {
      * @param level an <code>int</code> value
      * @return a <code>DifficultyLevel</code> value
      */
-    public DifficultyLevel getDifficultyLevel(int level) {
-        return difficultyLevels.get(level);
+    public OptionGroup getDifficultyLevel(int level) {
+        return getDifficultyLevels().get(level);
     }
 
     /**
@@ -1032,11 +1027,9 @@ public final class Specification {
      *
      * @param level difficulty level to apply
      */
-    public void applyDifficultyLevel(DifficultyLevel level) {
+    public void applyDifficultyLevel(OptionGroup level) {
         logger.info("Applying difficulty level " + level.getId());
-        for (String key : level.getOptions().keySet()) {
-            allOptions.put(key, level.getOptions().get(key));
-        }
+        addOptionGroup(level, true);
 
         for (FreeColGameObjectType type : allTypes.values()) {
             type.applyDifficultyLevel(level);
@@ -1048,6 +1041,15 @@ public final class Specification {
         }
 
         this.difficultyLevel = level.getId();
+    }
+
+    // -- Events --
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public Event getEvent(String id) {
+        return getType(id, Event.class);
     }
 
     /**
@@ -1104,7 +1106,6 @@ public final class Specification {
         writeSection(out, "european-nation-types", REFNationTypes);
         writeSection(out, "indian-nation-types", indianNationTypes);
         writeSection(out, "nations", nations);
-        writeSection(out, "difficultyLevels", difficultyLevels);
         writeSection(out, "options", allOptionGroups.values());
 
         // End element:

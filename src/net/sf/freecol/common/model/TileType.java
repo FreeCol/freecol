@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -340,7 +341,7 @@ public final class TileType extends FreeColGameObjectType {
      * @param difficulty difficulty level to apply
      */
     @Override
-    public void applyDifficultyLevel(DifficultyLevel difficultyLevel) {
+    public void applyDifficultyLevel(OptionGroup difficultyLevel) {
         String tileProduction = ((StringOption) difficultyLevel.getOption("model.option.tileProduction"))
             .getValue();
         primaryGoods = getPrimaryGoods(tileProduction);

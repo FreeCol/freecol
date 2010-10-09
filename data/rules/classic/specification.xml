@@ -1491,174 +1491,174 @@
        recruit-price-increase: determines how fast the price for recruiting colonists increases
        lower-cap-increase: determines how fast the minimum price for recruiting colonists increases
     -->
-  <difficultyLevels>
-    <difficultyLevel id="model.difficulty.veryEasy">
-      <integerOption id="model.option.startingMoney" value="1000"/>
-      <integerOption id="model.option.crossesIncrement" value="6"/>
-      <integerOption id="model.option.badGovernmentLimit" value="8"/>
-      <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
-      <integerOption id="model.option.landPriceFactor" value="40"/>
-      <integerOption id="model.option.foundingFatherFactor" value="24"/>
-      <integerOption id="model.option.arrearsFactor" value="300"/>
-      <integerOption id="model.option.nativeSettlementDensity" value="40"/>
-      <integerOption id="model.option.nativeConvertProbability" value="50"/>
-      <integerOption id="model.option.burnProbability" value="2"/>
-      <integerOption id="model.option.nativeDemands" value="0"/>
-      <integerOption id="model.option.recruitPriceIncrease" value="20"/>
-      <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-      <integerOption id="model.option.monarchMeddling" value="0"/>
-      <integerOption id="model.option.refStrength" value="0"/>
-      <integerOption id="model.option.taxAdjustment" value="0"/>
-      <integerOption id="model.option.mercenaryPrice" value="50"/>
-      <integerOption id="model.option.maximumTax" value="50"/>
-      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.expertStartingUnits" value="true" />
-      <stringOption  id="model.option.tileProduction" value="veryHigh" />
-      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
-      <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
-      <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
-    </difficultyLevel>
-    <difficultyLevel id="model.difficulty.easy">
-      <integerOption id="model.option.startingMoney" value="300"/>
-      <integerOption id="model.option.crossesIncrement" value="8"/>
-      <integerOption id="model.option.badGovernmentLimit" value="7"/>
-      <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
-      <integerOption id="model.option.landPriceFactor" value="50"/>
-      <integerOption id="model.option.foundingFatherFactor" value="32"/>
-      <integerOption id="model.option.arrearsFactor" value="400"/>
-      <integerOption id="model.option.nativeSettlementDensity" value="50"/>
-      <integerOption id="model.option.nativeConvertProbability" value="40"/>
-      <integerOption id="model.option.burnProbability" value="4"/>
-      <integerOption id="model.option.nativeDemands" value="1"/>
-      <integerOption id="model.option.recruitPriceIncrease" value="30"/>
-      <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-      <integerOption id="model.option.refStrength" value="2"/>
-      <integerOption id="model.option.monarchMeddling" value="1"/>
-      <integerOption id="model.option.taxAdjustment" value="1"/>
-      <integerOption id="model.option.mercenaryPrice" value="60"/>
-      <integerOption id="model.option.maximumTax" value="60"/>
-      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.expertStartingUnits" value="true" />
-      <stringOption  id="model.option.tileProduction" value="high" />
-      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
-      <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
-    </difficultyLevel>
-    <difficultyLevel id="model.difficulty.medium">
-      <integerOption id="model.option.startingMoney" value="0"/>
-      <integerOption id="model.option.crossesIncrement" value="10"/>
-      <integerOption id="model.option.badGovernmentLimit" value="6"/>
-      <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
-      <integerOption id="model.option.landPriceFactor" value="60"/>
-      <integerOption id="model.option.foundingFatherFactor" value="40"/>
-      <integerOption id="model.option.arrearsFactor" value="500"/>
-      <integerOption id="model.option.nativeSettlementDensity" value="60"/>
-      <integerOption id="model.option.nativeConvertProbability" value="30"/>
-      <integerOption id="model.option.burnProbability" value="6"/>
-      <integerOption id="model.option.nativeDemands" value="2"/>
-      <integerOption id="model.option.recruitPriceIncrease" value="40"/>
-      <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-      <integerOption id="model.option.refStrength" value="4"/>
-      <integerOption id="model.option.monarchMeddling" value="2"/>
-      <integerOption id="model.option.taxAdjustment" value="2"/>
-      <integerOption id="model.option.mercenaryPrice" value="65"/>
-      <integerOption id="model.option.maximumTax" value="65"/>
-      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.expertStartingUnits" value="false" />
-      <stringOption  id="model.option.tileProduction" value="medium" />
-      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
-    </difficultyLevel>
-    <difficultyLevel id="model.difficulty.hard">
-      <integerOption id="model.option.startingMoney" value="0"/>
-      <integerOption id="model.option.crossesIncrement" value="12"/>
-      <integerOption id="model.option.badGovernmentLimit" value="5"/>
-      <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
-      <integerOption id="model.option.landPriceFactor" value="70"/>
-      <integerOption id="model.option.foundingFatherFactor" value="48"/>
-      <integerOption id="model.option.arrearsFactor" value="600"/>
-      <integerOption id="model.option.nativeSettlementDensity" value="70"/>
-      <integerOption id="model.option.nativeConvertProbability" value="20"/>
-      <integerOption id="model.option.burnProbability" value="8"/>
-      <integerOption id="model.option.nativeDemands" value="3"/>
-      <integerOption id="model.option.recruitPriceIncrease" value="30"/>
-      <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-      <integerOption id="model.option.refStrength" value="6"/>
-      <integerOption id="model.option.monarchMeddling" value="3"/>
-      <integerOption id="model.option.taxAdjustment" value="3"/>
-      <integerOption id="model.option.mercenaryPrice" value="70"/>
-      <integerOption id="model.option.maximumTax" value="70"/>
-      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.expertStartingUnits" value="false" />
-      <stringOption  id="model.option.tileProduction" value="low" />
-   </difficultyLevel>
-    <difficultyLevel id="model.difficulty.veryHard">
-      <integerOption id="model.option.startingMoney" value="0"/>
-      <integerOption id="model.option.crossesIncrement" value="14"/>
-      <integerOption id="model.option.badGovernmentLimit" value="4"/>
-      <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
-      <integerOption id="model.option.landPriceFactor" value="80"/>
-      <integerOption id="model.option.foundingFatherFactor" value="56"/>
-      <integerOption id="model.option.arrearsFactor" value="700"/>
-      <integerOption id="model.option.nativeSettlementDensity" value="80"/>
-      <integerOption id="model.option.nativeConvertProbability" value="10"/>
-      <integerOption id="model.option.burnProbability" value="10"/>
-      <integerOption id="model.option.nativeDemands" value="4"/>
-      <integerOption id="model.option.recruitPriceIncrease" value="30"/>
-      <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-      <integerOption id="model.option.refStrength" value="8"/>
-      <integerOption id="model.option.monarchMeddling" value="4"/>
-      <integerOption id="model.option.taxAdjustment" value="4"/>
-      <integerOption id="model.option.mercenaryPrice" value="75"/>
-      <integerOption id="model.option.maximumTax" value="75"/>
-      <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-      <booleanOption id="model.option.expertStartingUnits" value="false" />
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-      <stringOption  id="model.option.tileProduction" value="veryLow" />
-    </difficultyLevel>
-    <difficultyLevel id="model.difficulty.custom">
-      <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
-      <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
-      <integerOption id="model.option.nativeSettlementDensity" value="80" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.nativeConvertProbability" value="10" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.burnProbability" value="10" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
-      <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
-      <integerOption id="model.option.refStrength" value="8" minimumValue="0" maximumValue="100"/>
-      <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
-      <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
-      <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
-      <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
-      <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
-      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.expertStartingUnits" value="false" />
-      <stringOption  id="model.option.tileProduction" value="veryLow">
-        <choice value="veryLow" />
-        <choice value="low" />
-        <choice value="medium" />
-        <choice value="high" />
-        <choice value="veryHigh" />
-      </stringOption>
-      <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
-      <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
-      <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />
-    </difficultyLevel>
-  </difficultyLevels>
   <options>
+    <optionGroup id="difficultyLevels" recursive="false">
+      <optionGroup id="model.difficulty.veryEasy">
+        <integerOption id="model.option.startingMoney" value="1000"/>
+        <integerOption id="model.option.crossesIncrement" value="6"/>
+        <integerOption id="model.option.badGovernmentLimit" value="8"/>
+        <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
+        <integerOption id="model.option.landPriceFactor" value="40"/>
+        <integerOption id="model.option.foundingFatherFactor" value="24"/>
+        <integerOption id="model.option.arrearsFactor" value="300"/>
+        <integerOption id="model.option.nativeSettlementDensity" value="40"/>
+        <integerOption id="model.option.nativeConvertProbability" value="50"/>
+        <integerOption id="model.option.burnProbability" value="2"/>
+        <integerOption id="model.option.nativeDemands" value="0"/>
+        <integerOption id="model.option.recruitPriceIncrease" value="20"/>
+        <integerOption id="model.option.lowerCapIncrease" value="0"/>
+        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+        <integerOption id="model.option.monarchMeddling" value="0"/>
+        <integerOption id="model.option.refStrength" value="0"/>
+        <integerOption id="model.option.taxAdjustment" value="0"/>
+        <integerOption id="model.option.mercenaryPrice" value="50"/>
+        <integerOption id="model.option.maximumTax" value="50"/>
+        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <booleanOption id="model.option.expertStartingUnits" value="true" />
+        <stringOption  id="model.option.tileProduction" value="veryHigh" />
+        <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+        <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
+        <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
+      </optionGroup>
+      <optionGroup id="model.difficulty.easy">
+        <integerOption id="model.option.startingMoney" value="300"/>
+        <integerOption id="model.option.crossesIncrement" value="8"/>
+        <integerOption id="model.option.badGovernmentLimit" value="7"/>
+        <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
+        <integerOption id="model.option.landPriceFactor" value="50"/>
+        <integerOption id="model.option.foundingFatherFactor" value="32"/>
+        <integerOption id="model.option.arrearsFactor" value="400"/>
+        <integerOption id="model.option.nativeSettlementDensity" value="50"/>
+        <integerOption id="model.option.nativeConvertProbability" value="40"/>
+        <integerOption id="model.option.burnProbability" value="4"/>
+        <integerOption id="model.option.nativeDemands" value="1"/>
+        <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+        <integerOption id="model.option.lowerCapIncrease" value="0"/>
+        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+        <integerOption id="model.option.refStrength" value="2"/>
+        <integerOption id="model.option.monarchMeddling" value="1"/>
+        <integerOption id="model.option.taxAdjustment" value="1"/>
+        <integerOption id="model.option.mercenaryPrice" value="60"/>
+        <integerOption id="model.option.maximumTax" value="60"/>
+        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <booleanOption id="model.option.expertStartingUnits" value="true" />
+        <stringOption  id="model.option.tileProduction" value="high" />
+        <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+        <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
+      </optionGroup>
+      <optionGroup id="model.difficulty.medium">
+        <integerOption id="model.option.startingMoney" value="0"/>
+        <integerOption id="model.option.crossesIncrement" value="10"/>
+        <integerOption id="model.option.badGovernmentLimit" value="6"/>
+        <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
+        <integerOption id="model.option.landPriceFactor" value="60"/>
+        <integerOption id="model.option.foundingFatherFactor" value="40"/>
+        <integerOption id="model.option.arrearsFactor" value="500"/>
+        <integerOption id="model.option.nativeSettlementDensity" value="60"/>
+        <integerOption id="model.option.nativeConvertProbability" value="30"/>
+        <integerOption id="model.option.burnProbability" value="6"/>
+        <integerOption id="model.option.nativeDemands" value="2"/>
+        <integerOption id="model.option.recruitPriceIncrease" value="40"/>
+        <integerOption id="model.option.lowerCapIncrease" value="0"/>
+        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+        <integerOption id="model.option.refStrength" value="4"/>
+        <integerOption id="model.option.monarchMeddling" value="2"/>
+        <integerOption id="model.option.taxAdjustment" value="2"/>
+        <integerOption id="model.option.mercenaryPrice" value="65"/>
+        <integerOption id="model.option.maximumTax" value="65"/>
+        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <booleanOption id="model.option.expertStartingUnits" value="false" />
+        <stringOption  id="model.option.tileProduction" value="medium" />
+        <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+      </optionGroup>
+      <optionGroup id="model.difficulty.hard">
+        <integerOption id="model.option.startingMoney" value="0"/>
+        <integerOption id="model.option.crossesIncrement" value="12"/>
+        <integerOption id="model.option.badGovernmentLimit" value="5"/>
+        <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
+        <integerOption id="model.option.landPriceFactor" value="70"/>
+        <integerOption id="model.option.foundingFatherFactor" value="48"/>
+        <integerOption id="model.option.arrearsFactor" value="600"/>
+        <integerOption id="model.option.nativeSettlementDensity" value="70"/>
+        <integerOption id="model.option.nativeConvertProbability" value="20"/>
+        <integerOption id="model.option.burnProbability" value="8"/>
+        <integerOption id="model.option.nativeDemands" value="3"/>
+        <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+        <integerOption id="model.option.lowerCapIncrease" value="0"/>
+        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+        <integerOption id="model.option.refStrength" value="6"/>
+        <integerOption id="model.option.monarchMeddling" value="3"/>
+        <integerOption id="model.option.taxAdjustment" value="3"/>
+        <integerOption id="model.option.mercenaryPrice" value="70"/>
+        <integerOption id="model.option.maximumTax" value="70"/>
+        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <booleanOption id="model.option.expertStartingUnits" value="false" />
+        <stringOption  id="model.option.tileProduction" value="low" />
+      </optionGroup>
+      <optionGroup id="model.difficulty.veryHard">
+        <integerOption id="model.option.startingMoney" value="0"/>
+        <integerOption id="model.option.crossesIncrement" value="14"/>
+        <integerOption id="model.option.badGovernmentLimit" value="4"/>
+        <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
+        <integerOption id="model.option.landPriceFactor" value="80"/>
+        <integerOption id="model.option.foundingFatherFactor" value="56"/>
+        <integerOption id="model.option.arrearsFactor" value="700"/>
+        <integerOption id="model.option.nativeSettlementDensity" value="80"/>
+        <integerOption id="model.option.nativeConvertProbability" value="10"/>
+        <integerOption id="model.option.burnProbability" value="10"/>
+        <integerOption id="model.option.nativeDemands" value="4"/>
+        <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+        <integerOption id="model.option.lowerCapIncrease" value="0"/>
+        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+        <integerOption id="model.option.refStrength" value="8"/>
+        <integerOption id="model.option.monarchMeddling" value="4"/>
+        <integerOption id="model.option.taxAdjustment" value="4"/>
+        <integerOption id="model.option.mercenaryPrice" value="75"/>
+        <integerOption id="model.option.maximumTax" value="75"/>
+        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+        <booleanOption id="model.option.expertStartingUnits" value="false" />
+        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <stringOption  id="model.option.tileProduction" value="veryLow" />
+      </optionGroup>
+      <optionGroup id="model.difficulty.custom">
+        <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
+        <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
+        <integerOption id="model.option.nativeSettlementDensity" value="80" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.nativeConvertProbability" value="10" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.burnProbability" value="10" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
+        <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
+        <integerOption id="model.option.refStrength" value="8" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
+        <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
+        <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
+        <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
+        <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
+        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <booleanOption id="model.option.expertStartingUnits" value="false" />
+        <stringOption  id="model.option.tileProduction" value="veryLow">
+          <choice value="veryLow" />
+          <choice value="low" />
+          <choice value="medium" />
+          <choice value="high" />
+          <choice value="veryHigh" />
+        </stringOption>
+        <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
+        <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
+        <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />
+      </optionGroup>
+    </optionGroup>
     <optionGroup id="gameOptions">
       <optionGroup id="gameOptions.map">
         <!-- Enables/disables fog of war -->

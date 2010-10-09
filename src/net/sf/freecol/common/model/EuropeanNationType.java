@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.OptionGroup;
 
 /**
  * Represents one of the European nations present in the game, i.e. both REFs
@@ -127,7 +128,7 @@ public class EuropeanNationType extends NationType {
      * @param difficulty difficulty level to apply
      */
     @Override
-    public void applyDifficultyLevel(DifficultyLevel difficulty) {
+    public void applyDifficultyLevel(OptionGroup difficulty) {
         String experts = Boolean.toString(((BooleanOption) difficulty.getOption("model.option.expertStartingUnits"))
                                           .getValue());
         startingUnits = getStartingUnits(experts);

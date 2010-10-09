@@ -100,11 +100,6 @@ public class Game extends FreeColGameObject {
      */
     private boolean spanishSuccession = false;
 
-    /**
-     * Describe difficultyLevel here.
-     */
-    private DifficultyLevel difficultyLevel;
-
     protected ModelController modelController;
 
     protected FreeColGameObjectListener freeColGameObjectListener;
@@ -316,21 +311,12 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the <code>DifficultyLevel</code> value.
+     * Get the <code>OptionGroup</code> value.
      *
-     * @return a <code>DifficultyLevel</code> value
+     * @return a <code>OptionGroup</code> value
      */
-    public final DifficultyLevel getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    /**
-     * Set the <code>DifficultyLevel</code> value.
-     *
-     * @param newDifficultyLevel The new DifficultyLevel value.
-     */
-    public final void setDifficultyLevel(final DifficultyLevel newDifficultyLevel) {
-        this.difficultyLevel = newDifficultyLevel;
+    public final OptionGroup getDifficultyLevel() {
+        return specification.getDifficultyLevel();
     }
 
     /**
@@ -1009,11 +995,6 @@ public class Game extends FreeColGameObject {
         }
         */
 
-        // serialize difficulty level
-        if (difficultyLevel != null) {
-            difficultyLevel.toXML(out);
-        }
-
         out.writeEndElement();
     }
 
@@ -1094,9 +1075,9 @@ public class Game extends FreeColGameObject {
             } else if (CIBOLA_TAG.equals(tagName)) {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
-            } else if (DifficultyLevel.getXMLElementTagName().equals(tagName)) {
-                difficultyLevel = new DifficultyLevel("", specification);
-                difficultyLevel.readFromXML(in);
+            } else if (OptionGroup.getXMLElementTagName().equals(tagName)) {
+                // remove compatibility code after 0.10.0
+                OptionGroup difficultyLevel = new OptionGroup(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
             } else if (Specification.getXMLElementTagName().equals(tagName)) {

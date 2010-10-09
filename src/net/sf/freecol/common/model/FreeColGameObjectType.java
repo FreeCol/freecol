@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.option.OptionGroup;
 
 /**
  * The base class for all types defined by the specification. It can
@@ -172,7 +173,7 @@ public class FreeColGameObjectType extends FreeColObject {
      *
      * @param difficulty difficulty level to apply
      */
-    public void applyDifficultyLevel(DifficultyLevel difficulty) {
+    public void applyDifficultyLevel(OptionGroup difficulty) {
         // do nothing
     }
 

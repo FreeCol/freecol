@@ -56,7 +56,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -76,6 +75,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
@@ -708,7 +708,7 @@ public final class FreeColServer {
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
-                        DifficultyLevel level = game.getDifficultyLevel();
+                        OptionGroup level = game.getDifficultyLevel();
                         if (level == null) {
                             try {
                                 int levelIndex = game.getSpecification().getInteger("model.option.difficulty");
@@ -720,7 +720,6 @@ public final class FreeColServer {
                         }
                         logger.fine("Difficulty level is " + level.getId());
                         game.getSpecification().applyDifficultyLevel(level);
-                        game.setDifficultyLevel(level);
                     }
                     game.setCurrentPlayer(null);
                     gameState = GameState.IN_GAME;

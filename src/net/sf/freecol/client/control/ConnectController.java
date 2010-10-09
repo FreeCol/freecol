@@ -47,7 +47,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -56,6 +55,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
@@ -95,7 +95,7 @@ public final class ConnectController {
      * @param level a <code>DifficultyLevel</code> value
      */
     public void startMultiplayerGame(Specification specification, boolean publicServer, String username, int port,
-                                     Advantages advantages, DifficultyLevel level) {
+                                     Advantages advantages, OptionGroup level) {
 
         freeColClient.setMapEditor(false);
 

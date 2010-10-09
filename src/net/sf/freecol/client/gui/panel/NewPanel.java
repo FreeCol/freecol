@@ -45,10 +45,10 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
-import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.option.OptionGroup;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -240,7 +240,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     String tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
                     FreeColTcFile tcData = new FreeColTcFile(tc);
                     Specification specification = tcData.getSpecification();
-                    DifficultyLevel level = getCanvas()
+                    OptionGroup level = getCanvas()
                         .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
                     specification.applyDifficultyLevel(level);
                     Advantages advantages = (Advantages) nationalAdvantages.getSelectedItem();

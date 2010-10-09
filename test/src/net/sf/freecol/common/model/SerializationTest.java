@@ -38,6 +38,7 @@ import javax.xml.validation.Validator;
 
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.xml.sax.SAXException;
@@ -186,8 +187,8 @@ public class SerializationTest extends FreeColTestCase {
         assertNotNull(specification1);
         assertNotNull(specification2);
 
-        DifficultyLevel level1 = specification1.getDifficultyLevel();
-        DifficultyLevel level2 = specification2.getDifficultyLevel();
+        OptionGroup level1 = specification1.getDifficultyLevel();
+        OptionGroup level2 = specification2.getDifficultyLevel();
         assertNotNull(level1);
         assertNotNull(level2);
         assertEquals(level1.getId(), level2.getId());
