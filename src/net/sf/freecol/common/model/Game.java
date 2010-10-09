@@ -1059,15 +1059,15 @@ public class Game extends FreeColGameObject {
                 nationOptions.readFromXML(in);
             } else if (tagName.equals(Player.getXMLElementTagName())) {
                 Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (player != null) {
-                    player.readFromXML(in);
-                } else {
+                if (player == null) {
                     player = new Player(this, in);
-                    if (player.getName().equals(Player.UNKNOWN_ENEMY)) {
+                    if (player.isUnknownEnemy()) {
                         setUnknownEnemy(player);
                     } else {
                         players.add(player);
                     }
+                } else {
+                    player.readFromXML(in);
                 }
             } else if (tagName.equals(Map.getXMLElementTagName())) {
                 String mapId = in.getAttributeValue(null, "ID");

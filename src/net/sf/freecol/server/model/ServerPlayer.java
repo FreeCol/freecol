@@ -169,12 +169,12 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
          *      || ((no units in New World)
          *         && ((year > 1600) || (cannot get a unit from Europe)))
          */
-
         switch (getPlayerType()) {
         case NATIVE: // All natives units are viable
             return getUnits().isEmpty();
 
         case COLONIAL: // Handle the hard case below
+            if (isUnknownEnemy()) return false;
             break;
 
         case REBEL: case INDEPENDENT:

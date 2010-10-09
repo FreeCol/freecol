@@ -1766,6 +1766,12 @@ public class Player extends FreeColGameObject implements Nameable {
         return getName();
     }
 
+    /**
+     * Is this player the unknown enemy?
+     */
+    public boolean isUnknownEnemy() {
+        return UNKNOWN_ENEMY.equals(name);
+    }
 
     /**
      * Returns the name of this player.
@@ -3256,7 +3262,7 @@ public class Player extends FreeColGameObject implements Nameable {
         setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
-        if (!name.equals(UNKNOWN_ENEMY)) {
+        if (!isUnknownEnemy()) {
             nationType = getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
         }
         admin = getAttribute(in, "admin", false);

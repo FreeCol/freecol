@@ -2270,9 +2270,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The name of the owner of this Unit unless this is hidden.
      */
     public StringTemplate getApparentOwnerName() {
-        return (hasAbility("model.ability.piracy"))
-            ? StringTemplate.name(Player.UNKNOWN_ENEMY)
-            : owner.getNationName();
+        return ((hasAbility("model.ability.piracy"))
+                ? getGame().getUnknownEnemy()
+                : owner).getNationName();
     }
 
     /**
