@@ -371,7 +371,7 @@ public final class TilePopup extends JPopupMenu {
                    && unit.getWorkImprovement() != null) {
             occ = StringTemplate.label(": ")
                 .add(unit.getWorkImprovement().getType() + ".occupationString")
-                .add(Integer.toString(unit.getWorkLeft()));
+                .add(Integer.toString(unit.getWorkTurnsLeft()));
         } else if (tradeRoute != null) {
             occ = StringTemplate.label(": ")
                 .add("model.unit.occupation.inTradeRoute")

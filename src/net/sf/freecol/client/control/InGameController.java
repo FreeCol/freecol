@@ -721,9 +721,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unload succeeded.
      */
     private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
-        if (colony == null && carrier.isInEurope()
-            && carrier.getOwner().canTrade(goods)) {
-            return sellGoods(goods);
+        if (colony == null && carrier.isInEurope()) {
+            return (!carrier.getOwner().canTrade(goods)) ? false
+                : sellGoods(goods);
         }
         GoodsType type = goods.getType();
         int amount = goods.getAmount();
@@ -4274,7 +4274,7 @@ public final class InGameController implements NetworkConstants {
             && !canvas.showConfirmDialog(unit.getTile(),
                                          "model.unit.confirmCancelWork",
                                          "yes", "no",
-                                         "%turns%", Integer.toString(unit.getWorkLeft()))) {
+                                         "%turns%", Integer.toString(unit.getWorkTurnsLeft()))) {
             return;
         }
 

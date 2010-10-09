@@ -2820,17 +2820,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Get the number of turns of work left.
      * 
-     * Caution: This does not equal the internal amount of work left as expert bonuses 
-     * are included in the returned number. 
+     * Caution: This does not equal the internal amount of work left
+     * as expert bonuses are included in the returned number.
      * 
-     * @return number of turns of work left.
+     * @return The number of turns of work left.
      */
-    public int getWorkLeft() {
-        if (state == UnitState.IMPROVING && unitType.hasAbility("model.ability.expertPioneer")){
-            return workLeft / 2;
-        }
-        
-        return workLeft;
+    public int getWorkTurnsLeft() {
+        return (state == UnitState.IMPROVING
+                && unitType.hasAbility("model.ability.expertPioneer"))
+            ? workLeft / 2
+            : workLeft;
     }
 
     /**

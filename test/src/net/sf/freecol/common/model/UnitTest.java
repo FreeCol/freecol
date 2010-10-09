@@ -94,7 +94,7 @@ public class UnitTest extends FreeColTestCase {
         // Before
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
-        assertEquals(-1, hardyPioneer.getWorkLeft());
+        assertEquals(-1, hardyPioneer.getWorkTurnsLeft());
         assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasImprovement(plow));
 
@@ -105,7 +105,7 @@ public class UnitTest extends FreeColTestCase {
 
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.IMPROVING, hardyPioneer.getState());
-        assertEquals(1, hardyPioneer.getWorkLeft());
+        assertEquals(1, hardyPioneer.getWorkTurnsLeft());
         assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasImprovement(plow));
 
@@ -115,7 +115,7 @@ public class UnitTest extends FreeColTestCase {
         // Pioneer finished work but can only move on next turn
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
-        assertEquals(-1, hardyPioneer.getWorkLeft());
+        assertEquals(-1, hardyPioneer.getWorkTurnsLeft());
         assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(true, plain.hasImprovement(plow));
 
@@ -124,7 +124,7 @@ public class UnitTest extends FreeColTestCase {
 
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
-        assertEquals(-1, hardyPioneer.getWorkLeft());
+        assertEquals(-1, hardyPioneer.getWorkTurnsLeft());
         assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(true, plain.hasImprovement(plow));
     }
@@ -222,12 +222,12 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(false, plain.hasRoad());
 
         assertEquals(3, hardyPioneer1.getMovesLeft());
-        assertEquals(-1, hardyPioneer1.getWorkLeft());
+        assertEquals(-1, hardyPioneer1.getWorkTurnsLeft());
         assertEquals(100, hardyPioneer1.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
 
         assertEquals(3, hardyPioneer2.getMovesLeft());
-        assertEquals(-1, hardyPioneer2.getWorkLeft());
+        assertEquals(-1, hardyPioneer2.getWorkTurnsLeft());
         assertEquals(100, hardyPioneer2.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer2.getState());
 
@@ -240,9 +240,9 @@ public class UnitTest extends FreeColTestCase {
         hardyPioneer1.work(roadImprovement);
         hardyPioneer2.work(roadImprovement);
         hardyPioneer3.work(clearImprovement);
-        assertEquals(2, hardyPioneer1.getWorkLeft());
-        assertEquals(1, hardyPioneer2.getWorkLeft());
-        assertEquals(3, hardyPioneer3.getWorkLeft());
+        assertEquals(2, hardyPioneer1.getWorkTurnsLeft());
+        assertEquals(1, hardyPioneer2.getWorkTurnsLeft());
+        assertEquals(3, hardyPioneer3.getWorkTurnsLeft());
 
         dutch.newTurn();
 
@@ -252,18 +252,18 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(clearImprovement.isComplete());
 
         assertEquals(3, hardyPioneer1.getMovesLeft());
-        assertEquals(-1, hardyPioneer1.getWorkLeft());
+        assertEquals(-1, hardyPioneer1.getWorkTurnsLeft());
         assertEquals(80, hardyPioneer1.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
 
         assertEquals(0, hardyPioneer2.getMovesLeft());
-        assertEquals(-1, hardyPioneer2.getWorkLeft());
+        assertEquals(-1, hardyPioneer2.getWorkTurnsLeft());
         assertEquals(80, hardyPioneer2.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer2.getState());
 
         // Pioneer clearing forest is not affected
         assertEquals(3, hardyPioneer3.getMovesLeft());
-        assertEquals(2, hardyPioneer3.getWorkLeft());
+        assertEquals(2, hardyPioneer3.getWorkTurnsLeft());
         assertEquals(100, hardyPioneer3.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.IMPROVING, hardyPioneer3.getState());
 
@@ -271,7 +271,7 @@ public class UnitTest extends FreeColTestCase {
         dutch.newTurn();
 
         assertEquals(3, hardyPioneer1.getMovesLeft());
-        assertEquals(-1, hardyPioneer1.getWorkLeft());
+        assertEquals(-1, hardyPioneer1.getWorkTurnsLeft());
         assertEquals(80, hardyPioneer1.getEquipmentCount(toolsType) * 20);
         assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
     }
@@ -295,7 +295,7 @@ public class UnitTest extends FreeColTestCase {
         }
         unit.work(improvement);
 
-        return unit.getWorkLeft();
+        return unit.getWorkTurnsLeft();
     }
 
     /**
