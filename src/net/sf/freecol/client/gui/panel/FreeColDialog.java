@@ -359,10 +359,8 @@ public class FreeColDialog<T> extends FreeColPanel {
 
     public static FreeColDialog<Dimension> createMapSizeDialog(final Canvas canvas) {
 
-        final int defaultSize = canvas.getSpecification().getRangeOption("model.option.mapSize")
-            .getValue();
-        final int defaultHeight = MapGeneratorOptions.getHeight(defaultSize);
-        final int defaultWidth = MapGeneratorOptions.getWidth(defaultSize);
+        final int defaultHeight = 100;
+        final int defaultWidth = 40;
         final int COLUMNS = 5;
         
         final String widthText = Messages.message("width");

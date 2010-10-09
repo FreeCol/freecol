@@ -43,27 +43,6 @@ import org.w3c.dom.Element;
 public class MapGeneratorOptions extends OptionMap {
 
     /**
-     * Option for setting the size of the map. Possible values are:
-     * <ul>
-     * <li>{@link #MAP_SIZE_SMALL}</li>
-     * <li>{@link #MAP_SIZE_MEDIUM}</li>
-     * <li>{@link #MAP_SIZE_LARGE}</li>
-     * <li>{@link #MAP_SIZE_VERY_LARGE}</li>
-     * <li>{@link #MAP_SIZE_HUGE}</li>
-     * 
-     */
-    public static final String MAP_SIZE = "model.option.mapSize";
-
-    /**
-     * One of the settings used by {@link #MAP_SIZE}.
-     */
-    public static final int MAP_SIZE_SMALL      = 0,
-                            MAP_SIZE_MEDIUM     = 1,
-                            MAP_SIZE_LARGE      = 2,
-                            MAP_SIZE_VERY_LARGE = 3,
-                            MAP_SIZE_HUGE       = 4;
-
-    /**
      * Option for setting the land mass of the map.
      */
     public static final String LAND_MASS = "model.option.landMass";
@@ -197,21 +176,6 @@ public class MapGeneratorOptions extends OptionMap {
 
         /* Add options here: */
         add(spec.getOptionGroup("mapGeneratorOptions.import"));
-
-        /* Add additional infos in the labels of map size and land mass options (but only once!) */
-        Map<Integer, String> mapSizeValues = spec.getRangeOption(MAP_SIZE).getItemValues();
-        Map<Integer, String> landMassValues = spec.getRangeOption(LAND_MASS).getItemValues();
-        if(!mapSizeValues.get(0).substring(0,1).equals("<")) {
-            for (int index : mapSizeValues.keySet()) {
-                mapSizeValues.put(index, "<html><center>" + mapSizeValues.get(index) + "<br/>(" + getWidth(index)
-                        + "\u00D7" + getHeight(index) + ")</center></html>");
-            }
-            for (int index : landMassValues.keySet()) {
-                landMassValues.put(index, "<html><center>" + landMassValues.get(index) + "<br/>(" + index
-                        + "%)</center></html>");
-            }
-        }
-        
         add(spec.getOptionGroup("mapGeneratorOptions.landGenerator"));
         add(spec.getOptionGroup("mapGeneratorOptions.terrainGenerator"));
     }
@@ -222,24 +186,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The width of the map.
      */
     public int getWidth() {
-        return getWidth(getInteger(MAP_SIZE));
-    }
-
-    public static int getWidth(final int size) {
-        switch (size) {
-        case MAP_SIZE_SMALL:
-            return 28;
-        case MAP_SIZE_MEDIUM:
-            return 40;
-        case MAP_SIZE_LARGE:
-            return 50;
-        case MAP_SIZE_VERY_LARGE:
-            return 60;
-        case MAP_SIZE_HUGE:
-            return 75;
-        default:
-            throw new IllegalStateException("Invalid map-size: " + size + ".");
-        }
+        return getSpecification().getInteger("model.option.mapWidth");
     }
 
     /**
@@ -248,24 +195,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The height of the map.
      */
     public int getHeight() {
-        return getHeight(getInteger(MAP_SIZE));
-    }
-
-    public static int getHeight(int size) {
-        switch (size) {
-        case MAP_SIZE_SMALL:
-            return 70;
-        case MAP_SIZE_MEDIUM:
-            return 100;
-        case MAP_SIZE_LARGE:
-            return 125;
-        case MAP_SIZE_VERY_LARGE:
-            return 150;
-        case MAP_SIZE_HUGE:
-            return 190;
-        default:
-            throw new IllegalStateException("Invalid map-size: " + size + ".");
-        }
+        return getSpecification().getInteger("model.option.mapHeight");
     }
 
     /**
@@ -274,7 +204,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of land.
      */
     public int getLandMass() {
-        return getSpecification().getRangeOption(LAND_MASS).getValue();
+        return getSpecification().getInteger(LAND_MASS);
     }
 
     /**
@@ -292,7 +222,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The value of the land generator.
      */
     public int getLandGeneratorType() {
-        return getSpecification().getRangeOption(LAND_GEN_TYPE).getValue();
+        return getSpecification().getInteger(LAND_GEN_TYPE);
     }
 
     /**
@@ -301,7 +231,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of rivers.
      */
     public int getNumberOfRivers() {
-        return getLand()/getSpecification().getRangeOption(RIVER_NUMBER).getValue();
+        return getLand()/getSpecification().getInteger(RIVER_NUMBER);
     }
 
     /**
@@ -310,7 +240,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of mountain tiles.
      */
     public int getNumberOfMountainTiles() {
-        return getLand()/getSpecification().getRangeOption(MOUNTAIN_NUMBER).getValue();
+        return getLand()/getSpecification().getInteger(MOUNTAIN_NUMBER);
     }
 
     /**
@@ -319,7 +249,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of rumours.
      */
     public int getNumberOfRumours() {
-        return getLand()/getSpecification().getRangeOption(RUMOUR_NUMBER).getValue();
+        return getLand()/getSpecification().getInteger(RUMOUR_NUMBER);
     }
 
     /**
@@ -328,7 +258,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of settlements.
      */
     public int getNumberOfSettlements() {
-        return getLand()/getSpecification().getRangeOption(SETTLEMENT_NUMBER).getValue();
+        return getLand()/getSpecification().getInteger(SETTLEMENT_NUMBER);
     }
 
     /**
@@ -337,7 +267,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of forests.
      */
     public int getPercentageOfForests() {
-        return getSpecification().getRangeOption(FOREST_NUMBER).getValue();
+        return getSpecification().getInteger(FOREST_NUMBER);
     }
 
     /**
@@ -346,7 +276,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of bonus tiles.
      */
     public int getPercentageOfBonusTiles() {
-        return getSpecification().getRangeOption(BONUS_NUMBER).getValue();
+        return getSpecification().getInteger(BONUS_NUMBER);
     }
 
     /**
@@ -355,21 +285,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The distance to land from high seas.
      */
     public int getDistLandHighSea() {
-        final int size = getInteger(MAP_SIZE);
-        switch (size) {
-        case MAP_SIZE_SMALL:
-            return 4;
-        case MAP_SIZE_MEDIUM:
-            return 4;
-        case MAP_SIZE_LARGE:
-            return 4;
-        case MAP_SIZE_VERY_LARGE:
-            return 4;
-        case MAP_SIZE_HUGE:
-            return 4;
-        default:
-            throw new IllegalStateException("Invalid map-size: " + size + ".");
-        }
+        return 4;
     }
 
     /**
@@ -378,21 +294,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The maximum distance to edge.
      */
     public int getMaxDistToEdge() {
-        final int size = getInteger(MAP_SIZE);
-        switch (size) {
-        case MAP_SIZE_SMALL:
-            return 7;
-        case MAP_SIZE_MEDIUM:
-            return 10;
-        case MAP_SIZE_LARGE:
-            return 12;
-        case MAP_SIZE_VERY_LARGE:
-            return 15;
-        case MAP_SIZE_HUGE:
-            return 20;
-        default:
-            throw new IllegalStateException("Invalid map-size: " + size + ".");
-        }
+        return Math.max(7, getWidth()/10);
     }
 
     /**
@@ -403,21 +305,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The preferred distance to edge.
      */
     public int getPrefDistToEdge() {
-        final int size = getInteger(MAP_SIZE);
-        switch (size) {
-        case MAP_SIZE_SMALL:
-            return 5;
-        case MAP_SIZE_MEDIUM:
-            return 5;
-        case MAP_SIZE_LARGE:
-            return 5;
-        case MAP_SIZE_VERY_LARGE:
-            return 5;
-        case MAP_SIZE_HUGE:
-            return 5;
-        default:
-            throw new IllegalStateException("Invalid map-size: " + size + ".");
-        }
+        return 5;
     }
 
     /**
@@ -426,7 +314,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The humidity.
      */
     public int getHumidity() {
-        return getSpecification().getRangeOption(HUMIDITY).getValue();
+        return getSpecification().getInteger(HUMIDITY);
     }
 
     /**
@@ -435,7 +323,7 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The temperature.
      */
     public int getTemperature() {
-        return getSpecification().getRangeOption(TEMPERATURE).getValue();
+        return getSpecification().getInteger(TEMPERATURE);
     }
 
     protected boolean isCorrectTagName(String tagName) {

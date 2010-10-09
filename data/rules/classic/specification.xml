@@ -1709,29 +1709,18 @@
         <booleanOption id="model.option.importSettlements" defaultValue="false"/>
       </optionGroup>
       <optionGroup id="mapGeneratorOptions.landGenerator" >
-        <!-- Option for setting the size of the map -->
-        <rangeOption id="model.option.mapSize" defaultValue="1" localizedLabels="true">
-          <rangeValue label="small" value="0"/>
-          <rangeValue label="medium" value="1"/>
-          <rangeValue label="large" value="2"/>
-          <rangeValue label="veryLarge" value="3"/>
-          <rangeValue label="huge" value="4"/>
-        </rangeOption>
+        <!-- Options for setting the size of the map -->
+        <integerOption id="model.option.mapWidth" value="40" minimumValue="20" maximumValue="200"/>
+        <integerOption id="model.option.mapHeight" value="100" minimumValue="20" maximumValue="200"/>
         <!-- Option for setting the land mass of the map -->
-        <rangeOption id="model.option.landMass" defaultValue="25" localizedLabels="true">
-          <rangeValue label="small" value="15"/>
-          <rangeValue label="medium" value="25"/>
-          <rangeValue label="large" value="30"/>
-          <rangeValue label="veryLarge" value="35"/>
-          <rangeValue label="huge" value="40"/>
-        </rangeOption>
+        <integerOption id="model.option.landMass" value="25" minimumValue="15" maximumValue="50"/>
         <!-- Option for setting the type of land generator to be used -->
-        <rangeOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
-          <rangeValue label="Classic" value="0"/>
-          <rangeValue label="Continent" value="1"/>
-          <rangeValue label="Archipelago" value="2"/>
-          <rangeValue label="Islands" value="3"/>
-        </rangeOption>
+        <selectOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
+          <selectValue label="Classic" value="0"/>
+          <selectValue label="Continent" value="1"/>
+          <selectValue label="Archipelago" value="2"/>
+          <selectValue label="Islands" value="3"/>
+        </selectOption>
       </optionGroup>
       <optionGroup id="mapGeneratorOptions.terrainGenerator" >
         <!-- Option for setting the number of rivers on the map

@@ -80,9 +80,6 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(null, g.getMap());
 
         IMapGenerator gen = new MapGenerator(mmc.getPseudoRandom(), spec());
-        RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getOption(MapGeneratorOptions.MAP_SIZE);
-        mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
-
         Nation nation = spec().getNation("model.nation.dutch");
 
         g.addPlayer(new Player(g, nation.getType().getNameKey(), false, nation));
