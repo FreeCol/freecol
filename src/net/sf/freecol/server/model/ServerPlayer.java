@@ -53,7 +53,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
-import net.sf.freecol.server.model.ServerTurn;
+import net.sf.freecol.server.model.ServerModelObject;
 
 
 /**
@@ -62,8 +62,8 @@ import net.sf.freecol.server.model.ServerTurn;
 * That is: pointers to this player's
 * {@link Connection} and {@link Socket}
 */
-public class ServerPlayer extends Player implements ServerModelObject, ServerTurn {
-    
+public class ServerPlayer extends Player implements ServerModelObject {
+
     private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
 
     /** The network socket to the player's client. */
@@ -77,11 +77,16 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
     /** Remaining emigrants to select due to a fountain of youth */
     private int remainingEmigrants = 0;
 
-    private String serverID;
-
 
     /**
-     * Creates a new <code>ServerPlayer</code>.
+     * Trivial constructor required for all ServerModelObjects.
+     */
+    public ServerPlayer(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
+     * Creates a new ServerPlayer.
      *
      * @param game The <code>Game</code> this object belongs to.
      * @param name The player name.
@@ -101,11 +106,6 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
         resetCanSeeTiles();
 
         connected = (connection != null);
-    }
-
-
-    public ServerPlayer(XMLStreamReader in) throws XMLStreamException {
-        readFromServerAdditionElement(in);
     }
 
 
@@ -683,38 +683,18 @@ public class ServerPlayer extends Player implements ServerModelObject, ServerTur
         */
     }
 
-    public void toServerAdditionElement(XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeStartElement(getServerAdditionXMLElementTagName());
-        out.writeAttribute("ID", getId());
-        out.writeEndElement();
-    }
-    
-    
-    /**
-     * Sets the ID of the super class to be <code>serverID</code>.
-     */
-    public void updateID() {
-        setId(serverID);
-    }
-    
-    
-    public void readFromServerAdditionElement(XMLStreamReader in) throws XMLStreamException {
-        serverID = in.getAttributeValue(null, "ID");
-        in.nextTag();
-    }
-    
     @Override
     public String toString() {
-        return "ServerPlayer[name="+getName()+",serverID=" + serverID + ",conn=" + connection + "]";
+        return "ServerPlayer[name=" + getName() + ",ID=" + getId()
+            + ",conn=" + connection + "]";
     }
-    
+
     /**
      * Returns the tag name of the root element representing this object.
      *
      * @return "serverPlayer"
      */
-    public static String getServerAdditionXMLElementTagName() {
+    public String getServerXMLElementTagName() {
         return "serverPlayer";
     }
 }

@@ -225,14 +225,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Updates the id. This method should be overwritten
-     * by server model objects.
-     */
-    public void updateID() {
-        
-    }
-    
-    /**
      * This method writes an XML-representation of this object to
      * the given stream for the purpose of storing this object
      * as a part of a saved game.
@@ -450,24 +442,23 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     public <T extends FreeColGameObject> T updateFreeColGameObject(XMLStreamReader in, Class<T> returnClass) {
-        final String attributeString = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if (attributeString == null) {
-            return null;
-        } else {
-            T returnValue = returnClass.cast(getGame().getFreeColGameObject(attributeString));
-            try {
-                if (returnValue == null) {
-                    Constructor<T> c = returnClass.getConstructor(Game.class, XMLStreamReader.class);
-                    returnValue = returnClass.cast(c.newInstance(getGame(), in));
-                } else {
-                    returnValue.readFromXML(in);
-                }
-                return returnValue;
-            } catch(Exception e) {
-                logger.warning("Failed to update FreeColGameObject with ID " + attributeString);
-                e.printStackTrace();
-                return null;
+        final String idString = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if (idString == null) return null;
+        FreeColGameObject fcgo = getGame().getFreeColGameObject(idString);
+        T returnValue = (fcgo == null) ? null : returnClass.cast(fcgo);
+        try {
+            if (returnValue == null) {
+                Constructor<T> c = returnClass.getConstructor(Game.class, XMLStreamReader.class);
+                returnValue = returnClass.cast(c.newInstance(getGame(), in));
+            } else {
+                returnValue.readFromXML(in);
             }
+            return returnValue;
+        } catch (Exception e) {
+            logger.warning("Failed to update FreeColGameObject with ID "
+                           + idString);
+            e.printStackTrace();
+            return null;
         }
     }
 

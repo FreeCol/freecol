@@ -596,11 +596,14 @@ public final class FreeColServer {
             xsw.writeAttribute("randomState", getRandomState(random));
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
-            Iterator<FreeColGameObject> fcgoIterator = game.getFreeColGameObjectIterator();
+            Iterator<FreeColGameObject> fcgoIterator
+                = game.getFreeColGameObjectIterator();
             while (fcgoIterator.hasNext()) {
                 FreeColGameObject fcgo = fcgoIterator.next();
                 if (fcgo instanceof ServerModelObject) {
-                    ((ServerModelObject) fcgo).toServerAdditionElement(xsw);
+                    xsw.writeStartElement(((ServerModelObject) fcgo).getServerXMLElementTagName());
+                    xsw.writeAttribute("ID", fcgo.getId());
+                    xsw.writeEndElement();
                 }
             }
             xsw.writeEndElement();
@@ -683,18 +686,15 @@ public final class FreeColServer {
                 }
             }
             final String owner = xsr.getAttributeValue(null, "owner");
-            ArrayList<Object> serverObjects = null;
+            ArrayList<String> serverObjects = null;
             aiMain = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("serverObjects")) {
-                    // Reads the ServerAdditionObjects:
-                    serverObjects = new ArrayList<Object>();
+                    serverObjects = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
-                            serverObjects.add(new ServerPlayer(xsr));
-                        } else {
-                            throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
-                        }
+                        serverObjects.add(xsr.getLocalName());
+                        serverObjects.add(xsr.getAttributeValue(null, "ID"));
+                        xsr.nextTag();
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
@@ -703,8 +703,8 @@ public final class FreeColServer {
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
-                    game = new ServerGame(null, getModelController(), xsr, serverObjects
-                                          .toArray(new FreeColGameObject[0]), specification);
+                    game = new ServerGame(null, getModelController(), xsr,
+                                          serverObjects, specification);
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level

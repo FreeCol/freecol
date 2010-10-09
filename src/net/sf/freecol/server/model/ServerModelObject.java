@@ -19,9 +19,14 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.Random;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.server.control.ChangeSet;
+
 
 /**
  * Interface for server-side objects which needs to store
@@ -29,6 +34,29 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public interface ServerModelObject  {
 
-    public void toServerAdditionElement(XMLStreamWriter out) throws XMLStreamException;
-    public void readFromServerAdditionElement(XMLStreamReader in) throws XMLStreamException;
+    /*
+      All ServerModelObjects must also implement a trivial constructor
+      (ServerGame does not but it is special, being the Game itself)
+      of the form:
+
+      public <constructor>(Game game, String id) {
+          super(game, id);
+      }
+    */
+
+    /**
+     * Gets the tag to use when saving this server object.
+     *
+     * @return The server object tag.
+     */
+    public String getServerXMLElementTagName();
+
+    /**
+     * Executes new-turn actions for this server object.
+     *
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csNewTurn(Random random, ChangeSet cs);
+
 } 

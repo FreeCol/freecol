@@ -19,6 +19,10 @@
 
 package net.sf.freecol.server.model;
 
+import java.lang.reflect.InvocationTargetException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -44,13 +48,13 @@ import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.model.ServerTurn;
+import net.sf.freecol.server.model.ServerModelObject;
 
 
 /**
  * The server representation of the game.
  */
-public class ServerGame extends Game implements ServerTurn {
+public class ServerGame extends Game implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerGame.class.getName());
 
@@ -83,15 +87,15 @@ public class ServerGame extends Game implements ServerTurn {
      *            actions not allowed from the model (generate random numbers
      *            etc).
      * @param in The input stream containing the XML.
-     * @param fcgos A list of <code>FreeColGameObject</code>s to be added to
-     *            this <code>Game</code>.
+     * @param serverStrings A list of server object type,ID pairs to create.
+     *            in this <code>Game</code>.
      * @param specification The <code>Specification</code> to use in this game.
      * @throws XMLStreamException if an error occurred during parsing.
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener,
                       ModelController modelController, XMLStreamReader in,
-                      FreeColGameObject[] fcgos, Specification specification)
+                      List<String> serverStrings, Specification specification)
         throws XMLStreamException {
         super(specification);
 
@@ -102,17 +106,50 @@ public class ServerGame extends Game implements ServerTurn {
             this.combatModel = new SimpleCombatModel();
         }
         this.viewOwner = null;
+        this.setGame(this);
 
-        for (FreeColGameObject object : fcgos) {
-            object.setGame(this);
-            object.updateID();
+        // Need a container to hold a reference to all the server
+        // objects until the rest of the game is read.  Without this,
+        // because the server objects are just placeholders with no
+        // real references to them, the WeakReferences in the Game are
+        // insufficient to preserve them across garbage collections.
+        List<Object> serverObjects = new ArrayList<Object>();
 
-            if (object instanceof Player) {
-                players.add((Player) object);
+        // Create trivial instantiations of all the server objects.
+        while (!serverStrings.isEmpty()) {
+            String type = serverStrings.remove(0);
+            String id = serverStrings.remove(0);
+            try {
+                Object o = makeServerObject(type, id);
+                serverObjects.add(o);
+                if (o instanceof Player) {
+                    players.add((Player) o);
+                }
+            } catch (Exception e) {
+                logger.warning("Build " + type + "failed: " + e.getMessage());
             }
         }
 
         readFromXML(in);
+    }
+
+    /**
+     * Makes a trivial server object in this game given a server object tag
+     * and an id.
+     *
+     * @param type The server object tag.
+     * @param id The id.
+     * @return A trivial server object.
+     */
+    private Object makeServerObject(String type, String id)
+        throws ClassNotFoundException, IllegalAccessException,
+               InstantiationException, InvocationTargetException,
+               NoSuchMethodException {
+        type = "net.sf.freecol.server.model."
+            + type.substring(0,1).toUpperCase() + type.substring(1);
+        Class<?> c = Class.forName(type);
+        return c.getConstructor(Game.class, String.class)
+            .newInstance(this, id);
     }
 
 
@@ -239,4 +276,12 @@ public class ServerGame extends Game implements ServerTurn {
         }
     }
 
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "serverGame".
+     */
+    public String getServerXMLElementTagName() {
+        return "serverGame";
+    }
 }

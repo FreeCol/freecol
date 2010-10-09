@@ -170,17 +170,13 @@ public class MapGenerator implements IMapGenerator {
             int savegameVersion = FreeColServer.getSavegameVersion(xsr);
             logger.info("Found savegame version " + savegameVersion);
             
-            ArrayList<Object> serverObjects = null;
+            ArrayList<String> serverObjects = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("serverObjects")) {
-                    // Reads the ServerAdditionObjects:
-                    serverObjects = new ArrayList<Object>();
+                    serverObjects = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
-                            serverObjects.add(new ServerPlayer(xsr));
-                        } else {
-                            throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
-                        }
+                        serverObjects.add(xsr.getLocalName());
+                        serverObjects.add(xsr.getAttributeValue(null, "ID"));
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
@@ -190,8 +186,7 @@ public class MapGenerator implements IMapGenerator {
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
-                    game = new ServerGame(null, null, xsr, serverObjects
-                                          .toArray(new FreeColGameObject[serverObjects.size()]), specification);
+                    game = new ServerGame(null, null, xsr, serverObjects, specification);
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
