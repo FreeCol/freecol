@@ -40,13 +40,14 @@ import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.miginfocom.swing.MigLayout;
 
 /**
  * Dialog for changing the
- * {@link net.sf.freecol.server.generator.MapGeneratorOptions}.
+ * {@link net.sf.freecol.server.generator.OptionGroup}.
  */
 public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
 
@@ -59,7 +60,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      * 
      * @param parent The parent of this panel.
      */
-    public MapGeneratorOptionsDialog(Canvas parent, MapGeneratorOptions mgo, boolean editable) {
+    public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable) {
         super(parent);
         setLayout(new MigLayout("wrap 1"));
 

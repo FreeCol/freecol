@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -65,7 +66,7 @@ public class TerrainGenerator {
         Direction.N, Direction.E, Direction.S, Direction.W
     };
 
-    private final MapGeneratorOptions mapGeneratorOptions;
+    private final OptionGroup mapGeneratorOptions;
     private final Random random;
 
     private TileType ocean;
@@ -83,8 +84,7 @@ public class TerrainGenerator {
      * @param random A <code>Random</code> number source.
      * @see #createMap
      */
-    public TerrainGenerator(MapGeneratorOptions mapGeneratorOptions,
-                            Random random) {
+    public TerrainGenerator(OptionGroup mapGeneratorOptions, Random random) {
         this.mapGeneratorOptions = mapGeneratorOptions;
         this.random = random;
     }
@@ -252,7 +252,8 @@ public class TerrainGenerator {
      */
     private void perhapsAddBonus(Tile t, boolean generateBonus) {
         if (t.isLand()) {
-            if (generateBonus && random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
+            if (generateBonus
+                && random.nextInt(100) < getMapGeneratorOptions().getInteger("model.option.bonusNumber")) {
                 // Create random Bonus Resource
                 t.setResource(createResource(t));
             }
@@ -288,7 +289,7 @@ public class TerrainGenerator {
                     t.setResource(createResource(t));
                 }
             } else {
-                if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
+                if (random.nextInt(100) < getMapGeneratorOptions().getInteger("model.option.bonusNumber")) {
                     // Create random Bonus Resource
                     t.setResource(createResource(t));
                 }
@@ -319,7 +320,7 @@ public class TerrainGenerator {
      * @return The <code>MapGeneratorOptions</code> being used
      *      when creating terrain.
      */
-    private MapGeneratorOptions getMapGeneratorOptions() {
+    private OptionGroup getMapGeneratorOptions() {
         return mapGeneratorOptions;
     }
 
@@ -334,8 +335,8 @@ public class TerrainGenerator {
      */
     private TileType getRandomLandTileType(Game game, int latitudePercent) {
         // decode options
-        final int forestChance = getMapGeneratorOptions().getPercentageOfForests();
-        final int temperaturePreference = getMapGeneratorOptions().getTemperature();
+        final int forestChance = getMapGeneratorOptions().getInteger("model.option.forestNumber");
+        final int temperaturePreference = getMapGeneratorOptions().getInteger("model.option.temperature");
         
         // create the main list of TileTypes the first time, and reuse it afterwards
         if (terrainTileTypes==null) {
@@ -792,10 +793,8 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to create high seas on.
      */
     private void createHighSeas(Map map) {
-        createHighSeas(map,
-            getMapGeneratorOptions().getDistLandHighSea(),
-            getMapGeneratorOptions().getMaxDistToEdge()
-        );
+        createHighSeas(map, getMapGeneratorOptions().getInteger("model.option.distanceToHighSea"),
+                       getMapGeneratorOptions().getInteger("model.option.maximumDistanceToEdge"));
     }
 
 
@@ -914,10 +913,11 @@ public class TerrainGenerator {
         float randomHillsRatio = 0.5f;
         // 50% of user settings will be allocated for random hills here and there
         // the rest will be allocated for large mountain ranges
-        int maximumLength = Math.max(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight()) / 10;
-        int number = (int)(getMapGeneratorOptions().getNumberOfMountainTiles()*(1-randomHillsRatio));
-        logger.info("Number of land tiles is " + getMapGeneratorOptions().getLand() +
-                    ", number of mountain tiles is " + number);
+        int maximumLength = Math.max(getMapGeneratorOptions().getInteger("model.option.mapWidth"),
+                                     getMapGeneratorOptions().getInteger("model.option.mapHeight")) / 10;
+        int number = (int)(getMapGeneratorOptions().getInteger("model.option.mountainNumber")
+                           * (1 - randomHillsRatio));
+        logger.info("Number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
         
         // lookup the resources from specification
@@ -1000,7 +1000,8 @@ public class TerrainGenerator {
         logger.info("Added " + counter + " mountain range tiles.");
         
         // and sprinkle a few random hills/mountains here and there
-        number = (int)(getMapGeneratorOptions().getNumberOfMountainTiles()*randomHillsRatio);
+        number = (int)(getMapGeneratorOptions().getInteger("model.option.mountainNumber")
+                       * randomHillsRatio);
         counter = 0;
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
@@ -1048,7 +1049,7 @@ public class TerrainGenerator {
      * @param map The map to create rivers on.
      */
     private void createRivers(Map map) {
-        int number = getMapGeneratorOptions().getNumberOfRivers();
+        int number = getMapGeneratorOptions().getInteger("model.option.riverNumber");
         int counter = 0;
         HashMap<Position, River> riverMap = new HashMap<Position, River>();
         List<River> rivers = new ArrayList<River>();

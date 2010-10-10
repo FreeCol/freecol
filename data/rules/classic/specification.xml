@@ -1721,6 +1721,12 @@
           <selectValue label="Archipelago" value="2"/>
           <selectValue label="Islands" value="3"/>
         </selectOption>
+        <integerOption id="model.option.preferredDistanceToEdge" defaultValue="5"
+                       minimumValue="1" maximumValue="10"/>
+        <integerOption id="model.option.maximumDistanceToEdge" defaultValue="10"
+                       minimumValue="5" maximumValue="20"/>
+        <integerOption id="model.option.distanceToHighSea" defaultValue="4"
+                       minimumValue="3" maximumValue="10"/>
       </optionGroup>
       <optionGroup id="mapGeneratorOptions.terrainGenerator" >
         <!-- Option for setting the number of rivers on the map

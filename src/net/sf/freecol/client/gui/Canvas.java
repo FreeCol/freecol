@@ -124,6 +124,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -1784,7 +1785,7 @@ public final class Canvas extends JDesktopPane {
      *         <code>false</code> otherwise.
      */
     public boolean showMapGeneratorOptionsDialog(boolean editable) {
-        final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
+        final OptionGroup mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
         return showMapGeneratorOptionsDialog(mgo, editable);
     }
 
@@ -1797,7 +1798,7 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the options have been modified, and
      *         <code>false</code> otherwise.
      */
-    public boolean showMapGeneratorOptionsDialog(MapGeneratorOptions mgo, boolean editable) {
+    public boolean showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable) {
         MapGeneratorOptionsDialog mapGeneratorOptionsDialog =
             new MapGeneratorOptionsDialog(this, mgo, editable);
         return showFreeColDialog(mapGeneratorOptionsDialog);

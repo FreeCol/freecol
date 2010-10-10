@@ -46,7 +46,6 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -59,7 +58,6 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -273,13 +271,6 @@ public final class ConnectController {
                 freeColClient.setGame(game);
                 freeColClient.setMyPlayer(thisPlayer);
 
-                final MapGeneratorOptions mgo;
-                if (in.getLocalName().equals(MapGeneratorOptions.getXMLElementTagName())) {
-                    mgo = new MapGeneratorOptions(in, game.getSpecification());
-                } else {
-                    mgo = new MapGeneratorOptions(game.getSpecification());
-                }
-                freeColClient.getPreGameController().setMapGeneratorOptions(mgo);
                 freeColClient.getActionManager().addSpecificationActions(game.getSpecification());
                 
                 c.endTransmission(in);

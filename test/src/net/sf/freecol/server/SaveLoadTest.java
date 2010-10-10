@@ -23,6 +23,7 @@ import java.io.File;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.generator.IMapGenerator;
@@ -77,7 +78,8 @@ public class SaveLoadTest extends FreeColTestCase {
         // start a new server and import the file
         server = ServerTestHelper.startServer(false, true);
         IMapGenerator mapGenerator = server.getMapGenerator();
-        mapGenerator.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, file);
+        ((FileOption) mapGenerator.getMapGeneratorOptions().getOption(MapGeneratorOptions.IMPORT_FILE))
+        .setValue(file);
         Controller c = server.getController();
         assertNotNull(c);
         assertTrue(c instanceof PreGameController);

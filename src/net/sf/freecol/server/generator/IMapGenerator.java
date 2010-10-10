@@ -2,6 +2,7 @@ package net.sf.freecol.server.generator;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.option.OptionGroup;
 
 /**
 * Creates maps and sets the starting locations for the players.
@@ -17,6 +18,6 @@ public interface IMapGenerator {
 	 * Gets the options used when generating the map.
 	 * @return The <code>MapGeneratorOptions</code>.
 	 */
-	public abstract MapGeneratorOptions getMapGeneratorOptions();
+	public abstract OptionGroup getMapGeneratorOptions();
 
 }

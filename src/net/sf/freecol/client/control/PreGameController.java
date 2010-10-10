@@ -55,15 +55,10 @@ import org.w3c.dom.Element;
 * The controller that will be used before the game starts.
 */
 public final class PreGameController {
+
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
 
-
     private FreeColClient freeColClient;
-
-    private MapGeneratorOptions mapGeneratorOptions = null;
-
-
-
 
     /**
     * The constructor to use.
@@ -73,26 +68,14 @@ public final class PreGameController {
         this.freeColClient = freeColClient;
     }
 
-
-
-    /**
-     * Sets the <code>MapGeneratorOptions</code> used when creating
-     * a map.
-     * 
-     * @param mapGeneratorOptions The <code>MapGeneratorOptions</code>.
-     */
-    void setMapGeneratorOptions(MapGeneratorOptions mapGeneratorOptions) {
-        this.mapGeneratorOptions = mapGeneratorOptions; 
-    }
-    
     /**
      * Gets the <code>MapGeneratorOptions</code> used when creating
      * a map.
      * 
      * @return The <code>MapGeneratorOptions</code>.
      */
-    public MapGeneratorOptions getMapGeneratorOptions() {
-        return mapGeneratorOptions; 
+    public OptionGroup getMapGeneratorOptions() {
+        return freeColClient.getGame().getMapGeneratorOptions();
     }
 
     /**
@@ -201,13 +184,12 @@ public final class PreGameController {
      * This method should be called after updating that object.
      */
      public void sendMapGeneratorOptions() {
-         if (mapGeneratorOptions != null) {
-             Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
-             updateMapGeneratorOptionsElement
-                 .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
-             freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
-             freeColClient.getClient().send(updateMapGeneratorOptionsElement);
-         }
+         OptionGroup mapGeneratorOptions = getMapGeneratorOptions();
+         Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
+         updateMapGeneratorOptionsElement
+             .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
+         //freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
+         freeColClient.getClient().send(updateMapGeneratorOptionsElement);
      }    
 
     /**

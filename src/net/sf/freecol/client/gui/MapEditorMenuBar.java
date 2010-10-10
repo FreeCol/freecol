@@ -49,7 +49,7 @@ import net.sf.freecol.client.gui.action.ZoomInAction;
 import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
+import net.sf.freecol.common.option.OptionGroup;
 
 /**
  * The menu bar used when running in editor mode.
@@ -115,11 +115,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         playItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     File saveGameFile = new File(FreeCol.getAutosaveDirectory(), "tempMap.fsg");
-                    MapGeneratorOptions options = freeColClient.getPreGameController().getMapGeneratorOptions();
-                    if (options == null) {
-                        options = new MapGeneratorOptions(freeColClient.getGame().getSpecification());
-                    }
-                    options.setFile(MapGeneratorOptions.IMPORT_FILE, saveGameFile);                        
+                    OptionGroup options = freeColClient.getPreGameController().getMapGeneratorOptions();
+                    //options.setFile(MapGeneratorOptions.IMPORT_FILE, saveGameFile);                        
                     freeColClient.getMapEditorController().saveGame(saveGameFile);
                     freeColClient.getPreGameController().sendMapGeneratorOptions();
                     freeColClient.getCanvas().newGame();

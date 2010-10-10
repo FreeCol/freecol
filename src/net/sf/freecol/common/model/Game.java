@@ -68,8 +68,6 @@ public class Game extends FreeColGameObject {
 
     private Map map;
 
-    protected MapGeneratorOptions mapGeneratorOptions;
-
     /** The name of the player whose turn it is. */
     protected Player currentPlayer = null;
 
@@ -836,12 +834,8 @@ public class Game extends FreeColGameObject {
      * Gets the <code>MapGeneratorOptions</code> that is associated with this
      * {@link Game}.
      */
-    public MapGeneratorOptions getMapGeneratorOptions() {
-        return mapGeneratorOptions;
-    }
-
-    public void setMapGeneratorOptions(MapGeneratorOptions options) {
-        mapGeneratorOptions = options;
+    public OptionGroup getMapGeneratorOptions() {
+        return specification.getOptionGroup("mapGeneratorOptions");
     }
 
     /**
@@ -967,9 +961,6 @@ public class Game extends FreeColGameObject {
             out.writeEndElement();
         }
         nationOptions.toXML(out);
-        if (mapGeneratorOptions != null) {
-            mapGeneratorOptions.toXML(out);
-        }
 
         // serialize players
         Iterator<Player> playerIterator = getPlayerIterator();
@@ -1027,6 +1018,7 @@ public class Game extends FreeColGameObject {
 
         citiesOfCibola = new ArrayList<String>(7);
         OptionGroup gameOptions = null;
+        OptionGroup mapGeneratorOptions = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tagName = in.getLocalName();
             logger.finest("Found tag " + tagName);
@@ -1079,7 +1071,8 @@ public class Game extends FreeColGameObject {
                 // remove compatibility code after 0.10.0
                 OptionGroup difficultyLevel = new OptionGroup(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
-                mapGeneratorOptions = new MapGeneratorOptions(in, getSpecification());
+                // TODO: remove 0.9.x compatibility code
+                mapGeneratorOptions = new OptionGroup(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
                 specification = new Specification();
                 specification.readFromXMLImpl(in);
@@ -1095,37 +1088,43 @@ public class Game extends FreeColGameObject {
                            "found instead: " + in.getLocalName());
         }
         
-        if (mapGeneratorOptions == null) {
-            mapGeneratorOptions = new MapGeneratorOptions(getSpecification());
-        }
-
         // TODO: remove compatibility code post 0.10.0
         if (gameOptions != null) {
-            Iterator<Option> iterator = gameOptions.iterator();
-            while (iterator.hasNext()) {
-                Option opt = iterator.next();
-                if (opt instanceof IntegerOption) {
-                    IntegerOption option = (IntegerOption) opt;
-                    IntegerOption otherOption = specification.getIntegerOption(option.getId());
-                    if (otherOption == null) {
-                        specification.addAbstractOption(option);
-                    } else {
-                        otherOption.setValue(option.getValue());
-                    }
-                } else if (opt instanceof BooleanOption) {
-                    BooleanOption option = (BooleanOption) opt;
-                    BooleanOption otherOption = specification.getBooleanOption(option.getId());
-                    if (otherOption == null) {
-                        specification.addAbstractOption(option);
-                    } else {
-                        otherOption.setValue(option.getValue());
-                    }
-                }
-            }
+            addOldOptions(gameOptions);
+        }
+        if (mapGeneratorOptions != null) {
+            addOldOptions(mapGeneratorOptions);
         }
         // end compatibility code
 
     }
+
+    // TODO: remove compatibility code post 0.10.0
+    private void addOldOptions(OptionGroup group) {
+        Iterator<Option> iterator = group.iterator();
+        while (iterator.hasNext()) {
+            Option opt = iterator.next();
+            if (opt instanceof IntegerOption) {
+                IntegerOption option = (IntegerOption) opt;
+                if (specification.hasOption(option.getId())) {
+                    specification.getIntegerOption(option.getId())
+                        .setValue(option.getValue());
+                } else {
+                    specification.addAbstractOption(option);
+                }
+            } else if (opt instanceof BooleanOption) {
+                BooleanOption option = (BooleanOption) opt;
+                if (specification.hasOption(option.getId())) {
+                specification.getBooleanOption(option.getId())
+                    .setValue(option.getValue());
+                } else {
+                    specification.addAbstractOption(option);
+                }
+            }
+        }
+    }
+    // end compatibility code
+
 
     /**
      * Partial writer, so that simple updates can be brief.

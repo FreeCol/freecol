@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.option.OptionGroup;
 
 /**
  * Class for creating a land map.
@@ -45,13 +46,14 @@ public class LandGenerator {
     
     public final static int POLAR_HEIGHT = 2;
 
-    private final MapGeneratorOptions mapGeneratorOptions;
+    private final OptionGroup mapGeneratorOptions;
     private final Random random;
      
     private boolean[][] map;
      
     private int width;
     private int height;
+    private int landMass;
 
     private int preferredDistanceToEdge;
     private int numberOfLandTiles;
@@ -67,8 +69,7 @@ public class LandGenerator {
      * @param random The <code>Random</code> number source to use.
      * @see #createLandMap
      */
-    public LandGenerator(MapGeneratorOptions mapGeneratorOptions,
-                         Random random) {
+    public LandGenerator(OptionGroup mapGeneratorOptions, Random random) {
         this.mapGeneratorOptions = mapGeneratorOptions;
         this.random = random;
     }
@@ -101,12 +102,12 @@ public class LandGenerator {
      */
     public boolean[][] createLandMap() {
         //get values from mapGeneratorOptions
-        width = mapGeneratorOptions.getWidth();
-        height = mapGeneratorOptions.getHeight();         
-        preferredDistanceToEdge = mapGeneratorOptions.getPrefDistToEdge();
-        mapGeneratorOptions.getLandMass();
-        minimumNumberOfTiles = mapGeneratorOptions.getLand();
-        genType = mapGeneratorOptions.getLandGeneratorType();
+        width = mapGeneratorOptions.getInteger("model.option.mapWidth");
+        height = mapGeneratorOptions.getInteger("model.option.mapHeight");
+        preferredDistanceToEdge = mapGeneratorOptions.getInteger("model.option.preferredDistanceToEdge");
+        landMass = mapGeneratorOptions.getInteger("model.option.landMass");
+        minimumNumberOfTiles = width * height * landMass / 100;
+        genType = mapGeneratorOptions.getInteger("model.option.landGeneratorType");
 
         //set other internal values        
         map = new boolean[width][height];

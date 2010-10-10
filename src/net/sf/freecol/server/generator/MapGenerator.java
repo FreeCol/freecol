@@ -67,6 +67,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
@@ -83,7 +85,7 @@ public class MapGenerator implements IMapGenerator {
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
     
     private final Random random;
-    private final MapGeneratorOptions mapGeneratorOptions;
+    private final OptionGroup mapGeneratorOptions;
     
     private final LandGenerator landGenerator;
     private final TerrainGenerator terrainGenerator;
@@ -102,22 +104,20 @@ public class MapGenerator implements IMapGenerator {
      */
     public MapGenerator(Random random, Specification specification) {
         this.random = random;
-        this.mapGeneratorOptions = new MapGeneratorOptions(specification);
+        this.mapGeneratorOptions = specification.getOptionGroup("mapGeneratorOptions");
         landGenerator = new LandGenerator(mapGeneratorOptions, random);
         terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
     }
 
-
     /* (non-Javadoc)
-	 * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
-	 */
-    /* (non-Javadoc)
-	 * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
-	 */
-    public void createMap(Game game) throws FreeColException {        
+     * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
+     * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
+     */
+    public void createMap(Game game) throws FreeColException {
         
         // Prepare imports:
-        final File importFile = getMapGeneratorOptions().getFile(MapGeneratorOptions.IMPORT_FILE);
+        final File importFile = ((FileOption) getMapGeneratorOptions()
+                                 .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
         final Game importGame;
         if (importFile != null) {
             importGame = loadSaveGame(importFile);
@@ -233,9 +233,9 @@ public class MapGenerator implements IMapGenerator {
     }
 
     /* (non-Javadoc)
-	 * @see net.sf.freecol.server.generator.IMapGenerator#getMapGeneratorOptions()
-	 */
-    public MapGeneratorOptions getMapGeneratorOptions() {
+     * @see net.sf.freecol.server.generator.IMapGenerator#getMapGeneratorOptions()
+     */
+    public OptionGroup getMapGeneratorOptions() {
         return mapGeneratorOptions;
     }
 
@@ -263,7 +263,7 @@ public class MapGenerator implements IMapGenerator {
                 }
             }
         } else {
-            int number = getMapGeneratorOptions().getNumberOfRumours();
+            int number = getMapGeneratorOptions().getInteger("model.option.rumourNumber");
             int counter = 0;
 
             // TODO: Remove temporary fix:
@@ -397,11 +397,12 @@ public class MapGenerator implements IMapGenerator {
         int nativeSettlementDensity = 50;
         boolean isNativeSettlementDensitySet = map.getSpecification().hasOption("model.option.nativeSettlementDensity");
         // A difficulty level was set, use the level value instead
-        if(isNativeSettlementDensitySet){
-        	nativeSettlementDensity = map.getSpecification().getIntegerOption("model.option.nativeSettlementDensity").getValue();
+        if (isNativeSettlementDensitySet){
+            nativeSettlementDensity = map.getSpecification().getInteger("model.option.nativeSettlementDensity");
         }
         
-        int number = mapGeneratorOptions.getNumberOfSettlements() * nativeSettlementDensity / 100;
+        int number = mapGeneratorOptions.getInteger("model.option.settlementNumber")
+            * nativeSettlementDensity / 100;
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {

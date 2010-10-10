@@ -108,8 +108,43 @@ public class OptionGroup extends AbstractOption {
     }
 
     /**
-    * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
+    * Gets the integer value of an option.
+    *
+    * @param id The id of the option.
+    * @return The value.
+    * @exception IllegalArgumentException If there is no integer
+    *            value associated with the specified option.
+    * @exception NullPointerException if the given <code>Option</code> does not exist.
     */
+    public int getInteger(String id) {
+        try {
+            return ((IntegerOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No integer value associated with the specified option.");
+        }
+    }
+
+
+    /**
+    * Gets the boolean value of an option.
+    *
+    * @param id The id of the option.
+    * @return The value.
+    * @exception IllegalArgumentException If there is no boolean
+    *            value associated with the specified option.
+    * @exception NullPointerException if the given <code>Option</code> does not exist.
+    */
+    public boolean getBoolean(String id) {
+        try {
+            return ((BooleanOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No boolean value associated with the specified option.");
+        }
+    }
+    
+    /**
+     * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
+     */
     public void removeAll() {
         options.clear();
         optionMap.clear();

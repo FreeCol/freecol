@@ -93,10 +93,10 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Check that the map is created at all
         assertNotNull(g.getMap());
 
-        assertEquals(gen.getMapGeneratorOptions().getWidth(), g.getMap()
-                     .getWidth());
-        assertEquals(gen.getMapGeneratorOptions().getHeight(), g.getMap()
-                     .getHeight());
+        assertEquals(gen.getMapGeneratorOptions().getInteger("model.option.mapWidth"),
+                     g.getMap().getWidth());
+        assertEquals(gen.getMapGeneratorOptions().getInteger("model.option.mapHeight"),
+                     g.getMap().getHeight());
 
     }
 
@@ -137,8 +137,10 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         // Map of correct size?
         Map m = g.getMap();
-        assertEquals(m.getWidth(), gen.getMapGeneratorOptions().getWidth());
-        assertEquals(m.getHeight(), gen.getMapGeneratorOptions().getHeight());
+        assertEquals(m.getWidth(),
+                     gen.getMapGeneratorOptions().getInteger("model.option.mapWidth"));
+        assertEquals(m.getHeight(),
+                     gen.getMapGeneratorOptions().getInteger("model.option.mapHeight"));
 
         // Sufficient land?
         Iterator<Position> it = m.getWholeMapIterator();
@@ -153,11 +155,12 @@ public class MapGeneratorTest extends FreeColTestCase {
         }
         // Land Mass requirement fulfilled?
         assertTrue(100 * land / total >= gen.getMapGeneratorOptions()
-                   .getLandMass());
+                   .getInteger("model.option.landMass"));
 
         // Does the wholeMapIterator visit all fields?
-        assertEquals(gen.getMapGeneratorOptions().getWidth()
-                     * gen.getMapGeneratorOptions().getHeight(), total);
+        assertEquals(total,
+                     gen.getMapGeneratorOptions().getInteger("model.option.mapWidth")
+                     * gen.getMapGeneratorOptions().getInteger("model.option.mapHeight"));
     }
 
     /**
@@ -221,7 +224,8 @@ public class MapGeneratorTest extends FreeColTestCase {
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
             if (importFile.getName().endsWith(".fsg")) {
-                gen.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
+                ((FileOption) gen.getMapGeneratorOptions().getOption(MapGeneratorOptions.IMPORT_FILE))
+                .setValue(importFile);
                 try {
                     gen.createMap(g);
                 } catch (FreeColException e) {
