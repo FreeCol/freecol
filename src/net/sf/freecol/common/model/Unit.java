@@ -3499,13 +3499,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", state.toString());
         out.writeAttribute("role", role.toString());
-        String ownerID = null;
-        if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
-            ownerID = owner.getId();
-        } else {
-            ownerID = Player.UNKNOWN_ENEMY;
-        }
-        out.writeAttribute("owner", ownerID);
+        Player who = (getOwner().equals(player)
+                      || !hasAbility("model.ability.piracy") || showAll)
+            ? owner
+            : getGame().getUnknownEnemy();
+        out.writeAttribute("owner", who.getId());
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         out.writeAttribute("workType", workType.getId());
         out.writeAttribute("experience", Integer.toString(experience));
@@ -3590,15 +3588,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
         attrition = getAttribute(in, "attrition", 0);
 
-        String ownerID = in.getAttributeValue(null, "owner");
-        if (ownerID.equals(Player.UNKNOWN_ENEMY)) {
-            owner = getGame().getUnknownEnemy();
-        } else {
-            owner = (Player) getGame().getFreeColGameObject(ownerID);
-            if (owner == null) {
-                owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-            }
-        }
+        String ownerId = in.getAttributeValue(null, "owner");
+        owner = (Player) getGame().getFreeColGameObject(ownerId);
+        if (owner == null) owner = new Player(getGame(), ownerId);
 
         if (oldUnitType == null) {
             owner.modifyScore(unitType.getScoreValue());
