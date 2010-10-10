@@ -48,7 +48,7 @@ import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.generator.IMapGenerator;
+import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -100,7 +100,7 @@ public final class PreGameController extends Controller {
         Game game = freeColServer.getGame();
         // Apply the difficulty level
         
-        IMapGenerator mapGenerator = freeColServer.getMapGenerator();
+        MapGenerator mapGenerator = freeColServer.getMapGenerator();
         AIMain aiMain = new AIMain(freeColServer);
         freeColServer.setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);

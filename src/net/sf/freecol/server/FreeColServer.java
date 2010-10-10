@@ -86,8 +86,8 @@ import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.control.UserConnectionHandler;
-import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.generator.SimpleMapGenerator;
 import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerModelObject;
@@ -150,7 +150,7 @@ public final class FreeColServer {
 
     private AIMain aiMain;
 
-    private IMapGenerator mapGenerator;
+    private MapGenerator mapGenerator;
 
     private boolean singleplayer;
 
@@ -225,7 +225,7 @@ public final class FreeColServer {
 
         game = new ServerGame(modelController, specification);
         game.setNationOptions(new NationOptions(specification, advantages));
-        mapGenerator = new MapGenerator(random, specification);
+        mapGenerator = new SimpleMapGenerator(random, specification);
 
         try {
             server = new Server(this, port);
@@ -287,7 +287,7 @@ public final class FreeColServer {
             fe.initCause(e);
             throw fe;
         }
-        mapGenerator = new MapGenerator(random, getSpecification());
+        mapGenerator = new SimpleMapGenerator(random, getSpecification());
 
         updateMetaServer(true);
         startMetaServerUpdateThread();
@@ -367,7 +367,7 @@ public final class FreeColServer {
      * 
      * @return The <code>MapGenerator</code>.
      */
-    public IMapGenerator getMapGenerator() {
+    public MapGenerator getMapGenerator() {
         return mapGenerator;
     }
     
@@ -377,7 +377,7 @@ public final class FreeColServer {
      * 
      * @param mapGenerator The <code>MapGenerator</code>.
      */
-    public void setMapGenerator(IMapGenerator mapGenerator) {
+    public void setMapGenerator(MapGenerator mapGenerator) {
         this.mapGenerator = mapGenerator;
     }
 

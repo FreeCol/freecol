@@ -41,7 +41,7 @@ import net.sf.freecol.server.model.ServerRegion;
  */
 public class River {
 
-    private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
+    private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
 
     /**
      * Possible direction changes for a river.

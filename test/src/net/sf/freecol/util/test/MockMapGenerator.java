@@ -7,9 +7,9 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.generator.IMapGenerator;
+import net.sf.freecol.server.generator.MapGenerator;
 
-public class MockMapGenerator implements IMapGenerator {
+public class MockMapGenerator implements MapGenerator {
 
     private Map map;
 	

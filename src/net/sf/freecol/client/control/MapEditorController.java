@@ -50,7 +50,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -173,7 +172,7 @@ public final class MapEditorController {
     public void newMap() {
         final Canvas canvas = freeColClient.getCanvas();
         final Game game = freeColClient.getGame();
-        final IMapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();        
+        final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();        
         
         boolean ok = canvas.showMapGeneratorOptionsDialog(mapGenerator.getMapGeneratorOptions(), true);
         if (!ok) {
