@@ -40,7 +40,6 @@ import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;

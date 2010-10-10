@@ -21,13 +21,6 @@
 package net.sf.freecol.common.model;
 
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import net.sf.freecol.common.option.OptionMap;
-import org.w3c.dom.Element;
-
-
 /**
 * Keeps track of the available game options. New options should be added to
 * {@link #addDefaultOptions()} and each option should be given an unique

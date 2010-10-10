@@ -19,12 +19,16 @@
 
 package net.sf.freecol.client;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -41,10 +45,15 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.SelectOption;
-import org.w3c.dom.Element;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 
 /**
  * Defines how available client options are displayed on the Setting dialog from
@@ -61,7 +70,7 @@ import org.w3c.dom.Element;
  * clientOptions.messages.guiShowSonsOfLiberty.shortDescription So be sure to
  * include both.
  */
-public class ClientOptions extends OptionMap {
+public class ClientOptions extends OptionGroup {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
@@ -455,17 +464,8 @@ public class ClientOptions extends OptionMap {
      * specification as it is needed before the specification is available.
      */
     public ClientOptions() {
-        super(getXMLElementTagName(), null);
-    }
-
-    /**
-     * Creates a <code>ClientOptions</code> from an XML representation.
-     * 
-     * @param element The XML <code>Element</code> from which this object
-     *            should be constructed.
-     */
-    public ClientOptions(Element element) {
-        super(element, getXMLElementTagName(), null);
+        super(getXMLElementTagName());
+        addDefaultOptions();
     }
 
     /**
@@ -528,6 +528,106 @@ public class ClientOptions extends OptionMap {
         }
         return active;
     }
+
+    /**
+     * Reads the options from the given file.
+     * 
+     * @param loadFile The <code>File</code> to read the
+     *            options from.
+     */
+    public void load(File loadFile) {
+        load(loadFile, true);
+    }
+
+    /**
+     * Reads the options from the given file.
+     * 
+     * @param loadFile The <code>File</code> to read the
+     *            options from.
+     * @param update a <code>boolean</code> value
+     */
+    private void load(File loadFile, boolean update) {
+        if (loadFile == null || !loadFile.exists()) {
+            logger.warning("Could not find the client options file.");
+            return;
+        }
+        
+        InputStream in = null;
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLStreamReader xsr = null;
+        try {
+            in = new BufferedInputStream(new FileInputStream(loadFile));
+            xsr = xif.createXMLStreamReader(in, "UTF-8");
+            xsr.nextTag();
+            while (!isCorrectTagName(xsr.getLocalName())) {
+                xsr.nextTag();
+            }
+            if (update) {
+                logger.finest("Updating " + getId() + " from " + loadFile.getPath());
+                updateFromXML(xsr);
+            } else {
+                logger.finest("Loading " + getId() + " from " + loadFile.getPath());
+                readFromXML(xsr);
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while loading options.", e);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception while closing stream.", e);
+            }
+        }
+    }
+    
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    private void updateFromXML(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(OptionGroup.getXMLElementTagName())) {
+                updateFromXML(in);
+            } else {
+                final String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                if (idStr != null) {
+                    // old protocols:
+                    Option o = getOption(idStr);
+
+                    if (o != null) {
+                        o.readFromXML(in);
+                    } else {
+                        // Normal only if this option is from an old save game:
+                        logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
+                        
+                        // Ignore the option:
+                        final String ignoredTag = in.getLocalName();
+                        while (in.nextTag() != XMLStreamConstants.END_ELEMENT
+                                || !in.getLocalName().equals(ignoredTag));
+                    }
+                } else {
+                    Option o = getOption(in.getLocalName());
+                    if (o != null) {
+                        o.readFromXML(in);
+                    } else {
+                        // Normal only if this option is from an old save game:
+                        logger.info("Option \"" + in.getLocalName() + " not found.");
+
+                        // Ignore the option:
+                        final String ignoredTag = in.getLocalName();
+                        while (in.nextTag() != XMLStreamConstants.END_ELEMENT
+                                || !in.getLocalName().equals(ignoredTag));
+                    }
+                }
+            }
+        }
+        // DONE BY while-loop: in.nextTag();
+    }
+
 
     /**
      * Return the client's preferred tile text type.

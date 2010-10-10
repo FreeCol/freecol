@@ -40,7 +40,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.option.OptionMap;
 
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
