@@ -113,18 +113,18 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.getViewport().setOpaque(false);
 
-        setLayout(new MigLayout("fill", "", ""));
+        setLayout(new MigLayout("fill, wrap 2"));
 
-        add(tableScroll, "width 600:, span 2, grow");
+        add(tableScroll, "width 600:, grow");
         if (!singlePlayerGame) {
             add(chatScroll, "width 250:, grow");
         }
-        add(mapGeneratorOptions, "newline, growx, top");
-        add(gameOptions, "growx, top");
+        add(mapGeneratorOptions, "newline, split 2, growx, top, sg");
+        add(gameOptions, "growx, top, sg");
         if (!singlePlayerGame) {
             add(chat, "grow, top");
         }
-        add(readyBox, "newline, span");
+        add(readyBox, "newline");
         add(start, "newline, span, split 2, tag ok");
         add(cancel, "tag cancel");
 
