@@ -148,6 +148,25 @@ public class SimpleMapGenerator implements MapGenerator {
     }
     
     /**
+     * Creates a <code>Map</code> for the given <code>Game</code>.
+     * 
+     * The <code>Map</code> is added to the <code>Game</code> after
+     * it is created.
+     * 
+     * @param game The game. 
+     * @param landMap Determines whether there should be land
+     *                or ocean on a given tile. This array also
+     *                specifies the size of the map that is going
+     *                to be created.
+     * @see Map
+     * @see TerrainGenerator#createMap
+     */
+    public void createEmptyMap(Game game, boolean[][] landMap) {
+        terrainGenerator.createMap(game, null, landMap);
+    }
+
+
+    /**
      * Loads a <code>Game</code> from the given <code>File</code>.
      * 
      * @param importFile The <code>File</code> to be loading the

@@ -27,6 +27,10 @@ public class MockMapGenerator implements MapGenerator {
 				
         }
     }
+
+    public void createEmptyMap(Game game, boolean[][] landMap) {
+        // do nothing yet
+    }
 	
     private void updateGameRefs(FreeColGameObject obj,Game game){
         if(obj == null)
