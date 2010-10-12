@@ -37,7 +37,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -55,7 +55,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
 
     private JPanel buttons = new JPanel(new FlowLayout());
     private JLabel header;
-    private OptionMapUI ui;
+    private OptionGroupUI ui;
 
 
     /**
@@ -108,7 +108,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(getClient().getClientOptions());
+        ui = new OptionGroupUI(getClient().getClientOptions());
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);

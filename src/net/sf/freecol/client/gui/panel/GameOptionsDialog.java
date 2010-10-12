@@ -38,7 +38,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
-import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.model.GameOptions;
 
 /**
@@ -56,7 +56,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
 
     private JLabel header;
 
-    private OptionMapUI ui;
+    private OptionGroupUI ui;
 
 
     /**
@@ -108,7 +108,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(getSpecification().getOptionGroup("gameOptions"), editable);
+        ui = new OptionGroupUI(getSpecification().getOptionGroup("gameOptions"), editable);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);

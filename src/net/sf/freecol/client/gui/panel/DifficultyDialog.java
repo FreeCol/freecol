@@ -36,7 +36,7 @@ import javax.swing.JScrollPane;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -54,7 +54,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
 
     private static final String RESET = "RESET";
 
-    private OptionMapUI ui;
+    private OptionGroupUI ui;
     private OptionGroup level;
     private JPanel optionPanel;
 
@@ -113,7 +113,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
         add(difficultyBox);
 
         // Options:
-        ui = new OptionMapUI(level, false);
+        ui = new OptionGroupUI(level, false);
         ui.setOpaque(false);
         optionPanel = new JPanel() {
             @Override
@@ -190,7 +190,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
         String id = (String) difficultyBox.getSelectedItem();
         Specification spec = specification;
         level = spec.getOptionGroup(id);
-        ui = new OptionMapUI(level, (CUSTOM_LEVEL.equals(id)));
+        ui = new OptionGroupUI(level, (CUSTOM_LEVEL.equals(id)));
         optionPanel.removeAll();
         optionPanel.add(ui);
         revalidate();

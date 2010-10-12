@@ -38,7 +38,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
-import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
@@ -53,7 +53,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
-    private final OptionMapUI ui;
+    private final OptionGroupUI ui;
 
     /**
      * The constructor that will add the items to this panel.
@@ -64,7 +64,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         super(parent);
         setLayout(new MigLayout("wrap 1"));
 
-        ui = new OptionMapUI(mgo, editable);
+        ui = new OptionGroupUI(mgo, editable);
 
         JButton reset = new JButton(Messages.message("reset"));
         reset.setActionCommand("RESET");
