@@ -475,10 +475,14 @@ public class ColonyPlan {
         
         workLocationPlans.clear();
         if (profile.getType() == ProfileType.OUTPOST) {
-            GoodsType goodsType = profile.getPreferredProduction().get(0);
-            workLocationPlans.add(new WorkLocationPlan(getAIMain(),
-                                                       getBestTileToProduce(goodsType),
-                                                       goodsType));
+            GoodsType goodsType;
+            ColonyTile productionTile;
+            if ((goodsType = profile.getPreferredProduction().get(0)) != null
+                && (productionTile = getBestTileToProduce(goodsType)) != null) {
+                workLocationPlans.add(new WorkLocationPlan(getAIMain(),
+                                                           productionTile,
+                                                           goodsType));
+            }
             return;
         }
 
@@ -493,18 +497,22 @@ public class ColonyPlan {
         
         // Choose the best production for each tile:
         for (ColonyTile ct : colony.getColonyTiles()) {
-
-            if (ct.getWorkTile().getOwningSettlement() != null &&
-                ct.getWorkTile().getOwningSettlement() != colony || ct.isColonyCenterTile()) {
+            if (ct.isColonyCenterTile()
+                || (ct.getWorkTile().getOwningSettlement() != null
+                    && ct.getWorkTile().getOwningSettlement() != colony)) {
                 continue;
             }
 
             GoodsType goodsType = getBestGoodsToProduce(ct.getWorkTile());
-            WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), ct, goodsType);
-            workLocationPlans.add(wlp);
+            if (goodsType != null) {
+                WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(),
+                                                            ct, goodsType);
+                workLocationPlans.add(wlp);
+            }
         }
         
-        // We need to find what, if any, is still required for what we are building
+        // We need to find what, if any, is still required for what we
+        // are building
         GoodsType buildingReq = null;
         GoodsType buildingRawMat = null;
         Building buildingReqProducer = null;
