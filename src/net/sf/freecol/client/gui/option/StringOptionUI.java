@@ -58,8 +58,8 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
         this.option = option;
         this.originalValue = option.getValue();
 
-        String name = option.getName();
-        String description = option.getShortDescription();
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
         String text = (description != null) ? description : name;
         label = new JLabel(name, JLabel.LEFT);
         label.setToolTipText(text);

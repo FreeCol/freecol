@@ -33,6 +33,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
@@ -230,6 +231,18 @@ public class Messages {
             return defaultKey;
         }
     }
+
+
+    public static String getName(FreeColObject object) {
+        return message(object.getId() + ".name");
+    }
+
+    public static String getShortDescription(FreeColObject object) {
+        return message(object.getId() + ".shortDescription");
+    }
+
+
+   
 
     /**
      * Returns the name of a unit in a human readable format. The

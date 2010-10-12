@@ -34,6 +34,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.RangeOption;
 
@@ -63,9 +64,9 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
         this.originalValue = option.getValue();
 
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
-                                                   option.getName()));
-        String name = option.getName();
-        String description = option.getShortDescription();
+                                                   Messages.getName(option)));
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
 
         setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0, 0, option.getItemValues().size() - 1));
         setOrientation(JSlider.HORIZONTAL);

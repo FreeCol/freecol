@@ -82,7 +82,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     public ListOptionUI(final ListOption<T> option, boolean editable) {
 
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
-                                                   option.getName()));
+                                                   Messages.getName(option)));
         this.option = option;
         this.originalValue = createElementList(option.getValue());
         this.listModel = new DefaultListModel();
@@ -90,8 +90,8 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
             this.listModel.addElement(e);
         }
 
-        String name = option.getName();
-        String description = option.getShortDescription();
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
 
         list = new JList(listModel);
         final JScrollPane sp = new JScrollPane(list);

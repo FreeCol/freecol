@@ -67,8 +67,8 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
         this.option = option;
         this.originalValue = option.getValue();
 
-        String name = option.getName();
-        String description = option.getShortDescription();
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
         JLabel label = new JLabel(name, JLabel.LEFT);
         label.setToolTipText((description != null) ? description : name);
         add(label);

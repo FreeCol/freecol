@@ -44,15 +44,6 @@ public interface Option {
     
 
     /**
-    * Gives a short description of this <code>Option</code>.
-    * Can for instance be used as a tooltip text.
-    * 
-    * @return A short description of this action.
-    */
-    public String getShortDescription();
-
-
-    /**
     * Returns a textual representation of this object.
     * @return The name of this <code>Option</code>.
     * @see #getShortDescription
@@ -66,12 +57,6 @@ public interface Option {
     */
     public String getId();
 
-
-    /**
-    * Returns the name of this <code>Option</code>.
-    * @return The name as provided in the constructor.
-    */
-    public String getName();
 
     /**
      * Should this option be updated directly so that

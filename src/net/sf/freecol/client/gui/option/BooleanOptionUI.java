@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.Option;
 
@@ -53,8 +54,8 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
         this.option = option;
         this.originalValue = option.getValue();
 
-        String name = option.getName();
-        String description = option.getShortDescription();
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
         setText(name);
         setSelected(option.getValue());
         setEnabled(editable);

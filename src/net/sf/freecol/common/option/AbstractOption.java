@@ -21,7 +21,6 @@ package net.sf.freecol.common.option;
 
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
 
 /**
@@ -82,15 +81,6 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     }
 
     /**
-     * Returns a textual representation of this object.
-     * 
-     * @return The name of this <code>Option</code>.
-     */
-    public String toString() {
-        return getName();
-    }
-
-    /**
      * Returns the string prefix that identifies the group of this
      * <code>Option</code>.
      * 
@@ -112,24 +102,5 @@ abstract public class AbstractOption extends FreeColObject implements Option {
         } else {
             optionGroup = group;
         }
-    }
-
-    /**
-     * Returns the name of this <code>Option</code>.
-     * 
-     * @return The name as provided in the constructor.
-     */
-    public String getName() {
-        return Messages.message(getGroup() + "." + getId().replaceFirst("model\\.option\\.", "") + ".name");
-    }
-    
-    /**
-     * Gives a short description of this <code>Option</code>. Can for
-     * instance be used as a tooltip text.
-     * 
-     * @return A short description of this <code>Option</code>.
-     */
-    public String getShortDescription() {
-        return Messages.message(getGroup() + "." + getId().replaceFirst("model\\.option\\.", "") + ".shortDescription");
     }
 }

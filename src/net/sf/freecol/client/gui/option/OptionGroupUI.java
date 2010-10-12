@@ -36,6 +36,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
@@ -103,17 +104,18 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             Option o = it.next();
 
             if (o instanceof OptionGroup) {
+                OptionGroup group = (OptionGroup) o;
                 JPanel groupPanel = new JPanel();
                 groupPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
                 groupPanel.setOpaque(true);
-                addOptionGroupUI((OptionGroup) o, groupPanel, editable);
+                addOptionGroupUI(group, groupPanel, editable);
                 JScrollPane scroll = new JScrollPane(groupPanel,
                                                      JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                 scroll.getVerticalScrollBar().setUnitIncrement(16);
                 scroll.setBorder(BorderFactory.createEmptyBorder());
                 groupPanel.setBorder(BorderFactory.createEmptyBorder(H_GAP - 5, H_GAP, 0, H_GAP));
-                tb.addTab(o.getName(), null, scroll, o.getShortDescription());
+                tb.addTab(Messages.getName(group), null, scroll, Messages.getShortDescription(group));
             } else {
                 addOptionUI(o, northPanel, editable);
             }
@@ -136,9 +138,10 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         while (iterator.hasNext()) {
             Option o = iterator.next();
             if (o instanceof OptionGroup) {
-                panel.add(new JLabel(o.getName()), "newline 20, span, split 2");
+                OptionGroup subgroup = (OptionGroup) o;
+                panel.add(new JLabel(Messages.getName(subgroup)), "newline 20, span, split 2");
                 panel.add(new JSeparator(), "growx");
-                addOptionGroupUI((OptionGroup) o, panel, editable);
+                addOptionGroupUI(subgroup, panel, editable);
             } else {
                 addOptionUI(o, panel, editable);
             }

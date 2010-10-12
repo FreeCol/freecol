@@ -29,6 +29,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 
@@ -57,8 +58,8 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
         this.option = option;
         this.originalValue = option.getValue();
 
-        String name = option.getName();
-        String description = option.getShortDescription();
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
         String text = (description != null) ? description : name;
         label = new JLabel(name, JLabel.LEFT);
         label.setToolTipText(text);

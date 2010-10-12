@@ -34,6 +34,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
@@ -62,11 +63,11 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
         this.option = option;
         this.originalValue = option.getValue();
 
-        String name = option.getName();
-        String description = option.getShortDescription();
+        String name = Messages.getName(option);
+        String description = Messages.getShortDescription(option);
 
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
-                                                   option.getName()));
+                                                   Messages.getName(option)));
 
         setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
         setOrientation(JSlider.HORIZONTAL);
