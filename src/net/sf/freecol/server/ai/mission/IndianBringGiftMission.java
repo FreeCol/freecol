@@ -71,7 +71,7 @@ public class IndianBringGiftMission extends Mission {
     private Colony target;
 
     /** Decides whether this mission has been completed or not. */
-    private boolean giftDelivered;
+    private boolean completed;
 
 
     /**
@@ -85,7 +85,7 @@ public class IndianBringGiftMission extends Mission {
         super(aiMain, aiUnit);
 
         this.target = target;
-        this.giftDelivered = false;
+        this.completed = false;
 
         if (!getUnit().getOwner().isIndian() || !getUnit().canCarryGoods()) {
             logger.warning("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
@@ -137,24 +137,29 @@ public class IndianBringGiftMission extends Mission {
                 Direction r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
                 moveButDontAttack(connection, r);
             } else {
+                IndianSettlement is = getUnit().getIndianSettlement();
                 // Load the goods:
                 List<Goods> goodsList = new ArrayList<Goods>();
-                GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
+                GoodsContainer gc = is.getGoodsContainer();
                 for (GoodsType goodsType : getAIMain().getGame().getSpecification().getNewWorldGoodsTypeList()) {
                     if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
-                                                goodsType,
+                        goodsList.add(new Goods(getGame(), is, goodsType,
                                                 getAIRandom().nextInt(15) + 10));
                     }
                 }
 
-                if (goodsList.size() > 0) {
+                if (goodsList.size() == 0) {
+                    completed = true;
+                } else {
                     Goods goods = goodsList.get(getAIRandom().nextInt(goodsList.size()));
                     LoadCargoMessage message = new LoadCargoMessage(goods, getUnit());
                     try {
                         connection.sendAndWait(message.toXMLElement());
+                        logger.info("IndianBringGift for " + getUnit().getId()
+                                    + " loaded at " + is.getName());
                     } catch (IOException e) {
                         logger.warning("Could not send \"loadCargo\"-message!");
+                        completed = true;
                     }
                 }
             }
@@ -166,7 +171,9 @@ public class IndianBringGiftMission extends Mission {
                 // We have arrived.
                 AIMessage.askDeliverGift(getAIUnit(), target,
                                          getUnit().getGoodsIterator().next());
-                giftDelivered = true;
+                logger.info("IndianBringGift for " + getUnit().getId()
+                            + " delivered at " + target.getName());
+                completed = true;
             }
         }
 
@@ -198,7 +205,7 @@ public class IndianBringGiftMission extends Mission {
      * @return <code>true</code> if this mission is still valid.
      */
     public boolean isValid() {
-        return target != null && !target.isDisposed() && target.getTile().getColony() == target && !giftDelivered
+        return target != null && !target.isDisposed() && target.getTile().getColony() == target && !completed
             && isValidMission(getUnit().getOwner(), target.getOwner()) && getUnit().getIndianSettlement() != null;
     }
 
@@ -231,14 +238,11 @@ public class IndianBringGiftMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-
         out.writeAttribute("unit", getUnit().getId());
-        if (target!=null) {
-            // the destination colony is still alive
+        if (target != null) {
             out.writeAttribute("target", target.getId());
         }
-        out.writeAttribute("giftDelivered", Boolean.toString(giftDelivered));
-
+        out.writeAttribute("completed", Boolean.toString(completed));
         out.writeEndElement();
     }
 
@@ -247,13 +251,21 @@ public class IndianBringGiftMission extends Mission {
      * from XML data.
      * 
      * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *             from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-
-        target = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "target"));
-        giftDelivered = Boolean.valueOf(in.getAttributeValue(null, "giftDelivered")).booleanValue();
-
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        String unitString = in.getAttributeValue(null, "unit");
+        setAIUnit((AIUnit) getAIMain().getAIObject(unitString));
+        String targetString = in.getAttributeValue(null, "target");
+        target = (targetString == null) ? null
+            : (Colony) getGame().getFreeColGameObject(targetString);
+        String completedString = in.getAttributeValue(null, "completed");
+        if (completedString == null) { // Remove compatibility code post 0.10.0
+            completedString = in.getAttributeValue(null, "giftDelivered");
+        }
+        completed = Boolean.valueOf(completedString).booleanValue();
         in.nextTag();
     }
 
@@ -278,7 +290,8 @@ public class IndianBringGiftMission extends Mission {
             return "[" + target.getName() + "] Getting gift: "
                     + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
-            return "[" + target.getName() + "] " + getUnit().getGoodsIterator().next().getNameKey();
+            return "[" + target.getName() + "] "
+                + getUnit().getGoodsIterator().next().getNameKey();
         }
     }
 }

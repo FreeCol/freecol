@@ -50,6 +50,7 @@ import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Mission for demanding goods from a specified player.
  */
@@ -118,45 +119,31 @@ public class IndianDemandMission extends Mission {
             return;
         }
 
-        if (!hasGift()) {
+        if (hasTribute()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
                 Direction r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
                 moveButDontAttack(connection, r);
             } else {
-                // Load the goods:
-                ArrayList<Goods> goodsList = new ArrayList<Goods>();
-                GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
-                for (GoodsType goodsType : getAIMain().getGame().getSpecification().getNewWorldGoodsTypeList()) {
-                    if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
-                                                goodsType,
-                                                getAIRandom().nextInt(15) + 10));
-                    }
+                // Unload the goods
+                GoodsContainer container = getUnit().getGoodsContainer();
+                IndianSettlement is = getUnit().getIndianSettlement();
+                for (Goods goods : container.getCompactGoods()) {
+                    Goods tribute = container.removeGoods(goods.getType());
+                    is.addGoods(tribute);
                 }
-
-                if (goodsList.size() > 0) {
-                    Goods goods = goodsList.get(getAIRandom().nextInt(goodsList.size()));
-                    LoadCargoMessage message = new LoadCargoMessage(goods, getUnit());
-                    try {
-                        connection.sendAndWait(message.toXMLElement());
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"loadCargo\"-message!");
-                    }
-                }
+                logger.info("IndianDemand for " + getUnit().getId()
+                            + " complete, tribute unloaded at " + is.getName());
+                completed = true;
             }
         } else {
-            // Move to the target's colony and deliver
+            // Move to the target's colony and demand
             Unit unit = getUnit();
             Direction r = moveTowards(connection, target.getTile());
             if (r != null &&
                 unit.getTile().getNeighbourOrNull(r) == target.getTile()
                 && unit.getMovesLeft() > 0) {
                 // We have arrived.
-                Element demandElement = Message.createNewRootElement("indianDemand");
-                demandElement.setAttribute("unit", unit.getId());
-                demandElement.setAttribute("colony", target.getId());
-
                 Player enemy = target.getOwner();
                 Goods goods = selectGoods(target);
                 int gold = 0;
@@ -181,33 +168,20 @@ public class IndianDemandMission extends Mission {
                                     > oldGoods)
                     || (gold > 0 && unit.getOwner().getGold() > oldGold);
                 if (accepted) {
-                    if (unitTension <= Tension.Level.HAPPY.getLimit()) {
-                        Goods gift = null;
-                        if (goods == null) {
-                            List<Goods> carried = unit.getGoodsList();
-                            if (!carried.isEmpty()) {
-                                gift = Utils.getRandomMember(carried,
-                                                             getAIRandom());
-                            }
-                        } else {
-                            for (Goods g : unit.getGoodsList()) {
-                                if (g.getType() != goods.getType()) {
-                                    gift = g;
-                                    break;
-                                }
-                            }
-                        }
-                        if (gift != null) {
-                            AIMessage.askDeliverGift(getAIUnit(), target, gift);
-                        }
-                    }
+                    String tribute = (goods != null) ? goods.toString()
+                        : (Integer.toString(gold) + " gold");
+                    logger.info("IndianDemand for " + getUnit().getId()
+                                + " accepted, tribute " + tribute);
                 } else {
+                    logger.info("IndianDemand for " + getUnit().getId()
+                                + " complete/refused at " + target.getName());
+                    // If not content and we didn't get what we
+                    // wanted then attack.
                     if (unitTension >= Tension.Level.CONTENT.getLimit()) {
-                        // if we didn't get what we wanted, attack
                         AIMessage.askAttack(getAIUnit(), r);
                     }
+                    completed = true;
                 }
-                completed = true;
             }
         }
 
@@ -321,25 +295,24 @@ public class IndianDemandMission extends Mission {
      * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and
      *         false otherwise.
      */
-    private boolean hasGift() {
+    private boolean hasTribute() {
         return (getUnit().getSpaceLeft() == 0);
     }
 
     /**
      * Checks if this mission is still valid to perform.
-     * 
-     * <BR>
-     * <BR>
-     * 
-     * This mission will be invalidated when the demand has been delivered.
+     * This mission will be invalidated when complete, if the home settlement
+     * is gone, the target is gone, or tension reduces to happy.
      * 
      * @return <code>true</code> if this mission is still valid.
      */
     public boolean isValid() {
-        // The last check is to ensure that the colony have not been burned to
-        // the ground.
-        return (!completed && target != null && !target.isDisposed() && target.getTile().getColony() == target &&
-                getUnit().getIndianSettlement() != null);
+        return !completed && getUnit().getIndianSettlement() != null
+            && (hasTribute()
+                || (target != null && !target.isDisposed()
+                    && target.getTile().getColony() == target
+                    && getUnit().getOwner().getTension(target.getOwner())
+                        .getLevel().compareTo(Tension.Level.HAPPY) <= 0));
     }
 
     /**
@@ -352,11 +325,11 @@ public class IndianDemandMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-
         out.writeAttribute("unit", getUnit().getId());
-        out.writeAttribute("target", target.getId());
+        if (target != null) {
+            out.writeAttribute("target", target.getId());
+        }
         out.writeAttribute("completed", Boolean.toString(completed));
-
         out.writeEndElement();
     }
 
@@ -365,13 +338,18 @@ public class IndianDemandMission extends Mission {
      * from XML data.
      * 
      * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *             from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-
-        target = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "target"));
-        completed = Boolean.valueOf(in.getAttributeValue(null, "completed")).booleanValue();
-
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        String unitString = in.getAttributeValue(null, "unit");
+        setAIUnit((AIUnit) getAIMain().getAIObject(unitString));
+        String targetString = in.getAttributeValue(null, "target");
+        target = (targetString == null) ? null
+            : (Colony) getGame().getFreeColGameObject(targetString);
+        String completedString = in.getAttributeValue(null, "completed");
+        completed = Boolean.valueOf(completedString).booleanValue();
         in.nextTag();
     }
 
@@ -396,11 +374,12 @@ public class IndianDemandMission extends Mission {
             return "invalid";
         }
         final String targetName = (target != null) ? target.getName() : "null";
-        if (!hasGift()) {
-            return "[" + targetName + "] Getting gift: "
-                    + getUnit().getIndianSettlement().getTile().getPosition();
+        if (!hasTribute()) {
+            return "[" + targetName + "] Getting tribute: "
+                + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
-            return "[" + targetName + "] " + getUnit().getGoodsIterator().next().getNameKey();
+            return "[" + targetName + "] "
+                + getUnit().getGoodsIterator().next().getNameKey();
         }
     }
 }
