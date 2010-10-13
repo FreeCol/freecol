@@ -2264,23 +2264,22 @@ public final class InGameController extends Controller {
         RumourType rumour = lostCity.getType();
         if (rumour == null) {
             rumour = lostCity.chooseType(unit, difficulty, random);
-        } else {
-            // Filter out failing cases that could only occur if the
-            // type was explicitly set in debug mode.
-            switch (rumour) {
-            case BURIAL_GROUND: case MOUNDS:
-                if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
-                    rumour = RumourType.NOTHING;
-                }
-                break;
-            case LEARN:
-                if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
-                    rumour = RumourType.NOTHING;
-                }
-                break;
-            default:
-                break;
+        }
+        // Filter out failing cases that could only occur if the
+        // type was explicitly set in debug mode.
+        switch (rumour) {
+        case BURIAL_GROUND: case MOUNDS:
+            if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
+                rumour = RumourType.NOTHING;
             }
+            break;
+        case LEARN:
+            if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
+                rumour = RumourType.NOTHING;
+            }
+            break;
+        default:
+            break;
         }
 
         // Mounds are a special case that degrade to other cases.
@@ -2395,7 +2394,8 @@ public final class InGameController extends Controller {
             }
             cs.addMessage(See.only(serverPlayer),
                  new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                  "lostCityRumour.Ruins",
+                                  ((mounds) ? "lostCityRumour.moundsTreasure"
+                                   : "lostCityRumour.Ruins"),
                                   serverPlayer, ((newUnit != null) ? newUnit : unit))
                      .addAmount("%money%", ruinsAmount));
             break;
