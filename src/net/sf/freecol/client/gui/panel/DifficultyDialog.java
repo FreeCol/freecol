@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -70,9 +71,17 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
     private final JComboBox difficultyBox = new JComboBox();
 
 
+    private class BoxRenderer extends FreeColComboBoxRenderer {
+        public void setLabelValues(JLabel c, Object value) {
+            c.setText(Messages.message((String) value));
+        }
+    }
+
+
     public DifficultyDialog(Canvas parent, OptionGroup level) {
         super(parent);
         specification = getSpecification();
+        difficultyBox.setRenderer(new BoxRenderer());
         List<OptionGroup> levels = new ArrayList<OptionGroup>(1);
         levels.add(level);
         initialize(levels);
@@ -85,6 +94,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
     public DifficultyDialog(Canvas parent, Specification specification) {
         super(parent);
         this.specification = specification;
+        difficultyBox.setRenderer(new BoxRenderer());
         initialize(specification.getDifficultyLevels());
     }
 
