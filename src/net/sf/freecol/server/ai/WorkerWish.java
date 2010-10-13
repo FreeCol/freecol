@@ -144,6 +144,11 @@ public class WorkerWish extends Wish {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        if (destination == null) {
+            // Avoid writing corrupt WorkerWish, mitigating #3084370.
+            return;
+        }
+
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());
