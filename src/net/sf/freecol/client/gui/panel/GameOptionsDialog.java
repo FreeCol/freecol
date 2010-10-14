@@ -19,9 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -31,7 +29,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
@@ -40,6 +37,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.model.GameOptions;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
@@ -50,9 +50,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
 
     private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3, RESET = 4;
 
-    private JButton ok, load, save, cancel;
-
-    private JPanel buttons = new JPanel(new FlowLayout());
+    private JButton ok, load, save, cancel, reset;
 
     private JLabel header;
 
@@ -66,55 +64,51 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
      */
     public GameOptionsDialog(Canvas parent, boolean editable) {
         super(parent);
-        setLayout(new BorderLayout());
+        setLayout(new MigLayout("wrap 1, fill"));
 
         ok = new JButton(Messages.message("ok"));
         ok.setActionCommand(String.valueOf(OK));
         ok.addActionListener(this);
         ok.setMnemonic('O');
-        buttons.add(ok);
 
         load = new JButton(Messages.message("load"));
         load.setActionCommand(String.valueOf(LOAD));
         load.addActionListener(this);
         load.setMnemonic('L');
-        buttons.add(load);
 
         save = new JButton(Messages.message("save"));
         save.setActionCommand(String.valueOf(SAVE));
         save.addActionListener(this);
         save.setMnemonic('S');
-        buttons.add(save);
         
-        JButton reset = new JButton(Messages.message("reset"));
+        reset = new JButton(Messages.message("reset"));
         reset.setActionCommand(String.valueOf(RESET));
         reset.addActionListener(this);
         reset.setMnemonic('R');
-        buttons.add(reset);
 
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
         cancel.setMnemonic('C');
-        buttons.add(cancel);
 
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
 
         // Header:
         header = getDefaultHeader(Messages.message("gameOptions"));
-        add(header, BorderLayout.NORTH);
+        add(header, "center");
 
         // Options:
-        JPanel uiPanel = new JPanel(new BorderLayout());
-        uiPanel.setOpaque(false);
         ui = new OptionGroupUI(getSpecification().getOptionGroup("gameOptions"), editable);
-        uiPanel.add(ui, BorderLayout.CENTER);
-        uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(uiPanel, BorderLayout.CENTER);
+        //ui.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(ui, "newline 20, grow");
 
         // Buttons:
-        add(buttons, BorderLayout.SOUTH);
+        add(ok, "newline 20, split 5, tag ok");
+        add(cancel, "tag cancel");
+        add(load);
+        add(save);
+        add(reset);
 
         ok.setEnabled(editable);
         save.setEnabled(editable);
