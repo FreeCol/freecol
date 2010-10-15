@@ -470,16 +470,22 @@ public final class Monarch extends FreeColGameObject implements Named {
             return support;
         }
 
-        int difficulty = spec.getRangeOption("model.option.difficulty")
-            .getValue();
+        /**
+         * TODO: we should use a total strength value, and randomly
+         * add individual units until that limit has been
+         * reached. E.g. given a value of 10, we might select two
+         * units with strength 5, or three units with strength 3 (plus
+         * one with strength 1, if there is one).
+         */
+        int difficulty = spec.getInteger("model.option.monarchSupport");
         switch (difficulty) {
-        case 0:
+        case 4:
             support.add(new AbstractUnit(Utils.getRandomMember(bombardTypes, random),
                                          Role.DEFAULT, 1));
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
                                          Role.DRAGOON, 2));
             break;
-        case 1:
+        case 3:
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
                                          Role.DRAGOON, 2));
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
@@ -489,13 +495,13 @@ public final class Monarch extends FreeColGameObject implements Named {
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
                                          Role.DRAGOON, 2));
             break;
-        case 3:
+        case 1:
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
                                          Role.DRAGOON, 1));
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
                                          Role.SOLDIER, 1));
             break;
-        case 4:
+        case 0:
             support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
                                          Role.SOLDIER, 1));
             break;
