@@ -63,6 +63,11 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
         label.setToolTipText(text);
 
         String[] strings = option.getItemValues().values().toArray(new String[0]);
+        if (option.localizeLabels()) {
+            for (int index = 0; index < strings.length; index++) {
+                strings[index] = Messages.message(strings[index]);
+            }
+        }
 
         setModel(new DefaultComboBoxModel(strings));
         if (option.getValue() < strings.length) {

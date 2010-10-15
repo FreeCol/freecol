@@ -28,8 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
 /**
  * Represents an option where the valid choice is an integer and the choices are
  * represented by strings. In general, these strings are localized by looking up
@@ -70,6 +68,18 @@ public class SelectOption extends IntegerOption {
     public Map<Integer, String> getItemValues() {
         return itemValues;
     }
+
+
+    /**
+     * Whether the labels of this option need to be localized. This is
+     * not the case when the labels are just numeric values.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean localizeLabels() {
+        return localizedLabels;
+    }
+
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -134,9 +144,6 @@ public class SelectOption extends IntegerOption {
             if (in.getLocalName().equals(getXMLItemElementTagName())) {
                 String label = in.getAttributeValue(null, "label");
                 final String itemValue = in.getAttributeValue(null, VALUE_TAG);
-                if (this.localizedLabels) {
-                    label = Messages.message(label);
-                }
                 itemValues.put(Integer.parseInt(itemValue), label);
                 in.nextTag();
             } else {

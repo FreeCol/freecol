@@ -73,7 +73,11 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
         int index = 0;
         for (String string : option.getItemValues().values()) {
-            labels.put(index, new JLabel(string));
+            if (option.localizeLabels()) {
+                labels.put(index, new JLabel(Messages.message(string)));
+            } else {
+                labels.put(index, new JLabel(string));
+            }
             index++;
         }
 
