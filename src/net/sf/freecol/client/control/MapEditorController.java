@@ -67,7 +67,7 @@ public final class MapEditorController {
      * The main controller.
      */
     private final FreeColClient freeColClient;
-    
+
     /**
      * The transform that should be applied to a
      * <code>Tile</code> that is clicked on the map.
@@ -97,7 +97,7 @@ public final class MapEditorController {
             Specification specification = tcData.getSpecification();
             freeColClient.setMapEditor(true);
             final FreeColServer freeColServer = new FreeColServer(specification, false, false, 0, null);
-            freeColClient.setFreeColServer(freeColServer);            
+            freeColClient.setFreeColServer(freeColServer);
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);
 
@@ -105,17 +105,17 @@ public final class MapEditorController {
             final GUI gui = freeColClient.getGUI();
 
             canvas.closeMainPanel();
-            canvas.closeMenus();            
+            canvas.closeMenus();
             gui.setInGame(true);
-            
+
             // We may need to reset the zoom value to the default value
             gui.scaleMap(2f);
-            
+
             freeColClient.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
             JInternalFrame f = freeColClient.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
             f.setLocation(f.getX(), 50);
-            
-            canvas.repaint();            
+
+            canvas.repaint();
             CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(canvas, gui);
             canvas.addMouseListener(listener);
             canvas.addMouseMotionListener(listener);
@@ -127,7 +127,7 @@ public final class MapEditorController {
             return;
         }
     }
-    
+
     /**
      * Sets the currently chosen <code>MapTransform</code>.
      * @param mt The transform that should be applied to a
@@ -140,7 +140,7 @@ public final class MapEditorController {
             mca.getMapControls().update(mt);
         }
     }
-    
+
     /**
      * Gets the current <code>MapTransform</code>.
      * @return The transform that should be applied to a
@@ -149,11 +149,11 @@ public final class MapEditorController {
     public MapTransform getMapTransform() {
         return currentMapTransform;
     }
-    
+
     /**
      * Transforms the given <code>Tile</code> using the
      * {@link #getMapTransform() current <code>MapTransform</code>}.
-     * 
+     *
      * @param t The <code>Tile</code> to be modified.
      */
     public void transform(Tile t) {
@@ -161,24 +161,24 @@ public final class MapEditorController {
             currentMapTransform.transform(t);
         }
     }
-    
+
     /**
      * Creates a new map using a <code>MapGenerator</code>. A panel
      * with the <code>MapGeneratorOptions</code> is first displayed.
-     * 
+     *
      * @see MapGenerator
      * @see MapGeneratorOptions
      */
     public void newMap() {
         final Canvas canvas = freeColClient.getCanvas();
         final Game game = freeColClient.getGame();
-        final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();        
-        
+        final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
+
         boolean ok = canvas.showMapGeneratorOptionsDialog(mapGenerator.getMapGeneratorOptions(), true);
         if (!ok) {
             return;
         }
-        
+
         try {
             //game.setMapGeneratorOptions(mapGenerator.getMapGeneratorOptions());
             mapGenerator.createMap(game);
@@ -190,7 +190,7 @@ public final class MapEditorController {
             canvas.errorMessage( e.getMessage() );
         }
     }
-    
+
     /**
      * Opens a dialog where the user should specify the filename
      * and saves the game.
@@ -203,7 +203,7 @@ public final class MapEditorController {
             saveGame(file);
         }
     }
-    
+
     /**
      * Saves the game to the given file.
      * @param file The <code>File</code>.
@@ -273,7 +273,7 @@ public final class MapEditorController {
 
         loadGame(file);
     }
-    
+
     /**
      * Loads a game from the given file.
      * @param file The <code>File</code>.
@@ -283,7 +283,7 @@ public final class MapEditorController {
         final File theFile = file;
 
         freeColClient.setMapEditor(true);
-        
+
         class ErrorJob implements Runnable {
             private final  String  message;
             ErrorJob( String message ) {
@@ -296,22 +296,22 @@ public final class MapEditorController {
         }
 
         canvas.showStatusPanel(Messages.message("status.loadingGame"));
-        
+
         Runnable loadGameJob = new Runnable() {
             public void run() {
                 FreeColServer freeColServer = null;
-                try {                    
+                try {
                     freeColServer = new FreeColServer(new FreeColSavegameFile(theFile), 0, "MapEditor");
                     freeColClient.setFreeColServer(freeColServer);
                     freeColClient.setGame(freeColServer.getGame());
                     SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {               
+                        public void run() {
                             canvas.closeStatusPanel();
                             freeColClient.getGUI().setFocus(1, 1);
                             freeColClient.getActionManager().update();
                             canvas.refresh();
                         }
-                    } );                    
+                    } );
                 } catch (NoRouteToServerException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -320,7 +320,7 @@ public final class MapEditorController {
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
-                } catch (FileNotFoundException e) {                    
+                } catch (FileNotFoundException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             freeColClient.getCanvas().closeMainPanel();
@@ -343,10 +343,10 @@ public final class MapEditorController {
                             freeColClient.getCanvas().showMainPanel();
                         }
                     });
-                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );                    
+                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
                 }
             }
         };
-        freeColClient.worker.schedule( loadGameJob );        
+        freeColClient.worker.schedule( loadGameJob );
     }
 }
