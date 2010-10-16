@@ -37,6 +37,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -185,22 +186,22 @@ public final class FreeColServer {
 
     /**
      * Starts a new server in a specified mode and with a specified port.
-     * 
+     *
      * @param publicServer This value should be set to <code>true</code> in
      *            order to appear on the meta server's listing.
-     * 
+     *
      * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
      *            multiplayer (if <i>false</i>).
-     * 
+     *
      * @param port The TCP port to use for the public socket. That is the port
      *            the clients will connect to.
-     * 
+     *
      * @param name The name of the server, or <code>null</code> if the default
      *            name should be used.
-     * 
+     *
      * @throws IOException if the public socket cannot be created (the exception
      *             will be logged by this class).
-     * 
+     *
      */
     public FreeColServer(Specification specification, boolean publicServer, boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
@@ -241,18 +242,18 @@ public final class FreeColServer {
     /**
      * Starts a new server in a specified mode and with a specified port and
      * loads the game from the given file.
-     * 
+     *
      * @param savegame The file where the game data is located.
-     * 
+     *
      * @param port The TCP port to use for the public socket. That is the port
      *            the clients will connect to.
-     * 
+     *
      * @param name The name of the server, or <code>null</code> if the default
      *            name should be used.
-     * 
+     *
      * @exception IOException if the public socket cannot be created (the exception
      *             will be logged by this class).
-     * 
+     *
      * @exception FreeColException if the savegame could not be loaded.
      * @exception NoRouteToServerException if an error occurs
      */
@@ -299,7 +300,7 @@ public final class FreeColServer {
 
     /**
      * Starts the metaserver update thread if <code>publicServer == true</code>.
-     * 
+     *
      * This update is really a "Hi! I am still here!"-message, since an
      * additional update should be sent when a new player is added to/removed
      * from this server etc.
@@ -320,7 +321,7 @@ public final class FreeColServer {
 
     /**
      * Enters revenge mode against those evil AIs.
-     * 
+     *
      * @param username The player to enter revenge mode.
      */
     public void enterRevengeMode(String username) {
@@ -364,17 +365,17 @@ public final class FreeColServer {
     /**
      * Gets the <code>MapGenerator</code> this <code>FreeColServer</code> is
      * using when creating random maps.
-     * 
+     *
      * @return The <code>MapGenerator</code>.
      */
     public MapGenerator getMapGenerator() {
         return mapGenerator;
     }
-    
+
     /**
      * Sets the <code>MapGenerator</code> this <code>FreeColServer</code> is
      * using when creating random maps.
-     * 
+     *
      * @param mapGenerator The <code>MapGenerator</code>.
      */
     public void setMapGenerator(MapGenerator mapGenerator) {
@@ -391,7 +392,7 @@ public final class FreeColServer {
 
     /**
      * Returns the name of this server.
-     * 
+     *
      * @return The name.
      */
     public String getName() {
@@ -400,7 +401,7 @@ public final class FreeColServer {
 
     /**
      * Sets the name of this server.
-     * 
+     *
      * @param name The name.
      */
     public void setName(String name) {
@@ -410,7 +411,7 @@ public final class FreeColServer {
     /**
      * Sends information about this server to the meta-server. The information
      * is only sent if <code>public == true</code>.
-     * 
+     *
      * @param firstTime Should be set to <i>true></i> when calling this method
      *      for the first time.
      * @throws NoRouteToServerException if the meta-server cannot connect to
@@ -500,7 +501,7 @@ public final class FreeColServer {
 
     /**
      * Gets the number of player that may connect.
-     * 
+     *
      * @return The number of available slots for human players. This number also
      *         includes european players currently controlled by the AI.
      */
@@ -521,7 +522,7 @@ public final class FreeColServer {
 
     /**
      * Gets the number of human players in this game that is still playing.
-     * 
+     *
      * @return The number.
      */
     public int getNumberOfLivingHumanPlayers() {
@@ -538,7 +539,7 @@ public final class FreeColServer {
 
     /**
      * Gets the owner of the <code>Game</code>.
-     * 
+     *
      * @return The owner of the game. THis is the player that has loaded the
      *         game (if any).
      * @see #loadGame
@@ -549,7 +550,7 @@ public final class FreeColServer {
 
     /**
      * Saves a game.
-     * 
+     *
      * @param file The file where the data will be written.
      * @param username The username of the player saving the game.
      * @throws IOException If a problem was encountered while trying to open,
@@ -561,7 +562,7 @@ public final class FreeColServer {
 
     /**
      * Saves a game.
-     * 
+     *
      * @param file The file where the data will be written.
      * @param username The username of the player saving the game.
      * @param image an <code>Image</code> value
@@ -580,6 +581,12 @@ public final class FreeColServer {
                 ImageIO.write(image, "png", fos);
                 fos.closeEntry();
             }
+            Properties properties = new Properties();
+            properties.put("map.width", Integer.toString(game.getMap().getWidth()));
+            properties.put("map.height", Integer.toString(game.getMap().getHeight()));
+            fos.putNextEntry(new JarEntry("savegame.properties"));
+            properties.store(fos, null);
+            fos.closeEntry();
 
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
@@ -587,7 +594,7 @@ public final class FreeColServer {
             xsw.writeStartDocument("UTF-8", "1.0");
             xsw.writeComment("Game version: "+FreeCol.getRevision());
             xsw.writeStartElement("savedGame");
-            
+
             // Add the attributes:
             xsw.writeAttribute("owner", username);
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
@@ -641,7 +648,7 @@ public final class FreeColServer {
     /**
      * Creates a <code>XMLStream</code> for reading the given file.
      * Compression is automatically detected.
-     * 
+     *
      * @param fis The file to be read.
      * @return The <code>XMLStreamr</code>.
      * @exception IOException if thrown while loading the game or if a
@@ -654,7 +661,7 @@ public final class FreeColServer {
 
     /**
      * Loads a game.
-     * 
+     *
      * @param fis The file where the game data is located.
      * @return The username of the player saving the game.
      * @throws IOException If a problem was encountered while trying to open,
@@ -671,12 +678,12 @@ public final class FreeColServer {
             xs = createXMLStreamReader(fis);
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
-            
+
             int savegameVersion = getSavegameVersion(xsr);
             logger.info("Found savegame version " + savegameVersion);
             singleplayer = FreeColObject.getAttribute(xsr, "singleplayer", true);
             publicServer =  FreeColObject.getAttribute(xsr, "publicServer", false);
-            
+
             String randomState = xsr.getAttributeValue(null, "randomState");
             if (randomState != null && randomState.length() > 0) {
                 try {
@@ -762,7 +769,7 @@ public final class FreeColServer {
                                                                         "Server-Server-" + player.getName(),
                                                                         getInGameInputHandler());
                     DummyConnection aiConnection = new DummyConnection(
-                                                                       "Server-AI-" + player.getName(),                            
+                                                                       "Server-AI-" + player.getName(),
                                                                        new AIInGameInputHandler(this, player, aiMain));
                     aiConnection.setOutgoingMessageHandler(theConnection);
                     theConnection.setOutgoingMessageHandler(aiConnection);
@@ -807,7 +814,7 @@ public final class FreeColServer {
         }
         return savegameVersion;
     }
-	
+
     /**
      * Removes automatically created save games.
      * Call this function to delete the automatically created save games from
@@ -823,7 +830,7 @@ public final class FreeColServer {
 
     /**
      * Sets the mode of the game: singleplayer/multiplayer.
-     * 
+     *
      * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
      *            multiplayer (if <i>false</i>).
      */
@@ -833,7 +840,7 @@ public final class FreeColServer {
 
     /**
      * Checks if the user is playing in singleplayer mode.
-     * 
+     *
      * @return <i>true</i> if the user is playing in singleplayer mode,
      *         <i>false</i> otherwise.
      */
@@ -865,7 +872,7 @@ public final class FreeColServer {
 
     /**
      * Gets a <code>Player</code> specified by a connection.
-     * 
+     *
      * @param connection The connection to use while searching for a
      *            <code>ServerPlayer</code>.
      * @return The player.
@@ -883,7 +890,7 @@ public final class FreeColServer {
 
     /**
      * Gets the <code>UserConnectionHandler</code>.
-     * 
+     *
      * @return The <code>UserConnectionHandler</code> that is beeing used when
      *         new client connect.
      */
@@ -893,7 +900,7 @@ public final class FreeColServer {
 
     /**
      * Gets the <code>Controller</code>.
-     * 
+     *
      * @return The <code>Controller</code>.
      */
     public Controller getController() {
@@ -906,7 +913,7 @@ public final class FreeColServer {
 
     /**
      * Gets the <code>PreGameInputHandler</code>.
-     * 
+     *
      * @return The <code>PreGameInputHandler</code>.
      */
     public PreGameInputHandler getPreGameInputHandler() {
@@ -915,7 +922,7 @@ public final class FreeColServer {
 
     /**
      * Gets the <code>InGameInputHandler</code>.
-     * 
+     *
      * @return The <code>InGameInputHandler</code>.
      */
     public InGameInputHandler getInGameInputHandler() {
@@ -924,7 +931,7 @@ public final class FreeColServer {
 
     /**
      * Gets the controller being used while the game is running.
-     * 
+     *
      * @return The controller from making a new turn etc.
      */
     public InGameController getInGameController() {
@@ -933,7 +940,7 @@ public final class FreeColServer {
 
     /**
      * Gets the <code>ModelController</code>.
-     * 
+     *
      * @return The controller used for generating random numbers and creating
      *         new {@link FreeColGameObject}s.
      */
@@ -943,7 +950,7 @@ public final class FreeColServer {
 
     /**
      * Gets the <code>Game</code> that is being played.
-     * 
+     *
      * @return The <code>Game</code> which is the main class of the game-model
      *         being used in this game.
      */
@@ -953,7 +960,7 @@ public final class FreeColServer {
 
     /**
      * Sets the main AI-object.
-     * 
+     *
      * @param aiMain The main AI-object which is responsible for controlling,
      *            updating and saving the AI objects.
      */
@@ -963,7 +970,7 @@ public final class FreeColServer {
 
     /**
      * Gets the main AI-object.
-     * 
+     *
      * @return The main AI-object which is responsible for controlling, updating
      *         and saving the AI objects.
      */
@@ -973,7 +980,7 @@ public final class FreeColServer {
 
     /**
      * Gets the current state of the game.
-     * 
+     *
      * @return One of: {@link GameState#STARTING_GAME}, {@link GameState#IN_GAME} and
      *         {@link GameState#ENDING_GAME}.
      */
@@ -983,7 +990,7 @@ public final class FreeColServer {
 
     /**
      * Sets the current state of the game.
-     * 
+     *
      * @param state The new state to be set. One of: {@link GameState#STARTING_GAME},
      *            {@link GameState#IN_GAME} and {@link GameState#ENDING_GAME}.
      */
@@ -993,7 +1000,7 @@ public final class FreeColServer {
 
     /**
      * Gets the network server responsible of handling the connections.
-     * 
+     *
      * @return The network server.
      */
     public Server getServer() {
@@ -1136,16 +1143,16 @@ public final class FreeColServer {
      */
     public ServerPlayer addAIPlayer(Nation nation) {
         String name = nation.getRulerNameKey();
-        DummyConnection theConnection = 
+        DummyConnection theConnection =
             new DummyConnection("Server connection - " + name, getInGameInputHandler());
-        ServerPlayer aiPlayer = 
+        ServerPlayer aiPlayer =
             new ServerPlayer(getGame(), name, false, nation,
                              null, theConnection);
         aiPlayer.setAI(true);
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + name,
                                   new AIInGameInputHandler(this, aiPlayer, getAIMain()));
-            
+
         aiConnection.setOutgoingMessageHandler(theConnection);
         theConnection.setOutgoingMessageHandler(aiConnection);
 
@@ -1201,7 +1208,7 @@ public final class FreeColServer {
 
     /**
      * Saves high scores.
-     * 
+     *
      * @throws IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
@@ -1254,7 +1261,7 @@ public final class FreeColServer {
 
     /**
      * Loads high scores.
-     * 
+     *
      * @throws IOException If a problem was encountered while trying to open,
      *             read or close the file.
      * @exception IOException if thrown while loading the game or if a
