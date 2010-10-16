@@ -83,18 +83,18 @@ import net.sf.freecol.server.model.ServerRegion;
 public class SimpleMapGenerator implements MapGenerator {
 
     private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
-    
+
     private final Random random;
     private final OptionGroup mapGeneratorOptions;
-    
+
     private final LandGenerator landGenerator;
     private final TerrainGenerator terrainGenerator;
-    
+
     // To avoid starting positions to be too close to the poles
     // percentage indicating how much of the half map close to the pole cannot be spawned on
     private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
 
-    
+
     /**
      * Creates a <code>MapGenerator</code>
      *
@@ -109,12 +109,24 @@ public class SimpleMapGenerator implements MapGenerator {
         terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
     }
 
+    /**
+     * Returns the approximate number of land tiles.
+     *
+     * @return the approximate number of land tiles
+     */
+    private int getLand() {
+        return mapGeneratorOptions.getInteger("model.option.mapWidth")
+            * mapGeneratorOptions.getInteger("model.option.mapHeight")
+            * mapGeneratorOptions.getInteger("model.option.landMass")
+            / 100;
+    }
+
     /* (non-Javadoc)
      * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
      * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
      */
     public void createMap(Game game) throws FreeColException {
-        
+
         // Prepare imports:
         final File importFile = ((FileOption) getMapGeneratorOptions()
                                  .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
@@ -132,7 +144,7 @@ public class SimpleMapGenerator implements MapGenerator {
         } else {
             landMap = landGenerator.createLandMap();
         }
-        
+
         // Create terrain:
         terrainGenerator.createMap(game, importGame, landMap);
 
@@ -144,16 +156,16 @@ public class SimpleMapGenerator implements MapGenerator {
         createIndianSettlements(map, game.getPlayers());
         createEuropeanUnits(map, game.getPlayers());
         createLostCityRumours(map, importGame);
-        
+
     }
-    
+
     /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
-     * 
+     *
      * The <code>Map</code> is added to the <code>Game</code> after
      * it is created.
-     * 
-     * @param game The game. 
+     *
+     * @param game The game.
      * @param landMap Determines whether there should be land
      *                or ocean on a given tile. This array also
      *                specifies the size of the map that is going
@@ -168,13 +180,13 @@ public class SimpleMapGenerator implements MapGenerator {
 
     /**
      * Loads a <code>Game</code> from the given <code>File</code>.
-     * 
+     *
      * @param importFile The <code>File</code> to be loading the
      *      <code>Game</code> from.
      * @return The <code>Game</code>.
      */
-    private Game loadSaveGame(File importFile) throws FreeColException {        
-        /* 
+    private Game loadSaveGame(File importFile) throws FreeColException {
+        /*
          * TODO-LATER: We are using same method in FreeColServer.
          *       Create a framework for loading games/maps.
          */
@@ -185,10 +197,10 @@ public class SimpleMapGenerator implements MapGenerator {
             xs = FreeColServer.createXMLStreamReader(fis);
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
-            
+
             int savegameVersion = FreeColServer.getSavegameVersion(xsr);
             logger.info("Found savegame version " + savegameVersion);
-            
+
             ArrayList<String> serverObjects = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("serverObjects")) {
@@ -267,7 +279,7 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     private void createLostCityRumours(Map map, Game importGame) {
         final boolean importRumours = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
-        
+
         if (importGame != null && importRumours) {
             for (Tile importTile : importGame.getMap().getAllTiles()) {
             	LostCityRumour rumor = importTile.getLostCityRumour();
@@ -282,7 +294,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
         } else {
-            int number = getMapGeneratorOptions().getInteger("model.option.rumourNumber");
+            int number = getLand() / getMapGeneratorOptions().getInteger("model.option.rumourNumber");
             int counter = 0;
 
             // TODO: Remove temporary fix:
@@ -295,11 +307,11 @@ public class SimpleMapGenerator implements MapGenerator {
                 .getRangeOption("model.option.difficulty").getValue();
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
-                    Position p = new Position(random.nextInt(map.getWidth()), 
+                    Position p = new Position(random.nextInt(map.getWidth()),
                             random.nextInt(map.getHeight()));
                     if (p.y <= LandGenerator.POLAR_HEIGHT ||
                         p.y >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
-                        // please no lost city on the poles, 
+                        // please no lost city on the poles,
                         // as they are too difficult to go visit, and not realistic
                         continue;
                     }
@@ -307,7 +319,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (map.getTile(p).isLand()
                             && !t.hasLostCityRumour()
                             && t.getSettlement() == null
-                            && t.getUnitCount() == 0) { 
+                            && t.getUnitCount() == 0) {
                         counter++;
                         LostCityRumour r = new LostCityRumour(t.getGame(), t);
                         if (r.chooseType(null, difficulty, random)
@@ -327,11 +339,11 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Create the Indian settlements, at least a capital for every nation and
      * random numbers of other settlements.
-     * 
+     *
      * @param map The <code>Map</code> to place the indian settlements on.
      * @param players The players to create <code>Settlement</code>s
-     *       and starting locations for. That is; both indian and 
-     *       european players. If players does not contain any indian players, 
+     *       and starting locations for. That is; both indian and
+     *       european players. If players does not contain any indian players,
      *       no settlements are added.
      */
     private void createIndianSettlements(final Map map, List<Player> players) {
@@ -411,7 +423,7 @@ public class SimpleMapGenerator implements MapGenerator {
         List<Tile> settlementTiles = new ArrayList<Tile>();
 
         final int minSettlementDistance = 3;
-        
+
         // Default value for map editor
         int nativeSettlementDensity = 50;
         boolean isNativeSettlementDensitySet = map.getSpecification().hasOption("model.option.nativeSettlementDensity");
@@ -419,9 +431,9 @@ public class SimpleMapGenerator implements MapGenerator {
         if (isNativeSettlementDensitySet){
             nativeSettlementDensity = map.getSpecification().getInteger("model.option.nativeSettlementDensity");
         }
-        
-        int number = mapGeneratorOptions.getInteger("model.option.settlementNumber")
-            * nativeSettlementDensity / 100;
+
+        int number = (getLand() * nativeSettlementDensity)
+            / (mapGeneratorOptions.getInteger("model.option.settlementNumber") * 100);
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
@@ -436,7 +448,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         if (candidate.getDistanceTo(tile) < minSettlementDistance) {
                             continue nextTry;
                         }
-                    }                            
+                    }
                     settlementTiles.add(candidate);
                     break;
                 }
@@ -476,7 +488,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 if (territory.region != null) {
                     name = territory.region.getNameKey();
                 }
-                logger.fine("Placing the " + territory.player + 
+                logger.fine("Placing the " + territory.player +
                         " capital in region: " + name +
                         " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, true, tile.getPosition(), map);
@@ -509,7 +521,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 if (territory.region != null) {
                     name = territory.region.getNameKey();
                 }
-                logger.fine("Placing a " + territory.player + 
+                logger.fine("Placing a " + territory.player +
                         " camp in region: " + name +
                         " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, false, tile.getPosition(), map);
@@ -575,7 +587,7 @@ public class SimpleMapGenerator implements MapGenerator {
             name = (capital) ? player.getCapitalName()
                 : player.getSettlementName();
         }
-        IndianSettlement settlement = 
+        IndianSettlement settlement =
             new IndianSettlement(map.getGame(), player, tile, name, capital,
                                  generateSkillForLocation(map, tile, player.getNationType()),
                                  new HashSet<Player>(), null);
@@ -619,13 +631,13 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
         // END DEBUG
-        
+
         return settlement;
     }
-    
+
     /**
      * Generates a skill that could be taught from a settlement on the given Tile.
-     *       
+     *
      * @param map The <code>Map</code>.
      * @param tile The tile where the settlement will be located.
      * @return A skill that can be taught to Europeans.
@@ -662,10 +674,10 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Create two ships, one with a colonist, for each player, and
      * select suitable starting positions.
-     * 
+     *
      * @param map The <code>Map</code> to place the european units on.
      * @param players The players to create <code>Settlement</code>s
-     *      and starting locations for. That is; both indian and 
+     *      and starting locations for. That is; both indian and
      *      european players.
      */
     private void createEuropeanUnits(Map map, List<Player> players) {
@@ -708,7 +720,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 } else {
                     passengers.add(newUnit);
                 }
-                
+
             }
 
             boolean startAtSea = true;
@@ -725,7 +737,7 @@ public class SimpleMapGenerator implements MapGenerator {
             } while (map.getTile(x, y).isLand() == startAtSea ||
                      isStartingPositionTooClose(map, y, startingPositions, startingYPositions));
             startingYPositions.add(new Integer(y));
-            
+
             if (startAtSea) {
                 // move westward to find the limit between high seas and coastal waters
                 while (map.getTile(x - 1, y).canMoveToEurope()) {
@@ -756,16 +768,16 @@ public class SimpleMapGenerator implements MapGenerator {
                     unit.setLocation(startTile);
                 }
             }
-            
+
             // START DEBUG:
             if (FreeCol.isInFullDebugMode()) {
                 // in debug mode give each player a few more units and a colony
                 UnitType unitType = map.getSpecification().getUnitType("model.unit.galleon");
                 Unit unit4 = new Unit(game, startTile, player, unitType, UnitState.ACTIVE);
-                
+
                 unitType = map.getSpecification().getUnitType("model.unit.privateer");
                 @SuppressWarnings("unused") Unit privateer = new Unit(game, startTile, player, unitType, UnitState.ACTIVE);
-                
+
                 unitType = map.getSpecification().getUnitType("model.unit.freeColonist");
                 @SuppressWarnings("unused") Unit unit5 = new Unit(game, unit4, player, unitType, UnitState.SENTRY);
                 unitType = map.getSpecification().getUnitType("model.unit.veteranSoldier");
@@ -851,16 +863,16 @@ public class SimpleMapGenerator implements MapGenerator {
 
                     unitType = map.getSpecification().getUnitType("model.unit.seasonedScout");
                     @SuppressWarnings("unused")
-                    Unit scout = new Unit(game, colonyTile, player, 
+                    Unit scout = new Unit(game, colonyTile, player,
                                           unitType, UnitState.ACTIVE);
 
                     unitType = map.getSpecification().getUnitType("model.unit.veteranSoldier");
                     @SuppressWarnings("unused")
-                    Unit unit8 = new Unit(game, colonyTile, player, 
+                    Unit unit8 = new Unit(game, colonyTile, player,
                                           unitType, UnitState.ACTIVE);
 
                     @SuppressWarnings("unused")
-                    Unit unit9 = new Unit(game, colonyTile, player, 
+                    Unit unit9 = new Unit(game, colonyTile, player,
                                           unitType, UnitState.ACTIVE);
 
                     unitType = map.getSpecification().getUnitType("model.unit.artillery");
@@ -879,7 +891,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     unitType = map.getSpecification().getUnitType("model.unit.treasureTrain");
                     Unit unit13 = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     unit13.setTreasureAmount(10000);
-                    
+
                     unitType = map.getSpecification().getUnitType("model.unit.wagonTrain");
                     Unit unit14 = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
                     GoodsType cigarsType = map.getSpecification().getGoodsType("model.goods.cigars");
@@ -942,7 +954,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 return position;
             }
         }
-        
+
         public String toString() {
             return player + " territory at " + region.toString();
         }
