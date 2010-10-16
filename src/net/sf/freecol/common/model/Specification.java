@@ -61,7 +61,7 @@ import net.sf.freecol.common.option.StringOption;
  */
 public final class Specification {
 
-    public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE = 
+    public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE =
         new FreeColGameObjectType("model.source.movementPenalty");
     public static final FreeColGameObjectType ARTILLERY_PENALTY_SOURCE =
         new FreeColGameObjectType("model.source.artilleryInTheOpen");
@@ -75,13 +75,13 @@ public final class Specification {
         new FreeColGameObjectType("model.source.baseOffence");
     public static final FreeColGameObjectType BASE_DEFENCE_SOURCE =
         new FreeColGameObjectType("model.source.baseDefence");
-    public static final FreeColGameObjectType CARGO_PENALTY_SOURCE = 
+    public static final FreeColGameObjectType CARGO_PENALTY_SOURCE =
         new FreeColGameObjectType("model.source.cargoPenalty");
-    public static final FreeColGameObjectType AMBUSH_BONUS_SOURCE = 
+    public static final FreeColGameObjectType AMBUSH_BONUS_SOURCE =
         new FreeColGameObjectType("model.source.ambushBonus");
-    public static final FreeColGameObjectType IN_SETTLEMENT = 
+    public static final FreeColGameObjectType IN_SETTLEMENT =
         new FreeColGameObjectType("model.source.inSettlement");
-    public static final FreeColGameObjectType IN_CAPITAL = 
+    public static final FreeColGameObjectType IN_CAPITAL =
         new FreeColGameObjectType("model.source.inCapital");
 
     // Workaround.  Not really in the specification.
@@ -180,7 +180,7 @@ public final class Specification {
                 FORTIFICATION_BONUS_SOURCE,
                 INDIAN_RAID_BONUS_SOURCE,
                 BASE_OFFENCE_SOURCE,
-                BASE_DEFENCE_SOURCE, 
+                BASE_DEFENCE_SOURCE,
                 CARGO_PENALTY_SOURCE,
                 AMBUSH_BONUS_SOURCE,
                 IN_SETTLEMENT,
@@ -729,7 +729,7 @@ public final class Specification {
             throw new IllegalArgumentException("No boolean value associated with the specified option.");
         }
     }
-    
+
 
     // -- Buildings --
     public List<BuildingType> getBuildingTypeList() {
@@ -1009,7 +1009,7 @@ public final class Specification {
     public void applyDifficultyLevel(int difficultyLevel) {
         applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
     }
-        
+
     /**
      * Applies the difficulty level identified by the given String to
      * the current specification.
@@ -1019,7 +1019,7 @@ public final class Specification {
     public void applyDifficultyLevel(String difficultyLevel) {
         applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
     }
-        
+
 
     /**
      * Applies the given difficulty level to the current
@@ -1078,7 +1078,7 @@ public final class Specification {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -1089,7 +1089,9 @@ public final class Specification {
 
         // Add attributes:
         out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("difficultyLevel", difficultyLevel);
+        if (difficultyLevel != null) {
+            out.writeAttribute("difficultyLevel", difficultyLevel);
+        }
 
         // copy the order of section in specification.xml
         writeSection(out, "modifiers", specialModifiers);
