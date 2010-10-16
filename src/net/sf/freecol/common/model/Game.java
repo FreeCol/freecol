@@ -44,10 +44,10 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 
 /**
  * The main component of the game model.
- * 
+ *
  * <br>
  * <br>
- * 
+ *
  * If an object of this class returns a non-null result to {@link #getViewOwner},
  * then this object just represents a view of the game from a single player's
  * perspective. In that case, some information might be missing from the model.
@@ -58,8 +58,8 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    /** 
-     * A virtual player to use with enemy privateers 
+    /**
+     * A virtual player to use with enemy privateers
      */
     private Player unknownEnemy;
 
@@ -134,9 +134,9 @@ public class Game extends FreeColGameObject {
         super(null);
         this.specification = specification;
     }
-    
+
     /**
-     * Minimal constructor, 
+     * Minimal constructor,
      * Just necessary to call parent constructor
      * @param game
      */
@@ -147,17 +147,17 @@ public class Game extends FreeColGameObject {
     /*
      * Initiate a new <code>Game</code> object from a <code>Element</code>
      * in a DOM-parsed XML-tree.
-     * 
+     *
      * Currently not used, commented.
-     * 
+     *
      * @param modelController A controller object the model can use to make
      * actions not allowed from the model (generate random numbers etc). @param
      * viewOwnerUsername The username of the owner of this view of the game.
      * @param e An XML-element that will be used to initialize this object.
-     * 
+     *
      * public Game(ModelController modelController, Element e, String
      * viewOwnerUsername){ super(null, e);
-     * 
+     *
      * this.modelController = modelController; canGiveID = false;
      * readFromXMLElement(e); this.viewOwner =
      * getPlayerByName(viewOwnerUsername); }
@@ -168,7 +168,7 @@ public class Game extends FreeColGameObject {
      * <p>
      * Note that this is used on the client side; the game is really a partial
      * view of the server-side game.
-     * 
+     *
      * @param modelController A controller object the model can use to make
      *            actions not allowed from the model (generate random numbers
      *            etc).
@@ -217,7 +217,7 @@ public class Game extends FreeColGameObject {
     public void setUnknownEnemy(Player player) {
         this.unknownEnemy = player;
     }
-    
+
     /**
      * Get the <code>VacantNations</code> value.
      *
@@ -236,7 +236,7 @@ public class Game extends FreeColGameObject {
     /**
      * Check if the clients are trusted or if the server should keep secrets in
      * order to prevent cheating.
-     * 
+     *
      * @return true if clients are to be trusted.
      */
     public boolean isClientTrusted() {
@@ -251,7 +251,7 @@ public class Game extends FreeColGameObject {
      * If this value is <code>null</code>, then it means that this
      * <code>Game</code> object has access to all information (ie is the
      * server model).
-     * 
+     *
      * @return The <code>Player</code> using this <code>Game</code>-object
      *         as a view.
      */
@@ -261,7 +261,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Returns the first <code>Settlement</code> with the given name.
-     * 
+     *
      * @param name The name of the <code>Settlement</code>.
      * @return The <code>Settlement</code> or <code>null</code> if there is no
      *         known <code>Settlement</code> with the specified name (the settlement
@@ -284,7 +284,7 @@ public class Game extends FreeColGameObject {
     public void setTurn(Turn newTurn) {
         turn = newTurn;
     }
-    
+
     public void increaseTurn() {
         setTurn(getTurn().next());
     }
@@ -319,7 +319,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Adds the specified player to the game.
-     * 
+     *
      * @param player The <code>Player</code> that shall be added to this
      *            <code>Game</code>.
      */
@@ -338,7 +338,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Removes the specified player from the game.
-     * 
+     *
      * @param player The <code>Player</code> that shall be removed from this
      *            <code>Game</code>.
      */
@@ -357,7 +357,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Registers a new <code>FreeColGameObject</code> with the specified ID.
-     * 
+     *
      * @param id The unique ID of the <code>FreeColGameObject</code>.
      * @param freeColGameObject The <code>FreeColGameObject</code> that shall
      *            be added to this <code>Game</code>.
@@ -395,7 +395,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Gets the <code>FreeColGameObject</code> with the specified ID.
-     * 
+     *
      * @param id The identifier of the <code>FreeColGameObject</code>.
      * @return The <code>FreeColGameObject</code>.
      * @exception IllegalArgumentException If <code>id == null</code>, or <code>id = ""</code>.
@@ -410,7 +410,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get the {@link FreeColGameObject} with the given id or null. This method
      * does NOT throw if the id is invalid.
-     * 
+     *
      * @param id The id, may be null or invalid.
      * @return game object with id or null.
      */
@@ -432,7 +432,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Removes the <code>FreeColGameObject</code> with the specified ID.
-     * 
+     *
      * @param id The identifier of the <code>FreeColGameObject</code> that
      *            shall be removed from this <code>Game</code>.
      * @return The <code>FreeColGameObject</code> that has been removed.
@@ -442,7 +442,7 @@ public class Game extends FreeColGameObject {
         if (id == null || id.equals("")) {
             throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
         }
-        
+
         final FreeColGameObject o = getFreeColGameObjectSafely(id);
 
         if (freeColGameObjectListener != null) {
@@ -455,7 +455,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Gets the <code>Map</code> that is being used in this game.
-     * 
+     *
      * @return The <code>Map</code> that is being used in this game or
      *         <i>null</i> if no <code>Map</code> has been created.
      */
@@ -465,7 +465,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Sets the <code>Map</code> that is going to be used in this game.
-     * 
+     *
      * @param map The <code>Map</code> that is going to be used in this game.
      */
     public void setMap(Map map) {
@@ -492,7 +492,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Returns a vacant nation.
-     * 
+     *
      * @return A vacant nation.
      */
     public Nation getVacantNation() {
@@ -507,7 +507,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Return a <code>Player</code> identified by it's nation.
-     * 
+     *
      * @param nationID The nation.
      * @return The <code>Player</code> of the given nation.
      */
@@ -525,7 +525,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Sets the current player.
-     * 
+     *
      * @param newCp The new current player.
      */
     public void setCurrentPlayer(Player newCp) {
@@ -543,7 +543,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the current player. This is the <code>Player</code> currently
      * playing the <code>Game</code>.
-     * 
+     *
      * @return The current player.
      */
     public Player getCurrentPlayer() {
@@ -552,7 +552,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Gets the next current player.
-     * 
+     *
      * @return The player that will start its turn as soon as the current player
      *         is ready.
      * @see #getCurrentPlayer
@@ -563,7 +563,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Gets the player after the given player.
-     * 
+     *
      * @param beforePlayer The <code>Player</code> before the
      *            <code>Player</code> to be returned.
      * @return The <code>Player</code> after the <code>beforePlayer</code>
@@ -599,7 +599,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Gets the first player in this game.
-     * 
+     *
      * @return the <code>Player</code> that was first added to this
      *         <code>Game</code>.
      */
@@ -614,11 +614,11 @@ public class Game extends FreeColGameObject {
     /**
      * Gets an <code>Iterator</code> of every registered
      * <code>FreeColGameObject</code>.
-     * 
+     *
      * This <code>Iterator</code> should be iterated at least once
      * in a while since it cleans the <code>FreeColGameObject</code>
      * cache.
-     * 
+     *
      * @return an <code>Iterator</code> containing every registered
      *         <code>FreeColGameObject</code>.
      * @see #setFreeColGameObject
@@ -627,7 +627,7 @@ public class Game extends FreeColGameObject {
         return new Iterator<FreeColGameObject>() {
             final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it = freeColGameObjects.entrySet().iterator();
             FreeColGameObject nextValue = null;
-            
+
             public boolean hasNext() {
                 while (nextValue == null) {
                     if (!it.hasNext()) {
@@ -646,7 +646,7 @@ public class Game extends FreeColGameObject {
                         nextValue = o;
                     }
                 }
-                
+
                 return nextValue != null;
             }
 
@@ -665,7 +665,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Gets a <code>Player</code> specified by a name.
-     * 
+     *
      * @param name The name identifying the <code>Player</code>.
      * @return The <code>Player</code>.
      */
@@ -684,13 +684,13 @@ public class Game extends FreeColGameObject {
 
     /**
      * Checks if the specified name is in use.
-     * 
+     *
      * @param username The name.
      * @return <i>true</i> if the name is already in use and <i>false</i>
      *         otherwise.
      */
     public boolean playerNameInUse(String username) {
-        
+
         for (Player player : players) {
             if (player.getName().equals(username)) {
                 return true;
@@ -702,7 +702,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets an <code>Iterator</code> of every <code>Player</code> in this
      * game.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<Player> getPlayerIterator() {
@@ -712,7 +712,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets an <code>Vector</code> containing every <code>Player</code> in
      * this game.
-     * 
+     *
      * @return The <code>Vector</code>.
      */
     public List<Player> getPlayers() {
@@ -725,7 +725,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Returns all the European players known by the player of this game.
-     * 
+     *
      * @return All the European players known by the player of this game.
      */
     public List<Player> getEuropeanPlayers() {
@@ -740,7 +740,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Checks if a new <code>Player</code> can be added.
-     * 
+     *
      * @return <i>true</i> if a new player can be added and <i>false</i>
      *         otherwise.
      */
@@ -750,7 +750,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Checks if all players are ready to launch.
-     * 
+     *
      * @return <i>true</i> if all players are ready to launch and <i>false</i>
      *         otherwise.
      */
@@ -785,9 +785,9 @@ public class Game extends FreeColGameObject {
      * Checks the integrity of this <code>Game</code
      * by checking if there are any
      * {@link FreeColGameObject#isUninitialized() uninitialized objects}.
-     * 
+     *
      * Detected problems gets written to the log.
-     * 
+     *
      * @return <code>true</code> if the <code>Game</code> has
      *      been loaded properly.
      */
@@ -812,7 +812,7 @@ public class Game extends FreeColGameObject {
         }
         return ok;
     }
-    
+
     /**
      * Try to fix integrity problems
      */
@@ -913,14 +913,14 @@ public class Game extends FreeColGameObject {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -991,7 +991,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -1067,7 +1067,8 @@ public class Game extends FreeColGameObject {
             } else if (CIBOLA_TAG.equals(tagName)) {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
-            } else if (OptionGroup.getXMLElementTagName().equals(tagName)) {
+            } else if (OptionGroup.getXMLElementTagName().equals(tagName)
+                       || "difficultyLevel".equals(tagName)) {
                 // remove compatibility code after 0.10.0
                 OptionGroup difficultyLevel = new OptionGroup(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
@@ -1087,7 +1088,7 @@ public class Game extends FreeColGameObject {
             logger.warning("Error parsing xml: expecting closing tag </" + Game.getXMLElementTagName() + "> "+
                            "found instead: " + in.getLocalName());
         }
-        
+
         // TODO: remove compatibility code post 0.10.0
         if (gameOptions != null) {
             addOldOptions(gameOptions);
@@ -1153,11 +1154,11 @@ public class Game extends FreeColGameObject {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return the tag name.
      */
     public static String getXMLElementTagName() {
         return "game";
     }
-    
+
 }
