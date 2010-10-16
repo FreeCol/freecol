@@ -51,7 +51,7 @@ import net.sf.freecol.common.util.Utils;
 public class FreeColDataFile {
 
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
-    
+
     private static final String FILE_PREFIX = "resources";
     private static final String FILE_SUFFIX = ".properties";
 
@@ -68,11 +68,11 @@ public class FreeColDataFile {
      * a ZIP-file).
      */
     private final String jarDirectory;
-    
-    
+
+
     /**
      * Opens the given file for reading.
-     * 
+     *
      * @param file The file to be read.
      */
     public FreeColDataFile(File file) {
@@ -85,20 +85,20 @@ public class FreeColDataFile {
                 }
             }
         }
-        
+
         this.file = file;
-        
+
         if (file.isDirectory()) {
             this.jarDirectory = null;
         } else {
             this.jarDirectory = findJarDirectory(file.getName().substring(0, file.getName().lastIndexOf('.')), file);
         }
     }
-    
+
     /**
      * Finds the directory within the zip-file in case the data file
      * has been renamed.
-     * 
+     *
      * @param expectedName The name the directory should have.
      * @param file The zip-file.
      * @return The name of the base directory in the zip-file.
@@ -168,7 +168,7 @@ public class FreeColDataFile {
      *      data. If this object represents a directory then the provided filename
      *      should be relative towards the path of the directory. In case
      *      of a compressed archieve it should be the path within the
-     *      archive. 
+     *      archive.
      * @return an <code>InputStream</code> value
      * @exception IOException if an error occurs
      */
@@ -177,7 +177,7 @@ public class FreeColDataFile {
         connection.setDefaultUseCaches(false);
         return new BufferedInputStream(connection.getInputStream());
     }
-    
+
     protected URI getURI(String filename) {
         try {
             if (filename.startsWith("urn:")) {
@@ -197,7 +197,7 @@ public class FreeColDataFile {
     /**
      * Creates a <code>ResourceMapping</code> from the available
      * resource files.
-     * 
+     *
      * @return A <code>ResourceMapping</code> or <code>null</code>
      *      there is no resource mapping file.
      */
@@ -262,7 +262,7 @@ public class FreeColDataFile {
         }
         return rc;
     }
-    
+
     /**
      * Returns a <code>FileFilter</code>.
      * @return The <code>FileFilter</code>.
@@ -280,12 +280,12 @@ public class FreeColDataFile {
             }
         };
     }
-    
+
     /**
      * File endings that are supported for this type of data file.
      * @return An array with a single element: ".zip".
      */
     protected String[] getFileEndings() {
-        return new String[] {".zip"};   
+        return new String[] {".zip"};
     }
 }

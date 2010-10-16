@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
  * An isometric map. The map is represented as a collection of tiles.
  */
 public class Map extends FreeColGameObject {
-    
+
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
     /**
@@ -50,8 +50,8 @@ public class Map extends FreeColGameObject {
      * map. Starting north and going clockwise.
     */
     public static enum Direction {
-        N  ( 0, -2,  0, -2), 
-        NE ( 1, -1,  0, -1), 
+        N  ( 0, -2,  0, -2),
+        NE ( 1, -1,  0, -1),
         E  ( 1,  0,  1,  0),
         SE ( 1,  1,  0,  1),
         S  ( 0,  2,  0,  2),
@@ -98,7 +98,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Returns the reverse direction of the given direction.
-         * 
+         *
          * @return The reverse direction of the given direction.
          */
         public Direction getReverseDirection() {
@@ -144,12 +144,12 @@ public class Map extends FreeColGameObject {
     public static enum PathType { BOTH_LAND_AND_SEA, ONLY_LAND, ONLY_SEA }
 
     private Tile[][] tiles;
-    
+
     private final java.util.Map<String, Region> regions = new HashMap<String, Region>();
 
     /**
      * Create a new <code>Map</code> from a collection of tiles.
-     * 
+     *
      * @param game
      *            The <code>Game</code> this map belongs to.
      * @param tiles
@@ -164,7 +164,7 @@ public class Map extends FreeColGameObject {
     /**
      * Create a new <code>Map</code> from an <code>Element</code> in a
      * DOM-parsed XML-tree.
-     * 
+     *
      * @param game
      *            The <code>Game</code> this map belongs to.
      * @param in
@@ -182,7 +182,7 @@ public class Map extends FreeColGameObject {
      * later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game
      *            The <code>Game</code> in which this object belong.
      * @param id
@@ -234,20 +234,20 @@ public class Map extends FreeColGameObject {
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against the
      * <code>options</code>.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * <i>Important: This method will not include colonies in a possible path,
      * and {@link PathNode#getTurns}, {@link PathNode#getTotalTurns} and
      * {@link PathNode#getMovesLeft} will all return <code>-1</code> for the
      * generated {@link PathNode}s.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Use {@link #findPath(Unit, Tile, Tile)} whenever possible.</i>
-     * 
+     *
      * @param start
      *            The <code>Tile</code> in which the path starts from.
      * @param end
@@ -276,7 +276,7 @@ public class Map extends FreeColGameObject {
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against the <code>unit</code>'s
      * legal moves.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal.
@@ -302,12 +302,12 @@ public class Map extends FreeColGameObject {
         }
         return findPath(unit, start, end, null, null, CostDeciders.defaultFor(unit));
     }
-    
+
     /**
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against the <code>unit</code>'s
      * legal moves.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal.
@@ -335,12 +335,12 @@ public class Map extends FreeColGameObject {
         }
         return findPath(unit, start, end, null, null, costDecider);
     }
-    
+
     /**
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against the <code>unit</code>'s
      * legal moves.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal.
@@ -377,7 +377,7 @@ public class Map extends FreeColGameObject {
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against the <code>unit</code>'s
      * legal moves.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal.
@@ -412,7 +412,7 @@ public class Map extends FreeColGameObject {
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against validity (neither the
      * <code>options</code> nor allowed movement by the <code>unit</code>.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal. The <code>options</code> are
@@ -446,7 +446,7 @@ public class Map extends FreeColGameObject {
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against validity (neither the
      * <code>options</code> nor allowed movement by the <code>unit</code>.
-     * 
+     *
      * @param unit an <code>Unit</code> value
      * @param start
      *            The <code>Tile</code> in which the path starts from.
@@ -480,12 +480,12 @@ public class Map extends FreeColGameObject {
             final PathType type, final Unit carrier, final CostDecider costDecider) {
         /*
          * Using A* with the Manhatten distance as the heuristics.
-         * 
+         *
          * The data structure for the open list is a combined structure: using a
          * HashMap for membership tests and a PriorityQueue for getting the node
          * with the minimal f (cost+heuristics). This gives O(1) on membership
          * test and O(log N) for remove-best and insertions.
-         * 
+         *
          * The data structure for the closed list is simply a HashMap.
          */
 
@@ -558,14 +558,14 @@ public class Map extends FreeColGameObject {
                     continue;
                 }
             }
-            
+
             // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
                 final Tile newTile = currentTile.getNeighbourOrNull(direction);
                 if (newTile == null) {
                     continue;
                 }
-                
+
                 // If the new tile is the tile we just visited, skip
                 // it. We can use == because PathNode.getTile() and
                 // getNeighborOrNull both return references to the
@@ -657,13 +657,13 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> to find the path for.
      * @param gd
@@ -681,13 +681,13 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> to find the path for.
      * @param startTile
@@ -705,16 +705,16 @@ public class Map extends FreeColGameObject {
             int maxTurns) {
         return search(unit, startTile, gd, CostDeciders.defaultFor(unit), maxTurns);
     }
-    
+
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> to find the path for.
      * @param gd
@@ -738,13 +738,13 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd
@@ -765,13 +765,13 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> to find the path for.
      * @param startTile
@@ -791,16 +791,16 @@ public class Map extends FreeColGameObject {
             CostDecider costDecider, int maxTurns) {
         return search(unit, startTile, gd, costDecider, maxTurns, null);
     }
-    
+
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param unit an <code>Unit</code> value
      * @param startTile
      *            The <code>Tile</code> to start the search from.
@@ -823,16 +823,16 @@ public class Map extends FreeColGameObject {
             final Unit carrier) {
         return search(unit, startTile, gd, CostDeciders.defaultFor(unit), maxTurns, carrier);
     }
-    
+
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     * 
+     *
      * <br />
      * <br />
-     * 
+     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
-     * 
+     *
      * @param unit an <code>Unit</code> value
      * @param startTile
      *            The <code>Tile</code> to start the search from.
@@ -927,7 +927,7 @@ public class Map extends FreeColGameObject {
                 if (newTile == null) {
                     continue;
                 }
-                
+
                 // If the new tile is the tile we just visited, skip
                 // it. We can use == because PathNode.getTile() and
                 // getNeighborOrNull both return references to the
@@ -1003,7 +1003,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds the best path to <code>Europe</code>.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal.
@@ -1019,7 +1019,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds the best path to <code>Europe</code>.
-     * 
+     *
      * @param unit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal.
@@ -1047,12 +1047,12 @@ public class Map extends FreeColGameObject {
                     goal = pathNode;
                     return true;
                 }
-                
+
                 //TODO: This may make invalid assumptions about map topology!
                 //Solution: Add booleans, defining which edges are considered
                 //  connected to europe
                 //or make sure during map generation that high seas tiles
-                //  exist in all sensible spots, then remove this check. 
+                //  exist in all sensible spots, then remove this check.
                 if (pathNode.getTile().isAdjacentToVerticalMapEdge()) {
                     goal = pathNode;
                     return true;
@@ -1062,11 +1062,11 @@ public class Map extends FreeColGameObject {
         };
         return search(unit, start, gd, costDecider, INFINITY);
     }
-    
+
     /**
      * Finds the best path to <code>Europe</code> independently of any unit.
      * This method is meant to be executed by the server/AI code, with complete knowledge of the map
-     * 
+     *
      * @param start
      *            The starting <code>Tile</code>.
      * @return The path to the target or <code>null</code> if no target can be
@@ -1091,12 +1091,12 @@ public class Map extends FreeColGameObject {
                     goal = pathNode;
                     return true;
                 }
-                
+
                 //TODO: This may make invalid assumptions about map topology!
                 //Solution: Add booleans, defining which edges are considered
                 //  connected to europe
                 //or make sure during map generation that high seas tiles
-                //  exist in all sensible spots, then remove this check. 
+                //  exist in all sensible spots, then remove this check.
                 if (t.isAdjacentToVerticalMapEdge()) {
                     goal = pathNode;
                     return true;
@@ -1124,7 +1124,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Searches for land within the given radius.
-     * 
+     *
      * @param x
      *            X-component of the position to search from.
      * @param y
@@ -1149,7 +1149,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Returns the Tile at a requested position.
-     * 
+     *
      * @param p
      *            The position.
      * @return The Tile at the given position.
@@ -1161,7 +1161,7 @@ public class Map extends FreeColGameObject {
     /**
      * Returns the Tile at position (x, y). 'x' specifies a column and 'y'
      * specifies a row. (0, 0) is the Tile at the top-left corner of the Map.
-     * 
+     *
      * @param x
      *            The x-coordinate of the <code>Tile</code>.
      * @param y
@@ -1179,7 +1179,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Sets the given tile the the given coordinates.
-     * 
+     *
      * @param x
      *            The x-coordinate of the <code>Tile</code>.
      * @param y
@@ -1193,7 +1193,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Returns the width of this Map.
-     * 
+     *
      * @return The width of this Map.
      */
     public int getWidth() {
@@ -1206,7 +1206,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Returns the height of this Map.
-     * 
+     *
      * @return The height of this Map.
      */
     public int getHeight() {
@@ -1216,17 +1216,17 @@ public class Map extends FreeColGameObject {
             return tiles[0].length;
         }
     }
-    
+
     /**
      * Returns the direction a unit needs to move in
      * order to get from <code>t1</code> to <code>t2</code>
-     * 
+     *
      * @param t1 The tile to move from.
      * @param t2 The target tile if moving from <code>t1</code>
      *      in the direction returned by this method.
      * @return The direction you need to move from <code>t1</code>
      *      in order to reach <code>t2</code>, or null if the two
-     *      specified tiles are not neighbours. 
+     *      specified tiles are not neighbours.
      */
     public Direction getDirection(Tile t1, Tile t2) {
         for (Direction d : Direction.values()) {
@@ -1241,20 +1241,20 @@ public class Map extends FreeColGameObject {
 
     /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
-     * 
+     *
      * @return the <code>Iterator</code>.
      */
     public WholeMapIterator getWholeMapIterator() {
         return new WholeMapIterator();
     }
-    
-     
+
+
 
 
 
     /**
      * Get an adjacent iterator.
-     * 
+     *
      * @param centerPosition
      *            The center position to iterate around
      * @return Iterator
@@ -1265,7 +1265,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Get a border adjacent iterator.
-     * 
+     *
      * @param centerPosition
      *            The center position to iterate around
      * @return Iterator
@@ -1276,7 +1276,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Get a flood fill iterator.
-     * 
+     *
      * @param centerPosition
      *            The center position to iterate around
      * @return Iterator
@@ -1287,7 +1287,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Get a circle iterator.
-     * 
+     *
      * @param center
      *            The center position to iterate around
      * @param isFilled
@@ -1303,7 +1303,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Checks whether a position is valid (within the map limits).
-     * 
+     *
      * @param position
      *            The position
      * @return True if it is valid
@@ -1314,7 +1314,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Checks whether a position is valid (within the map limits).
-     * 
+     *
      * @param x
      *            X coordinate
      * @param y
@@ -1327,25 +1327,25 @@ public class Map extends FreeColGameObject {
 
     /**
      * Checks whether a position is valid.
-     * 
+     *
      * @param position The position
      * @param width The width of the map.
      * @param height The height of the map.
-     * @return <code>true</code> if the given position is 
+     * @return <code>true</code> if the given position is
      *        within the bounds of the map and <code>false</code> otherwise
      */
     public static boolean isValid(Position position, int width, int height) {
         return isValid(position.x, position.y, width, height);
     }
-    
+
     /**
      * Checks if the given position is valid.
-     * 
+     *
      * @param x The x-coordinate of the position.
      * @param y The y-coordinate of the position.
      * @param width The width of the map.
      * @param height The height of the map.
-     * @return <code>true</code> if the given position is 
+     * @return <code>true</code> if the given position is
      *        within the bounds of the map and <code>false</code> otherwise
      */
     public static boolean isValid(int x, int y, int width, int height) {
@@ -1354,7 +1354,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Select a random land position on the map.
-     * 
+     *
      * <b>Warning:</b> This method should not be used by any model
      * object unless we have completed restructuring the model
      * (making all model changes at the server). The reason is
@@ -1378,7 +1378,7 @@ public class Map extends FreeColGameObject {
         }
         return null;
     }
-    
+
     /**
      * Represents a position on the Map.
      */
@@ -1387,7 +1387,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Creates a new object with the given position.
-         * 
+         *
          * @param posX
          *            The x-coordinate for this position.
          * @param posY
@@ -1400,7 +1400,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Returns the x-coordinate of this Position.
-         * 
+         *
          * @return The x-coordinate of this Position.
          */
         public int getX() {
@@ -1409,7 +1409,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Returns the y-coordinate of this Position.
-         * 
+         *
          * @return The y-coordinate of this Position.
          */
         public int getY() {
@@ -1418,7 +1418,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Compares the other Position based on the coordinates.
-         * 
+         *
          * @param other the reference object with which to compare.
          * @return true iff the coordinates match.
          */
@@ -1439,7 +1439,7 @@ public class Map extends FreeColGameObject {
          * Returns a hash code value. The current implementation (which may
          * change at any time) works well as long as the maximum coordinates fit
          * in 16 bits.
-         * 
+         *
          * @return a hash code value for this object.
          */
         @Override
@@ -1449,7 +1449,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Returns a string representation of the object.
-         * 
+         *
          * @return a string representation of the object.
          */
         @Override
@@ -1509,7 +1509,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Get the next position as a position rather as an object.
-         * 
+         *
          * @return position.
          * @throws NoSuchElementException
          *             if iterator is exhausted.
@@ -1518,7 +1518,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Returns the next element in the iteration.
-         * 
+         *
          * @return the next element in the iteration.
          * @exception NoSuchElementException
          *                iteration has no more elements.
@@ -1530,7 +1530,7 @@ public class Map extends FreeColGameObject {
         /**
          * Removes from the underlying collection the last element returned by
          * the iterator (optional operation).
-         * 
+         *
          * @exception UnsupportedOperationException
          *                no matter what.
          */
@@ -1553,7 +1553,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Determine if the iterator has another position in it.
-         * 
+         *
          * @return True of there is another position
          */
         public boolean hasNext() {
@@ -1562,7 +1562,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Obtain the next position to iterate over.
-         * 
+         *
          * @return Next position
          * @throws java.util.NoSuchElementException
          *             if last position already returned
@@ -1590,7 +1590,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * The constructor to use.
-         * 
+         *
          * @param basePosition
          *            The position around which to iterate
          */
@@ -1600,7 +1600,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Determine if the iterator has another position in it.
-         * 
+         *
          * @return True of there is another position
          */
         public boolean hasNext() {
@@ -1614,7 +1614,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Obtain the next position to iterate over.
-         * 
+         *
          * @return Next position
          * @throws NoSuchElementException
          *             if last position already returned
@@ -1636,7 +1636,7 @@ public class Map extends FreeColGameObject {
      * An interator returning positions in a spiral starting at a given center
      * tile. The center tile is never included in the positions returned, and
      * all returned positions are valid.
-     * 
+     *
      * @see Map.Position
      */
     public final class CircleIterator extends MapIterator {
@@ -1648,7 +1648,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * The constructor to use.
-         * 
+         *
          * @param center
          *            The center of the circle
          * @param isFilled
@@ -1683,7 +1683,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Returns the current radius of the circle.
-         * 
+         *
          * @return The distance from the center tile this
          *         <code>CircleIterator</code> was initialized with.
          */
@@ -1737,7 +1737,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Determine if the iterator has another position in it.
-         * 
+         *
          * @return <code>true</code> of there is another position and
          *         <code>false</code> otherwise.
          */
@@ -1747,7 +1747,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Obtains the next position.
-         * 
+         *
          * @return The next position. This position is guaranteed to be
          *         {@link Map#isValid(net.sf.freecol.common.model.Map.Position) valid}.
          */
@@ -1771,7 +1771,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * The constructor to use.
-         * 
+         *
          * @param basePosition
          *            The position around which to iterate
          */
@@ -1782,7 +1782,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Determine if the iterator has another position in it.
-         * 
+         *
          * @return True of there is another position
          */
         public boolean hasNext() {
@@ -1796,7 +1796,7 @@ public class Map extends FreeColGameObject {
 
         /**
          * Obtain the next position to iterate over.
-         * 
+         *
          * @return Next position
          * @throws NoSuchElementException
          *             if last position already returned
@@ -1817,14 +1817,14 @@ public class Map extends FreeColGameObject {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out
      *            The target stream.
      * @param player
@@ -1868,7 +1868,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in
      *            The input stream with the XML.
      */
@@ -1899,7 +1899,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return the tag name.
      */
     public static String getXMLElementTagName() {
@@ -1908,16 +1908,16 @@ public class Map extends FreeColGameObject {
 
     /**
      * Make the map usable as a parameter in the for-loop.
-     * 
+     *
      * Returns all Tiles based on the order of the WholeMapIterator.
-     * 
+     *
      * @return An Iterable that can be used to get an iterator for all tiles of the map.
      */
     public Iterable<Tile> getAllTiles() {
         return new Iterable<Tile>(){
             public Iterator<Tile> iterator(){
                 final WholeMapIterator m = getWholeMapIterator();
-                
+
                 return new Iterator<Tile>(){
                     public boolean hasNext() {
                         return m.hasNext();

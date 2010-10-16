@@ -30,16 +30,16 @@ import java.util.logging.Logger;
 public class FreeColSavegameFile extends FreeColDataFile {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
-    
+
     public static final String SAVEGAME_FILE = "savegame.xml";
-    
+
     public FreeColSavegameFile(File file) throws IOException {
         super(file);
     }
-    
+
     /**
      * Gets the input stream to the savegame data.
-     * 
+     *
      * @return An <code>InputStream</code> to the file
      *      "savegame.xml" within this data file.
      * @throws IOException if thrown while opening the
