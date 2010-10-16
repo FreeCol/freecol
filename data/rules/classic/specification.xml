@@ -1764,7 +1764,7 @@
           <rangeValue label="huge" value="20"/>
         </rangeOption>
         <!-- Option for setting the number of settlements on the map
-             The value indicates the number of land tile per sttlement tile -->
+             The value indicates the number of land tile per settlement tile -->
         <rangeOption id="model.option.settlementNumber" defaultValue="14" localizedLabels="true">
           <rangeValue label="small" value="20"/>
           <rangeValue label="medium" value="14"/>
