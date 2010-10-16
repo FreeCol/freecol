@@ -2135,69 +2135,60 @@ public final class GUI {
      *        unexplored terrain.
      */
     private void displayBaseTile(Graphics2D g, Map map, Tile tile, boolean drawUnexploredBorders) {
-        if (tile == null) {
-            return;
-        }
-        // ATTENTION: we assume that all base tiles have the same size
-        g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
-
-        if (!tile.isLand() && tile.getStyle() > 0) {
-            int edgeStyle = tile.getStyle() >> 4;
-            if (edgeStyle > 0) {
-                g.drawImage(lib.getBeachEdgeImage(edgeStyle), 0, 0, null);
-            }
-            int cornerStyle = tile.getStyle() & 15;
-            if (cornerStyle > 0) {
-                g.drawImage(lib.getBeachCornerImage(cornerStyle), 0, 0, null);
-            }
-        }
-
-        for (Direction direction : Direction.values()) {
-            Tile borderingTile = tile.getAdjacentTile(direction);
-            if (borderingTile!=null) {
-
-                if (!drawUnexploredBorders && !borderingTile.isExplored() &&
-                    (direction == Direction.SE || direction == Direction.S ||
-                     direction == Direction.SW)) {
-                    continue;
-                }
-
-                if (tile.getType() == borderingTile.getType()) {
-                    // Equal tiles, no need to draw border
-                    continue;
-                }
-                else if (tile.isLand() && !borderingTile.isLand()) {
-                    // The beach borders are drawn on the side of water tiles only
-                    continue;
-                }
-                else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
-                    // If there is a Coast image (eg. beach) defined, use it, otherwise skip
-                    /*
-                    if (borderingTile.getType().getArtCoast() != null) {
-                        g.drawImage(lib.getCoastImage(borderingTile.getType(), direction,
-                                                        tile.getX(), tile.getY()),
-                                                        x, y, null);
+        if (tile != null) {
+            // ATTENTION: we assume that all base tiles have the same size
+            g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
+            if (tile.isExplored()) {
+                if (!tile.isLand() && tile.getStyle() > 0) {
+                    int edgeStyle = tile.getStyle() >> 4;
+                    if (edgeStyle > 0) {
+                        g.drawImage(lib.getBeachEdgeImage(edgeStyle), 0, 0, null);
                     }
-                    */
-                    // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                    g.drawImage(lib.getBorderImage(borderingTile.getType(), direction, tile.getX(), tile.getY()), 0, 0, null);
-                    TileImprovement river = borderingTile.getRiver();
-                    if (river != null && (direction == Direction.SE || direction == Direction.SW ||
-                                          direction == Direction.NE || direction == Direction.NW)) {
-                        int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
-                        if (branches[direction.getReverseDirection().ordinal()] > 0) {
-                            g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(), tile.getX(), tile.getY()), 0, 0, null);
+                    int cornerStyle = tile.getStyle() & 15;
+                    if (cornerStyle > 0) {
+                        g.drawImage(lib.getBeachCornerImage(cornerStyle), 0, 0, null);
+                    }
+                }
+
+                for (Direction direction : Direction.values()) {
+                    Tile borderingTile = tile.getAdjacentTile(direction);
+                    if (borderingTile != null) {
+
+                        if (!drawUnexploredBorders && !borderingTile.isExplored() &&
+                            (direction == Direction.SE || direction == Direction.S ||
+                             direction == Direction.SW)) {
+                            continue;
                         }
-                    }
-               } else if (tile.isExplored() && borderingTile.isExplored()) {
-                    if (lib.getTerrainImage(tile.getType(), 0, 0)
-                        .equals(lib.getTerrainImage(borderingTile.getType(), 0, 0))) {
-                        // Do not draw limit between tile that share same graphics (ocean & great river)
-                        continue;
-                    } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
-                        // Draw land terrain with bordering land type, or ocean/high seas limit
-                        g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                       tile.getX(), tile.getY()), 0, 0, null);
+
+                        if (tile.getType() == borderingTile.getType()) {
+                            // Equal tiles, no need to draw border
+                            continue;
+                        } else if (tile.isLand() && !borderingTile.isLand()) {
+                            // The beach borders are drawn on the side of water tiles only
+                            continue;
+                        } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
+                            // If there is a Coast image (eg. beach) defined, use it, otherwise skip
+                            // Draw the grass from the neighboring tile, spilling over on the side of this tile
+                            g.drawImage(lib.getBorderImage(borderingTile.getType(), direction, tile.getX(), tile.getY()), 0, 0, null);
+                            TileImprovement river = borderingTile.getRiver();
+                            if (river != null && (direction == Direction.SE || direction == Direction.SW ||
+                                                  direction == Direction.NE || direction == Direction.NW)) {
+                                int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
+                                if (branches[direction.getReverseDirection().ordinal()] > 0) {
+                                    g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(), tile.getX(), tile.getY()), 0, 0, null);
+                                }
+                            }
+                        } else if (borderingTile.isExplored()) {
+                            if (lib.getTerrainImage(tile.getType(), 0, 0)
+                                .equals(lib.getTerrainImage(borderingTile.getType(), 0, 0))) {
+                                // Do not draw limit between tile that share same graphics (ocean & great river)
+                                continue;
+                            } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
+                                // Draw land terrain with bordering land type, or ocean/high seas limit
+                                g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
+                                                               tile.getX(), tile.getY()), 0, 0, null);
+                            }
+                        }
                     }
                 }
             }
@@ -2318,11 +2309,16 @@ public final class GUI {
      */
     private void displayTileOverlays(Graphics2D g, Map map, Tile tile,
                                      boolean drawUnexploredBorders, boolean withNumber) {
-        if (tile != null) {
-            displayTileItems(g, map, tile);
+        if (tile != null && tile.isExplored()) {
             if (drawUnexploredBorders) {
-                displayUnexploredBorders(g, map, tile);
+                for (Direction direction : Direction.values()) {
+                    Tile borderingTile = tile.getAdjacentTile(direction);
+                    if (borderingTile != null && !borderingTile.isExplored()){
+                        g.drawImage(lib.getBorderImage(null, direction, tile.getX(), tile.getY()), 0, 0, null);
+                    }
+                }
             }
+            displayTileItems(g, map, tile);
             displaySettlement(g, map, tile, withNumber);
             displayFogOfWar(g, map, tile);
             displayOptionalValues(g, map, tile);
@@ -2515,32 +2511,6 @@ public final class GUI {
             g.setComposite(oldComposite);
         }
     }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Borders next to unexplored
-     * tiles will be drawn differently.
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
-     * @param tile The Tile to draw.
-     */
-    private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile) {
-        if (tile.isExplored()) {
-
-            for (Direction direction : Direction.values()) {
-                Tile borderingTile = tile.getAdjacentTile(direction);
-                if (borderingTile!=null) {
-
-                    if (borderingTile.isExplored()){
-                        continue;
-                    }
-
-                    g.drawImage(lib.getBorderImage(null, direction, tile.getX(), tile.getY()), 0, 0, null);
-                }
-            }
-        }
-    }
-
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
