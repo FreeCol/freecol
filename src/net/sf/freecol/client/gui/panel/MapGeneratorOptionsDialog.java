@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -57,7 +58,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable) {
@@ -70,9 +71,9 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         reset.setActionCommand("RESET");
         reset.addActionListener(this);
         reset.setMnemonic('R');
-        
+
         setCancelComponent(cancelButton);
-        
+
         setSize(750, 500);
 
         // Header:
@@ -96,6 +97,15 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
                     FreeColSavegameFile savegame = new FreeColSavegameFile(file);
                     Image thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
                     mapButton.setIcon(new ImageIcon(thumbnail));
+                    try {
+                        Properties properties = new Properties();
+                        properties.load(savegame.getInputStream("savegame.properties"));
+                        mapButton.setToolTipText(properties.getProperty("map.width")
+                                                 + "\u00D7"
+                                                 + properties.getProperty("map.height"));
+                    } catch(Exception e) {
+                        logger.fine("Unable to load savegame properties.");
+                    }
                     mapButton.setHorizontalTextPosition(JButton.CENTER);
                     mapButton.setVerticalTextPosition(JButton.BOTTOM);
                 } catch(Exception e) {
@@ -107,7 +117,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
                             ui.reset();
                             FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
                             fou.setValue(file);
-                    
+
                             ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
                             ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
                             ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
@@ -148,16 +158,16 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
     public Dimension getMinimumSize() {
         return new Dimension(750, 500);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
-    
+
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
