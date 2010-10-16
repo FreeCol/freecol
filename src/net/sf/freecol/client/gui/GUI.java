@@ -97,7 +97,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
-    
+
     /**
      * Custom component to paint turn progress.
      * <p>
@@ -200,10 +200,10 @@ public final class GUI {
         /**
          * Set the player for which we paint. If the player is already set, then
          * nothing happens, otherwise a repaint event is sent.
-         * 
+         *
          * @param player
          *            Player for status information
-         * 
+         *
          * @see #paint(Graphics)
          */
         public void setPlayer(Player player) {
@@ -294,13 +294,13 @@ public final class GUI {
 
     public boolean debugShowMission = false;
     public boolean debugShowMissionInfo = false;
-    
+
     private volatile boolean blinkingMarqueeEnabled;
-    
+
     private Image cursorImage;
-    
+
     private GrayLayer greyLayer;
-    
+
     private java.util.Map<Unit, Integer> unitsOutForAnimation;
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
@@ -330,7 +330,7 @@ public final class GUI {
         this.size = size;
 
         setImageLibrary(lib);
-        
+
         unitsOutForAnimation = new HashMap<Unit, Integer>();
         unitsOutForAnimationLabels = new HashMap<Unit, JLabel>();
 
@@ -345,7 +345,7 @@ public final class GUI {
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
 
     }
-    
+
     /**
      * Sets the ImageLibrary and calculates various items that depend
      * on tile size.
@@ -409,7 +409,7 @@ public final class GUI {
 
         updateMapDisplayVariables();
     }
-    
+
     /**
      * Returns true if the given Unit is being animated.
      *
@@ -419,13 +419,13 @@ public final class GUI {
     private boolean isOutForAnimation(final Unit unit) {
         return unitsOutForAnimation.containsKey(unit);
     }
-    
+
     /**
      * Run some code with the given unit made invisible.
      * You can nest several of these method calls in order
      * to hide multiple units. There are no problems
      * related to nested calls with the same unit.
-     * 
+     *
      * @param unit The unit to be hidden.
      * @param sourceTile a <code>Tile</code> value
      * @param r The code to be executed.
@@ -440,7 +440,7 @@ public final class GUI {
             releaseUnitOutForAnimation(unit);
         }
     }
-    
+
     /**
      * Describe <code>enterUnitOutForAnimation</code> method here.
      *
@@ -465,7 +465,7 @@ public final class GUI {
         unitsOutForAnimation.put(unit, i);
         return unitsOutForAnimationLabels.get(unit);
     }
-    
+
     /**
      * Describe <code>releaseUnitOutForAnimation</code> method here.
      *
@@ -474,14 +474,14 @@ public final class GUI {
     private void releaseUnitOutForAnimation(final Unit unit) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
-            throw new IllegalStateException("Tried to release unit that was not out for animation"); 
+            throw new IllegalStateException("Tried to release unit that was not out for animation");
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
             freeColClient.getCanvas().remove(unitsOutForAnimationLabels.remove(unit), false);
         } else {
             i--;
-            unitsOutForAnimation.put(unit, i); 
+            unitsOutForAnimation.put(unit, i);
         }
     }
 
@@ -528,7 +528,7 @@ public final class GUI {
         leftSpace = (size.width - tileWidth) / 2;
         rightSpace = leftSpace;
     }
-    
+
     /**
      *  Get the <code>View Mode</code> object
      * @return the current view mode.
@@ -536,13 +536,13 @@ public final class GUI {
     public ViewMode getViewMode(){
         return viewMode;
     }
-    
+
     /**
      * Starts the unit-selection-cursor blinking animation.
      */
     public void startCursorBlinking() {
-        
-        final FreeColClient theFreeColClient = freeColClient; 
+
+        final FreeColClient theFreeColClient = freeColClient;
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (!blinkingMarqueeEnabled) return;
@@ -557,15 +557,15 @@ public final class GUI {
                         && x >= leftColumn && x <= rightColumn) {
                         freeColClient.getCanvas().refreshTile(x, y);
                     }
-                }               
+                }
             }
         };
-        
+
         cursor.addActionListener(taskPerformer);
-        
+
         cursor.startBlinking();
     }
-    
+
     /**
      * Describe <code>getCursor</code> method here.
      *
@@ -574,7 +574,7 @@ public final class GUI {
     public TerrainCursor getCursor(){
         return cursor;
     }
-    
+
     /**
      * Describe <code>setSize</code> method here.
      *
@@ -584,7 +584,7 @@ public final class GUI {
         this.size = size;
         updateMapDisplayVariables();
     }
-    
+
     /**
      * Describe <code>moveTileCursor</code> method here.
      *
@@ -592,7 +592,7 @@ public final class GUI {
      */
     public void moveTileCursor(Direction direction){
         Tile selectedTile = freeColClient.getGame().getMap().getTile(getSelectedTile());
-        if(selectedTile != null){   
+        if(selectedTile != null){
             Tile newTile = selectedTile.getNeighbourOrNull(direction);
             if(newTile != null)
                 setSelectedTile(newTile.getPosition());
@@ -703,7 +703,7 @@ public final class GUI {
                 }
             }
         }
-        
+
         freeColClient.getActionManager().update();
         freeColClient.updateMenuBar();
 
@@ -769,7 +769,7 @@ public final class GUI {
             }
         }
     }
-    
+
     /**
      * Describe <code>restartBlinking</code> method here.
      *
@@ -777,7 +777,7 @@ public final class GUI {
     public void restartBlinking() {
         blinkingMarqueeEnabled = true;
     }
-    
+
     /**
      * Describe <code>stopBlinking</code> method here.
      *
@@ -808,7 +808,7 @@ public final class GUI {
                         return bestDefendingUnit;
                     }
                 }
-                
+
                 Unit movableUnit = unitTile.getMovableUnit();
                 if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
                     return movableUnit;
@@ -821,7 +821,7 @@ public final class GUI {
                             bestPick = u;
                         }
                     }
-                    
+
                     return bestPick;
                 }
             } else {
@@ -830,7 +830,7 @@ public final class GUI {
         }
     }
 
-    
+
     /**
     * Gets the selected tile.
     *
@@ -868,7 +868,7 @@ public final class GUI {
             freeColClient.getInGameController().nextActiveUnit();
             return;
         }*/
-        
+
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
             return;
@@ -1100,29 +1100,29 @@ public final class GUI {
         } else {
             if (freeColClient.isMapEditor()) {
                 g.setColor(Color.black);
-                g.fillRect(0, 0, size.width, size.height);                
+                g.fillRect(0, 0, size.width, size.height);
             } else {
                 Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
                 if (bgImage != null) {
                     g.drawImage(bgImage, 0, 0, freeColClient.getCanvas());
-                    
+
                     // Show version on initial screen
                     String versionStr = "v. " + FreeCol.getVersion();
                     Font oldFont = g.getFont();
                     Color oldColor = g.getColor();
                     Font newFont = oldFont.deriveFont(Font.BOLD);
                     TextLayout layout = new TextLayout(versionStr, newFont, g.getFontRenderContext());
-                   
+
                     Rectangle2D bounds = layout.getBounds();
                     float x = getWidth() - (float) bounds.getWidth() - 5;
                     float y = getHeight() - (float) bounds.getHeight();
                     g.setColor(Color.white);
                     layout.draw(g, x, y);
-                    
+
                     // restore old values
                     g.setFont(oldFont);
                     g.setColor(oldColor);
-                    
+
                 } else {
                     g.setColor(Color.black);
                     g.fillRect(0, 0, size.width, size.height);
@@ -1222,7 +1222,7 @@ public final class GUI {
      */
     private void positionMap(Position pos) {
         Game gameData = freeColClient.getGame();
-        
+
         int x = pos.getX(),
             y = pos.getY();
         int leftColumns = getLeftColumns(),
@@ -1308,7 +1308,7 @@ public final class GUI {
         }
     }
 
-    
+
     /**
      * Describe <code>displayGotoPath</code> method here.
      *
@@ -1324,14 +1324,14 @@ public final class GUI {
                 if (p != null) {
                     Tile tile = temp.getTile();
                     Image image;
-                    final Color textColor; 
+                    final Color textColor;
                     if (temp.getTurns() == 0) {
-                        g.setColor(Color.GREEN);                        
+                        g.setColor(Color.GREEN);
                         image = lib.getPathImage(activeUnit);
-                        if (activeUnit != null 
+                        if (activeUnit != null
                                 && tile.isExplored()
                                 && activeUnit.isNaval()
-                                && tile.isLand() 
+                                && tile.isLand()
                                 && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
                             image = lib.getPathImage(activeUnit.getFirstUnit());
                         }
@@ -1342,12 +1342,12 @@ public final class GUI {
                         if (activeUnit != null
                                 && tile.isExplored()
                                 && activeUnit.isNaval()
-                                && tile.isLand() 
+                                && tile.isLand()
                                 && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
                             image = lib.getPathNextTurnImage(activeUnit.getFirstUnit());
                         }
                         textColor = Color.WHITE;
-                    }                
+                    }
                     g.translate(p.x, p.y);
                     if (image != null) {
                         centerImage(g, image);
@@ -1355,14 +1355,14 @@ public final class GUI {
                         g.fillOval(halfWidth, halfHeight, 10, 10);
                         g.setColor(Color.BLACK);
                         g.drawOval(halfWidth, halfHeight, 10, 10);
-                    }                
+                    }
                     if (temp.getTurns() > 0) {
                         Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
                                                               textColor, font);
                         centerImage(g, stringImage);
                     }
                     g.translate(-p.x, -p.y);
-                }                    
+                }
                 temp = temp.next;
             }
         }
@@ -1487,7 +1487,7 @@ public final class GUI {
         List<AffineTransform> unitTransforms = new ArrayList<AffineTransform>();
         List<Settlement> settlements = new ArrayList<Settlement>();
         List<AffineTransform> settlementTransforms = new ArrayList<AffineTransform>();
-        
+
         int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
         // Row per row; start with the top modified row
@@ -1509,7 +1509,7 @@ public final class GUI {
             // Column per column; start at the left side to display the tiles.
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
-                    
+
                 // paint full borders
                 paintBorders(g, tile, BorderType.COUNTRY, true);
                 // Display the Tile overlays:
@@ -1591,7 +1591,7 @@ public final class GUI {
                     case ClientOptions.COLONY_LABELS_MODERN:
                     default:
                         backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                        
+
                         TextSpecification[] specs = new TextSpecification[1];
                         if (settlement instanceof Colony && settlement.getOwner() == clientPlayer) {
                             Colony colony = (Colony) settlement;
@@ -1613,7 +1613,7 @@ public final class GUI {
                             if (settlement instanceof Colony) {
                                 String size = Integer.toString(((Colony) settlement).getUnitCount());
                                 leftImage = createLabel(g, size, font, backgroundColor);
-                                
+
                                 if (settlement.getOwner() == clientPlayer) {
                                     int bonusProduction = ((Colony) settlement).getProductionBonus();
                                     if (bonusProduction != 0) {
@@ -1627,7 +1627,7 @@ public final class GUI {
 //                                    leftImage = createLabel(g, "\u2606", font, backgroundColor);
                                              leftImage = createCapitalMarker(nameImage.getHeight(null), 5, backgroundColor);
                                 }
-                                
+
                                 Unit missionary = nativeSettlement.getMissionary();
                                 if (missionary != null) {
                                     boolean expert = missionary.hasAbility("model.ability.expertMissionary");
@@ -1637,7 +1637,7 @@ public final class GUI {
                                     rightImage = createLabel(g, cross, font, backgroundColor);
                                 }
                             }
-                            
+
                             int width = nameImage.getWidth(null)
                                 + (leftImage != null ? leftImage.getWidth(null) + spacing : 0)
                                 + (rightImage != null ? rightImage.getWidth(null) + spacing : 0);
@@ -1669,18 +1669,18 @@ public final class GUI {
 
         displayGotoPath(g, currentPath);
         displayGotoPath(g, gotoPath);
-        
+
         /*
         PART 5
         ======
         Grey out the map if it is not my turn (and a multiplayer game).
          */
         Canvas canvas = freeColClient.getCanvas();
-        
+
         if (!freeColClient.isMapEditor()
             && freeColClient.getGame() != null
             && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
-            
+
             if (greyLayer == null) {
                 greyLayer = new GrayLayer(lib);
             }
@@ -1688,10 +1688,10 @@ public final class GUI {
                 canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, false);
                 canvas.moveToFront(greyLayer);
             }
-                        
+
             greyLayer.setBounds(0,0,canvas.getSize().width, canvas.getSize().height);
             greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
-            
+
         }
         else {
             if (greyLayer != null && greyLayer.getParent() != null) {
@@ -1733,17 +1733,17 @@ public final class GUI {
         g.drawImage(decoration, 0, 0, null);
         decoration = ResourceManager.getImage("menuborder.shadow.se.image");
         g.drawImage(decoration, size.width - decoration.getWidth(null), 0, null);
-        
+
     }
-    
+
     /**
-     * Creates an image with a string of a given color and with 
+     * Creates an image with a string of a given color and with
      * a black border around the glyphs.
      *
      * @param g A <code>Graphics</code>-object for getting a
      *       <code>Font</code>.
      * @param nameString The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use when displaying 
+     * @param color The <code>Color</code> to use when displaying
      *       the <code>nameString</code>.
      * @param font a <code>Font</code> value
      * @return The image that was created.
@@ -1766,7 +1766,7 @@ public final class GUI {
 
         // create an image of the appropriate size
         FontMetrics fontMetrics = g.getFontMetrics(font);
-        BufferedImage bi = new BufferedImage(fontMetrics.stringWidth(nameString) + 4, 
+        BufferedImage bi = new BufferedImage(fontMetrics.stringWidth(nameString) + 4,
                                              fontMetrics.getMaxAscent() + fontMetrics.getMaxDescent(),
                                              BufferedImage.TYPE_INT_ARGB);
         // draw the string with selected color
@@ -1803,7 +1803,7 @@ public final class GUI {
     }
 
     /**
-     * Creates an image with a string of a given color and with 
+     * Creates an image with a string of a given color and with
      * a black border around the glyphs.
      *
      * @param c A <code>JComponent</code>-object for getting a
@@ -1812,7 +1812,7 @@ public final class GUI {
      *       <code>Font</code>.
      * @param text The <code>String</code> to make an image of.
      * @param font The font with which to render.
-     * @param color The <code>Color</code> to use when displaying 
+     * @param color The <code>Color</code> to use when displaying
      *       the <code>text</code>.
      * @return The image that was created.
      */
@@ -1860,7 +1860,7 @@ public final class GUI {
         return bi;
     }
     */
-    
+
     /**
      * Creates an Image that shows the given text centred on a
      * translucent rounded rectangle with the given color.
@@ -2032,13 +2032,13 @@ public final class GUI {
 
 
     /**
-     * Displays the given <code>Tile</code> onto the given 
-     * <code>Graphics2D</code> object at the location specified 
+     * Displays the given <code>Tile</code> onto the given
+     * <code>Graphics2D</code> object at the location specified
      * by the coordinates. The visualization of the <code>Tile</code>
      * also includes information from the corresponding
      * <code>ColonyTile</code> from the given <code>Colony</code>.
-     * 
-     * @param g The <code>Graphics2D</code> object on which to draw 
+     *
+     * @param g The <code>Graphics2D</code> object on which to draw
      *      the <code>Tile</code>.
      * @param map The <code>Map</code>.
      * @param tile The <code>Tile</code> to draw.
@@ -2060,13 +2060,13 @@ public final class GUI {
             }
         }
         displayTileOverlays(g, map, tile, false, false);
-        
+
         if (price > 0 && tile.getSettlement() == null) {
             // tile is owned by an IndianSettlement
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             centerImage(g, image);
         }
-        
+
         if (occupyingUnit != null) {
             ImageIcon image = lib.getUnitImageIcon(occupyingUnit, 0.5);
             g.drawImage(image.getImage(), tileWidth/4 - image.getIconWidth() / 2,
@@ -2202,7 +2202,7 @@ public final class GUI {
                 }
             }
         }
-    }    
+    }
 
 
     /**
@@ -2316,13 +2316,13 @@ public final class GUI {
      *        unexplored terrain.
      * @param withNumber indicates if the number of inhabitants should be drawn too.
      */
-    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, 
+    private void displayTileOverlays(Graphics2D g, Map map, Tile tile,
                                      boolean drawUnexploredBorders, boolean withNumber) {
         if (tile != null) {
+            displayTileItems(g, map, tile);
             if (drawUnexploredBorders) {
                 displayUnexploredBorders(g, map, tile);
             }
-            displayTileItems(g, map, tile);
             displaySettlement(g, map, tile, withNumber);
             displayFogOfWar(g, map, tile);
             displayOptionalValues(g, map, tile);
@@ -2429,7 +2429,7 @@ public final class GUI {
      * @param tile The Tile to draw.
      * @param withNumber a <code>boolean</code> value
      */
-    private void displaySettlement(Graphics2D g, Map map, Tile tile, boolean withNumber) {  
+    private void displaySettlement(Graphics2D g, Map map, Tile tile, boolean withNumber) {
         if (tile.isExplored()) {
             Settlement settlement = tile.getSettlement();
 
@@ -2502,7 +2502,7 @@ public final class GUI {
      * @param map The map.
      * @param tile The Tile to draw.
      */
-    private void displayFogOfWar(Graphics2D g, Map map, Tile tile) {  
+    private void displayFogOfWar(Graphics2D g, Map map, Tile tile) {
         if (tile.isExplored()
             && freeColClient.getGame().getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
             && freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR)
@@ -2524,7 +2524,7 @@ public final class GUI {
      * @param map The map.
      * @param tile The Tile to draw.
      */
-    private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile) {  
+    private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile) {
         if (tile.isExplored()) {
 
             for (Direction direction : Direction.values()) {
@@ -2725,7 +2725,7 @@ public final class GUI {
         }
         return -1;
     }
-    
+
     /**
      * Returns an occupation indicator, i.e. a small image with a
      * single letter or symbol that indicates the Unit's state.
@@ -2828,7 +2828,7 @@ public final class GUI {
             return Color.BLACK;
         }
     }
-    
+
     /**
      * Describe <code>getStringBorderColor</code> method here.
      *
@@ -2849,7 +2849,7 @@ public final class GUI {
             return Color.BLACK;
         }
     }
-    
+
     /**
      * Displays the given Unit onto the given Graphics2D object at the
      * location specified by the coordinates.
@@ -2895,9 +2895,9 @@ public final class GUI {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         // FOR DEBUGGING:
-        if (debugShowMission 
+        if (debugShowMission
             && freeColClient.getFreeColServer() != null
             && (unit.getOwner().isAI()
                 || unit.hasAbility("model.ability.piracy"))) {
@@ -2910,27 +2910,27 @@ public final class GUI {
                 if (au.getMission() != null) {
                     String missionName = au.getMission().getClass().toString();
                     missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
-                    
+
                     if (FreeCol.usesExperimentalAI() && au.getGoal()!=null) {
                         missionName = "";
                         String goalName = au.getGoal().getDebugDescription();
                         text += goalName;
                     }
-                    
+
                     text += missionName;
                     if (debugShowMissionInfo) {
                         debuggingInfo = au.getMission().getDebuggingInfo();
                     }
                 } else {
                     text += "No mission";
-                }                
+                }
                 text += (unit.getOwner().isAI()) ? "" : ")";
                 g.drawString(text, 0 , 0);
                 g.drawString(debuggingInfo, 0 , 25);
             }
         }
     }
-    
+
     /**
      * Gets the coordinates to draw a unit in a given tile.
      * @param unitImage The unit's image
@@ -2939,7 +2939,7 @@ public final class GUI {
     private Point getUnitImagePositionInTile(Image unitImage) {
         return getUnitImagePositionInTile(unitImage.getWidth(null), unitImage.getHeight(null));
     }
-    
+
     /**
      * Gets the coordinates to draw a unit in a given tile.
      * @param unitImageWidth The unit image's width
@@ -2950,12 +2950,12 @@ public final class GUI {
         int unitX = (tileWidth - unitImageWidth) / 2;
         int unitY = (tileHeight - unitImageHeight) / 2 -
                     (int) (UNIT_OFFSET * lib.getScalingFactor());
-        
+
         return new Point(unitX, unitY);
     }
-    
+
     /**
-     * Gets the position where a unitLabel located at tile should be drawn. 
+     * Gets the position where a unitLabel located at tile should be drawn.
      * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
      * @param tile The tile where the unitLabel will be drawn over
      * @return The position where to put the label, null if the Tile is offscreen.
@@ -2963,9 +2963,9 @@ public final class GUI {
     public Point getUnitLabelPositionInTile(JLabel unitLabel, Tile tile) {
         return getUnitLabelPositionInTile(unitLabel, getTilePosition(tile));
     }
-    
+
     /**
-     * Gets the position where a unitLabel located at tile should be drawn. 
+     * Gets the position where a unitLabel located at tile should be drawn.
      * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
      * @param tileP The position of the Tile on the screen.
      * @return The position where to put the label, null if tileP is null.
@@ -2975,13 +2975,13 @@ public final class GUI {
             int labelX = tileP.x + getTileWidth() / 2 - unitLabel.getWidth() / 2;
             int labelY = tileP.y + getTileHeight() / 2 - unitLabel.getHeight() / 2 -
                         (int) (UNIT_OFFSET * lib.getScalingFactor());
-            
+
             return new Point(labelX, labelY);
         } else {
             return null;
         }
     }
-    
+
     /**
      * Describe <code>drawCursor</code> method here.
      *
@@ -3623,7 +3623,7 @@ public final class GUI {
     /**
      * Gets the position of the given <code>Tile</code>
      * on the drawn map.
-     * 
+     *
      * @param t The <code>Tile</code>.
      * @return The position of the given <code>Tile</code>,
      *      or <code>null</code> if the <code>Tile</code> is
@@ -3633,13 +3633,13 @@ public final class GUI {
         if (bottomRow < 0) {
             positionMap();
         }
-        if (t.getY() >= topRow 
-                && t.getY() <= bottomRow 
-                && t.getX() >= leftColumn 
+        if (t.getY() >= topRow
+                && t.getY() <= bottomRow
+                && t.getX() >= leftColumn
                 && t.getX() <= rightColumn) {
             int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
             int y = ((t.getY() - topRow) * halfHeight) + topRowY;
-            if ((t.getY() % 2) != 0) {     
+            if ((t.getY() % 2) != 0) {
                 x += halfWidth;
             }
             return new Point(x, y);
@@ -3647,7 +3647,7 @@ public final class GUI {
             return null;
         }
     }
-    
+
     /**
      * Calculate the bounds of the rectangle containing a Tile on the screen,
      * and return it. If the Tile is not on-screen a maximal rectangle is returned.
@@ -3659,7 +3659,7 @@ public final class GUI {
     public Rectangle getTileBounds(Tile tile) {
         return getTileBounds(tile.getX(), tile.getY());
     }
-    
+
     /**
      * Calculate the bounds of the rectangle containing a Tile on the screen,
      * and return it. If the Tile is not on-screen a maximal rectangle is returned.
@@ -3708,8 +3708,8 @@ public final class GUI {
     public int getTileWidth() {
         return tileWidth;
     }
-    
-    
+
+
     public static String getTurnsText(Colony colony, BuildableType buildable) {
         String turnsStr = Messages.message("notApplicable.short");
         int turnsLeft = colony.getTurnsToComplete(buildable);
@@ -3719,7 +3719,7 @@ public final class GUI {
         else if(turnsLeft != Integer.MIN_VALUE){
             turnsStr = ">" + Integer.toString(turnsLeft*-1);
         }
-        
+
         return turnsStr;
     }
 
