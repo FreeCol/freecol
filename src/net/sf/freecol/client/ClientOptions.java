@@ -58,10 +58,10 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * Defines how available client options are displayed on the Setting dialog from
  * File>Preferences Also contains several Comparators used for display purposes.
- * 
+ *
  * <br>
  * <br>
- * 
+ *
  * New options should be added to {@link #addDefaultOptions()} and each option
  * should be given an unique identifier (defined as a constant in this class,
  * then as fully-qualified strings in FreeColMessages.properties). Identifiers
@@ -84,7 +84,7 @@ public class ClientOptions extends OptionGroup {
      * If this option is enabled, the display will recenter in order to display
      * the active unit if it is not
      * {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String JUMP_TO_ACTIVE_UNIT = "model.option.jumpToActiveUnit";
@@ -92,7 +92,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Selected tiles always gets centered if this option is enabled (even if
      * the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String ALWAYS_CENTER = "model.option.alwaysCenter";
@@ -100,7 +100,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Used by GUI, this is the minimum number of goods a colony must possess for
      * the goods to show up at the bottom of the colony panel.
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS = "model.option.guiMinNumberToDisplayGoods";
@@ -108,7 +108,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT = "model.option.guiMinNumberToDisplayGoodsCount";
@@ -116,7 +116,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Used by GUI, this is the most repetitions drawn of a goods image for a
      * single goods grouping.
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MAX_NUMBER_OF_GOODS_IMAGES = "model.option.guiMaxNumberOfGoodsImages";
@@ -138,11 +138,11 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Whether to delay on a unit's last move or not.
-     * 
+     *
      * TODO: Add this option's name and short description to languages other than English.
      */
     public static final String UNIT_LAST_MOVE_DELAY = "model.option.unitLastMoveDelay";
-    
+
     /**
      * Whether to display borders by default or not.
      */
@@ -168,7 +168,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Used by GUI, this defines the grouping of ModelMessages. Possible values
      * include nothing, type and source.
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      * @see net.sf.freecol.common.model.ModelMessage
      */
@@ -186,7 +186,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
-     * 
+     *
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String SHOW_COLONY_WARNINGS = "model.option.guiShowColonyWarnings";
@@ -239,15 +239,15 @@ public class ClientOptions extends OptionGroup {
      * autosaves are kept.
      */
     public static final String AUTOSAVE_GENERATIONS = "model.option.autosaveGenerations";
-    
-    
-    
+
+
+
     /**
-     * Option for deleting autosaves when a new game is started. If set to 
+     * Option for deleting autosaves when a new game is started. If set to
      * true, old autosaves will be deleted if a new game is started.
      */
     public static final String AUTOSAVE_DELETE = "model.option.autosaveDelete";
-    
+
     /**
      * Option for setting wether or not the fog of war should be displayed.
      */
@@ -263,7 +263,7 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String AUTO_SCROLL = "model.option.autoScroll";
 
-	
+
     /**
      * Option for autoload emigrants on saling to america.
      */
@@ -288,7 +288,7 @@ public class ClientOptions extends OptionGroup {
     public static final String MINIMAP_BACKGROUND_COLOR = "model.option.color.background";
 
     public static final String USER_MODS ="userMods";
-    
+
     /**
      * The Stock the custom house should keep when selling goods.
      */
@@ -474,10 +474,10 @@ public class ClientOptions extends OptionGroup {
     protected void addDefaultOptions() {
         load(new File(new File(FreeCol.getDataDirectory(), "base"),
                       "client-options.xml"), false);
-        
+
         final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
         final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {
-            private Map<String, ModInfo> mods = null; 
+            private Map<String, ModInfo> mods = null;
             private void init() {
                 if (mods == null) {
                     List<FreeColModFile> fcmfs = Mods.getAllMods();
@@ -531,7 +531,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Reads the options from the given file.
-     * 
+     *
      * @param loadFile The <code>File</code> to read the
      *            options from.
      */
@@ -541,7 +541,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Reads the options from the given file.
-     * 
+     *
      * @param loadFile The <code>File</code> to read the
      *            options from.
      * @param update a <code>boolean</code> value
@@ -551,7 +551,7 @@ public class ClientOptions extends OptionGroup {
             logger.warning("Could not find the client options file.");
             return;
         }
-        
+
         InputStream in = null;
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader xsr = null;
@@ -559,9 +559,6 @@ public class ClientOptions extends OptionGroup {
             in = new BufferedInputStream(new FileInputStream(loadFile));
             xsr = xif.createXMLStreamReader(in, "UTF-8");
             xsr.nextTag();
-            while (!isCorrectTagName(xsr.getLocalName())) {
-                xsr.nextTag();
-            }
             if (update) {
                 logger.finest("Updating " + getId() + " from " + loadFile.getPath());
                 updateFromXML(xsr);
@@ -581,7 +578,7 @@ public class ClientOptions extends OptionGroup {
             }
         }
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
@@ -603,7 +600,7 @@ public class ClientOptions extends OptionGroup {
                     } else {
                         // Normal only if this option is from an old save game:
                         logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
-                        
+
                         // Ignore the option:
                         final String ignoredTag = in.getLocalName();
                         while (in.nextTag() != XMLStreamConstants.END_ELEMENT
@@ -640,7 +637,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Return the client's preferred comparator for colonies.
-     * 
+     *
      * @return a <code>Comparator</code> value
      */
     public Comparator<Colony> getColonyComparator() {
@@ -649,7 +646,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Return the colony comparator identified by type.
-     * 
+     *
      * @param type an <code>int</code> value
      * @return a <code>Comparator</code> value
      */
@@ -672,7 +669,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Return the client's preferred comparator for ModelMessages.
-     * 
+     *
      * @return a <code>Comparator</code> value
      */
     public Comparator<ModelMessage> getModelMessageComparator() {
@@ -688,7 +685,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Returns the boolean option associated with a ModelMessage.
-     * 
+     *
      * @param message a <code>ModelMessage</code> value
      * @return a <code>BooleanOption</code> value
      */
@@ -702,7 +699,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "clientOptions".
      */
     public static String getXMLElementTagName() {
