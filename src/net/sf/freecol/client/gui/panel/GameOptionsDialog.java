@@ -59,7 +59,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public GameOptionsDialog(Canvas parent, boolean editable) {
@@ -80,7 +80,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         save.setActionCommand(String.valueOf(SAVE));
         save.addActionListener(this);
         save.setMnemonic('S');
-        
+
         reset = new JButton(Messages.message("reset"));
         reset.setActionCommand(String.valueOf(RESET));
         reset.addActionListener(this);
@@ -104,18 +104,18 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         add(ui, "newline 20, grow");
 
         // Buttons:
-        add(ok, "newline 20, split 5, tag ok");
-        add(cancel, "tag cancel");
-        add(load);
-        add(save);
-        add(reset);
+        if (editable) {
+            add(ok, "newline 20, split 5, tag ok");
+            add(cancel, "tag cancel");
+            add(load);
+            add(save);
+            add(reset);
+        } else {
+            add(ok, "newline 20, tag ok");
+        }
 
-        ok.setEnabled(editable);
-        save.setEnabled(editable);
-        load.setEnabled(editable);
-        
         // Set special cases
-        
+
         // Disable victory option "All humans defeated"
         //when playing single player
         if (editable && getClient().isSingleplayer()){
@@ -132,12 +132,12 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
     public Dimension getMinimumSize() {
         return new Dimension(640, 480);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
-    
+
     public void requestFocus() {
         if (ok.isEnabled()) {
             ok.requestFocus();
@@ -149,7 +149,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -171,7 +171,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
                 break;
             case SAVE:
                 FileFilter[] filters = new FileFilter[] { FreeColDialog.getFGOFileFilter(),
-                                                          FreeColDialog.getFSGFileFilter(), 
+                                                          FreeColDialog.getFSGFileFilter(),
                                                           FreeColDialog.getGameOptionsFileFilter() };
                 File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
                 if (saveFile != null) {

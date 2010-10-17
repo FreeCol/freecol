@@ -79,70 +79,80 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         // Header:
         add(getDefaultHeader(mgo.getName()), "align center");
 
-        JPanel mapPanel = new JPanel();
-        mapPanel.setLayout(new MigLayout("", "", "[nogrid][]"));
-        /*
-         * TODO: The update should be solved by PropertyEvent.
-         */
-        File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
-        if (mapDirectory.isDirectory()) {
-            for (final File file : mapDirectory.listFiles(new FileFilter() {
-                    public boolean accept(File file) {
-                        return file.isFile() && file.getName().endsWith(".fsg");
-                    }
-                })) {
-                String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                JButton mapButton = new JButton(mapName);
-                try {
-                    FreeColSavegameFile savegame = new FreeColSavegameFile(file);
-                    Image thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
-                    mapButton.setIcon(new ImageIcon(thumbnail));
-                    try {
-                        Properties properties = new Properties();
-                        properties.load(savegame.getInputStream("savegame.properties"));
-                        mapButton.setToolTipText(properties.getProperty("map.width")
-                                                 + "\u00D7"
-                                                 + properties.getProperty("map.height"));
-                    } catch(Exception e) {
-                        logger.fine("Unable to load savegame properties.");
-                    }
-                    mapButton.setHorizontalTextPosition(JButton.CENTER);
-                    mapButton.setVerticalTextPosition(JButton.BOTTOM);
-                } catch(Exception e) {
-                    logger.warning("Failed to read thumbnail.");
-                }
+        JScrollPane scrollPane;
 
-                mapButton.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            ui.reset();
-                            FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-                            fou.setValue(file);
-
-                            ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
-                            ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
-                            ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+        if (editable) {
+            JPanel mapPanel = new JPanel();
+            mapPanel.setLayout(new MigLayout("", "", "[nogrid][]"));
+            /*
+             * TODO: The update should be solved by PropertyEvent.
+             */
+            File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
+            if (mapDirectory.isDirectory()) {
+                for (final File file : mapDirectory.listFiles(new FileFilter() {
+                        public boolean accept(File file) {
+                            return file.isFile() && file.getName().endsWith(".fsg");
                         }
-                    });
-                mapPanel.add(mapButton);
+                    })) {
+                    String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
+                    JButton mapButton = new JButton(mapName);
+                    try {
+                        FreeColSavegameFile savegame = new FreeColSavegameFile(file);
+                        Image thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
+                        mapButton.setIcon(new ImageIcon(thumbnail));
+                        try {
+                            Properties properties = new Properties();
+                            properties.load(savegame.getInputStream("savegame.properties"));
+                            mapButton.setToolTipText(properties.getProperty("map.width")
+                                                     + "\u00D7"
+                                                     + properties.getProperty("map.height"));
+                        } catch(Exception e) {
+                            logger.fine("Unable to load savegame properties.");
+                        }
+                        mapButton.setHorizontalTextPosition(JButton.CENTER);
+                        mapButton.setVerticalTextPosition(JButton.BOTTOM);
+                    } catch(Exception e) {
+                        logger.warning("Failed to read thumbnail.");
+                    }
+
+                    mapButton.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                ui.reset();
+                                FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
+                                fou.setValue(file);
+
+                                ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
+                                ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
+                                ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+                            }
+                        });
+                    mapPanel.add(mapButton);
+                }
             }
+
+            // Options:
+            mapPanel.add(ui, "newline 20");
+
+            scrollPane = new JScrollPane(mapPanel,
+                                         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        } else {
+            scrollPane = new JScrollPane(ui,
+                                         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         }
-
-        // Options:
-        mapPanel.add(ui, "newline 20");
-
-        JScrollPane scrollPane = new JScrollPane(mapPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.getViewport().setOpaque(false);
         add(scrollPane, "height 100%, width 100%");
 
-        okButton.setEnabled(editable);
-
         // Buttons:
-        add(okButton, "newline 20, split 3, tag ok");
-        add(reset);
-        add(cancelButton, "tag cancel");
+        if (editable) {
+            add(okButton, "newline 20, split 3, tag ok");
+            add(reset);
+            add(cancelButton, "tag cancel");
+        } else {
+            add(okButton, "newline 20, tag ok");
+        }
 
     }
 
