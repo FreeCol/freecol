@@ -264,11 +264,6 @@ public class ServerGame extends Game implements ServerModelObject {
                     tile.setOwner(strongestAIPlayer);
                 }
             }
-            for (Tile tile : getGame().getMap().getAllTiles()) {
-                if (tile.getOwner() == weakestAIPlayer) {
-                    tile.setOwner(strongestAIPlayer);
-                }
-            }
             for (Unit unit : weakestAIPlayer.getUnits()) {
                 unit.setOwner(strongestAIPlayer);
                 cs.add(See.perhaps(), unit);

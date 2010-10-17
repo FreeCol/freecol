@@ -951,6 +951,13 @@ public final class InGameController extends Controller {
             cs.addDispose(serverPlayer, settlement.getTile(), settlement);
         }
 
+        // Clean up remaining tile ownerships
+        for (Tile tile : getGame().getMap().getAllTiles()) {
+            if (tile.getOwner() == serverPlayer) {
+                tile.setOwner(null);
+            }
+        }
+
         // Remove units
         List<Unit> units = serverPlayer.getUnits();
         while (!units.isEmpty()) {
