@@ -26,6 +26,7 @@
      0.48: add difficultyLevel attribute for in-game specification
      0.49: marketData add goods-type attribute and make ID a MarketDataId
      0.50: allow OptionGroups to contain OptionGroups
+     0.51: remove improvementaction-type and difficultyLevels
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -37,14 +38,12 @@
         <xs:element ref="tile-types"/>
         <xs:element ref="equipment-types"/>
         <xs:element ref="tileimprovement-types"/>
-        <xs:element ref="improvementaction-types"/>
         <xs:element ref="unit-types"/>
         <xs:element ref="building-types"/>
         <xs:element ref="founding-fathers"/>
         <xs:element ref="european-nation-types"/>
         <xs:element ref="indian-nation-types"/>
         <xs:element ref="nations"/>
-        <xs:element ref="difficultyLevels"/>
         <xs:element ref="options"/>
         <xs:element ref="modifiers"/>
         <xs:element ref="events"/>
@@ -282,25 +281,6 @@
     <xs:complexType>
       <xs:attribute name="from" use="required" type="TileTypeId"/>
       <xs:attribute name="to" use="required" type="TileTypeId"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="improvementaction-types">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="improvementaction-type"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="ImprovementActionTypeId" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="improvementaction-type">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="action"/>
-      </xs:sequence>
-      <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="accelerator" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -577,6 +557,7 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="nations">
     <xs:complexType>
       <xs:sequence>
@@ -590,26 +571,6 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="difficultyLevels">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="difficultyLevel"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="DifficultyLevelId" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="difficultyLevel">
-    <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="integerOption"/>
-        <xs:element ref="booleanOption"/>
-        <xs:element ref="stringOption"/>
-      </xs:choice>
-      <xs:attribute name="id" use="required" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
 
@@ -973,12 +934,6 @@
   <xs:simpleType name="GoodsTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.goods\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="ImprovementActionTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="imp([a-zA-Z]+)Action" />
     </xs:restriction>
   </xs:simpleType>
 
