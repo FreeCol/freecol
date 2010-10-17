@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XSD for specification version 0.50
+     CHANGELOG:
+     0.26: add capture-equipment
+     0.27: add limits
+     0.28: move limits into other elements
+     0.29: add events
+     0.30: extend string options
+     0.31: change difficulty selection for tile types
+     0.32: change difficulty selection for european nation types
+     0.33: add scoreValue to event
+     0.34: add abstract buildable types
+     0.35: remove minimap-color from tile-type
+     0.36: change image-id of improvement action to string
+     0.37: remove art element from tile-type
+     0.38: remove overlay attribute from tileimprovement-type
+     0.39: remove color from nation and add audio options
+     0.40: change tile(s) children of tile improvement to scope
+     0.41: add consumes element to unit-type
+     0.42: remove pathImage attribute from unit-type
+     0.43: add attributes id and extends to specification
+     0.44: add delete element
+     0.45: add delete attribute to upgrade, downgrade, ability and modifier
+     0.46: add undead downgrade
+     0.47: remove index from player
+     0.48: add difficultyLevel attribute for in-game specification
+     0.49: marketData add goods-type attribute and make ID a MarketDataId
+     0.50: allow OptionGroups to contain OptionGroups
+  -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="freecol-specification">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="goods-types"/>
+        <xs:element ref="resource-types"/>
+        <xs:element ref="tile-types"/>
+        <xs:element ref="equipment-types"/>
+        <xs:element ref="tileimprovement-types"/>
+        <xs:element ref="unit-types"/>
+        <xs:element ref="building-types"/>
+        <xs:element ref="founding-fathers"/>
+        <xs:element ref="european-nation-types"/>
+        <xs:element ref="indian-nation-types"/>
+        <xs:element ref="nations"/>
+        <xs:element ref="options"/>
+        <xs:element ref="modifiers"/>
+        <xs:element ref="events"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute name="extends" type="xs:string"/>
+      <xs:attribute name="difficultyLevel" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="goods-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="goods-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="GoodsTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="goods-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier"/>
+        <xs:element ref="ability"/>
+        <xs:element name="market">
+          <xs:complexType>
+            <xs:attribute name="initial-amount" use="required" type="xs:nonNegativeInteger"/>
+            <xs:attribute name="initial-price" use="required" type="xs:nonNegativeInteger"/>
+            <xs:attribute name="price-difference" use="required" type="xs:nonNegativeInteger"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="is-farmed" type="xs:boolean"/>
+      <xs:attribute name="ignore-limit" type="xs:boolean"/>
+      <xs:attribute name="is-food" type="xs:boolean"/>
+      <xs:attribute name="made-from" type="GoodsTypeId"/>
+      <xs:attribute name="storable" type="xs:boolean"/>
+      <xs:attribute name="stored-as" type="GoodsTypeId"/>
+      <xs:attribute name="new-world-goods" type="xs:boolean"/>
+      <xs:attribute name="trade-goods" type="xs:boolean"/>
+      <xs:attribute name="breeding-number" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="price" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="resource-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="resource-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="ResourceTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="resource-type">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="modifier"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="minimum-value" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="maximum-value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tile-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="tile-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="TileTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tile-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier"/>
+        <xs:element ref="gen"/>
+        <xs:element ref="skirmish"/>
+        <xs:element name="resource">
+          <xs:complexType>
+            <xs:attribute name="type" use="required" type="ResourceTypeId"/>
+            <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="production"/>
+        <xs:element ref="primary-production"/>
+        <xs:element ref="secondary-production"/>
+        <xs:element ref="ability"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="basic-move-cost" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="basic-work-turns" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="is-forest" type="xs:boolean"/>
+      <xs:attribute name="is-water" type="xs:boolean"/>
+      <xs:attribute name="can-settle" type="xs:boolean"/>
+      <xs:attribute name="is-connected" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="gen">
+    <xs:complexType>
+      <xs:attribute name="humidityMin" use="required" type="xs:int"/>
+      <xs:attribute name="humidityMax" use="required" type="xs:int"/>
+      <xs:attribute name="temperatureMin" use="required" type="xs:int"/>
+      <xs:attribute name="temperatureMax" use="required" type="xs:int"/>
+      <xs:attribute name="altitudeMin" use="required" type="xs:int"/>
+      <xs:attribute name="altitudeMax" use="required" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="skirmish">
+    <xs:complexType>
+      <xs:attribute name="defence-factor" use="required" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="production">
+    <xs:complexType>
+      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="tile-production" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="primary-production">
+    <xs:complexType>
+      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="tile-production" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="secondary-production">
+    <xs:complexType>
+      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="tile-production" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="equipment-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="equipment-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="EquipmentTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="equipment-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier"/>
+        <xs:element ref="ability"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="required-location-ability"/>
+        <xs:element ref="required-goods"/>
+        <xs:element ref="compatible-equipment"/>
+        <xs:element ref="capture-equipment"/>
+        <xs:element ref="limit"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="combat-loss-priority" type="xs:int"/>
+      <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="role">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="default"/>
+            <xs:enumeration value="pioneer"/>
+            <xs:enumeration value="missionary"/>
+            <xs:enumeration value="soldier"/>
+            <xs:enumeration value="scout"/>
+            <xs:enumeration value="dragoon"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="compatible-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="capture-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" type="EquipmentTypeId"/>
+      <xs:attribute name="by-indians" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tileimprovement-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="tileimprovement-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="TileImprovementTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tileimprovement-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="scope"/>
+        <xs:choice>
+          <xs:element ref="modifier"/>
+          <xs:element ref="change"/>
+        </xs:choice>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="natural" type="xs:boolean"/>
+      <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="occupation-string" type="xs:string"/>
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
+      <xs:attribute name="expended-amount" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
+      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="change">
+    <xs:complexType>
+      <xs:attribute name="from" use="required" type="TileTypeId"/>
+      <xs:attribute name="to" use="required" type="TileTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="action">
+    <xs:complexType>
+      <xs:attribute name="tileimprovement-type" use="required" type="TileImprovementTypeId"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="image-id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unit-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="unit-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="UnitTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unit-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="upgrade"/>
+        <xs:element ref="downgrade"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="required-goods"/>
+        <xs:element ref="default-equipment"/>
+        <xs:element ref="limit"/>
+        <xs:element ref="consumes"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="lineOfSight" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="skill" type="xs:int"/>
+      <xs:attribute name="space" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="spaceTaken" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="price" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="hitPoints" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="recruitProbability" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expert-production" type="GoodsTypeId"/>
+      <xs:attribute name="skillTaught" type="xs:string"/>
+      <xs:attribute name="scoreValue" type="xs:int"/>
+      <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="building-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="building-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="BuildingTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="building-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="required-goods"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="ability"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="limit"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="basicProduction" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="produces" type="GoodsTypeId"/>
+      <xs:attribute name="consumes" type="GoodsTypeId"/>
+      <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="sequence" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="minSkill" type="xs:int"/>
+      <xs:attribute name="maxSkill" type="xs:int"/>
+      <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="founding-fathers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="founding-father"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="FoundingFatherId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="founding-father">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="event"/>
+        <xs:element name="nation">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="NationId"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="nation-type"/>
+        <xs:element name="unit">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="UnitTypeId"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="upgrade">
+          <xs:complexType>
+            <xs:attribute name="from-id" use="required" type="UnitTypeId"/>
+            <xs:attribute name="to-id" use="required" type="UnitTypeId"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="exploration"/>
+            <xs:enumeration value="military"/>
+            <xs:enumeration value="political"/>
+            <xs:enumeration value="religious"/>
+            <xs:enumeration value="trade"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="weight1" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="weight2" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="weight3" use="required" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="events">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="event" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="event">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded" >
+        <xs:element ref="limit" />
+        <xs:element ref="ability" />
+        <xs:element ref="modifier" />
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="scoreValue" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="nation-type">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="NationTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="european-nation-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="european-nation-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="NationTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="indian-nation-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="indian-nation-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="NationTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="european-nation-type">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="unit">
+            <xs:complexType>
+              <xs:attribute name="id" use="required" type="xs:string"/>
+              <xs:attribute name="type" use="required" type="UnitTypeId"/>
+              <xs:attribute name="role">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="default"/>
+                    <xs:enumeration value="pioneer"/>
+                    <xs:enumeration value="missionary"/>
+                    <xs:enumeration value="soldier"/>
+                    <xs:enumeration value="scout"/>
+                    <xs:enumeration value="dragoon"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="expert-starting-units" type="xs:string"/>
+              <xs:attribute name="mounted" type="xs:boolean"/>
+              <xs:attribute name="missionary" type="xs:boolean"/>
+              <xs:attribute name="tools" type="xs:nonNegativeInteger"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element ref="ability"/>
+          <xs:element ref="modifier"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" type="xs:boolean" />
+      <xs:attribute name="extends" type="xs:string" />
+      <xs:attribute name="ref" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="indian-nation-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="skill"/>
+        <xs:element name="region">
+          <xs:complexType>
+            <xs:attribute name="id">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="model.region.center"/>
+                  <xs:enumeration value="model.region.north"/>
+                  <xs:enumeration value="model.region.northEast"/>
+                  <xs:enumeration value="model.region.east"/>
+                  <xs:enumeration value="model.region.southEast"/>
+                  <xs:enumeration value="model.region.south"/>
+                  <xs:enumeration value="model.region.southWest"/>
+                  <xs:enumeration value="model.region.west"/>
+                  <xs:enumeration value="model.region.northWest"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="abstract" type="xs:boolean" />
+      <xs:attribute name="extends" type="xs:string" />
+      <xs:attribute name="number-of-settlements">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="high"/>
+            <xs:enumeration value="low"/>
+            <xs:enumeration value="average"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="aggression">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="high"/>
+            <xs:enumeration value="low"/>
+            <xs:enumeration value="average"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type-of-settlement">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="indian_camp"/>
+            <xs:enumeration value="indian_village"/>
+            <xs:enumeration value="inca_city"/>
+            <xs:enumeration value="aztec_city"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="settlementRadius" type="xs:int" use="optional" />
+      <xs:attribute name="capitalRadius" type="xs:int" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="skill">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="UnitTypeId"/>
+      <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="nations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="nation">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="xs:ID"/>
+            <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
+            <xs:attribute name="selectable" type="xs:boolean"/>
+            <xs:attribute name="anthem" type="xs:string"/>
+            <xs:attribute name="ref" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="limits">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="limit"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="modifiers">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="options">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="optionGroup"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="optionGroup">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="integerOption"/>
+        <xs:element ref="booleanOption"/>
+        <xs:element ref="stringOption"/>
+        <xs:element ref="rangeOption"/>
+        <xs:element ref="selectOption"/>
+        <xs:element ref="languageOption"/>
+        <xs:element ref="fileOption"/>
+        <xs:element ref="audioMixerOption"/>
+        <xs:element ref="percentageOption"/>
+        <xs:element ref="optionGroup"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="rangeOption">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="rangeValue"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="localizedLabels" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="audioMixerOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="percentageOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" use="required" type="xs:string"/>
+      <xs:attribute name="previewEnabled" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="rangeValue">
+    <xs:complexType>
+      <xs:attribute name="label" use="required" type="xs:string"/>
+      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="languageOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ability">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="value" type="xs:boolean"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
+      <xs:attribute name="source" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="scope" type="ScopeType" />
+
+  <xs:element name="required-ability">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="value" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="required-location-ability">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="value" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="required-goods">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="consumes">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="default-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="upgrade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
+      <xs:attribute name="learnFromNatives" type="xs:boolean"/>
+      <xs:attribute name="learnFromExperience" type="xs:boolean"/>
+      <xs:attribute name="learnInLostCity" type="xs:boolean"/>
+      <xs:attribute name="learnInSchool" type="xs:boolean"/>
+      <xs:attribute name="promotion" type="xs:boolean"/>
+      <xs:attribute name="creation" type="xs:boolean"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
+      <xs:attribute name="independence" type="xs:boolean"/>
+      <xs:attribute name="enterColony" type="xs:boolean"/>
+      <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
+      <!-- TODO: these are downgrades, but serialization can not
+        handle non-static XML Element tag names! We need to combine
+        upgrade and downgrade into a typechange. -->
+        <xs:attribute name="capture" type="xs:boolean"/>
+        <xs:attribute name="demotion" type="xs:boolean"/>
+        <xs:attribute name="clearSkill" type="xs:boolean"/>
+        <xs:attribute name="undead" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="downgrade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
+      <xs:attribute name="capture" type="xs:boolean"/>
+      <xs:attribute name="demotion" type="xs:boolean"/>
+      <xs:attribute name="clearSkill" type="xs:boolean"/>
+      <xs:attribute name="undead" type="xs:boolean"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="limit">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="leftHandSide" type="OperandType" />
+        <xs:element name="rightHandSide" type="OperandType" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" />
+      <xs:attribute name="operator" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="LT"/>
+            <xs:enumeration value="LE"/>
+            <xs:enumeration value="GT"/>
+            <xs:enumeration value="GE"/>
+            <xs:enumeration value="EQ"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="ScopeType">
+    <xs:attribute name="matchesNull" type="xs:boolean"/>
+    <xs:attribute name="matchNegated" type="xs:boolean"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="ability-id" type="AbilityId"/>
+    <xs:attribute name="ability-value" type="xs:boolean"/>
+    <xs:attribute name="method-name" type="xs:string"/>
+    <xs:attribute name="method-value" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="OperandType">
+    <xs:complexContent>
+      <xs:extension base="ScopeType">
+        <xs:attribute name="operandType">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="UNITS" />
+              <xs:enumeration value="BUILDINGS" />
+              <xs:enumeration value="SETTLEMENTS" />
+              <xs:enumeration value="FOUNDING_FATHERS" />
+              <xs:enumeration value="NONE" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="scopeLevel">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="SETTLEMENT" />
+              <xs:enumeration value="PLAYER" />
+              <xs:enumeration value="GAME" />
+              <xs:enumeration value="NONE" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:integer" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Game Object Types -->
+
+  <!-- Either a building type or a unit type -->
+  <xs:simpleType name="AbilityId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.ability\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EquipmentTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BuildingTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.building\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DifficultyLevelId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.difficulty\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FoundingFatherId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.foundingFather\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

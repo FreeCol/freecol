@@ -44,7 +44,8 @@
 	  </xs:complexType>
 	</xs:element>
       </xs:choice>
-      <xs:attribute name="ID" type="RegionId" use="required">
+      <xs:attribute name="id" type="RegionId"/>
+      <xs:attribute name="ID" type="RegionId">
 	<xs:annotation>
 	  <xs:documentation>
 	    Object ID

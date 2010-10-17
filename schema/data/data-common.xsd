@@ -270,15 +270,48 @@
 
   <xs:element name="selectOption">
     <xs:complexType>
-      <xs:attribute name="id" type="OptionId" use="required" />
-      <xs:attribute name="value" type="xs:int" use="required" />
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="selectValue"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="localizedLabels" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="selectValue">
+    <xs:complexType>
+      <xs:attribute name="label" use="required" type="xs:string"/>
+      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
 
   <xs:element name="stringOption">
     <xs:complexType>
-      <xs:attribute name="id" type="OptionId" use="required" />
-      <xs:attribute name="value" type="xs:string" use="required" />
+      <xs:sequence>
+        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:string"/>
+      <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="addNone" type="xs:boolean" />
+      <xs:attribute name="generate">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="UNITS" />
+            <xs:enumeration value="IMMIGRANTS" />
+            <xs:enumeration value="LAND_UNITS" />
+            <xs:enumeration value="NAVAL_UNITS" />
+            <xs:enumeration value="BUILDINGS" />
+            <xs:enumeration value="FOUNDING_FATHERS" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 

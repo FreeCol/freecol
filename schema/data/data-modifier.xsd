@@ -32,7 +32,13 @@
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
+
+      <xs:attribute name="id" type="xs:string" use="optional" />
       <xs:attribute name="source" type="xs:string" use="optional" />
+      <xs:attribute name="index" type="xs:int" use="optional" />
       <xs:attribute name="firstTurn" type="xs:int" use="optional" />
       <xs:attribute name="lastTurn" type="xs:int" use="optional" />
 
@@ -48,8 +54,11 @@
 
   <xs:simpleType name="ModifierType">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="additive" />
       <xs:enumeration value="ADDITIVE" />
+      <xs:enumeration value="multiplicative" />
       <xs:enumeration value="MULTIPLICATIVE" />
+      <xs:enumeration value="percentage" />
       <xs:enumeration value="PERCENTAGE" />
     </xs:restriction>
   </xs:simpleType>
