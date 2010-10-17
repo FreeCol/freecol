@@ -117,6 +117,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
 
         if (levels.size() == 1) {
             difficultyBox.setEnabled(false);
+            level = levels.get(0);
         } else {
             difficultyBox.addItemListener(this);
         }
@@ -150,7 +151,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
             reset.addActionListener(this);
             reset.setMnemonic('R');
             add(reset);
-        
+
             add(cancelButton, "tag cancel");
         }
 
@@ -161,7 +162,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
     public Dimension getMinimumSize() {
         return new Dimension(780, 540);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
