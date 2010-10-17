@@ -1513,6 +1513,7 @@
         <integerOption id="model.option.maximumTax" value="50"/>
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="4"/>
+        <integerOption id="model.option.rumourDifficulty" value="0"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="veryHigh" />
@@ -1541,6 +1542,7 @@
         <integerOption id="model.option.maximumTax" value="60"/>
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="3"/>
+        <integerOption id="model.option.rumourDifficulty" value="1"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="high" />
@@ -1568,6 +1570,7 @@
         <integerOption id="model.option.maximumTax" value="65"/>
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="2"/>
+        <integerOption id="model.option.rumourDifficulty" value="2"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="medium" />
@@ -1594,6 +1597,7 @@
         <integerOption id="model.option.maximumTax" value="70"/>
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="1"/>
+        <integerOption id="model.option.rumourDifficulty" value="3"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="low" />
@@ -1619,6 +1623,7 @@
         <integerOption id="model.option.maximumTax" value="75"/>
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="0"/>
+        <integerOption id="model.option.rumourDifficulty" value="4"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <stringOption  id="model.option.tileProduction" value="veryLow" />
@@ -1644,6 +1649,7 @@
         <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
         <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
         <integerOption id="model.option.monarchSupport" value="0" minimumValue="0" maximumValue="4"/>
+        <integerOption id="model.option.rumourDifficulty" value="4" minimumValue="0" maximumValue="4"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="veryLow">
@@ -1683,16 +1689,6 @@
         <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
         <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
         <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
-      </optionGroup>
-      <optionGroup id="gameOptions.difficultySettings">
-        <!-- TODO: this must go -->
-        <rangeOption id="model.option.difficulty" defaultValue="2" localizedLabels="true">
-          <rangeValue label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
-          <rangeValue label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
-          <rangeValue label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
-          <rangeValue label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
-          <rangeValue label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
-        </rangeOption>
       </optionGroup>
     </optionGroup>
     <optionGroup id="mapGeneratorOptions">

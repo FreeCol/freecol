@@ -49,19 +49,19 @@ public class GameOptions {
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "model.option.fogOfWar";
 
-    /** 
+    /**
      * Victory condition: Should the <code>Player</code> who first defeats the
      * Royal Expeditionary Force win the game?
      */
     public static final String VICTORY_DEFEAT_REF = "model.option.victoryDefeatREF";
-    
-    /** 
+
+    /**
      * Victory condition: Should a <code>Player</code> who first defeats all
      * other european players win the game?
      */
-    public static final String VICTORY_DEFEAT_EUROPEANS = "model.option.victoryDefeatEuropeans";    
+    public static final String VICTORY_DEFEAT_EUROPEANS = "model.option.victoryDefeatEuropeans";
 
-    /** 
+    /**
      * Victory condition: Should a <code>Player</code> who first defeats all
      * other human players win the game?
      */
@@ -74,11 +74,5 @@ public class GameOptions {
      */
     public static final String ALLOW_STUDENT_SELECTION =
         "model.option.allowStudentSelection";
-
-    /**
-     * The difficulty of the game.
-     */
-    public static final String DIFFICULTY = "model.option.difficulty";
-    
 
 }

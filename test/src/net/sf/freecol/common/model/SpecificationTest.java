@@ -38,7 +38,7 @@ public final class SpecificationTest extends FreeColTestCase {
     /**
      * Make sure that a specification object can be created without an exception
      * being thrown.
-     * 
+     *
      */
     public void testLoad() {
 
@@ -49,9 +49,9 @@ public final class SpecificationTest extends FreeColTestCase {
             e.printStackTrace();
             fail();
         }
-    	
+
     	assertNotNull(spec);
-    	
+
     }
 
     /**
@@ -93,7 +93,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(caravel.hasAbility("model.ability.carryGoods"));
         assertTrue(caravel.hasAbility("model.ability.carryUnits"));
         assertFalse(caravel.hasAbility("model.ability.captureGoods"));
-                   
+
         UnitType privateer = spec.getUnitType("model.unit.privateer");
         assertFalse(privateer.hasAbility("model.ability.foundColony"));
         assertFalse(privateer.isRecruitable());
@@ -125,29 +125,10 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(smith.hasAbility("model.ability.buildFactory"));
     }
 
-    // Check difficulty levels presence and values
-    public void testDifficultyLevels() {
-        assertEquals(6, spec().getDifficultyLevels().size());
-        RangeOption diffOpt = (RangeOption) spec().getOption(GameOptions.DIFFICULTY);
-
-        assertTrue(diffOpt.getValue() == 2);
-        assertTrue(diffOpt.getItemValues().size() == 5);
-
-        IntegerOption option = null;
-
-        // initializing server difficulty options
-        spec().applyDifficultyLevel(2);
-      
-        // should succeed now
-        option = spec().getIntegerOption("model.option.crossesIncrement");
-        assertNotNull(option);
-        assertEquals(10, option.getValue());
-    }
-
     public void testModifiers() {
 
     	Specification spec = spec();
-    	
+
     	// Percentage Modifier
     	BuildingType ironWorks = spec.getBuildingType("model.building.ironWorks");
     	Modifier modifier = ironWorks.getModifierSet("model.goods.tools").iterator().next();
@@ -159,7 +140,7 @@ public final class SpecificationTest extends FreeColTestCase {
     	modifier = depot.getModifierSet("model.modifier.warehouseStorage").iterator().next();
     	assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
     	assertEquals(100f, modifier.getValue());
-    	
+
     	// Multiplicative Modifier
     	UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
     	modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
@@ -190,7 +171,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertEquals(1, REFNationTypes.size());
 
     }
-    
+
     public void testReqAbilitiesForEquipmentTypes() {
     	String equipmentTypeStr;
     	Map<String,Boolean> abilitiesReq, expectAbilities;
@@ -198,32 +179,32 @@ public final class SpecificationTest extends FreeColTestCase {
         Specification spec = spec();
 
         Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();
-        
+
         // Abilities
         equipmentTypeStr = "model.equipment.horses";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
         expectAbilities.put("model.ability.bornInIndianSettlement", false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
-        
+
         equipmentTypeStr = "model.equipment.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
         expectAbilities.put("model.ability.bornInIndianSettlement", false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
-        
+
         equipmentTypeStr = "model.equipment.indian.horses";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
         expectAbilities.put("model.ability.bornInIndianSettlement", true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
-        
+
         equipmentTypeStr = "model.equipment.indian.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
         expectAbilities.put("model.ability.bornInIndianSettlement", true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
-        
+
         // Verify
         for (Entry<String, Map<String, Boolean>> entry : eqTypesAbilities.entrySet()){
             equipmentTypeStr = entry.getKey();

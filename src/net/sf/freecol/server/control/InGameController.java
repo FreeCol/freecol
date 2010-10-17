@@ -2277,8 +2277,7 @@ public final class InGameController extends Controller {
 
         Game game = unit.getGame();
         Specification specification = game.getSpecification();
-        int difficulty = specification.getRangeOption("model.option.difficulty")
-            .getValue();
+        int difficulty = specification.getInteger("model.option.rumourDifficulty");
         int dx = 10 - difficulty;
         UnitType unitType;
         Unit newUnit = null;

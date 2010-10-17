@@ -308,7 +308,7 @@ public class SimpleMapGenerator implements MapGenerator {
             // END TODO
 
             int difficulty = map.getGame().getSpecification()
-                .getRangeOption("model.option.difficulty").getValue();
+                .getInteger("model.option.rumourDifficulty");
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
                     Position p = new Position(random.nextInt(map.getWidth()),
