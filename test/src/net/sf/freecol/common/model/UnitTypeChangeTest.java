@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class UnitTypeChangeTest extends FreeColTestCase {
 
@@ -90,7 +93,8 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         assertTrue(change.appliesTo(dutch));
         assertEquals(farmer, gardener.getUnitTypeChange(creation, dutch));
 
-        Unit gardenerUnit = new Unit(game, dutch, gardener);
+        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardener,
+                                           UnitState.ACTIVE);
         assertEquals(farmer, gardenerUnit.getType());
 
     }
@@ -117,7 +121,8 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         assertTrue(change.appliesTo(dutch));
         assertEquals(farmer, gardener.getUnitTypeChange(enterColony, dutch));
 
-        Unit gardenerUnit = new Unit(game, dutch, gardener);
+        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardener,
+                                           UnitState.ACTIVE);
         assertEquals(gardener, gardenerUnit.getType());
         assertEquals(farmer, gardenerUnit.getType().getUnitTypeChange(enterColony, dutch));
         assertNotNull(colony.getVacantWorkLocationFor(gardenerUnit));

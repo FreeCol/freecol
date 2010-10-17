@@ -38,74 +38,65 @@ import net.sf.freecol.server.ai.TileImprovementPlan;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
+
 public class PioneeringMissionTest extends FreeColTestCase {
-    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    EquipmentType toolsEqType = spec().getEquipmentType("model.equipment.tools");
-    
+
+    private static final EquipmentType toolsEqType
+        = spec().getEquipmentType("model.equipment.tools");
+
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+
+
+    @Override
+    public void tearDown() throws Exception {
+        ServerTestHelper.stopServerGame();
+        super.tearDown();
+    }
+
+
     public void testImprovementNoLongerValid() {
-        // start a server
-        FreeColServer server = ServerTestHelper.startServer(false, true);
-        
         Map map = getTestMap();
-        
-        server.setMapGenerator(new MockMapGenerator(map));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        try{
-            Game game = server.getGame();
-            map = game.getMap();  // update reference
+        Game game = ServerTestHelper.startServerGame(map);
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
-            server.getController();
+        // Create player and unit
+        ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-            AIMain aiMain = server.getAIMain();
+        Tile unitTile = map.getTile(2, 2);
+        Unit colonist = new ServerUnit(game, unitTile, player, colonistType,
+                                       UnitState.ACTIVE, toolsEqType);
 
-            // Create player and unit
-            ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        // Setup mission
+        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(colonist);
+        assertNotNull(aiUnit);
+        Tile improvementTarget = map.getTile(10, 10);
+        TileImprovementType roadImprovement = spec().getTileImprovementType("model.improvement.road");
+        TileImprovementPlan improvement =  new TileImprovementPlan(aiMain, improvementTarget, roadImprovement, 100);
+        improvement.setPioneer(aiUnit);
+        PioneeringMission mission = new PioneeringMission(aiMain,aiUnit);
+        mission.setTileImprovementPlan(improvement);
+        aiUnit.setMission(mission);
 
-            Tile unitTile = map.getTile(2, 2);
-            Unit colonist = new Unit(game, unitTile, player, colonistType, UnitState.ACTIVE, toolsEqType);
-            
-            // Setup mission
-            AIUnit aiUnit = (AIUnit) aiMain.getAIObject(colonist);
-            assertNotNull(aiUnit);
-            Tile improvementTarget = map.getTile(10, 10);
-            TileImprovementType roadImprovement = spec().getTileImprovementType("model.improvement.road");
-            TileImprovementPlan improvement =  new TileImprovementPlan(aiMain, improvementTarget, roadImprovement, 100);                        
-            improvement.setPioneer(aiUnit);
-            PioneeringMission mission = new PioneeringMission(aiMain,aiUnit);
-            mission.setTileImprovementPlan(improvement);            
-            aiUnit.setMission(mission);
-            
-            //Verify assigned mission
-            Mission unitMission = aiUnit.getMission();
-            assertNotNull("Colonist should have been assigned a mission", unitMission);
-            boolean hasPioneeringMission = unitMission instanceof PioneeringMission;
-            assertTrue("Colonist should have been assigned a Pioneering mission",hasPioneeringMission);
-            assertTrue("Pioneering mission should be valid", aiUnit.getMission().isValid());
+        //Verify assigned mission
+        Mission unitMission = aiUnit.getMission();
+        assertNotNull("Colonist should have been assigned a mission", unitMission);
+        boolean hasPioneeringMission = unitMission instanceof PioneeringMission;
+        assertTrue("Colonist should have been assigned a Pioneering mission",hasPioneeringMission);
+        assertTrue("Pioneering mission should be valid", aiUnit.getMission().isValid());
 
-            // Simulate improvement tile getting road other than by unit 
-            TileImprovement tileRoad = new TileImprovement(game, improvementTarget, roadImprovement);
-            tileRoad.setTurnsToComplete(0);
-            improvementTarget.setTileItemContainer(new TileItemContainer(game, improvementTarget));
-            improvementTarget.getTileItemContainer().addTileItem(tileRoad);
-            assertTrue("Tile should have road", improvementTarget.hasRoad());            
+        // Simulate improvement tile getting road other than by unit
+        TileImprovement tileRoad = new TileImprovement(game, improvementTarget, roadImprovement);
+        tileRoad.setTurnsToComplete(0);
+        improvementTarget.setTileItemContainer(new TileItemContainer(game, improvementTarget));
+        improvementTarget.getTileItemContainer().addTileItem(tileRoad);
+        assertTrue("Tile should have road", improvementTarget.hasRoad());
 
-            // Verify that mission no longer valid
-            assertFalse("Pioneering mission should not be valid anymore", aiUnit.getMission().isValid());
-        }finally {
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-        }
+        // Verify that mission no longer valid
+        assertFalse("Pioneering mission should not be valid anymore", aiUnit.getMission().isValid());
     }
 }

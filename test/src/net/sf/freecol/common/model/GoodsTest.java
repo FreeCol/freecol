@@ -26,10 +26,12 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 
 public class GoodsTest extends FreeColTestCase {
 
@@ -46,9 +48,9 @@ public class GoodsTest extends FreeColTestCase {
 
         Map map = getTestMap(plainsType);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(),
-                              spec().getUnitType("model.unit.wagonTrain"),
-                              UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(),
+                                    spec().getUnitType("model.unit.wagonTrain"),
+                                    UnitState.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
 
@@ -62,9 +64,9 @@ public class GoodsTest extends FreeColTestCase {
         try {
             Map map = getTestMap(plainsType);
 
-            Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), 
-                                  spec().getUnitType("model.unit.wagonTrain"),
-                                  UnitState.ACTIVE);
+            Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(),
+                                        spec().getUnitType("model.unit.wagonTrain"),
+                                        UnitState.ACTIVE);
 
             Goods g = new Goods(getGame(), wagon, cottonType, 75);
 
@@ -82,8 +84,8 @@ public class GoodsTest extends FreeColTestCase {
 
         Map map = getTestMap(plainsType);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
+                                    UnitState.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
 
@@ -200,8 +202,8 @@ public class GoodsTest extends FreeColTestCase {
     public void testGetTakeSpace() {
         Map map = getTestMap(plainsType, true);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
+                                    UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
 
@@ -211,8 +213,8 @@ public class GoodsTest extends FreeColTestCase {
     public void testSetGetAmount() {
         Map map = getTestMap(plainsType, true);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
+                                    UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
 
@@ -236,8 +238,8 @@ public class GoodsTest extends FreeColTestCase {
 
         Map map = getTestMap(plainsType, true);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
+                                    UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
 

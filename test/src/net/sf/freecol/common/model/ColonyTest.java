@@ -20,7 +20,11 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class ColonyTest extends FreeColTestCase {
     BuildingType depotType = spec().getBuildingType("model.building.depot");
@@ -80,146 +84,6 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals("Building queue should have 3 entries", 3, colony.getBuildQueue().size());
     }
     
-    /**
-     * Tests completion of buildable
-     */
-    public void testBuildingCompletion() {
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-        
-        Colony colony = getStandardColony();
-        Building initialWarehouse = new Building(getGame(), colony, depotType);
-        colony.addBuilding(initialWarehouse);
-        assertTrue("Colony should be able to build warehouse",colony.canBuild(warehouseType));
-        colony.setCurrentlyBuilding(warehouseType);
-        colony.addGoods(hammerGoodsType, 90);
-                
-        // Simulate that the build is done
-        assertFalse("Colony should not have warehouse",colony.getWarehouse().getType() == warehouseType);
-        colony.checkBuildableComplete();
-        assertTrue("Colony should have warehouse",colony.getWarehouse().getType() == warehouseType);
-        
-    }
-    
-    /**
-     * Tests invalid completion of buildable, having enough resources
-    */
-    public void testInvalidCompletion() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
-
-    	Colony colony = getStandardColony(2);
-    	Building carpenterHouse = new Building(getGame(), colony, carpenterHouseType);
-    	colony.addBuilding(carpenterHouse);
-    	assertFalse("Colony should not be able to build lumber mill",colony.canBuild(lumberMillType));
-    	colony.setCurrentlyBuilding(lumberMillType);
-    	assertTrue("Colony should be building lumber mill",colony.getCurrentlyBuilding() == lumberMillType);
-    	// add sufficient goods to build lumber mill
-    	for(AbstractGoods reqGoods : lumberMillType.getGoodsRequired()){
-    		GoodsType type = reqGoods.getType();
-    		int ammount = reqGoods.getAmount() + 1;
-    		colony.addGoods(type, ammount);
-    		assertEquals("Wrong quantity of " + type,ammount, colony.getGoodsCount(type));
-    	}
-
-    	// test
-    	assertFalse("Colony should not have lumber mill",colony.getBuilding(lumberMillType).getType() == lumberMillType);
-    	colony.checkBuildableComplete();
-    	assertFalse("Colony should not have lumber mill",colony.getBuilding(lumberMillType).getType() == lumberMillType);
-    	assertFalse("Colony should no longer be building lumber mill",colony.getCurrentlyBuilding() == lumberMillType);
-    }
-    
-    public void testNoBuildingMaterialsProductionWhenBuildingNothing(){
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-        
-        Colony colony = getStandardColony();
-        Building carpenterHouse = new Building(getGame(), colony, carpenterHouseType);
-        colony.addBuilding(carpenterHouse);
-        Unit unit = colony.getUnitList().get(0);
-        colony.getBuilding(carpenterHouseType).add(unit);
-        // necessary for work production
-        int initialLumber = 100;
-        int initialHammers = 0;
-        colony.addGoods(lumberGoodsType, initialLumber);
-        colony.setCurrentlyBuilding(null);
-        
-        assertEquals("Wrong initial lumber quantity, ",
-                     initialLumber, colony.getGoodsCount(lumberGoodsType));
-        assertTrue("Colony shoud be able to produce work (hammers)",
-                   colony.getProductionOf(hammerGoodsType) > 0);
-        assertEquals("Colony shold not have any work production(hammers) initially, ",
-                     initialHammers, colony.getGoodsCount(hammerGoodsType));
-        colony.newTurn();
-        assertEquals("Colony shold not have any work production(hammers) after, ",
-                     initialHammers, colony.getGoodsCount(hammerGoodsType));
-        assertEquals("Wrong final lumber quantity, ",
-                     initialLumber, colony.getGoodsCount(lumberGoodsType));
-    }
-
-
-
-    public void testLibertyAndImmigration() {
-
-        int population = 3;
-
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-        Colony colony = getStandardColony(population);
-        
-        Building townHall = new Building(getGame(), colony, townHallType);
-        colony.addBuilding(townHall);
-        Unit statesman = colony.getUnitList().get(0);
-        statesman.setLocation(null);
-        townHall.add(statesman);
-
-        Building church = new Building(getGame(), colony, churchType);
-        colony.addBuilding(church);
-        church.upgrade();
-        Unit preacher = colony.getUnitList().get(1);
-        preacher.setLocation(null);
-        church.add(preacher);
-
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-        GoodsType crossType = spec().getGoodsType("model.goods.crosses");
-
-        colony.newTurn();
-        assertEquals(population, colony.getUnitCount());
-        assertEquals(4, colony.getProductionOf(bellsType));
-        assertEquals(population - 2, colony.getConsumptionOf(bellsType));
-
-        int bells = colony.getProductionOf(bellsType) - colony.getConsumptionOf(bellsType);
-        assertEquals(bells, colony.getProductionNetOf(bellsType));
-        assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getLiberty());
-
-        colony.addGoods(bellsType, 7);
-        bells += 7;
-        assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getLiberty());
-
-        colony.removeGoods(bellsType, 5);
-        bells -= 5;
-        assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getLiberty());
-
-        int crosses = colony.getProductionOf(crossType) - colony.getConsumptionOf(crossType);
-        assertEquals(crosses, colony.getProductionNetOf(crossType));
-        assertEquals(crosses, colony.getGoodsCount(crossType));
-        assertEquals(crosses, colony.getImmigration());
-
-        colony.addGoods(crossType, 7);
-        crosses += 7;
-        assertEquals(crosses, colony.getGoodsCount(crossType));
-        assertEquals(crosses, colony.getImmigration());
-
-        colony.removeGoods(crossType, 5);
-        crosses -= 5;
-        assertEquals(crosses, colony.getGoodsCount(crossType));
-        assertEquals(crosses, colony.getImmigration());
-
-    }
-
     public void testOccupationWithFood() {
 
         int population = 3;
@@ -239,7 +103,9 @@ public class ColonyTest extends FreeColTestCase {
                    freeColonist.getConsumptionOf(food));
 
         // colonist with no skill or experience will produce food
-        Unit colonist = new Unit(game, colony.getOwner(), freeColonist);
+        Unit colonist = new ServerUnit(game, colony.getTile(),
+                                       colony.getOwner(), freeColonist,
+                                       UnitState.ACTIVE);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(food, colonist.getWorkType());
@@ -324,7 +190,10 @@ public class ColonyTest extends FreeColTestCase {
                    freeColonist.getConsumptionOf(food));
 
         // colonist produces bells because they require no input
-        Unit colonist = new Unit(game, colony.getOwner(), spec().getUnitType("model.unit.freeColonist"));
+        Unit colonist = new ServerUnit(game, colony.getTile(),
+                                       colony.getOwner(),
+                                       spec().getUnitType("model.unit.freeColonist"),
+                                       UnitState.ACTIVE);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         assertEquals(townHall, colony.getBuildingFor(colonist).getType());

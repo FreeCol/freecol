@@ -11,6 +11,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerUnit;
+
 
 public class FreeColTestUtils {
     
@@ -136,7 +139,7 @@ public class FreeColTestUtils {
             }
             */
             
-            Colony colony = new Colony(game, player, name, colonyTile);
+            Colony colony = new ServerColony(game, player, name, colonyTile);
             colony.placeSettlement();
 
             
@@ -147,7 +150,8 @@ public class FreeColTestUtils {
                 UnitType type = iter.next();
                 Integer n = colonists.get(type);
                 for(int i=0; i < n; i++){
-                    Unit colonist = new Unit(game, colony, player, type, UnitState.IN_COLONY,
+                    Unit colonist = new ServerUnit(game, colony, player, type,
+                                                   UnitState.IN_COLONY,
                             colonistType.getDefaultEquipment());
                     colonist.setLocation(colony);
                     nCol++;
@@ -155,7 +159,8 @@ public class FreeColTestUtils {
             }
             // add rest of colonists as simple free colonists
             for(int i=nCol; i < initialColonists; i++){
-                Unit colonist = new Unit(game, colony, player, colonistType, UnitState.IN_COLONY,
+                Unit colonist = new ServerUnit(game, colony, player,
+                                               colonistType, UnitState.IN_COLONY,
                         colonistType.getDefaultEquipment());
                 colonist.setLocation(colony);
             }

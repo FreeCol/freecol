@@ -22,7 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class PlayerTest extends FreeColTestCase {
     UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
@@ -42,10 +44,14 @@ public class PlayerTest extends FreeColTestCase {
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
 
-        Unit unit1 = new Unit(game, map.getTile(4, 7), dutch, freeColonist, UnitState.ACTIVE);
-        Unit unit2 = new Unit(game, map.getTile(4, 8), dutch, freeColonist, UnitState.ACTIVE);
-        Unit unit3 = new Unit(game, map.getTile(5, 7), dutch, freeColonist, UnitState.ACTIVE);
-        Unit unit4 = new Unit(game, map.getTile(5, 8), dutch, freeColonist, UnitState.ACTIVE);
+        Unit unit1 = new ServerUnit(game, map.getTile(4, 7), dutch,
+                                    freeColonist, UnitState.ACTIVE);
+        Unit unit2 = new ServerUnit(game, map.getTile(4, 8), dutch,
+                                    freeColonist, UnitState.ACTIVE);
+        Unit unit3 = new ServerUnit(game, map.getTile(5, 7), dutch,
+                                    freeColonist, UnitState.ACTIVE);
+        Unit unit4 = new ServerUnit(game, map.getTile(5, 8), dutch,
+                                    freeColonist, UnitState.ACTIVE);
 
         int count = 0;
         Iterator<Unit> unitIterator = dutch.getUnitIterator();
@@ -211,7 +217,8 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals("Wrong number of units for dutch player",0,dutch.getUnits().size());
         assertEquals("Wrong number of units for french player",0,french.getUnits().size());
         
-        Unit colonist = new Unit(game, map.getTile(6, 8), dutch, freeColonist, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
+                                       freeColonist, UnitState.ACTIVE);
         assertTrue("Colonist should be dutch", colonist.getOwner() == dutch);
         assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
         

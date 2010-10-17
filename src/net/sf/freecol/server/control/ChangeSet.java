@@ -880,7 +880,7 @@ public class ChangeSet {
     /**
      * Simple constructor.
      */
-    ChangeSet() {
+    public ChangeSet() {
         changes = new ArrayList<Change>();
     }
 
@@ -889,7 +889,7 @@ public class ChangeSet {
      *
      * @param other The other <code>ChangeSet</code> to copy.
      */
-    ChangeSet(ChangeSet other) {
+    public ChangeSet(ChangeSet other) {
         changes = new ArrayList<Change>(other.changes);
     }
 

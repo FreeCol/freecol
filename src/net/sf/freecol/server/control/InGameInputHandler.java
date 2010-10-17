@@ -133,21 +133,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     public InGameInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // TODO: move and simplify methods later, for now just delegate
-        register("createUnit", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return createUnit(connection, element);
-            }
-        });
-        register("createBuilding", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return createBuilding(connection, element);
-            }
-        });
-        register("getRandom", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return getRandom(connection, element);
-            }
-        });
         register("getVacantEntryLocation", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return getVacantEntryLocation(connection, element);
@@ -557,70 +542,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         return result;
-    }
-
-
-    /**
-     * Handles a "createUnit"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element createUnit(Connection connection, Element element) {
-        logger.info("Receiving \"createUnit\"-request.");
-        String taskID = element.getAttribute("taskID");
-        Location location = (Location) getGame().getFreeColGameObject(element.getAttribute("location"));
-        Player owner = (Player) getGame().getFreeColGameObject(element.getAttribute("owner"));
-        UnitType type = getGame().getSpecification().getUnitType(element.getAttribute("type"));
-        if (location == null) {
-            throw new NullPointerException();
-        }
-        if (owner == null) {
-            throw new NullPointerException();
-        }
-        Unit unit = getFreeColServer().getModelController()
-                .createUnit(taskID, location, owner, type, false, connection);
-        Element reply = Message.createNewRootElement("createUnitConfirmed");
-        reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));
-        return reply;
-    }
-
-    /**
-     * Handles a "createBuilding"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element createBuilding(Connection connection, Element element) {
-        logger.info("Receiving \"createBuilding\"-request.");
-        String taskID = element.getAttribute("taskID");
-        Colony colony = (Colony) getGame().getFreeColGameObject(element.getAttribute("colony"));
-        BuildingType type = getGame().getSpecification().getBuildingType(element.getAttribute("type"));
-        if (colony == null) {
-            throw new NullPointerException();
-        }
-        Building building = getFreeColServer().getModelController()
-                .createBuilding(taskID, colony, type, false, connection);
-        Element reply = Message.createNewRootElement("createBuildingConfirmed");
-        reply.appendChild(building.toXMLElement(colony.getOwner(), reply.getOwnerDocument()));
-        return reply;
-    }
-
-    /**
-     * Handles a "getRandom"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element getRandom(Connection connection, Element element) {
-        //logger.info("Receiving \"getRandom\"-request.");
-        String taskID = element.getAttribute("taskID");
-        int n = Integer.parseInt(element.getAttribute("n"));
-        int result = getFreeColServer().getModelController().getRandom(taskID, n);
-        Element reply = Message.createNewRootElement("getRandomConfirmed");
-        reply.setAttribute("result", Integer.toString(result));
-        //logger.info("Result: " + result);
-        return reply;
     }
 
     /**

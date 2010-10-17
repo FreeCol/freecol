@@ -28,18 +28,24 @@ import java.util.Set;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class FoundingFatherTest extends FreeColTestCase {
 
-    private static UnitType servantType = spec().getUnitType("model.unit.indenturedServant");
-    private static UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    private static UnitType statesmanType = spec().getUnitType("model.unit.elderStatesman");
+    private static GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
 
-    private static GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+    private static UnitType servantType
+        = spec().getUnitType("model.unit.indenturedServant");
+    private static UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static UnitType statesmanType
+        = spec().getUnitType("model.unit.elderStatesman");
+
 
     public void testFeatures() {
-
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
 
@@ -80,31 +86,6 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
-
-    public void testBuildingBonus() {
-        BuildingType press = spec().getBuildingType("model.building.printingPress");
-
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
-    	
-        Player dutch = game.getPlayer("model.nation.dutch");
-
-        FoundingFather father = new FoundingFather("father", spec());
-        Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus", -100f, Modifier.Type.PERCENTAGE);
-        Scope pressScope = new Scope();
-        pressScope.setType("model.building.printingPress");
-        List<Scope> scopeList = new ArrayList<Scope>();
-        scopeList.add(pressScope);
-        priceBonus.setScopes(scopeList);
-        father.addModifier(priceBonus);
-        dutch.addFather(father);
-
-        Colony colony = getStandardColony(4);
-
-        assertTrue(colony.getBuilding(press) != null);
-
-    }
-    
     public void testPeterStuyvesant() {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
@@ -277,7 +258,8 @@ public class FoundingFatherTest extends FreeColTestCase {
         IndianSettlement camp = builder.build();
         EquipmentType bible = spec().getEquipmentType("model.equipment.missionary");
 
-        Unit missionary = new Unit(game, null, dutch, colonist, UnitState.ACTIVE, bible);
+        Unit missionary = new ServerUnit(game, null, dutch, colonist,
+                                   UnitState.ACTIVE, bible);
         camp.setMissionary(missionary);
 
         assertTrue(bible.hasAbility("model.ability.missionary"));

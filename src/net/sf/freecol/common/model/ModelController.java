@@ -42,43 +42,6 @@ import net.sf.freecol.common.model.Player.Stance;
 public interface ModelController {
 
     /**
-    * Creates a new unit.
-    *
-    * @param taskID The <code>taskID</code> should be a unique identifier.
-    *               One method to make a unique <code>taskID</code>:
-    *               <br><br>
-    *               getId() + "methodName:taskDescription"
-    *               <br><br>
-    *               As long as the "taskDescription" is unique
-    *               within the method ("methodName"), you get a unique
-    *               identifier.
-    * @param location The <code>Location</code> where the <code>Unit</code>
-    *               will be created.
-    * @param owner  The <code>Player</code> owning the <code>Unit</code>.
-    * @param type   The type of unit (Unit.FREE_COLONIST...).
-    * @return The created <code>Unit</code>.
-    */
-    public Unit createUnit(String taskID, Location location, Player owner, UnitType type);
-
-    /**
-    * Creates a new building.
-    *
-    * @param taskID The <code>taskID</code> should be a unique identifier.
-    *               One method to make a unique <code>taskID</code>:
-    *               <br><br>
-    *               getId() + "methodName:taskDescription"
-    *               <br><br>
-    *               As long as the "taskDescription" is unique
-    *               within the method ("methodName"), you get a unique
-    *               identifier.
-    * @param colony The <code>Colony</code> where the <code>Building</code>
-    *               will be created.
-    * @param type   The type of building.
-    * @return The created <code>Building</code>.
-    */
-    public Building createBuilding(String taskID, Colony colony, BuildingType type);
-
-    /**
     * Puts the specified <code>Unit</code> in America.
     * @param unit The <code>Unit</code>.
     * @return The <code>Location</code> where the <code>Unit</code> appears.
@@ -106,23 +69,6 @@ public interface ModelController {
      */
     public void tileImprovementFinished(Unit unit, TileImprovement improvement);
     
-    /**
-    * Returns a pseudo-random int, uniformly distributed between 0
-    * (inclusive) and the specified value (exclusive).
-    * 
-    * @param taskID The <code>taskID</code> should be a unique identifier.
-    *               One method to make a unique <code>taskID</code>:
-    *               <br><br>
-    *               getId() + "methodName:taskDescription"
-    *               <br><br>
-    *               As long as the "taskDescription" is unique
-    *               within the method ("methodName"), you get a unique
-    *               identifier.
-    * @param n The specified value. 
-    * @return The generated number.
-    */
-    public int getRandom(String taskID, int n);
-
     /**
      * Get a new <code>TradeRoute</code> object.
      */

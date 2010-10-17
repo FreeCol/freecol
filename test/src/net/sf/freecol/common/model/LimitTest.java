@@ -21,7 +21,10 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.model.Operand.OperandType;
 import net.sf.freecol.common.model.Operand.ScopeLevel;
+import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class LimitTest extends FreeColTestCase {
 
@@ -48,7 +51,7 @@ public class LimitTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = getStandardColony(3);
-        Building armory = new Building(getGame(), colony, spec().getBuildingType("model.building.armory"));
+        Building armory = new ServerBuilding(getGame(), colony, spec().getBuildingType("model.building.armory"));
         colony.addBuilding(armory);
 
         UnitType wagonTrain = spec().getUnitType("model.unit.wagonTrain");
@@ -63,7 +66,7 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colony.canBuild(wagonTrain));
 
         @SuppressWarnings("unused")
-        Unit wagon = new Unit(game, colony.getTile(), dutch, wagonTrain, Unit.UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(game, colony.getTile(), dutch, wagonTrain, Unit.UnitState.ACTIVE);
         assertEquals(Colony.NoBuildReason.LIMIT_EXCEEDED, colony.getNoBuildReason(wagonTrain));
         assertFalse(wagonTrainLimit.evaluate(colony));
         assertFalse(colony.canBuild(wagonTrain));

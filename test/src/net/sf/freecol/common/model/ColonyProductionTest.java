@@ -21,7 +21,10 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class ColonyProductionTest extends FreeColTestCase {
 
@@ -49,9 +52,9 @@ public class ColonyProductionTest extends FreeColTestCase {
                 
         game.setMap(map);
         UnitType veteran = spec().getUnitType("model.unit.veteranSoldier");
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
+        Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
 
-        Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
+        Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
         GoodsType foodType = spec().getGoodsType("model.goods.food");
         soldier.setWorkType(foodType);
         nonServerBuildColony(soldier, colony);
@@ -115,10 +118,11 @@ public class ColonyProductionTest extends FreeColTestCase {
         game.setMap(map);
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         GoodsType foodType = spec().getGoodsType("model.goods.food");
-        Unit pioneer = new Unit(game, map.getTile(6, 8), dutch, pioneerType, UnitState.ACTIVE,
-                                pioneerType.getDefaultEquipment());
+        Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch,
+                                      pioneerType, UnitState.ACTIVE,
+                                      pioneerType.getDefaultEquipment());
 
-        Colony colony = new Colony(game, dutch, "New Amsterdam", pioneer.getTile());
+        Colony colony = new ServerColony(game, dutch, "New Amsterdam", pioneer.getTile());
         pioneer.setWorkType(foodType);
         nonServerBuildColony(pioneer, colony);
 

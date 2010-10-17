@@ -33,63 +33,46 @@ import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
+
 public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
-	
-    FreeColServer server = null;
-	
-    public void tearDown(){
-        if(server != null){
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-            setGame(null);
-            server = null;
-        }
+
+    private static final EquipmentType muskets
+        = spec().getEquipmentType("model.equipment.muskets");
+
+    private static final UnitType veteranType
+        = spec().getUnitType("model.unit.veteranSoldier");
+
+
+    @Override
+    public void tearDown() throws Exception {
+        ServerTestHelper.stopServerGame();
+        super.tearDown();
     }
 	
-    private void setupServer(){
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-                
-        server.setMapGenerator(new MockMapGenerator(getTestMap()));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-            setGame(server.getGame());
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-    }
 	
     public void testCapturedUnitsLoseMission() {
-        setupServer();
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         
-        Game game = server.getGame();
-        Map map = game.getMap();
-        AIMain aiMain = server.getAIMain();
-        
-        UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
-        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
-
         // Create attacking player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
-        Unit attacker = new Unit(game, tile1, player1, veteranType, UnitState.ACTIVE);
+        Unit attacker = new ServerUnit(game, tile1, player1, veteranType,
+                                       UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile2 = map.getTile(2, 1);
-        Unit defender = new Unit(game, tile2, player2, veteranType,
-                                 UnitState.ACTIVE, muskets);
+        Unit defender = new ServerUnit(game, tile2, player2, veteranType,
+                                       UnitState.ACTIVE, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
@@ -110,27 +93,23 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
     }
 	
     public void testDoNotPursueUnitsInColonies(){
-        setupServer();
-		
-        Game game = server.getGame();
-        Map map = game.getMap();
-        AIMain aiMain = server.getAIMain();
-		
-        UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
-        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create attacking player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
-        Unit attacker = new Unit(game, tile1, player1, veteranType, UnitState.ACTIVE);
+        Unit attacker = new ServerUnit(game, tile1, player1, veteranType,
+                                       UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile defenderTile = map.getTile(2, 1);
-        Unit defender = new Unit(game, defenderTile, player2, veteranType,
-                                 UnitState.ACTIVE, muskets);
+        Unit defender = new ServerUnit(game, defenderTile, player2, veteranType,
+                                       UnitState.ACTIVE, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);

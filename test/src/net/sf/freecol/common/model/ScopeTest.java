@@ -20,7 +20,9 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class ScopeTest extends FreeColTestCase {
 
@@ -208,7 +210,8 @@ public class ScopeTest extends FreeColTestCase {
         Tile unitTile = map.getTile(6, 8);
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         
-        Unit unit = new Unit(game, unitTile, dutch, colonistType, Unit.UnitState.ACTIVE);
+        Unit unit = new ServerUnit(game, unitTile, dutch, colonistType,
+                                   Unit.UnitState.ACTIVE);
 
         Scope scope = new Scope();
         scope.setAbilityID("model.ability.foundColony");

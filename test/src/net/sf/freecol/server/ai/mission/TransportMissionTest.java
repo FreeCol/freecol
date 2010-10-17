@@ -50,124 +50,99 @@ import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
+
 public class TransportMissionTest extends FreeColTestCase {
-    FreeColServer server = null;
     
-    public void tearDown(){
-        if(server != null){
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-            server = null;   
-        }
-        setGame(null);
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+
+    private static final TileType plainsType
+        = spec().getTileType("model.tile.plains");
+
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType
+        = spec().getUnitType("model.unit.privateer");
+
+
+    @Override
+    public void tearDown() throws Exception {
+        ServerTestHelper.stopServerGame();
+        super.tearDown();
     }
     
-    private Game startServerGame(){
-    	return startServerGame(null);
-    }
-    
-    private Game startServerGame(Map map){
-        // Reset import file option value (may have been set by previous tests)
-        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
-        
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-        
-        if(map != null){
-        	server.setMapGenerator(new MockMapGenerator(map));
-        }
-        
-        Controller c = server.getController();
-        assertNotNull(c);
-        assertTrue(c instanceof PreGameController);
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail();
-        }
-        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
-        
-        Game game = server.getGame();
-        assertNotNull(game);
-        FreeColTestCase.setGame(game);
-        return game;
-    }
     
     public void testTransportMissionInvalidAfterCombatLost() {   
-        Game game = startServerGame();
-        InGameController igc = (InGameController) server.getController();
-
-        Map map = game.getMap();
-        assertNotNull(map);
-        
-        AIMain aiMain = server.getAIMain();
+        Map map = getCoastTestMap(plainsType);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        AIPlayer aiPlayer = (AIPlayer)aiMain.getAIObject(dutch.getId());
+
+        // Create a ship at sea carrying a colonist
+        Tile tile1 = map.getTile(12, 9);
         
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        AIPlayer aiPlayer = (AIPlayer)aiMain.getAIObject(player1.getId());
-    
-        // create a ship carrying a colonist
-        Tile tile1 = map.getTile(6, 9);
-        
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game, tile1, player1, galleonType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, tile1, dutch, galleonType,
+                                      UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
         assertNotNull(aiUnit);
         assertTrue(galleon.hasAbility("model.ability.navalUnit"));
-        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        Unit colonist = new Unit(game, galleon, player1, colonistType, UnitState.SENTRY);
+        assertEquals("Galleon should be repaired in Europe",
+                     dutch.getEurope(), tile1.getRepairLocation(dutch));
+        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType,
+                                       UnitState.SENTRY);
         assertTrue(colonist.getLocation()==galleon);
         
-        //Create the attacker
+        // Create the attacker, also at sea
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-        Tile tile2 = map.getTile(5, 9);
-        UnitType privateerType = spec().getUnitType("model.unit.privateer");
-        Unit privateer = new Unit(game, tile2, french, privateerType, UnitState.ACTIVE);
+        Tile tile2 = map.getTile(11, 9);
+        Unit privateer = new ServerUnit(game, tile2, french, privateerType,
+                                        UnitState.ACTIVE);
                 
         // assign transport mission to the ship
         aiUnit.setMission(new TransportMission(aiMain, aiUnit));
         
-        //Simulate the combat
-        List<CombatResult> crs = new ArrayList<CombatResult>();
-        crs.add(CombatResult.WIN);
-        crs.add(CombatResult.DAMAGE_SHIP_ATTACK);
-        igc.combat(french, privateer, galleon, crs);
+        // Simulate the combat
+        igc.combat(dutch, privateer, galleon,
+                   fakeAttackResult(CombatResult.WIN, privateer, galleon));
 
-        // Verify that the outcome of the combat is  a return to Europe for repairs
-        // and also invalidation of the transport mission as side effect
+        // Verify that the outcome of the combat is a return to Europe
+        // for repairs and also invalidation of the transport mission
+        // as side effect.
         assertTrue(galleon.isUnderRepair());
         assertFalse(aiUnit.getMission().isValid());
                 
-        // this will call AIPlayer.abortInvalidMissions() and change the carrier mission
+        // This will call AIPlayer.abortInvalidMissions() and change
+        // the carrier mission.
         aiPlayer.startWorking();
         assertFalse(aiUnit.getMission() instanceof TransportMission);
     }
     
     public void testGetNextStopAlreadyAtDestination(){
-    	final TileType plainsType = spec().getTileType("model.tile.plains");
-    	final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-    	
-    	Map map = getCoastTestMap(plainsType);
-    	
-    	Game game = startServerGame(map);
-    	map = game.getMap();  // update reference
-    	
-        AIMain aiMain = server.getAIMain();
+        Map map = getCoastTestMap(plainsType);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
-        
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
     
         // create a ship carrying a colonist
         Tile colonyTile = map.getTile(9, 9);
         getStandardColony(1, colonyTile.getX(), colonyTile.getY());
         
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game, colonyTile, player1, galleonType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, colonyTile, dutch, galleonType,
+                                      UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
         assertNotNull(aiUnit);
         
@@ -186,27 +161,22 @@ public class TransportMissionTest extends FreeColTestCase {
     }
     
     public void testGetNextStopIsEurope(){
-    	final TileType plainsType = spec().getTileType("model.tile.plains");
-    	final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-    	
-    	Map map = getCoastTestMap(plainsType);
-    	
-    	Game game = startServerGame(map);
-    	map = game.getMap();  // update reference
-    	
-        AIMain aiMain = server.getAIMain();
+        Map map = getCoastTestMap(plainsType);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
-        
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Europe europe = player1.getEurope();
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
         
-        // create a ship carrying a colonist
+        // create a ship carrying a colonist in a colony
         Tile colonyTile = map.getTile(9, 9);
         getStandardColony(1, colonyTile.getX(), colonyTile.getY());
         
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game, colonyTile, player1, galleonType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, colonyTile, dutch, galleonType,
+                                      UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
         assertNotNull(aiUnit);
         
@@ -226,19 +196,14 @@ public class TransportMissionTest extends FreeColTestCase {
     }
     
     public void testGetNextStopIsColony(){
-    	final TileType plainsType = spec().getTileType("model.tile.plains");
-    	final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-    	
-    	Map map = getCoastTestMap(plainsType);
-    	
-    	Game game = startServerGame(map);
-    	map = game.getMap();  // update reference
-    	
-        AIMain aiMain = server.getAIMain();
+        Map map = getCoastTestMap(plainsType);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
         
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Europe europe = player1.getEurope();
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
         
         // create a ship carrying a colonist
@@ -246,8 +211,8 @@ public class TransportMissionTest extends FreeColTestCase {
         Tile galleonTile = map.getTile(9, 10);
         getStandardColony(1, colonyTile.getX(), colonyTile.getY());
         
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game, galleonTile, player1, galleonType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, galleonTile, dutch, galleonType,
+                                      UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
         assertNotNull(aiUnit);
         
@@ -268,26 +233,22 @@ public class TransportMissionTest extends FreeColTestCase {
         assertEquals("Unit destiny should be the colony", destPath.getLastNode().getTile(),colonyTile);
     }
     
-    public void testGetDefaultDestination(){
-    	final TileType plainsType = spec().getTileType("model.tile.plains");
-    	
-    	Map map = getCoastTestMap(plainsType);
-    	
-    	Game game = startServerGame(map);
-    	map = game.getMap();  // update reference
-    	
-        AIMain aiMain = server.getAIMain();
+    public void testGetDefaultDestination() {
+        Map map = getCoastTestMap(plainsType);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
         
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Europe europe = player1.getEurope();
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
         
         // create a ship
 
         Tile galleonTile = map.getTile(9, 10);
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game, galleonTile, player1, galleonType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, galleonTile, dutch, galleonType,
+                                      UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
         assertNotNull(aiUnit);
         
@@ -295,7 +256,7 @@ public class TransportMissionTest extends FreeColTestCase {
         TransportMission mission = new TransportMission(aiMain, aiUnit); 
         aiUnit.setMission(mission);
 
-        assertTrue("Setup error, player should not have colonies", player1.getColonies().isEmpty());
+        assertTrue("Setup error, player should not have colonies", dutch.getColonies().isEmpty());
         
         // Exercise
         Destination dest = mission.getDefaultDestination();
@@ -307,8 +268,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // add colony
         Tile colonyTile = map.getTile(9, 9);
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
-        builder.colonyTile(colonyTile).initialColonists(1).player(player1).build();
-        assertFalse("Player should now have a colony", player1.getColonies().isEmpty());
+        builder.colonyTile(colonyTile).initialColonists(1).player(dutch).build();
+        assertFalse("Player should now have a colony", dutch.getColonies().isEmpty());
         
         // Exercise
         dest = mission.getDefaultDestination();

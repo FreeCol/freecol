@@ -35,15 +35,12 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.server.model.ServerBuilding;
+
 
 public class MockModelController implements ModelController {
     private MockPseudoRandom setPseudoRandom = null;
     
-    public Unit createUnit(String taskID, Location location, Player owner, int type) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public void exploreTiles(Player player, ArrayList<Tile> tiles) {
         // TODO Auto-generated method stub
 		
@@ -62,11 +59,6 @@ public class MockModelController implements ModelController {
         setPseudoRandom = newPseudoRandom;
     }
 
-    public int getRandom(String taskID, int n) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public Location setToVacantEntryLocation(Unit unit) {
         // TODO Auto-generated method stub
         return null;
@@ -79,15 +71,9 @@ public class MockModelController implements ModelController {
         return true;
     }
 
-    public Unit createUnit(String taskID, Location location, Player owner,
-                           UnitType type) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public Building createBuilding(String taskID, Colony colony, BuildingType type) {
         // TODO Auto-generated method stub
-        return new Building(colony.getGame(), colony, type);
+        return new ServerBuilding(colony.getGame(), colony, type);
     }
 
     public void tileImprovementFinished(Unit unit, TileImprovement improvement) {

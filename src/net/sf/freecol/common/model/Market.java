@@ -46,7 +46,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     /**
      * Constant for specifying the access to this <code>Market</code>
-     * when {@link #sell(GoodsType, int, Player, Access) selling} goods.
+     * when selling goods.
      */
     public static enum Access {
         EUROPE,
@@ -214,93 +214,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Sells an amount of a particular type of good with the proceeds
-     * of the sale being paid to a supplied player. The goods is sold
-     * using {@link #EUROPE} as the access point for this market.
-     * Note that post-independence this no longer refers to a specific port.
-     *
-     * @param goods The <code>Goods</code> object being sold.
-     * @param player The <code>Player</code> selling the goods.
-     */
-    public void sell(Goods goods, Player player) {
-        sell(goods.getType(), goods.getAmount(), player, Market.Access.EUROPE);
-    }
-
-    /**
-     * Sells an amount of a particular type of good with the proceeds
-     * of the sale being paid to a supplied player. The goods is
-     * sold using {@link #EUROPE} as the accesspoint for this market.
-     *
-     * @param type The type of goods to be sold.
-     * @param amount The amount of goods to be sold.
-     * @param player The <code>Player</code> selling the goods.
-     */
-    public void sell(GoodsType type, int amount, Player player) {
-        sell(type, amount, player, Market.Access.EUROPE);
-    }
-
-    /**
-     * Sells an amount of a particular type of good with the proceeds
-     * of the sale being paid to a supplied player.
-     *
-     * @param type   The type of goods to be sold.
-     * @param amount The amount of goods to be sold.
-     * @param player The <code>Player</code> selling the goods.
-     * @param access The place where goods are traded.
-     */
-    public void sell(GoodsType type, int amount, Player player, Access access) {
-        if (player.canTrade(type, access)) {
-            int tax = player.getTax();
-            int incomeBeforeTaxes = getSalePrice(type, amount);
-            int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
-            player.modifyGold(incomeAfterTaxes);
-            modifySales(type, amount);
-            modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
-            modifyIncomeAfterTaxes(type, incomeAfterTaxes);
-
-            amount = (int) player.getFeatureContainer()
-                .applyModifier(amount, "model.modifier.tradeBonus",
-                               type, getGame().getTurn());
-            addGoodsToMarket(type, amount);
-        } else {
-            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                    "model.europe.market", this)
-                            .add("%goods%", type.getNameKey()));
-        }
-    }
-
-    /**
-     * Buys an amount of a particular type of good with the cost being
-     * met by a supplied player.
-     *
-     * @param goodsType The type of the good that is being bought.
-     * @param amount The amount of goods that are being bought.
-     * @param player The <code>Player</code> buying the goods.
-     * @throws IllegalStateException If the <code>player</code> cannot afford
-     *                               to buy the goods.
-     */
-    public void buy(GoodsType goodsType, int amount, Player player)
-        throws IllegalStateException {
-        int price = getBidPrice(goodsType, amount);
-        if (price > player.getGold()) {
-            throw new IllegalStateException("Player " + player.getName()
-                + " tried to buy " + Integer.toString(amount)
-                + " " + goodsType.toString()
-                + " for " + Integer.toString(price)
-                + " but has " + Integer.toString(player.getGold()) + " gold.");
-        }
-        player.modifyGold(-price);
-        modifySales(goodsType, -amount);
-        modifyIncomeBeforeTaxes(goodsType, -price);
-        modifyIncomeAfterTaxes(goodsType, -price);
-
-        amount = (int) player.getFeatureContainer()
-            .applyModifier(amount, "model.modifier.tradeBonus",
-                           goodsType, getGame().getTurn());
-        addGoodsToMarket(goodsType, -amount);
-    }
-
-    /**
      * Add (or remove) some goods to this market.
      * 
      * @param goodsType The <code>GoodsType</code> to add.
@@ -309,7 +222,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public void addGoodsToMarket(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);
 
-        // Markets are bottomless, amount can not go below the threshold       */
+        // Markets are bottomless, amount can not go below the threshold
         data.setAmountInMarket(Math.max(MINIMUM_AMOUNT,
                                         data.getAmountInMarket() + amount));
         data.setTraded(true);

@@ -65,6 +65,7 @@ import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.TileImprovementPlan;
 import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.mission.TransportMission;
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -542,7 +543,8 @@ public final class TilePopup extends JPopupMenu {
             Player player = freeColClient.getMyPlayer();
             Player sPlayer = (Player) sGame.getFreeColGameObject(player.getId());
             Tile sTile = (Tile) sGame.getFreeColGameObject(tile.getId());
-            Unit sUnit = new Unit(sGame, sTile, sPlayer, unitChoice, UnitState.ACTIVE);
+            ServerUnit sUnit = new ServerUnit(sGame, sTile, sPlayer,
+                                              unitChoice, UnitState.ACTIVE);
             Unit unit = new Unit(game, sUnit.toXMLElement(Message.createNewDocument()));
             tile.add(unit);
             player.invalidateCanSeeTiles();

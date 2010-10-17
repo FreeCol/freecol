@@ -60,6 +60,9 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerIndianSettlement;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.RiverSection;
 
@@ -394,12 +397,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         nativePlayer.installSettlementNames(Messages.getSettlementNames(nativePlayer), null);
                         name = nativePlayer.getSettlementName();
                     }
-                    settlement = new IndianSettlement(t.getGame(), nativePlayer, t, name, false,
+                    settlement = new ServerIndianSettlement(t.getGame(), nativePlayer, name, t, false,
                                                       skill, new HashSet<Player>(), null);
                     t.setSettlement(settlement);
                     UnitType brave = getSpecification().getUnitType("model.unit.brave");
                     for (int index = 0; index < 5; index++) {
-                        settlement.add(new Unit(settlement.getGame(), settlement, settlement.getOwner(),
+                        settlement.add(new ServerUnit(settlement.getGame(), settlement, settlement.getOwner(),
                                                 brave, UnitState.ACTIVE));
                     }
                 }

@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.MockModelController;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -297,7 +298,8 @@ public class MapTest extends FreeColTestCase {
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
         Tile destinationTile = map.getTile(3,7);
-        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
+                                       colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
         
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
@@ -324,7 +326,8 @@ public class MapTest extends FreeColTestCase {
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
         Tile destinationTile = map.getTile(3,7);
-        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
+                                       colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
         
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
@@ -340,11 +343,13 @@ public class MapTest extends FreeColTestCase {
         //Setup
         Tile enemyUnitTile = map.getTile(2,1);
         Player frenchPlayer = game.getPlayer("model.nation.french");
-        new Unit(game, enemyUnitTile, frenchPlayer, pioneerType, UnitState.ACTIVE);
+        new ServerUnit(game, enemyUnitTile, frenchPlayer, pioneerType,
+                       UnitState.ACTIVE);
         
         Tile unitTile = map.getTile(1, 1);
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
-        Unit unit = new Unit(game, unitTile, dutchPlayer, pioneerType, UnitState.ACTIVE);
+        Unit unit = new ServerUnit(game, unitTile, dutchPlayer, pioneerType,
+                                   UnitState.ACTIVE);
         // unit is going somewhere else
         Tile unitDestination = map.getTile(3, 1);
         unit.setDestination(unitDestination);
@@ -369,13 +374,15 @@ public class MapTest extends FreeColTestCase {
         // set obstructing unit
         Tile unitObstructionTile = map.getTile(2,10);
         Player frenchPlayer = game.getPlayer("model.nation.french");
-        new Unit(game, unitObstructionTile, frenchPlayer, colonistType, UnitState.ACTIVE);
+        new ServerUnit(game, unitObstructionTile, frenchPlayer, colonistType,
+                       UnitState.ACTIVE);
         
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
         Tile destinationTile = map.getTile(3,7);
-        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
+                                       colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
         
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile, CostDeciders.avoidSettlementsAndBlockingUnits());
@@ -395,7 +402,8 @@ public class MapTest extends FreeColTestCase {
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
-        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
+                                       colonistType, UnitState.ACTIVE);
         Tile destinationTile = map.getTile(3,7);
         colonist.setDestination(destinationTile);
         
@@ -414,9 +422,10 @@ public class MapTest extends FreeColTestCase {
         UnitType galleonType = spec().getUnitType("model.unit.galleon");
         Tile unitTile = map.getTile(15, 5);
         Tile colonyTile = map.getTile(9, 9); // should be on coast
-        Unit galleon = new Unit(game, unitTile, dutchPlayer, galleonType,
-                                UnitState.ACTIVE);
-        Unit artillery = new Unit(game, galleon, dutchPlayer, artilleryType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, unitTile, dutchPlayer, galleonType,
+                                      UnitState.ACTIVE);
+        Unit artillery = new ServerUnit(game, galleon, dutchPlayer,
+                                        artilleryType, UnitState.ACTIVE);
         FreeColTestUtils.getColonyBuilder()
             .player(frenchPlayer)
             .colonyTile(colonyTile)

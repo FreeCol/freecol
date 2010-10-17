@@ -19,12 +19,15 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.Random;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
@@ -38,6 +41,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -46,43 +50,34 @@ import net.sf.freecol.util.test.MockMapGenerator;
 
 public class ServerPlayerTest extends FreeColTestCase {	
 
-    GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType cottonType
+        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType silverType
+        = spec().getGoodsType("model.goods.silver");
 
-    TileType plains = spec().getTileType("model.tile.plains");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
     
-    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
-    UnitType caravelType = spec().getUnitType("model.unit.caravel");
-    UnitType galleonType = spec().getUnitType("model.unit.galleon");
-    UnitType privateerType = spec().getUnitType("model.unit.privateer");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType wagonTrainType
+        = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType caravelType
+        = spec().getUnitType("model.unit.caravel");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType
+        = spec().getUnitType("model.unit.privateer");
 
-    FreeColServer server = null;
-	
+
+    @Override
     public void tearDown() throws Exception {
-        if(server != null){
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-            FreeCol.setInDebugMode(false);
-            FreeColTestCase.setGame(null);
-            server = null;
-        }
+        ServerTestHelper.stopServerGame();
         super.tearDown();
-    }
-
-    private Game startSPT() {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-        server.setMapGenerator(new MockMapGenerator(getTestMap()));
-        PreGameController pgc = (PreGameController) server.getController();
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-        return game;
     }
 
     /**
@@ -91,27 +86,26 @@ public class ServerPlayerTest extends FreeColTestCase {
      * test that selling reduces the price for other players.
      */
     public void testMarketRecovery() {
-        Game game = startSPT();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        InGameController igc = ServerTestHelper.getInGameController();
 
-        Player french = game.getPlayer("model.nation.french");
-        Player english = game.getPlayer("model.nation.english");
+        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer english = (ServerPlayer) game.getPlayer("model.nation.english");
         Market frenchMarket = french.getMarket();
         Market englishMarket = english.getMarket();
         int frenchGold = french.getGold();
-        Specification s = spec();
-        GoodsType silver = s.getGoodsType("model.goods.silver");
-        int silverPrice = silver.getInitialSellPrice();
+        int silverPrice = silverType.getInitialSellPrice();
 
         // Sell lightly in the English market to check that the good
         // is now considered "traded".
-        englishMarket.sell(silver, 1, english);
-        assertTrue(englishMarket.hasBeenTraded(silver));
+        english.csSell(null, silverType, 1, new Random(), new ChangeSet());
+        assertTrue(englishMarket.hasBeenTraded(silverType));
 
         // Sell heavily in the French market, price should drop.
-        frenchMarket.sell(silver, 200, french);
+        french.csSell(null, silverType, 200, new Random(), new ChangeSet());
         assertEquals(frenchGold + silverPrice * 200, french.getGold());
-        assertTrue(frenchMarket.hasBeenTraded(silver));
-        assertTrue(frenchMarket.getSalePrice(silver, 1) < silverPrice);
+        assertTrue(frenchMarket.hasBeenTraded(silverType));
+        assertTrue(frenchMarket.getSalePrice(silverType, 1) < silverPrice);
 
         // Price should have dropped in the English market too, but
         // not as much as for the French.
@@ -124,7 +118,6 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // Pretend time is passing.
         // Have to advance time as yearly goods removal is initially low.
-        InGameController igc = server.getInGameController();
         game.setTurn(new Turn(200));
         for (int i = 0; i < 100; i++) {
             igc.yearlyGoodsRemoval((ServerPlayer) french);
@@ -133,20 +126,19 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // Price should have recovered
         int newPrice;
-        newPrice = frenchMarket.getSalePrice(silver, 1);
+        newPrice = frenchMarket.getSalePrice(silverType, 1);
         assertTrue("French silver price " + newPrice
                    + " should have recovered to " + silverPrice,
                    newPrice >= silverPrice);
-        newPrice = englishMarket.getSalePrice(silver, 1);
+        newPrice = englishMarket.getSalePrice(silverType, 1);
         assertTrue("English silver price " + newPrice
                    + " should have recovered to " + silverPrice,
                    newPrice >= silverPrice);
     }
 
     public void testHasExploredTile() {
-        // we need to update the reference
-        Game game = startSPT();
-        Map map = game.getMap();
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
         
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
@@ -157,8 +149,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertFalse("Setup error, tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertFalse("Setup error, tile2 should not be explored by french player",french.hasExplored(tile2));
 
-        new Unit(game, tile1, dutch, colonistType, UnitState.SENTRY);
-        new Unit(game, tile2, french, colonistType, UnitState.SENTRY);
+        new ServerUnit(game, tile1, dutch, colonistType, UnitState.SENTRY);
+        new ServerUnit(game, tile2, french, colonistType, UnitState.SENTRY);
         assertTrue("Tile1 should be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Tile1 should not be explored by french player",french.hasExplored(tile1));
         assertFalse("Tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
@@ -166,16 +158,17 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testLoadInColony() {
-        Game game = startSPT();
-        Map map = game.getMap();
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
         
         Colony colony = getStandardColony();
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Unit wagonInColony = new Unit(game, colony.getTile(), dutch,
-                                      wagonTrainType, UnitState.ACTIVE);
-        Unit wagonNotInColony = new Unit(game, map.getTile(10, 10), dutch,
-                                         wagonTrainType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit wagonInColony = new ServerUnit(game, colony.getTile(), dutch,
+                                            wagonTrainType, UnitState.ACTIVE);
+        Unit wagonNotInColony = new ServerUnit(game, map.getTile(10, 10), dutch,
+                                               wagonTrainType,
+                                               UnitState.ACTIVE);
         Goods cotton = new Goods(game, null, cottonType, 75);
 
         // Check if location null
@@ -225,16 +218,16 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testLoadInEurope() {
-        Game game = startSPT();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Goods cotton = new Goods(game, null, cottonType, 75);
         Europe europe = dutch.getEurope();
-        Unit privateer1 = new Unit(game, europe, dutch,
-                                   privateerType, UnitState.ACTIVE);
-        Unit privateer2 = new Unit(game, europe, dutch,
-                                   privateerType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit privateer1 = new ServerUnit(game, europe, dutch,
+                                         privateerType, UnitState.ACTIVE);
+        Unit privateer2 = new ServerUnit(game, europe, dutch,
+                                         privateerType, UnitState.ACTIVE);
 
         // While source in Europe, target in Europe
         cotton.setLocation(privateer1);
@@ -326,7 +319,7 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckGameOverNoUnits() {
-        Game game = startSPT();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
@@ -335,7 +328,7 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckNoGameOverEnoughMoney() {
-        Game game = startSPT();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
@@ -345,28 +338,27 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckNoGameOverHasColonistInNewWorld() {
-        Game game = startSPT();
         Map map = getTestMap();
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(map);
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        new Unit(game, map.getTile(4, 7), dutch, colonistType, UnitState.ACTIVE);
+        new ServerUnit(game, map.getTile(4, 7), dutch, colonistType, UnitState.ACTIVE);
 
         assertFalse("Should not be game over, has units",
                     dutch.checkForDeath());
     }
 
     public void testCheckGameOver1600Threshold() {
-        Game game = startSPT();
         Map map = getTestMap();
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(map);
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        UnitType galleon = spec().getUnitType("model.unit.galleon");
-        new Unit(game, dutch.getEurope(), dutch, colonistType, UnitState.SENTRY);
-        new Unit(game, dutch.getEurope(), dutch, galleon, UnitState.SENTRY);
+        new ServerUnit(game, dutch.getEurope(), dutch, colonistType,
+                       UnitState.SENTRY);
+        new ServerUnit(game, dutch.getEurope(), dutch, galleonType,
+                       UnitState.SENTRY);
         assertFalse("Should not be game over, not 1600 yet",
                     dutch.checkForDeath());
 
@@ -376,18 +368,20 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckGameOverUnitsGoingToEurope() {
-        Game game = startSPT();
         Map map = getTestMap(spec().getTileType("model.tile.highSeas"));
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game,map.getTile(6, 8) , dutch, galleonType, UnitState.ACTIVE);
-        Unit colonist = new Unit(game, galleon, dutch, colonistType, UnitState.SENTRY);
-        assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
-        assertEquals("Galleon should have a colonist onboard",1,galleon.getUnitCount());
-        InGameController igc = (InGameController) server.getController();
+        Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch,
+                                      galleonType, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType,
+                                       UnitState.SENTRY);
+        assertTrue("Colonist should be aboard the galleon",
+                   colonist.getLocation() == galleon);
+        assertEquals("Galleon should have a colonist onboard",
+                     1, galleon.getUnitCount());
         igc.moveToEurope(dutch, galleon);
 
         assertFalse("Should not be game over, units between new world and europe",
@@ -399,17 +393,16 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckGameOverUnitsGoingToNewWorld() {
-        Game game = startSPT();
         Map map = getTestMap();
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        Unit galleon = new Unit(game,dutch.getEurope() , dutch, galleonType, UnitState.ACTIVE);
-        Unit colonist = new Unit(game, galleon, dutch, colonistType, UnitState.SENTRY);
+        Unit galleon = new ServerUnit(game,dutch.getEurope() , dutch, galleonType, UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType, UnitState.SENTRY);
         assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
         assertEquals("Galleon should have a colonist onboard",1,galleon.getUnitCount());
-        InGameController igc = (InGameController) server.getController();
         igc.moveToAmerica(dutch, galleon);
 
         assertFalse("Should not be game over, units between new world and europe",
@@ -420,4 +413,116 @@ public class ServerPlayerTest extends FreeColTestCase {
                    dutch.checkForDeath());
     }
 
+    public void testSellingMakesPricesFall() {
+        Game g = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerPlayer p = (ServerPlayer) g.getPlayer("model.nation.dutch");
+        Market dm = p.getMarket();
+        int previousGold = p.getGold();
+        int price = silverType.getInitialSellPrice();
+
+        p.csSell(null, silverType, 1000, new Random(), new ChangeSet());
+
+        assertEquals(previousGold + price * 1000, p.getGold());
+        assertTrue(dm.getSalePrice(silverType, 1) < price);
+    }
+
+    public void testBuyingMakesPricesRaise() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Market dm = player.getMarket();
+        player.modifyGold(1000000);
+        int price = foodType.getInitialBuyPrice();
+        player.csBuy(new GoodsContainer(game, player.getEurope()), foodType,
+                     10000, new Random(), new ChangeSet());
+
+        assertEquals(1000000 - 10000 * price, player.getGold());
+        assertTrue(dm.getBidPrice(foodType, 1) > price);
+    }
+
+    /**
+     * Helper Method for finding out how much of a good to sell until the price drops.
+     */
+    public int sellUntilPriceDrop(Game game, ServerPlayer player,
+                                  GoodsType type) {
+        Random random = new Random();
+        ChangeSet cs = new ChangeSet();
+
+        int result = 0;
+
+        Market market = player.getMarket();
+
+        int price = market.getSalePrice(type, 1);
+
+        if (price == 0)
+            throw new IllegalArgumentException("Price is already 0 for selling " + type);
+
+        while (price == market.getSalePrice(type, 1)){
+            player.csSell(null, type, 10, random, cs);
+            result++;
+        }
+        return result;
+    }
+
+    /*
+     * Helper method for finding out how much to buy of a good before the prices
+     * rises.
+     */
+    public int buyUntilPriceRise(Game game, ServerPlayer player,
+                                 GoodsType type) {
+        Game g = ServerTestHelper.startServerGame(getTestMap());
+        Random random = new Random();
+        ChangeSet cs = new ChangeSet();
+
+        int result = 0;
+
+        Market market = player.getMarket();
+
+        int price = market.getBidPrice(type, 1);
+
+        if (price == 20)
+            throw new IllegalArgumentException("Price is already 20 for buying " + type);
+
+        GoodsContainer container = new GoodsContainer(game, player.getEurope());
+        while (price == market.getBidPrice(type, 1)) {
+            player.csBuy(container, type, 10, random, cs);
+            result++;
+        }
+        return result;
+    }
+
+    /**
+     * Assert that the dutch nation has more stable prices than the other
+     * nations
+     */
+    public void testDutchMarket() {
+
+        Game game = getStandardGame();
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        assertEquals("model.nationType.trade", dutch.getNationType().getId());
+        assertFalse(dutch.getNationType().getFeatureContainer()
+                    .getModifierSet("model.modifier.tradeBonus").isEmpty());
+        assertFalse(dutch.getFeatureContainer().getModifierSet("model.modifier.tradeBonus").isEmpty());
+
+        {// Test that the dutch can sell more goods until the price drops
+            int dutchSellAmount = sellUntilPriceDrop(game, dutch, silverType);
+
+            Game g2 = getStandardGame();
+            ServerPlayer french2 = (ServerPlayer) g2.getPlayer("model.nation.french");
+            int frenchSellAmount = sellUntilPriceDrop(g2, french2, silverType);
+
+            assertTrue(dutchSellAmount > frenchSellAmount);
+        }
+        {// Test that the dutch can buy more goods until the price rises
+            dutch.modifyGold(10000);
+            french.modifyGold(10000);
+            int dutchBuyAmount = buyUntilPriceRise(getStandardGame(), dutch, musketsType);
+
+            int frenchBuyAmount = buyUntilPriceRise(getStandardGame(), french, musketsType);
+
+            assertTrue(dutchBuyAmount > frenchBuyAmount);
+        }
+    }
 }

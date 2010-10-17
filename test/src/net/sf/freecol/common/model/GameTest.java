@@ -28,8 +28,10 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
+
 
 public class GameTest extends FreeColTestCase {
 
@@ -39,7 +41,9 @@ public class GameTest extends FreeColTestCase {
         game.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
         game.setMap(getTestMap());
 
-        game.addPlayer(new Player(game, "TestPlayer", false, spec().getNation("model.nation.dutch")));
+        game.addPlayer(new ServerPlayer(game, "TestPlayer", false,
+                                        spec().getNation("model.nation.dutch"),
+                                        null, null));
 
         // map tiles are null
         //game.newTurn();
@@ -58,12 +62,9 @@ public class GameTest extends FreeColTestCase {
             if (defaultOptions.getNationState(n) == NationOptions.NationState.NOT_AVAILABLE) {
                 counter++;
             } else {
-                Player p;
-                if (n.getType().isEuropean() && !n.getType().isREF()) {
-                    p = new Player(game, n.getType().getNameKey(), false, n);
-                } else {
-                    p = new Player(game, n.getType().getNameKey(), false, true, n);
-                }
+                Player p = new ServerPlayer(game, n.getType().getNameKey(),
+                                            false, n, null, null);
+                p.setAI(!n.getType().isEuropean() || n.getType().isREF());
                 game.addPlayer(p);
                 players.add(p);
             }

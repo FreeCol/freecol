@@ -36,37 +36,42 @@ import org.w3c.dom.Element;
 /**
  * Represents a building in a colony.
  */
-public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named,
-                                                                 Comparable<Building> {
+public class Building extends FreeColGameObject
+    implements WorkLocation, Ownable, Named, Comparable<Building> {
 
     private static Logger logger = Logger.getLogger(Building.class.getName());
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
     /** The colony containing this building. */
-    private Colony colony;
+    protected Colony colony;
+
+    /** The type of building. */
+    protected BuildingType buildingType;
 
     /**
      * List of the units which have this <code>Building</code> as it's
      * {@link Unit#getLocation() location}.
      */
-    private List<Unit> units = Collections.emptyList();
-
-    private BuildingType buildingType;
+    private final List<Unit> units = new ArrayList<Unit>();
 
 
     /**
-     * Creates a new <code>Building</code>.
+     * Constructor for ServerBuilding.
+     */
+    protected Building() {
+        // empty constructor
+    }
+
+    /**
+     * Constructor for ServerBuilding.
      *
      * @param game The <code>Game</code> this object belongs to.
      * @param colony The colony in which this building is located.
      * @param type The type of building.
      */
-    public Building(Game game, Colony colony, BuildingType type) {
+    protected Building(Game game) {
         super(game);
-
-        this.colony = colony;
-        this.buildingType = type;
     }
 
     /**
@@ -349,9 +354,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (units.contains(locatable)) return;
 
         final Unit unit = (Unit) locatable;
-        if (units.equals(Collections.emptyList())) {
-            units = new ArrayList<Unit>();
-        }
         units.add(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
 
@@ -456,151 +458,39 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Prepares this <code>Building</code> for a new turn.
+     * Find a student for the specified teacher.
+     * Do not search if ALLOW_STUDENT_SELECTION is true--- its the player's
+     * job then.
+     *
+     * @param teacher The teacher <code>Unit</code> that needs a student.
+     * @return A potential student, or null of none found.
      */
-    public void newTurn() {
-        if (buildingType.hasAbility("model.ability.teach")) {
-            trainStudents();
-        }
-        if (buildingType.hasAbility("model.ability.repairUnits")) {
-            repairUnits();
-        }
-        if (getGoodsOutputType() != null) {
-            produceGoods();
-        }
-    }
-
-    // Repair any damaged units:
-    private void repairUnits() {
-        for (Unit unit : getTile().getUnitList()) {
-            if (unit.isUnderRepair() &&
-                buildingType.hasAbility("model.ability.repairUnits", unit.getType())) {
-                unit.setHitpoints(unit.getHitpoints() + 1);
-                if (!unit.isUnderRepair()) {
-                    getOwner().addModelMessage(new ModelMessage("model.unit.unitRepaired",
-                                                                this)
-                                    .addStringTemplate("%unit%", unit.getLabel())
-                                    .addStringTemplate("%repairLocation%", getLocationNameFor(getOwner())));
-                }
-            }
-        }
-    }
-
-    private void produceGoods() {
-        final int goodsInput = getGoodsInput();
-        final int goodsOutput = getProduction();
-        final GoodsType goodsInputType = getGoodsInputType();
-        final GoodsType goodsOutputType = getGoodsOutputType();
-
-        if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
-            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                                        "model.building.notEnoughInput",
-                                                        getColony(), goodsInputType)
-                            .add("%inputGoods%", goodsInputType.getNameKey())
-                            .add("%building%", getNameKey())
-                            .addName("%colony%", colony.getName()));
-        }
-
-        if (goodsOutput <= 0) {
-            return;
-        }
-
-        // Do nothing if:
-        //  - produces building material that is not storable
-        // and
-        //  -for some reason the colony is not building nothing that turn
-        if (goodsOutputType.isBuildingMaterial()
-                && !goodsOutputType.isStorable()
-                && !getColony().canBuild()){
-            return;
-        }
-
-        // Actually produce the goods:
-        if (goodsInputType != null) {
-            colony.removeGoods(goodsInputType, goodsInput);
-        }
-        colony.addGoods(goodsOutputType, goodsOutput);
-
-        if (getUnitCount() > 0) {
-            final int experience = goodsOutput / getUnitCount();
-            for (Unit unit : getUnitList()) {
-                unit.modifyExperience(experience);
-            }
-        }
-    }
-
     public Unit findStudent(final Unit teacher) {
+        if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)){
+            return null; // Do not automatically assign students.
+        }
         Unit student = null;
         GoodsType expertProduction = teacher.getType().getExpertProduction();
-        boolean leastSkilled = !getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
-        int skill = leastSkilled ? INFINITY : UNDEFINED;
+        int skillLevel = INFINITY;
         for (Unit potentialStudent : getColony().getUnitList()) {
             /**
-             * If two potential students have the same skill level,
-             * select the one working in the teacher's trade. If not,
-             * select the one with the lower skill level if the option
-             * "educateLeastSkilledUnitFirst" is set, the one with the
-             * higher level otherwise.
+             * Always pick the student with the least skill first.
+             * Break ties by favouring the one working in the teacher's trade,
+             * otherwise first applicant wins.
              */
-            if (potentialStudent.getTeacher() == null &&
-                potentialStudent.canBeStudent(teacher)) {
-                if ((student == null || potentialStudent.getSkillLevel() == skill) &&
-                    potentialStudent.getWorkType() == expertProduction) {
+            if (potentialStudent.getTeacher() == null
+                && potentialStudent.canBeStudent(teacher)) {
+                if (student == null
+                    || potentialStudent.getSkillLevel() < skillLevel
+                    || (potentialStudent.getSkillLevel() == skillLevel
+                        && potentialStudent.getWorkType() == expertProduction)){
                     student = potentialStudent;
-                } else if (leastSkilled && potentialStudent.getSkillLevel() < skill ||
-                           !leastSkilled && potentialStudent.getSkillLevel() > skill) {
-                    student = potentialStudent;
-                    skill = student.getSkillLevel();
+                    skillLevel = student.getSkillLevel();
                 }
             }
         }
         return student;
     }
-
-    private boolean assignStudent(Unit teacher) {
-        final Unit student = findStudent(teacher);
-        if (student == null) {
-            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                        "model.building.noStudent",
-                                                        getColony(), teacher)
-                            .addStringTemplate("%teacher%", teacher.getLabel())
-                            .addName("%colony%", colony.getName()));
-            return false;
-        } else {
-            teacher.setStudent(student);
-            student.setTeacher(teacher);
-            return true;
-        }
-    }
-
-    private void trainStudents() {
-        final Iterator<Unit> teachers = getUnitIterator();
-        while (teachers.hasNext()) {
-            final Unit teacher = teachers.next();
-
-            //Sanitation, make sure we have the proper teacher/student relation
-            if (teacher.getStudent() != null && teacher.getStudent().getTeacher() != teacher){
-            	logger.warning("Teacher assigned to student who does not know teacher");
-            	teacher.setStudent(null);
-            }
-
-            // student may have changed
-            if (teacher.getStudent() == null && !assignStudent(teacher)) {
-                continue;
-            }
-            final int training = teacher.getTurnsOfTraining() + 1;
-            if (training < teacher.getNeededTurnsOfTraining()) {
-                teacher.setTurnsOfTraining(training);
-            } else {
-                teacher.setTurnsOfTraining(0);
-                teacher.getStudent().train();
-                if (teacher.getStudent() == null) {
-                    assignStudent(teacher);
-                }
-            }
-        }
-    }
-
 
     /**
      * Returns the type of goods this <code>Building</code> produces.
@@ -1071,12 +961,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             Unit unit = updateFreeColGameObject(in, Unit.class);
-            if (!units.contains(unit)) {
-                if (units.equals(Collections.emptyList())) {
-                    units = new ArrayList<Unit>();
-                }
-                units.add(unit);
-            }
+            if (!units.contains(unit)) units.add(unit);
         }
     }
 

@@ -421,20 +421,24 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handles a "newTurn"-message.
      * 
-     * @param newTurnElement The element (root element in a DOM-parsed XML tree)
+     * @param element The element (root element in a DOM-parsed XML tree)
      *            that holds all the information.
      */
-    private Element newTurn(Element newTurnElement) {
-        // getGame().newTurn();
-        getGame().setTurn(getGame().getTurn().next());
-        getFreeColClient().getMyPlayer().newTurn();
-        new UpdateMenuBarSwingTask().invokeLater();
-
-        // Show info message for change to two turns per year
-        Turn currTurn = getGame().getTurn();
-        if (currTurn.getYear() == 1600 && Turn.getYear(currTurn.getNumber() - 1) == 1599) {
+    private Element newTurn(Element element) {
+        Game game = getGame();
+        String turnString = element.getAttribute("turn");
+        try {
+            int turnNumber = Integer.parseInt(turnString);
+            game.setTurn(new Turn(turnNumber));
+        } catch (NumberFormatException e) {
+            logger.warning("Bad turn in newTurn: " + turnString);
+        }
+        Turn currTurn = game.getTurn();
+        if (currTurn.getYear() == 1600
+            && Turn.getYear(currTurn.getNumber() - 1) == 1599) {
             new ShowInformationMessageSwingTask("twoTurnsPerYear").invokeLater();
         }
+        new UpdateMenuBarSwingTask().invokeLater();
         return null;
     }
 

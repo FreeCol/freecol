@@ -40,12 +40,16 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
+
 
 public class MapGeneratorTest extends FreeColTestCase {
 
     public void testWithNoIndians() {
+        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
@@ -57,7 +61,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         for (Nation n : spec().getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
-                g.addPlayer(new Player(g, n.getType().getNameKey(), false, n));
+                g.addPlayer(new ServerPlayer(g, n.getType().getNameKey(), false, n, null, null));
             }
         }
 
@@ -72,6 +76,8 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testSinglePlayerOnSmallMap() {
+        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
@@ -82,7 +88,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
         Nation nation = spec().getNation("model.nation.dutch");
 
-        g.addPlayer(new Player(g, nation.getType().getNameKey(), false, nation));
+        g.addPlayer(new ServerPlayer(g, nation.getType().getNameKey(), false, nation, null, null));
 
         try {
             gen.createMap(g);
@@ -101,6 +107,8 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testMapGenerator() {
+        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
 
@@ -116,12 +124,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         Vector<Player> players = new Vector<Player>();
 
         for (Nation n : spec().getNations()) {
-            Player p;
-            if (n.getType().isEuropean() && !n.getType().isREF()){
-                p = new Player(g, n.getType().getNameKey(), false, n);
-            } else {
-                p = new Player(g, n.getType().getNameKey(), false, true, n);
-            }
+            Player p = new ServerPlayer(g, n.getType().getNameKey(), false, n,
+                                        null, null);
+            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
             g.addPlayer(p);
             players.add(p);
         }
@@ -168,6 +173,8 @@ public class MapGeneratorTest extends FreeColTestCase {
      * 
      */
     public void testIndianCapital() {
+        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
@@ -177,12 +184,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         Vector<Player> players = new Vector<Player>();
 
         for (Nation n : spec().getNations()) {
-            Player p;
-            if (n.getType().isEuropean() && !n.getType().isREF()){
-                p = new Player(g, n.getType().getNameKey(), false, n);
-            } else {
-                p = new Player(g, n.getType().getNameKey(), false, true, n);
-            }
+            Player p = new ServerPlayer(g, n.getType().getNameKey(), false, n,
+                                        null, null);
+            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
             g.addPlayer(p);
             players.add(p);
         }

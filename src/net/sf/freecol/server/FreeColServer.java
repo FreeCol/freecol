@@ -30,6 +30,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.Class;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +60,10 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -90,13 +97,20 @@ import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
 import net.sf.freecol.server.generator.TerrainGenerator;
+import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerColonyTile;
+import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Element;
+
 
 /**
  * The main control class for the FreeCol server. This class both starts and
@@ -342,10 +356,10 @@ public final class FreeColServer {
             }
             if (navalUnits.size() > 0) {
                 UnitType navalType = navalUnits.get(random.nextInt(navalUnits.size()));
-                Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, navalType, UnitState.ACTIVE);
+                Unit theFlyingDutchman = new ServerUnit(game, p.getEntryLocation(), p, navalType, UnitState.ACTIVE);
                 if (landUnits.size() > 0) {
                     UnitType landType = landUnits.get(random.nextInt(landUnits.size()));
-                    new Unit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
+                    new ServerUnit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
                 }
                 p.setDead(false);
                 p.setPlayerType(PlayerType.UNDEAD);
@@ -693,15 +707,20 @@ public final class FreeColServer {
                 }
             }
             final String owner = xsr.getAttributeValue(null, "owner");
-            ArrayList<String> serverObjects = null;
+            ArrayList<String> serverStrings = null;
             aiMain = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("serverObjects")) {
-                    serverObjects = new ArrayList<String>();
+                    serverStrings = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        serverObjects.add(xsr.getLocalName());
-                        serverObjects.add(xsr.getAttributeValue(null, "ID"));
+                        serverStrings.add(xsr.getLocalName());
+                        serverStrings.add(xsr.getAttributeValue(null, "ID"));
                         xsr.nextTag();
+                    }
+                    if (savegameVersion < 11) {
+                        // version 11 is new in 0.10.0, remove this hack
+                        // in 0.11.0.
+                        v11FixServerObjects(serverStrings, fis);
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
@@ -711,7 +730,7 @@ public final class FreeColServer {
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
                     game = new ServerGame(null, getModelController(), xsr,
-                                          serverObjects, specification);
+                                          serverStrings, specification);
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
@@ -813,6 +832,66 @@ public final class FreeColServer {
             throw new FreeColException("incompatibleVersions");
         }
         return savegameVersion;
+    }
+
+
+    /**
+     * At savegame version 11 (new in 0.10.0) several classes were
+     * added to serverObjects.  Evil hack here to scan the game for
+     * objects in pre-v11 games that should now be in serverObjects,
+     * and put them in.
+     * Remove this hack in 0.11.0, unless of course, we do it again.
+     *
+     * @param serverStrings A list of server object {type, id} pairs to add to.
+     * @param fis The savegame to scan.
+     */
+    private static void v11FixServerObjects(List<String> serverStrings,
+                                            final FreeColSavegameFile fis) {
+        XMLStream xs = null;
+        try {
+            xs = createXMLStreamReader(fis);
+            final XMLStreamReader xsr = xs.getXMLStreamReader();
+            xsr.nextTag();
+            final String owner = xsr.getAttributeValue(null, "owner");
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
+                    Game game = new ServerGame(null, null, xsr,
+                            new ArrayList<String>(serverStrings),
+                            new FreeColTcFile("freecol").getSpecification());
+                    Iterator<FreeColGameObject> objs
+                        = game.getFreeColGameObjectIterator();
+                    while (objs.hasNext()) {
+                        FreeColGameObject fcgo = objs.next();
+                        if (serverStrings.contains(fcgo.getId())) {
+                            continue;
+                        } else if (fcgo instanceof Europe) {
+                            serverStrings.add("serverEurope");
+                        } else if (fcgo instanceof Colony) {
+                            serverStrings.add("serverColony");
+                        } else if (fcgo instanceof Building) {
+                            serverStrings.add("serverBuilding");
+                        } else if (fcgo instanceof ColonyTile) {
+                            serverStrings.add("serverColonyTile");
+                        } else if (fcgo instanceof IndianSettlement) {
+                            serverStrings.add("serverIndianSettlement");
+                        } else if (fcgo instanceof Unit) {
+                            serverStrings.add("serverUnit");
+                        } else {
+                            continue;
+                        }
+                        serverStrings.add(fcgo.getId());
+                    }
+                    break;
+                }
+                while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    xsr.nextTag();
+                }
+            }
+        } catch (Exception e) {
+            ;
+        } finally {
+            if (xs != null) xs.close();
+        }
     }
 
     /**
@@ -1145,9 +1224,9 @@ public final class FreeColServer {
         String name = nation.getRulerNameKey();
         DummyConnection theConnection =
             new DummyConnection("Server connection - " + name, getInGameInputHandler());
-        ServerPlayer aiPlayer =
-            new ServerPlayer(getGame(), name, false, nation,
-                             null, theConnection);
+        ServerPlayer aiPlayer
+            = new ServerPlayer(getGame(), name, false, nation,
+                               null, theConnection);
         aiPlayer.setAI(true);
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + name,

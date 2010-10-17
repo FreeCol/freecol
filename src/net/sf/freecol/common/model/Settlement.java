@@ -43,13 +43,15 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName()); 
     
+    public static final int FOOD_PER_COLONIST = 200;
+
     public static enum SettlementType {
         SMALL_COLONY, MEDIUM_COLONY, LARGE_COLONY, 
-            SMALL_STOCKADE,
-            MEDIUM_STOCKADE, MEDIUM_FORT,
-            LARGE_STOCKADE, LARGE_FORT, LARGE_FORTRESS, 
-            UNDEAD, 
-            INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY }
+        SMALL_STOCKADE, MEDIUM_STOCKADE, MEDIUM_FORT,
+        LARGE_STOCKADE, LARGE_FORT, LARGE_FORTRESS,
+        UNDEAD,
+        INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
+    }
 
     // TODO: remove this -- requires AI to calculate actual consumption
     public static final int FOOD_CONSUMPTION = 2;
@@ -75,6 +77,13 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     private FeatureContainer featureContainer;
 
+
+    /**
+     * Empty constructor needed for Colony -> ServerColony.
+     */
+    protected Settlement() {
+        // empty constructor
+    }
 
     /**
      * Creates a new <code>Settlement</code>.
@@ -495,7 +504,10 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         }
     }
 
-    public abstract void newTurn();
+    /**
+     * Gets the current Sons of Liberty in this settlement.
+     */
+    public abstract int getSoL();
 
     /**
      * Propagates a global change in tension down to a settlement.

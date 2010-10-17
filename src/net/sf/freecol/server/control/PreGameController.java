@@ -106,8 +106,8 @@ public final class PreGameController extends Controller {
         game.setFreeColGameObjectListener(aiMain);
 
         // Add AI players
-        game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
-
+        game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
+                                              false, null, null, null));
         Set<Entry<Nation, NationState>> entries =
             new HashSet<Entry<Nation, NationState>>(game.getNationOptions().getNations().entrySet());
         for (Entry<Nation, NationState> entry : entries) {

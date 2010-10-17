@@ -37,48 +37,37 @@ import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class ContactTest extends FreeColTestCase {
 
-    TileType plains = spec().getTileType("model.tile.plains");
-    TileType ocean = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
+    private static final TileType ocean
+        = spec().getTileType("model.tile.ocean");
 
-    UnitType galleonType = spec().getUnitType("model.unit.galleon");
-    UnitType braveType = spec().getUnitType("model.unit.brave");
-    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType braveType
+        = spec().getUnitType("model.unit.brave");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
 
-    FreeColServer server = null;
 
-
+    @Override
     public void tearDown() throws Exception {
-        if (server != null) {
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-            FreeCol.setInDebugMode(false);
-            FreeColTestCase.setGame(null);
-            server = null;
-        }
+        ServerTestHelper.stopServerGame();
         super.tearDown();
     }
 
+
     public void testEuropeanMeetsEuropean() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
@@ -96,9 +85,8 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(french));
 
         @SuppressWarnings("unused")
-        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
-        Unit soldier = new Unit(game, tile3, french, colonistType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
+        Unit soldier = new ServerUnit(game, tile3, french, colonistType, UnitState.ACTIVE);
         igc.move(french, soldier, tile2);
 
         assertTrue(french.hasContacted(dutch));
@@ -108,20 +96,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testEuropeanMeetsNative() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
@@ -138,11 +115,12 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(iroquois.hasContacted(dutch));
         assertFalse(dutch.hasContacted(iroquois));
 
-        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
+                                       UnitState.FORTIFIED);
         @SuppressWarnings("unused")
-        Unit soldier = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
+        Unit soldier = new ServerUnit(game, tile3, iroquois, braveType,
+                                      UnitState.ACTIVE);
 
-        InGameController igc = (InGameController) server.getController();
         igc.move(dutch, colonist, tile2);
 
         assertTrue(iroquois.hasContacted(dutch));
@@ -154,20 +132,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testEuropeanMeetsColony() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
@@ -186,8 +153,8 @@ public class ContactTest extends FreeColTestCase {
 
         @SuppressWarnings("unused")
         Colony colony = getStandardColony(1, 5, 8);
-        Unit soldier = new Unit(game, tile3, french, colonistType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit soldier = new ServerUnit(game, tile3, french, colonistType,
+                                      UnitState.ACTIVE);
         igc.move(french, soldier, tile2);
 
         assertTrue(french.hasContacted(dutch));
@@ -197,20 +164,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testEuropeanMeetsIndianSettlement() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
@@ -229,8 +185,8 @@ public class ContactTest extends FreeColTestCase {
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement settlement = builder.player(iroquois).settlementTile(tile3).skillToTeach(null).build();
-        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
-        InGameController igc = (InGameController) server.getController();
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
+                                       UnitState.FORTIFIED);
         igc.move(dutch, colonist, tile2);
 
         assertTrue(iroquois.hasContacted(dutch));
@@ -243,20 +199,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsEuropean() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
@@ -273,10 +218,11 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(french.hasContacted(apache));
         assertFalse(apache.hasContacted(french));
 
-        Unit brave = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
+        Unit brave = new ServerUnit(game, tile1, apache, braveType,
+                                    UnitState.FORTIFIED);
         @SuppressWarnings("unused")
-        Unit colonist = new Unit(game, tile3, french, colonistType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit colonist = new ServerUnit(game, tile3, french, colonistType,
+                                       UnitState.ACTIVE);
         igc.move(apache, brave, tile2);
 
         assertTrue(french.hasContacted(apache));
@@ -286,20 +232,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsNative() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
@@ -316,10 +251,11 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(iroquois.hasContacted(apache));
         assertFalse(apache.hasContacted(iroquois));
 
-        Unit brave1 = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
+        Unit brave1 = new ServerUnit(game, tile1, apache, braveType,
+                                     UnitState.FORTIFIED);
         @SuppressWarnings("unused")
-        Unit brave2 = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit brave2 = new ServerUnit(game, tile3, iroquois, braveType,
+                                     UnitState.ACTIVE);
         igc.move(apache, brave1, tile2);
 
         assertTrue(iroquois.hasContacted(apache));
@@ -332,20 +268,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsColony() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
@@ -364,8 +289,8 @@ public class ContactTest extends FreeColTestCase {
 
         @SuppressWarnings("unused")
         Colony colony = getStandardColony(1, 5, 8);
-        Unit brave = new Unit(game, tile3, apache, braveType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit brave = new ServerUnit(game, tile3, apache, braveType,
+                                    UnitState.ACTIVE);
         igc.move(apache, brave, tile2);
 
         assertTrue(dutch.hasContacted(apache));
@@ -375,20 +300,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsIndianSettlement() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
@@ -408,8 +322,8 @@ public class ContactTest extends FreeColTestCase {
         // build settlement
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         builder.player(iroquois).settlementTile(tile3).skillToTeach(null).build();
-        Unit brave = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
-        InGameController igc = (InGameController) server.getController();
+        Unit brave = new ServerUnit(game, tile1, apache, braveType,
+                                    UnitState.FORTIFIED);
         igc.move(apache, brave, tile2);
 
         assertTrue(iroquois.hasContacted(apache));
@@ -423,21 +337,9 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testShipMeetsShip() throws Exception {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
         Map map = getTestMap(ocean);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
@@ -454,10 +356,11 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
 
-        Unit ship1 = new Unit(game, tile1, dutch, galleonType, UnitState.FORTIFIED);
+        Unit ship1 = new ServerUnit(game, tile1, dutch, galleonType,
+                                    UnitState.FORTIFIED);
         @SuppressWarnings("unused")
-        Unit ship2 = new Unit(game, tile3, french, galleonType, UnitState.ACTIVE);
-        InGameController igc = (InGameController) server.getController();
+        Unit ship2 = new ServerUnit(game, tile3, french, galleonType,
+                                    UnitState.ACTIVE);
         igc.move(dutch, ship1, tile2);
 
         assertFalse(french.hasContacted(dutch));

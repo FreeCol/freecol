@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
  * <p/> Europe is the place where you can {@link #recruit} and {@link #train}
  * new units. You may also sell/buy goods.
  */
-public final class Europe extends FreeColGameObject implements Location, Ownable, Named {
+public class Europe extends FreeColGameObject implements Location, Ownable, Named {
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
@@ -62,7 +62,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     private UnitType[] recruitables = { null, null, null };
     public static final int RECRUIT_COUNT = 3;
 
-    private java.util.Map<UnitType, Integer> unitPrices = new HashMap<UnitType, Integer>();
+    protected java.util.Map<UnitType, Integer> unitPrices
+        = new HashMap<UnitType, Integer>();
 
     private int recruitPrice;
 
@@ -77,13 +78,20 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
 
     /**
-     * Creates a new <code>Europe</code>.
+     * Constructor for ServerEurope.
+     */
+    protected Europe() {
+        // empty constructor
+    }
+
+    /**
+     * Constructor for ServerEurope.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param owner The <code>Player</code> that will be using this object of
      *            <code>Europe</code>.
      */
-    public Europe(Game game, Player owner) {
+    protected Europe(Game game, Player owner) {
         super(game);
         this.owner = owner;
 
@@ -376,28 +384,6 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
-     * Increases the price for a unit.
-     *
-     * @param unitType The <code>UnitType</code>, trained or purchased
-     * @param price The current price of the unit
-     */
-    public void increasePrice(UnitType unitType, int price) {
-        Specification spec = getSpecification();
-        String baseOption = "model.option.priceIncreasePerType";
-        String name
-            = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
-        String option = (spec.getBooleanOption(baseOption).getValue())
-            ? "model.option.priceIncrease" + name
-            : "model.option.priceIncrease";
-        int increase = (spec.hasOption(option))
-            ? spec.getIntegerOption(option).getValue()
-            : 0;
-        if (increase != 0) {
-            unitPrices.put(unitType, new Integer(price + increase));
-        }
-    }
-
-    /**
      * Gets the current price for a recruit.
      *
      * @return The current price of the recruit in this <code>Europe</code>.
@@ -435,25 +421,6 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Prepares this object for a new turn. TODO: give Europe a shipyard and
-     * remove this
-     */
-    public void newTurn() {
-        // Repair any damaged ships:
-        for (Unit unit : getUnitList()) {
-            if (unit.isNaval() && unit.isUnderRepair()) {
-                unit.setHitpoints(unit.getHitpoints() + 1);
-                if (!unit.isUnderRepair()) {
-                    getOwner().addModelMessage(new ModelMessage("model.unit.shipRepaired",
-                                                                this, unit)
-                                    .addStringTemplate("%unit%", unit.getLabel())
-                                    .addStringTemplate("%repairLocation%", getLocationNameFor(getOwner())));
-                }
-            }
-        }
     }
 
     /**

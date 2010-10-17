@@ -812,12 +812,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param connection The <code>Connection</code> to be used when
      *            communicating with the server.
      */
-    public void rearrangeWorkers(Connection connection) {
+    public boolean rearrangeWorkers(Connection connection) {
         colonyPlan.create();
 
         if (!rearrangeWorkers) {
             logger.fine("No need to rearrange workers in " + colony.getName() + ".");
-            return;
+            return false;
         }
         
         // TODO: Detect a siege and move the workers temporarily around.
@@ -1172,6 +1172,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // no need to rearrange workers again immediately
         rearrangeWorkers = false;
+        return true;
     }
 
     private void checkForUnequippedExpertPioneer() {

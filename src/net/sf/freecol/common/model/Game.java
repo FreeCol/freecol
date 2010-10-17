@@ -199,6 +199,15 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Sets the Game's ModelController.
+     *
+     * @param modelController The new <code>ModelController</code>.
+     */
+    public void setModelController(ModelController modelController) {
+        this.modelController = modelController;
+    }
+
+    /**
      * Returns the "Unknown Enemy" Player, which is used for
      * privateers.
      *
@@ -277,18 +286,23 @@ public class Game extends FreeColGameObject {
         return null;
     }
 
+    /**
+     * Gets the current turn in this game.
+     *
+     * @return The current <code>Turn</code>.
+     */
     public Turn getTurn() {
         return turn;
     }
 
+    /**
+     * Sets the current turn in this game.
+     *
+     * @param newTurn The new <code>Turn</code> to set.
+     */
     public void setTurn(Turn newTurn) {
         turn = newTurn;
     }
-
-    public void increaseTurn() {
-        setTurn(getTurn().next());
-    }
-
 
     /**
      * Get the <code>CombatModel</code> value.

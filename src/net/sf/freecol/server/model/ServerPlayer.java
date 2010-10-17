@@ -32,16 +32,20 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -53,7 +57,11 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerEurope;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerModelObject;
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -97,17 +105,65 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public ServerPlayer(Game game, String name, boolean admin, Nation nation,
                         Socket socket, Connection connection) {
-        super(game, name, admin, nation);
+        super(game);
+
+        this.name = name;
+        this.admin = admin;
+        featureContainer = new FeatureContainer(game.getSpecification());
+        europe = null;
+        if (nation != null && nation.getType() != null) {
+            this.nationType = nation.getType();
+            this.nationID = nation.getId();
+            try {
+                featureContainer.add(nationType.getFeatureContainer());
+            } catch (Throwable error) {
+                error.printStackTrace();
+            }
+            if (nationType.isEuropean()) {
+                /*
+                 * Setting the amount of gold to
+                 * "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"
+                 *
+                 * just before starting the game. See
+                 * "net.sf.freecol.server.control.PreGameController".
+                 */
+                gold = 0;
+                europe = new ServerEurope(game, this);
+                playerType = (nationType.isREF()) ? PlayerType.ROYAL
+                    : PlayerType.COLONIAL;
+                if (playerType == PlayerType.COLONIAL) {
+                    monarch = new Monarch(game, this, nation.getRulerNameKey());
+                }
+            } else { // indians
+                gold = 1500;
+                playerType = PlayerType.NATIVE;
+            }
+        } else {
+            // virtual "enemy privateer" player
+            // or undead ?
+            this.nationID = Nation.UNKNOWN_NATION_ID;
+            this.playerType = PlayerType.COLONIAL;
+        }
+        market = new Market(getGame(), this);
+        immigration = 0;
+        liberty = 0;
+        currentFather = null;
+
+        //call of super() will lead to this object being registered with AIMain
+        //before playerType has been set. AIMain will fall back to use of
+        //standard AIPlayer in this case. Set object again to fix this.
+        //Possible TODO: Is there a better way to do this?
+        final String curId = getId();
+        game.removeFreeColGameObject(curId);
+        game.setFreeColGameObject(curId, this);
 
         this.socket = socket;
         this.connection = connection;
+        connected = connection != null;
 
         resetExploredTiles(getGame().getMap());
         resetCanSeeTiles();
-
-        connected = (connection != null);
     }
-
 
     /**
      * Checks if this player is currently connected to the server.
@@ -159,7 +215,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Checks if this player has died.
      *
-     * @return <i>true</i> if this player should die.
+     * @return True if this player should die.
      */
     public boolean checkForDeath() {
         /*
@@ -380,7 +436,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public int getRemainingEmigrants() {
         return remainingEmigrants;
     }
-    
+
     public void setRemainingEmigrants(int emigrants) {
         remainingEmigrants = emigrants;
     }
@@ -508,18 +564,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
     }
-    
+
 
     /**
-    * (DEBUG ONLY) Makes the entire map visible.
-    */
+     * Makes the entire map visible.
+     * Debug mode helper.
+     */
     public void revealMap() {
         for (Tile tile: getGame().getMap().getAllTiles()) {
             setExplored(tile);
         }
-        
         getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR).setValue(false);
-        
         resetCanSeeTiles();
     }
 
@@ -648,13 +703,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csNewTurn(Random random, ChangeSet cs) {
         logger.finest("ServerPlayer.csNewTurn, for " + toString());
 
-        /* Disabled for now
         // Settlements
         List<Settlement> settlements
             = new ArrayList<Settlement>(getSettlements());
         int newSoL = 0;
         for (Settlement settlement : settlements) {
-            ((ServerSettlement) settlement).csNewTurn(random, cs);
+            ((ServerModelObject) settlement).csNewTurn(random, cs);
             newSoL += settlement.getSoL();
         }
         int numberOfColonies = settlements.size();
@@ -673,14 +727,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Europe.
-        ServerEurope europe = (ServerEurope) getEurope();
-        if (europe != null) europe.csNewTurn(random, cs);
-
+        if (europe != null) {
+            ((ServerModelObject) europe).csNewTurn(random, cs);
+        }
         // Units.
         for (Unit unit : new ArrayList<Unit>(getUnits())) {
-            ((ServerUnit) unit).csNewTurn(random, cs);
+            ((ServerModelObject) unit).csNewTurn(random, cs);
         }
-        */
     }
 
     @Override

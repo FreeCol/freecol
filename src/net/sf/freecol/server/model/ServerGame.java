@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -47,8 +48,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerModelObject;
+import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -122,15 +123,24 @@ public class ServerGame extends Game implements ServerModelObject {
             try {
                 Object o = makeServerObject(type, id);
                 serverObjects.add(o);
-                if (o instanceof Player) {
-                    players.add((Player) o);
-                }
             } catch (Exception e) {
-                logger.warning("Build " + type + "failed: " + e.getMessage());
+                logger.log(Level.WARNING, "Build " + type + " failed", e);
             }
         }
 
         readFromXML(in);
+
+        // Initialize players.
+        for (Object o : serverObjects) {
+            if (o instanceof Player) {
+                Player player = (Player)o;
+                if (player.isUnknownEnemy()) {
+                    setUnknownEnemy(player);
+                } else {
+                    players.add(player);
+                }
+            }
+        }
     }
 
     /**
@@ -174,6 +184,7 @@ public class ServerGame extends Game implements ServerModelObject {
             || currentPlayer == nextPlayer;
     }
 
+
     /**
      * New turn for this game.
      *
@@ -187,8 +198,9 @@ public class ServerGame extends Game implements ServerModelObject {
         logger.info("ServerGame.csNewTurn, turn is " + getTurn().toString());
 
         for (Player player : getPlayers()) {
-            player.newTurn();
-            //((ServerPlayer) player).csNewTurn(random, cs);
+            if (!player.isUnknownEnemy()) {
+                ((ServerPlayer) player).csNewTurn(random, cs);
+            }
         }
 
         if (getTurn().getAge() > 1 && !getSpanishSuccession()) {
@@ -245,6 +257,16 @@ public class ServerGame extends Game implements ServerModelObject {
                 colony.changeOwner(strongestAIPlayer);
                 for (Tile tile : colony.getOwnedTiles()) {
                     cs.add(See.perhaps(), tile);
+                }
+            }
+            for (Tile tile : getGame().getMap().getAllTiles()) {
+                if (tile.getOwner() == weakestAIPlayer) {
+                    tile.setOwner(strongestAIPlayer);
+                }
+            }
+            for (Tile tile : getGame().getMap().getAllTiles()) {
+                if (tile.getOwner() == weakestAIPlayer) {
+                    tile.setOwner(strongestAIPlayer);
                 }
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {

@@ -32,41 +32,51 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class MoveTest extends FreeColTestCase {
 
-    public void testSimpleMove() {
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
 
-        FreeColServer server = null;
+    private static final UnitType pioneerType
+        = spec().getUnitType("model.unit.hardyPioneer");
+
+
+    @Override
+    public void tearDown() throws Exception {
+        ServerTestHelper.stopServerGame();
+        super.tearDown();
+    }
+
+
+    public void testSimpleMove() {
+        Map map = getTestMap(plains);
+        Game game = ServerTestHelper.startServerGame(map);
+
         FreeColClient client = null;
         try {
-            server = ServerTestHelper.startServer(false, true);
-            client = ClientTestHelper.startClient(server);
+            client = ClientTestHelper
+                .startClient(ServerTestHelper.getServer());
 
-            Game game = getStandardGame();
             Player dutch = game.getPlayer("model.nation.dutch");
-            TileType plains = spec().getTileType("model.tile.plains");
-            Map map = getTestMap(plains);
-            game.setMap(map);
-            client.setGame(game);
             Tile plain1 = map.getTile(5, 8);
             plain1.setExploredBy(dutch, true);
             Tile plain2 = map.getTile(5, 7);
             plain2.setExploredBy(dutch, true);
     
-            UnitType pionnerType = spec().getUnitType("model.unit.hardyPioneer");
-            Unit hardyPioneer = new Unit(game, plain1, dutch, pionnerType, UnitState.ACTIVE);
+            Unit hardyPioneer = new ServerUnit(game, plain1, dutch,
+                                               pioneerType,
+                                               UnitState.ACTIVE);
     
             client.getPreGameController().startGame();
             assertEquals(plain1.getNeighbourOrNull(Direction.NE), plain2);
             client.getInGameController().move(hardyPioneer, Direction.NE);
             
         } finally {
-            if (client!=null)
-                ClientTestHelper.stopClient(client);
-            if (server!=null)
-                ServerTestHelper.stopServer(server);
+            if (client != null) ClientTestHelper.stopClient(client);
         }
     }
 

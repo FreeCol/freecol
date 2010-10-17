@@ -115,8 +115,13 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 import org.w3c.dom.Element;
 
@@ -202,6 +207,15 @@ public final class InGameController extends Controller {
             debugMonarchPlayer = (ServerPlayer) player;
             debugMonarchAction = action;
         }
+    }
+
+    /**
+     * Debug convenience to step the random number generator.
+     *
+     * @return The next random number in series, in the range 0-99.
+     */
+    public int stepRandom() {
+        return random.nextInt(100);
     }
 
     /**
@@ -480,12 +494,15 @@ public final class InGameController extends Controller {
         }
         game.setCurrentPlayer(newPlayer);
 
-        // Do "new turn"-like actions that need to wait until right
-        // before the player is about to move.
-        csStartTurn(newPlayer, cs);
-        cs.addTrivial(See.all(), "setCurrentPlayer", ChangePriority.CHANGE_LATE,
-                      "player", newPlayer.getId());
-        sendToAll(cs);
+        if (newPlayer != null) {
+            // Do "new turn"-like actions that need to wait until right
+            // before the player is about to move.
+            csStartTurn(newPlayer, cs);
+            cs.addTrivial(See.all(), "setCurrentPlayer",
+                          ChangePriority.CHANGE_LATE,
+                          "player", newPlayer.getId());
+            sendToAll(cs);
+        }
 
         return newPlayer;
     }
@@ -814,7 +831,7 @@ public final class InGameController extends Controller {
                 BuildingType type = spec.getBuildingType(event.getValue());
                 for (Colony colony : serverPlayer.getColonies()) {
                     if (colony.canBuild(type)) {
-                        colony.addBuilding(new Building(game, colony, type));
+                        colony.addBuilding(new ServerBuilding(game, colony, type));
                         colony.getBuildQueue().remove(type);
                         cs.add(See.only(serverPlayer), colony);
                     }
@@ -1289,9 +1306,10 @@ public final class InGameController extends Controller {
 
         for (AbstractUnit au : abstractUnits) {
             for (int i = 0; i < au.getNumber(); i++) {
-                units.add(new Unit(game, europe, serverPlayer,
-                                   au.getUnitType(spec), UnitState.ACTIVE,
-                                   au.getEquipment(spec)));
+                units.add(new ServerUnit(game, europe, serverPlayer,
+                                         au.getUnitType(spec),
+                                         UnitState.ACTIVE,
+                                         au.getEquipment(spec)));
             }
         }
         return units;
@@ -2114,9 +2132,8 @@ public final class InGameController extends Controller {
         Europe europe = serverPlayer.getEurope();
         UnitType recruitType = europe.getRecruitable(index);
         Game game = getGame();
-        Unit unit = new Unit(game, europe, serverPlayer, recruitType,
-                             UnitState.ACTIVE,
-                             recruitType.getDefaultEquipment());
+        Unit unit = new ServerUnit(game, europe, serverPlayer, recruitType,
+                                   UnitState.ACTIVE);
         unit.setLocation(europe);
 
         // Handle migration type specific changes.
@@ -2351,8 +2368,8 @@ public final class InGameController extends Controller {
         case COLONIST:
             List<UnitType> foundTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
             unitType = Utils.getRandomMember(foundTypes, random);
-            newUnit = new Unit(game, tile, serverPlayer, unitType,
-                               UnitState.ACTIVE);
+            newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
+                                     UnitState.ACTIVE);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  "lostCityRumour.Colonist",
@@ -2363,8 +2380,8 @@ public final class InGameController extends Controller {
             if (cityName != null) {
                 int treasureAmount = random.nextInt(dx * 600) + dx * 300;
                 unitType = Utils.getRandomMember(treasureUnitTypes, random);
-                newUnit = new Unit(game, tile, serverPlayer, unitType,
-                                   UnitState.ACTIVE);
+                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
+                                         UnitState.ACTIVE);
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -2388,8 +2405,8 @@ public final class InGameController extends Controller {
                               "gold", "score");
             } else {
                 unitType = Utils.getRandomMember(treasureUnitTypes, random);
-                newUnit = new Unit(game, tile, serverPlayer, unitType,
-                                   UnitState.ACTIVE);
+                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
+                                         UnitState.ACTIVE);
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             cs.addMessage(See.only(serverPlayer),
@@ -2417,9 +2434,10 @@ public final class InGameController extends Controller {
                     List<RandomChoice<UnitType>> recruitables
                         = serverPlayer.generateRecruitablesList();
                     for (int k = 0; k < dx; k++) {
-                        new Unit(game, europe, serverPlayer,
-                                 RandomChoice.getWeightedRandom(random, recruitables),
-                                 UnitState.ACTIVE);
+                        UnitType type = RandomChoice
+                            .getWeightedRandom(random, recruitables);
+                        new ServerUnit(game, europe, serverPlayer, type,
+                                       UnitState.ACTIVE);
                     }
                     cs.add(See.only(serverPlayer), europe);
                 }
@@ -3879,8 +3897,8 @@ public final class InGameController extends Controller {
         List<UnitType> unitTypes = game.getSpecification()
             .getUnitTypesWithAbility("model.ability.carryTreasure");
         UnitType type = Utils.getRandomMember(unitTypes, random);
-        Unit train = new Unit(game, tile, attackerPlayer, type,
-                              UnitState.ACTIVE);
+        Unit train = new ServerUnit(game, tile, attackerPlayer, type,
+                                    UnitState.ACTIVE);
         train.setTreasureAmount(treasure);
 
         // This is an atrocity.
@@ -5342,15 +5360,16 @@ public final class InGameController extends Controller {
             }
         }
         if (serverPlayer.isEuropean()) {
-            settlement = new Colony(game, serverPlayer, name, tile);
+            settlement = new ServerColony(game, serverPlayer, name, tile);
         } else {
             IndianNationType nationType
                 = (IndianNationType) serverPlayer.getNationType();
             UnitType skill = generateSkillForLocation(game.getMap(), tile,
                                                       nationType);
-            settlement = new IndianSettlement(game, serverPlayer, tile,
-                                              name, false, skill,
-                                              new HashSet<Player>(), null);
+            settlement = new ServerIndianSettlement(game, serverPlayer, name,
+                                                    tile, false, skill,
+                                                    new HashSet<Player>(),
+                                                    null);
             // TODO: its lame that the settlement starts with no contacts
         }
         settlement.placeSettlement();
@@ -6110,9 +6129,9 @@ public final class InGameController extends Controller {
             return Message.clientError("Not enough gold to train " + type);
         }
 
-        new Unit(getGame(), europe, serverPlayer, type, UnitState.ACTIVE);
+        new ServerUnit(getGame(), europe, serverPlayer, type, UnitState.ACTIVE);
         serverPlayer.modifyGold(-price);
-        europe.increasePrice(type, price);
+        ((ServerEurope) europe).increasePrice(type, price);
 
         // Only visible in Europe
         ChangeSet cs = new ChangeSet();

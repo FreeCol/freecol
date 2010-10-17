@@ -36,46 +36,26 @@ import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
+
 public class REFTest extends FreeColTestCase {
 
-    FreeColServer server = null;
-	
-    public void tearDown(){
-        if(server != null){
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-            server = null;
-        }
-        setGame(null);
+    private static final UnitType artilleryType
+        = spec().getUnitType("model.unit.artillery");
+    private static final UnitType soldierType
+        = spec().getUnitType("model.unit.kingsRegular");
+
+
+    @Override
+    public void tearDown() throws Exception {
+        ServerTestHelper.stopServerGame();
+        super.tearDown();
     }
+
 	
     public void testCreateREFPlayer() {
-        // start a server
-        server = ServerTestHelper.startServer(false, true);
-        
         Map map = getTestMap();
-        
-        server.setMapGenerator(new MockMapGenerator(map));
-        
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        
-        Game game = server.getGame();
-
-        c = server.getController();
-        assertTrue("Controller not instance of InGameController", c instanceof InGameController);
-        InGameController igc = (InGameController) c;
-
-        assertNotNull("InGameController is null",igc);
-
-        UnitType soldierType = spec().getUnitType("model.unit.kingsRegular");
-        UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         // Create player
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");

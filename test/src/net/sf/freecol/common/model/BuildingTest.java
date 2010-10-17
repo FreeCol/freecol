@@ -28,7 +28,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public class BuildingTest extends FreeColTestCase {
     
@@ -44,7 +46,7 @@ public class BuildingTest extends FreeColTestCase {
         // First check with a building that can be fully built with a
         // normal colony
         BuildingType warehouseType = spec().getBuildingType("model.building.depot");
-        Building warehouse = new Building(getGame(), colony, warehouseType);
+        Building warehouse = new ServerBuilding(getGame(), colony, warehouseType);
         colony.addBuilding(warehouse);
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
@@ -195,7 +197,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(school == null);
 
         // build school
-        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new ServerBuilding(getGame(), colony, schoolType));
         school = colony.getBuilding(schoolType);
         assertTrue(school != null);
 
@@ -446,7 +448,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Wrong bell production with Jefferson and +2 production bonus",
                      23, building.getProduction());
         
-        Building newspaper = new Building(getGame(), colony, newspaperType);
+        Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
         colony.addBuilding(newspaper);
         assertEquals(5, building.getUnitProductivity(colonist));
         assertEquals(10, building.getUnitProductivity(statesman));
@@ -469,7 +471,7 @@ public class BuildingTest extends FreeColTestCase {
         int expectBellProd = 1;
         assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
         
-        Building printingPress = new Building(getGame(), colony, printingPressType);
+        Building printingPress = new ServerBuilding(getGame(), colony, printingPressType);
         colony.addBuilding(printingPress);
         
         bellProduction = building.getProduction();
@@ -494,7 +496,7 @@ public class BuildingTest extends FreeColTestCase {
         int expectBellProd = 1;
         assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
         
-        Building newspaper = new Building(getGame(), colony, newspaperType);
+        Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
         colony.addBuilding(newspaper);
         
         bellProduction = building.getProduction();

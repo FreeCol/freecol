@@ -1470,12 +1470,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * This method is called only when a new turn is beginning. It will reduce the quantity of
-     * the bonus <code>Resource</code> that is on the tile, if any and if applicable.
+     * This method is called only when a new turn is beginning. It
+     * will reduce the quantity of the bonus <code>Resource</code>
+     * that is on the tile, if any and if applicable.
+     *
+     * @return The resource if it is exhausted by this call (so it can
+     *     be used in a message), otherwise null.
      * @see ResourceType
      * @see ColonyTile#newTurn
      */
-    public void expendResource(GoodsType goodsType, UnitType unitType, Settlement settlement) {
+    public Resource expendResource(GoodsType goodsType, UnitType unitType, Settlement settlement) {
         if (hasResource() && tileItemContainer.getResource().getQuantity() != -1) {
             Resource resource = tileItemContainer.getResource();
             // Potential of this Tile and Improvements
@@ -1488,16 +1492,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
 
             if (resource.useQuantity(goodsType, unitType, potential) == 0) {
-                Player owner = settlement.getOwner();
-                owner.addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                       "model.tile.resourceExhausted",
-                                                       settlement)
-                                .add("%resource%", resource.getNameKey())
-                                .addName("%colony%", settlement.getName()));
                 tileItemContainer.removeTileItem(resource);
-                updatePlayerExploredTiles();
+                return resource;
             }
         }
+        return null;
     }
 
 

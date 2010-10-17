@@ -39,11 +39,13 @@ import javax.xml.validation.Validator;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
 
 
 public class SerializationTest extends FreeColTestCase {
@@ -83,15 +85,13 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testValidation() throws Exception {
-
-        Game game = getGame();
-        Map map = getTestMap(true);
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         Player player = game.getPlayer("model.nation.dutch");
-        colony.newTurn();
-        colony.newTurn();
+
+        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
 
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
@@ -103,6 +103,7 @@ public class SerializationTest extends FreeColTestCase {
             fail(errMsg);
         }
 
+        ServerTestHelper.stopServerGame();
     }
 
     public void testMapAfrica() throws Exception {
@@ -123,13 +124,12 @@ public class SerializationTest extends FreeColTestCase {
 
     public void testStringTemplate() throws Exception {
 
-	StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
-	    .add("%goods%", "model.goods.food.name")
-	    .addName("%amount%", "100");
+        StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", "model.goods.food.name")
+            .addName("%amount%", "100");
         StringTemplate t2 = StringTemplate.template("model.goods.goodsAmount")
             .addAmount("%amount%", 50)
             .addStringTemplate("%goods%", t1);
-
 
         Game game = getGame();
         Player player = game.getPlayer("model.nation.dutch");
@@ -137,18 +137,15 @@ public class SerializationTest extends FreeColTestCase {
         try {
             Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");
             validator.validate(buildSource(t2, player, true, true));
-        } catch(SAXParseException e){
+        } catch (SAXParseException e){
             String errMsg = e.getMessage() 
                 + " at line=" + e.getLineNumber() 
                 + " column=" + e.getColumnNumber();
             fail(errMsg);
         }
-
-
     }
 
     public void testSpecification() throws Exception {
-
         try {
             String filename = "test/data/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
@@ -158,7 +155,7 @@ public class SerializationTest extends FreeColTestCase {
             spec().toXMLImpl(out);
             out.close();
             validator.validate(new StreamSource(new FileReader(filename)));
-        } catch(SAXParseException e){
+        } catch (SAXParseException e) {
             String errMsg = e.getMessage() 
                 + " at line=" + e.getLineNumber() 
                 + " column=" + e.getColumnNumber();
@@ -168,7 +165,6 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testDifficulty() throws Exception {
-
         Specification specification1 = null;
         Specification specification2 = null;
         try {
@@ -197,13 +193,12 @@ public class SerializationTest extends FreeColTestCase {
             int increment1 = specification1.getIntegerOption("model.option.crossesIncrement").getValue();
             int increment2 = specification2.getIntegerOption("model.option.crossesIncrement").getValue();
             assertEquals(increment1, increment2);
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     public void testGeneratedLists() throws Exception {
-
         Specification specification1 = null;
         Specification specification2 = null;
         try {
@@ -215,7 +210,7 @@ public class SerializationTest extends FreeColTestCase {
             specification1.toXMLImpl(out);
             out.close();
             specification2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -228,7 +223,5 @@ public class SerializationTest extends FreeColTestCase {
         List<GoodsType> farmed2 = specification2.getFarmedGoodsTypeList();
         assertEquals(farmed1.size(), farmed2.size());
         assertEquals(farmed1.get(0).getId(), farmed2.get(0).getId());
-
     }
-
 }

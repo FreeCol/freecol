@@ -40,37 +40,41 @@ import org.w3c.dom.Element;
 /**
 * Represents a work location on a tile.
 */
-public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownable {
+public class ColonyTile extends FreeColGameObject
+    implements WorkLocation, Ownable {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
-    private Colony colony;
-    private Tile workTile;
-    private Unit unit;
-    private boolean colonyCenterTile;
+    /** The colony this colony tile belongs to. */
+    protected Colony colony;
+
+    /** The tile to work. */
+    protected Tile workTile;
+
+    /** The unit working the tile. */
+    protected Unit unit;
+
+    /** Is this colony tile at the center of the colony. */
+    protected boolean colonyCenterTile;
+
 
     /**
-    * Creates a new <code>ColonyTile</code>.
-    *
-    * @param game The <code>Game</code> this object belongs to.
-    * @param colony The <code>Colony</code> this object belongs to.
-    * @param workTile The tile in which this <code>ColonyTile</code> represents a
-    *                 <code>WorkLocation</code> for.
-    */
-    public ColonyTile(Game game, Colony colony, Tile workTile) {
+     * Constructor for ServerColonyTile.
+     */
+    protected ColonyTile() {
+        // empty constructor
+    }
+
+    /**
+     * Constructor for ServerColonyTile.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     */
+    public ColonyTile(Game game) {
         super(game);
-
-        this.colony = colony;
-        this.workTile = workTile;
-
-        if (colony.getTile() == workTile) {
-            colonyCenterTile = true;
-        } else {
-            colonyCenterTile = false;
-        }
     }
 
     /**
@@ -180,56 +184,53 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         return colonyCenterTile;
     }
 
-
     /**
-    * Gets the work tile.
-    *
-    * @return The tile in which this <code>ColonyTile</code> represents a
-    *         <code>WorkLocation</code> for.
-    */
+     * Gets the work tile.
+     *
+     * @return The tile in which this <code>ColonyTile</code> represents a
+     *         <code>WorkLocation</code> for.
+     */
     public Tile getWorkTile() {
         return workTile;
     }
 
-
     /**
-    * Gets the tile where the colony is located.
-    * @return The <code>Tile</code>.
-    */
+     * Gets the tile where the colony is located.
+     * @return The <code>Tile</code>.
+     */
     public Tile getTile() {
         return colony.getTile();
     }
-
 
     public GoodsContainer getGoodsContainer() {
         return null;
     }
 
-
     /**
-    * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
-    *
-    * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-    * @see #setUnit
-    */
-    public Unit getUnit() {
-        return unit;
-    }
-
-    /**
-    * Gets a pointer to the colony containing this tile.
-    * @return The <code>Colony</code>.
-    */
+     * Gets a pointer to the colony containing this tile.
+     *
+     * @return The <code>Colony</code>.
+     */
     public Colony getColony() {
         return colony;
     }
 
     /**
-    * Sets a <code>Unit</code> to this <code>ColonyTile</code>.
-    *
-    * @param unit The <code>Unit</code>.
-    * @see #getUnit
-    */
+     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
+     *
+     * @return The <code>Unit</code> or <i>null</i> if no unit is present.
+     * @see #setUnit
+     */
+    public Unit getUnit() {
+        return unit;
+    }
+
+    /**
+     * Sets a <code>Unit</code> to this <code>ColonyTile</code>.
+     *
+     * @param unit The <code>Unit</code>.
+     * @see #getUnit
+     */
     public void setUnit(Unit unit) {
         Unit oldUnit = getUnit();
         this.unit = unit;
@@ -246,11 +247,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
     }
 
-
     /**
-    * Gets the amount of Units at this <code>ColonyTile</code>.
-    * @return The amount of Units at this <code>ColonyTile</code>.
-    */
+     * Gets the amount of Units at this <code>ColonyTile</code>.
+     * @return The amount of Units at this <code>ColonyTile</code>.
+     */
     public int getUnitCount() {
         return (getUnit() != null) ? 1 : 0;
     }
@@ -444,40 +444,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
-    * Prepares this <code>ColonyTile</code> for a new turn.
-    */
-    public void newTurn() {
-        if (isColonyCenterTile()) {
-            produceGoodsCenterTile();
-        } else if (getUnit() != null && !isOccupied()) {
-            produceGoods();
-            workTile.expendResource(getUnit().getWorkType(), getUnit().getType(), colony);
-        }
-    }
-
-    private void produceGoods() {
-        int amount = getProductionOf(getUnit().getWorkType());
-
-        if (amount > 0) {
-            colony.addGoods(getUnit().getWorkType(), amount);
-            unit.modifyExperience(amount);
-        }
-    }
-
-    private void produceGoodsCenterTile() {
-
-        if (workTile.getType().getPrimaryGoods() != null) {
-            GoodsType goodsType = workTile.getType().getPrimaryGoods().getType();
-            colony.addGoods(goodsType, workTile.getPrimaryProduction());
-        }
-        if (workTile.getType().getSecondaryGoods() != null) {
-            GoodsType goodsType = workTile.getType().getSecondaryGoods().getType();
-            colony.addGoods(goodsType, workTile.getSecondaryProduction());
-        }
-
-    }
-
-    /**
      * Returns a worktype for a unit.
      *
      * @param unit a <code>Unit</code> value
@@ -581,7 +547,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return 0;
         }
     }
-
 
     /**
      * Removes all references to this object.
@@ -692,7 +657,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * Will return the position of the tile and the name of the colony in
      * addition to the FreeColObject.toString().
      *
-     * @return A representation of a colony-tile that can be used for debugging.
+     * @return A representation of a colony-tile that can be used for
+     *    debugging.
      */
     public String toString() {
         return "ColonyTile " + getWorkTile().getPosition().toString()
@@ -700,9 +666,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "colonyTile".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "colonyTile".
+     */
     public static String getXMLElementTagName() {
         return "colonyTile";
     }

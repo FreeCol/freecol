@@ -39,66 +39,58 @@ import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class StandardAIPlayerTest extends FreeColTestCase {
-    final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-    final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-    final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
-    final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
-    final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-    final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
-    final EquipmentType toolsEqType = spec().getEquipmentType("model.equipment.tools");
-    final UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+
+    private static final EquipmentType horsesEqType
+        = spec().getEquipmentType("model.equipment.horses");
+    private static final EquipmentType musketsEqType
+        = spec().getEquipmentType("model.equipment.muskets");
+    private static final EquipmentType toolsEqType
+        = spec().getEquipmentType("model.equipment.tools");
+
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+
+    private static final UnitType artilleryType
+        = spec().getUnitType("model.unit.artillery");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertSoldierType
+        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType indenturedServantType
+        = spec().getUnitType("model.unit.indenturedServant");
     
-    FreeColServer server = null;
 	
+    @Override
     public void tearDown() throws Exception {
-        if(server != null){
-            // must make sure that the server is stopped
-            ServerTestHelper.stopServer(server);
-            server = null;
-        }
+        ServerTestHelper.stopServerGame();
         super.tearDown();
     }
     
-    private Game start(Map map) {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-        server.setMapGenerator(new MockMapGenerator(map));
-        PreGameController pgc = (PreGameController) server.getController();
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-        return game;
-    }
-
 
     public void testSwitchIndenturedServantInsideColonyWithFreeColonistSoldier(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
-        final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
-        final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
-        
-        FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
+
+        FreeColTestUtils.ColonyBuilder builder
+            = FreeColTestUtils.getColonyBuilder();
         builder.initialColonists(1).addColonist(indenturedServantType);
         Colony colony = builder.build();
         assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
         
         Unit indenturedServant = colony.getUnitList().get(0);
-        
-        Unit freeColonist = new Unit(game, colony.getTile(), colony.getOwner(), colonistType, UnitState.ACTIVE, musketsEqType, horsesEqType);
+        Unit freeColonist = new ServerUnit(game, colony.getTile(),
+                                           colony.getOwner(), colonistType,
+                                           UnitState.ACTIVE,
+                                           musketsEqType, horsesEqType);
 
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
@@ -115,24 +107,24 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     }
     
     public void testSwitchArmedFreeColonistSoldierEquipmentWithUnarmedExpertSoldierOutsideColony(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         
         Colony colony = getStandardColony(1);
 
-        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
-        final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
-
         colony.addGoods(horsesType, 10);
         
-        Unit expertSoldier = new Unit(game, colony.getTile(), colony.getOwner(), expertSoldierType, UnitState.ACTIVE, new EquipmentType[0]);
-        
-        Unit freeColonist = new Unit(game, colony.getTile(), colony.getOwner(), colonistType, UnitState.ACTIVE, musketsEqType, horsesEqType);
-
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
+        Unit expertSoldier = new ServerUnit(game, colony.getTile(),
+                                            colony.getOwner(),
+                                            expertSoldierType,
+                                            UnitState.ACTIVE,
+                                            new EquipmentType[0]);
+        Unit freeColonist = new ServerUnit(game, colony.getTile(),
+                                           colony.getOwner(), colonistType,
+                                           UnitState.ACTIVE,
+                                           musketsEqType, horsesEqType);
+        StandardAIPlayer player
+            = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
         
         assertTrue("Free colonist should have horses",freeColonist.getEquipmentCount(horsesEqType) == 1);
@@ -151,28 +143,19 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     }
     
     public void testEquipExpertSoldiersOutsideColony(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony = getStandardColony(1);
-
-        final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        @SuppressWarnings("unused")
-        final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
-        @SuppressWarnings("unused")
-        final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
-        final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
-
         colony.addGoods(musketsType, 100);
         colony.addGoods(horsesType, 100);
         assertTrue("Colony should be hable to equip units with horses",colony.canBuildEquipment(horsesEqType));
         
-        Unit expertSoldier = new Unit(game, colony.getTile(), colony.getOwner(), expertSoldierType,
-                                      UnitState.ACTIVE, new EquipmentType[0]);
-
+        Unit expertSoldier = new ServerUnit(game, colony.getTile(),
+                                            colony.getOwner(),
+                                            expertSoldierType,
+                                            UnitState.ACTIVE,
+                                            new EquipmentType[0]);
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
 
@@ -185,8 +168,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     }
 
     public void testSwitchEquipmentWith(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony1 = getStandardColony(1);
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony1.getOwner());
@@ -194,13 +177,23 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         Tile col1Tile = colony1.getTile();
         Tile otherTile = col1Tile.getAdjacentTile(Direction.N);
 
-        Unit insideUnit1 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, toolsEqType);
-        Unit insideUnit2 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsEqType, horsesEqType);
-        Unit insideUnit3 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE);
-        Unit artillery = new Unit(game, col1Tile, colony1.getOwner(), artilleryType, UnitState.ACTIVE);
+        Unit insideUnit1 = new ServerUnit(game, col1Tile, colony1.getOwner(),
+                                          colonistType, UnitState.ACTIVE,
+                                          toolsEqType);
+        Unit insideUnit2 = new ServerUnit(game, col1Tile, colony1.getOwner(),
+                                          colonistType, UnitState.ACTIVE,
+                                          musketsEqType, horsesEqType);
+        Unit insideUnit3 = new ServerUnit(game, col1Tile, colony1.getOwner(),
+                                          colonistType, UnitState.ACTIVE);
+        Unit artillery = new ServerUnit(game, col1Tile, colony1.getOwner(),
+                                        artilleryType, UnitState.ACTIVE);
 
-        Unit outsideUnit1 = new Unit(game, otherTile, colony1.getOwner(), colonistType, UnitState.ACTIVE, toolsEqType);
-        Unit outsideUnit2 = new Unit(game, otherTile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsEqType, horsesEqType);
+        Unit outsideUnit1 = new ServerUnit(game, otherTile, colony1.getOwner(),
+                                           colonistType, UnitState.ACTIVE,
+                                           toolsEqType);
+        Unit outsideUnit2 = new ServerUnit(game, otherTile, colony1.getOwner(),
+                                           colonistType, UnitState.ACTIVE,
+                                           musketsEqType, horsesEqType);
 
         boolean exceptionThrown = false;
         try{
@@ -251,16 +244,20 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     }
 
     public void testSwitchEquipmentWithUnitHavingSomeAlredy(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony1 = getStandardColony(1);
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony1.getOwner());
         game.setCurrentPlayer(colony1.getOwner());
         Tile col1Tile = colony1.getTile();
 
-        Unit insideUnit1 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsEqType);
-        Unit insideUnit2 = new Unit(game, col1Tile, colony1.getOwner(), colonistType, UnitState.ACTIVE, musketsEqType, horsesEqType);
+        Unit insideUnit1 = new ServerUnit(game, col1Tile, colony1.getOwner(),
+                                          colonistType, UnitState.ACTIVE,
+                                          musketsEqType);
+        Unit insideUnit2 = new ServerUnit(game, col1Tile, colony1.getOwner(),
+                                          colonistType, UnitState.ACTIVE,
+                                          musketsEqType, horsesEqType);
 
         assertEquals("Unit1 should not have horses",0,insideUnit1.getEquipmentCount(horsesEqType));
         assertEquals("Unit1 should have muskets",1,insideUnit1.getEquipmentCount(musketsEqType));
@@ -275,13 +272,11 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     }
 
     public void testEquipBraves(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
-        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
@@ -336,13 +331,11 @@ public class StandardAIPlayerTest extends FreeColTestCase {
     }
 
     public void testEquipBravesNotEnoughReqGoods(){
-        Game game = start(getTestMap());
-        AIMain aiMain = server.getAIMain();
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
-        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());

@@ -50,6 +50,7 @@ import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -164,6 +165,9 @@ public class DebugMenu extends JMenu {
                         freeColClient.getFreeColServer().revealMapForAllPlayers();
                     }
                     reveal.setEnabled(false);
+                    freeColClient.getGame().getSpecification()
+                        .getBooleanOption(GameOptions.FOG_OF_WAR)
+                        .setValue(false);
                 }
             });
 
@@ -330,11 +334,12 @@ public class DebugMenu extends JMenu {
         this.add(rng);
         rng.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    InGameController igc = freeColClient.getFreeColServer()
+                        .getInGameController();
                     boolean more = true;
                     int n = 0;
                     while (more) {
-                        int val = freeColClient.getGame().getModelController()
-                            .getRandom("step" + n++, 100);
+                        int val = igc.stepRandom();
                         more = canvas.showConfirmDialog(null,
                                 "menuBar.debug.stepRandomNumberGenerator",
                                 "more", "ok",

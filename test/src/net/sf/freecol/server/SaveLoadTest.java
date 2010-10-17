@@ -30,23 +30,24 @@ import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class SaveLoadTest extends FreeColTestCase {
     
-    FreeColServer server = null;
-    
-    public void tearDown(){
-        if(server != null){
-            // must make sure that the server is stopped
+    private FreeColServer server = null;
+
+    @Override
+    public void tearDown() throws Exception {
+        if (server != null) { // Make sure that the server is stopped.
             ServerTestHelper.stopServer(server);
             server = null;
         }
+        super.tearDown();
     }
 
     public void testDelayedLoading() {
-        
         File file = ServerTestHelper.createRandomSaveGame();
-        
-        // start a new server and read the file back
+        ServerTestHelper.stopServer(server);
+
         server = ServerTestHelper.startServer(false, true);
         try {
             server.loadGame(new FreeColSavegameFile(file));
@@ -60,10 +61,9 @@ public class SaveLoadTest extends FreeColTestCase {
     }
 
     public void testImmediateLoading() {
-        
         File file = ServerTestHelper.createRandomSaveGame();
-        
-        // start a new server and read the file back
+        ServerTestHelper.stopServer(server);
+
         server = ServerTestHelper.startServer(file, false, true);
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
@@ -72,14 +72,13 @@ public class SaveLoadTest extends FreeColTestCase {
     }
     
     public void testImport() {
-        
         File file = ServerTestHelper.createRandomSaveGame();
-        
-        // start a new server and import the file
+        ServerTestHelper.stopServer(server);
+
         server = ServerTestHelper.startServer(false, true);
         MapGenerator mapGenerator = server.getMapGenerator();
-        ((FileOption) mapGenerator.getMapGeneratorOptions().getOption(MapGeneratorOptions.IMPORT_FILE))
-        .setValue(file);
+        ((FileOption) mapGenerator.getMapGeneratorOptions()
+            .getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(file);
         Controller c = server.getController();
         assertNotNull(c);
         assertTrue(c instanceof PreGameController);

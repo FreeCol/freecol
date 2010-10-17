@@ -311,7 +311,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             return 0;
         }
     }
-    
+
     public Goods getGoods(GoodsType goodsType) {
         return new Goods(getGame(), parent, goodsType, getGoodsCount(goodsType));
     }
@@ -418,6 +418,21 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
+     * Has this goods containers contents changed from what was recorded
+     * last time the state was saved?
+     *
+     * @return True if the contents have changed.
+     */
+    public boolean hasChanged() {
+        for (GoodsType type : getSpecification().getGoodsTypeList()) {
+            int oldCount = getOldGoodsCount(type);
+            int newCount = getGoodsCount(type);
+            if (oldCount != newCount) return true;
+        }
+        return false;
+    }
+
+    /**
      * Fire property changes for all goods that have seen level changes
      * since the last saveState().
      */
@@ -430,61 +445,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             }
         }
         oldStoredGoods.clear();
-    }
-
-    /**
-     * Removes goods exceeding limit and reports on goods exceeding levels.
-     *
-     */
-    public void cleanAndReport() {
-        if (!(parent instanceof Colony)) {
-            return;
-        }
-        Colony colony = (Colony) parent;
-        int limit = colony.getWarehouseCapacity();
-        int adjustment = limit / CARGO_SIZE;
-
-        for (GoodsType goodsType : storedGoods.keySet()) {
-            if (!goodsType.isStorable()) {
-                continue;
-            }
-            ExportData exportData = colony.getExportData(goodsType);
-            int low = exportData.getLowLevel() * adjustment;
-            int high = exportData.getHighLevel() * adjustment;
-            int amount = storedGoods.get(goodsType).intValue();
-            int oldAmount = getOldGoodsCount(goodsType);
-            String messageId = null;
-            int level = 0;
-            int waste = 0;
-            if (!goodsType.limitIgnored()) {
-                if (amount > limit) {
-                    // limit has been exceeded
-                    waste = amount - limit;
-                    setAmount(goodsType, limit);
-                    messageId = "model.building.warehouseWaste";
-                } else if (amount == limit && oldAmount < limit) {
-                    // limit has been reached during this turn
-                    messageId = "model.building.warehouseOverfull";
-                } else if (amount > high && oldAmount <= high) {
-                    messageId = "model.building.warehouseFull";
-                    level = high;
-                }
-            }
-            if (amount < low && oldAmount >= low) {
-                messageId = "model.building.warehouseEmpty";
-                level = low;
-            }
-            if (messageId != null) {
-                Player owner = colony.getOwner();
-                owner.addModelMessage(new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                                       messageId, colony, goodsType)
-                                .add("%goods%", goodsType.getNameKey())
-                                .addAmount("%waste%", waste)
-                                .addAmount("%level%", level)
-                                .addName("%colony%", colony.getName()));
-            }
-        }
-
     }
 
     /**

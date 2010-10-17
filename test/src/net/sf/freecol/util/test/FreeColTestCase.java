@@ -21,6 +21,8 @@ package net.sf.freecol.util.test;
 
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -29,6 +31,10 @@ import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.CombatModel.CombatOdds;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -45,6 +51,11 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerIndianSettlement;
+import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.util.test.MockPseudoRandom;
+
 
 /**
  * The base class for all FreeCol tests. Contains useful methods used by the
@@ -71,8 +82,8 @@ public class FreeColTestCase extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-    	// If a game has been created destroy it.
-    	game = null;
+        // If a game has been created destroy it.
+        game = null;
     }
 
     /**
@@ -93,9 +104,11 @@ public class FreeColTestCase extends TestCase {
     }
     
     /**
-     * Specifically sets the game instance to run with
-     * Necessary for server tests that create their own game instances
-     * Allows for same interface for accessing the game instance for all types of tests
+     * Specifically sets the game instance to run with.  Necessary for
+     * server tests that create their own game instances.  Allows for
+     * same interface for accessing the game instance for all types of
+     * tests.
+     *
      * @param newGame Game instance to work with
      */
     public static void setGame(Game newGame) {
@@ -136,23 +149,21 @@ public class FreeColTestCase extends TestCase {
 
         spec().applyDifficultyLevel("model.difficulty.medium");
         for (Nation n : spec().getNations()) {
-            Player p;
-            if (n.getType().isEuropean() && !n.getType().isREF()){
-                p = new Player(game, n.getRulerNameKey(), false, n);
-            } else {
-                p = new Player(game, n.getRulerNameKey(), false, true, n);
-            }
+            Player p = new ServerPlayer(game, n.getRulerNameKey(), false, n,
+                                        null, null);
+            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
             game.addPlayer(p);
         }
         return game;
     }
-    
+
     /**
      * Creates a standardized map on which all fields have the plains type.
      * 
      * Uses the getGame() method to access the currently running game.
      * 
-     * Does not call Game.setMap(Map) with the returned map. The map is unexplored.
+     * Does not call Game.setMap(Map) with the returned map. The map
+     * is unexplored.
      * 
      * @return The map created as described above.
      */
@@ -166,7 +177,8 @@ public class FreeColTestCase extends TestCase {
      * 
      * Uses the getGame() method to access the currently running game.
      * 
-     * Does not call Game.setMap(Map) with the returned map. The map is unexplored.
+     * Does not call Game.setMap(Map) with the returned map. The map
+     * is unexplored.
      * 
      * @param type The type of land with which to initialize the map.
      * 
@@ -186,9 +198,8 @@ public class FreeColTestCase extends TestCase {
      * Does not call Game.setMap(Map) with the returned map.
      * 
      * @param type The type of land with which to initialize the map.
-     * 
-     * @param explored Set to true if you want all the tiles on the map to have been explored by all players.
-     * 
+     * @param explored Set to true if you want all the tiles on the
+     *     map to have been explored by all players.
      * @return The map created as described above.
      */
     public static Map getTestMap(TileType tileType, boolean explored) {
@@ -535,15 +546,18 @@ public class FreeColTestCase extends TestCase {
     			}
     		}
     		
-    		IndianSettlement camp =
-                    new IndianSettlement(game, indianPlayer, settlementTile,
+    		IndianSettlement camp
+            = new ServerIndianSettlement(game, indianPlayer,
                                          getSimpleName(indianPlayer, isCapital),
-                                         isCapital, skillToTeach, isVisited, residentMissionary);
+                                         settlementTile, isCapital,
+                                         skillToTeach, isVisited,
+                                         residentMissionary);
             
     		// Add braves
             for(int i=0; i < initialBravesInCamp; i++){
-            	Unit brave = new Unit(game, camp, indianPlayer, indianBraveType, UnitState.ACTIVE,
-                    indianBraveType.getDefaultEquipment());
+            	Unit brave = new ServerUnit(game, camp, indianPlayer,
+                                          indianBraveType, UnitState.ACTIVE,
+                                          indianBraveType.getDefaultEquipment());
             	camp.addOwnedUnit(brave);
             }
             camp.placeSettlement();
@@ -591,4 +605,34 @@ public class FreeColTestCase extends TestCase {
         builder.setLocation(colony);
         builder.setMovesLeft(0);
     }
+
+    /**
+     * Repeatedly ask the CombatModel for an attack result until it
+     * gives the primary one we want (WIN, LOSE, NO_RESULT).
+     */
+    public List<CombatResult> fakeAttackResult(CombatResult result,
+                                               FreeColGameObject attacker,
+                                               FreeColGameObject defender)
+    {
+        List<CombatResult> crs;
+        final float delta = 0.02f;
+        CombatModel combatModel = getGame().getCombatModel();
+        CombatOdds combatOdds = combatModel.calculateCombatOdds(attacker, defender);
+        float f = combatOdds.win;
+        MockPseudoRandom mr = new MockPseudoRandom();
+        List<Integer> number = new ArrayList<Integer>();
+        number.add(-1);
+        do {
+            f += (result == CombatResult.WIN) ? -delta : delta;
+            if (f < 0.0f || f >= 1.0f) {
+                throw new IllegalStateException("f out of range: "
+                                                + Float.toString(f));
+            }
+            number.set(0, new Integer((int)(Integer.MAX_VALUE * f)));
+            mr.setNextNumbers(number, true);
+            crs = combatModel.generateAttackResult(mr, attacker, defender);
+        } while (crs.get(0) != result);
+        return crs;
+    }
+
 }

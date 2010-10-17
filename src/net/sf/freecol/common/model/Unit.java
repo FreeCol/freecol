@@ -78,8 +78,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * A state a Unit can have.
      */
-    public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY, IMPROVING,
-            TO_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
+    public static enum UnitState {
+        ACTIVE,
+        FORTIFIED,
+        SENTRY,
+        IN_COLONY,
+        IMPROVING,
+        TO_EUROPE,
+        TO_AMERICA,
+        FORTIFYING,
+        SKIPPED
+    }
 
     /** The roles a Unit can have. */
     public static enum Role {
@@ -156,66 +165,68 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
     }
 
-    private UnitType unitType;
+    protected UnitType unitType;
 
-    private boolean naval;
+    protected boolean naval;
 
-    private int movesLeft;
+    protected int movesLeft;
 
-    private UnitState state = UnitState.ACTIVE;
+    protected UnitState state = UnitState.ACTIVE;
 
-    private Role role = Role.DEFAULT;
+    protected Role role = Role.DEFAULT;
 
     /** 
      * The number of turns until the work is finished, or '-1' if a
      * Unit can stay in its state forever.
      */
-    private int workLeft;
+    protected int workLeft;
 
-    private int hitpoints; // For now; only used by ships when repairing.
+    protected int hitpoints; // For now; only used by ships when repairing.
 
-    private Player owner;
+    protected Player owner;
 
-    private List<Unit> units = Collections.emptyList();
+    protected List<Unit> units = Collections.emptyList();
 
-    private GoodsContainer goodsContainer;
+    protected GoodsContainer goodsContainer;
 
-    private Location entryLocation;
+    protected Location entryLocation;
 
-    private Location location;
+    protected Location location;
 
-    private IndianSettlement indianSettlement = null; // only used by BRAVE.
+    protected IndianSettlement indianSettlement = null; // only used by BRAVE.
 
-    private Location destination = null;
+    protected Location destination = null;
 
-    private TradeRoute tradeRoute = null; // only used by carriers
+    /** The trade route this unit has. */
+    protected TradeRoute tradeRoute = null;
 
-    // Unit is going towards current stop's location
-    private int currentStop = -1;
+    /** Whic stop in a trade route the unit is going to. */
+    protected int currentStop = -1;
 
-    // to be used only for type == TREASURE_TRAIN
-    private int treasureAmount;
+    /** To be used only for type == TREASURE_TRAIN */
+    protected int treasureAmount;
 
-    // to be used only for PIONEERs - where they are working
-    private TileImprovement workImprovement;
+    /**
+     * What is being improved (to be used only for PIONEERs - where
+     * they are working.
+     */
+    protected TileImprovement workImprovement;
 
-    // What type of goods this unit produces in its occupation.
-    private GoodsType workType;
+    /** What type of goods this unit produces in its occupation. */
+    protected GoodsType workType;
 
-    private int experience = 0;
+    protected int experience = 0;
 
-    private int turnsOfTraining = 0;
+    protected int turnsOfTraining = 0;
 
     /**
      * The attrition this unit has accumulated. At the moment, this
      * equals the number of turns it has spent in the open.
      */
-    private int attrition = 0;
+    protected int attrition = 0;
 
-    /**
-     * The individual name of this unit, not of the unit type.
-     */
-    private String name = null;
+    /** The individual name of this unit, not of the unit type. */
+    protected String name = null;
 
     /**
      * The amount of goods carried by this unit. This variable is only used by
@@ -223,108 +234,33 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * 
      * @see #getVisibleGoodsCount()
      */
-    private int visibleGoodsCount;
+    protected int visibleGoodsCount;
 
-    /**
-     * The student of this Unit, if it has one.
-     */
-    private Unit student;
+    /** The student of this Unit, if it has one. */
+    protected Unit student;
 
-    /**
-     * The teacher of this Unit, if it has one.
-     */
-    private Unit teacher;
+    /** The teacher of this Unit, if it has one. */
+    protected Unit teacher;
 
-    /**
-     * The equipment this Unit carries.
-     */
-    private TypeCountMap<EquipmentType> equipment = new TypeCountMap<EquipmentType>();
+    /** The equipment this Unit carries. */
+    protected TypeCountMap<EquipmentType> equipment
+        = new TypeCountMap<EquipmentType>();
 
 
     /**
-     * Initiate a new <code>Unit</code> of a specified type with the state set
-     * to {@link UnitState#ACTIVE} if a carrier and {@link UnitState#SENTRY} otherwise. The
-     * {@link Location} is set to <i>null</i>.
-     * 
-     * @param game The <code>Game</code> in which this <code>Unit</code>
-     *            belong.
-     * @param owner The Player owning the unit.
-     * @param type The type of the unit.
+     * Constructor for ServerUnit.
      */
-    public Unit(Game game, Player owner, UnitType type) {
-        this(game, null, owner, type, UnitState.ACTIVE);
+    protected Unit() {
+        // empty constructor
     }
 
     /**
-     * Initiate a new <code>Unit</code> with the specified parameters.
+     * Constructor for ServerUnit.
      * 
-     * @param game The <code>Game</code> in which this <code>Unit</code>
-     *            belong.
-     * @param location The <code>Location</code> to place this
-     *            <code>Unit</code> upon.
-     * @param owner The <code>Player</code> owning this unit.
-     * @param type The type of the unit.
-     * @param state The initial state for this Unit (one of {@link UnitState#ACTIVE},
-     *            {@link UnitState#FORTIFIED}...).
+     * @param game The <code>Game</code> in which this unit belongs.
      */
-    public Unit(Game game, Location location, Player owner, UnitType type, UnitState state) {
-        this(game, location, owner, type, state, type.getDefaultEquipment());
-    }
-
-    /**
-     * Initiate a new <code>Unit</code> with the specified parameters.
-     * 
-     * @param game The <code>Game</code> in which this <code>Unit</code>
-     *            belong.
-     * @param location The <code>Location</code> to place this
-     *            <code>Unit</code> upon.
-     * @param owner The <code>Player</code> owning this unit.
-     * @param type The type of the unit.
-     * @param state The initial state for this Unit (one of {@link UnitState#ACTIVE},
-     *            {@link UnitState#FORTIFIED}...).
-     * @param initialEquipment The list of initial EquimentTypes
-     */
-    public Unit(Game game, Location location, Player owner, UnitType type, UnitState state, 
-                EquipmentType... initialEquipment) {
+    protected Unit(Game game) {
         super(game);
-
-        visibleGoodsCount = -1;
-
-        if (type.canCarryGoods()) {
-            goodsContainer = new GoodsContainer(game, this);
-        }
-
-        UnitType newType = type.getUnitTypeChange(ChangeType.CREATION, owner);
-        if (newType == null) {
-            unitType = type;
-        } else {
-            unitType = newType;
-        }
-        this.owner = owner;
-        owner.getNationID();
-        naval = unitType.hasAbility("model.ability.navalUnit");
-        setLocation(location);
-
-        workLeft = -1;
-        workType = getSpecification().getGoodsFood().get(0);
-
-        this.movesLeft = getInitialMovesLeft();
-        hitpoints = unitType.getHitPoints();
-
-        for (EquipmentType equipmentType : initialEquipment) {
-            if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
-                equipment.clear();
-                break;
-            } else {
-                equipment.incrementCount(equipmentType, 1);
-            }
-        }
-        setRole();
-        setStateUnchecked(state);
-
-        getOwner().setUnit(this);
-        getOwner().invalidateCanSeeTiles();
-        getOwner().modifyScore(type.getScoreValue());
     }
 
     /**
@@ -2541,7 +2477,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Determine role based on equipment.
      */
-    private void setRole() {
+    protected void setRole() {
         Role oldRole = role;
         role = Role.DEFAULT;
         for (EquipmentType type : equipment.keySet()) {
@@ -2641,7 +2577,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
     }
 
-    private void setStateUnchecked(UnitState s) {
+    protected void setStateUnchecked(UnitState s) {
         // Cleanup the old UnitState, for example destroy the
         // TileImprovment being built by a pioneer.
         switch (state) {
@@ -2681,7 +2617,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 workLeft = workImprovement.getTurnsToComplete();
             }
             state = s;
-            doAssignedWork();
+            // TODO: Removed a doAssignedWork() from here.  Was that right?
             return;
         case TO_EUROPE:
             workLeft = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
@@ -2818,6 +2754,24 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Gets the amount of work left.
+     *
+     * @return The amount of work left.
+     */
+    public int getWorkLeft() {
+        return workLeft;
+    }
+
+    /**
+     * Sets the amount of work left.
+     *
+     * @param workLeft The new amount of work left.
+     */
+    public void setWorkLeft(int workLeft) {
+        this.workLeft = workLeft;
+    }
+
+    /**
      * Get the number of turns of work left.
      * 
      * Caution: This does not equal the internal amount of work left
@@ -2830,152 +2784,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 && unitType.hasAbility("model.ability.expertPioneer"))
             ? workLeft / 2
             : workLeft;
-    }
-
-    /**
-     * The status of units that are currently working (for instance on building
-     * a road, or fortifying themselves) is updated in this method.
-     */
-    public void doAssignedWork() {
-        logger.finest("Entering method doAssignedWork.");
-        if (workLeft > 0) {
-            if (state == UnitState.IMPROVING) {
-                // Has the improvement been completed already? Do nothing.
-                if (getWorkImprovement().isComplete()) {
-                    setState(UnitState.ACTIVE);
-                    return;
-                }
-
-                // Otherwise do work
-                int amountOfWork = unitType.hasAbility("model.ability.expertPioneer") ? 2 : 1;
-                
-                workLeft = getWorkImprovement().doWork(amountOfWork);
-                
-                // Make sure that a hardy pioneer will finish if the workLeft is 
-                // less than he can do in a turn 
-                if (0 < workLeft && workLeft < amountOfWork){
-                    workLeft = getWorkImprovement().doWork(workLeft);
-                }
-            } else {
-                workLeft--;
-            }
-
-            // Shorter travel time to America for the REF:
-            if (state == UnitState.TO_AMERICA && getOwner().isREF()) {
-                workLeft = 0;
-            }
-
-            if (workLeft == 0) {
-                workLeft = -1;
-
-                UnitState state = getState();
-
-                switch (state) {
-                case TO_EUROPE:
-                    logger.info(toString() + " arrives in Europe");
-                    // trade unit arrives in Europe
-                    if (this.getTradeRoute() != null){
-                        setMovesLeft(0);
-                        setState(UnitState.ACTIVE);
-                        return;
-                    }
-                        
-                    getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                     "model.unit.arriveInEurope", getOwner().getEurope(), this)
-                                    .add("%europe%", getOwner().getEurope().getNameKey()));
-                    setState(UnitState.ACTIVE);
-                    break;
-                case TO_AMERICA:
-                    logger.info(toString() + " arrives in America");
-                    getGame().getModelController().setToVacantEntryLocation(this);
-                    setState(UnitState.ACTIVE);
-                    break;
-                case FORTIFYING:
-                    setState(UnitState.FORTIFIED);
-                    break;
-                case IMPROVING:
-                    // Deliver Goods if any
-                    GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
-                    if (deliverType != null) {
-                        int deliverAmount = getTile().potential(deliverType, getType())
-                            * getWorkImprovement().getDeliverAmount();
-                        if (unitType.hasAbility("model.ability.expertPioneer")) {
-                            deliverAmount *= 2;
-                        }
-                        if (getColony() != null && getColony().getOwner().equals(getOwner())) {
-                            getColony().addGoods(deliverType, deliverAmount);
-                        } else {
-                            List<Settlement> adjacentColonies = new ArrayList<Settlement>();
-                            for (Tile t: getTile().getSurroundingTiles(1)) {
-                                if (t.getColony() != null && t.getColony().getOwner().equals(getOwner())) {
-                                    adjacentColonies.add(t.getColony());
-                                }
-                            }
-                            if (adjacentColonies.size() > 0) {
-                                int deliverPerCity = (deliverAmount / adjacentColonies.size());
-                                for (int i = 0; i < adjacentColonies.size(); i++) {
-                                    Colony c = (Colony) adjacentColonies.get(i);
-                                    // Make sure the lumber lost is being added
-                                    // again to the first adjacent colony:
-                                    if (i == 0) {
-                                        c.addGoods(deliverType, deliverPerCity
-                                                   + (deliverAmount % adjacentColonies.size()));
-                                    } else {
-                                        c.addGoods(deliverType, deliverPerCity);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // Finish up
-                    TileImprovement improvement = getWorkImprovement();
-                    for (Unit unit : getTile().getUnitList()) {
-                        if (unit.getState() == UnitState.IMPROVING
-                            && unit.getWorkImprovement().getType() == improvement.getType()) {
-                            unit.expendEquipment(improvement.getExpendedEquipmentType(), 
-                                                 improvement.getExpendedAmount());
-                            unit.workLeft = -1;
-                            unit.setWorkImprovement(null);
-                            unit.setState(UnitState.ACTIVE);
-                            // this only works for the current unit,
-                            // all others will already have spent
-                            // their moves, or will reset their moves
-                            unit.setMovesLeft(0);
-                        }
-                    }
-                    // This should be run at the end, so that the info sent to the other players
-                    //is up to date.
-                    getGame().getModelController().tileImprovementFinished(this, improvement);
-                    
-                    break;
-                default:
-                    logger.warning("Unknown work completed. State: " + state);
-                    setState(UnitState.ACTIVE);
-                }
-            }
-        }
-    }
-
-    /**
-     * Reduces the number of tools and produces a warning if all tools are used
-     * up.
-     * 
-     * @param amount The number of tools to remove.
-     */
-    private void expendEquipment(EquipmentType type, int amount) {
-        equipment.incrementCount(type, -amount);
-        setRole();
-        // TODO: make this more generic
-        EquipmentType tools = getSpecification().getEquipmentType("model.equipment.tools");
-        if (!equipment.containsKey(tools)) {
-            String messageId = (getType().getDefaultEquipmentType() == type)
-                ? getType() + ".noMoreTools" : "model.unit.noMoreTools";
-            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                        messageId, this)
-                            .addStringTemplate("%unit%", getLabel())
-                            .addStringTemplate("%location%", getLocation().getLocationNameFor(getOwner())));
-            firePropertyChange(Unit.EQUIPMENT_CHANGE, null, null);
-        }
     }
 
     /**
@@ -3071,33 +2879,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public boolean isUndead() {
         return hasAbility("model.ability.undead");
-    }
-
-    /**
-     * Train the current unit in the job of its teacher.
-     * 
-     */
-    public void train() {
-        StringTemplate oldName = getLabel();
-        UnitType skillTaught = getTeacher().getType().getSkillTaught();
-        UnitType learning = getUnitTypeTeaching(skillTaught, unitType);
-
-        if (learning != null) {
-            setType(learning);
-        }
-
-        StringTemplate newName = getLabel();
-        if (!newName.equals(oldName)) {
-            Colony colony = getTile().getColony();
-            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                                        "model.unit.unitEducated", colony, this)
-                            .addStringTemplate("%oldName%", oldName)
-                            .addStringTemplate("%unit%", newName)
-                            .addName("%colony%", colony.getName()));
-        }
-        this.setTurnsOfTraining(0);
-        //setState(UnitState.ACTIVE);
-        setMovesLeft(0);
     }
 
     /**
@@ -3212,72 +2993,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void dispose() {
         disposeList();
-    }
-
-    /**
-     * Checks if a colonist can get promoted by experience.
-     */
-    private void checkExperiencePromotion() {
-        GoodsType produce = getWorkType();
-        
-        if(produce == null){
-            return;
-        }
-        
-        UnitType learnType = getSpecification().getExpertForProducing(produce);
-        if (learnType == null || 
-            learnType == unitType ||
-            !unitType.canBeUpgraded(learnType, ChangeType.EXPERIENCE)) {
-                return;
-        }
-        
-        int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
-        if (random >= Math.min(experience, 200)) {
-            return;
-        }
-
-        logger.finest("About to change type of unit due to experience.");
-        StringTemplate oldName = getLabel();
-        setType(learnType);
-        getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                                    "model.unit.experience", getColony(), this)
-                        .addStringTemplate("%oldName%", oldName)
-                        .addStringTemplate("%unit%", getLabel())
-                        .addName("%colony%", getColony().getName()));
-    }
-
-    /**
-     * Prepares the <code>Unit</code> for a new turn.
-     */
-    public void newTurn() {
-        if (isUninitialized()) {
-            logger.warning("Calling newTurn for an uninitialized object: " + getId());
-            return;
-        }
-        if (location instanceof ColonyTile) {
-            checkExperiencePromotion();
-        } 
-        if (location instanceof Tile && ((Tile) location).getSettlement() == null) {
-            attrition++;
-            if (attrition > getType().getMaximumAttrition()) {
-                getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                                            "model.unit.attrition", this)
-                                .addStringTemplate("%unit%", getLabel()));
-                dispose();
-            }
-        } else {
-            attrition = 0;
-        }
-        if (isUnderRepair()) {
-            movesLeft = 0;
-        } else {
-            movesLeft = getInitialMovesLeft();
-        }
-        doAssignedWork();
-        if (getState() == UnitState.SKIPPED) {
-            setState(UnitState.ACTIVE);
-        }
-
     }
 
     private Location newLocation(Game game, String locationString) {

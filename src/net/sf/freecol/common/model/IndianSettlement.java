@@ -63,7 +63,10 @@ public class IndianSettlement extends Settlement {
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
 
-    /** The amount of raw material that should be available before producing manufactured goods. */
+    /**
+     * The amount of raw material that should be available before
+     * producing manufactured goods.
+     */
     public static final int KEEP_RAW_MATERIAL = 50;
 
     /**
@@ -73,9 +76,10 @@ public class IndianSettlement extends Settlement {
      * side the value null is also possible in case the player hasn't
      * checked out the settlement yet.
      */
-    private UnitType learnableSkill = null;
+    protected UnitType learnableSkill = null;
 
-    private GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
+    /** The goods this settlement wants. */
+    protected GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
 
     /**
      * A map that tells if a player has visited the settlement.
@@ -83,19 +87,22 @@ public class IndianSettlement extends Settlement {
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
-    private Set<Player> visitedBy = new HashSet<Player>();
+    protected Set<Player> visitedBy = new HashSet<Player>();
 
-    private List<Unit> units = Collections.emptyList();
+    /** Units present at this settlement. */
+    protected List<Unit> units = Collections.emptyList();
 
-    private ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
+    /** Units that belong to this settlement. */
+    protected ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
 
-    private Unit missionary = null;
+    /** The missionary at this settlement. */
+    protected Unit missionary = null;
 
     /** Used for monitoring the progress towards creating a convert. */
-    private int convertProgress = 0;
+    protected int convertProgress = 0;
 
     /** The number of the turn during which the last tribute was paid. */
-    int lastTribute = 0;
+    protected int lastTribute = 0;
 
     /**
      * Stores the alarm levels. <b>Only used by AI.</b>
@@ -124,37 +131,25 @@ public class IndianSettlement extends Settlement {
         }
     };
 
+
     /**
-     * The constructor to use.
+     * Constructor for ServerIndianSettlement.
+     */
+    protected IndianSettlement() {
+        // empty constructor
+    }
+
+    /**
+     * Constructor for ServerIndianSettlement.
      *
      * @param game The <code>Game</code> in which this object belong.
-     * @param player The <code>Player</code> owning this settlement.
+     * @param owner The <code>Player</code> owning this settlement.
      * @param name The name for this settlement.
      * @param tile The location of the <code>IndianSettlement</code>.
-     * @param isCapital True if settlement is tribe's capital
-     * @param learnableSkill The skill that can be learned by Europeans at this settlement.
-     * @param isVisited Indicates if any European scout has asked to speak with the chief.
-     * @param missionary The missionary in this settlement (or null).
-     * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
-    public IndianSettlement(Game game, Player player, Tile tile, String name,
-                            boolean isCapital,
-                            UnitType learnableSkill, Set<Player> isVisited, Unit missionary) {
-        super(game, player, name, tile);
-
-        if (tile == null) {
-            throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
-        }
-
-        goodsContainer = new GoodsContainer(game, this);
-
-        this.learnableSkill = learnableSkill;
-        setCapital(isCapital);
-        this.visitedBy = isVisited;
-        this.missionary = missionary;
-
-        convertProgress = 0;
-        updateWantedGoods();
+    protected IndianSettlement(Game game, Player owner, String name,
+                               Tile tile) {
+        super(game, owner, name, tile);
     }
 
 
@@ -957,59 +952,13 @@ public class IndianSettlement extends Settlement {
         return potential;
     }
 
-    @Override
-    public void newTurn() {
-        if (isUninitialized()) {
-            logger.warning("Uninitialized when calling newTurn");
-            return;
-        }
-
-        List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
-        int workers = ownedUnits.size();
-        for (GoodsType g : goodsList) {
-            /* Determine the maximum possible production for each type of goods: */
-            addGoods(g, getProductionOf(g));
-        }
-
-        /* Use tools (if available) to produce manufactured goods: */
-        // TODO: what on Earth is this supposed to simulate?
-        GoodsType tools = getSpecification().getGoodsType("model.goods.tools");
-        if (getGoodsCount(tools) > 0) {
-            GoodsType typeWithSmallestAmount = null;
-            for (GoodsType g : goodsList) {
-                if (g.isFoodType() || g.isBuildingMaterial() || g.isRawBuildingMaterial()) {
-                    continue;
-                }
-                if (g.isRawMaterial() && getGoodsCount(g) > KEEP_RAW_MATERIAL) {
-                    if (typeWithSmallestAmount == null ||
-                        getGoodsCount(g.getProducedMaterial()) < getGoodsCount(typeWithSmallestAmount)) {
-                        typeWithSmallestAmount = g.getProducedMaterial();
-                    }
-                }
-            }
-            if (typeWithSmallestAmount != null) {
-                int production = Math.min(getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
-                                          Math.min(10, getGoodsCount(tools)));
-                removeGoods(tools, production);
-                removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
-                addGoods(typeWithSmallestAmount, production * 5);
-            }
-        }
-
-        /* Consume goods */
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            consumeGoods(goodsType, getConsumptionOf(goodsType));
-            /* TODO: do we need this at all? At the moment, most Indian Settlements
-               consume more than they produce.
-            */
-        }
-        goodsContainer.removeAbove(500);
-
-        checkForNewIndian();
-
-        breedHorses();
-         
-        updateWantedGoods();
+    /**
+     * Native settlements do not generate SoL.
+     *
+     * @return 0.
+     */
+    public int getSoL() {
+        return 0;
     }
 
     public boolean checkForNewMissionaryConvert() {
@@ -1035,44 +984,6 @@ public class IndianSettlement extends Settlement {
         return false;
     }
 
-    // Create a new colonist if there is enough food:
-    private void checkForNewIndian() {
-        // Alcohol also contributes to create children. 
-        if (getFoodCount() + 4*getGoodsCount(getSpecification().getGoodsType("model.goods.rum"))
-                                             > 200+KEEP_RAW_MATERIAL ) {
-            /*
-             * Allow one more brave than the initially generated number.
-             * This is more than sufficient. Do not increase the amount
-             * without discussing it on the developer's mailing list first.
-             */
-            if (ownedUnits.size() <= getGeneratedUnitCount()) {
-                // up to a limit. Anyway cities produce more children than camps
-                List<UnitType> unitTypes = getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
-                if (unitTypes.size() > 0) {
-                    int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
-                    Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
-                                                                       getTile(), getOwner(), unitTypes.get(random));
-                    addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
-                    u.setIndianSettlement(this);
-                    logger.info("New indian native created in " + getTile() + " with ID=" + u.getId());
-                }
-            }
-            // Always consume goods in order to avoid stockpiling.
-            consumeGoods(getSpecification().getGoodsType("model.goods.food"), 200);
-            // All food will be consumed, even if RUM helped
-            consumeGoods(getSpecification().getGoodsType("model.goods.rum"), 200/4);
-            // Also, some available RUM is consumed
-        }
-    }
-
-    private void consumeGoods(GoodsType type, int amount) {
-        if (getGoodsCount(type) > 0) {
-            amount = Math.min(amount, getGoodsCount(type));
-            getOwner().modifyGold(amount);
-            removeGoods(type, amount);
-        }
-    }
-    
     /**
      * Dispose of this native settlement.
      *
@@ -1110,31 +1021,6 @@ public class IndianSettlement extends Settlement {
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);
     }
-    
-    /**
-     * If horses are available and enough food is produced, increase horses
-     */
-    private void breedHorses() {
-    	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-    	GoodsType reqGoodsType = horsesType.getRawMaterial();
-  
-    	// Not enough horses to breed
-    	if(getGoodsCount(horsesType) < horsesType.getBreedingNumber()){
-    		return;
-    	}
-    	
-    	int foodProdAvail = getProductionOf(reqGoodsType) - getFoodConsumptionByType(reqGoodsType);
-
-    	// no food production available for breeding
-    	if(foodProdAvail <= 0){
-    		return;
-    	}
-    	
-    	int horsesThisTurn = Math.min(IndianSettlement.MAX_HORSES_PER_TURN, foodProdAvail);
-    	
-    	addGoods(horsesType, horsesThisTurn);
-    }
-    
     
 
     /**
