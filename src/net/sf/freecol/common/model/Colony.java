@@ -59,7 +59,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
 
-    public static final FreeColGameObjectType SOL_MODIFIER_SOURCE = 
+    public static final FreeColGameObjectType SOL_MODIFIER_SOURCE =
         new FreeColGameObjectType("model.source.solModifier");
 
     public static enum ColonyChangeEvent {
@@ -148,11 +148,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * A list of Buildable items, which is NEVER empty.
      */
     private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
-    
+
 
     /**
      * Creates a new <code>Colony</code>.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belongs.
      * @param owner The <code>Player</code> owning this <code>Colony</code>.
      * @param name The name of the new <code>Colony</code>.
@@ -212,7 +212,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Initiates a new <code>Colony</code> from an XML representation.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if an error occurred during parsing.
@@ -224,7 +224,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Initiates a new <code>Colony</code> from an XML representation.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param e An XML-element that will be used to initialize this object.
      */
@@ -238,7 +238,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -305,7 +305,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return a <code>boolean</code> value
      */
     public boolean canReducePopulation() {
-        return getUnitCount() > 
+        return getUnitCount() >
             FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
                                               getModifierSet("model.modifier.minimumColonySize"));
     }
@@ -389,7 +389,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns whether this colony is landlocked, or has access to water.
-     * 
+     *
      * @return <code>true</code> if there are no adjacent tiles to this
      *         <code>Colony</code>'s tile being water tiles.
      */
@@ -416,7 +416,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns whether this colony has undead units.
-     * 
+     *
      * @return whether this colony has undead units.
      */
     public boolean isUndead() {
@@ -427,7 +427,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Sets the owner of this <code>Colony</code>, including all units
      * within, and change main tile nation ownership.
-     * 
+     *
      * @param owner The <code>Player</code> that shall own this
      *            <code>Settlement</code>.
      * @see Settlement#getOwner
@@ -457,7 +457,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Sets the number of units inside the colony, used in enemy colonies
-     * 
+     *
      * @param unitCount The units inside the colony
      * @see #getUnitCount
      */
@@ -467,7 +467,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Collect the buildings for producing the given type of goods.
-     * 
+     *
      * @param goodsType The type of goods.
      * @return A <code>List</code> of <code>Building</code>s which produce
      *         the given type of goods.
@@ -484,7 +484,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Collect the buildings for consuming the given type of goods.
-     * 
+     *
      * @param goodsType The type of goods.
      * @return A <code>List</code> of <code>Building</code>s which consume
      *         the given type of goods.
@@ -527,7 +527,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Gets a <code>List</code> of every {@link WorkLocation} in this
      * <code>Colony</code>.
-     * 
+     *
      * @return The <code>List</code>.
      * @see WorkLocation
      */
@@ -540,7 +540,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Gets a <code>List</code> of every {@link Building} in this
      * <code>Colony</code>.
-     * 
+     *
      * @return The <code>List</code>.
      * @see Building
      */
@@ -551,7 +551,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Gets a <code>List</code> of every {@link ColonyTile} in this
      * <code>Colony</code>.
-     * 
+     *
      * @return The <code>List</code>.
      * @see ColonyTile
      */
@@ -561,7 +561,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Gets a <code>Building</code> of the specified type.
-     * 
+     *
      * @param type The type of the building to get.
      * @return The <code>Building</code>.
      */
@@ -589,7 +589,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Returns the <code>ColonyTile</code> matching the given
      * <code>Tile</code>.
-     * 
+     *
      * @param t The <code>Tile</code> to get the <code>ColonyTile</code>
      *            for.
      * @return The <code>ColonyTile</code>
@@ -641,7 +641,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Adds a <code>Locatable</code> to this Location.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public void add(Locatable locatable) {
@@ -671,7 +671,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
     /**
      * Removes a specified amount of a type of Goods from this Settlement.
-     * 
+     *
      * @param type The type of Goods to remove from this settlement.
      * @param amount The amount of Goods to remove from this settlement.
      */
@@ -741,7 +741,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Removes a <code>Locatable</code> from this Location.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
@@ -764,7 +764,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Gets the number of units at this colony.  Units are located in a
      * {@link WorkLocation}s.
-     * 
+     *
      * @return The number of <code>Unit</code>s in this colony.
      */
     public int getUnitCount() {
@@ -816,7 +816,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Returns true if this colony has a schoolhouse and the unit type is a
      * skilled unit type with a skill level not exceeding the level of the
      * schoolhouse. @see Building#canAdd
-     * 
+     *
      * @param unit The unit to add as a teacher.
      * @return <code>true</code> if this unit type could be added.
      */
@@ -830,7 +830,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * schoolhouse. The number of units already in the schoolhouse and
      * the availability of pupils are not taken into account. @see
      * Building#canAdd
-     * 
+     *
      * @param unitType The unit type to add as a teacher.
      * @return <code>true</code> if this unit type could be added.
      */
@@ -838,7 +838,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (!hasAbility("model.ability.teach")) {
             return false;
         }
-        
+
         for (Building building : buildingMap.values()) {
             if (building.getType().hasAbility("model.ability.teach") &&
                 building.canAdd(unitType)) {
@@ -869,9 +869,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Typically, colonies are also defended by units outside the colony on the same tile.
      * To consider units outside the colony as well, use (@see Tile#getDefendingUnit) instead.
      * <p>
-     * Returns an arbitrary unarmed land unit unless Paul Revere is present 
-     * as founding father, in which case the unit can be armed as well. 
-     * 
+     * Returns an arbitrary unarmed land unit unless Paul Revere is present
+     * as founding father, in which case the unit can be armed as well.
+     *
      * @param attacker The unit that would be attacking this colony.
      * @return The <code>Unit</code> that has been chosen to defend this
      *         colony, or <code>null</code> if the colony belongs to another
@@ -882,12 +882,12 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     @Override
     public Unit getDefendingUnit(Unit attacker) {
         List<Unit> unitList = getUnitList();
-        
+
         if (unitCount != -1 && unitList.isEmpty()) {
             // There are units, but we don't see them
             return null;
         }
-        
+
         Unit defender = null;
         float defencePower = -1.0f;
         for (Unit nextUnit : unitList) {
@@ -978,7 +978,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Returns a <code>List</code> with every unit type this colony may
      * build.
-     * 
+     *
      * @return A <code>List</code> with <code>UnitType</code>
      */
     public List<UnitType> getBuildableUnits() {
@@ -994,7 +994,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the type of building currently being built.
-     * 
+     *
      * @return The type of building currently being built.
      */
     public BuildableType getCurrentlyBuilding() {
@@ -1007,7 +1007,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Sets the type of building to be built.
-     * 
+     *
      * @param buildable The type of building to be built.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
@@ -1036,7 +1036,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         boolean goodsMissing = false;
         boolean goodsBeingProduced = false;
         boolean productionMissing = false;
-        
+
         for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
@@ -1050,7 +1050,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 continue;
             }
             goodsBeingProduced = true;
-            
+
             int amountRemaining = amountNeeded - amountAvailable;
             int eta = amountRemaining / amountProduced;
             if (amountRemaining % amountProduced != 0) {
@@ -1067,7 +1067,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if(productionMissing){
             result = result * -1;
         }
-        
+
         return result;
     }
 
@@ -1116,7 +1116,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Adds to the liberty points of the colony. Used only by DebugMenu.
-     * 
+     *
      * @param amount The number of liberty to add.
      */
     public void addLiberty(int amount) {
@@ -1160,7 +1160,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the current SoL membership of the colony.
-     * 
+     *
      * @return The current SoL membership of the colony.
      */
     public int getSoL() {
@@ -1210,7 +1210,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the Tory membership of the colony.
-     * 
+     *
      * @return The current Tory membership of the colony.
      */
     public int getTory() {
@@ -1219,7 +1219,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the production bonus, if any, of the colony.
-     * 
+     *
      * @return The current production bonus of the colony.
      */
     public int getProductionBonus() {
@@ -1244,7 +1244,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Gets a string representation of the Colony. Currently this method just
      * returns the name of the <code>Colony</code>, but that may change
      * later.
-     * 
+     *
      * @return The name of the colony.
      * @see #getName
      */
@@ -1255,7 +1255,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the name of this location.
-     * 
+     *
      * @return The name of this location.
      */
     public StringTemplate getLocationName() {
@@ -1271,7 +1271,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public StringTemplate getLocationNameFor(Player player) {
         return StringTemplate.name(getNameFor(player));
     }
-    
+
     /**
      * Gets the combined production of all food types.
      *
@@ -1287,7 +1287,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the production of the given type of goods.
-     * 
+     *
      * @param goodsType The type of goods to get the production for.
      * @return The production of the given type of goods the current turn by all
      *         of the <code>Colony</code>'s {@link Building buildings} and
@@ -1303,7 +1303,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Gets a vacant <code>WorkLocation</code> for the given <code>Unit</code>.
-     * 
+     *
      * @param unit The <code>Unit</code>
      * @return A vacant <code>WorkLocation</code> for the given
      *         <code>Unit</code> or <code>null</code> if there is no such
@@ -1320,7 +1320,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns an <code>Occupation</code> for the given <code>Unit</code>.
-     * 
+     *
      * @param unit The <code>Unit</code>
      * @return An <code>Occupation</code> for the given
      *         <code>Unit</code> or <code>null</code> if there is none.
@@ -1403,7 +1403,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Returns a vacant <code>ColonyTile</code> where the given
      * <code>unit</code> produces the maximum output of the given
      * <code>goodsType</code>.
-     * 
+     *
      * @param unit The <code>Unit</code> to find a vacant
      *            <code>ColonyTile</code> for.
      * @param allowClaim Allow claiming free tiles from other settlements.
@@ -1442,7 +1442,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns how much of a Good will be produced by this colony this turn
-     * 
+     *
      * @param goodsType The goods' type.
      * @return The amount of the given goods will be produced for next turn.
      */
@@ -1460,7 +1460,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Returns how much of a Good will be produced by this colony this turn,
      * taking into account how much is consumed - by workers, horses, etc.
-     * 
+     *
      * @param goodsType The goods' type.
      * @return The amount of the given goods currently unallocated for next
      *         turn.
@@ -1617,13 +1617,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             // building nothing
             return;
         }
-        
+
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
             return;
         }
         lastVisited = getGame().getTurn().getNumber();
-        
+
         // Always check first the currently build
         while (!buildQueue.isEmpty() && !canBuild()) {
             getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -1642,7 +1642,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                             .addName("%colony%", getName()));
             return;
         }
-        
+
         // Check availability of goods required for construction
         ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
         for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
@@ -1665,7 +1665,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                              .add("%goodsType%", requiredGoodsType.getNameKey()));
             }
         }
-       
+
         if (!messages.isEmpty()) {
             // building/unit cant be completed
             // storable goods necessary for the build are missing
@@ -1675,10 +1675,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
             return;
         }
-      
+
         // All required goods are present
         // Buildable can be completed
-        
+
         // consume the goods
         for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
             if (getSpecification().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
@@ -1689,7 +1689,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 removeGoods(goodsRequired.getType());
             }
         }
-        
+
         if (buildable instanceof UnitType) {
             // artillery/ship/wagon completed
             Unit unit = getGame().getModelController()
@@ -1719,7 +1719,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                             .add("%building%", buildable.getNameKey()));
             buildQueue.remove(0);
         }
-            
+
         // Buildable can not be built at this time
         while (!buildQueue.isEmpty() && !canBuild()) {
             getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -1742,7 +1742,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Returns the price for the remaining hammers and tools for the
      * {@link Building} that is currently being built.
-     * 
+     *
      * @return The price.
      * @see #payForBuilding
      */
@@ -1752,7 +1752,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Gets the price for the remaining resources to build a given buildable.
-     * 
+     *
      * @param type The <code>BuildableType</code> to build.
      * @return The price.
      * @see #payForBuilding
@@ -1803,9 +1803,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Check if the owner can buy the remaining hammers and tools for 
+     * Check if the owner can buy the remaining hammers and tools for
      * the {@link Building} that is currently being built.
-     * 
+     *
      * @exception IllegalStateException If the owner of this <code>Colony</code>
      *                has an insufficient amount of gold.
      * @see #getPriceForBuilding
@@ -1815,9 +1815,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Check if the owner can buy the remaining hammers and tools for 
+     * Check if the owner can buy the remaining hammers and tools for
      * the {@link Building} given.
-     * 
+     *
      * @param buildableType a <code>BuildableType</code> value
      * @return a <code>boolean</code> value
      * @exception IllegalStateException If the owner of this <code>Colony</code>
@@ -1923,7 +1923,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     /**
      * Returns a random unit from this colony. At this moment, this method
      * always returns the first unit in the colony.
-     * 
+     *
      * @return A random unit from this <code>Colony</code>. This
      *         <code>Unit</code> will either be working in a {@link Building}
      *         or a {@link ColonyTile}.
@@ -2100,7 +2100,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         }
 
     }
-    
+
     /**
      * Returns 1, 0, or -1 to indicate that government would improve,
      * remain the same, or deteriorate if the colony had the given
@@ -2134,7 +2134,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (sonsOfLiberty >= 50) {
                 result = -1;
             }
-        	
+
             // Now that no bonus is applied, penalties may.
             if (loyalists > veryBadGovernment) {
                 if (tories <= veryBadGovernment) {
@@ -2158,7 +2158,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
         final int badGovernment = getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
-        
+
         String msgId = null;
         ModelMessage.MessageType msgType = ModelMessage.MessageType.GOVERNMENT_EFFICIENCY;
         if (sonsOfLiberty == 100) {
@@ -2180,7 +2180,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 msgId = "model.colony.lostSoL50";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
             }
-        	
+
             // Now that no bonus is applied, penalties may.
             if (tories > veryBadGovernment) {
                 if (oldTories <= veryBadGovernment) {
@@ -2200,7 +2200,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 msgId = "model.colony.governmentImproved2";
             }
         }
-        
+
         GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
         return (msgId == null) ? null
             : new ModelMessage(msgType, msgId, this, bells)
@@ -2286,7 +2286,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 firePropertyChange(REARRANGE_WORKERS, false, true);
             }
         }
-        
+
         List<Building> buildingsProducingBuildingMaterials = new ArrayList<Building>();
         List<Building> buildingsProducingFood = new ArrayList<Building>();
         List<Building> otherBuildings = new ArrayList<Building>();
@@ -2390,7 +2390,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Returns the capacity of this colony's warehouse. All goods above this
      * limit, except Food, will be removed when calling
      * {@link #newTurn}.
-     * 
+     *
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
     public int getWarehouseCapacity() {
@@ -2400,7 +2400,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return (int) getFeatureContainer().applyModifier(0, "model.modifier.warehouseStorage",
                                                     null, getGame().getTurn());
     }
-    
+
     public Building getWarehouse() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
@@ -2543,7 +2543,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -2620,7 +2620,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     @Override

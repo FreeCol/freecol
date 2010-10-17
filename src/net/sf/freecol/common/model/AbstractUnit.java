@@ -153,7 +153,7 @@ public class AbstractUnit extends FreeColObject {
     public String toString() {
         return Integer.toString(number) + " " + getId() + " (" + role.toString() + ")";
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      *
@@ -167,7 +167,7 @@ public class AbstractUnit extends FreeColObject {
         number = getAttribute(in, "number", 1);
         in.nextTag(); // close this element
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

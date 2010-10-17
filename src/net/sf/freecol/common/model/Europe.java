@@ -78,7 +78,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Creates a new <code>Europe</code>.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param owner The <code>Player</code> that will be using this object of
      *            <code>Europe</code>.
@@ -93,7 +93,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Initializes this object from an XML-representation of this object.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if an error occurred during parsing.
@@ -106,7 +106,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Initializes this object from an XML-representation of this object.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param e An XML-element that will be used to initialize this object.
      */
@@ -121,7 +121,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -150,7 +150,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Returns true if not all recruitables are of the same type.
-     * 
+     *
      * @return a <code>boolean</code> value
      */
     public boolean recruitablesDiffer() {
@@ -159,7 +159,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Gets the type of the recruitable in Europe at the given slot.
-     * 
+     *
      * @param slot The slot of the recruitable whose type needs to be returned.
      *            Should be 0, 1 or 2. NOTE - used to be 1, 2 or 3 and was
      *            called with 1-3 by some classes and 0-2 by others, the method
@@ -178,7 +178,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Sets the type of the recruitable in Europe at the given slot to the given
      * type.
-     * 
+     *
      * @param slot The slot of the recruitable whose type needs to be set.
      *            Should be 0, 1 or 2. NOTE - changed in order to match
      *            getRecruitable above!
@@ -196,7 +196,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Returns <i>null</i>.
-     * 
+     *
      * @return <i>null</i>.
      */
     public Tile getTile() {
@@ -205,7 +205,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Europe does not belong to a colony.
-     * 
+     *
      * @return Always returns null.
      */
     public Colony getColony() {
@@ -214,7 +214,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Adds a <code>Locatable</code> to this Location.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public void add(Locatable locatable) {
@@ -235,7 +235,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Removes a <code>Locatable</code> from this Location.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
@@ -251,7 +251,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Checks if the specified <code>Locatable</code> is at this
      * <code>Location</code>.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to test the presence of.
      * @return The result.
      */
@@ -270,7 +270,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to test the addabillity of.
      * @return <i>true</i>.
      */
@@ -280,7 +280,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Gets the amount of Units at this Location.
-     * 
+     *
      * @return The amount of Units at this Location.
      */
     public int getUnitCount() {
@@ -291,7 +291,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * Gets a <code>List</code> of every <code>Unit</code> directly located
      * in this <code>Europe</code>. This does not include <code>Unit</code>s
      * on ships.
-     * 
+     *
      * @return The <code>List</code>.
      */
     public List<Unit> getUnitList() {
@@ -325,7 +325,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * Gets an <code>Iterator</code> of every <code>Unit</code> directly
      * located in this <code>Europe</code>. This does not include
      * <code>Unit</code>s on ships.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
@@ -334,7 +334,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Gets the first <code>Unit</code> in this <code>Europe</code>.
-     * 
+     *
      * @return The first <code>Unit</code> in this <code>Europe</code>.
      */
     public Unit getFirstUnit() {
@@ -347,7 +347,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Gets the last <code>Unit</code> in this <code>Europe</code>.
-     * 
+     *
      * @return The last <code>Unit</code> in this <code>Europe</code>.
      */
     public Unit getLastUnit() {
@@ -360,7 +360,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Returns the price of a unit in Europe.
-     * 
+     *
      * @param unitType The type of unit of which you need the price.
      * @return The price of this unit when trained in Europe.
      *         'UNDEFINED' is returned in case the unit cannot be
@@ -386,10 +386,10 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         String baseOption = "model.option.priceIncreasePerType";
         String name
             = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
-        String option = (spec.getBooleanOption(baseOption).getValue()) 
+        String option = (spec.getBooleanOption(baseOption).getValue())
             ? "model.option.priceIncrease" + name
             : "model.option.priceIncrease";
-        int increase = (spec.hasOption(option)) 
+        int increase = (spec.hasOption(option))
             ? spec.getIntegerOption(option).getValue()
             : 0;
         if (increase != 0) {
@@ -399,7 +399,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Gets the current price for a recruit.
-     * 
+     *
      * @return The current price of the recruit in this <code>Europe</code>.
      */
     public int getRecruitPrice() {
@@ -428,7 +428,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Sets the owner of this <code>Ownable</code>.
-     * 
+     *
      * @param p The <code>Player</code> that should take ownership of this
      *            {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by this method.
@@ -458,7 +458,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Returns the name of this location.
-     * 
+     *
      * @return The name of this location.
      */
     public StringTemplate getLocationName() {
@@ -477,7 +477,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Returns the name of the owner's home port.
-     * 
+     *
      * @return The name of this location.
      */
     public String getNameKey() {
@@ -505,14 +505,14 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -554,7 +554,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -620,7 +620,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "europe".
      */
     public static String getXMLElementTagName() {

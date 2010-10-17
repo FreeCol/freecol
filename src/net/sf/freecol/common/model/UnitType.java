@@ -75,7 +75,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * Describe movement here.
      */
     private int movement = 3;
-    
+
     /**
      * Describe lineOfSight here.
      */
@@ -120,7 +120,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * The possible type changes for this unit type.
      */
     private List<UnitTypeChange> typeChanges = new ArrayList<UnitTypeChange>();
-    
+
 
     /**
      * Creates a new <code>UnitType</code> instance.
@@ -328,10 +328,10 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * Get the <code>Price</code> value.
      *
      * @return an <code>int</code> value
-     * 
+     *
      * This returns the base price of the <code>UnitType</code>
-     * 
-     * For the actual price of the unit, use {@link Europe#getUnitPrice(UnitType)} 
+     *
+     * For the actual price of the unit, use {@link Europe#getUnitPrice(UnitType)}
      */
     public int getPrice() {
         return price;
@@ -503,7 +503,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         return null;
     }
 
-    
+
 
     /**
      * Return true if this UnitType can be upgraded to the given
@@ -667,7 +667,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -761,11 +761,11 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         if (base == 0) {
             return 0;
         }
-        
+
         base = (int) getFeatureContainer().applyModifier(base, goodsType.getId());
         return Math.max(base, 1);
     }
 
 
-    
+
 }

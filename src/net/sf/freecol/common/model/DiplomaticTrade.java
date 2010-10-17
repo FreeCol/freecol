@@ -49,7 +49,7 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
 
-    /** 
+    /**
      * The individual items the trade consists of.
      */
     private List<TradeItem> items;
@@ -169,7 +169,7 @@ public class DiplomaticTrade extends FreeColObject {
 
     /**
      * Add to the DiplomaticTrade.
-     * 
+     *
      * @param newItem The <code>TradeItem</code> to add.
      */
     public void add(TradeItem newItem) {
@@ -181,7 +181,7 @@ public class DiplomaticTrade extends FreeColObject {
 
     /**
      * Remove a from the DiplomaticTrade.
-     * 
+     *
      * @param newItem The <code>TradeItem</code> to remove.
      */
     public void remove(TradeItem newItem) {
@@ -190,7 +190,7 @@ public class DiplomaticTrade extends FreeColObject {
 
     /**
      * Remove from the DiplomaticTrade.
-     * 
+     *
      * @param index The index of the <code>TradeItem</code> to remove
      */
     public void remove(int index) {
@@ -246,7 +246,7 @@ public class DiplomaticTrade extends FreeColObject {
         }
         return null;
     }
-    
+
     /**
      * Get the goods being offered.
      *
@@ -263,7 +263,7 @@ public class DiplomaticTrade extends FreeColObject {
         }
         return goodsList;
     }
-    
+
     /**
      * Get a list of colonies offered in this trade.
      *
@@ -280,11 +280,11 @@ public class DiplomaticTrade extends FreeColObject {
         }
         return colonyList;
     }
-    
+
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -324,7 +324,7 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to
      *         the stream.
@@ -340,7 +340,7 @@ public class DiplomaticTrade extends FreeColObject {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "diplomaticTrade".
      */
     public static String getXMLElementTagName() {

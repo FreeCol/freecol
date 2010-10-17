@@ -53,10 +53,10 @@ public class ExportData extends FreeColObject {
     /**
      * Package constructor: This class is only supposed to be
      * constructed by {@link Colony}.
-     * 
+     *
      */
     public ExportData() {}
-    
+
     /**
      * Creates a new <code>ExportData</code> instance.
      *
@@ -183,13 +183,13 @@ public class ExportData extends FreeColObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
@@ -217,7 +217,7 @@ public class ExportData extends FreeColObject {
         highLevel = Integer.parseInt(in.getAttributeValue(null, "highLevel"));
         lowLevel = Integer.parseInt(in.getAttributeValue(null, "lowLevel"));
         exportLevel = Integer.parseInt(in.getAttributeValue(null, "exportLevel"));
-    
+
         in.nextTag();
     }
 
@@ -230,4 +230,4 @@ public class ExportData extends FreeColObject {
         return "exportData";
     }
 
-} 
+}

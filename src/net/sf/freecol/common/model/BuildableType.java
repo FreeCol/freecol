@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 public abstract class BuildableType extends FreeColGameObjectType {
 
     public static final String NOTHING = "model.buildableType.nothing";
-    
+
     /**
      * The minimum population that a Colony needs in order to build
      * this type.
@@ -82,7 +82,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
     	}
     	return 0;
     }
-    
+
     /**
      * Set the <code>GoodsRequired</code> value.
      *

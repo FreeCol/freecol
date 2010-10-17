@@ -105,11 +105,11 @@ public class AbstractGoods extends FreeColObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
@@ -117,14 +117,14 @@ public class AbstractGoods extends FreeColObject {
         out.writeAttribute("amount", Integer.toString(amount));
         out.writeEndElement();
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         type = getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
         amount = Integer.parseInt(in.getAttributeValue(null, "amount"));
         in.nextTag();

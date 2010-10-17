@@ -174,7 +174,7 @@ public class EuropeanNationType extends NationType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.

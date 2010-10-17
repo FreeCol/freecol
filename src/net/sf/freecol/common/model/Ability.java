@@ -69,7 +69,7 @@ public final class Ability extends Feature {
         setSource(source);
         this.value = value;
     }
-    
+
     /**
      * Creates a new <code>Ability</code> instance.
      *
@@ -78,7 +78,7 @@ public final class Ability extends Feature {
     public Ability(Element element) {
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>Ability</code> instance.
      *
@@ -90,7 +90,7 @@ public final class Ability extends Feature {
         throws XMLStreamException {
         readFromXMLImpl(in, specification);
     }
-    
+
     /**
      * Get the <code>Value</code> value.
      *
@@ -133,11 +133,11 @@ public final class Ability extends Feature {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         writeAttributes(out);
@@ -150,7 +150,7 @@ public final class Ability extends Feature {
         super.readAttributes(in, specification);
         value = getAttribute(in, VALUE_TAG, true);
     }
-    
+
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute(VALUE_TAG, String.valueOf(value));

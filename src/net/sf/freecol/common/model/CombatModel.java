@@ -68,7 +68,7 @@ abstract public class CombatModel {
      */
     public class CombatOdds {
         public static final float UNKNOWN_ODDS = -1.0f;
-        
+
         public float win;
 
         public CombatOdds(float win) {
@@ -136,7 +136,7 @@ abstract public class CombatModel {
 
     /**
      * Calculates the chance of the outcomes of a combat.
-     * 
+     *
      * @param attacker The attacker.
      * @param defender The defender.
      * @return The <code>CombatOdds</code>.
@@ -149,7 +149,7 @@ abstract public class CombatModel {
      *
      * Null can be passed for the defender when only the attacker
      * stats are required.
-     * 
+     *
      * @param attacker The attacker.
      * @param defender The defender.
      * @return The offensive power.
@@ -159,7 +159,7 @@ abstract public class CombatModel {
 
     /**
      * Get the defensive power of a defender wrt an attacker.
-     * 
+     *
      * @param attacker The attacker.
      * @param defender The defender.
      * @return The defensive power.
@@ -169,7 +169,7 @@ abstract public class CombatModel {
 
     /**
      * Collect all the offensive modifiers that apply to an attack.
-     * 
+     *
      * Null can be passed as the defender when only the attacker unit
      * stats are required.
      *

@@ -87,7 +87,7 @@ public class FoundingFather extends FreeColGameObjectType {
     public FoundingFatherType getType() {
         return type;
     }
-    
+
     /**
      * Return the localized type of this FoundingFather.
      *
@@ -253,7 +253,7 @@ public class FoundingFather extends FreeColGameObjectType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.

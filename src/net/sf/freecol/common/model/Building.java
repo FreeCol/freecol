@@ -40,7 +40,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                                                  Comparable<Building> {
 
     private static Logger logger = Logger.getLogger(Building.class.getName());
-	
+
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
     /** The colony containing this building. */
@@ -57,7 +57,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Creates a new <code>Building</code>.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param colony The colony in which this building is located.
      * @param type The type of building.
@@ -71,7 +71,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Initiates a new <code>Building</code> from an XML representation.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -84,7 +84,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Initiates a new <code>Building</code> from an XML representation.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param e An XML-element that will be used to initialize this object.
      */
@@ -99,7 +99,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -109,7 +109,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets the owner of this <code>Ownable</code>.
-     * 
+     *
      * @return The <code>Player</code> controlling this {@link Ownable}.
      */
     public Player getOwner() {
@@ -118,7 +118,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Sets the owner of this <code>Ownable</code>.
-     * 
+     *
      * @param p The <code>Player</code> that should take ownership of this
      *            {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by this method.
@@ -130,7 +130,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Gets the <code>Tile</code> where this <code>Building</code> is
      * located.
-     * 
+     *
      * @return The <code>Tile</code>.
      */
     public Tile getTile() {
@@ -152,7 +152,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the name of this location.
-     * 
+     *
      * @return The name of this location.
      */
     public StringTemplate getLocationName() {
@@ -173,7 +173,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Gets the name of the improved building of the same type. An improved
      * building is a building of a higher level.
-     * 
+     *
      * @return The name of the improved building or <code>null</code> if the
      *         improvement does not exist.
      */
@@ -184,7 +184,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Checks if this building can have a higher level.
-     * 
+     *
      * @return If this <code>Building</code> can have a higher level, that
      *         {@link FoundingFather Adam Smith} is present for manufactoring
      *         factory level buildings and that the <code>Colony</code>
@@ -197,7 +197,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets a pointer to the colony containing this building.
-     * 
+     *
      * @return The <code>Colony</code>.
      */
     public Colony getColony() {
@@ -206,13 +206,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets the type of this building.
-     * 
+     *
      * @return The type.
      */
     public BuildingType getType() {
         return buildingType;
     }
-    
+
     /**
      * Returns whether this building can be damaged
      *
@@ -223,7 +223,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return !buildingType.isAutomaticBuild()
             && !colony.isAutomaticBuild(buildingType);
     }
-    
+
     /**
      * Reduces this building to previous level (is set to UpgradesFrom
      * attribute in BuildingType) or is destroyed if it's the first level
@@ -237,7 +237,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
         return false;
     }
-    
+
     /**
      * Upgrades this building to next level (is set to UpgradesTo
      * attribute in BuildingType)
@@ -248,17 +248,17 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
         setType(buildingType.getUpgradesTo());
     }
-    
+
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
         colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
-            
+
             // add new features and abilities from new type
             colony.getFeatureContainer().add(buildingType.getFeatureContainer());
-            
+
             // Colonists which can't work here must be put outside
             for (Unit unit : units) {
                 if (!canAdd(unit.getType())) {
@@ -266,16 +266,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 }
             }
         }
-        
+
         // Colonists exceding units limit must be put outside
         while (units.size() > getMaxUnits()) {
             getLastUnit().putOutsideColony();
         }
     }
-    
+
     /**
      * Gets the maximum number of units allowed in this <code>Building</code>.
-     * 
+     *
      * @return The number.
      */
     public int getMaxUnits() {
@@ -284,7 +284,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets the amount of units at this <code>WorkLocation</code>.
-     * 
+     *
      * @return The amount of units at this {@link WorkLocation}.
      */
     public int getUnitCount() {
@@ -303,7 +303,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Checks if the specified <code>Locatable</code> may be added to this
      * <code>WorkLocation</code>.
-     * 
+     *
      * @param locatable the <code>Locatable</code>.
      * @return <i>true</i> if the <i>Unit</i> may be added and <i>false</i>
      *         otherwise.
@@ -312,7 +312,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (locatable.getLocation() == this) {
             return true;
         }
-        
+
         if (getUnitCount() >= getMaxUnits()) {
             return false;
         }
@@ -326,7 +326,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Checks if the specified <code>UnitType</code> may be added to this
      * <code>WorkLocation</code>.
-     * 
+     *
      * @param unitType the <code>UnitTYpe</code>.
      * @return <i>true</i> if the <i>UnitType</i> may be added and <i>false</i>
      *         otherwise.
@@ -338,7 +338,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Adds the specified locatable to this building.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to add.
      */
     public void add(final Locatable locatable) {
@@ -366,7 +366,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Removes the specified locatable from this building.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to remove.
      */
     public void remove(final Locatable locatable) {
@@ -392,7 +392,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Checks if this <code>Building</code> contains the specified
      * <code>Locatable</code>.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to test the presence of.
      * @return
      *            <ul>
@@ -408,7 +408,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets the first unit in this building.
-     * 
+     *
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
@@ -421,7 +421,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets the last unit in this building.
-     * 
+     *
      * @return The <code>Unit</code>.
      */
     public Unit getLastUnit() {
@@ -435,7 +435,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Gets an <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Building</code>.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
@@ -448,7 +448,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Gets this <code>Location</code>'s <code>GoodsContainer</code>.
-     * 
+     *
      * @return <code>null</code>.
      */
     public GoodsContainer getGoodsContainer() {
@@ -504,12 +504,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (goodsOutput <= 0) {
             return;
         }
-        
+
         // Do nothing if:
         //  - produces building material that is not storable
         // and
         //  -for some reason the colony is not building nothing that turn
-        if (goodsOutputType.isBuildingMaterial() 
+        if (goodsOutputType.isBuildingMaterial()
                 && !goodsOutputType.isStorable()
                 && !getColony().canBuild()){
             return;
@@ -543,7 +543,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
              * higher level otherwise.
              */
             if (potentialStudent.getTeacher() == null &&
-                potentialStudent.canBeStudent(teacher)) {                
+                potentialStudent.canBeStudent(teacher)) {
                 if ((student == null || potentialStudent.getSkillLevel() == skill) &&
                     potentialStudent.getWorkType() == expertProduction) {
                     student = potentialStudent;
@@ -570,20 +570,20 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             teacher.setStudent(student);
             student.setTeacher(teacher);
             return true;
-        }                
+        }
     }
 
     private void trainStudents() {
         final Iterator<Unit> teachers = getUnitIterator();
         while (teachers.hasNext()) {
             final Unit teacher = teachers.next();
-            
+
             //Sanitation, make sure we have the proper teacher/student relation
             if (teacher.getStudent() != null && teacher.getStudent().getTeacher() != teacher){
             	logger.warning("Teacher assigned to student who does not know teacher");
             	teacher.setStudent(null);
             }
-            
+
             // student may have changed
             if (teacher.getStudent() == null && !assignStudent(teacher)) {
                 continue;
@@ -604,7 +604,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the type of goods this <code>Building</code> produces.
-     * 
+     *
      * @return The type of goods this <code>Building</code> produces or
      *         <code>-1</code> if there is no goods production by this
      *         <code>Building</code>.
@@ -615,7 +615,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the type of goods this building needs for input.
-     * 
+     *
      * @return The type of goods this <code>Building</code> requires as input
      *         in order to produce it's {@link #getGoodsOutputType output}.
      */
@@ -625,7 +625,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the amount of goods needed to have a full production.
-     * 
+     *
      * @return The maximum level of goods needed in order to have the maximum
      *         possible production with the current configuration of workers and
      *         improvements. This is actually the {@link #getGoodsInput input}
@@ -656,7 +656,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Returns the amount of goods being used to get the current
      * {@link #getProduction production}.
-     * 
+     *
      * @return The actual amount of goods that is being used to support the
      *         current production.
      * @see #getMaximumGoodsInput
@@ -671,11 +671,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return calculateGoodsInput(getMaximumGoodsInput(), 0);
         }
     }
-    
+
     /**
      * Returns the amount of goods being used to get the current
      * {@link #getProduction production} at the next turn.
-     * 
+     *
      * @return The actual amount of goods that will be used to support the
      *         production at the next turn.
      * @see #getMaximumGoodsInput
@@ -709,7 +709,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                         return 0;
                     }
                     // half of the surplus food, rounded down, is stored
-                    surplus = (int) Math.ceil(surplus / 2.0);  
+                    surplus = (int) Math.ceil(surplus / 2.0);
                 }
                return surplus;
             }
@@ -724,7 +724,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
         return maximumGoodsInput;
     }
-    
+
     /**
      * Returns the actual production of this building if
      * <Code>Unit</code> was added.
@@ -768,7 +768,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the actual production of this building.
-     * 
+     *
      * @return The amount of goods being produced by this <code>Building</code>
      *         the current turn. The type of goods being produced is given by
      *         {@link #getGoodsOutputType}.
@@ -782,10 +782,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return getProductionAdding(getStoredInput());
         }
     }
-    
+
     /**
      * Returns the actual production of this building for next turn.
-     * 
+     *
      * @return The production of this building the next turn.
      * @see #getProduction
      */
@@ -795,7 +795,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         } else if (getGoodsInputType() == null) {
             return getProductionAdding(0);
         } else {
-            return getProductionAdding(getStoredInput() + 
+            return getProductionAdding(getStoredInput() +
                                        colony.getProductionNextTurn(getGoodsInputType()));
         }
     }
@@ -834,8 +834,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         // apply modifiers, if any
         goodsOutput = applyModifiers(goodsOutput);
-        
-        // auto-produced goods should not overflow    
+
+        // auto-produced goods should not overflow
         int availSpace = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
         if (goodsOutput > availSpace) {
             goodsOutput = availSpace;
@@ -845,19 +845,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the additional production of new <code>Unit</code> at this building for next turn.
-     * 
+     *
      * @return The production of this building the next turn.
      * @see #getProduction
      */
     public int getAdditionalProductionNextTurn(Unit addUnit) {
-        return getProductionAdding(getStoredInput() + 
-                                   colony.getProductionNextTurn(getGoodsInputType()), addUnit) - 
+        return getProductionAdding(getStoredInput() +
+                                   colony.getProductionNextTurn(getGoodsInputType()), addUnit) -
             getProductionNextTurn();
     }
 
     /**
      * Returns the production of the given type of goods.
-     * 
+     *
      * @param goodsType The type of goods to get the production for.
      * @return the production og the given goods this turn. This method will
      *         return the same as {@link #getProduction} if the given type of
@@ -921,7 +921,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Returns the maximum production of this building.
-     * 
+     *
      * @return The production of this building, with the current amount of
      *         workers, when there is enough "input goods".
      */
@@ -932,7 +932,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return applyModifiers(getProductivity());
         }
     }
-    
+
     /**
      * Returns the maximum production of a building with 0 workplaces
      */
@@ -980,7 +980,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return (int) FeatureContainer.applyModifiers(productivity, getGame().getTurn(), modifiers);
 
     }
-    
+
     public int compareTo(Building other) {
         return getType().compareTo(other.getType());
     }
@@ -1013,14 +1013,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -1056,7 +1056,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */

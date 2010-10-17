@@ -48,14 +48,14 @@ abstract public class FreeColGameObject extends FreeColObject {
     private boolean disposed = false;
     private boolean uninitialized;
 
-    protected FreeColGameObject() {    
+    protected FreeColGameObject() {
         logger.info("FreeColGameObject without ID created.");
         uninitialized = false;
     }
-    
+
 
     /**
-     * Creates a new <code>FreeColGameObject</code> with an automatically assigned 
+     * Creates a new <code>FreeColGameObject</code> with an automatically assigned
      * ID and registers this object at the specified <code>Game</code>.
      *
      * @param game The <code>Game</code> in which this object belong.
@@ -70,11 +70,11 @@ abstract public class FreeColGameObject extends FreeColObject {
         } else {
             logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
         }
-        
+
         uninitialized = false;
     }
-    
-       
+
+
     /**
      * Initiates a new <code>FreeColGameObject</code> from an <code>Element</code>.
      *
@@ -111,7 +111,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Initiates a new <code>FreeColGameObject</code> 
+     * Initiates a new <code>FreeColGameObject</code>
      * with the given ID. The object should later be
      * initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -128,7 +128,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
 
         setId(id);
-        
+
         uninitialized = true;
     }
 
@@ -142,7 +142,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         setId(getRealXMLElementTagName() + ":"
               + ((ServerGame)game).getNextID());
     }
-    
+
     /**
      * Gets the game object this <code>FreeColGameObject</code> belongs to.
      * @return The <code>game</code>.
@@ -172,7 +172,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      */
     public void setGame(Game game) {
         this.game = game;
-    }    
+    }
 
 
     /**
@@ -213,11 +213,11 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Checks if this <code>FreeColGameObject</code> 
+     * Checks if this <code>FreeColGameObject</code>
      * is uninitialized. That is: it has been referenced
      * by another object, but has not yet been updated with
      * {@link #readFromXML}.
-     * 
+     *
      * @return <code>true</code> if this object is not initialized.
      */
     public boolean isUninitialized() {
@@ -240,7 +240,7 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -248,55 +248,55 @@ abstract public class FreeColGameObject extends FreeColObject {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXMLImpl(out, null, false, false);
     }
-            
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
      *      is only needed when saving a game is added.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
-    abstract protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, 
+     */
+    abstract protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll,
                                       boolean toSavedGame) throws XMLStreamException;
 
 
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
      *      is only needed when saving a game is added.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public final void toXML(XMLStreamWriter out, Player player, boolean showAll,
                             boolean toSavedGame) throws XMLStreamException {
         if (toSavedGame && !showAll) {
@@ -304,7 +304,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
         toXMLImpl(out, player, showAll, toSavedGame);
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream containing the XML.
@@ -361,7 +361,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
     }
 
-    
+
     /**
      * Checks if this object has the specified ID.
      *
@@ -386,7 +386,7 @@ abstract public class FreeColGameObject extends FreeColObject {
             return false;
         }
     }
-    
+
     /**
      * Checks if the given <code>FreeColGameObject</code> equals this object.
      *
@@ -396,12 +396,12 @@ abstract public class FreeColGameObject extends FreeColObject {
     public boolean equals(Object o) {
         return (o instanceof FreeColGameObject) ? equals((FreeColGameObject) o) : false;
     }
-        
+
     public int hashCode() {
         return getId().hashCode();
     }
 
-    
+
     /**
      * Returns a string representation of the object.
      * @return The <code>String</code>

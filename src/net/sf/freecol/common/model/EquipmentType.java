@@ -64,13 +64,13 @@ public class EquipmentType extends BuildableType {
      * Describe militaryEquipment here.
      */
     private boolean militaryEquipment;
-    
+
     /**
      * Stores the abilities required of the location where the unit is
      * to be equipped.
      */
     private HashMap<String, Boolean> requiredLocationAbilities = new HashMap<String, Boolean>();
-    
+
     /**
      * A List containing the IDs of equipment types compatible with this one.
      */
@@ -292,7 +292,7 @@ public class EquipmentType extends BuildableType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.

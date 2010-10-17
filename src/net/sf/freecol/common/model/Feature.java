@@ -351,7 +351,7 @@ public abstract class Feature extends FreeColObject {
                     in.nextTag();
                 }
             }
-        }        
+        }
     }
 
 }

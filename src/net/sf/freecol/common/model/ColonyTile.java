@@ -86,7 +86,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
         readFromXML(in);
     }
-    
+
     /**
      * Initiates a new <code>Building</code> from an
      * XML representation.
@@ -102,7 +102,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
-     * Initiates a new <code>ColonyTile</code> 
+     * Initiates a new <code>ColonyTile</code>
      * with the given ID. The object should later be
      * initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -138,7 +138,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public StringTemplate getLocationNameFor(Player player) {
         return getLocationName();
     }
-    
+
     /**
      * Returns a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow).
@@ -200,11 +200,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         return colony.getTile();
     }
 
-    
+
     public GoodsContainer getGoodsContainer() {
         return null;
     }
-    
+
 
     /**
     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
@@ -215,7 +215,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public Unit getUnit() {
         return unit;
     }
-    
+
     /**
     * Gets a pointer to the colony containing this tile.
     * @return The <code>Colony</code>.
@@ -362,7 +362,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         setUnit(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
     }
-    
+
     /**
      * Remove the specified locatable from this colony tile.
      *
@@ -395,7 +395,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     /**
     * Checks if this <code>ColonyTile</code> contains the given <code>Locatable</code>.
-    * 
+    *
     * @param locatable The <code>Locatable</code>.
     * @return The result.
     */
@@ -442,7 +442,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public boolean isOccupied() {
         return workTile.isOccupied();
     }
-    
+
     /**
     * Prepares this <code>ColonyTile</code> for a new turn.
     */
@@ -476,7 +476,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
 
     }
-   
+
     /**
      * Returns a worktype for a unit.
      *
@@ -498,7 +498,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
         return workType;
     }
-    
+
     /**
      * Returns the production of the given type of goods.
      *
@@ -607,18 +607,18 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
@@ -629,8 +629,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-        
-        // Add attributes:       
+
+        // Add attributes:
         out.writeAttribute("ID", getId());
         out.writeAttribute("colony", colony.getId());
         out.writeAttribute("workTile", workTile.getId());
@@ -653,7 +653,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         colony = getFreeColGameObject(in, "colony", Colony.class);
         workTile = getFreeColGameObject(in, "workTile", Tile.class);
         colonyCenterTile = (colony.getTile() == workTile);
-        
+
         unit = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
@@ -691,7 +691,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     /**
      * Will return the position of the tile and the name of the colony in
      * addition to the FreeColObject.toString().
-     * 
+     *
      * @return A representation of a colony-tile that can be used for debugging.
      */
     public String toString() {

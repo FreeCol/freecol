@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 public class ColonyTradeItem extends TradeItem {
-    
+
     /**
      * The ID of the colony to change hands.
      */
@@ -137,7 +137,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -149,7 +149,7 @@ public class ColonyTradeItem extends TradeItem {
         out.writeAttribute("colonyName", colonyName);
         out.writeEndElement();
     }
-    
+
     /**
      * Gets the tag name of the root element representing this object.
      * @return "goods".

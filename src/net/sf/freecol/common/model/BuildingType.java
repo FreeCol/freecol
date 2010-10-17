@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
  * name of the building in a given level and what is needed to build it.
  */
 public final class BuildingType extends BuildableType implements Comparable<BuildingType> {
-    
+
     private int level = 1;
     private int workPlaces = 3;
     private int basicProduction = 3;
@@ -43,22 +43,22 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private Modifier productionModifier = null;
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
-    
+
 
     public BuildingType(String id, Specification specification) {
         super(id, specification);
         setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
 
-    
+
     public BuildingType getUpgradesFrom() {
         return upgradesFrom;
     }
-    
+
     public BuildingType getUpgradesTo() {
         return upgradesTo;
     }
-    
+
     public BuildingType getFirstLevel() {
         BuildingType buildingType = this;
         while (buildingType.getUpgradesFrom() != null) {
@@ -66,11 +66,11 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         }
         return buildingType;
     }
-    
+
     public int getWorkPlaces() {
         return workPlaces;
     }
-    
+
     public int getBasicProduction() {
         return basicProduction;
     }
@@ -153,7 +153,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
         minSkill = getAttribute(in, "minSkill", parent.minSkill);
         maxSkill = getAttribute(in, "maxSkill", parent.maxSkill);
-        
+
         sequence = getAttribute(in, "sequence", parent.sequence);
 
         if (parent != this) {
@@ -166,7 +166,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -212,5 +212,5 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     public boolean canAdd(UnitType unitType) {
         return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
     }
-  
+
 }
