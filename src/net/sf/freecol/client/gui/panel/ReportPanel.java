@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,6 +60,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected JScrollPane scrollPane;
 
+    protected Component main;
+
     /**
      * The saved size of this panel.
      */
@@ -78,38 +81,53 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      * @param title The title to display on the panel.
      */
     public ReportPanel(Canvas parent, String title) {
+        this(parent, title, null);
+    }
+
+    /**
+     * The constructor that will add the items to this panel.
+     *
+     * @param parent The parent of this panel.
+     * @param title The title to display on the panel.
+     * @param main a <code>Component</code> value
+     */
+    public ReportPanel(Canvas parent, String title, Component main) {
         super(parent);
+        this.main = main;
 
         setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 
         header = getDefaultHeader(title);
         add(header, "align center");
 
-        reportPanel = new JPanel() {
-            @Override
-            public String getUIClassID() {
-                return "ReportPanelUI";
-            }
-        };
+        if (main == null) {
+            reportPanel = new JPanel() {
+                    @Override
+                    public String getUIClassID() {
+                        return "ReportPanelUI";
+                    }
+                };
 
-        reportPanel.setOpaque(true);
-        reportPanel.setBorder(createBorder());
+            reportPanel.setOpaque(true);
+            reportPanel.setBorder(createBorder());
 
-        scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
-        add(scrollPane, "height 100%, width 100%");
-
+            scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
+            add(scrollPane, "height 100%, width 100%");
+        } else {
+            add(main, "height 100%, width 100%");
+        }
         add(okButton, "tag ok");
 
         setPreferredSize(savedSize);
     }
-    
+
     protected Border createBorder() {
         return new EmptyBorder(20, 20, 20, 20);
     }
@@ -142,7 +160,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     /**
      * Returns a unit type comparator.
-     * 
+     *
      * @return A unit type comparator.
      */
     public static Comparator<Unit> getUnitTypeComparator() {
@@ -168,7 +186,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {

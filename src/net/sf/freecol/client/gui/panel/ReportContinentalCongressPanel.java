@@ -19,16 +19,24 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Image;
+import java.util.EnumMap;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -44,21 +52,22 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportContinentalCongressPanel(Canvas parent) {
-        super(parent, title);
+        super(parent, title, new JTabbedPane(JTabbedPane.TOP));
 
-        reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
+        //reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
+
+        JTabbedPane tabs = (JTabbedPane) main;
+        tabs.setOpaque(false);
 
         Player player = getMyPlayer();
 
-        JLabel recruiting = new JLabel(Messages.message("report.continentalCongress.recruiting"));
-        recruiting.setFont(smallHeaderFont);
-        reportPanel.add(recruiting, "align center, growy");
+        JPanel recruitingPanel = new JPanel(new MigLayout("center, wrap 1"));
         if (player.getCurrentFather() == null) {
-            reportPanel.add(new JLabel(none), "wrap 20");
+            recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
             FoundingFather father = player.getCurrentFather();
             JLabel currentFatherLabel = new JLabel(Messages.message(father.getNameKey()),
@@ -67,7 +76,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             currentFatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
             currentFatherLabel.setVerticalTextPosition(JLabel.TOP);
             currentFatherLabel.setHorizontalTextPosition(JLabel.CENTER);
-            reportPanel.add(currentFatherLabel);
+            recruitingPanel.add(currentFatherLabel);
             GoodsType bellsType = getSpecification().getGoodsType("model.goods.bells");
             FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), bellsType);
             int total = 0;
@@ -77,18 +86,37 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             int bells = player.getLiberty();
             int required = player.getTotalFoundingFatherCost();
             progressBar.update(0, required, bells, total);
-            reportPanel.add(progressBar, "wrap 20");
+            recruitingPanel.add(progressBar, "wrap 20");
         }
+        tabs.addTab(Messages.message("report.continentalCongress.recruiting"), null,
+                    recruitingPanel, null);
 
-        // founding fathers
-        for (FoundingFather father : player.getFathers()) {
+        Map<FoundingFatherType, JPanel> panels =
+            new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
+        for (FoundingFatherType type : FoundingFatherType.values()) {
+            JPanel panel = new JPanel();
+            panels.put(type, panel);
+            JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
+                        scrollPane, null);
+        }
+        for (FoundingFather father : getSpecification().getFoundingFathers()) {
+            JPanel panel = panels.get(father.getType());
+            Image image;
+            if (player.hasFather(father)) {
+                image = getLibrary().getFoundingFatherImage(father);
+            } else {
+                image = ResourceManager.getGrayscaleImage(father.getId() + ".image", 1);
+            }
             JLabel fatherLabel = new JLabel(Messages.message(father.getNameKey()),
-                                            new ImageIcon(getLibrary().getFoundingFatherImage(father)),
+                                            new ImageIcon(image),
                                             JLabel.CENTER);
             fatherLabel.setVerticalTextPosition(JLabel.TOP);
             fatherLabel.setHorizontalTextPosition(JLabel.CENTER);
             fatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
-            reportPanel.add(fatherLabel);
+            panel.add(fatherLabel);
         }
+        //reportPanel.add(tabs);
     }
 }
