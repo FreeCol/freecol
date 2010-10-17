@@ -63,7 +63,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     public static final int H_GAP = 10;
 
     private final List<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
-    
+
     private final HashMap<String, JComponent> optionUIs;
 
     private final JTabbedPane tb;
@@ -74,7 +74,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * <code>OptionMap</code>. This is the same as using
      * {@link #OptionGroupUI(OptionMap, boolean)} with
      * <code>editable == true</code>.
-     * 
+     *
      * @param option The <code>OptionMap</code> to make a user interface for.
      */
     public OptionGroupUI(OptionGroup option) {
@@ -84,7 +84,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
      * <code>OptionMap</code>.
-     * 
+     *
      * @param option The <code>OptionMap</code> to make a user interface for.
      */
     public OptionGroupUI(OptionGroup option, boolean editable) {
@@ -93,7 +93,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
         northPanel.setOpaque(false);
-        
+
         optionUIs = new HashMap<String, JComponent>();
 
         tb = new JTabbedPane(JTabbedPane.TOP);
@@ -156,7 +156,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             } else {
                 panel.add(c, "span 2");
             }
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -170,7 +172,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         } else if (option instanceof PercentageOption) {
             PercentageOptionUI c = new PercentageOptionUI((PercentageOption) option, editable);
             panel.add(c, "newline, span");
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -178,14 +182,18 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             @SuppressWarnings("unchecked")
             ListOptionUI c = new ListOptionUI((ListOption) option, editable);
             panel.add(c);
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
         } else if (option instanceof RangeOption) {
             RangeOptionUI c = new RangeOptionUI((RangeOption) option, editable);
             panel.add(c, "newline, span");
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -197,7 +205,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel(), "right");
             }
             panel.add(c);
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -209,7 +219,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel(), "right");
             }
             panel.add(c);
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -233,7 +245,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel());
             }
             panel.add(c);
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -245,7 +259,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel());
             }
             panel.add(c);
-            optionUpdaters.add(c);
+            if (editable) {
+                optionUpdaters.add(c);
+            }
             if (!option.getId().equals(Option.NO_ID)) {
                 optionUIs.put(option.getId(), c);
             }
@@ -264,7 +280,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -274,7 +290,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             optionUpdater.rollback();
         }
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -292,7 +308,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             optionUpdater.updateOption();
         }
     }
-    
+
     public JComponent getOptionUI(String key) {
         return optionUIs.get(key);
     }
@@ -300,7 +316,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     /**
      * Removes the given <code>KeyStroke</code> from all of this
      * <code>OptionGroupUI</code>'s children.
-     * 
+     *
      * @param keyStroke The <code>KeyStroke</code> to be removed.
      */
     public void removeKeyStroke(KeyStroke keyStroke) {

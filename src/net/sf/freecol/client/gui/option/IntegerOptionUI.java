@@ -63,27 +63,32 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
         String text = (description != null) ? description : name;
         label = new JLabel(name, JLabel.LEFT);
         label.setToolTipText(text);
-
-        int stepSize = Math.min((option.getMaximumValue() - option.getMinimumValue()) / 10, 1000);
-        setModel(new SpinnerNumberModel(option.getValue(), option.getMinimumValue(),
-                                        option.getMaximumValue(), Math.max(1, stepSize)));
         setToolTipText(text);
-        
+
         setEnabled(editable);
-        addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (option.isPreviewEnabled()) {
-                    final int value = (Integer) getValue();
-                    if (option.getValue() != value) {
-                        option.setValue(value);
-                    }
-                }
-            }
-        });
-        
-        option.addPropertyChangeListener(this);
-        
         setOpaque(false);
+
+        if (editable) {
+            int stepSize = Math.min((option.getMaximumValue() - option.getMinimumValue()) / 10, 1000);
+            setModel(new SpinnerNumberModel(option.getValue(), option.getMinimumValue(),
+                                            option.getMaximumValue(), Math.max(1, stepSize)));
+            addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent e) {
+                        if (option.isPreviewEnabled()) {
+                            final int value = (Integer) getValue();
+                            if (option.getValue() != value) {
+                                option.setValue(value);
+                            }
+                        }
+                    }
+                });
+
+            option.addPropertyChangeListener(this);
+        } else {
+            int value = option.getValue();
+            setModel(new SpinnerNumberModel(value, value, value, 1));
+        }
+
     }
 
     /**
@@ -106,7 +111,7 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -114,14 +119,14 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
-    
+
     /**
      * Updates this UI with the new data from the option.
      * @param event The event.
@@ -135,7 +140,7 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
             }
         }
     }
-    
+
     /**
      * Updates the value of the {@link Option} this object keeps.
      */
