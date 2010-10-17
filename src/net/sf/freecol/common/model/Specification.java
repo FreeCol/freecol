@@ -976,8 +976,13 @@ public final class Specification {
         return result;
     }
 
+    /**
+     * Return the current difficulty level.
+     *
+     * @return the current difficulty level
+     */
     public OptionGroup getDifficultyLevel() {
-        return (OptionGroup) allOptionGroups.get("difficultyLevels").getOption(difficultyLevel);
+        return allOptionGroups.get(difficultyLevel);
     }
 
     /**
