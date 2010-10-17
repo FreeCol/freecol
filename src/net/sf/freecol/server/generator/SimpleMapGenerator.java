@@ -425,15 +425,7 @@ public class SimpleMapGenerator implements MapGenerator {
         final int minSettlementDistance = 3;
 
         // Default value for map editor
-        int nativeSettlementDensity = 50;
-        boolean isNativeSettlementDensitySet = map.getSpecification().hasOption("model.option.nativeSettlementDensity");
-        // A difficulty level was set, use the level value instead
-        if (isNativeSettlementDensitySet){
-            nativeSettlementDensity = map.getSpecification().getInteger("model.option.nativeSettlementDensity");
-        }
-
-        int number = (getLand() * nativeSettlementDensity)
-            / (mapGeneratorOptions.getInteger("model.option.settlementNumber") * 100);
+        int number = getLand() / mapGeneratorOptions.getInteger("model.option.settlementNumber");
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
