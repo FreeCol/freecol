@@ -56,11 +56,11 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportContinentalCongressPanel(Canvas parent) {
-        super(parent, title, new JTabbedPane(JTabbedPane.TOP));
+        super(parent, title);
 
         //reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
 
-        JTabbedPane tabs = (JTabbedPane) main;
+        JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);
 
         Player player = getMyPlayer();
@@ -117,6 +117,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             fatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
             panel.add(fatherLabel);
         }
-        //reportPanel.add(tabs);
+
+        setMainComponent(tabs);
     }
 }

@@ -60,8 +60,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected JScrollPane scrollPane;
 
-    protected Component main;
-
     /**
      * The saved size of this panel.
      */
@@ -86,46 +84,35 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param title The title to display on the panel.
      */
     public ReportPanel(Canvas parent, String title) {
-        this(parent, title, null);
-    }
-
-    /**
-     * The constructor that will add the items to this panel.
-     *
-     * @param parent The parent of this panel.
-     * @param title The title to display on the panel.
-     * @param main a <code>Component</code> value
-     */
-    public ReportPanel(Canvas parent, String title, Component main) {
         super(parent);
-        this.main = main;
 
         setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 
         header = getDefaultHeader(title);
-        add(header, "align center");
+        add(header, "cell 0 0, align center");
 
-        if (main == null) {
-            reportPanel = new JPanel() {
-                    @Override
-                    public String getUIClassID() {
-                        return "ReportPanelUI";
-                    }
-                };
+        reportPanel = new JPanel() {
+                @Override
+                public String getUIClassID() {
+                    return "ReportPanelUI";
+                }
+            };
 
-            reportPanel.setOpaque(true);
-            reportPanel.setBorder(createBorder());
+        reportPanel.setOpaque(true);
+        reportPanel.setBorder(createBorder());
 
-            scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
-            add(scrollPane, "height 100%, width 100%");
-        } else {
-            add(main, "height 100%, width 100%");
-        }
-        add(okButton, "tag ok");
+        scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
+        add(scrollPane, "cell 0 1, height 100%, width 100%");
+        add(okButton, "cell 0 2, tag ok");
 
         setPreferredSize(savedSize);
+    }
+
+    protected void setMainComponent(Component main) {
+        remove(scrollPane);
+        add(main, "cell 0 1, height 100%, width 100%");
     }
 
     protected Border createBorder() {
