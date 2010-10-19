@@ -107,85 +107,85 @@ public class UnitTest extends FreeColTestCase {
     public void testDoAssignedWorkAmateurAndHardyPioneer() {
     	
         { // Savanna
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, savannahForest, clear));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, savannahForest, road));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, savannah, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(colonistType, savannah, road));
+            assertEquals(8, getWorkLeftForPioneerWork(colonistType, savannahForest, clear));
+            assertEquals(6, getWorkLeftForPioneerWork(colonistType, savannahForest, road));
+            assertEquals(5, getWorkLeftForPioneerWork(colonistType, savannah, plow));
+            assertEquals(3, getWorkLeftForPioneerWork(colonistType, savannah, road));
 
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, road));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, savannah, plow));
-            assertEquals(-1, getWorkLeftForPioneerWork(hardyPioneerType, savannah, road));
+            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, clear));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannah, plow));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, savannah, road));
         }
 
         { // Tundra
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, tundraForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, tundraForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, tundra, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, tundra, road));
+            assertEquals(6, getWorkLeftForPioneerWork(colonistType, tundraForest, clear));
+            assertEquals(4, getWorkLeftForPioneerWork(colonistType, tundraForest, road));
+            assertEquals(6, getWorkLeftForPioneerWork(colonistType, tundra, plow));
+            assertEquals(4, getWorkLeftForPioneerWork(colonistType, tundra, road));
 
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, clear));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, road));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundra, plow));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, tundra, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, clear));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, tundra, plow));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundra, road));
         }
 
         { // Plains
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, plainsForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, plainsForest, road));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, plains, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(colonistType, plains, road));
+            assertEquals(6, getWorkLeftForPioneerWork(colonistType, plainsForest, clear));
+            assertEquals(4, getWorkLeftForPioneerWork(colonistType, plainsForest, road));
+            assertEquals(5, getWorkLeftForPioneerWork(colonistType, plains, plow));
+            assertEquals(3, getWorkLeftForPioneerWork(colonistType, plains, road));
 
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, clear));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, road));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, plains, plow));
-            assertEquals(-1, getWorkLeftForPioneerWork(hardyPioneerType, plains, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, clear));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, plains, plow));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plains, road));
         }
 
         { // Hill
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, hills, road));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, hills, road));
+            assertEquals(4, getWorkLeftForPioneerWork(colonistType, hills, road));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, hills, road));
         }
 
         { // Mountain
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, mountains, road));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, mountains, road));
+            assertEquals(7, getWorkLeftForPioneerWork(colonistType, mountains, road));
+            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, mountains, road));
         }
 
         { // Marsh
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, marshForest, clear));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, marshForest, road));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, marsh, plow));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, marsh, road));
+            assertEquals(8, getWorkLeftForPioneerWork(colonistType, marshForest, clear));
+            assertEquals(6, getWorkLeftForPioneerWork(colonistType, marshForest, road));
+            assertEquals(7, getWorkLeftForPioneerWork(colonistType, marsh, plow));
+            assertEquals(5, getWorkLeftForPioneerWork(colonistType, marsh, road));
 
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, road));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, marsh, plow));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, marsh, road));
+            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, clear));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, road));
+            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, marsh, plow));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marsh, road));
         }
 
         { // Desert
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, desertForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, desertForest, road));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, desert, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(colonistType, desert, road));
+            assertEquals(6, getWorkLeftForPioneerWork(colonistType, desertForest, clear));
+            assertEquals(4, getWorkLeftForPioneerWork(colonistType, desertForest, road));
+            assertEquals(5, getWorkLeftForPioneerWork(colonistType, desert, plow));
+            assertEquals(3, getWorkLeftForPioneerWork(colonistType, desert, road));
 
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, clear));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, road));
-            assertEquals(1, getWorkLeftForPioneerWork(hardyPioneerType, desert, plow));
-            assertEquals(-1, getWorkLeftForPioneerWork(hardyPioneerType, desert, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, clear));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, road));
+            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, desert, plow));
+            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desert, road));
         }
 
         { // Swamp
-            assertEquals(8, getWorkLeftForPioneerWork(colonistType, swampForest, clear));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, swampForest, road));
-            assertEquals(8, getWorkLeftForPioneerWork(colonistType, swamp, plow));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, swamp, road));
+            assertEquals(9, getWorkLeftForPioneerWork(colonistType, swampForest, clear));
+            assertEquals(7, getWorkLeftForPioneerWork(colonistType, swampForest, road));
+            assertEquals(9, getWorkLeftForPioneerWork(colonistType, swamp, plow));
+            assertEquals(7, getWorkLeftForPioneerWork(colonistType, swamp, road));
 
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, swamp, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, swamp, road));
+            assertEquals(5, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, clear));
+            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, road));
+            assertEquals(5, getWorkLeftForPioneerWork(hardyPioneerType, swamp, plow));
+            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, swamp, road));
         }
     }
     

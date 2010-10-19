@@ -208,28 +208,6 @@ public class TileImprovement extends TileItem implements Named {
         return turnsToComplete <= 0;
     }
 
-    /**
-     * Performs work towards completion of this <code>TileImprovement</code>
-     * 
-     * This function allows for a unit to perform more than 1 'turn', perhaps in
-     * the event a skilled unit is able to build improvements with a bonus. The
-     * <code>doWork</code> function without any input params assumes 1 turn of
-     * work done.
-     * 
-     * @return remaining turns to completion
-     */
-    public int doWork(int turns) {
-        turnsToComplete -= turns;
-        if (turnsToComplete <= 0) {
-            turnsToComplete = 0;
-        }
-        return turnsToComplete;
-    }
-
-    public int doWork() {
-        return doWork(1);
-    }
-
     public EquipmentType getExpendedEquipmentType() {
         return type.getExpendedEquipmentType();
     }

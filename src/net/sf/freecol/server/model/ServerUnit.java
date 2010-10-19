@@ -223,22 +223,19 @@ public class ServerUnit extends Unit implements ServerModelObject {
         switch (getState()) {
         case IMPROVING:
             // Has the improvement been completed already? Do nothing.
-            if (getWorkImprovement().isComplete()) {
+            TileImprovement ti = getWorkImprovement();
+            if (ti.isComplete()) {
                 setState(UnitState.ACTIVE);
                 return false;
             }
 
             // Otherwise do work
-            int amountOfWork
-                = getType().hasAbility("model.ability.expertPioneer") ? 2 : 1;
-            setWorkLeft(getWorkImprovement().doWork(amountOfWork));
-
-            // TODO: what is going on here?
-            // Make sure that a hardy pioneer will finish if the
-            // workLeft is less than he can do in a turn
-            //if (0 < workLeft && workLeft < amountOfWork){
-            //    workLeft = getWorkImprovement().doWork(workLeft);
-            //}
+            int amount = (getType().hasAbility("model.ability.expertPioneer"))
+                ? 2 : 1;
+            int turns = ti.getTurnsToComplete();
+            if ((turns -= amount) < 0) turns = 0;
+            ti.setTurnsToComplete(turns);
+            setWorkLeft(turns);
             break;
         case TO_AMERICA:
             if (getOwner().isREF()) { // Shorter travel to America for the REF
@@ -277,8 +274,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             case FORTIFYING:
                 setState(UnitState.FORTIFIED);
                 break;
-            case IMPROVING:
-                // Deliver Goods if any
+            case IMPROVING: // Deliver goods if any
                 GoodsType deliver = getWorkImprovement().getDeliverGoodsType();
                 if (deliver != null) {
                     int amount = getTile().potential(deliver, getType())
@@ -316,9 +312,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 EquipmentType type = ti.getExpendedEquipmentType();
                 changeEquipment(type, -ti.getExpendedAmount());
                 for (Unit unit : getTile().getUnitList()) {
-                    if (unit.getState() == UnitState.IMPROVING
-                        && unit.getWorkImprovement().getType()
-                        == ti.getType()) {
+                    if (unit.getWorkImprovement() != null
+                        && unit.getWorkImprovement().getType() == ti.getType()
+                        && unit.getState() == UnitState.IMPROVING) {
                         unit.setWorkLeft(-1);
                         unit.setWorkImprovement(null);
                         unit.setState(UnitState.ACTIVE);
@@ -329,14 +325,16 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 EquipmentType tools = getSpecification()
                     .getEquipmentType("model.equipment.tools");
                 if (type == tools && getEquipmentCount(tools) == 0) {
+                    StringTemplate locName
+                        = getLocation().getLocationNameFor(owner);
                     String messageId = (getType().getDefaultEquipmentType() == type)
                         ? getType() + ".noMoreTools"
                         : "model.unit.noMoreTools";
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
                                          messageId, this)
-                            .addStringTemplate("%unit%", getLabel())
-                            .addStringTemplate("%location%", getLocation().getLocationNameFor(owner)));
+                                  .addStringTemplate("%unit%", getLabel())
+                                  .addStringTemplate("%location%", locName));
                 }
                 return true;
             default:
