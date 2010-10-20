@@ -102,7 +102,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
         setLayout(new MigLayout("wrap 1, fill"));
 
         // Header:
-        JLabel header = localizedLabel("gameOptions.difficultySettings.name");
+        JLabel header = localizedLabel("difficulty");
         header.setFont(ResourceManager.getFont("HeaderFont", 48f));
         add(header, "center, wrap 20");
 
