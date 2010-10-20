@@ -1199,6 +1199,7 @@
       <modifier id="model.modifier.sailHighSeas" type="additive" value="-1">
         <scope ability-id="model.ability.navalUnit" ability-value="true"/>
       </modifier>
+      <event id="model.event.movementChange"/>
     </founding-father>
     <founding-father id="model.foundingFather.franciscoDeCoronado" type="exploration"
                      weight1="3" weight2="5" weight3="7">

@@ -887,6 +887,13 @@ public final class InGameController extends Controller {
                 if (!europeDirty && changed) {
                     cs.add(See.only(serverPlayer), europe);
                 }
+            } else if (eventId.equals("model.event.movementChange")) {
+                for (Unit u : serverPlayer.getUnits()) {
+                    if (u.getMovesLeft() > 0) {
+                        u.setMovesLeft(u.getInitialMovesLeft());
+                        cs.addPartial(See.only(serverPlayer), u, "movesLeft");
+                    }
+                }
             }
         }
         // Alas, have to update the whole player to get the father in.
