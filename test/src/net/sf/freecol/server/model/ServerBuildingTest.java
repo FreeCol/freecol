@@ -913,11 +913,12 @@ public class ServerBuildingTest extends FreeColTestCase {
         Unit miner = units.next();
         miner.setType(expertOreMinerType);
 
-        // Put LumberJack in School
+        // Put Lumberjack in School
         lumberjack.setLocation(school);
+        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
         assertTrue(lumberjack.getStudent() == colonist);
         assertTrue(colonist.getTeacher() == lumberjack);
-        trainForTurns(colony, 2);
+        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
 
         // After 2 turns replace by miner. Progress starts from scratch.
         lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, foodType));
@@ -925,8 +926,9 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertTrue(colonist.getTeacher() == null);
 
         miner.setLocation(school);
-        assertTrue(miner.getStudent() == colonist);
-        assertTrue(colonist.getTeacher() == miner);
+        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        assertEquals(miner.getStudent(), colonist);
+        assertEquals(colonist.getTeacher(), miner);
         trainForTurns(colony, miner.getNeededTurnsOfTraining());
 
         assertEquals(0, getUnitList(colony, freeColonistType).size());
