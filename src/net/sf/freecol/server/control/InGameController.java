@@ -6153,4 +6153,21 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
+    /**
+     * Set build queue.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
+     * @param colony The <code>Colony</code> to set the queue of.
+     * @param queue The new build queue.
+     */
+    public Element setBuildQueue(ServerPlayer serverPlayer, Colony colony,
+                                 List<BuildableType> queue) {
+        colony.setBuildQueue(queue);
+
+        // Only visible to player.
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(serverPlayer), colony);
+        return cs.build(serverPlayer);
+    }
+
 }

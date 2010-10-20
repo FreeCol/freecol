@@ -103,6 +103,7 @@ import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
+import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
@@ -298,10 +299,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return workImprovement(connection, element);
             }
         });
-        register("setBuildQueue", new CurrentPlayerNetworkRequestHandler() {
+        register(SetBuildQueueMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return setBuildQueue(connection, element);
+                return new SetBuildQueueMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("changeState", new CurrentPlayerNetworkRequestHandler() {
@@ -780,33 +781,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             teacher.getStudent().setTeacher(null);
         }
         teacher.setStudent(student);
-        return null;
-    }
-
-    /**
-     * Handles a "setBuildQueue"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param setBuildQueueElement The element containing the request.
-     */
-    private Element setBuildQueue(Connection connection, Element setBuildQueueElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) getGame().getFreeColGameObject(setBuildQueueElement.getAttribute("colony"));
-        if (colony.getOwner() != player) {
-            throw new IllegalStateException("Not your colony!");
-        }
-        List<BuildableType> buildQueue = new ArrayList<BuildableType>();
-        int size = Integer.parseInt(setBuildQueueElement.getAttribute("size"));
-        for (int x = 0; x < size; x++) {
-            String typeId = setBuildQueueElement.getAttribute("x" + Integer.toString(x));
-            buildQueue.add((BuildableType) getGame().getSpecification().getType(typeId));
-        }
-
-        colony.setBuildQueue(buildQueue);
-        // TODO: what is the following line for?
-        // AFAICT, it is pointless, and I just broke it, and so
-        // commented it out.  --MTP
-        // sendUpdatedTileToAll(colony.getTile(), player);
         return null;
     }
 

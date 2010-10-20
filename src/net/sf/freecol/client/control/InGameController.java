@@ -135,6 +135,7 @@ import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
+import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
@@ -4187,20 +4188,33 @@ public final class InGameController implements NetworkConstants {
      * @param colony The <code>Colony</code>
      */
     public void setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
-        colony.setBuildQueue(buildQueue);
+        askSetBuildQueue(colony, buildQueue);
+    }
 
-        Element setBuildQueueElement = Message.createNewRootElement("setBuildQueue");
-        setBuildQueueElement.setAttribute("colony", colony.getId());
-        setBuildQueueElement.setAttribute("size", Integer.toString(buildQueue.size()));
-        for (int x = 0; x < buildQueue.size(); x++) {
-            setBuildQueueElement.setAttribute("x" + Integer.toString(x), buildQueue.get(x).getId());
-        }
-        freeColClient.getClient().sendAndWait(setBuildQueueElement);
+    /**
+     * Server query-response for changing a work location.
+     *
+     * @param unit The <code>Unit</code> to change the workLocation of.
+     * @param workLocation The <code>WorkLocation</code> to change to.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askSetBuildQueue(Colony colony,
+                                     List<BuildableType> buildQueue) {
+        Client client = freeColClient.getClient();
+        SetBuildQueueMessage message = new SetBuildQueueMessage(colony,
+                                                                buildQueue);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**
