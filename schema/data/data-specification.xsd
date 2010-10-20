@@ -360,6 +360,7 @@
       <xs:attribute name="minSkill" type="xs:int"/>
       <xs:attribute name="maxSkill" type="xs:int"/>
       <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
+      <xs:attribute name="upkeep" type="xs:int"/>
     </xs:complexType>
   </xs:element>
 

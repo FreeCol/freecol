@@ -38,6 +38,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private int minSkill = UNDEFINED;
     private int maxSkill = INFINITY;
     private int sequence = 0;
+    private int upkeep = 0;
 
     private GoodsType consumes, produces;
     private Modifier productionModifier = null;
@@ -89,6 +90,10 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
     public int getSequence() {
         return sequence;
+    }
+
+    public int getUpkeep() {
+        return upkeep;
     }
 
     public FreeColGameObjectType getType() {
@@ -155,6 +160,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         maxSkill = getAttribute(in, "maxSkill", parent.maxSkill);
 
         sequence = getAttribute(in, "sequence", parent.sequence);
+        upkeep = getAttribute(in, "upkeep", parent.upkeep);
 
         if (parent != this) {
             getFeatureContainer().add(parent.getFeatureContainer());
@@ -189,7 +195,9 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
             out.writeAttribute("maxSkill", Integer.toString(maxSkill));
         }
         out.writeAttribute("sequence", Integer.toString(sequence));
-
+        if (upkeep > 0) {
+            out.writeAttribute("upkeep", Integer.toString(upkeep));
+        }
         if (consumes != null) {
             out.writeAttribute("consumes", consumes.getId());
         }

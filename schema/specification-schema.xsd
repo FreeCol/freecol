@@ -27,6 +27,7 @@
      0.49: marketData add goods-type attribute and make ID a MarketDataId
      0.50: allow OptionGroups to contain OptionGroups
      0.51: remove improvementaction-type and difficultyLevels
+     0.52: add upkeep attribute to building-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -365,6 +366,7 @@
       <xs:attribute name="minSkill" type="xs:int"/>
       <xs:attribute name="maxSkill" type="xs:int"/>
       <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
+      <xs:attribute name="upkeep" type="xs:int"/>
     </xs:complexType>
   </xs:element>
 
