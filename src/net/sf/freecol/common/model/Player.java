@@ -317,7 +317,7 @@ public class Player extends FreeColGameObject implements Nameable {
         = new ArrayList<Settlement>();
 
     /** Trade routes of this player. */
-    protected List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
+    protected final List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
     /** Model messages for this player. */
     protected final List<ModelMessage> modelMessages
@@ -1897,16 +1897,16 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Set the players trade routes.
      *
-     * Set the <code>TradeRoutes</code> value.
-     *
-     *
-     *
-     * @param newTradeRoutes The new TradeRoutes value.
+     * @param newTradeRoutes The new list of <code>TradeRoute</code>s.
      *
      */
     public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
-        this.tradeRoutes = newTradeRoutes;
+        tradeRoutes.clear();
+        for (TradeRoute tr : newTradeRoutes) {
+            tradeRoutes.add(tr);
+        }
     }
 
     /**
