@@ -451,7 +451,7 @@ public class ColonyTile extends FreeColGameObject
      */
     public GoodsType getWorkType(Unit unit) {
         GoodsType workType = unit.getWorkType();
-        int amount = getProductionOf(unit, workType);
+        int amount = (workType == null) ? 0 : getProductionOf(unit, workType);
         if (amount == 0) {
             List<GoodsType> farmedGoodsTypes = getSpecification().getFarmedGoodsTypeList();
             for(GoodsType farmedGoods : farmedGoodsTypes) {
