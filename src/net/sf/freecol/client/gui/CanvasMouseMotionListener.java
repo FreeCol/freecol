@@ -104,7 +104,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             if (tile != null) {
                 if (lastTile != tile) {
                     lastTile = tile;
-                    if (gui.getActiveUnit().getTile() != tile) {
+                    if (gui.getActiveUnit() != null
+                        && gui.getActiveUnit().getTile() != tile) {
                         PathNode dragPath = gui.getActiveUnit().findPath(tile);
                         gui.setGotoPath(dragPath);
                     } else {
