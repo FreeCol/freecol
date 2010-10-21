@@ -964,21 +964,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildBuildingDetail(BuildingType buildingType) {
 
-        /*
-         * don't need this at the moment int[][] buildingUpkeep = { {0, -1, -1}, //
-         * Town hall {0, 10, -1}, // Carpenter's house, Lumber mill {0, 5, 15}, //
-         * Blacksmith's house, Blacksmith's shop, Iron works {0, 5, 15}, //
-         * Tobacconist's house, Tobacconist's shop, Cigar factory {0, 5, 15}, //
-         * Weaver's house, Weaver's shop, Textile mill {0, 5, 15}, //
-         * Distiller's house, Rum distillery, Rum factory {0, 5, 15}, // Fur
-         * trader's house, Fur trading post, Fur factory {5, 10, 15}, //
-         * Schoolhouse, College, University {5, 10, 15}, // Armory, Magazine,
-         * Arsenal {5, 15, -1}, // Church, Cathedral {0, 10, 15}, // Stockade,
-         * Fort, Fortress {5, 5, -1}, // Warehouse, Warehouse expansion {5, -1,
-         * -1}, // Stables {5, 10, 15}, // Docks, Drydock, Shipyard {5, 10, -1}, //
-         * Printing press, Newspaper {15, -1, -1} // Custom house };
-         */
-
         detailPanel.removeAll();
 
         if (buildingType == null) {
