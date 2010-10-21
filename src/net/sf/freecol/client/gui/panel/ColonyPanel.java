@@ -90,6 +90,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
@@ -1427,7 +1428,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 this.colonyTile = colonyTile;
 
-                colonyTile.addPropertyChangeListener(this);
+                addPropertyChangeListeners();
 
                 setOpaque(false);
                 TileType tileType = colonyTile.getTile().getType();
@@ -1500,10 +1501,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     pl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                     add(pl);
                 }
-            }
-
-            public void removePropertyChangeListeners() {
-                colonyTile.removePropertyChangeListener(this);
             }
 
             /**
@@ -1629,7 +1626,43 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 return comp;
             }
     
+            public void addPropertyChangeListeners() {
+                colonyTile.addPropertyChangeListener(this);
+                Colony colony = colonyTile.getColony();
+                List<AbstractGoods> production
+                    = colonyTile.getTile().getType().getProduction(null);
+                for (AbstractGoods ag : production) {
+                    colony.addPropertyChangeListener(ag.getType().getId(),
+                                                     this);
+                }
+            }
+
+            public void removePropertyChangeListeners() {
+                colonyTile.removePropertyChangeListener(this);
+                Colony colony = colonyTile.getColony();
+                List<AbstractGoods> production
+                    = colonyTile.getTile().getType().getProduction(null);
+                for (AbstractGoods ag : production) {
+                    colony.removePropertyChangeListener(ag.getType().getId(),
+                                                        this);
+                }
+            }
+
             public void propertyChange(PropertyChangeEvent event) {
+                String property = event.getPropertyName();
+                if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
+                    Colony colony = colonyTile.getColony();
+                    // Have to use abstract production as if the unit was
+                    // removed we can not tell what it was producing.
+                    List<AbstractGoods> production
+                        = colonyTile.getTile().getType().getProduction(null);
+                    for (AbstractGoods ag : production) {
+                        colony.firePropertyChange(ag.getType().getId(), 0, 1);
+                        // However, we only really need fire one change
+                        // event as that is enough to provoke a redisplay.
+                        break;
+                    }
+                }
                 initialize();
             }
 

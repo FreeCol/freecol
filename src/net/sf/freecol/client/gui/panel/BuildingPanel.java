@@ -38,6 +38,7 @@ import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -68,12 +69,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         this.building = building;
         this.parent = parent;
 
-        building.addPropertyChangeListener(this);
-        GoodsType inputType = building.getGoodsInputType();
-        if (inputType != null) {
-            // get notified of production changes and warehouse changes
-            building.getColony().addPropertyChangeListener(inputType.getId(), this);
-        }
+        addPropertyChangeListeners();
 
         setToolTipText(" ");
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
@@ -104,14 +100,6 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         setSize(new Dimension(96,76));
         revalidate();
         repaint();
-    }
-
-    public void removePropertyChangeListeners() {
-        building.removePropertyChangeListener(this);
-        GoodsType inputType = building.getGoodsInputType();
-        if (inputType != null) {
-            building.getColony().removePropertyChangeListener(inputType.getId(), this);
-        }
     }
 
     /**
@@ -157,10 +145,46 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         return new BuildingToolTip(building, parent);
     }
 
+    public void addPropertyChangeListeners() {
+        building.addPropertyChangeListener(this);
+        Colony colony = building.getColony();
+        GoodsType type = building.getGoodsInputType();
+        if (type != null) {
+            colony.addPropertyChangeListener(type.getId(), this);
+        }
+        type = building.getGoodsOutputType();
+        if (type != null) {
+            colony.addPropertyChangeListener(type.getId(), this);
+        }
+    }
+
+    public void removePropertyChangeListeners() {
+        building.removePropertyChangeListener(this);
+        Colony colony = building.getColony();
+        GoodsType type = building.getGoodsInputType();
+        if (type != null) {
+            colony.removePropertyChangeListener(type.getId(), this);
+        }
+        type = building.getGoodsOutputType();
+        if (type != null) {
+            colony.removePropertyChangeListener(type.getId(), this);
+        }
+    }
+
     public void propertyChange(PropertyChangeEvent event) {
+        String property = event.getPropertyName();
+        if (Building.UNIT_CHANGE.toString().equals(property)) {
+            Colony colony = building.getColony();
+            GoodsType type = building.getGoodsInputType();
+            if (type != null) {
+                colony.firePropertyChange(type.getId(), 0, 1);
+            }
+            type = building.getGoodsOutputType();
+            if (type != null) {
+                colony.firePropertyChange(type.getId(), 0, 1);
+            }
+        }
         initialize();
     }
 
 }
-
-
