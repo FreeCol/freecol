@@ -41,12 +41,12 @@ import org.w3c.dom.Element;
  */
 abstract public class Settlement extends FreeColGameObject implements Location, Named, Ownable {
 
-    private static final Logger logger = Logger.getLogger(Settlement.class.getName()); 
-    
+    private static final Logger logger = Logger.getLogger(Settlement.class.getName());
+
     public static final int FOOD_PER_COLONIST = 200;
 
     public static enum SettlementType {
-        SMALL_COLONY, MEDIUM_COLONY, LARGE_COLONY, 
+        SMALL_COLONY, MEDIUM_COLONY, LARGE_COLONY,
         SMALL_STOCKADE, MEDIUM_STOCKADE, MEDIUM_FORT,
         LARGE_STOCKADE, LARGE_FORT, LARGE_FORTRESS,
         UNDEAD,
@@ -64,9 +64,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     /** The <code>Tile</code> where this <code>Settlement</code> is located. */
     protected Tile tile;
-    
+
     protected GoodsContainer goodsContainer;
-    
+
     /**
      * Whether this is the capital of the nation.
      */
@@ -91,7 +91,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @param game The <code>Game</code> in which this object belong.
      * @param owner The owner of this <code>Settlement</code>.
      * @param name The name for this <code>Settlement</code>.
-     * @param tile The location of the <code>Settlement</code>.    
+     * @param tile The location of the <code>Settlement</code>.
      */
     public Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
@@ -115,7 +115,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         owner.addSettlement(this);
     }
 
-    
+
 
     /**
      * Initiates a new <code>Settlement</code> from an <code>Element</code>.
@@ -141,7 +141,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     /**
-     * Initiates a new <code>Settlement</code> 
+     * Initiates a new <code>Settlement</code>
      * with the given ID. The object should later be
      * initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -153,7 +153,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public Settlement(Game game, String id) {
         super(game, id);
     }
-    
+
 
     // TODO: remove this again
     public String getNameKey() {
@@ -232,7 +232,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public int getLineOfSight() {
         return 2;
     }
-    
+
 
     /**
      * Gets the <code>Unit</code> that is currently defending this
@@ -248,7 +248,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * Get the amount of gold plundered when this settlement is captured.
      */
     abstract public int getPlunder();
-    
+
     /**
      * Gets the <code>Tile</code> where this <code>Settlement</code> is located.
      * @return The <code>Tile</code> where this <code>Settlement</code> is located.
@@ -256,7 +256,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public Tile getTile() {
         return tile;
     }
-    
+
     /**
      * Can a settlement claim a tile?
      *
@@ -370,16 +370,16 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @see #getOwner
      */
     public void changeOwner(Player newOwner) {
-        Player oldOwner = this.owner;        
+        Player oldOwner = this.owner;
         setOwner(newOwner);
-        
+
         if (oldOwner.hasSettlement(this)) {
             oldOwner.removeSettlement(this);
         }
         if (!newOwner.hasSettlement(this)) {
             newOwner.addSettlement(this);
         }
-        
+
         List<Unit> units = getUnitList();
         units.addAll(getTile().getUnitList());
         for (Unit u : units) {
@@ -420,7 +420,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * Gets an <code>List</code> with every <code>Goods</code> in this
      * <code>Colony</code>. There is only one <code>Goods</code> for each
      * type of goods.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public List<Goods> getCompactGoods() {
@@ -489,7 +489,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public void dispose() {
         disposeList();
     }
-    
+
     /**
      * Gets the radius of what the <code>Settlement</code> considers
      * as it's own land.
@@ -523,7 +523,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     /**
      * Removes a specified amount of a type of Goods from this Settlement.
-     * 
+     *
      * @param type The type of Goods to remove from this settlement.
      * @param amount The amount of Goods to remove from this settlement.
      */
@@ -565,7 +565,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     /**
      * Gets the amount of one type of Goods at this Settlement.
-     * 
+     *
      * @param type The type of goods to look for.
      * @return The amount of this type of Goods at this Location.
      */
@@ -576,12 +576,12 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             return 0;
         }
     }
-    
+
     /**
      * Returns the production of the given type of goods.
-     * 
+     *
      * @param goodsType The type of goods to get the production for.
-     * @return The production of the given type of goods the current turn by the 
+     * @return The production of the given type of goods the current turn by the
      * <code>Settlement</code>
      */
     public abstract int getProductionOf(GoodsType goodsType);
@@ -593,25 +593,27 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @param goodsTypes <code>GoodsType</code> values
      * @return an <code>int</code> value
      */
-    public int getConsumptionOf(GoodsType... goodsTypes) {
+    public int getConsumptionOf(GoodsType goodsType) {
         int result = 0;
-        for (GoodsType goodsType : goodsTypes) {
-            for (Unit unit : getUnitList()) {
-                result += unit.getType().getConsumptionOf(goodsType);
-            }
+        for (Unit unit : getUnitList()) {
+            result += unit.getType().getConsumptionOf(goodsType);
         }
         return Math.max(0, result);
     }
 
     /**
      * Gives the food needed to keep all units alive in this Settlement.
-     * 
+     *
      * @return The amount of food eaten in this colony each this turn.
      */
     public int getFoodConsumption() {
-        return getConsumptionOf(getSpecification().getGoodsType("model.goods.food"));
+        int result = 0;
+        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
+            result += getConsumptionOf(foodType);
+        }
+        return result;
     }
-    
+
     /**
      * Gets food consumption by type
      */
@@ -620,32 +622,32 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     	// purposes we will hard code the preference of consumption
     	// for other types of food If later other requirements appear,
     	// an allocation algorithm needs to be implemented
-    	
+
     	if(!type.isFoodType()){
             logger.warning("Good type given isnt food type");
             return 0;
     	}
-    	
+
     	int required = getFoodConsumption();
     	int consumed = 0;
     	GoodsType corn = getSpecification().getGoodsType("model.goods.food");
-    	
+
     	for (GoodsType foodType : getSpecification().getGoodsFood()) {
             if(foodType == corn){
                 // consumption of corn calculated last
                 continue;
             }
-    		
+
             consumed = Math.min(getProductionOf(foodType),required);
             if(type == foodType){
                 return consumed;
             }
             required -= consumed;
         }
-    	
+
     	// type asked is corn, calculate consumption and return
     	consumed = Math.min(getProductionOf(corn),required);
-    	
+
     	return consumed;
     }
 
@@ -669,9 +671,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             throw new IllegalStateException("Attempted to remove more food than was present.");
         }
     }
-            
+
     /**
-     * Returns the total amount of food present. 
+     * Returns the total amount of food present.
      *
      * @return an <code>int</code> value
      */

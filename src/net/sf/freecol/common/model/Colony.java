@@ -1093,12 +1093,10 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @param goodsTypes <code>GoodsType</code> values
      * @return an <code>int</code> value
      */
-    public int getConsumptionOf(GoodsType... goodsTypes) {
-        int result = super.getConsumptionOf(goodsTypes);
-        for (GoodsType goodsType : goodsTypes) {
-            if (getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
-                result -= getSpecification().getIntegerOption("model.option.unitsThatUseNoBells").getValue();
-            }
+    public int getConsumptionOf(GoodsType goodsType) {
+        int result = super.getConsumptionOf(goodsType);
+        if (getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
+            result -= getSpecification().getIntegerOption("model.option.unitsThatUseNoBells").getValue();
         }
         return Math.max(0, result);
     }
