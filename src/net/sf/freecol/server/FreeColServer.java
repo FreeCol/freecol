@@ -802,19 +802,8 @@ public final class FreeColServer {
 
             // Add a default value for options new to each version.
             if (savegameVersion < 11) {
-                Specification spec = game.getSpecification();
-                String optionName = "model.option.indianClaimRadius";
-                if (!spec.hasOption(optionName)) {
-                    IntegerOption op = new IntegerOption(optionName);
-                    op.setValue(3);
-                    spec.addAbstractOption(op);
-                }
-                optionName = "model.option.monarchSupport";
-                if (!spec.hasOption(optionName)) {
-                    IntegerOption op = new IntegerOption(optionName);
-                    op.setValue(2);
-                    spec.addAbstractOption(op);
-                }
+                addIntegerOption("model.option.indianClaimRadius", 3);
+                addIntegerOption("model.option.monarchSupport", 2);
             }
 
             // Later, we might want to modify loaded savegames:
@@ -836,6 +825,15 @@ public final class FreeColServer {
             throw new IOException(e.toString());
         } finally {
             xs.close();
+        }
+    }
+
+    private void addIntegerOption(String id, int defaultValue) {
+        Specification spec = game.getSpecification();
+        if (!spec.hasOption(id)) {
+            IntegerOption op = new IntegerOption(id);
+            op.setValue(3);
+            spec.addAbstractOption(op);
         }
     }
 
