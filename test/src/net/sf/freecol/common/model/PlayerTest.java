@@ -22,7 +22,10 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.util.test.MockModelController;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -115,28 +118,19 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals(2, player.getMaximumFoodConsumption());
     }
 
-    public void testPlayers() {
-        Game game = getStandardGame();
+    public void testClassicPlayers() {
+        Game game = getStandardGame("classic");
 
         // europeans
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Player english = game.getPlayer("model.nation.english");
         Player spanish = game.getPlayer("model.nation.spanish");
-        /* Commented out as long as they are not used
-        Player portuguese = game.getPlayer("model.nation.portuguese");
-        Player swedish = game.getPlayer("model.nation.swedish");
-        Player danish = game.getPlayer("model.nation.danish");
-        Player russian = game.getPlayer("model.nation.russian");
-        */
+
         testEuropeanPlayer(dutch);
         testEuropeanPlayer(french);
         testEuropeanPlayer(english);
         testEuropeanPlayer(spanish);
-        //testEuropeanPlayer(portuguese);
-        //testEuropeanPlayer(swedish);
-        //testEuropeanPlayer(danish);
-        //testEuropeanPlayer(russian);
 
         // indians
         Player inca = game.getPlayer("model.nation.inca");
@@ -157,7 +151,79 @@ public class PlayerTest extends FreeColTestCase {
         testIndianPlayer(tupi);
 
         // royal
-        /* this works differently now
+        Player dutchREF = game.getPlayer("model.nation.dutchREF");
+        Player frenchREF = game.getPlayer("model.nation.frenchREF");
+        Player englishREF = game.getPlayer("model.nation.englishREF");
+        Player spanishREF = game.getPlayer("model.nation.spanishREF");
+        testRoyalPlayer(dutchREF);
+        testRoyalPlayer(frenchREF);
+        testRoyalPlayer(englishREF);
+        testRoyalPlayer(spanishREF);
+        assertEquals(dutchREF, dutch.getREFPlayer());
+        assertEquals(frenchREF, french.getREFPlayer());
+        assertEquals(englishREF, english.getREFPlayer());
+        assertEquals(spanishREF, spanish.getREFPlayer());
+
+    }
+
+    public void testFreecolPlayers() {
+        // the initialization code is basically the same as in
+        // getStandardGame(), except that all European nations are
+        // available
+        Specification specification = getSpecification("freecol");
+        Game game = new ServerGame(new MockModelController(), specification);
+        NationOptions nationOptions = new NationOptions(specification, NationOptions.Advantages.SELECTABLE);
+        for (Nation nation : specification.getEuropeanNations()) {
+            nationOptions.setNationState(nation, NationOptions.NationState.AVAILABLE);
+        }
+        game.setNationOptions(nationOptions);
+
+        specification.applyDifficultyLevel("model.difficulty.medium");
+        for (Nation n : specification.getNations()) {
+            Player p = new ServerPlayer(game, n.getRulerNameKey(), false, n,
+                                        null, null);
+            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
+            game.addPlayer(p);
+        }
+
+        // europeans
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Player english = game.getPlayer("model.nation.english");
+        Player spanish = game.getPlayer("model.nation.spanish");
+        Player portuguese = game.getPlayer("model.nation.portuguese");
+        Player swedish = game.getPlayer("model.nation.swedish");
+        Player danish = game.getPlayer("model.nation.danish");
+        Player russian = game.getPlayer("model.nation.russian");
+
+        testEuropeanPlayer(dutch);
+        testEuropeanPlayer(french);
+        testEuropeanPlayer(english);
+        testEuropeanPlayer(spanish);
+        testEuropeanPlayer(portuguese);
+        testEuropeanPlayer(swedish);
+        testEuropeanPlayer(danish);
+        testEuropeanPlayer(russian);
+
+        // indians
+        Player inca = game.getPlayer("model.nation.inca");
+        Player aztec = game.getPlayer("model.nation.aztec");
+        Player arawak = game.getPlayer("model.nation.arawak");
+        Player cherokee = game.getPlayer("model.nation.cherokee");
+        Player iroquois = game.getPlayer("model.nation.iroquois");
+        Player sioux = game.getPlayer("model.nation.sioux");
+        Player apache = game.getPlayer("model.nation.apache");
+        Player tupi = game.getPlayer("model.nation.tupi");
+        testIndianPlayer(inca);
+        testIndianPlayer(aztec);
+        testIndianPlayer(arawak);
+        testIndianPlayer(cherokee);
+        testIndianPlayer(iroquois);
+        testIndianPlayer(sioux);
+        testIndianPlayer(apache);
+        testIndianPlayer(tupi);
+
+        // royal
         Player dutchREF = game.getPlayer("model.nation.dutchREF");
         Player frenchREF = game.getPlayer("model.nation.frenchREF");
         Player englishREF = game.getPlayer("model.nation.englishREF");
@@ -182,7 +248,6 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals(swedishREF, swedish.getREFPlayer());
         assertEquals(danishREF, danish.getREFPlayer());
         assertEquals(russianREF, russian.getREFPlayer());
-        */
     }
 
     public void testTension(){
