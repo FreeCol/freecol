@@ -417,7 +417,7 @@
 
   <xs:element name="events">
     <xs:complexType>
-      <xs:sequence>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="event" />
       </xs:sequence>
     </xs:complexType>
@@ -794,6 +794,7 @@
               <xs:enumeration value="BUILDINGS" />
               <xs:enumeration value="SETTLEMENTS" />
               <xs:enumeration value="FOUNDING_FATHERS" />
+              <xs:enumeration value="YEAR" />
               <xs:enumeration value="NONE" />
             </xs:restriction>
           </xs:simpleType>

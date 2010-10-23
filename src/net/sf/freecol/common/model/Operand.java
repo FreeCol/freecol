@@ -49,7 +49,7 @@ public class Operand extends Scope {
     private static final Logger logger = Logger.getLogger(Operand.class.getName());
 
     public static enum OperandType {
-        UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, NONE
+        UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, YEAR, NONE
     }
 
     public static enum ScopeLevel {
@@ -179,6 +179,8 @@ public class Operand extends Scope {
                         logger.warning(e.toString());
                         return null;
                     }
+                } else if (operandType == OperandType.YEAR) {
+                    return game.getTurn().getYear();
                 } else {
                     for (Player player : game.getPlayers()) {
                         switch(operandType) {
@@ -327,11 +329,11 @@ public class Operand extends Scope {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
         out.writeStartElement(tag);
         writeAttributes(out);
@@ -354,7 +356,7 @@ public class Operand extends Scope {
             value = new Integer(attribute);
         }
     }
-    
+
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("operandType", operandType.toString());

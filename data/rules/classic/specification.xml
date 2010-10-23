@@ -60,6 +60,20 @@
       </limit>
       <ability id="model.ability.independenceDeclared" />
     </event>
+    <event id="model.event.spanishSuccession">
+      <limit id="model.limit.spanishSuccession.year" operator="GE">
+        <leftHandSide scopeLevel="GAME" operandType="YEAR"/>
+        <rightHandSide value="1600"/>
+      </limit>
+      <limit id="model.limit.spanishSuccession.weakestPlayer" operator="LT">
+        <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
+        <rightHandSide value="50" />
+      </limit>
+      <limit id="model.limit.spanishSuccession.strongestPlayer" operator="GT">
+        <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
+        <rightHandSide value="50" />
+      </limit>
+    </event>
   </events>
 
   <goods-types>

@@ -19,8 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -43,7 +44,7 @@ public class Event extends FreeColGameObjectType {
     /**
      * Describe limits here.
      */
-    private List<Limit> limits;
+    private Map<String, Limit> limits;
 
 
 
@@ -74,17 +75,18 @@ public class Event extends FreeColGameObjectType {
      *
      * @return a <code>List<Limit></code> value
      */
-    public final List<Limit> getLimits() {
-        return limits;
+    public final Collection<Limit> getLimits() {
+        return limits.values();
     }
 
     /**
-     * Set the <code>Limits</code> value.
+     * Return the <code>Limit</code> with the given id.
      *
-     * @param newLimits The new Limits value.
+     * @param id a <code>String</code> value
+     * @return a <code>Limit</code> value
      */
-    public final void setLimits(final List<Limit> newLimits) {
-        this.limits = newLimits;
+    public final Limit getLimit(String id) {
+        return limits.get(id);
     }
 
     /**
@@ -123,7 +125,7 @@ public class Event extends FreeColGameObjectType {
     public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
         if (limits != null) {
-            for (Limit limit : limits) {
+            for (Limit limit : limits.values()) {
                 limit.toXMLImpl(out);
             }
         }
@@ -139,11 +141,11 @@ public class Event extends FreeColGameObjectType {
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         if (Limit.getXMLElementTagName().equals(in.getLocalName())) {
             if (limits == null) {
-                limits = new ArrayList<Limit>();
+                limits = new HashMap<String, Limit>();
             }
             Limit limit = new Limit(getSpecification());
             limit.readFromXML(in);
-            limits.add(limit);
+            limits.put(limit.getId(), limit);
         } else {
             super.readChild(in);
         }

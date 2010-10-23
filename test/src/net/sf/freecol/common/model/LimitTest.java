@@ -86,15 +86,9 @@ public class LimitTest extends FreeColTestCase {
         Event event = spec().getEvent("model.event.declareIndependence");
         assertNotNull(event);
         assertNotNull(event.getLimits());
-        
-        Limit rebelLimit = null, colonyLimit = null;
-        for (Limit limit : event.getLimits()) {
-            if (limit.getId().equals("model.limit.independence.rebels")) {
-                rebelLimit = limit;
-            } else if (limit.getId().equals("model.limit.independence.colonies")) {
-                colonyLimit = limit;
-            }
-        }
+
+        Limit rebelLimit = event.getLimit("model.limit.independence.rebels");
+        Limit colonyLimit = event.getLimit("model.limit.independence.colonies");
 
         assertNotNull(rebelLimit);
         assertEquals(Limit.Operator.GE, rebelLimit.getOperator());
@@ -122,6 +116,54 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colony.isConnected());
         assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
         assertTrue(colonyLimit.evaluate(dutch));
+
+    }
+
+    public void testSuccessionLimits() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap();
+        game.setMap(map);
+
+        Colony colony = getStandardColony(3);
+
+        Event event = spec().getEvent("model.event.spanishSuccession");
+        assertNotNull(event);
+        assertNotNull(event.getLimits());
+
+        Limit weakestPlayerLimit = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
+        Limit strongestPlayerLimit = event.getLimit("model.limit.spanishSuccession.strongestPlayer");
+        Limit yearLimit = event.getLimit("model.limit.spanishSuccession.year");
+
+        assertNotNull(strongestPlayerLimit);
+        assertEquals(Limit.Operator.GT, strongestPlayerLimit.getOperator());
+        assertEquals(Operand.OperandType.NONE, strongestPlayerLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.PLAYER, strongestPlayerLimit.getLeftHandSide().getScopeLevel());
+        assertEquals(new Integer(0), strongestPlayerLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(new Integer(50), strongestPlayerLimit.getRightHandSide().getValue(dutch));
+        assertFalse(strongestPlayerLimit.evaluate(dutch));
+
+        assertNotNull(weakestPlayerLimit);
+        assertEquals(Limit.Operator.LT, weakestPlayerLimit.getOperator());
+        assertEquals(Operand.OperandType.NONE, weakestPlayerLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.PLAYER, weakestPlayerLimit.getLeftHandSide().getScopeLevel());
+        assertEquals(new Integer(0), weakestPlayerLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(new Integer(50), weakestPlayerLimit.getRightHandSide().getValue(dutch));
+        assertTrue(weakestPlayerLimit.evaluate(dutch));
+
+        assertNotNull(yearLimit);
+        assertEquals(Limit.Operator.GE, yearLimit.getOperator());
+        assertEquals(Operand.OperandType.YEAR, yearLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.GAME, yearLimit.getLeftHandSide().getScopeLevel());
+        assertEquals(new Integer(1492), yearLimit.getLeftHandSide().getValue(game));
+        assertEquals(new Integer(1600), yearLimit.getRightHandSide().getValue());
+        assertFalse(yearLimit.evaluate(game));
+
+        colony.incrementLiberty(10000);
+        colony.updateSoL();
+        assertTrue(strongestPlayerLimit.evaluate(dutch));
+        assertFalse(weakestPlayerLimit.evaluate(dutch));
 
     }
 
