@@ -47,13 +47,13 @@ import org.w3c.dom.Element;
 
 /**
  * Objects of this class describes the plan the AI has for a <code>Colony</code>.
- * 
+ *
  * <br>
  * <br>
- * 
+ *
  * A <code>ColonyPlan</code> contains {@link WorkLocationPlan}s which defines
  * the production of each {@link Building} and {@link ColonyTile}.
- * 
+ *
  * @see Colony
  */
 public class ColonyPlan {
@@ -77,7 +77,7 @@ public class ColonyPlan {
     // per building?
     private static final int MAX_LEVEL = 3;
     private static final int MIN_RAW_GOODS_THRESHOLD = 20;
-    
+
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
@@ -88,7 +88,7 @@ public class ColonyPlan {
     private ArrayList<WorkLocationPlan> workLocationPlans = new ArrayList<WorkLocationPlan>();
 
     private GoodsType primaryRawMaterial = null;
-    
+
     private GoodsType secondaryRawMaterial = null;
 
     /**
@@ -96,11 +96,11 @@ public class ColonyPlan {
      */
     private ColonyProfile profile;
 
-    
-    
+
+
     /**
      * Creates a new <code>ColonyPlan</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param colony The colony to make a <code>ColonyPlan</code> for.
      */
@@ -115,7 +115,7 @@ public class ColonyPlan {
 
     /**
      * Creates a new <code>ColonyPlan</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -128,7 +128,7 @@ public class ColonyPlan {
     /**
      * Returns the <code>WorkLocationPlan</code>s associated with this
      * <code>ColonyPlan</code>.
-     * 
+     *
      * @return The list of <code>WorkLocationPlan</code>s .
      */
     public List<WorkLocationPlan> getWorkLocationPlans() {
@@ -138,7 +138,7 @@ public class ColonyPlan {
     /**
      * Returns the <code>WorkLocationPlan</code>s associated with this
      * <code>ColonyPlan</code> sorted by production in a decreasing order.
-     * 
+     *
      * @return The list of <code>WorkLocationPlan</code>s .
      */
     public List<WorkLocationPlan> getSortedWorkLocationPlans() {
@@ -184,7 +184,7 @@ public class ColonyPlan {
     /**
      * Gets an <code>Iterator</code> for everything to be built in the
      * <code>Colony</code>.
-     * 
+     *
      * @return An iterator containing all the <code>Buildable</code> sorted by
      *         priority (highest priority first).
      */
@@ -197,7 +197,7 @@ public class ColonyPlan {
         }
 
         List<Buildable> buildables = new ArrayList<Buildable>();
-        
+
         List<BuildingType> docks = new ArrayList<BuildingType>();
         List<BuildingType> customs = new ArrayList<BuildingType>();
         List<BuildingType> builders = new ArrayList<BuildingType>();
@@ -210,10 +210,10 @@ public class ColonyPlan {
         for (BuildingType type : colony.getSpecification().getBuildingTypeList()) {
             if (type.hasAbility("model.ability.produceInWater")) {
                 docks.add(type);
-            } 
+            }
             if (type.hasAbility("model.ability.export")) {
                 customs.add(type);
-            } 
+            }
             if (type.hasAbility("model.ability.teach")) {
                 schools.add(type);
             }
@@ -373,7 +373,7 @@ public class ColonyPlan {
         for (BuildingType buildingType : military) {
             if (colony.canBuild(buildingType)) {
                 if (colony.getBuilding(buildingType) == null
-                    && (buildingType.getConsumedGoodsType() == null 
+                    && (buildingType.getConsumedGoodsType() == null
                         || buildingType.getConsumedGoodsType().isFarmed())) {
                     buildables.add(new Buildable(buildingType, UPGRADE_PRIORITY));
                 } else {
@@ -394,7 +394,7 @@ public class ColonyPlan {
                     break;
                 }
             }
-        }        
+        }
 
         // improve education
         if (profile.getType() != ProfileType.SMALL) {
@@ -450,7 +450,7 @@ public class ColonyPlan {
 
     /**
      * Gets the main AI-object.
-     * 
+     *
      * @return The main AI-object.
      */
     public AIMain getAIMain() {
@@ -459,7 +459,7 @@ public class ColonyPlan {
 
     /**
      * Get the <code>Game</code> this object is associated to.
-     * 
+     *
      * @return The <code>Game</code>.
      */
     public Game getGame() {
@@ -472,7 +472,7 @@ public class ColonyPlan {
      * manufactured.
      */
     public void create() {
-        
+
         workLocationPlans.clear();
         if (profile.getType() == ProfileType.OUTPOST) {
             GoodsType goodsType;
@@ -492,9 +492,9 @@ public class ColonyPlan {
         GoodsType muskets = colony.getSpecification().getGoodsType("model.goods.muskets");
         GoodsType ore = colony.getSpecification().getGoodsType("model.goods.ore");
         GoodsType silver = colony.getSpecification().getGoodsType("model.goods.silver");
-                
+
         Building townHall = colony.getBuildingForProducing(bells);
-        
+
         // Choose the best production for each tile:
         for (ColonyTile ct : colony.getColonyTiles()) {
             if (ct.isColonyCenterTile()
@@ -510,7 +510,7 @@ public class ColonyPlan {
                 workLocationPlans.add(wlp);
             }
         }
-        
+
         // We need to find what, if any, is still required for what we
         // are building
         GoodsType buildingReq = null;
@@ -519,9 +519,9 @@ public class ColonyPlan {
         final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
         final GoodsType lumberType = colony.getSpecification().getGoodsType("model.goods.lumber");
         final GoodsType oreType = colony.getSpecification().getGoodsType("model.goods.ore");
-        
+
         buildingReq = getBuildingReqGoods();
-        
+
         if(buildingReq != null){
             if(buildingReq == hammersType){
                 buildingRawMat = lumberType;
@@ -534,10 +534,10 @@ public class ColonyPlan {
 
         // Try to ensure that we produce the raw material necessary for
         //what we are building
-        boolean buildingRawMatReq = buildingRawMat != null 
+        boolean buildingRawMatReq = buildingRawMat != null
                                     && colony.getGoodsCount(buildingRawMat) < MIN_RAW_GOODS_THRESHOLD
-                                    && getProductionOf(buildingRawMat) <= 0; 
-        
+                                    && getProductionOf(buildingRawMat) <= 0;
+
         if(buildingRawMatReq) {
             WorkLocationPlan bestChoice = null;
             int highestPotential = 0;
@@ -569,7 +569,7 @@ public class ColonyPlan {
         for (GoodsType goodsType : goodsTypeList) {
             // only consider goods that can be transformed
             // do not consider hammers as a valid transformation
-            if (goodsType.getProducedMaterial() == null 
+            if (goodsType.getProducedMaterial() == null
                     || goodsType.getProducedMaterial() == hammersType) {
                 continue;
             }
@@ -616,8 +616,8 @@ public class ColonyPlan {
         // Produce the goods required for what is being built, if:
         //     - anything is being built, and
         //     - there is either production or stock of the raw material
-        if(buildingReq != null && 
-            (getProductionOf(buildingRawMat) > 0 
+        if(buildingReq != null &&
+            (getProductionOf(buildingRawMat) > 0
               || colony.getGoodsCount(buildingRawMat) > 0)){
             WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(),
                     colony.getBuildingForProducing(buildingReq), buildingReq);
@@ -639,8 +639,8 @@ public class ColonyPlan {
         }
 
         // Remove the secondary goods if we need food:
-        if (secondaryRawMaterial != null 
-                && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION 
+        if (secondaryRawMaterial != null
+                && needsFood()
                 && secondaryRawMaterial.isNewWorldGoodsType()) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
             while (wlpIterator2.hasNext()) {
@@ -658,9 +658,9 @@ public class ColonyPlan {
         }
 
         // Remove the workers on the primary goods one-by-one if we need food:
-        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+        if (needsFood()) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+            while (wlpIterator2.hasNext() && needsFood()) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == primaryRawMaterial) {
                     Tile t = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
@@ -675,9 +675,9 @@ public class ColonyPlan {
         }
 
         // Remove the manufacturer if we still lack food:
-        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+        if (needsFood()) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+            while (wlpIterator2.hasNext() && needsFood()) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     Building b = (Building) wlp.getWorkLocation();
@@ -696,33 +696,33 @@ public class ColonyPlan {
         if(colony.getGoodsCount(buildingRawMat) > 0){
             buildMatToGo = buildingRawMat;
         }
-        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+        if (needsFood()) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+            while (wlpIterator2.hasNext() && needsFood()) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == buildMatToGo) {
                     wlpIterator2.remove();
                 }
             }
             // still lacking food, removing the rest
-            if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+            if (needsFood()) {
                 buildMatToGo = (buildMatToGo == buildingRawMat)? buildingReq : buildingRawMat;
-                
+
                 wlpIterator2 = workLocationPlans.iterator();
-                while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+                while (wlpIterator2.hasNext() && needsFood()) {
                     WorkLocationPlan wlp = wlpIterator2.next();
                     if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == buildMatToGo) {
                         wlpIterator2.remove();
                     }
                 }
             }
-        }        
-        
+        }
+
         // Primary allocations done
         // Beginning secondary allocations
-        
+
         // Not enough food for more allocations, save work and stop here
-        if(getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2){
+        if (getFoodProduction() < getNextFoodConsumption()) {
             return;
         }
 
@@ -736,7 +736,7 @@ public class ColonyPlan {
             boolean blacksmithAdded = false;
 
             // Add a manufacturer for the secondary type of goods:
-            if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2 &&
+            if (getFoodProduction() >= getNextFoodConsumption() &&
                 secondaryRawMaterial != null &&
                 12 * secondaryWorkers + 6 <= getProductionOf(secondaryRawMaterial) &&
                 secondaryWorkers <= MAX_LEVEL) {
@@ -754,9 +754,10 @@ public class ColonyPlan {
             }
 
             // Add a manufacturer for the primary type of goods:
-            if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2 && primaryRawMaterial != null
-                    && 12 * primaryWorkers + 6 <= getProductionOf(primaryRawMaterial)
-                    && primaryWorkers <= MAX_LEVEL) {
+            if (getFoodProduction() >= getNextFoodConsumption()
+                && primaryRawMaterial != null
+                && 12 * primaryWorkers + 6 <= getProductionOf(primaryRawMaterial)
+                && primaryWorkers <= MAX_LEVEL) {
                 GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
                 Building b = colony.getBuildingForProducing(producedGoods);
                 if (b != null) {
@@ -771,8 +772,9 @@ public class ColonyPlan {
             }
 
             // Add a gunsmith:
-            if (blacksmithAdded && getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2
-                    && gunsmiths < MAX_LEVEL) {
+            if (blacksmithAdded
+                && getFoodProduction() >= getNextFoodConsumption()
+                && gunsmiths < MAX_LEVEL) {
                 Building b = colony.getBuildingForProducing(muskets);
                 if (b != null) {
                     WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, muskets);
@@ -783,10 +785,10 @@ public class ColonyPlan {
             }
 
             // Add builders
-            if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2
-                    && buildingReqProducer != null 
-                    && buildingReqProducer.getProduction() * builders <= getProductionOf(buildingRawMat) 
-                    && buildingReqProducer.getMaxUnits() < builders) {
+            if (getFoodProduction() >= getNextFoodConsumption()
+                && buildingReqProducer != null
+                && buildingReqProducer.getProduction() * builders <= getProductionOf(buildingRawMat)
+                && buildingReqProducer.getMaxUnits() < builders) {
                 WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), buildingReqProducer, buildingReq);
                 workLocationPlans.add(wlp);
                 colonistAdded = true;
@@ -803,9 +805,21 @@ public class ColonyPlan {
         // TODO: Add preacher
     }
 
+    private int getFoodConsumption() {
+        return workLocationPlans.size() * colony.getOwner().getMaximumFoodConsumption();
+    }
+
+    private int getNextFoodConsumption() {
+        return (workLocationPlans.size() + 1) * colony.getOwner().getMaximumFoodConsumption();
+    }
+
+    private boolean needsFood() {
+        return (getFoodProduction() < getFoodConsumption());
+    }
+
     /**
      * Returns the production of the given type of goods according to this plan.
-     * 
+     *
      * @param goodsType The type of goods to check the production for.
      * @return The maximum possible production of the given type of goods
      *         according to this <code>ColonyPlan</code>.
@@ -830,7 +844,7 @@ public class ColonyPlan {
 
     /**
      * Returns the production of food according to this plan.
-     * 
+     *
      * @return The maximum possible food production
      *         according to this <code>ColonyPlan</code>.
      */
@@ -846,7 +860,7 @@ public class ColonyPlan {
     /**
      * Determines the best goods to produce on a given <code>Tile</code>
      * within this colony.
-     * 
+     *
      * @param t The <code>Tile</code>.
      * @return The type of goods.
      */
@@ -916,33 +930,33 @@ public class ColonyPlan {
         return bestProduction;
     }
 
-    
+
     public void adjustProductionAndManufacture(){
-        List<GoodsType> rawMatList = new ArrayList<GoodsType>(); 
+        List<GoodsType> rawMatList = new ArrayList<GoodsType>();
 
         final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
         final GoodsType lumberType = colony.getSpecification().getGoodsType("model.goods.lumber");
         final GoodsType oreType = colony.getSpecification().getGoodsType("model.goods.ore");
-    
+
         if(getBuildingReqGoods() == hammersType){
             rawMatList.add(lumberType);
         }
         rawMatList.add(oreType);
-        
+
         if (primaryRawMaterial != null
                 && primaryRawMaterial != lumberType
                 && primaryRawMaterial != oreType
                 && !primaryRawMaterial.isFoodType()) {
             rawMatList.add(primaryRawMaterial);
         }
-        
+
         if (secondaryRawMaterial != null
                 && secondaryRawMaterial != lumberType
                 && secondaryRawMaterial != oreType
                 && !secondaryRawMaterial.isFoodType()) {
             rawMatList.add(secondaryRawMaterial);
         }
-        
+
         for(GoodsType rawMat : rawMatList){
             GoodsType producedGoods = rawMat.getProducedMaterial();
             if(producedGoods == null){
@@ -951,16 +965,16 @@ public class ColonyPlan {
             adjustProductionAndManufactureFor(rawMat,producedGoods);
         }
     }
-    
+
     public void adjustProductionAndManufactureFor(GoodsType rawMat, GoodsType producedGoods){
         Building factory = colony.getBuildingForProducing(producedGoods);
         if(factory == null){
             return;
         }
-        
+
         List<Unit> producers = new ArrayList<Unit>();
         int stockRawMat = colony.getGoodsCount(rawMat);
-       
+
         for(ColonyTile t : colony.getColonyTiles()){
             if(t.isColonyCenterTile()){
                 continue;
@@ -972,9 +986,9 @@ public class ColonyPlan {
             if(u.getWorkType() != rawMat){
                 continue;
             }
-            producers.add(u); 
+            producers.add(u);
         }
-        
+
         if(producers.size() == 0){
             return;
         }
@@ -985,7 +999,7 @@ public class ColonyPlan {
                     GoodsType goodsType = u1.getWorkType();
                     int prodU1 = ((ColonyTile) u1.getLocation()).getProductionOf(u1, goodsType);
                     int prodU2 = ((ColonyTile) u2.getLocation()).getProductionOf(u2, goodsType);
-                    
+
                     if(prodU1 > prodU2){
                         return 1;
                     }
@@ -996,7 +1010,7 @@ public class ColonyPlan {
                 }
         };
         Collections.sort(producers, comp);
-        
+
         // shift units gathering raw materials to production of manufactured goods
         Iterator<Unit> iter = new ArrayList<Unit>(producers).iterator();
         while(iter.hasNext()){
@@ -1004,7 +1018,7 @@ public class ColonyPlan {
             if(stockRawMat < 50 && producers.size() < 2){
                 return;
             }
-            
+
             if(factory.getUnitCount() == factory.getMaxUnits()){
                 return;
             }
@@ -1014,19 +1028,19 @@ public class ColonyPlan {
                 continue;
             }
 
-            // get  the production values if the unit is shifted 
+            // get  the production values if the unit is shifted
             int rawProd = colony.getProductionNextTurn(rawMat) - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
             int mfnProd = colony.getProductionNextTurn(producedGoods) + factory.getAdditionalProductionNextTurn(u);
             if(stockRawMat < 50 && rawProd < mfnProd){
                 return;
             }
-            
+
             u.setLocation(factory);
             u.setWorkType(producedGoods);
             producers.remove(u);
         }
     }
-    
+
     public GoodsType getBuildingReqGoods(){
         BuildableType currBuild = colony.getCurrentlyBuilding();
         if(currBuild == null){
@@ -1034,14 +1048,14 @@ public class ColonyPlan {
         }
         final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
         final GoodsType toolsType = colony.getSpecification().getGoodsType("model.goods.tools");
-        
+
         if(colony.getGoodsCount(hammersType) < currBuild.getAmountRequiredOf(hammersType)){
             return hammersType;
         } else{
             return toolsType;
         }
     }
-    
+
     public GoodsType getPrimaryRawMaterial(){
         return primaryRawMaterial;
     }
@@ -1049,10 +1063,10 @@ public class ColonyPlan {
     public GoodsType getSecondaryRawMaterial(){
         return secondaryRawMaterial;
     }
-    
+
     /**
      * Gets the <code>Colony</code> this <code>ColonyPlan</code> controls.
-     * 
+     *
      * @return The <code>Colony</code>.
      */
     public Colony getColony() {
@@ -1075,7 +1089,7 @@ public class ColonyPlan {
 
     /**
      * Creates an XML-representation of this object.
-     * 
+     *
      * @param document The <code>Document</code> in which the
      *            XML-representation should be created.
      * @return The XML-representation.
@@ -1091,7 +1105,7 @@ public class ColonyPlan {
     /**
      * Updates this object from an XML-representation of a
      * <code>ColonyPlan</code>.
-     * 
+     *
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
@@ -1102,13 +1116,13 @@ public class ColonyPlan {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "colonyPlan"
      */
     public static String getXMLElementTagName() {
         return "colonyPlan";
     }
-    
+
     /**
      * Creates a <code>String</code> representation of this plan.
      */

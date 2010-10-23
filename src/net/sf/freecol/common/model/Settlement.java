@@ -53,9 +53,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
     }
 
-    // TODO: remove this -- requires AI to calculate actual consumption
-    public static final int FOOD_CONSUMPTION = 2;
-
     /** The <code>Player</code> owning this <code>Settlement</code>. */
     protected Player owner;
 

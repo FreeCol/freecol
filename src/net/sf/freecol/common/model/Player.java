@@ -335,6 +335,8 @@ public class Player extends FreeColGameObject implements Nameable {
     // Contains the abilities and modifiers of this type.
     protected FeatureContainer featureContainer;
 
+    // Maximum food consumption of unit types available to this player.
+    private int maximumFoodConsumption = -1;
 
     protected final Iterator<Unit> nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
 
@@ -563,6 +565,29 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the maximum food consumption of any unit types
+     * available to this player.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getMaximumFoodConsumption() {
+        if (maximumFoodConsumption < 0) {
+            for (UnitType unitType : getSpecification().getUnitTypeList()) {
+                if (unitType.isAvailableTo(this)) {
+                    int foodConsumption = 0;
+                    for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
+                        foodConsumption += unitType.getConsumptionOf(foodType);
+                    }
+                    if (foodConsumption > maximumFoodConsumption) {
+                        maximumFoodConsumption = foodConsumption;
+                    }
+                }
+            }
+        }
+        return maximumFoodConsumption;
     }
 
     /**

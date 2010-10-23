@@ -97,7 +97,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Creates a new <code>AIColony</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param colony The colony to make an {@link AIObject} for.
      */
@@ -111,7 +111,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Creates a new <code>AIColony</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -123,7 +123,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Creates a new <code>AIColony</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -139,7 +139,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Creates a new <code>AIColony</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param id
      */
@@ -149,7 +149,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Gets the <code>Colony</code> this <code>AIColony</code> controls.
-     * 
+     *
      * @return The <code>Colony</code>.
      */
     public Colony getColony() {
@@ -177,13 +177,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         super.dispose();
     }
-    
+
     /**
      * Returns an <code>Iterator</code> of the goods to be shipped from this
      * colony. The item with the highest
      * {@link Transportable#getTransportPriority transport priority} gets
      * returned first by this <code>Iterator</code>.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<AIGoods> getAIGoodsIterator() {
@@ -201,7 +201,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Gets an <code>Iterator</code> for every <code>Wish</code> the
      * <code>Colony</code> has.
-     * 
+     *
      * @return The <code>Iterator</code>. The items with the
      *         {@link Wish#getValue highest value} appears first in the
      *         <code>Iterator</code>
@@ -214,7 +214,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Creates a list of the <code>Tile</code>-improvements which will
      * increase the production by this <code>Colony</code>.
-     * 
+     *
      * @see TileImprovementPlan
      */
     public void createTileImprovementPlans() {
@@ -274,22 +274,22 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Returns an <code>Iterator</code> over all the
      * <code>TileImprovementPlan</code>s needed by this colony.
-     * 
+     *
      * @return The <code>Iterator</code>.
      * @see TileImprovementPlan
      */
     public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
         return tileImprovementPlans.iterator();
     }
-    
+
     /**
      * Removes a <code>TileImprovementPlan</code> from the list
-     * @return True if it was successfully deleted, false otherwise 
+     * @return True if it was successfully deleted, false otherwise
      */
     public boolean removeTileImprovementPlan(TileImprovementPlan plan){
         return tileImprovementPlans.remove(plan);
     }
-    
+
     /**
      * Creates the wishes for the <code>Colony</code>.
      */
@@ -313,7 +313,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (colony.governmentChange(newPopulation) >= 0) {
                 // population increase incurs no penalty
                 boolean needFood = colony.getFoodProduction()
-                    <= newPopulation * Colony.FOOD_CONSUMPTION;
+                    <= colony.getFoodConsumption() + colony.getOwner().getMaximumFoodConsumption();
                 // choose expert for best work location plan
                 UnitType expert = getNextExpert(needFood);
                 wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
@@ -515,7 +515,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Add a <code>GoodsWish</code> to the wish list.
-     * 
+     *
      * @param gw The <code>GoodsWish</code> to be added.
      */
     public void addGoodsWish(GoodsWish gw) {
@@ -527,7 +527,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * <code>AIGoods</code>-object is not disposed as part of this operation.
      * Use that method instead to remove the object completely (this method
      * would then be called indirectly).
-     * 
+     *
      * @param ag The <code>AIGoods</code> to be removed.
      * @see AIGoods#dispose()
      */
@@ -721,7 +721,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Returns the available amount of the GoodsType given.
-     * 
+     *
      * @return The amount of tools not needed for the next thing we are
      *         building.
      */
@@ -808,7 +808,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Rearranges the workers within this colony. This is done according to the
      * {@link ColonyPlan}, although minor adjustments can be done to increase
      * production.
-     * 
+     *
      * @param connection The <code>Connection</code> to be used when
      *            communicating with the server.
      */
@@ -819,11 +819,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             logger.fine("No need to rearrange workers in " + colony.getName() + ".");
             return false;
         }
-        
+
         // TODO: Detect a siege and move the workers temporarily around.
 
         checkForUnequippedExpertPioneer();
-        
+
         checkForUnarmedExpertSoldier();
 
         List<Unit> units = new ArrayList<Unit>();
@@ -1110,7 +1110,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     }
                 }
                 if (bestUnit != null && wlp.getWorkLocation().canAdd(bestUnit)) {
-                    
+
                     if (AIMessage.askWork(getAIUnit(bestUnit), wlp.getWorkLocation())) {
                         bestUnit.setWorkType(wlp.getGoodsType());
                         units.remove(bestUnit);
@@ -1139,13 +1139,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
           colony.setExports(Goods.CLOTH, true);
           colony.setExports(Goods.COATS, true);
           }*/
-        
+
         decideBuildable(connection);
         createTileImprovementPlans();
         createWishes();
         colonyPlan.adjustProductionAndManufacture();
         checkConditionsForHorseBreed();
-        
+
         if (this.colony.getUnitCount()<=0) {
             // Something bad happened, there is no remaining unit
             // working in the colony.
@@ -1179,7 +1179,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (colony.getUnitCount() < 2) {
             return;
         }
-        
+
         for(Unit unit : colony.getUnitList()){
             if(!unit.hasAbility("model.ability.expertPioneer")){
                 continue;
@@ -1311,25 +1311,25 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void checkForUnarmedExpertSoldier() {
         EquipmentType musketsEqType = colony.getSpecification().getEquipmentType("model.equipment.muskets");
-        
+
         for(Unit unit : colony.getUnitList()){
             if(colony.getUnitCount() == 1){
                 return;
             }
-            
+
             if(!unit.hasAbility("model.ability.expertSoldier")){
                 continue;
             }
-            
+
             // check if colony has goods to equip unit
             if(colony.canBuildEquipment(musketsEqType)){
                 unit.putOutsideColony();
                 continue;
             }
-            
+
             // check for armed non-expert unit
             for(Unit outsideUnit : colony.getTile().getUnitList()){
-                if(outsideUnit.isArmed() 
+                if(outsideUnit.isArmed()
                         && !outsideUnit.hasAbility("model.ability.expertSoldier")){
                     unit.putOutsideColony();
                     break;
@@ -1346,19 +1346,19 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         GoodsType horsesType = colony.getSpecification().getGoodsType("model.goods.horses");
         EquipmentType horsesEqType = colony.getSpecification().getEquipmentType("model.equipment.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
-        
+
         // Colony already is breeding horses
         if(colony.getGoodsCount(horsesType) >= horsesType.getBreedingNumber()){
             return;
         }
-        
+
         int foodProdAvail = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
         // no food production available for breeding anyway
         if(foodProdAvail <= 0){
             return;
         }
-        
-        // we will now look for any mounted unit that can be temporarily dismounted  
+
+        // we will now look for any mounted unit that can be temporarily dismounted
         for(Unit u : colony.getTile().getUnitList()){
             int amount = u.getEquipmentCount(horsesEqType);
             if (amount > 0
@@ -1373,56 +1373,56 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private void placeExpertsInWorkPlaces(List<Unit> units, List<WorkLocationPlan> workLocationPlans) {
         boolean canProduceInWater = colony.hasAbility("model.ability.produceInWater");
-        
+
         // Since we will change the original list, we need to make a copy to iterate from
         Iterator<Unit> uit = new ArrayList<Unit>(units).iterator();
         while (uit.hasNext()) {
             Unit unit = uit.next();
-            
+
             GoodsType expertProd = unit.getType().getExpertProduction();
-            
+
             // not an expert
             if(expertProd == null){
                 continue;
             }
-            
+
             WorkLocationPlan bestWorkPlan = null;
             int bestProduction = 0;
-                        
+
             Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
             while (wlpIterator.hasNext()) {
                 WorkLocationPlan wlp = wlpIterator.next();
                 WorkLocation wl = wlp.getWorkLocation();
-                
+
                 GoodsType locGoods = wlp.getGoodsType();
-                
+
                 boolean isColonyTile = wl instanceof ColonyTile;
                 boolean isLand = true;
                 if(isColonyTile){
                     isLand = ((ColonyTile) wl).getWorkTile().isLand();
                 }
-                
+
                 //Colony cannot get fish yet
                 if(isColonyTile && !isLand && !canProduceInWater){
                     continue;
                 }
-                
+
                 // not a fit
                 if(expertProd != locGoods){
                     continue;
                 }
-                
+
                 // no need to look any further, only one place to work in
                 if(!isColonyTile){
                     bestWorkPlan = wlp;
                     break;
                 }
-                
+
                 int planProd = wlp.getProductionOf(expertProd);
                 if(bestWorkPlan == null || bestProduction < planProd){
                     bestWorkPlan = wlp;
                     bestProduction = planProd;
-                    
+
                 }
             }
 
@@ -1436,7 +1436,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Decides what to build in the <code>Colony</code>.
-     * 
+     *
      * @param connection The connection to use when communicating with the
      *            server.
      */
@@ -1467,7 +1467,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Writes this object to an XML stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -1524,7 +1524,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Reads information for this object from an XML stream.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
@@ -1579,14 +1579,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             logger.warning("Expected end tag, received: " + in.getLocalName());
         }
     }
-    
+
     public ColonyPlan getColonyPlan() {
         return colonyPlan;
     }
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "aiColony"
      */
     public static String getXMLElementTagName() {
