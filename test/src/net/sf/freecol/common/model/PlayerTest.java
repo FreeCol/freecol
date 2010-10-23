@@ -75,7 +75,7 @@ public class PlayerTest extends FreeColTestCase {
         assertTrue(french.getUnit(unit2.getId()) == unit2);
 
     }
-    
+
     public void testEuropeanPlayer(Player player) {
         assertTrue(player.canBuildColonies());
         assertTrue(player.canHaveFoundingFathers());
@@ -86,8 +86,9 @@ public class PlayerTest extends FreeColTestCase {
         assertTrue(player.isEuropean());
         assertFalse(player.isIndian());
         assertFalse(player.isREF());
+        assertEquals(2, player.getMaximumFoodConsumption());
     }
-    
+
     public void testIndianPlayer(Player player) {
         assertFalse(player.canBuildColonies());
         assertFalse(player.canHaveFoundingFathers());
@@ -98,8 +99,9 @@ public class PlayerTest extends FreeColTestCase {
         assertFalse(player.isEuropean());
         assertTrue(player.isIndian());
         assertFalse(player.isREF());
+        assertEquals(2, player.getMaximumFoodConsumption());
     }
-    
+
     public void testRoyalPlayer(Player player) {
         assertFalse(player.canBuildColonies());
         assertFalse(player.canHaveFoundingFathers());
@@ -110,11 +112,12 @@ public class PlayerTest extends FreeColTestCase {
         assertTrue(player.isEuropean());
         assertFalse(player.isIndian());
         assertTrue(player.isREF());
+        assertEquals(2, player.getMaximumFoodConsumption());
     }
-    
+
     public void testPlayers() {
         Game game = getStandardGame();
-        
+
         // europeans
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -134,7 +137,7 @@ public class PlayerTest extends FreeColTestCase {
         //testEuropeanPlayer(swedish);
         //testEuropeanPlayer(danish);
         //testEuropeanPlayer(russian);
-        
+
         // indians
         Player inca = game.getPlayer("model.nation.inca");
         Player aztec = game.getPlayer("model.nation.aztec");
@@ -152,7 +155,7 @@ public class PlayerTest extends FreeColTestCase {
         testIndianPlayer(sioux);
         testIndianPlayer(apache);
         testIndianPlayer(tupi);
-        
+
         // royal
         /* this works differently now
         Player dutchREF = game.getPlayer("model.nation.dutchREF");
@@ -185,7 +188,7 @@ public class PlayerTest extends FreeColTestCase {
     public void testTension(){
     	String errMsg = "";
     	Game game = getStandardGame();
-        
+
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
 
@@ -194,34 +197,34 @@ public class PlayerTest extends FreeColTestCase {
 
         dutch.setTension(french, new Tension(initialTension));
         french.setTension(dutch, new Tension(initialTension));
-        
+
         dutch.modifyTension(french, change);
 
         int expectedDutchTension = initialTension + change;
         int expectedFrenchTension = initialTension;
-        
+
         errMsg = "Dutch tension value should have changed";
         assertEquals(errMsg, expectedDutchTension, dutch.getTension(french).getValue());
         errMsg = "French tension value should have remained the same";
         assertEquals(errMsg, expectedFrenchTension ,french.getTension(dutch).getValue());
     }
-    
+
     public void testAddAnotherPlayersUnit(){
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-        
+
         Player dutch =  game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
-        
+
         assertEquals("Wrong number of units for dutch player",0,dutch.getUnits().size());
         assertEquals("Wrong number of units for french player",0,french.getUnits().size());
-        
+
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        freeColonist, UnitState.ACTIVE);
         assertTrue("Colonist should be dutch", colonist.getOwner() == dutch);
         assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
-        
+
         try{
             french.setUnit(colonist);
             fail("An IllegalStateException should have been raised");
@@ -230,7 +233,7 @@ public class PlayerTest extends FreeColTestCase {
             assertTrue("Colonist owner should not have been changed", colonist.getOwner() == dutch);
             assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
             assertEquals("Wrong number of units for french player",0,french.getUnits().size());
-            
+
         }
 
     }
