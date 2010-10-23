@@ -1679,6 +1679,8 @@
       <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
       <!-- Whether to award exploration points or not -->
       <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
+      <!-- Radius from home settlement within which natives claim land -->
+      <integerOption id="model.option.indianClaimRadius" defaultValue="3" minimumValue="0" maximumValue="1000"/>
     </optionGroup>
     <optionGroup id="gameOptions.colony">
       <!-- Does the Custom House sell boycotted goods -->
