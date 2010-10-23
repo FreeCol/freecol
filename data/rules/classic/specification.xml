@@ -1524,6 +1524,7 @@
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="veryHigh" />
+        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.always" />
         <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
         <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
         <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
@@ -1553,6 +1554,7 @@
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="high" />
+        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
         <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
         <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
       </optionGroup>
@@ -1581,6 +1583,7 @@
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="medium" />
+        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
         <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
       </optionGroup>
       <optionGroup id="model.difficulty.hard">
@@ -1608,6 +1611,7 @@
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="low" />
+        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
       </optionGroup>
       <optionGroup id="model.difficulty.veryHard">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1634,6 +1638,7 @@
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <stringOption  id="model.option.tileProduction" value="veryLow" />
+        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
       </optionGroup>
       <optionGroup id="model.difficulty.custom">
         <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
@@ -1665,6 +1670,13 @@
           <choice value="medium" />
           <choice value="high" />
           <choice value="veryHigh" />
+        </stringOption>
+        <stringOption  id="model.option.buildOnNativeLand"
+                       value="model.option.buildOnNativeLand.never">
+          <choice value="model.option.buildOnNativeLand.always" />
+          <choice value="model.option.buildOnNativeLand.first" />
+          <choice value="model.option.buildOnNativeLand.firstAndUncontacted" />
+          <choice value="model.option.buildOnNativeLand.never" />
         </stringOption>
         <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
         <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />

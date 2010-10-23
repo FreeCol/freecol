@@ -84,6 +84,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -804,6 +805,8 @@ public final class FreeColServer {
             if (savegameVersion < 11) {
                 addIntegerOption("model.option.indianClaimRadius", 3);
                 addIntegerOption("model.option.monarchSupport", 2);
+                addStringOption("model.option.buildOnNativeLand",
+                                "model.option.buildOnNativeLand.never");
             }
 
             // Later, we might want to modify loaded savegames:
@@ -832,6 +835,15 @@ public final class FreeColServer {
         Specification spec = game.getSpecification();
         if (!spec.hasOption(id)) {
             IntegerOption op = new IntegerOption(id);
+            op.setValue(defaultValue);
+            spec.addAbstractOption(op);
+        }
+    }
+
+    private void addStringOption(String id, String defaultValue) {
+        Specification spec = game.getSpecification();
+        if (!spec.hasOption(id)) {
+            StringOption op = new StringOption(id);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
         }

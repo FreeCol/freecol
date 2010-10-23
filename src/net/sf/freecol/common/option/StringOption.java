@@ -67,6 +67,16 @@ public class StringOption extends AbstractOption {
 
     /**
      * Creates a new <code>StringOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object
+     *            should be found in an {@link OptionGroup}.
+     */
+    public StringOption(String id) {
+        super(id);
+    }
+
+    /**
+     * Creates a new <code>StringOption</code>.
      * @param in The <code>XMLStreamReader</code> containing the data.
      * @exception XMLStreamException if an error occurs
      */

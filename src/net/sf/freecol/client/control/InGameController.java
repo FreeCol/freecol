@@ -1181,9 +1181,10 @@ public final class InGameController implements NetworkConstants {
      * Use the active unit to build a colony.
      */
     public void buildColony() {
+        Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
+        if (game.getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
@@ -1200,17 +1201,18 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         if (!unit.canBuildColony()) return;
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
+
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
             && !showColonyWarnings(tile, unit)) {
             return;
         }
         
-        // check ownership of central tile
-        if(tile.getOwner() != null && tile.getOwner()!= player){
-        	boolean isNewOwner = claimLand(tile, null, 0);
-        	if(!isNewOwner){
-        		return;
-        	}
+        // Check for tile ownership problems.
+        if (tile.getOwner() != null && tile.getOwner() != player) {
+            if (!claimLand(tile, null, 0)) {
+                return;
+            }
         }
 
         // Get and check the name.

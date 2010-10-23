@@ -1189,6 +1189,17 @@ public class Player extends FreeColGameObject implements Nameable {
                 return 0; // Claim abandoned or only by tile improvement
             }
         } // Else, native ownership
+        String build = getGame().getSpecification()
+            .getStringOption("model.option.buildOnNativeLand").getValue();
+        if (build.equals("model.option.buildOnNativeLand.always")
+            || (build.equals("model.option.buildOnNativeLand.first")
+                && getNumberOfSettlements() == 0)
+            || (build.equals("model.option.buildOnNativeLand.firstAndUncontacted")
+                && getNumberOfSettlements() == 0
+                && nationOwner.getStance(this) == Stance.UNCONTACTED)) {
+            return 0;
+        }
+
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             price += tile.potential(type, null);
         }
