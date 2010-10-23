@@ -832,7 +832,7 @@ public final class FreeColServer {
         Specification spec = game.getSpecification();
         if (!spec.hasOption(id)) {
             IntegerOption op = new IntegerOption(id);
-            op.setValue(3);
+            op.setValue(defaultValue);
             spec.addAbstractOption(op);
         }
     }
