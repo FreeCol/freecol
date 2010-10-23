@@ -535,7 +535,7 @@ public class Building extends FreeColGameObject
         }
     }
 
-    private int getStoredInput() {
+    protected int getStoredInput() {
         if (getGoodsInputType() == null) {
             return 0;
         } else {
@@ -558,7 +558,7 @@ public class Building extends FreeColGameObject
         } else if (canAutoProduce()) {
             return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
         } else {
-            return calculateGoodsInput(getMaximumGoodsInput(), 0);
+            return Math.min(getMaximumGoodsInput(), getStoredInput());
         }
     }
 
@@ -577,8 +577,8 @@ public class Building extends FreeColGameObject
         } else if (canAutoProduce()) {
             return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
         } else {
-            return calculateGoodsInput(getMaximumGoodsInput(),
-                                       colony.getProductionNextTurn(getGoodsInputType()));
+            return Math.min(getMaximumGoodsInput(),
+                            getStoredInput() + colony.getProductionNextTurn(getGoodsInputType()));
         }
     }
 
@@ -606,23 +606,16 @@ public class Building extends FreeColGameObject
         }
     }
 
-    private int calculateGoodsInput(final int maximumGoodsInput, final int addToWarehouse) {
-        final int availableInput = getStoredInput() + addToWarehouse;
-        if (availableInput < maximumGoodsInput) {
-            // Not enough goods to do this?
-            return availableInput;
-        }
-        return maximumGoodsInput;
-    }
-
     /**
-     * Returns the actual production of this building if
-     * <Code>Unit</code> was added.
+     * Returns the actual production of this building given the number
+     * of input goods available, and optionally adding any number of
+     * <Code>Unit</code>s.
      *
-     * @param additionalUnits The Unit that was added
+     * @param availableGoodsInput The amount of input goods available
+     * @param additionalUnits The Units to be added
      * @return The amount of goods being produced by this <code>Building</code>
      */
-    private int getProductionAdding(int availableGoodsInput, Unit... additionalUnits) {
+    protected int getProductionAdding(int availableGoodsInput, Unit... additionalUnits) {
         if (getGoodsOutputType() == null) {
             return 0;
         } else {

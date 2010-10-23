@@ -91,6 +91,17 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
+        csNewTurn(random, cs, getStoredInput());
+    }
+
+    /**
+     * New turn for this building.
+     *
+     * @param random A <code>Random</code> number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @param maxInput The maximum number of input goods to consume
+     */
+    public void csNewTurn(Random random, ChangeSet cs, int maxInput) {
         logger.finest("ServerBuilding.csNewTurn, for " + toString());
         BuildingType type = getType();
         Colony colony = getColony();
@@ -105,13 +116,13 @@ public class ServerBuilding extends Building implements ServerModelObject {
         }
 
         if (getGoodsOutputType() != null) {
-            produceGoods(cs, owner);
+            produceGoods(cs, owner, maxInput);
         }
     }
 
-    private void produceGoods(ChangeSet cs, ServerPlayer owner) {
-        final int goodsInput = getGoodsInput();
-        final int goodsOutput = getProduction();
+    private void produceGoods(ChangeSet cs, ServerPlayer owner, int maxInput) {
+        final int goodsInput = Math.min(getGoodsInput(), maxInput);
+        final int goodsOutput = getProductionAdding(maxInput);
         final GoodsType goodsInputType = getGoodsInputType();
         final GoodsType goodsOutputType = getGoodsOutputType();
 
