@@ -2515,6 +2515,7 @@ public final class InGameController extends Controller {
     private void csMove(ServerPlayer serverPlayer, Unit unit, Tile newTile,
                         ChangeSet cs) {
         Game game = getGame();
+        Specification spec = game.getSpecification();
         Turn turn = game.getTurn();
 
         // Plan to update tiles that could not be seen before but will
@@ -2563,6 +2564,16 @@ public final class InGameController extends Controller {
 
         if (!unit.isDisposed()) {
             if (newTile.isLand()) {
+                // Claim land for tribe?
+                if (newTile.getOwner() == null
+                    && serverPlayer.isIndian()
+                    && unit.getIndianSettlement() != null
+                    && (newTile.getPosition().getDistance(unit
+                            .getIndianSettlement().getTile().getPosition())
+                        < spec.getInteger("model.option.indianClaimRadius"))) {
+                    newTile.setOwner(serverPlayer);
+                }
+
                 // Check for first landing
                 if (serverPlayer.isEuropean()
                     && !serverPlayer.isNewLandNamed()) {

@@ -83,6 +83,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -798,6 +799,18 @@ public final class FreeColServer {
                 }
             }
             xs.close();
+
+            // Add a default value for options new to each version.
+            if (savegameVersion < 11) {
+                Specification spec = game.getSpecification();
+                final String optionName = "model.option.indianClaimRadius";
+                if (!spec.hasOption(optionName)) {
+                    IntegerOption op = new IntegerOption(optionName);
+                    op.setValue(3);
+                    spec.addAbstractOption(op);
+                }
+            }
+
             // Later, we might want to modify loaded savegames:
             return owner;
         } catch (XMLStreamException e) {

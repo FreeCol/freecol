@@ -1679,6 +1679,7 @@
         <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
         <!-- The number of turns it takes to sail between Europe and the New World -->
         <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+        <integerOption id="model.option.indianClaimRadius" defaultValue="3" minimumValue="0" maximumValue="1000"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->
