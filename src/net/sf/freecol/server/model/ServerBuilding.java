@@ -97,136 +97,139 @@ public class ServerBuilding extends Building implements ServerModelObject {
         ServerPlayer owner = (ServerPlayer) colony.getOwner();
 
         if (type.hasAbility("model.ability.teach")) {
-            for (Unit teacher : getUnitList()) {
-                boolean teacherDirty = false;
-                boolean studentDirty = false;
-                Unit student = teacher.getStudent();
-
-                if (student != null && student.getTeacher() != teacher) {
-                    // Sanitation, make sure we have the proper
-                    // teacher/student relation.
-                    logger.warning("Bogus teacher/student assignment.");
-                    teacher.setStudent(null);
-                    student = null;
-                    teacherDirty = true;
-                }
-
-                // Student may have changed
-                if (student == null && csAssignStudent(teacher, cs)) {
-                    teacherDirty = true;
-                    studentDirty = true;
-                    student = teacher.getStudent();
-                }
-
-                // Ready to train?
-                if (student != null) {
-                    final int training = teacher.getTurnsOfTraining() + 1;
-                    if (training < teacher.getNeededTurnsOfTraining()) {
-                        teacher.setTurnsOfTraining(training);
-                        if (!teacherDirty) {
-                            cs.addPartial(See.only(owner), teacher,
-                                          "turnsOfTraining");
-                        }
-                    } else {
-                        StringTemplate oldName = student.getLabel();
-                        UnitType teach = teacher.getType().getSkillTaught();
-                        UnitType skill = Unit
-                            .getUnitTypeTeaching(teach, student.getType());
-                        if (skill == null) {
-                            logger.warning("Student " + student.getId()
-                                           + " can not learn from "
-                                           + teacher.getId());
-                        } else {
-                            student.setType(skill);
-                            StringTemplate newName = student.getLabel();
-                            cs.addMessage(See.only(owner),
-                                new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                                 "model.unit.unitEducated",
-                                                 colony, this)
-                                    .addStringTemplate("%oldName%", oldName)
-                                    .addStringTemplate("%unit%", newName)
-                                    .addName("%colony%", colony.getName()));
-                        }
-                        student.setTurnsOfTraining(0);
-                        student.setMovesLeft(0);
-                        cs.add(See.only(owner), student);
-                        studentDirty = false;
-
-                        teacher.setTurnsOfTraining(0);
-                        if (student.canBeStudent(teacher)) { // Keep teaching
-                            cs.addPartial(See.only(owner), teacher,
-                                          "turnsOfTraining");
-                        } else {
-                            student.setTeacher(null);
-                            teacher.setStudent(null);
-                            teacherDirty = true;
-                            if (csAssignStudent(teacher, cs)) {
-                                student = teacher.getStudent();
-                                studentDirty = true;
-                            }
-                        }
-                    }
-                }
-
-                if (teacherDirty) cs.add(See.only(owner), teacher);
-                if (studentDirty) cs.add(See.only(owner), student);
-            }
+            teach(cs, owner);
         }
 
         if (type.hasAbility("model.ability.repairUnits")) {
-            for (Unit unit : getTile().getUnitList()) {
-                if (unit.isUnderRepair()
-                    && type.hasAbility("model.ability.repairUnits",
-                                       unit.getType())) {
-                    ((ServerUnit) unit).csRepairUnit(cs);
-                }
-            }
+            repairUnits(cs);
         }
 
         if (getGoodsOutputType() != null) {
-            final int goodsInput = getGoodsInput();
-            final int goodsOutput = getProduction();
-            final GoodsType goodsInputType = getGoodsInputType();
-            final GoodsType goodsOutputType = getGoodsOutputType();
+            produceGoods(cs, owner);
+        }
+    }
 
-            if (goodsInput == 0 && !canAutoProduce()
-                && getMaximumGoodsInput() > 0) {
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                     "model.building.notEnoughInput",
-                                     colony, goodsInputType)
-                              .add("%inputGoods%", goodsInputType.getNameKey())
-                              .add("%building%", getNameKey())
-                              .addName("%colony%", colony.getName()));
+    private void produceGoods(ChangeSet cs, ServerPlayer owner) {
+        final int goodsInput = getGoodsInput();
+        final int goodsOutput = getProduction();
+        final GoodsType goodsInputType = getGoodsInputType();
+        final GoodsType goodsOutputType = getGoodsOutputType();
+
+        if (goodsInput == 0 && !canAutoProduce()
+            && getMaximumGoodsInput() > 0) {
+            cs.addMessage(See.only(owner),
+                          new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                           "model.building.notEnoughInput",
+                                           colony, goodsInputType)
+                          .add("%inputGoods%", goodsInputType.getNameKey())
+                          .add("%building%", getNameKey())
+                          .addName("%colony%", colony.getName()));
+        }
+
+        // Produce if:
+        //   - there is output
+        // and not
+        //   - produces building material that is not storable
+        //   and
+        //   - for some reason the colony is not building
+        //     that turn
+        if (goodsOutput > 0
+            && !(goodsOutputType.isBuildingMaterial()
+                 && !goodsOutputType.isStorable()
+                 && !colony.canBuild())) {
+            // Actually produce the goods:
+            if (goodsInputType != null) {
+                colony.removeGoods(goodsInputType, goodsInput);
             }
+            colony.addGoods(goodsOutputType, goodsOutput);
 
-            // Produce if:
-            //   - there is output
-            // and not
-            //   - produces building material that is not storable
-            //   and
-            //   - for some reason the colony is not building
-            //     that turn
-            if (goodsOutput > 0
-                && !(goodsOutputType.isBuildingMaterial()
-                     && !goodsOutputType.isStorable()
-                     && !colony.canBuild())) {
-                // Actually produce the goods:
-                if (goodsInputType != null) {
-                    colony.removeGoods(goodsInputType, goodsInput);
-                }
-                colony.addGoods(goodsOutputType, goodsOutput);
-
-                if (getUnitCount() > 0) {
-                    int experience = goodsOutput / getUnitCount();
-                    for (Unit unit : getUnitList()) {
-                        unit.setExperience(unit.getExperience() + experience);
-                        cs.addPartial(See.only(owner), unit, "experience");
-                    }
+            if (getUnitCount() > 0) {
+                int experience = goodsOutput / getUnitCount();
+                for (Unit unit : getUnitList()) {
+                    unit.setExperience(unit.getExperience() + experience);
+                    cs.addPartial(See.only(owner), unit, "experience");
                 }
             }
         }
     }
+
+    private void teach(ChangeSet cs, ServerPlayer owner) {
+        for (Unit teacher : getUnitList()) {
+            boolean teacherDirty = false;
+            boolean studentDirty = false;
+            Unit student = teacher.getStudent();
+
+            if (student != null && student.getTeacher() != teacher) {
+                // Sanitation, make sure we have the proper
+                // teacher/student relation.
+                logger.warning("Bogus teacher/student assignment.");
+                teacher.setStudent(null);
+                student = null;
+                teacherDirty = true;
+            }
+
+            // Student may have changed
+            if (student == null && csAssignStudent(teacher, cs)) {
+                teacherDirty = true;
+                studentDirty = true;
+                student = teacher.getStudent();
+            }
+
+            // Ready to train?
+            if (student != null) {
+                final int training = teacher.getTurnsOfTraining() + 1;
+                if (training < teacher.getNeededTurnsOfTraining()) {
+                    teacher.setTurnsOfTraining(training);
+                    if (!teacherDirty) {
+                        cs.addPartial(See.only(owner), teacher,
+                                      "turnsOfTraining");
+                    }
+                } else {
+                    StringTemplate oldName = student.getLabel();
+                    UnitType teach = teacher.getType().getSkillTaught();
+                    UnitType skill = Unit
+                        .getUnitTypeTeaching(teach, student.getType());
+                    if (skill == null) {
+                        logger.warning("Student " + student.getId()
+                                       + " can not learn from "
+                                       + teacher.getId());
+                    } else {
+                        student.setType(skill);
+                        StringTemplate newName = student.getLabel();
+                        cs.addMessage(See.only(owner),
+                                      new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                                       "model.unit.unitEducated",
+                                                       colony, this)
+                                      .addStringTemplate("%oldName%", oldName)
+                                      .addStringTemplate("%unit%", newName)
+                                      .addName("%colony%", colony.getName()));
+                    }
+                    student.setTurnsOfTraining(0);
+                    student.setMovesLeft(0);
+                    cs.add(See.only(owner), student);
+                    studentDirty = false;
+
+                    teacher.setTurnsOfTraining(0);
+                    if (student.canBeStudent(teacher)) { // Keep teaching
+                        cs.addPartial(See.only(owner), teacher,
+                                      "turnsOfTraining");
+                    } else {
+                        student.setTeacher(null);
+                        teacher.setStudent(null);
+                        teacherDirty = true;
+                        if (csAssignStudent(teacher, cs)) {
+                            student = teacher.getStudent();
+                            studentDirty = true;
+                        }
+                    }
+                }
+            }
+
+            if (teacherDirty) cs.add(See.only(owner), teacher);
+            if (studentDirty) cs.add(See.only(owner), student);
+        }
+    }
+
 
     /**
      * Assigns a student to a teacher within a building.
@@ -249,6 +252,16 @@ public class ServerBuilding extends Building implements ServerModelObject {
         teacher.setStudent(student);
         student.setTeacher(teacher);
         return true;
+    }
+
+    private void repairUnits(ChangeSet cs) {
+        for (Unit unit : getTile().getUnitList()) {
+            if (unit.isUnderRepair()
+                && getType().hasAbility("model.ability.repairUnits",
+                                        unit.getType())) {
+                ((ServerUnit) unit).csRepairUnit(cs);
+            }
+        }
     }
 
     /**
