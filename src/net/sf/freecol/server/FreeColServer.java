@@ -803,10 +803,16 @@ public final class FreeColServer {
             // Add a default value for options new to each version.
             if (savegameVersion < 11) {
                 Specification spec = game.getSpecification();
-                final String optionName = "model.option.indianClaimRadius";
+                String optionName = "model.option.indianClaimRadius";
                 if (!spec.hasOption(optionName)) {
                     IntegerOption op = new IntegerOption(optionName);
                     op.setValue(3);
+                    spec.addAbstractOption(op);
+                }
+                optionName = "model.option.monarchSupport";
+                if (!spec.hasOption(optionName)) {
+                    IntegerOption op = new IntegerOption(optionName);
+                    op.setValue(2);
                     spec.addAbstractOption(op);
                 }
             }
