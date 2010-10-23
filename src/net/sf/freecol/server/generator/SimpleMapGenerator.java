@@ -609,7 +609,8 @@ public class SimpleMapGenerator implements MapGenerator {
         Map.CircleIterator iterator = map.getCircleIterator(position, false, settlement.getRadius() + 1);
         while (iterator.hasNext()) {
             Position p = iterator.next();
-            if (map.getTile(p).isLand() && random.nextInt(2) == 0) {
+            if (map.getTile(p).getOwningSettlement() == null
+                && map.getTile(p).isLand() && random.nextInt(2) == 0) {
                 settlement.claimTile(map.getTile(p));
             }
         }
@@ -617,7 +618,8 @@ public class SimpleMapGenerator implements MapGenerator {
         iterator = map.getCircleIterator(position, false, settlement.getRadius() + 2);
         while (iterator.hasNext()) {
             Position p = iterator.next();
-            if (map.getTile(p).isLand() && random.nextInt(4) == 0) {
+            if (map.getTile(p).getOwningSettlement() == null
+                && map.getTile(p).isLand() && random.nextInt(4) == 0) {
                 settlement.claimTile(map.getTile(p));
             }
         }
