@@ -50,12 +50,12 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
-    
+
     private final static Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
 
     private File dataDirectory;
 
-    
+
     /**
      * Initiates a new FreeCol look and feel.
      *
@@ -111,22 +111,22 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         try {
             int offset = "FreeCol".length();
             for (Class uiClass : new Class[] {
-                    FreeColButtonUI.class,          
-                    FreeColCheckBoxUI.class,        
-                    FreeColComboBoxUI.class,        
-                    FreeColLabelUI.class,           
-                    FreeColListUI.class,            
-                    FreeColMenuBarUI.class,         
-                    FreeColMenuItemUI.class,        
-                    FreeColPanelUI.class,           
-                    FreeColPopupMenuUI.class,       
-                    FreeColRadioButtonUI.class,     
-                    FreeColScrollPaneUI.class,      
-                    FreeColTableHeaderUI.class,     
-                    FreeColTableUI.class,           
-                    FreeColTextAreaUI.class,        
-                    FreeColTextFieldUI.class,       
-                    FreeColToolTipUI.class,         
+                    FreeColButtonUI.class,
+                    FreeColCheckBoxUI.class,
+                    FreeColComboBoxUI.class,
+                    FreeColLabelUI.class,
+                    FreeColListUI.class,
+                    FreeColMenuBarUI.class,
+                    FreeColMenuItemUI.class,
+                    FreeColPanelUI.class,
+                    FreeColPopupMenuUI.class,
+                    FreeColRadioButtonUI.class,
+                    FreeColScrollPaneUI.class,
+                    FreeColTableHeaderUI.class,
+                    FreeColTableUI.class,
+                    FreeColTextAreaUI.class,
+                    FreeColTextFieldUI.class,
+                    FreeColToolTipUI.class,
                     FreeColTransparentPanelUI.class
                 }) {
                 String name = uiClass.getName();
@@ -164,7 +164,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ToEuropePanelUI", transparentPanelUI);
             u.put("EuropeInPortPanelUI", transparentPanelUI);
             u.put("DocksPanelUI", transparentPanelUI);
-            
+
             // Add cursors:
             Image im = ResourceManager.getImage("cursor.go.image");
             if (im != null) {
@@ -182,7 +182,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
         return u;
     }
-    
+
     /**
      * Installs a FreeColLookAndFeel as the default look and feel.
      *
@@ -208,7 +208,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             }
         }
     }
-    
+
     /**
      * Gets a one line description of this Look and Feel.
      *
