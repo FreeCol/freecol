@@ -70,7 +70,7 @@ public final class DragListener extends MouseAdapter {
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param parentPanel The layered pane that contains the components to which
      *            a DragListener might be attached.
      */
@@ -82,7 +82,7 @@ public final class DragListener extends MouseAdapter {
     /**
      * Gets called when the mouse was pressed on a Swing component that has this
      * object as a MouseListener.
-     * 
+     *
      * @param e The event that holds the information about the mouse click.
      */
     public void mousePressed(MouseEvent e) {
@@ -143,7 +143,7 @@ public final class DragListener extends MouseAdapter {
                     ((MarketLabel) comp).setAmount(100);
                 }
             }
-        
+
             if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
                 Unit u = ((UnitLabel) comp).getUnit();
                 if (parentPanel instanceof EuropePanel) {
@@ -173,7 +173,7 @@ public final class DragListener extends MouseAdapter {
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit, 0.66);
 
         JMenuItem name = new JMenuItem(Messages.message(tempUnit.getLabel()) + " (" +
-                                       Messages.message("menuBar.colopedia") + ")", 
+                                       Messages.message("menuBar.colopedia") + ")",
                                        unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
         name.addActionListener(unitLabel);
@@ -184,9 +184,9 @@ public final class DragListener extends MouseAdapter {
             if (addCarrierItems(unitLabel, menu)) {
                 menu.addSeparator();
             }
-        }                
+        }
 
-        if (tempUnit.getLocation().getTile() != null && 
+        if (tempUnit.getLocation().getTile() != null &&
             tempUnit.getLocation().getTile().getColony() != null) {
             if (addWorkItems(unitLabel, menu)) {
                 menu.addSeparator();
@@ -267,7 +267,7 @@ public final class DragListener extends MouseAdapter {
                 separatorNeeded = true;
             }
         }
-                    
+
         // Work at Building - show both max potential and realistic projection
         for (Building building : colony.getBuildings()) {
             if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
@@ -321,12 +321,12 @@ public final class DragListener extends MouseAdapter {
 
         return separatorNeeded;
     }
-    
+
     private boolean addEducationItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         boolean separatorNeeded = false;
         Unit unit = unitLabel.getUnit();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
-        
+
         if (unit.getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : unit.getColony().getTeachers()) {
                 if (unit.canBeStudent(teacher) && (unit.getLocation() instanceof WorkLocation)) {
@@ -346,7 +346,7 @@ public final class DragListener extends MouseAdapter {
                 }
             }
         }
-        
+
         if ((unit.getTurnsOfTraining() > 0) && (unit.getStudent() != null)) {
             JMenuItem menuItem = new JMenuItem(Messages.message("menuBar.teacher") +
                                                ": " + unit.getTurnsOfTraining() +
@@ -355,7 +355,7 @@ public final class DragListener extends MouseAdapter {
             menu.add(menuItem);
             separatorNeeded = true;
         }
-        
+
         int experience = Math.min(unit.getExperience(), 200);
         GoodsType goods = unit.getExperienceType();
         if (goods == null) {
@@ -380,7 +380,7 @@ public final class DragListener extends MouseAdapter {
     private boolean addCommandItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
         final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
-        
+
         JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
         menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
         menuItem.addActionListener(unitLabel);
@@ -397,7 +397,7 @@ public final class DragListener extends MouseAdapter {
                                      tempUnit.getState() == UnitState.FORTIFYING));
             menu.add(menuItem);
         }
- 
+
         UnitState unitState = tempUnit.getState();
         menuItem = new JMenuItem(Messages.message("sentryUnit"));
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
@@ -405,7 +405,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setEnabled(unitState != UnitState.SENTRY
                                 && !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
-        
+
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
         menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
@@ -460,7 +460,7 @@ public final class DragListener extends MouseAdapter {
                     newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                 }
                 final int items = count;
-                final EquipmentType type = equipmentType; 
+                final EquipmentType type = equipmentType;
                 newItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             igc.equipUnit(tempUnit, type, -items);
@@ -489,7 +489,7 @@ public final class DragListener extends MouseAdapter {
                         count--;
                     }
                     newItem.setText(Messages.message(equipmentType.getId() + ".add") + " (" +
-                                    Messages.message("goldAmount", "%amount%", 
+                                    Messages.message("goldAmount", "%amount%",
                                                      String.valueOf(count * price)) +
                                     ")");
                 } else if (tempUnit.getColony() != null &&
@@ -513,7 +513,7 @@ public final class DragListener extends MouseAdapter {
                         muskets = equipmentType;
                     }
                     final int items = count;
-                    final EquipmentType type = equipmentType; 
+                    final EquipmentType type = equipmentType;
                     newItem.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 igc.equipUnit(tempUnit, type, items);
@@ -537,7 +537,7 @@ public final class DragListener extends MouseAdapter {
                     }
                 });
             menu.add(newItem);
-        }            
+        }
 
         separatorNeeded = true;
 
@@ -569,7 +569,7 @@ public final class DragListener extends MouseAdapter {
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         JPopupMenu menu = new JPopupMenu("Cargo");
         JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey()) + " (" +
-                                       Messages.message("menuBar.colopedia") + ")", 
+                                       Messages.message("menuBar.colopedia") + ")",
                                        imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -578,7 +578,7 @@ public final class DragListener extends MouseAdapter {
                 }
             });
         menu.add(name);
-                
+
         if (!(goods.getLocation() instanceof Colony)) {
             if (canvas.getClient().getMyPlayer().canTrade(goods)) {
                 JMenuItem unload = new JMenuItem(Messages.message("unload"));
@@ -627,7 +627,7 @@ public final class DragListener extends MouseAdapter {
             });
             menu.add(dump);
         }
-                
+
         return menu;
     }
 }
