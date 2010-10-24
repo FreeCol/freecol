@@ -113,7 +113,7 @@ public final class TilePopup extends JPopupMenu {
                 activeUnit.getMoveType(tile) == MoveType.ATTACK) {
                 CombatOdds combatOdds = activeUnit.getGame().getCombatModel()
                     .calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
-                    
+
                 String victoryPercent;
                 //If attacking a settlement, the true odds are never known because units may be hidden within
                 if (tile.getSettlement() != null || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
@@ -141,7 +141,7 @@ public final class TilePopup extends JPopupMenu {
 
                             freeColClient.getInGameController().setDestination(activeUnit, tile);
                             freeColClient.getInGameController().moveToDestination(activeUnit);
-                            
+
                             //if unit did not move, we should show the goto path
                             if(activeUnit.getTile() == currTile){
                             	gui.updateGotoPathForActiveUnit();
@@ -417,17 +417,12 @@ public final class TilePopup extends JPopupMenu {
             hasGoods = true;
         }
 
-        if (hasGoods) {
+        if (unit == gui.getActiveUnit() && hasGoods) {
             JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
             dumpItem.setAction(new UnloadAction(freeColClient));
             menu.add(dumpItem);
             lineCount++;
         }
-//        if (menu instanceof JMenu) {
-//            ((JMenu) menu).addSeparator();
-//        } else {
-//            ((JPopupMenu) menu).addSeparator();
-//        }
         hasAnItem = true;
         return lineCount;
     }
