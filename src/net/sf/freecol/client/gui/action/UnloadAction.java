@@ -30,40 +30,64 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
- * An action for unloading the currently selected unit.
+ * An action for unloading a unit.
  */
-public class UnloadAction extends UnitAction {
+public class UnloadAction extends MapboardAction {
 
     public static final String id = "unloadAction";
 
+    private Unit unit = null;
+
     /**
-     * Creates this action.
+     * Creates an action for unloading the currently selected unit.
+     *
      * @param freeColClient The main controller object for the client.
      */
     public UnloadAction(FreeColClient freeColClient) {
+        this(freeColClient, null);
+    }
+
+    /**
+     * Creates an action for unloading the <code>Unit</code>
+     * provided. If the <code>Unit</code> is <code>null</code>, then
+     * the currently selected unit is used instead.
+     *
+     * @param freeColClient The main controller object for the client.
+     * @param unit an <code>Unit</code> value
+     * @see GUI#getActiveUnit()
+     */
+    public UnloadAction(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, id);
+        this.unit = unit;
+    }
+
+    private Unit getUnit() {
+        return (unit == null)
+            ? getFreeColClient().getGUI().getActiveUnit()
+            : unit;
     }
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if there is a carrier active
      */
     protected boolean shouldBeEnabled() {
+        Unit carrier = getUnit();
         return super.shouldBeEnabled()
-            && getFreeColClient().getGUI().getActiveUnit() != null
-            && getFreeColClient().getGUI().getActiveUnit().isCarrier()
-            && getFreeColClient().getGUI().getActiveUnit().getGoodsCount() > 0;
-    }    
-    
+            && carrier != null
+            && carrier.isCarrier()
+            && carrier.getGoodsCount() > 0;
+    }
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
-     */    
+     */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getFreeColClient().getGUI().getActiveUnit();
-        if (unit != null) {
-            getFreeColClient().getInGameController().unload(unit);
+        Unit carrier = getUnit();
+        if (carrier != null) {
+            getFreeColClient().getInGameController().unload(carrier);
             MapControls controls
                 = ((MapControlsAction) getFreeColClient().getActionManager()
                    .getFreeColAction(MapControlsAction.id)).getMapControls();
