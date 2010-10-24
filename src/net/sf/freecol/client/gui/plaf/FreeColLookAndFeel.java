@@ -91,6 +91,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 protected ColorUIResource getSecondary3() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
                 }
+
+                public ColorUIResource getMenuDisabledForeground() {
+                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabledMenu.color"));
+                }
             });
 
         if (dataDirectory.isDirectory()) {
