@@ -417,9 +417,9 @@ public final class TilePopup extends JPopupMenu {
             hasGoods = true;
         }
 
-        if (unit == gui.getActiveUnit() && hasGoods) {
+        if (hasGoods) {
             JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
-            dumpItem.setAction(new UnloadAction(freeColClient));
+            dumpItem.setAction(new UnloadAction(freeColClient, unit));
             menu.add(dumpItem);
             lineCount++;
         }
