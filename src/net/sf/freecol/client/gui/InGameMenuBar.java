@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * This is the menu bar used in-game.
@@ -176,8 +177,9 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_O);
 
-        menu.add(getMenuItem(SentryAction.id));
-        menu.add(getMenuItem(FortifyAction.id));
+        for (UnitState state : ActionManager.STATES) {
+            menu.add(getMenuItem(state.getId() + "Action"));
+        }
 
         menu.addSeparator();
 
@@ -204,9 +206,8 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(WaitAction.id));
-        menu.add(getMenuItem(SkipUnitAction.id));
         menu.add(getMenuItem(ChangeAction.id));
- 
+
         menu.addSeparator();
 
         menu.add(getMenuItem(ClearOrdersAction.id));

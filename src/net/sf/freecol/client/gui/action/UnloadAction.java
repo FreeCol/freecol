@@ -32,11 +32,9 @@ import net.sf.freecol.common.model.Unit;
 /**
  * An action for unloading a unit.
  */
-public class UnloadAction extends MapboardAction {
+public class UnloadAction extends UnitAction {
 
     public static final String id = "unloadAction";
-
-    private Unit unit = null;
 
     /**
      * Creates an action for unloading the currently selected unit.
@@ -57,14 +55,7 @@ public class UnloadAction extends MapboardAction {
      * @see GUI#getActiveUnit()
      */
     public UnloadAction(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient, id);
-        this.unit = unit;
-    }
-
-    private Unit getUnit() {
-        return (unit == null)
-            ? getFreeColClient().getGUI().getActiveUnit()
-            : unit;
+        super(freeColClient, id, unit);
     }
 
     /**
@@ -75,7 +66,6 @@ public class UnloadAction extends MapboardAction {
     protected boolean shouldBeEnabled() {
         Unit carrier = getUnit();
         return super.shouldBeEnabled()
-            && carrier != null
             && carrier.isCarrier()
             && carrier.getGoodsCount() > 0;
     }

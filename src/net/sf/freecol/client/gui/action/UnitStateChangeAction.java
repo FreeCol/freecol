@@ -17,6 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
@@ -26,30 +27,30 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
- * An action for skipping the active unit.
+ * An action to change the state of a unit.
  */
-public class SkipUnitAction extends UnitAction {
+public class UnitStateChangeAction extends UnitAction {
 
-    public static final String id = "skipUnitAction";
+    public static final String id = "stateChangeAction";
 
+    private UnitState state;
 
     /**
      * Creates this action.
-     * 
      * @param freeColClient The main controller object for the client.
      */
-    SkipUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
-        addImageIcons("done");
+    public UnitStateChangeAction(FreeColClient freeColClient, UnitState unitState) {
+        super(freeColClient, unitState.getId() + "Action");
+        this.state = unitState;
+        addImageIcons(unitState.getId());
     }
 
     /**
      * Applies this action.
-     * 
-     * @param e The <code>ActionEvent</code>.
+     * @param actionEvent The <code>ActionEvent</code>.
      */
-    public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), 
-                                                             UnitState.SKIPPED);
+    public void actionPerformed(ActionEvent actionEvent) {
+        getFreeColClient().getInGameController().changeState(getUnit(), state);
     }
+
 }
