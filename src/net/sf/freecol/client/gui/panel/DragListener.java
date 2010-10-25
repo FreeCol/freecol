@@ -39,6 +39,8 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.UnitStateChangeAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -381,33 +383,17 @@ public final class DragListener extends MouseAdapter {
         final Unit tempUnit = unitLabel.getUnit();
         final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
 
-        JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
-        menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
-        menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE
-                                && !isUnitBetweenEuropeAndNewWorld);
-        menu.add(menuItem);
-
-        if (!(tempUnit.getLocation() instanceof Europe)) {
-            menuItem = new JMenuItem(Messages.message("fortifyUnit"));
-            menuItem.setActionCommand(UnitAction.FORTIFY.toString());
-            menuItem.addActionListener(unitLabel);
-            menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
-                                && !(tempUnit.getState() == UnitState.FORTIFIED ||
-                                     tempUnit.getState() == UnitState.FORTIFYING));
+        for (UnitState state : ActionManager.STATES) {
+            UnitStateChangeAction action = new UnitStateChangeAction(canvas.getClient(), tempUnit, state);
+            action.update();
+            JMenuItem menuItem = new JMenuItem(action);
             menu.add(menuItem);
         }
 
         UnitState unitState = tempUnit.getState();
-        menuItem = new JMenuItem(Messages.message("sentryUnit"));
-        menuItem.setActionCommand(UnitAction.SENTRY.toString());
-        menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(unitState != UnitState.SENTRY
-                                && !isUnitBetweenEuropeAndNewWorld);
-        menu.add(menuItem);
 
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
-        menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
+        JMenuItem menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)

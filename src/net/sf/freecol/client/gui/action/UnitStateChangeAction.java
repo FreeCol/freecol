@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
@@ -38,11 +39,30 @@ public class UnitStateChangeAction extends UnitAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param unitState an <code>UnitState</code> value
      */
     public UnitStateChangeAction(FreeColClient freeColClient, UnitState unitState) {
-        super(freeColClient, unitState.getId() + "Action");
+        this(freeColClient, null, unitState);
+    }
+
+    /**
+     * Creates this action.
+     * @param freeColClient The main controller object for the client.
+     * @param unitState an <code>UnitState</code> value
+     */
+    public UnitStateChangeAction(FreeColClient freeColClient, Unit unit, UnitState unitState) {
+        super(freeColClient, unitState.getId() + "Action", unit);
         this.state = unitState;
         addImageIcons(unitState.getId());
+    }
+
+    /**
+     * Checks if this action should be enabled.
+     *
+     * @return <code>false</code> if there is no active unit.
+     */
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled() && getUnit().checkSetState(state);
     }
 
     /**

@@ -2539,7 +2539,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         switch (s) {
         case ACTIVE:
         case SENTRY:
-            return true;
+            return (getState() != UnitState.TO_EUROPE
+                    && getState() != UnitState.TO_AMERICA);
         case IN_COLONY:
             return !isNaval();
         case FORTIFIED:
@@ -2551,6 +2552,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
             return false;
         case FORTIFYING:
+            return (getMovesLeft() > 0 && !isInEurope());
         case SKIPPED:
             return (getMovesLeft() > 0);
         case TO_EUROPE:

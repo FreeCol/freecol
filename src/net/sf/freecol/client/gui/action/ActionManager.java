@@ -41,6 +41,7 @@ public class ActionManager extends OptionGroup {
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
     public static final UnitState[] STATES = new UnitState[] {
+        UnitState.ACTIVE,
         UnitState.FORTIFYING,
         UnitState.SENTRY,
         UnitState.SKIPPED
@@ -177,6 +178,10 @@ public class ActionManager extends OptionGroup {
      */
     public FreeColAction getFreeColAction(String id) {
         return (FreeColAction) super.getOption(id);
+    }
+
+    public FreeColAction getAction(UnitState state) {
+        return (FreeColAction) super.getOption(state.getId() + "Action");
     }
 
     /**

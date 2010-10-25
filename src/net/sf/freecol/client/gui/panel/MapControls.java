@@ -87,9 +87,9 @@ public final class MapControls {
 
         List<UnitButton> ubList = new ArrayList<UnitButton>();
         ubList.add(new UnitButton(am.getFreeColAction(WaitAction.id)));
-        ubList.add(new UnitButton(am.getFreeColAction(UnitState.SKIPPED.getId() + "Action")));
-        ubList.add(new UnitButton(am.getFreeColAction(UnitState.SENTRY.getId() + "Action")));
-        ubList.add(new UnitButton(am.getFreeColAction(UnitState.FORTIFYING.getId() + "Action")));
+        ubList.add(new UnitButton(am.getAction(UnitState.SKIPPED)));
+        ubList.add(new UnitButton(am.getAction(UnitState.SENTRY)));
+        ubList.add(new UnitButton(am.getAction(UnitState.FORTIFYING)));
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
             if (!type.isNatural()) {
