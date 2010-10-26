@@ -22,6 +22,8 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * An action for clearing the active unit's orders.
@@ -32,19 +34,43 @@ public class ClearOrdersAction extends UnitAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
-    ClearOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    public ClearOrdersAction(FreeColClient freeColClient) {
+        this(freeColClient, null);
+    }
+
+    /**
+     * Creates this action.
+     *
+     * @param freeColClient The main controller object for the client.
+     * @param unit an <code>Unit</code> value
+     */
+    public ClearOrdersAction(FreeColClient freeColClient, Unit unit) {
+        super(freeColClient, id, unit);
+    }
+
+
+    /**
+     * Checks if this action should be enabled.
+     *
+     * @return <code>false</code> if there is no active unit.
+     */
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled()
+            && (getUnit().getState() != UnitState.ACTIVE
+                || getUnit().getTradeRoute() != null)
+            && (getUnit().getState() != UnitState.TO_AMERICA
+                && getUnit().getState() != UnitState.TO_EUROPE);
     }
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().clearOrders(getFreeColClient().getGUI().getActiveUnit());
+        getFreeColClient().getInGameController().clearOrders(getUnit());
     }
 }

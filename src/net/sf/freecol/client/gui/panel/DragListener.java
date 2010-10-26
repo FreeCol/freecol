@@ -40,6 +40,8 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.ClearOrdersAction;
+import net.sf.freecol.client.gui.action.ColopediaAction;
 import net.sf.freecol.client.gui.action.UnitStateChangeAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
@@ -174,11 +176,9 @@ public final class DragListener extends MouseAdapter {
         JPopupMenu menu = new JPopupMenu("Unit");
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit, 0.66);
 
-        JMenuItem name = new JMenuItem(Messages.message(tempUnit.getLabel()) + " (" +
-                                       Messages.message("menuBar.colopedia") + ")",
-                                       unitIcon);
-        name.setActionCommand(UnitAction.COLOPEDIA.toString());
-        name.addActionListener(unitLabel);
+        ColopediaAction action = new ColopediaAction(canvas.getClient(), tempUnit.getType());
+        JMenuItem name = new JMenuItem(action);
+        name.setIcon(unitIcon);
         menu.add(name);
         menu.addSeparator();
 
@@ -392,12 +392,9 @@ public final class DragListener extends MouseAdapter {
 
         UnitState unitState = tempUnit.getState();
 
-        boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
-        JMenuItem menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
-        menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
-        menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
-                                && !isUnitBetweenEuropeAndNewWorld);
+        ClearOrdersAction action = new ClearOrdersAction(canvas.getClient(), tempUnit);
+        action.update();
+        JMenuItem menuItem = new JMenuItem(action);
         menu.add(menuItem);
 
         if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {

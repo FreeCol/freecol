@@ -67,7 +67,10 @@ public abstract class UnitAction extends MapboardAction {
      * @return <code>false</code> if there is no active unit.
      */
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getUnit() != null;
+        return getFreeColClient().getCanvas() != null
+            && (getFreeColClient().getGame() == null
+                || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer())
+            && getUnit() != null;
     }
 
 }
