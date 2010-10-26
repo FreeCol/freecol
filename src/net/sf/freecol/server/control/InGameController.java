@@ -2565,12 +2565,14 @@ public final class InGameController extends Controller {
         if (!unit.isDisposed()) {
             if (newTile.isLand()) {
                 // Claim land for tribe?
+                Settlement settlement;
                 if (newTile.getOwner() == null
                     && serverPlayer.isIndian()
-                    && unit.getIndianSettlement() != null
-                    && (newTile.getPosition().getDistance(unit
-                            .getIndianSettlement().getTile().getPosition())
-                        < spec.getInteger("model.option.indianClaimRadius"))) {
+                    && (settlement = unit.getIndianSettlement()) != null
+                    && (newTile.getPosition().getDistance(settlement
+                            .getTile().getPosition())
+                        < spec.getInteger("model.option.indianClaimRadius")
+                            + settlement.getRadius())) {
                     newTile.setOwner(serverPlayer);
                 }
 
@@ -2597,7 +2599,7 @@ public final class InGameController extends Controller {
                     }
 
                     ServerPlayer other = null;
-                    Settlement settlement = t.getSettlement();
+                    settlement = t.getSettlement();
                     if (settlement != null) {
                         other = (ServerPlayer) t.getSettlement().getOwner();
                     } else if (t.getFirstUnit() != null) {
