@@ -1683,6 +1683,8 @@
           <choice value="high" />
           <choice value="veryHigh" />
         </stringOption>
+        <!-- Whether a player can build a colony on native land without
+             having to buy/steal the land first. -->
         <stringOption  id="model.option.buildOnNativeLand"
                        value="model.option.buildOnNativeLand.never">
           <choice value="model.option.buildOnNativeLand.always" />
@@ -1762,54 +1764,54 @@
         <!-- Option for setting the number of rivers on the map
              The value indicates the number of land tile per river tile -->
         <rangeOption id="model.option.riverNumber" defaultValue="10" localizedLabels="true">
-          <rangeValue label="small" value="20"/>
-          <rangeValue label="medium" value="10"/>
-          <rangeValue label="large" value="9"/>
-          <rangeValue label="veryLarge" value="8"/>
-          <rangeValue label="huge" value="7"/>
+          <rangeValue label="verySmall" value="20"/>
+          <rangeValue label="small" value="10"/>
+          <rangeValue label="medium" value="9"/>
+          <rangeValue label="large" value="8"/>
+          <rangeValue label="veryLarge" value="7"/>
         </rangeOption>
         <!-- Option for setting the number of mountains on the map
              The value indicates the number of land tile per mountain tile -->
         <rangeOption id="model.option.mountainNumber" defaultValue="10" localizedLabels="true">
-          <rangeValue label="small" value="20"/>
-          <rangeValue label="medium" value="10"/>
-          <rangeValue label="large" value="9"/>
-          <rangeValue label="veryLarge" value="8"/>
-          <rangeValue label="huge" value="7"/>
+          <rangeValue label="verySmall" value="20"/>
+          <rangeValue label="small" value="10"/>
+          <rangeValue label="medium" value="9"/>
+          <rangeValue label="large" value="8"/>
+          <rangeValue label="veryLarge" value="7"/>
         </rangeOption>
         <!-- Option for setting the number of rumours on the map
              The value indicates the number of land tile per rumour tile -->
         <rangeOption id="model.option.rumourNumber" defaultValue="35" localizedLabels="true">
-          <rangeValue label="small" value="50"/>
-          <rangeValue label="medium" value="35"/>
-          <rangeValue label="large" value="30"/>
-          <rangeValue label="veryLarge" value="25"/>
-          <rangeValue label="huge" value="20"/>
+          <rangeValue label="verySmall" value="50"/>
+          <rangeValue label="small" value="35"/>
+          <rangeValue label="medium" value="30"/>
+          <rangeValue label="large" value="25"/>
+          <rangeValue label="veryLarge" value="20"/>
         </rangeOption>
         <!-- Option for setting the number of settlements on the map
              The value indicates the number of land tile per settlement tile -->
-        <rangeOption id="model.option.settlementNumber" defaultValue="14" localizedLabels="true">
-          <rangeValue label="small" value="20"/>
-          <rangeValue label="medium" value="14"/>
-          <rangeValue label="large" value="12"/>
+        <rangeOption id="model.option.settlementNumber" defaultValue="20" localizedLabels="true">
+          <rangeValue label="verySmall" value="30"/>
+          <rangeValue label="small" value="25"/>
+          <rangeValue label="medium" value="20"/>
+          <rangeValue label="large" value="15"/>
           <rangeValue label="veryLarge" value="10"/>
-          <rangeValue label="huge" value="8"/>
         </rangeOption>
         <!-- Option for setting the percentage of forests on the map -->
         <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
-          <rangeValue label="small" value="10"/>
-          <rangeValue label="medium" value="30"/>
-          <rangeValue label="large" value="50"/>
-          <rangeValue label="veryLarge" value="70"/>
-          <rangeValue label="huge" value="90"/>
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="30"/>
+          <rangeValue label="medium" value="50"/>
+          <rangeValue label="large" value="70"/>
+          <rangeValue label="veryLarge" value="90"/>
         </rangeOption>
         <!-- Option for setting the percentage of bonus tiles on the map -->
         <rangeOption id="model.option.bonusNumber" defaultValue="10" localizedLabels="true">
-          <rangeValue label="small" value="5"/>
-          <rangeValue label="medium" value="10"/>
-          <rangeValue label="large" value="13"/>
-          <rangeValue label="veryLarge" value="17"/>
-          <rangeValue label="huge" value="20"/>
+          <rangeValue label="verySmall" value="5"/>
+          <rangeValue label="small" value="10"/>
+          <rangeValue label="medium" value="13"/>
+          <rangeValue label="large" value="17"/>
+          <rangeValue label="veryLarge" value="20"/>
         </rangeOption>
         <!-- Option for setting the humidity of the map -->
         <rangeOption id="model.option.humidity" defaultValue="40" localizedLabels="true">
