@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -43,6 +43,12 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
+/**
+ * The production cache is intended to record all possible
+ * combinations of units producing goods in a colony's work
+ * locations. These entries are sorted, allowing fast retrieval of the
+ * most efficient way to produce a given type of goods.
+ */
 public class ProductionCache {
 
     private final Colony colony;
@@ -200,9 +206,16 @@ public class ProductionCache {
 
 
 
+    /**
+     * Assigns an entry. All conflicting entries, i.e. entries that
+     * refer to the same unit or colony tile, are removed from the
+     * cache.
+     *
+     * @param entry an <code>Entry</code> value
+     */
     public void assign(Entry entry) {
         ColonyTile colonyTile = null;
-        Building building = null; 
+        Building building = null;
         if (entry.getWorkLocation() instanceof ColonyTile) {
             colonyTile = (ColonyTile) entry.getWorkLocation();
             colonyTiles.remove(colonyTile);
@@ -247,6 +260,15 @@ public class ProductionCache {
     }
     */
 
+    /**
+     * Removes all entries that refer to the unit or work location
+     * given from the given list of entries and returns them.
+     *
+     * @param unit a <code>Unit</code>
+     * @param workLocation a <code>WorkLocation</code>
+     * @param entryList a <code>List</code> of <code>Entry</code>s
+     * @return the <code>Entry</code>s removed
+     */
     public static List<Entry> removeEntries(Unit unit, WorkLocation workLocation, List<Entry> entryList) {
         Iterator<Entry> entryIterator = entryList.iterator();
         List<Entry> removedEntries = new ArrayList<Entry>();
@@ -261,6 +283,15 @@ public class ProductionCache {
         return removedEntries;
     }
 
+
+    /**
+     * An Entry in the production cache represents a single unit
+     * producing goods in a certain work location. It records
+     * information on the type and amount of goods produced, as well
+     * as on whether the unit is an expert for producing this type of
+     * goods, or can be upgraded to one.
+     *
+     */
     public class Entry {
         private final GoodsType goodsType;
         private final WorkLocation workLocation;
@@ -292,50 +323,96 @@ public class ProductionCache {
             } else {
                 for (UnitTypeChange change : unit.getType().getTypeChanges()) {
                     if (change.asResultOf(ChangeType.EXPERIENCE)) {
+                        unitUpgrades = true;
                         if (change.getNewUnitType().getExpertProduction() == goodsType) {
-                            unitUpgrades = true;
                             unitUpgradesToExpert = true;
                             break;
-                        } else {
-                            unitUpgrades = true;
                         }
                     }
                 }
             }
         }
 
+        /**
+         * Returns the type of goods produced.
+         *
+         * @return a <code>GoodsType</code> value
+         */
         public GoodsType getGoodsType() {
             return goodsType;
         }
 
+        /**
+         * Returns the work location where goods are produced.
+         *
+         * @return a <code>WorkLocation</code> value
+         */
         public WorkLocation getWorkLocation() {
             return workLocation;
         }
 
+        /**
+         * Returns a unit producing goods in this work location.
+         *
+         * @return an <code>Unit</code> value
+         */
         public Unit getUnit() {
             return unit;
         }
 
+        /**
+         * Returns the amount of goods produced.
+         *
+         * @return an <code>int</code> value
+         */
         public int getProduction() {
             return production;
         }
 
+        /**
+         * Returns true if the unit is an expert for producing the
+         * type of goods selected.
+         *
+         * @return a <code>boolean</code> value
+         */
         public boolean isExpert() {
             return isExpert;
         }
 
+        /**
+         * Returns true if the unit is an expert for producing a type
+         * of goods other than the one selected.
+         *
+         * @return a <code>boolean</code> value
+         */
         public boolean isOtherExpert() {
             return isOtherExpert;
         }
 
+        /**
+         * Returns true if the unit can be upgraded through experience.
+         *
+         * @return a <code>boolean</code> value
+         */
         public boolean unitUpgrades() {
             return unitUpgrades;
         }
 
+        /**
+         * Returns true if the unit can be upgraded to an expert for
+         * producing the type of goods selected through experience.
+         *
+         * @return a <code>boolean</code> value
+         */
         public boolean unitUpgradesToExpert() {
             return unitUpgradesToExpert;
         }
 
+        /**
+         * Returns a string representation of this entry.
+         *
+         * @return a <code>String</code> value
+         */
         public String toString() {
             String result = "Cache entry: " + unit.toString();
             if (workLocation instanceof ColonyTile) {
