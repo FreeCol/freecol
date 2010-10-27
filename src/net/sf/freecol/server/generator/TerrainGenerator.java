@@ -640,9 +640,11 @@ public class TerrainGenerator {
             new ServerRegion(game, "model.region.southEast", RegionType.LAND);
         southEast.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,map.getWidth()-twoThirdWidth,map.getHeight()-twoThirdHeight));
 
-        for (ServerRegion region : new ServerRegion[] { northWest, north, northEast,
-                                                        west, center, east,
-                                                        southWest, south, southEast } ) {
+        ServerRegion[] geographicRegions = new ServerRegion[] {
+            northWest, north, northEast, west, center,
+            east, southWest, south, southEast
+        };
+        for (ServerRegion region : geographicRegions) {
             region.setDiscoverable(false);
             map.setRegion(region);
         }
@@ -709,9 +711,10 @@ public class TerrainGenerator {
             }
         }
 
-        //go through landmasses, split up those too big
+        // Go through landmasses, split up those too big
         int oldcontinents = continents;
-        for (int c = 1; c <= oldcontinents; c++) { //c starting at 1, c=0 is all water tiles
+        for (int c = 1; c <= oldcontinents; c++) {
+            //c starting at 1, c=0 is all water tiles
             if (continentsize[c]>LAND_REGION_MAX_SIZE) {
                 boolean[][] splitcontinent = new boolean[map.getWidth()][map.getHeight()];
                 Position splitposition = new Position(0,0);
@@ -752,38 +755,62 @@ public class TerrainGenerator {
         }
         logger.info("Number of land regions being created: " + continents);
 
-        //create ServerRegions for all continents
+        // Create ServerRegions for all land regions
         ServerRegion[] landregions = new ServerRegion[continents+1];
-        for (int c = 1; c <= continents; c++) { //c starting at 1, c=0 is all water tiles
-            landregions[c] =
-                new ServerRegion(map.getGame(), "model.region.land" + c, Region.RegionType.LAND);
+        for (int c = 1; c <= continents; c++) {
+            //c starting at 1, c=0 is all water tiles
+            landregions[c]
+                = new ServerRegion(map.getGame(), "model.region.land" + c,
+                                   Region.RegionType.LAND);
             landregions[c].setDiscoverable(true);
             map.setRegion(landregions[c]);
-            //landregions[c].setName("Land "+c);
         }
 
-        //add tiles to ServerRegions; also, get NEW landmass sizes
-        continentsize = new int[continents+1];
+        // Add tiles to ServerRegions
         landsize = 0;
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
-                continentsize[continentmap[x][y]]++;
-                if (continentmap[x][y]>0) {
-                    landsize++;
+                if (continentmap[x][y] > 0) {
                     Tile tile = map.getTile(x, y);
-                    if (tile.isLand() && (tile.getRegion() == null)) {
-                        landregions[continentmap[x][y]].addTile(tile);
-                    }
+                    landregions[continentmap[x][y]].addTile(tile);
+                    landsize++;
                 }
             }
         }
 
-        //set exploration points for land regions based on size
-        for (int c = 1; c <= continents; c++) { //c starting at 1, c=0 is all water tiles
-            int score = Math.max((int)(((float)continentsize[c]/landsize)*LAND_REGIONS_SCORE_VALUE), LAND_REGION_MIN_SCORE);
-            landregions[c].setScoreValue(score);
-            logger.info("Created land region (size " + continentsize[c] +
-                        ", score value " + score + ").");
+        for (int c = 1; c <= continents; c++) {
+            ServerRegion sr = landregions[c];
+
+            // Set exploration points for land regions based on size
+            int score = Math.max((int)(((float) sr.getSize() / landsize)
+                                       * LAND_REGIONS_SCORE_VALUE),
+                                 LAND_REGION_MIN_SCORE);
+            sr.setScoreValue(score);
+
+            // Set a parent region from the geographic regions now we
+            // know where each region is.
+            for (ServerRegion gr : geographicRegions) {
+                Position cen = sr.getCenter();
+                if (gr.getBounds().contains(cen.getX(), cen.getY())) {
+                    sr.setParent(gr);
+                    gr.addChild(sr);
+                    gr.setSize(gr.getSize() + sr.getSize());
+                    break;
+                }
+            }
+            logger.info("Created land region " + sr.getNameKey()
+                        + " (size " + sr.getSize()
+                        + ", score " + sr.getScoreValue()
+                        + ", parent " + ((sr.getParent() == null) ? "(null)"
+                                         : sr.getParent().getNameKey())
+                        + ")");
+        }
+
+        for (ServerRegion gr : geographicRegions) {
+            logger.info("Geographic region " + gr.getNameKey()
+                        + " (size " + gr.getSize()
+                        + ", children " + gr.getChildren().size()
+                        + ")");
         }
     }
 

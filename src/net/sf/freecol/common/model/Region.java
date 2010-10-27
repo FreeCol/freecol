@@ -96,7 +96,7 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * The children Regions of this Region.
      */
-    private List<Region> children;
+    private List<Region> children = new ArrayList<Region>();
 
 
     /**
@@ -236,6 +236,15 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     public final void setChildren(final List<Region> newChildren) {
         this.children = newChildren;
+    }
+
+    /**
+     * Add a child region to this region.
+     *
+     * @param child The child <code>Region</code> to add.
+     */
+    public void addChild(Region child) {
+        children.add(child);
     }
 
     /**

@@ -33,7 +33,7 @@ public class ServerRegion extends Region {
     /**
      * The size of this Region (number of Tiles).
      */
-    private int size;
+    private int size = 0;
 
     /**
      * A Rectangle that contains all points of the Region.
