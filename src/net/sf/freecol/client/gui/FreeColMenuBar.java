@@ -58,7 +58,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
      * all of the submenus and items.
-     * 
+     *
      * @param f The main controller.
      */
     protected FreeColMenuBar(FreeColClient f) {
@@ -91,20 +91,20 @@ public abstract class FreeColMenuBar extends JMenuBar {
         setBorder(FreeColImageBorder.imageBorder);
     }
 
-    
+
     /**
      * Resets this menu bar.
-     * 
+     *
      * <br><br>
      * <b>For subclasses:</b>
      * This method should reset both the texts and
      * the accelerator keys used by the menu items.
      */
     public abstract void reset();
-    
+
     /**
      * Creates a default FreeCol JMenuItem.
-     * 
+     *
      * @param actionID The ID given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
      * @return The menu item.
@@ -130,7 +130,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     /**
      * Creates a default FreeCol JMenuItem.
-     * 
+     *
      * @param actionID The ID given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
      * @param actionListener An <code>ActionListener</code> that will be
@@ -147,7 +147,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     /**
      * Creates a default FreeCol <code>JCheckBoxMenuItem</code>.
-     * 
+     *
      * @param actionID The ID given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
      * @return The menu item.
@@ -171,7 +171,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     /**
      * Creates a default FreeCol <code>JRadioButtonMenuItem</code>.
-     * 
+     *
      * @param actionID The ID given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
      * @param group The <code>ButtonGroup</code> to add this item to
@@ -221,7 +221,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
         menu.setMnemonic(KeyEvent.VK_C);
 
         for (PanelType type : PanelType.values()) {
-            menu.add(getMenuItem(ColopediaAction.id + type));
+            menu.add(getMenuItem(ColopediaAction.id + "." + type));
         }
         menu.addSeparator();
         menu.add(getMenuItem(AboutAction.id));
@@ -238,5 +238,5 @@ public abstract class FreeColMenuBar extends JMenuBar {
         } else {
             ImageLibrary.drawTiledImage("background.FreeColMenuBar", g, this, getInsets());
         }
-    }    
+    }
 }
