@@ -501,7 +501,7 @@ public class SimpleCombatModel extends CombatModel {
         logger.info(attacker.toString() + " " + action
                     + " " + defender.toString()
                     + ": victory=" + Float.toString(odds.win)
-                    + " random=" + Float.toString(r)
+                    + " random(1.0) = " + Float.toString(r)
                     + " great=" + Boolean.toString(great)
                     + " => " + Utils.join(" ", results));
         return crs;

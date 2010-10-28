@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -36,6 +37,8 @@ import org.w3c.dom.Element;
  * Represents a lost city rumour.
  */
 public class LostCityRumour extends TileItem {
+
+    private static Logger logger = Logger.getLogger(LostCityRumour.class.getName());
 
     /**
      * The type of the rumour. A RumourType, or null if the type has
@@ -306,7 +309,8 @@ public class LostCityRumour extends TileItem {
         if (eventFountain > 0) {
             choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
         }
-        return RandomChoice.getWeightedRandom(random, choices);
+        return RandomChoice.getWeightedRandom(logger,
+            "Explore rumour", random, choices);
     }
 
     /**

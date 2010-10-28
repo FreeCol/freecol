@@ -164,7 +164,8 @@ public class ServerIndianSettlement extends IndianSettlement
             // Allow one more brave than the initially generated number.
             // This is more than sufficient. Do not increase the amount
             // without discussing it on the developer's mailing list first.
-            UnitType type = Utils.getRandomMember(unitTypes, random);
+            UnitType type = Utils.getRandomMember(logger, "Choose birth",
+                                                  unitTypes, random);
             Unit unit = new ServerUnit(getGame(), getTile(), owner, type,
                                        UnitState.ACTIVE);
             consumeGoods(foodType, FOOD_PER_COLONIST);

@@ -21,6 +21,9 @@ package net.sf.freecol.common.util;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.logging.Logger;
+
+import net.sf.freecol.common.util.Utils;
 
 
 public class RandomChoice<T> {
@@ -42,13 +45,16 @@ public class RandomChoice<T> {
     }
 
 
-    public static <T> T getWeightedRandom(Random random, Collection<RandomChoice<T>> input) {
+    public static <T> T getWeightedRandom(Logger logger, String logMe,
+                                          Random random,
+                                          Collection<RandomChoice<T>> input) {
         if (input == null || input.isEmpty()) {
             return null;
         } else if (input.size() == 1) {
             return input.iterator().next().getObject();
         } else {
-            return select(input, random.nextInt(getTotalProbability(input)));
+            return select(input, Utils.randomInt(logger, logMe, random,
+                                                 getTotalProbability(input)));
         }
     }
 

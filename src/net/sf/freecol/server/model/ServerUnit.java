@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -158,7 +159,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             && (learn = spec.getExpertForProducing(produce)) != null
             && learn != getType()
             && getType().canBeUpgraded(learn, ChangeType.EXPERIENCE)
-            && random.nextInt(5000) < Math.min(getExperience(), 200)) {
+            && (Utils.randomInt(logger, "Experience", random, 5000)
+                < Math.min(getExperience(), 200))) {
             StringTemplate oldName = getLabel();
             setType(learn);
             cs.addMessage(See.only(owner),

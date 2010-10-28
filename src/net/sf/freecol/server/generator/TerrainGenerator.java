@@ -302,8 +302,8 @@ public class TerrainGenerator {
         if (tile == null) {
             return null;
         }
-        ResourceType resourceType = RandomChoice
-            .getWeightedRandom(random, tile.getType().getWeightedResources());
+        ResourceType resourceType = RandomChoice.getWeightedRandom(null, null,
+            random, tile.getType().getWeightedResources());
         if (resourceType == null) {
             return null;
         }

@@ -46,6 +46,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.MapGenerator;
@@ -177,13 +178,14 @@ public final class PreGameController extends Controller {
                         }
                     }
                     europe.setRecruitable(index,
-                        RandomChoice.getWeightedRandom(random, recruits));
+                        RandomChoice.getWeightedRandom(null, null,
+                                                       random, recruits));
                 }
 
                 Market market = player.getMarket();
                 for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
                     if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {
-                        int increase = random.nextInt(3);
+                        int increase = Utils.randomInt(null, null, random, 3);
                         if (increase > 0) {
                             int newPrice = goodsType.getInitialSellPrice() + increase;
                             market.setInitialPrice(goodsType, newPrice);

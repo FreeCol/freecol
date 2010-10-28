@@ -21,6 +21,8 @@ package net.sf.freecol.common.util;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -82,13 +84,51 @@ public class Utils {
     }
 
     /**
+     * Convenience to aid logging uses of Randoms.
+     *
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
+     * @param random A pseudo-<code>Random</code> number source.
+     * @param n The exclusive maximum integer to return.
+     * @return A pseudo-random integer r, 0 <= r < n.
+     */
+    public static int randomInt(Logger logger, String logMe, Random random,
+                                int n) {
+        int ret = random.nextInt(n);
+        if (logger != null) {
+            logger.finest(logMe + " random(" + n + ") = " + ret);
+        }
+        return ret;
+    }
+
+    /**
+     * Convenience to aid logging uses of Randoms.
+     *
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
+     * @param random A pseudo-<code>Random</code> number source.
+     * @return A pseudo-random double r, 0 <= r < 1.0.
+     */
+    public static double randomDouble(Logger logger, String logMe,
+                                      Random random) {
+        double ret = random.nextDouble();
+        if (logger != null) {
+            logger.finest(logMe + " random(1.0) = " + ret);
+        }
+        return ret;
+    }
+
+    /**
      * Gets a random member of a list.
      *
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
      * @param list The list.
      * @param random A random number source.
      * @return A random member from the list.
      */
-    public static <T> T getRandomMember(List<T> list, Random random) {
-        return list.get(random.nextInt(list.size()));
+    public static <T> T getRandomMember(Logger logger, String logMe,
+                                        List<T> list, Random random) {
+        return list.get(randomInt(logger, logMe, random, list.size()));
     }
 }

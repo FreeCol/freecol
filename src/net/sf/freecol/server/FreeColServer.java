@@ -86,6 +86,7 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
@@ -357,7 +358,7 @@ public final class FreeColServer {
                 }
             }
             if (navalUnits.size() > 0) {
-                UnitType navalType = navalUnits.get(random.nextInt(navalUnits.size()));
+                UnitType navalType = navalUnits.get(Utils.randomInt(logger, "Choose undead navy", random, navalUnits.size()));
                 Unit theFlyingDutchman = new ServerUnit(game, p.getEntryLocation(), p, navalType, UnitState.ACTIVE);
                 if (landUnits.size() > 0) {
                     UnitType landType = landUnits.get(random.nextInt(landUnits.size()));

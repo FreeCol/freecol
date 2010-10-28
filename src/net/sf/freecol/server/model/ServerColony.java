@@ -226,7 +226,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         if (foodRequired > foodAvailable) { // Someone starves.
             removeFood(foodAvailable);
             if (getUnitCount() > 1) {
-                Unit victim = Utils.getRandomMember(getUnitList(), random);
+                Unit victim = Utils.getRandomMember(logger, "Choose starver",
+                                                    getUnitList(), random);
                 updates.add((FreeColGameObject) victim.getLocation());
                 cs.addDispose(owner, this, victim);
                 cs.addMessage(See.only(owner),
@@ -343,7 +344,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<UnitType> colonyTypes
             = spec.getUnitTypesWithAbility("model.ability.bornInColony");
         if (getFoodCount() >= FOOD_PER_COLONIST && !colonyTypes.isEmpty()) {
-            UnitType type = Utils.getRandomMember(colonyTypes, random);
+            UnitType type = Utils.getRandomMember(logger, "Choose birth",
+                                                  colonyTypes, random);
             Unit unit = new ServerUnit(getGame(), getTile(), owner, type,
                                        UnitState.ACTIVE);
             removeFood(FOOD_PER_COLONIST);

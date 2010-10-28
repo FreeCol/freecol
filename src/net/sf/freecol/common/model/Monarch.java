@@ -370,7 +370,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         int turn = getGame().getTurn().getNumber();
         int oldTax = player.getTax();
         int adjust = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
-        adjust = random.nextInt(5 + turn/adjust) + 1;
+        adjust = Utils.randomInt(logger, "Tax rise", random, 5 + turn/adjust)
+            + 1;
         return Math.min(oldTax + adjust, taxMaximum());
     }
 
@@ -385,7 +386,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             .getIntegerOption("model.option.taxAdjustment").getValue();
         int oldTax = player.getTax();
         int adjust = Math.max(1, 10 - taxAdjustment); // 5-10
-        adjust = random.nextInt(adjust) + 1;
+        adjust = Utils.randomInt(logger, "Tax reduction", random, adjust) + 1;
         return Math.max(oldTax - adjust, Monarch.MINIMUM_TAX_RATE);
     }
 
@@ -400,12 +401,15 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
         if (capacity < spaceRequired + 15) {
-            AbstractUnit unit = Utils.getRandomMember(navalUnits, random);
+            AbstractUnit unit = Utils.getRandomMember(logger, "Choose naval",
+                                                      navalUnits, random);
             result.add(new AbstractUnit(unit.getId(), unit.getRole(), 1));
         } else {
-            AbstractUnit unit = Utils.getRandomMember(landUnits, random);
+            AbstractUnit unit = Utils.getRandomMember(logger, "Choose land",
+                                                      landUnits, random);
             result.add(new AbstractUnit(unit.getId(), unit.getRole(),
-                                        random.nextInt(3) + 1));
+                                        Utils.randomInt(logger, "Choose land#",
+                                                        random, 3) + 1));
         }
         return result;
     }
@@ -464,8 +468,9 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         }
         if (naval) {
-            support.add(new AbstractUnit(Utils.getRandomMember(navalTypes, random),
-                                         Role.DEFAULT, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose naval support", navalTypes, random),
+                        Role.DEFAULT, 1));
             setSupportSea(true);
             return support;
         }
@@ -480,30 +485,38 @@ public final class Monarch extends FreeColGameObject implements Named {
         int difficulty = spec.getInteger("model.option.monarchSupport");
         switch (difficulty) {
         case 4:
-            support.add(new AbstractUnit(Utils.getRandomMember(bombardTypes, random),
-                                         Role.DEFAULT, 1));
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.DRAGOON, 2));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose bombard", bombardTypes, random),
+                        Role.DEFAULT, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose mounted", mountedTypes, random),
+                        Role.DRAGOON, 2));
             break;
         case 3:
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.DRAGOON, 2));
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.SOLDIER, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose mounted", mountedTypes, random),
+                        Role.DRAGOON, 2));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose soldier", mountedTypes, random),
+                        Role.SOLDIER, 1));
             break;
         case 2:
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.DRAGOON, 2));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose mounted", mountedTypes, random),
+                        Role.DRAGOON, 2));
             break;
         case 1:
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.DRAGOON, 1));
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.SOLDIER, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose mounted", mountedTypes, random),
+                        Role.DRAGOON, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose soldier", mountedTypes, random),
+                        Role.SOLDIER, 1));
             break;
         case 0:
-            support.add(new AbstractUnit(Utils.getRandomMember(mountedTypes, random),
-                                         Role.SOLDIER, 1));
+            support.add(new AbstractUnit(Utils.getRandomMember(logger,
+                        "Choose soldier",mountedTypes, random),
+                        Role.SOLDIER, 1));
             break;
         default:
             break;
@@ -535,7 +548,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         UnitType unitType = null;
         AbstractUnit au;
         for (int count = 0; count < limit; count++) {
-            unitType = Utils.getRandomMember(unitTypes, random);
+            unitType = Utils.getRandomMember(logger, "Choose unit", unitTypes,
+                                             random);
             if (unitType.hasAbility("model.ability.canBeEquipped")) {
                 for (int number = 3; number > 0; number--) {
                     au = new AbstractUnit(unitType, Role.DRAGOON, number);

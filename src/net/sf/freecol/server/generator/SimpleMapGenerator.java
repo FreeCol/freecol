@@ -645,7 +645,8 @@ public class SimpleMapGenerator implements MapGenerator {
             int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
             scaledSkills.add(new RandomChoice<UnitType>(unitType, skill.getProbability() * scaleValue));
         }
-        UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
+        UnitType skill = RandomChoice.getWeightedRandom(null, null,
+                                                        random, scaledSkills);
         if (skill == null) {
             // Seasoned Scout
             List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");

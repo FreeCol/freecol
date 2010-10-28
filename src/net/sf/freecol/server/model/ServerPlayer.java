@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -592,7 +593,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Propagate 5-30% of the original change.
         final int lowerBound = 5; // TODO: make into game option?
         final int upperBound = 30;// TODO: make into game option?
-        amount *= random.nextInt(upperBound - lowerBound + 1) + lowerBound;
+        amount *= Utils.randomInt(logger, "Propagate goods", random,
+                                  upperBound - lowerBound + 1) + lowerBound;
         amount /= 100;
         if (amount == 0) return;
 
