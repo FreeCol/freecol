@@ -49,13 +49,13 @@ public class ColonyProductionTest extends FreeColTestCase {
         map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
-                
+
         game.setMap(map);
         UnitType veteran = spec().getUnitType("model.unit.veteranSoldier");
         Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        GoodsType foodType = spec().getGoodsType("model.goods.grain");
         soldier.setWorkType(foodType);
         nonServerBuildColony(soldier, colony);
 
@@ -83,11 +83,11 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // Test the state of the soldier
         // Soldier should be working on the field with the bonus
-        
+
         assertEquals(foodType, soldier.getWorkType());
 
         assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), soldier.getLocation().getTile());
-        
+
         assertEquals(0, soldier.getMovesLeft());
 
         //assertEquals(false, soldier.isArmed());
@@ -114,10 +114,10 @@ public class ColonyProductionTest extends FreeColTestCase {
         map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
-                
+
         game.setMap(map);
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        GoodsType foodType = spec().getGoodsType("model.goods.grain");
         Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch,
                                       pioneerType, UnitState.ACTIVE,
                                       pioneerType.getDefaultEquipment());
@@ -151,23 +151,23 @@ public class ColonyProductionTest extends FreeColTestCase {
         // Test the state of the pioneer
         // Pioneer should be working on the field with the bonus
         assertEquals(foodType, pioneer.getWorkType());
-        
+
         assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), pioneer.getLocation().getTile());
-        
+
         assertEquals(0, pioneer.getMovesLeft());
 
         //assertEquals(false, pioneer.isArmed());
     }
-    
+
     public void testBellNetProduction(){
     	GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-    	    	
+
     	Game game = getStandardGame();
-    	
+
     	game.setMap(getTestMap());
-    	
+
     	Colony colony = getStandardColony(7);
-    	    	
+
     	int initialBellCount = colony.getGoodsCount(bellsType);
     	int expectedBellCount = 0;
     	int bellsProdPerTurn = colony.getProductionOf(bellsType);
@@ -176,7 +176,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     	int expectedBellUpkeep =  colony.getUnitCount() - 2;
     	int bellsNetProdPerTurn = colony.getProductionNetOf(bellsType);
     	int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
-    	
+
     	assertEquals("Wrong bell count", expectedBellCount, initialBellCount);
     	assertEquals("Wrong bell production",expectedBellProd,bellsProdPerTurn);
     	assertEquals("Wrong bell upkeep",expectedBellUpkeep,bellsUpkeep);
@@ -189,21 +189,21 @@ public class ColonyProductionTest extends FreeColTestCase {
     public void testNoHorsesOverProduction() {
         Game game = getGame();
         game.setMap(getTestMap());
-        
+
         Colony colony = getStandardColony(1);
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
         Building pasture = colony.getBuilding(spec().getBuildingType("model.building.country"));
         assertEquals(horsesType, pasture.getGoodsOutputType());
         assertEquals("Wrong warehouse capacity in colony",100,colony.getWarehouseCapacity());
-        
+
         // Still room for more
         colony.addGoods(horsesType, 99);
-        
+
         assertEquals("Wrong horse production",1, pasture.getProductionOf(horsesType));
         assertEquals("Wrong maximum horse production",9, pasture.getMaximumProduction());
         assertEquals("Wrong net horse production",1, colony.getProductionNetOf(horsesType));
-        
+
         // No more room available
         colony.addGoods(horsesType, 1);
         assertEquals("Wrong number of horses in colony",colony.getWarehouseCapacity(), colony.getGoodsCount(horsesType));

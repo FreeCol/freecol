@@ -59,7 +59,7 @@ public class TileTest extends FreeColTestCase {
     TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
     TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
 
-    GoodsType food = spec().getGoodsType("model.goods.food");
+    GoodsType food = spec().getGoodsType("model.goods.grain");
     GoodsType fish = spec().getGoodsType("model.goods.fish");
     GoodsType sugar = spec().getGoodsType("model.goods.sugar");
     GoodsType cotton = spec().getGoodsType("model.goods.cotton");
@@ -81,7 +81,7 @@ public class TileTest extends FreeColTestCase {
         assertNotNull( marsh );
         assertNotNull( swamp );
         assertNotNull( arctic );
-        
+
         assertNotNull( plainsForest );
         assertNotNull( desertForest );
         assertNotNull( grasslandForest );
@@ -90,17 +90,17 @@ public class TileTest extends FreeColTestCase {
         assertNotNull( savannahForest );
         assertNotNull( marshForest );
         assertNotNull( swampForest );
-        
-        
+
+
         assertEquals(2, plow.getAddWorkTurns());
         assertEquals(0, road.getAddWorkTurns());
         assertEquals(2, clearForest.getAddWorkTurns());
-        
-        
+
+
         assertNotNull(plow);
         assertNotNull(road);
         assertNotNull(clearForest);
-        
+
         java.util.Map<TileType, int[]> cost = new HashMap<TileType, int[]>();
         cost.put(plains, new int[] { 5, 3 });
         cost.put(desert, new int[] { 5, 3 });
@@ -112,17 +112,17 @@ public class TileTest extends FreeColTestCase {
         cost.put(swamp, new int[] { 9, 7 });
         // TODO: fix test
         //cost.put(arctic, new int[] { 6, 4 });
-        
+
         for (java.util.Map.Entry<TileType, int[]> entry : cost.entrySet()){
             Tile tile = new Tile(game, entry.getKey(), 0, 0);
             assertTrue(tile.getType().toString(), plow.isTileAllowed(tile));
             assertTrue(tile.getType().toString(), road.isTileAllowed(tile));
             assertFalse(tile.getType().toString(), clearForest.isTileAllowed(tile));
-            
+
             assertEquals(tile.getType().toString(), entry.getValue()[0], tile.getWorkAmount(plow));
             assertEquals(tile.getType().toString(), entry.getValue()[1], tile.getWorkAmount(road));
         }
-        
+
         // Now check the forests
         cost.clear();
         cost.put(tundraForest, new int[] { 6, 4 });
@@ -133,39 +133,39 @@ public class TileTest extends FreeColTestCase {
         cost.put(marshForest, new int[] { 8, 6 });
         cost.put(swampForest, new int[] { 9, 7});
         cost.put(plainsForest, new int[] { 6, 4});
-        
+
         for (java.util.Map.Entry<TileType, int[]> entry : cost.entrySet()){
             Tile tile = new Tile(game, entry.getKey(), 0, 0);
             assertFalse(tile.getType().toString(), plow.isTileAllowed(tile));
             assertTrue(tile.getType().toString(), road.isTileAllowed(tile));
             assertTrue(tile.getType().toString(), clearForest.isTileAllowed(tile));
-            
+
             assertEquals(tile.getType().toString(), entry.getValue()[0], tile.getWorkAmount(clearForest));
             assertEquals(tile.getType().toString(), entry.getValue()[1], tile.getWorkAmount(road));
         }
-        
+
     }
-    
+
     public void testPrimarySecondaryGoods() {
-        
+
         Game game = getStandardGame();
-        
+
         Tile tile = new Tile(game, spec().getTileType("model.tile.prairie"), 0, 0);
-        assertEquals(spec().getGoodsType("model.goods.food"),
+        assertEquals(spec().getGoodsType("model.goods.grain"),
                      tile.getType().getPrimaryGoods().getType());
         assertEquals(3, tile.getPrimaryProduction());
         assertEquals(spec().getGoodsType("model.goods.cotton"),
                      tile.getType().getSecondaryGoods().getType());
         assertEquals(3, tile.getSecondaryProduction());
-        
+
         Tile tile2 = new Tile(game, spec().getTileType("model.tile.mixedForest"), 0, 0);
-        assertEquals(spec().getGoodsType("model.goods.food"),
+        assertEquals(spec().getGoodsType("model.goods.grain"),
                      tile2.getType().getPrimaryGoods().getType());
         assertEquals(3, tile2.getPrimaryProduction());
         assertEquals(spec().getGoodsType("model.goods.furs"),
                      tile2.getType().getSecondaryGoods().getType());
         assertEquals(3, tile2.getSecondaryProduction());
-        
+
     }
 
     public void testPotential() {
@@ -192,16 +192,16 @@ public class TileTest extends FreeColTestCase {
         assertEquals(4, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
 
         Tile tile2 = new Tile(game, spec().getTileType("model.tile.plains"), 0, 1);
-        assertEquals(5, tile2.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(6, tile2.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
+        assertEquals(5, tile2.potential(spec().getGoodsType("model.goods.grain"), null));
+        assertEquals(6, tile2.getMaximumPotential(spec().getGoodsType("model.goods.grain"), null));
         tile2.setResource(new Resource(game, tile2, spec().getResourceType("model.resource.grain")));
         // potential assumes expert
-        assertEquals(9, tile2.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(10, tile2.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
+        assertEquals(9, tile2.potential(spec().getGoodsType("model.goods.grain"), null));
+        assertEquals(10, tile2.getMaximumPotential(spec().getGoodsType("model.goods.grain"), null));
 
         Tile tile3 = new Tile(game, spec().getTileType("model.tile.mixedForest"), 1, 1);
-        assertEquals(3, tile3.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(6, tile3.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
+        assertEquals(3, tile3.potential(spec().getGoodsType("model.goods.grain"), null));
+        assertEquals(6, tile3.getMaximumPotential(spec().getGoodsType("model.goods.grain"), null));
 
     }
 
@@ -295,9 +295,9 @@ public class TileTest extends FreeColTestCase {
     public void testProductionModifiers() throws Exception {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
-    	
+
         Colony colony = getStandardColony();
-        
+
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
 
         ColonyTile colonyTile1 = colonyTiles.get(0);
@@ -363,7 +363,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
         game.setMap(map);
-        
+
         Colony colony = FreeColTestUtils.getColonyBuilder().build();
 
         assertTrue(colony.getTile().hasRoad());
@@ -467,7 +467,7 @@ public class TileTest extends FreeColTestCase {
         sortedPotential = tile1.getSortedPotential(farmer, null);
         assertEquals(1, sortedPotential.size());
         assertEquals(fish, sortedPotential.get(0).getType());
-        
+
     }
     */
 
@@ -506,7 +506,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getGame();
         Map map = getTestMap(tundra);
     	game.setMap(map);
-    	
+
     	Colony colony = getStandardColony();
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         ResourceType minerals = spec().getResourceType("model.resource.minerals");

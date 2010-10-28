@@ -37,57 +37,57 @@ public class ColonyTest extends FreeColTestCase {
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
-    
+
     public void testCurrentlyBuilding() {
         Game game = getGame();
     	game.setMap(getTestMap(true));
-    	
+
     	Colony colony = getStandardColony();
-    	    	
+
     	colony.setCurrentlyBuilding(warehouseType);
     	assertEquals("Colony should be building a warehouse",warehouseType,colony.getCurrentlyBuilding());
-    	
+
         colony.setCurrentlyBuilding(churchType);
-        assertEquals("Colony should be building a church",churchType,colony.getCurrentlyBuilding());        
+        assertEquals("Colony should be building a church",churchType,colony.getCurrentlyBuilding());
     }
-    
+
     public void testBuildQueueDoesNotAcceptBuildingDoubles() {
         Game game = getGame();
         game.setMap(getTestMap(true));
-        
+
         Colony colony = getStandardColony();
-                
+
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Building queue should have 1 entry", 1, colony.getBuildQueue().size());
-        
+
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Building queue should still have 1 entry", 1, colony.getBuildQueue().size());
-        
+
         colony.setCurrentlyBuilding(churchType);
         assertEquals("Building queue should have 2 entries", 2, colony.getBuildQueue().size());
-        
+
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Building queue should still have 2 entries", 2, colony.getBuildQueue().size());
     }
-    
+
     public void testBuildQueueAcceptsUnitDoubles() {
         Game game = getGame();
         game.setMap(getTestMap(true));
-        
+
         Colony colony = getStandardColony();
-                
+
         colony.setCurrentlyBuilding(wagonTrainType);
         // default item will be added to new colony's build queue
         assertEquals("Building queue should have 2 entry", 2, colony.getBuildQueue().size());
-                
+
         colony.setCurrentlyBuilding(wagonTrainType);
         assertEquals("Building queue should have 3 entries", 3, colony.getBuildQueue().size());
     }
-    
+
     public void testOccupationWithFood() {
 
         int population = 3;
-        GoodsType food = spec().getGoodsType("model.goods.food");
+        GoodsType food = spec().getGoodsType("model.goods.grain");
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
         UnitType cottonPlanter = spec().getUnitType("model.unit.masterCottonPlanter");
@@ -118,14 +118,14 @@ public class ColonyTest extends FreeColTestCase {
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(cotton, colonist.getWorkType());
-        
+
         // expert will produce expert goods
         colonist.putOutsideColony();
         colonist.setType(cottonPlanter);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(cotton, colonist.getWorkType());
-        
+
         // expert will produce expert goods
         colonist.putOutsideColony();
         colonist.setType(statesman);
@@ -140,7 +140,7 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
         spec();
-        
+
         colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
         colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
         colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
@@ -224,7 +224,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(weaversHouse, colony.getBuildingFor(colonist).getType());
         assertEquals(weaversHouse, ((Building) colonist.getLocation()).getType());
         assertEquals(cloth, colonist.getWorkType());
-        
+
 
     }
 
