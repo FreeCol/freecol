@@ -137,8 +137,10 @@ public class ImageResource extends Resource {
             if (cached != null) return cached;
             MediaTracker mt = new MediaTracker(_c);
             try {
+                //use SCALE_REPLICATE instead of SCALE_SMOOTH to avoid ClassCastException
+                //TODO (perhaps): find better solution
                 Image scaledVersion = im.getScaledInstance(d.width, d.height,
-                                                           Image.SCALE_SMOOTH);
+                                                           Image.SCALE_REPLICATE);
                 mt.addImage(scaledVersion, 0, d.width, d.height);
                 mt.waitForID(0);
                 if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
