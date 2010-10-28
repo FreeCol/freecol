@@ -57,7 +57,7 @@ public class ServerUnitTest extends FreeColTestCase {
         = spec().getEquipmentType("model.equipment.tools");
 
     private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getGoodsType("model.goods.grain");
 
     private static final TileImprovementType road
         = spec().getTileImprovementType("model.improvement.road");

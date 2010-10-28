@@ -53,6 +53,9 @@ public class ServerBuildingTest extends FreeColTestCase {
     private static final GoodsType foodType
         = spec().getGoodsType("model.goods.food");
 
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
+
     private static final UnitType freeColonistType
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType indenturedServantType

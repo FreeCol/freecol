@@ -38,6 +38,8 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType foodType
         = spec().getGoodsType("model.goods.food");
     private static final TileType desertType
@@ -54,8 +56,8 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertEquals(1, camp.getUnitCount());
         assertEquals(0, camp.getFoodCount());
 
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
-        int foodProduced = camp.getProductionOf(foodType);
+        GoodsType grainType = spec().getGoodsType("model.goods.grain");
+        int foodProduced = camp.getProductionOf(grainType);
         int foodConsumed = camp.getFoodConsumption();
         assertTrue("Food Produced should be more the food consumed",foodProduced > foodConsumed);
 
@@ -82,7 +84,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
         // verify that there is food production for the horses
         assertEquals("Horses need food", foodType, horsesType.getRawMaterial());
-        int foodProduced = camp.getProductionOf(foodType);
+        int foodProduced = camp.getProductionOf(grainType);
         int foodConsumed = camp.getFoodConsumptionByType(foodType);
         int foodAvail = foodProduced - foodConsumed;
         assertTrue("Food Produced should be more the food consumed",
@@ -138,7 +140,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertEquals(initialBravesInCamp, camp1.getUnitCount());
         assertEquals(0, camp1.getFoodCount());
 
-        int foodProduced = camp1.getProductionOf(foodType);
+        int foodProduced = camp1.getProductionOf(grainType);
         int foodConsumed = camp1.getFoodConsumption();
         UnitType brave = spec().getUnitType("model.unit.brave");
         assertEquals(2, brave.getConsumptionOf(spec().getGoodsType("model.goods.food")));
