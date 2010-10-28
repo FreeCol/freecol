@@ -11,7 +11,7 @@
     </description>
     <property name="java.target.version" value="1.5"/>
     <property name="freecol.name" value="freecol"/>
-    <property environment="env"/>  
+    <property environment="env"/>
     <property name="freecol.data.dir" value="${basedir}/data"/>
     <property name="freecol.rules.dir" value="${basedir}/data/rules"/>
     <property name="freecol.src.dir" value="${basedir}/src"/>
@@ -118,20 +118,9 @@
         />
     </target>
 
-    <target name="reencode_messages" description="Reencodes the message files and outputs them to data/strings">
-    
-        <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
-                    encoding="UTF-8" 
-                    includes="*.properties" 
-                    excludes=""/>
-        <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
-                    encoding="ISO-8859-1"
-                    includes=""/>
-    </target>
-
-    <target name="build" depends="init,compile,reencode_messages" description="Compiles the source files.">
+    <target name="build" depends="init,compile" description="Compiles the source files.">
       <copy todir="${freecol.build.dir}">
-        <fileset dir="${freecol.src.dir}" includes="**/*.xml" /> 
+        <fileset dir="${freecol.src.dir}" includes="**/*.xml" />
       </copy>
     </target>
 
@@ -194,7 +183,7 @@
 
         For a formal release, none of these properties should be set.
     -->
-    <target name="dist" description="Creates archives and installers for distribution." 
+    <target name="dist" description="Creates archives and installers for distribution."
             depends="init,initDist,tarJavaBundle,zipJavaBundle,tarSourceBundle,zipSourceBundle,javaInstallerBundle,winInstallerBundle,tarMacJavaBundle">
 
         <echo message="" />
@@ -210,7 +199,7 @@
 
     <target name="setReleaseVersion" unless="freecol.version">
         <input message="Please specify the release version (default: svn-${DSTAMP}): " addproperty="freecol.version" defaultvalue="svn-${DSTAMP}" />
-        <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
+        <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>
         <echo message="Creating Distribution of ${freecol.release.name}"/>
         <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
                        match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
@@ -288,7 +277,7 @@
             <fileset dir="${freecol.release.dir}/source" includes="${freecol.name}/**"/>
         </zip>
     </target>
-    
+
     <target name="executeIzpack">
         <condition property="beginExtraPacks" value="" else="&lt;!--">
             <istrue value="${includeExtraPacks}" />
@@ -301,7 +290,7 @@
         </condition>
 
         <izpack output="${freecol.release.dir}/${freecol.release.name}-installer${sourcesIncluded}.jar"
-                installerType="standard" 
+                installerType="standard"
                 basedir="${freecol.release.dir}/"
                 izpackdir="${freecol.build.dir}">
             <config><![CDATA[
@@ -435,11 +424,11 @@
         <copy todir="${freecol.release.dir}">
             <fileset dir="${freecol.build.dir}" includes="installer.jsmooth"/>
         </copy>
-        <replace file="${freecol.release.dir}/installer.jsmooth" 
+        <replace file="${freecol.release.dir}/installer.jsmooth"
                 token="%ant:freecol.release.name%"
                 value="${freecol.release.name}"
         />
-        <replace file="${freecol.release.dir}/installer.jsmooth" 
+        <replace file="${freecol.release.dir}/installer.jsmooth"
                 token="%ant:freecol.installerjar%"
                 value="${freecol.release.dir}/${freecol.release.name}-installer.jar"
         />
@@ -451,8 +440,8 @@
         <!-- JarBundler is a feature-rich Ant task which will create a Mac OS X
              application bundle from a list of Jar files and a main class name.
              (GPL-Software) -> http://informagen.com/JarBundler/  -->
-        <taskdef name="jarbundler" 
-                classname="net.sourceforge.jarbundler.JarBundler" 
+        <taskdef name="jarbundler"
+                classname="net.sourceforge.jarbundler.JarBundler"
                 classpath="${freecol.build.dir}/jars/jarbundler.jar"
         />
 
@@ -464,7 +453,7 @@
                             jvmversion="1.6+"
                             arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                             stubfile="${freecol.build.dir}/skeletons/FreeCol"
-                            icon="${freecol.packaging.dir}/icons/FreeCol.icns"> 
+                            icon="${freecol.packaging.dir}/icons/FreeCol.icns">
             <jarfileset dir="${freecol.release.dir}/base/freecol/">
                 <include name="**/*" />
                 <exclude name="data/**" />
@@ -491,16 +480,16 @@
     <target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="skip.dist.mac" if="isOsWindows">
         <echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
         <tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
-            <tarfileset dir="${freecol.release.dir}" mode="755" 
-                    includes="FreeCol.app/Contents/MacOS/FreeCol" 
+            <tarfileset dir="${freecol.release.dir}" mode="755"
+                    includes="FreeCol.app/Contents/MacOS/FreeCol"
                     excludes="**/freecol*"
-                    followsymlinks="false" 
+                    followsymlinks="false"
             />
             <tarfileset followsymlinks="false" dir="${freecol.release.dir}">
                 <include name="FreeCol.app/**"/>
                 <exclude name="**/freecol*"/>
                 <exclude name="FreeCol.app/Contents/MacOS/FreeCol"/>
-            </tarfileset>	
+            </tarfileset>
         </tar>
     </target>
 
@@ -566,7 +555,7 @@
         <!-- if the next fails then here is the long answer:
             http://ant.apache.org/faq.html#delegating-classloader
             the short answer depends.
-            if you have Ant 1.7, the junit.jar can exist on the classpath.  
+            if you have Ant 1.7, the junit.jar can exist on the classpath.
             upgrading to 1.7 may be the best solution.
 
             if you have Ant 1.6:
@@ -580,7 +569,7 @@
         <junit printsummary="yes">
 	        <classpath refid="test.run.classpath"/>
 	       	<formatter type="brief" usefile="false" />
-        	<formatter type="plain" /> 
+        	<formatter type="plain" />
         	<test todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
                 <sysproperty key="java.awt.headless" value="true" />
         </junit>
@@ -590,16 +579,16 @@
 
     <target name="testall" depends="build-unit-tests" unless="skip.dist.test"
             description="Runs all unit tests">
-    	
+
     	<delete dir="${freecol.build.dir}/report" />
     	<mkdir dir="${freecol.build.dir}/report"/>
     	<mkdir dir="${freecol.build.dir}/report/xml"/>
-    	
+
         <echo message="if the next task fails then please read the build script" />
         <!-- if the next fails then here is the long answer:
             http://ant.apache.org/faq.html#delegating-classloader
             the short answer depends.
-            if you have Ant 1.7, the junit.jar can exist on the classpath.  
+            if you have Ant 1.7, the junit.jar can exist on the classpath.
             upgrading to 1.7 may be the best solution.
 
             if you have Ant 1.6:
@@ -613,9 +602,9 @@
         <junit printsummary="on" errorproperty="error.junit" fork="yes" maxmemory="48m">
             <classpath refid="test.run.classpath"/>
             <formatter type="xml" />
-            
+
            	<test todir="${freecol.build.dir}/report/xml" name="net.sf.freecol.AllTests" fork="yes"/>
-        	
+
         	<!--
         	<batchtest fork="false" todir="${freecol.build.dir}/report/xml">
                 <fileset dir="test/src" includes="**/*Test.java" />
@@ -623,7 +612,7 @@
             -->
                 <sysproperty key="java.awt.headless" value="true" />
         </junit>
-        
+
         <junitreport>
             <fileset dir="${freecol.build.dir}/report/xml">
                 <include name="TEST-*.xml"/>
@@ -632,7 +621,7 @@
         </junitreport>
 
     	<echo message="For detailed results of the test run see: ${freecol.build.dir}/report/index.html"/>
-        
+
     	<fail if="error.junit" message="Automated Unit Tests failed."/>
     </target>
 
@@ -641,7 +630,7 @@
                 cache="${freecol.build.dir}" />
         <javac srcdir="test/src" destdir="${freecol.build.dir}"
             classpathref="test.build.classpath" debug="on" deprecation="off"
-            source="${java.target.version}" target="${java.target.version}" 
+            source="${java.target.version}" target="${java.target.version}"
             includeantruntime="false"/>
     </target>
 
@@ -694,7 +683,7 @@
         </exec>
     </target>
 
-    <target name="manual" depends="print-manual,online-manual" 
+    <target name="manual" depends="print-manual,online-manual"
             description="Creates the printable and online user guides.">
     </target>
 
@@ -713,7 +702,7 @@
     <!-- Prints a report on certain translations, which you can specify
         by setting the localeKey property ("-DlocaleKey=fi", for example),
         or all translations. Use "-emacs" in order to suppress extensive
-        logging.  --> 
+        logging.  -->
     <target name="translation-report" depends="build"
             description="Creates report on translations.">
         <condition property="localeKey" else="">
@@ -789,7 +778,7 @@
 
     <target name="cobertura" depends="build">
       <property name="cobertura.dir" value="cobertura" />
-      
+
       <path id="cobertura.classpath">
         <fileset dir="${cobertura.dir}">
           <include name="cobertura.jar" />
@@ -804,11 +793,11 @@
           <include name="**/*.class"/>
         </fileset>
       </cobertura-instrument>
-      
+
       <delete dir="${freecol.build.dir}/report" />
       <mkdir dir="${freecol.build.dir}/report"/>
       <mkdir dir="${freecol.build.dir}/report/xml"/>
-      
+
       <echo message="if the next task fails then please read the build script" />
       <junit printsummary="on" errorproperty="error.junit" fork="yes" maxmemory="48m">
         <classpath location="build/instrumented-classes"/>
@@ -816,11 +805,11 @@
         <classpath refid="cobertura.classpath"/>
         <classpath refid="test.run.classpath"/>
         <formatter type="xml" />
-        
+
         <test todir="${freecol.build.dir}/report/xml" name="net.sf.freecol.AllTests" fork="yes"/>
         <sysproperty key="java.awt.headless" value="true" />
       </junit>
-      
+
       <cobertura-report srcdir="${freecol.src.dir}" destdir="cobertura/report"/>
     </target>
 

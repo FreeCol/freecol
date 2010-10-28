@@ -19,14 +19,17 @@
 
 package net.sf.freecol.client.gui.i18n;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -42,10 +45,10 @@ import net.sf.freecol.common.model.UnitType;
 
 /**
  * Represents a collection of messages in a particular locale. <p/>
- * 
+ *
  * This class is NOT thread-safe. (CO: I cannot find any place that really has a
  * problem) <p/>
- * 
+ *
  * Messages are put in the file "FreeColMessages.properties". This file is
  * presently located in the same directory as the source file of this class.
  */
@@ -59,11 +62,12 @@ public class Messages {
 
     public static final String FILE_SUFFIX = ".properties";
 
-    private static Properties messageBundle = null;
+    private static Map<String, String> messageBundle =
+        new HashMap<String, String>();
 
     /**
      * Set the resource bundle for the given locale
-     * 
+     *
      * @param locale
      */
     public static void setMessageBundle(Locale locale) {
@@ -79,14 +83,14 @@ public class Messages {
 
     /**
      * Set the resource bundle to the given locale
-     * 
+     *
      * @param language The language for this locale.
      * @param country The language for this locale.
      * @param variant The variant for this locale.
      */
     private static void setMessageBundle(String language, String country, String variant) {
 
-        messageBundle = new Properties();
+        messageBundle = new HashMap<String, String>();
         List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX, FILE_SUFFIX, language, country, variant);
 
         for (String fileName : filenames) {
@@ -126,13 +130,13 @@ public class Messages {
     /**
      * Finds the message with a particular ID in the default locale and performs
      * string replacements.
-     * 
+     *
      * @param messageId The key of the message to find
      * @param data consists of pairs of strings, each time the first of the pair
      *       is replaced by the second in the messages.
      */
     public static String message(String messageId, String... data) {
-        // Check that all the values are correct.        
+        // Check that all the values are correct.
         if (messageId == null) {
             throw new NullPointerException();
         }
@@ -142,8 +146,8 @@ public class Messages {
         if (messageBundle == null) {
             setMessageBundle(Locale.getDefault());
         }
- 
-        String message = messageBundle.getProperty(messageId);
+
+        String message = messageBundle.get(messageId);
         if (message == null) {
             return messageId;
         }
@@ -211,7 +215,7 @@ public class Messages {
         if (messageBundle == null) {
             setMessageBundle(Locale.getDefault());
         }
-        return (messageBundle.getProperty(key) != null);
+        return (messageBundle.get(key) != null);
     }
 
 
@@ -242,7 +246,7 @@ public class Messages {
     }
 
 
-   
+
 
     /**
      * Returns the name of a unit in a human readable format. The
@@ -252,7 +256,7 @@ public class Messages {
      * unit's type, the proper name of the unit, and additional
      * information about gold (in the case of treasure trains), or
      * equipment.
-     * 
+     *
      * @param unit an <code>Unit</code> value
      * @return A label to describe the given unit
      */
@@ -297,7 +301,7 @@ public class Messages {
      /**
      * Returns the name of a unit in a human readable format. The return value
      * can be used when communicating with the user.
-     * 
+     *
      * @param someType an <code>UnitType</code> value
      * @param someRole a <code>Role</code> value
      * @return The given unit type as a String
@@ -319,7 +323,7 @@ public class Messages {
     /**
      * Returns the name of a unit in a human readable format. The return value
      * can be used when communicating with the user.
-     * 
+     *
      * @param unit an <code>AbstractUnit</code> value
      * @return The given unit type as a String
      */
@@ -413,31 +417,51 @@ public class Messages {
 
     /**
      * Loads a new resource file into the current message bundle.
-     * 
+     *
      * @param resourceFile
      */
     public static void loadResources(File resourceFile) {
 
-        if ((resourceFile != null) && resourceFile.exists() && resourceFile.isFile() && resourceFile.canRead()) {
+        if ((resourceFile != null) && resourceFile.exists()
+            && resourceFile.isFile() && resourceFile.canRead()) {
             try {
-                messageBundle.load(new FileInputStream(resourceFile));
+                loadResources(new FileInputStream(resourceFile));
             } catch (Exception e) {
                 logger.warning("Unable to load resource file " + resourceFile.getPath());
             }
         }
     }
 
+
+
     /**
      * Loads a new resource file into the current message bundle.
-     * 
-     * @param input an <code>InputStream</code> value
+     *
+     * @param is an <code>InputStream</code> value
      */
-    public static void loadResources(InputStream input) {
+    public static void loadResources(InputStream is) {
         try {
-            messageBundle.load(input);
+            InputStreamReader inputReader = new InputStreamReader(is, "UTF-8");
+            BufferedReader in = new BufferedReader(inputReader);
+
+            String line = null;
+            while((line = in.readLine()) != null) {
+                line = line.trim();
+                int index = line.indexOf('#');
+                if (index == 0) {
+                    continue;
+                }
+                index = line.indexOf('=');
+                if (index > 0) {
+                    String key = line.substring(0, index).trim();
+                    String value = line.substring(index + 1).trim();
+                    messageBundle.put(key, value);
+                }
+            }
         } catch (Exception e) {
-            logger.warning("Unable to load resource into message bundle.");
+            logger.warning("Unable to load resources from input stream.");
         }
     }
+
 
 }
