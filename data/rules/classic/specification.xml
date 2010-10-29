@@ -1376,13 +1376,23 @@
       </ability>
       <ability id="model.ability.native"/>
     </indian-nation-type>
-    <indian-nation-type id="camp-or-village" abstract="true" extends="default">
+    <indian-nation-type id="camp" abstract="true" extends="default">
+      <settlement probability="20" minimum="2" maximum="3" factor="100" />
+      <capital probability="100" minimum="2" maximum="4" factor="200" />
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
                 type="percentage" value="50" />
       <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
                 type="percentage" value="50" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.apache" extends="camp-or-village" number-of-settlements="average"
+    <indian-nation-type id="village" abstract="true" extends="default">
+      <settlement probability="50" minimum="3" maximum="8" factor="100" />
+      <capital probability="100" minimum="3" maximum="8" factor="200" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
+    </indian-nation-type>
+    <indian-nation-type id="model.nationType.apache" extends="camp" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
@@ -1390,7 +1400,7 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <region id="model.region.west" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.sioux" extends="camp-or-village" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.sioux" extends="camp" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_camp">
       <skill id="model.unit.masterTobaccoPlanter" probability="20"/>
       <skill id="model.unit.expertFurTrapper" probability="10"/>
@@ -1398,7 +1408,7 @@
       <skill id="model.unit.expertFarmer" probability="3"/>
       <region id="model.region.northWest" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.tupi" extends="camp-or-village" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.tupi" extends="camp" number-of-settlements="low"
                         aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
@@ -1407,13 +1417,13 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <region id="model.region.southEast" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.arawak" extends="camp-or-village" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.arawak" extends="village" number-of-settlements="low"
                         aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
       <region id="model.region.east" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.cherokee" extends="camp-or-village" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.cherokee" extends="village" number-of-settlements="average"
                         aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterCottonPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
@@ -1424,7 +1434,7 @@
       <skill id="model.unit.masterFurTrader" probability="3"/>
       <region id="model.region.northEast" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.iroquois" extends="camp-or-village" number-of-settlements="average"
+    <indian-nation-type id="model.nationType.iroquois" extends="village" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_village">
       <skill id="model.unit.expertFurTrapper" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
@@ -1451,6 +1461,8 @@
       <skill id="model.unit.masterWeaver" probability="3"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
+      <settlement probability="100" minimum="2" maximum="6" factor="2100" />
+      <capital probability="100" minimum="2" maximum="6" factor="3000" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.aztec" extends="city"
                         aggression="high" type-of-settlement="aztec_city">
@@ -1458,6 +1470,8 @@
       <skill id="model.unit.expertOreMiner" probability="3"/>
       <region id="model.region.center" />
       <region id="model.region.east" />
+      <settlement probability="100" minimum="5" maximum="9" factor="1000" />
+      <capital probability="100" minimum="7" maximum="12" factor="1000" />
     </indian-nation-type>
   </indian-nation-types>
 

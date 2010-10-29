@@ -510,6 +510,8 @@
         <xs:element ref="modifier"/>
         <xs:element ref="skill"/>
         <xs:element ref="region"/>
+        <xs:element name="settlement" type="PlunderType"/>
+        <xs:element name="capital" type="PlunderType"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" type="xs:boolean" />
@@ -899,6 +901,13 @@
         <xs:attribute name="value" type="xs:integer" />
       </xs:extension>
     </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="PlunderType">
+    <xs:attribute name="probability" type="xs:int"/>
+    <xs:attribute name="minimum" type="xs:int"/>
+    <xs:attribute name="maximum" type="xs:int"/>
+    <xs:attribute name="factor" type="xs:int"/>
   </xs:complexType>
 
   <!-- Game Object Types -->
