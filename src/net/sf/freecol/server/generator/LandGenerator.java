@@ -44,8 +44,6 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public class LandGenerator {
     
-    public final static int POLAR_HEIGHT = 2;
-
     private final OptionGroup mapGeneratorOptions;
     private final Random random;
      
@@ -256,13 +254,13 @@ public class LandGenerator {
      */
     private void addPolarRegions() {
         for (int x = 0; x < width; x++) {
-            for (int y = 0; y < POLAR_HEIGHT; y++) {
+            for (int y = 0; y < Map.POLAR_HEIGHT; y++) {
                 if (map[x][y] == false) {
                     map[x][y] = true;
                     numberOfLandTiles++;
                 }
             }
-            int limit = height - 1 - POLAR_HEIGHT;
+            int limit = height - 1 - Map.POLAR_HEIGHT;
             for (int y = limit; y < height; y++) {
                 if (map[x][y] == false) {
                     map[x][y] = true;

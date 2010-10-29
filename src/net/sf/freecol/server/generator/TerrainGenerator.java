@@ -579,8 +579,8 @@ public class TerrainGenerator {
         map.setRegion(antarctic);
         antarctic.setPrediscovered(true);
 
-        int arcticHeight = LandGenerator.POLAR_HEIGHT;
-        int antarcticHeight = map.getHeight() - LandGenerator.POLAR_HEIGHT - 1;
+        int arcticHeight = Map.POLAR_HEIGHT;
+        int antarcticHeight = map.getHeight() - Map.POLAR_HEIGHT - 1;
 
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < arcticHeight; y++) {

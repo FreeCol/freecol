@@ -19,8 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -43,6 +45,8 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 public class Map extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
+
+    public final static int POLAR_HEIGHT = 2;
 
     /**
      * The directions a Unit can move to. Includes deltas for moving
@@ -228,6 +232,17 @@ public class Map extends FreeColGameObject {
      */
     public void setRegion(final Region region) {
         regions.put(region.getNameKey(), region);
+    }
+
+    /**
+     * Is a tile in the map in a polar region?
+     *
+     * @param tile The <code>Tile</code> to examine.
+     * @return True if the tile is in a polar region.
+     */
+    public boolean isPolar(Tile tile) {
+        return tile.getY() <= POLAR_HEIGHT
+            || tile.getY() >= getHeight() - POLAR_HEIGHT - 1;
     }
 
     /**

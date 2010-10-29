@@ -313,13 +313,12 @@ public class SimpleMapGenerator implements MapGenerator {
                 for (int tries=0; tries<100; tries++) {
                     Position p = new Position(random.nextInt(map.getWidth()),
                             random.nextInt(map.getHeight()));
-                    if (p.y <= LandGenerator.POLAR_HEIGHT ||
-                        p.y >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
+                    Tile t = map.getTile(p);
+                    if (map.isPolar(t)) {
                         // please no lost city on the poles,
                         // as they are too difficult to go visit, and not realistic
                         continue;
                     }
-                    Tile t = map.getTile(p);
                     if (map.getTile(p).isLand()
                             && !t.hasLostCityRumour()
                             && t.getSettlement() == null
@@ -434,11 +433,8 @@ public class SimpleMapGenerator implements MapGenerator {
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
                 Position position = map.getRandomLandPosition(random);
-                if (position.getY() <= LandGenerator.POLAR_HEIGHT ||
-                    position.getY() >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
-                    continue;
-                }
                 Tile candidate = map.getTile(position);
+                if (map.isPolar(candidate)) continue;
                 if (candidate.isSettleable()) {
                     for (Tile tile : settlementTiles) {
                         if (candidate.getDistanceTo(tile) < minSettlementDistance) {
@@ -786,8 +782,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 Iterator<Position> cti = map.getFloodFillIterator(new Position(x, y));
                 while(cti.hasNext()) {
                     Tile tempTile = map.getTile(cti.next());
-                    if (tempTile.getY() <= LandGenerator.POLAR_HEIGHT ||
-                        tempTile.getY() >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
+                    if (map.isPolar(tempTile)) {
                         // do not place the initial colony at the pole
                         continue;
                     }
