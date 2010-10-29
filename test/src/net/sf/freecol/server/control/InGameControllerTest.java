@@ -69,10 +69,12 @@ import net.sf.freecol.util.test.MockPseudoRandom;
 
 
 public class InGameControllerTest extends FreeColTestCase {
-    private static final BuildingType schoolHouseType
-        = spec().getBuildingType("model.building.Schoolhouse");
     private static BuildingType press
         = spec().getBuildingType("model.building.printingPress");
+    private static final BuildingType schoolHouseType
+        = spec().getBuildingType("model.building.Schoolhouse");
+    private static final BuildingType stockadeType
+        = spec().getBuildingType("model.building.stockade");
 
     private static final EquipmentType tools
         = spec().getEquipmentType("model.equipment.tools");
@@ -85,6 +87,8 @@ public class InGameControllerTest extends FreeColTestCase {
     private static final EquipmentType indianHorses
         = spec().getEquipmentType("model.equipment.indian.horses");
 
+    private static final GoodsType bellsType
+        = spec().getGoodsType("model.goods.bells");
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
     private static final GoodsType musketType
@@ -1847,8 +1851,6 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals(2, colony.getUnitCount());
 
         // the colony has no stockade initially
-        BuildingType stockadeType
-            = spec().getBuildingType("model.building.stockade");
         Building b = colony.getBuilding(stockadeType);
         assertNull(b);
 
@@ -1864,10 +1866,9 @@ public class InGameControllerTest extends FreeColTestCase {
         // increasing population to 3 should give access to stockade
         Unit unit = new ServerUnit(getGame(), colony.getTile(), player,
                                    colonistType, UnitState.ACTIVE);
-        // set the unit as a farmer in the colony
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
-        unit.setWorkType(foodType);
-        unit.setLocation(colony.getVacantColonyTileFor(unit, true, foodType));
+        // set the unit to work making bells
+        unit.setWorkType(bellsType);
+        unit.setLocation(colony.getBuildingsForProducing(bellsType).get(0));
         ServerTestHelper.newTurn((ServerPlayer) player);
 
         assertNotNull(colony.getBuilding(stockadeType));

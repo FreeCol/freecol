@@ -43,15 +43,14 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class ServerBuildingTest extends FreeColTestCase {
 
+    private static final BuildingType collegeType
+        = spec().getBuildingType("model.building.college");
     private static final BuildingType schoolType
         = spec().getBuildingType("model.building.schoolhouse");
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
     private static final BuildingType universityType
         = spec().getBuildingType("model.building.university");
-
-    private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
 
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
@@ -82,29 +81,24 @@ public class ServerBuildingTest extends FreeColTestCase {
 
     private Building addSchoolToColony(Game game, Colony colony,
                                        SchoolLevel level) {
-        BuildingType schoolType = null;
+        BuildingType type = null;
         switch (level) {
         case SCHOOLHOUSE:
-            schoolType = spec().getBuildingType("model.building.schoolhouse");
+            type = schoolType;
             break;
         case COLLEGE:
-            schoolType = spec().getBuildingType("model.building.college");
+            type = collegeType;
             break;
         case UNIVERSITY:
-            schoolType = spec().getBuildingType("model.building.university");
+            type = universityType;
             break;
         default:
             fail("Setup error, cannot setup school");
         }
-        Building school = new ServerBuilding(colony.getGame(), colony,
-                                             schoolType);
+        Building school = new ServerBuilding(colony.getGame(), colony, type);
         colony.addBuilding(school);
-
-        Building townHall = colony.getBuilding(townHallType);
-        for (Unit u : new ArrayList<Unit>(school.getUnitList())) {
-            u.setLocation(townHall);
-        }
-
+        assertEquals(school.getUnitList().size(), 0);
+        setProductionBonus(colony, 0);
         return school;
     }
 
@@ -114,11 +108,9 @@ public class ServerBuildingTest extends FreeColTestCase {
      */
     private Colony getUniversityColony() {
         Colony colony = getStandardColony(10);
-
         for (Unit u : colony.getUnitList()) {
             u.setType(elderStatesmanType);
         }
-
         addSchoolToColony(colony.getGame(), colony, SchoolLevel.UNIVERSITY);
         return colony;
     }
@@ -206,25 +198,21 @@ public class ServerBuildingTest extends FreeColTestCase {
     public void testUniversity() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
-        Colony colony = getStandardColony(10);
+        Colony colony = getUniversityColony();
         assertEquals(10, colony.getUnitCount());
+        Building university = colony.getBuilding(universityType);
+        assertNotNull(university);
 
         Iterator<Unit> units = colony.getUnitIterator();
-
         Unit colonist = units.next();
-        assertTrue("unit is not in a WorkLocation",
-                   colonist.getLocation() instanceof WorkLocation);
         colonist.setType(freeColonistType);
+        colonist.setLocation(colony.getBuilding(townHallType));
 
         Unit elder = units.next();
-        assertTrue("unit is not in a WorkLocation",
-                   colonist.getLocation() instanceof WorkLocation);
-        elder.setType(elderStatesmanType);
+        assertEquals(elder.getType(), elderStatesmanType);
 
-        Building university
-            = addSchoolToColony(game, colony, SchoolLevel.UNIVERSITY);
         elder.setLocation(university);
-        elder.setStudent(colonist);
+        assertEquals(elder.getStudent(), colonist);
         trainForTurns(colony, elder.getNeededTurnsOfTraining());
 
         assertEquals(elderStatesmanType, colonist.getType());
@@ -303,7 +291,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
 
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, foodType));
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true,
+                                                             grainType));
         ore.setLocation(college);
 
         while (3 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
@@ -312,7 +301,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(2, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
 
-        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true, foodType));
+        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true,
+                                                             grainType));
         veteran.setLocation(college);
 
         while (2 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
@@ -321,7 +311,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
 
-        ore.setLocation(colony.getVacantColonyTileFor(ore, true, foodType));
+        ore.setLocation(colony.getVacantColonyTileFor(ore, true, grainType));
 
         while (1 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
             ServerTestHelper.newTurn((ServerPlayer) college.getOwner());
@@ -336,7 +326,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getStandardColony(10);
-        setProductionBonus(colony, 0);
 
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -482,7 +471,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
 
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -567,7 +555,6 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
-        setProductionBonus(colony, 0);
 
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -594,7 +581,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -630,7 +616,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         outsider.setType(freeColonistType);
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
         Unit student = units.next();
@@ -663,7 +648,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -697,7 +681,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         // Now we want the colonist to be a carpenter. We just want to
         // shuffle the teachers.
-        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true, foodType));
+        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true,
+                                                           grainType));
         // outside the colony is still considered OK (same Tile)
         teacher1.putOutsideColony();
 
@@ -757,7 +742,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(3, teacher1.getTurnsOfTraining());
 
         // Then teacher2 for 1 turn
-        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, true, foodType));
+        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, true,
+                                                           grainType));
         teacher2.setLocation(school);
         ServerTestHelper.newTurn((ServerPlayer) school.getOwner());
         assertEquals(3, teacher1.getTurnsOfTraining());
@@ -788,7 +774,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         outsider.setType(freeColonistType);
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -820,7 +805,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         // Now we move the teachers somewhere else
         teacher1.setLocation(getGame().getMap().getTile(6, 8));
-        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, true, foodType));
+        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, true, grainType));
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(0, teacher2.getTurnsOfTraining());
         assertEquals(1, getUnitList(colony, freeColonistType).size());
@@ -835,7 +820,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(0, teacher2.getTurnsOfTraining());
         assertEquals(teacher1, colonist.getTeacher());
         assertEquals(teacher2, criminal.getTeacher());
-        setProductionBonus(colony, 0);
 
         // Check that 2 new turns aren't enough for training
         ServerTestHelper.newTurn((ServerPlayer) school.getOwner());
@@ -924,7 +908,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
 
         // After 2 turns replace by miner. Progress starts from scratch.
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, foodType));
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, grainType));
         assertTrue(lumberjack.getStudent() == null);
         assertTrue(colonist.getTeacher() == null);
 
@@ -948,7 +932,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -1019,7 +1002,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getUniversityColony();
-        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -1075,7 +1057,6 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getStandardColony(10);
-        setProductionBonus(colony, 0);
         Player owner = colony.getOwner();
         owner.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
 
