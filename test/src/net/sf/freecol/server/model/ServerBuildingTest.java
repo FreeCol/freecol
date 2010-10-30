@@ -117,10 +117,6 @@ public class ServerBuildingTest extends FreeColTestCase {
     }
 
     private void trainForTurns(Colony colony, int requiredTurns) {
-        trainForTurns(colony, requiredTurns, freeColonistType);
-    }
-
-    private void trainForTurns(Colony colony, int requiredTurns, UnitType unitType) {
         for (int turn = 0; turn < requiredTurns; turn++) {
             ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
         }
@@ -540,7 +536,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertTrue(criminal.canBeStudent(teacher));
 
         // PETTY_CRIMINALS become INDENTURED_SERVANTS
-        trainForTurns(colony, teacher.getNeededTurnsOfTraining(), pettyCriminalType);
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining());
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
         assertEquals(indenturedServantType, criminal.getType());
     }
@@ -568,7 +564,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         teacher.setLocation(school);
 
         assertEquals(teacher.getNeededTurnsOfTraining(), 4);
-        trainForTurns(colony, teacher.getNeededTurnsOfTraining(), pettyCriminalType);
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining());
         assertEquals(indenturedServantType, criminal.getType());
     }
 
@@ -594,8 +590,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         teacher.setLocation(school);
         assertEquals(teacher.getNeededTurnsOfTraining(), 4);
-        trainForTurns(colony, teacher.getNeededTurnsOfTraining(),
-                      indenturedServantType);
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining());
         // Train to become free colonist
         assertEquals(freeColonistType, indenturedServant.getType());
     }
@@ -1031,7 +1026,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(indenturedServant, teacher2.getStudent());
 
         // Training time
-        trainForTurns(colony, teacher1.getNeededTurnsOfTraining(), pettyCriminalType);
+        trainForTurns(colony, teacher1.getNeededTurnsOfTraining());
 
         // indentured servant should have been promoted to free colonist
         // petty criminal should have been promoted to indentured servant
@@ -1043,18 +1038,17 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, indenturedServantType).size());
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
         criminal.setLocation(getGame().getMap().getTile(10,8));
+        assertNull(teacher1.getStudent());
+        assertEquals(teacher2, indenturedServant.getTeacher());
 
         // Train again
-        ServerTestHelper.newTurn((ServerPlayer) school.getOwner());
-        ServerTestHelper.newTurn((ServerPlayer) school.getOwner());
-        ServerTestHelper.newTurn((ServerPlayer) school.getOwner());
-        ServerTestHelper.newTurn((ServerPlayer) school.getOwner());
+        trainForTurns(colony, teacher2.getNeededTurnsOfTraining());
+        assertEquals(expertLumberJackType, indenturedServant.getType());
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(0, getUnitList(colony, indenturedServantType).size());
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
-        assertEquals(expertLumberJackType, indenturedServant.getType());
     }
 
     public void testColonialRegular() {
