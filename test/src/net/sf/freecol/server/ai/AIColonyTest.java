@@ -50,13 +50,15 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 
-public class AIColonyTest extends FreeColTestCase {	
+public class AIColonyTest extends FreeColTestCase {
 
     private static final BuildingType warehouse
         = spec().getBuildingType("model.building.warehouse");
 
     private static final GoodsType foodType
         = spec().getGoodsType("model.goods.food");
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammersType
         = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType lumberType
@@ -81,17 +83,17 @@ public class AIColonyTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.expertLumberJack");
 
     final int fullStock = 100;
-    
-	
+
+
     @Override
     public void tearDown() throws Exception {
         ServerTestHelper.stopServerGame();
         super.tearDown();
     }
-        
+
 
     // creates the special map for the tests
-    // map will have: 
+    // map will have:
     //    - a colony in (5,8) (built after)
     //    - a forest in (4,8) for lumber
     //    - a mountain in (6,8) for ore
@@ -104,7 +106,7 @@ public class AIColonyTest extends FreeColTestCase {
         }
         return builder.build();
     }
-        
+
     /*
      * Tests worker allocation regarding building tasks
      */
@@ -121,25 +123,25 @@ public class AIColonyTest extends FreeColTestCase {
             = colony.getBuildingForProducing(hammersType);
         final Building blacksmithHouse
             = colony.getBuildingForProducing(toolsType);
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
+        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
 
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
-        
+
         assertTrue("Colony should have been assigned a lumberjack",colony.getProductionOf(lumberType) > 0);
         assertTrue("Colony should have been assigned a carpenter",carpenterHouse.getUnitCount() > 0);
-        
+
         // Simulate that enough hammers have been gathered, re-arrange and re-check
         colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
-        
+
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         assertFalse("Colony does not need a carpenter",carpenterHouse.getUnitCount() > 0);
         assertTrue("Colony should have been assigned a ore miner",colony.getProductionOf(oreType) > 0);
         assertTrue("Colony should have been assigned a blacksmith",blacksmithHouse.getUnitCount() > 0);
     }
-        
+
     /*
      * Tests worker allocation regarding building tasks when the
      * colony does not have tiles that provide the raw materials for
@@ -163,47 +165,47 @@ public class AIColonyTest extends FreeColTestCase {
             assertTrue(msg1, tile.potential(lumberType, colonistType) == 0);
             assertTrue(msg2, tile.potential(oreType, colonistType) == 0);
         }
-        
+
         colony.setCurrentlyBuilding(warehouse);
         final Building carpenterHouse
             = colony.getBuildingForProducing(hammersType);
         final Building blacksmithHouse
             = colony.getBuildingForProducing(toolsType);
-       
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
+
+        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
         aiColony.propertyChange(null); // force rearranging workers
 
         assertFalse("Colony couldnt have been assigned a lumberjack, no lumber",colony.getProductionOf(lumberType) > 0);
         assertFalse("Colony couldnt have been assigned a carpenter, no lumber",carpenterHouse.getUnitCount() > 0);
-        
+
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, fullStock);
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
-        
+
         assertEquals("Colony couldnt have been assigned a lumberjack, no lumber",
                      colony.getProductionOf(lumberType), 0);
         assertTrue("Colony should have been assigned a carpenter, has lumber in stock",carpenterHouse.getUnitCount() > 0);
-        
+
         // Simulate that enough hammers have been gathered, re-arrange and re-check
         colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
-        
+
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
         assertFalse("Colony does not need a carpenter",carpenterHouse.getUnitCount() > 0);
         assertFalse("Colony couldnt have been assigned a ore miner, no ore",colony.getProductionOf(oreType) > 0);
         assertFalse("Colony couldnt have been assigned a blacksmith, no ore",blacksmithHouse.getUnitCount() > 0);
-               
+
         // Add ore to stock, re-arrange and re-check
         colony.addGoods(oreType, fullStock);
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
-        
+
         assertFalse("Colony couldnt have been assigned a ore miner, no ore",colony.getProductionOf(oreType) > 0);
         assertTrue("Colony should have been assigned a blacksmith, has ore in stock",blacksmithHouse.getUnitCount() > 0);
     }
-    
+
     /*
      * Tests expert allocation regarding raw materials where there are plenty already in stock
      */
@@ -215,29 +217,29 @@ public class AIColonyTest extends FreeColTestCase {
             = FreeColTestUtils.getColonyBuilder();
         Colony colony = builder.addColonist(lumberJackType).build();
         game.setCurrentPlayer(colony.getOwner());
-        
+
         ServerPlayer player = (ServerPlayer) colony.getOwner();
         assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
         Unit lumberjack = colony.getUnitList().get(0);
-                       
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
+
+        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
 
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
-                
+
         final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
         assertTrue("Lumberjack should have been assigned to collect lumber",
                    lumberjack.getWorkType() == lumberType);
-                
+
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, fullStock);
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
-        
+
         String errMsg = "Lumberjack should not have been assigned to collect lumber, enough lumber in the colony";
         assertFalse(errMsg, lumberType == lumberjack.getWorkType());
     }
-    
+
     public void testCheckConditionsForHorseBreed(){
         Game game = ServerTestHelper.startServerGame(getTestMap());
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
@@ -247,21 +249,24 @@ public class AIColonyTest extends FreeColTestCase {
         game.setCurrentPlayer(colony.getOwner());
         final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
-        int foodSuplus = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
-        assertTrue("Setup error, colony does not have food surplus", foodSuplus > 0);
-                
+
+        int foodSurplus = colony.getFoodProduction() - colony.getConsumptionOf(reqGoodsType);
+        assertTrue("Setup error, colony does not have food surplus", foodSurplus > 0);
+
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
         Unit scout = new ServerUnit(getGame(), colony.getTile(), colony.getOwner(),
                                     colonistType, UnitState.ACTIVE, horsesEqType);
-        assertTrue("Scout should be mounted",scout.isMounted());
-        
-        assertTrue("Setup error, colony should not have horses in stock",colony.getGoodsCount(horsesType) == 0);
-        
+        assertTrue("Scout should be mounted", scout.isMounted());
+
+        assertEquals("Setup error, colony should not have horses in stock",
+                     0, colony.getGoodsCount(horsesType));
+
         aiColony.checkConditionsForHorseBreed();
-        
-        assertTrue("Colony should now have horses in stock",colony.getGoodsCount(horsesType) > 0);
-        assertFalse("Scout should not be mounted",scout.isMounted());
+
+        assertEquals("Colony should now have horses in stock",
+                     50, colony.getGoodsCount(horsesType));
+        assertFalse("Scout should not be mounted", scout.isMounted());
     }
 
     public void testBestUnitForWorkLocation() {
@@ -283,21 +288,21 @@ public class AIColonyTest extends FreeColTestCase {
                                       UnitState.ACTIVE);
         units.add(servant);
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         final UnitType criminalType = spec().getUnitType("model.unit.pettyCriminal");
         Unit criminal = new ServerUnit(getGame(), null, dutch, criminalType,
                                        UnitState.ACTIVE);
         units.add(criminal);
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         Unit colonist1 = new ServerUnit(getGame(), null, dutch, colonistType,
                                         UnitState.ACTIVE);
         units.add(colonist1);
         assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         Unit colonist2 = new ServerUnit(getGame(), null, dutch, colonistType,
                                         UnitState.ACTIVE);
@@ -306,13 +311,13 @@ public class AIColonyTest extends FreeColTestCase {
         colonist2.modifyExperience(100);
         // colonist2 has more sugar experience
         assertEquals(colonist2, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         colonist2.setWorkType(lumberType);
         colonist2.modifyExperience(100);
         // colonist1 has *less* experience to waste
         assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
         // colonist2 has lumber experience, but production is zero
         assertEquals(null, AIColony.bestUnitForWorkLocation(units, colonyTile, lumberType));
 
@@ -321,7 +326,7 @@ public class AIColonyTest extends FreeColTestCase {
                                       UnitState.ACTIVE);
         units.add(convert);
         assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
         units.remove(convert);
 
         final UnitType sugarPlanterType = spec().getUnitType("model.unit.masterSugarPlanter");
@@ -330,7 +335,7 @@ public class AIColonyTest extends FreeColTestCase {
         units.add(sugarPlanter);
         assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         // prefer colonist over wrong type of expert
-        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
         units.remove(sugarPlanter);
 
         final UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
@@ -339,13 +344,13 @@ public class AIColonyTest extends FreeColTestCase {
         units.add(farmer);
         // prefer colonist over wrong type of expert
         assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         units.add(convert);
         units.add(sugarPlanter);
 
         assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-        assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+        assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         Building townHall = new ServerBuilding(game, colony, spec().getBuildingType("model.building.townHall"));
         units.clear();

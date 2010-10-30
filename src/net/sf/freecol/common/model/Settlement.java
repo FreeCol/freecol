@@ -658,7 +658,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     	int required = getFoodConsumption();
     	int consumed = 0;
-    	GoodsType corn = getSpecification().getGoodsType("model.goods.food");
+    	GoodsType corn = getSpecification().getGoodsType("model.goods.grain");
 
     	for (GoodsType foodType : getSpecification().getGoodsFood()) {
             if(foodType == corn){

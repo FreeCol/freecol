@@ -254,7 +254,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         TileImprovementPlan centerPlan = plans.get(centerTile);
         TileImprovementType type = TileImprovement
             .findBestTileImprovementType(centerTile, colony.getSpecification()
-                                         .getGoodsType("model.goods.food"));
+                                         .getGoodsType("model.goods.grain"));
         if (type == null) {
             if (centerPlan != null) {
                 tileImprovementPlans.remove(centerPlan);
@@ -844,7 +844,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         placeExpertsInWorkPlaces(units, workLocationPlans);
 
         boolean workerAdded = true;
-        GoodsType foodType = colony.getSpecification().getGoodsType("model.goods.food");
+        GoodsType foodType = colony.getSpecification().getGoodsType("model.goods.grain");
         while (workerAdded) {
             workerAdded = false;
             // Use a food production plan if necessary:
@@ -1352,7 +1352,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             return;
         }
 
-        int foodProdAvail = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
+        //int foodProdAvail = colony.getProductionOf(reqGoodsType) - colony.getConsumptionOf(reqGoodsType);
+        int foodProdAvail = colony.getFoodProduction() - colony.getConsumptionOf(reqGoodsType);
         // no food production available for breeding anyway
         if(foodProdAvail <= 0){
             return;
