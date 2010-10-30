@@ -290,12 +290,18 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true,
                                                              grainType));
+        assertNull(lumberjack.getStudent());
+        Unit smithToBe = blacksmith.getStudent();
+        assertNotNull(smithToBe);
         ore.setLocation(college);
+        assertNotNull(ore.getStudent());
+        assertEquals(smithToBe, blacksmith.getStudent());
 
         while (3 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
             ServerTestHelper.newTurn((ServerPlayer) college.getOwner());
         }
         assertEquals(2, getUnitList(colony, freeColonistType).size());
+        assertEquals(1, getUnitList(colony, expertOreMinerType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
 
         blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true,
