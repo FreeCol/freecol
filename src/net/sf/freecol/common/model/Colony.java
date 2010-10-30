@@ -389,18 +389,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     }
 
     /**
-     * Can this colony claim a tile?
-     *
-     * @param tile The <code>Tile</code> to claim.
-     * @return True if the colony can claim this tile.
-     */
-    @Override
-    public boolean canClaimTile(Tile tile) {
-        // Not if there is a rumour.
-        return (tile.hasLostCityRumour()) ? false : super.canClaimTile(tile);
-    }
-
-    /**
      * Sets the number of units inside the colony, used in enemy colonies
      *
      * @param unitCount The units inside the colony
@@ -502,6 +490,17 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      */
     public List<ColonyTile> getColonyTiles() {
         return colonyTiles;
+    }
+
+    /**
+     * Is a tile actually in use by this colony?
+     *
+     * @param tile The <code>Tile</code> to test.
+     * @return True if this tile is actively in use by this colony.
+     */
+    public boolean isTileInUse(Tile tile) {
+        ColonyTile colonyTile = getColonyTile(tile);
+        return colonyTile != null && colonyTile.getUnit() != null;
     }
 
     /**

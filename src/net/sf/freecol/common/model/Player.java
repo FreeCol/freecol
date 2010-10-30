@@ -1025,6 +1025,52 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Can a tile be owned by this player?
+     * This is a test of basic practicality and does not consider
+     * tile ownership issues.
+     *
+     * @param tile The <code>Tile</code> to consider.
+     * @return True if the tile can be owned by this player.
+     */
+    public boolean canOwnTile(Tile tile) {
+        return (isEuropean())
+            ? !tile.hasLostCityRumour()
+            : tile.isLand();
+    }
+
+    /**
+     * The test for whether a tile can be claimed by a player
+     * settlement.  Note that this does not consider stealing.  The
+     * rule for the center tile is one step more exacting than this.
+     *
+     * The tile must be ownable by this player, not currently owned,
+     * or owned by this player and not by a settlement, unless it is a
+     * colony that is not using the tile.  Got that?
+     *
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be claimed.
+     */
+    public boolean canClaimForSettlement(Tile tile) {
+        return canOwnTile(tile)
+            && (tile.getOwner() == null
+                || (tile.getOwner() == this
+                    && (tile.getOwningSettlement() == null
+                        || (tile.getOwningSettlement() instanceof Colony
+                            && !(((Colony) tile.getOwningSettlement())
+                                 .isTileInUse(tile))))));
+    }
+
+    /**
+     * Can a tile be claimed to found a settlement on?
+     *
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be claimed.
+     */
+    public boolean canClaimToFoundSettlement(Tile tile) {
+        return tile.isSettleable() && canClaimForSettlement(tile);
+    }
+
+    /**
      * Get the <code>Unit</code> value.
      *
      * @return a <code>List<Unit></code> value

@@ -1009,39 +1009,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Check if the tile type is suitable for a <code>Settlement</code>,
-     * either by a <code>Colony</code> or an <code>IndianSettlement</code>.
+     * Check to see if this tile can be used to construct a new settlement.
      * 
-     * @return true if tile suitable for settlement
+     * @return True if tile is suitable for colonization, false otherwise
      */
     public boolean isSettleable() {
-        return getType().canSettle();
-    }
+        if (settlement != null || !getType().canSettle()) return false;
 
-    /**
-     * Check to see if this tile can be used to construct a new
-     * <code>Colony</code>. If there is a colony here or in a tile next to
-     * this one, it is unsuitable for colonization.
-     * 
-     * @return true if tile is suitable for colonization, false otherwise
-     */
-    public boolean isColonizeable() {
-        if (!isSettleable()) {
-            return false;
-        }
-
-        if (settlement != null) {
-            return false;
-        }
-
-        for (Direction direction : Direction.values()) {
-            Tile otherTile = getNeighbourOrNull(direction);
-            if (otherTile != null) {
-                Settlement set = otherTile.getSettlement();
-                if ((set != null) && (set.getOwner().isEuropean())) {
-                    return false;
-                }
-            }
+        for (Tile tile : getSurroundingTiles(1)) {
+            if (tile.getSettlement() != null
+                && tile.getOwner().isEuropean()) return false;
         }
 
         return true;

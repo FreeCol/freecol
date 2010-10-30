@@ -434,7 +434,7 @@ public class UnitTest extends FreeColTestCase {
         Unit brave = new ServerUnit(game, tile1, sioux, braveType,
                                     UnitState.ACTIVE,
                                     braveType.getDefaultEquipment());
-        //assertFalse(brave.canBuildColony());
+        assertTrue(brave.canBuildColony());
     }
 
     public void testIndianDies() {

@@ -117,8 +117,8 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     public void testMinuit() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony();
         Unit unit = colony.getRandomUnit();
@@ -126,8 +126,9 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player iroquois = getGame().getPlayer("model.nation.iroquois");
         Tile colonyCenterTile = colony.getTile();
         Tile disputedTile = colonyCenterTile.getNeighbourOrNull(Direction.N);
-        Tile settlementTile = colonyCenterTile.getNeighbourOrNull(Direction.NE);
-        
+        Tile settlementTile = disputedTile.getNeighbourOrNull(Direction.N);
+        assertNull(settlementTile.getOwner());
+
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(getGame());
         IndianSettlement indianSettlement = builder.player(iroquois).settlementTile(settlementTile)
             .skillToTeach(null).build();
@@ -138,15 +139,13 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertNotNull(settlementTile.getSettlement());
         assertTrue(player.getLandPrice(disputedTile) > 0);
         assertFalse(colony.getColonyTile(disputedTile).canAdd(unit));
-        assertFalse(colony.getColonyTile(settlementTile).canAdd(unit));
 
-        FoundingFather minuit = spec().getFoundingFather("model.foundingFather.peterMinuit");
+        FoundingFather minuit
+            = spec().getFoundingFather("model.foundingFather.peterMinuit");
         player.addFather(minuit);
 
         assertEquals(0, player.getLandPrice(disputedTile));
         assertTrue(colony.getColonyTile(disputedTile).canAdd(unit));
-        assertFalse(colony.getColonyTile(settlementTile).canAdd(unit));
-
     }
 
     public void testPaine() {

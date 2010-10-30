@@ -255,19 +255,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     /**
-     * Can a settlement claim a tile?
-     *
-     * @param tile The <code>Tile</code> to claim.
-     * @return True if the settlement can claim this tile.
-     */
-    public boolean canClaimTile(Tile tile) {
-        return (getTile().getDistanceTo(tile) > getRadius()) ? false
-            : tile.getOwner() == null
-            || tile.getOwningSettlement() == null
-            || tile.getOwningSettlement() == this;
-    }
-
-    /**
      * Claim ownership of a tile for this settlement.
      *
      * @param tile The <code>Tile</code> to claim.
@@ -306,65 +293,19 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     /**
-     * Gets the list of tiles that might be claimable by this
-     * settlement.  We can not do a simple iteration of the rings
-     * because this allows settlements to claim tiles across
-     * unclaimable gaps (e.g. Aztecs owning tiles on nearby islands).
-     * So we have to only allow tiles that are adjacent to a known
-     * connected tile.
-     *
-     * @param centerTile The intended settlement center tile.
-     * @return A list of potentially claimable tiles.
-     */
-    public List<Tile> getClaimableTiles(Tile centerTile) {
-        List<Tile> tiles = new ArrayList<Tile>();
-        List<Tile> layer = new ArrayList<Tile>();
-        if (canClaimTile(centerTile)) {
-            layer.add(centerTile);
-            for (int r = 1; r <= getRadius(); r++) {
-                List<Tile> lastLayer = new ArrayList<Tile>(layer);
-                tiles.addAll(layer);
-                layer.clear();
-                for (Tile have : lastLayer) {
-                    for (Tile next : have.getSurroundingTiles(1)) {
-                        if (!tiles.contains(next) && canClaimTile(next)) {
-                            layer.add(next);
-                        }
-                    }
-                }
-            }
-            tiles.addAll(layer);
-        }
-        return tiles;
-    }
-
-    /**
-     * Claims the surrounding tiles.
-     *
-     * @param tiles The tiles to claim.
-     */
-    private void claimTiles(List<Tile> tiles) {
-        // Always claim the settlement tile no matter what
-        claimTile(tile);
-
-        // Claim suitable tiles, disclaim ones now owned but ineligible
-        for (Tile t : tiles) {
-            if (t != tile) {
-                if (canClaimTile(t)) {
-                    claimTile(t);
-                } else {
-                    disclaimTile(t);
-                }
-            }
-        }
-    }
-
-    /**
      * Put a prepared settlement onto the map.
      */
     public void placeSettlement() {
-        claimTiles(getClaimableTiles(tile));
+        List<Tile> tiles = getGame().getMap().getClaimableTiles(owner, tile,
+                                                                getRadius());
+        if (tiles.isEmpty() || tiles.get(0) != tile) {
+            throw new IllegalStateException("Can not claim center tile");
+        }
         tile.setSettlement(this);
+        for (Tile t : tiles) {
+            t.setOwner(owner);
+            t.setOwningSettlement(this);
+        }
         for (Tile t : tile.getSurroundingTiles(getLineOfSight())) {
             owner.setExplored(t);
         }
@@ -419,7 +360,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             u.setOwner(newOwner);
         }
 
-        claimTiles(getOwnedTiles());
+        for (Tile t : getOwnedTiles()) t.setOwner(newOwner);
         oldOwner.invalidateCanSeeTiles();
         newOwner.invalidateCanSeeTiles();
 

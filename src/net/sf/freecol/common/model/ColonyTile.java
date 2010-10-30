@@ -286,8 +286,7 @@ public class ColonyTile extends FreeColGameObject
         Tile tile = getWorkTile();
         if (tile.getSettlement() != null
             || tile.getOccupyingUnit() != null
-            || !(tile.isLand() || colony.hasAbility("model.ability.produceInWater"))
-            || (player.isEuropean() && tile.hasLostCityRumour())) {
+            || !player.canOwnTile(tile)) {
             return false;
         }
 
@@ -300,7 +299,7 @@ public class ColonyTile extends FreeColGameObject
             Colony otherColony = (Colony) settlement;
             if (otherColony != colony) {
                 if (otherColony.getOwner() != player
-                    || otherColony.getColonyTile(tile).getUnit() != null) {
+                    || otherColony.isTileInUse(tile)) {
                     return false;
                 }
             }

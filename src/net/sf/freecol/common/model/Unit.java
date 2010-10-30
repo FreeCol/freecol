@@ -2693,16 +2693,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Check if this unit can build a colony on the tile where it is located.
+     * Check if this unit can build a colony.  Does not consider whether
+     * the tile where the unit is located is suitable,
+     * @see #Player.canClaimToFoundSettlement.
      *
-     * @return <code>true</code> if this unit can build a colony on the tile
-     *         where it is located and <code>false</code> otherwise.
+     * @return <code>true</code> if this unit can build a colony.
      */
     public boolean canBuildColony() {
-        return (unitType.hasAbility("model.ability.foundColony") &&
-                getMovesLeft() > 0 &&
-                getTile() != null &&
-                getTile().isColonizeable());
+        return unitType.hasAbility("model.ability.foundColony")
+            && getMovesLeft() > 0
+            && getTile() != null;
     }
 
     /**

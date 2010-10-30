@@ -90,24 +90,20 @@ public class BuildColonyMessage extends Message {
             return Message.clientError(e.getMessage());
         }
         if (colonyName == null) {
-            return Message.createError("server.buildColony.badName",
-                                       "Null colony name");
+            return Message.clientError("Null colony name");
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
         } else if (player.getColony(colonyName) != null) {
-            return Message.createError("server.buildColony.badName",
-                                       "Non-unique colony name " + colonyName);
+            return Message.clientError("Non-unique colony name " + colonyName);
         }
         if (!unit.canBuildColony()) {
-            return Message.createError("server.buildColony.badUnit",
-                                       "Unit " + builderId
-                                       + " can not build colony " + colonyName);
+            return Message.clientError("Unit " + builderId
+                                       + " can not build colony.");
         }
         Tile tile = unit.getTile();
-        if (tile.getOwner() != null && tile.getOwner() != player) {
-            return Message.createError("server.buildColony.tileHasOwner",
-                                       "Tile " + tile
-                                       + " belongs to someone else");
+        if (!player.canClaimToFoundSettlement(tile)) {
+            return Message.clientError("Can not build colony on tile: "
+                                       + tile);
         }
 
         // Build can proceed.

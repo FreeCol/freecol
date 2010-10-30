@@ -122,7 +122,7 @@ public class ClaimLandMessage extends Message {
             if (settlement != null
                 && ownerSettlement != null
                 && ownerSettlement instanceof Colony
-                && ((Colony) ownerSettlement).getColonyTile(tile).getUnit() != null) {
+                && ((Colony) ownerSettlement).isTileInUse(tile)) {
                 return Message.createError("tileTakenSelf", null);
             }
             price = 0;

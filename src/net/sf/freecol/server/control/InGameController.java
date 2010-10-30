@@ -4006,7 +4006,7 @@ public final class InGameController extends Controller {
                     // Add this to the tiles to process if its not
                     // there already.
                     if (!owned.contains(t)) owned.add(t);
-                } else if (s.canClaimTile(t)) {
+                } else if (s.getOwner().canOwnTile(t)) {
                     // Weight claimant settlements:
                     //   settlements owned by the same player
                     //     > settlements owned by same type of player

@@ -1818,13 +1818,15 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testPocahontas() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
         InGameController igc = ServerTestHelper.getInGameController();
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         FreeColTestCase.IndianSettlementBuilder builder
-            = new FreeColTestCase.IndianSettlementBuilder(game);
+            = new FreeColTestCase.IndianSettlementBuilder(game)
+                .settlementTile(map.getTile(8, 8));
         IndianSettlement camp = builder.build();
         Player indian = camp.getOwner();
         Player.makeContact(indian, player);

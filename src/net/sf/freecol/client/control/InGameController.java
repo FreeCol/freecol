@@ -1193,14 +1193,21 @@ public final class InGameController implements NetworkConstants {
         // Show the colony warnings if required.
         GUI gui = freeColClient.getGUI();
         Unit unit = gui.getActiveUnit();
-        if (unit == null) return;
+        if (unit == null) {
+            return;
+        } else if (!unit.canBuildColony()) {
+            canvas.showInformationMessage(unit, "buildColony.badUnit",
+                                          "%unit%", unit.getName());
+            return;
+        }
         Tile tile = unit.getTile();
-        if (tile == null) return;
         if (tile.getColony() != null) {
             askJoinColony(unit, tile.getColony());
             return;
+        } else if (!tile.isSettleable()) {
+            canvas.showInformationMessage("buildColony.badTile");
+            return;
         }
-        if (!unit.canBuildColony()) return;
 
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
@@ -1208,7 +1215,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         
-        // Check for tile ownership problems.
+        // Claim the land if it is not free.
         if (tile.getOwner() != null && tile.getOwner() != player) {
             if (!claimLand(tile, null, 0)) {
                 return;

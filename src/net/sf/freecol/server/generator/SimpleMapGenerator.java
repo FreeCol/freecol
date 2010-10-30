@@ -472,23 +472,24 @@ public class SimpleMapGenerator implements MapGenerator {
                 break;
             }
             Tile tile = getClosestTile(territory.getCenter(), settlementTiles);
-            if (tile == null) {
-                // no more tiles
-                break;
-            } else {
-                String name = "default region";
-                if (territory.region != null) {
-                    name = territory.region.getNameKey();
-                }
-                logger.fine("Placing the " + territory.player +
+            if (tile == null) break; // No more tiles
+            if (tile.getOwner() != null) { // Do not allow overlap
+                settlementTiles.remove(tile);
+                continue;
+            }
+
+            String name = "default region";
+            if (territory.region != null) {
+                name = territory.region.getNameKey();
+            }
+            logger.fine("Placing the " + territory.player +
                         " capital in region: " + name +
                         " at Tile: "+ tile.getPosition());
-                placeIndianSettlement(territory.player, true, tile.getPosition(), map);
-                territory.numberOfSettlements--;
-                territory.position = tile.getPosition();
-                settlementTiles.remove(tile);
-                counter++;
-            }
+            placeIndianSettlement(territory.player, true, tile.getPosition(), map);
+            territory.numberOfSettlements--;
+            territory.position = tile.getPosition();
+            settlementTiles.remove(tile);
+            counter++;
         }
 
         // sort tiles from the edges of the map inward
@@ -504,6 +505,8 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // next, other settlements
         for (Tile tile : settlementTiles) {
+            if (tile.getOwner() != null) continue; // No close overlap
+
             Territory territory = getClosestTerritory(tile, territories);
             if (territory == null) {
                 // no more territories
@@ -786,7 +789,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         // do not place the initial colony at the pole
                         continue;
                     }
-                    if (tempTile.isColonizeable()) {
+                    if (player.canClaimToFoundSettlement(tempTile)) {
                         colonyTile = tempTile;
                         break;
                     }
