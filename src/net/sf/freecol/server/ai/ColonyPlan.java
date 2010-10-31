@@ -487,7 +487,7 @@ public class ColonyPlan {
         }
 
         GoodsType bells = colony.getSpecification().getGoodsType("model.goods.bells");
-        GoodsType food = colony.getSpecification().getGoodsType("model.goods.food");
+        GoodsType food = colony.getSpecification().getGoodsType("model.goods.grain");
         GoodsType lumber = colony.getSpecification().getGoodsType("model.goods.lumber");
         GoodsType muskets = colony.getSpecification().getGoodsType("model.goods.muskets");
         GoodsType ore = colony.getSpecification().getGoodsType("model.goods.ore");
@@ -569,8 +569,9 @@ public class ColonyPlan {
         for (GoodsType goodsType : goodsTypeList) {
             // only consider goods that can be transformed
             // do not consider hammers as a valid transformation
-            if (goodsType.getProducedMaterial() == null
-                    || goodsType.getProducedMaterial() == hammersType) {
+            if ((goodsType.getProducedMaterial() == null
+                 && !goodsType.isFoodType())
+                || goodsType.getProducedMaterial() == hammersType) {
                 continue;
             }
             if (getProductionOf(goodsType) > primaryRawMaterialProduction) {
