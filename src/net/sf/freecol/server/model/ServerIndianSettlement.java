@@ -179,9 +179,10 @@ public class ServerIndianSettlement extends IndianSettlement
 
         // Try to breed horses
         GoodsType horsesType = spec.getGoodsType("model.goods.horses");
+        // TODO: remove this
+        GoodsType grainType = spec.getGoodsType("model.goods.grain");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
-        int foodProdAvail = getProductionOf(reqGoodsType)
-            - getFoodConsumptionByType(reqGoodsType);
+        int foodProdAvail = getProductionOf(grainType) - getFoodConsumption();
         if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
             && foodProdAvail > 0) {
             int nHorses = Math.min(IndianSettlement.MAX_HORSES_PER_TURN,
