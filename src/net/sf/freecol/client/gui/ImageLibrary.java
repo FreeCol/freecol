@@ -655,8 +655,13 @@ public final class ImageLibrary {
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
-        Image im = ResourceManager.getImage(unitType.getId() + ".image", scale);
-        return (im == null) ? null : new ImageIcon(im);
+        Image im = null;
+		try {
+			im = ResourceManager.getImage(unitType.getId() + ".image", scale);
+        } catch (NullPointerException e) {
+//			logger.dontKnow("Trying to get image from te resource manager for '" + unitType.getId() + ".image' threw an NPE.")
+		}
+		return (im == null) ? null : new ImageIcon(im);
     }
     
     /**
