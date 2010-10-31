@@ -2539,8 +2539,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         switch (s) {
         case ACTIVE:
         case SENTRY:
-            return (getState() != UnitState.TO_EUROPE
-                    && getState() != UnitState.TO_AMERICA);
+            return true;
         case IN_COLONY:
             return !isNaval();
         case FORTIFIED:

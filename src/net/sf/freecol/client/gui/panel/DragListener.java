@@ -381,33 +381,36 @@ public final class DragListener extends MouseAdapter {
 
     private boolean addCommandItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
-        final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
 
-        for (UnitState state : ActionManager.STATES) {
-            UnitStateChangeAction action = new UnitStateChangeAction(canvas.getClient(), tempUnit, state);
+        if (tempUnit.isBetweenEuropeAndNewWorld()) {
+            return false;
+        } else {
+            for (UnitState state : ActionManager.STATES) {
+                UnitStateChangeAction action = new UnitStateChangeAction(canvas.getClient(), tempUnit, state);
+                action.update();
+                JMenuItem menuItem = new JMenuItem(action);
+                menu.add(menuItem);
+            }
+
+            UnitState unitState = tempUnit.getState();
+
+            ClearOrdersAction action = new ClearOrdersAction(canvas.getClient(), tempUnit);
             action.update();
             JMenuItem menuItem = new JMenuItem(action);
             menu.add(menuItem);
+
+            if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
+                menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
+                menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            canvas.getClient().getInGameController()
+                                .checkCashInTreasureTrain(tempUnit);
+                        }
+                    });
+                menu.add(menuItem);
+            }
+            return true;
         }
-
-        UnitState unitState = tempUnit.getState();
-
-        ClearOrdersAction action = new ClearOrdersAction(canvas.getClient(), tempUnit);
-        action.update();
-        JMenuItem menuItem = new JMenuItem(action);
-        menu.add(menuItem);
-
-        if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
-            menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
-            menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        canvas.getClient().getInGameController()
-                            .checkCashInTreasureTrain(tempUnit);
-                    }
-                });
-            menu.add(menuItem);
-        }
-        return true;
     }
 
 
