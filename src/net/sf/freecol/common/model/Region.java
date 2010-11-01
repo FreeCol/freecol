@@ -529,8 +529,7 @@ public class Region extends FreeColGameObject implements Nameable {
                     children.add(getGame().getMap().getRegion(child));
                 }
             } else if (CHILD_TAG.equals(in.getLocalName())) {
-                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                children.add(getGame().getMap().getRegion(id));
+                children.add(getFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
                 in.nextTag();
             }
         }
