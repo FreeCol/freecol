@@ -319,9 +319,11 @@ public final class InGameController implements NetworkConstants {
         if ("error".equals(reply.getTagName())) {
             String messageId = reply.getAttribute("messageID");
             String message = reply.getAttribute("message");
-            if (FreeCol.isInDebugMode() && messageId != null && message != null) {
-                // If debugging suppress the bland failure in favour
-                // of the higher detail text.
+            if (messageId != null && message != null
+                && FreeCol.isInDebugMode()) {
+                // If debugging suppress the bland but i18n compliant
+                // failure message in favour of the higher detail
+                // non-i18n text.
                 reply.removeAttribute("messageID");
             }
             if (messageId == null && message == null) {

@@ -2294,13 +2294,13 @@ public final class InGameController extends Controller {
         if (lostCity == null) return;
 
         Game game = unit.getGame();
-        Specification specification = game.getSpecification();
-        int difficulty = specification.getInteger("model.option.rumourDifficulty");
+        Specification spec = game.getSpecification();
+        int difficulty = spec.getInteger("model.option.rumourDifficulty");
         int dx = 10 - difficulty;
         UnitType unitType;
         Unit newUnit = null;
         List<UnitType> treasureUnitTypes
-            = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
+            = spec.getUnitTypesWithAbility("model.ability.carryTreasure");
 
         RumourType rumour = lostCity.getType();
         if (rumour == null) {
@@ -2336,7 +2336,8 @@ public final class InGameController extends Controller {
                     done = true;
                     break;
                 case BURIAL_GROUND:
-                    if (!burial) {
+                    if (tile.getOwner() != null && tile.getOwner().isIndian()
+                        && !burial) {
                         csNativeBurialGround(serverPlayer, unit, cs);
                         burial = true;
                     }
@@ -2347,6 +2348,7 @@ public final class InGameController extends Controller {
             }
         }
 
+        logger.info("Unit " + unit.getId() + " is exploring rumour " + rumour);
         switch (rumour) {
         case BURIAL_GROUND:
             csNativeBurialGround(serverPlayer, unit, cs);
@@ -2392,7 +2394,7 @@ public final class InGameController extends Controller {
                     .addAmount("%money%", chiefAmount));
             break;
         case COLONIST:
-            List<UnitType> foundTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
+            List<UnitType> foundTypes = spec.getUnitTypesWithAbility("model.ability.foundInLostCity");
             unitType = Utils.getRandomMember(logger, "Choose found",
                                              foundTypes, random);
             newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
@@ -2481,7 +2483,8 @@ public final class InGameController extends Controller {
             break;
         case NO_SUCH_RUMOUR: case MOUNDS:
         default:
-            throw new IllegalStateException("No such rumour.");
+            logger.warning("Bogus rumour type: " + rumour);
+            break;
         }
         tile.removeLostCityRumour();
     }
@@ -2577,156 +2580,151 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject) oldLocation);
         cs.add(See.perhaps().always(serverPlayer), newTile);
-        if (!unit.isDisposed()) {
-            cs.add(See.only(serverPlayer), newTiles);
+        if (unit.isDisposed()) return;
+        cs.add(See.only(serverPlayer), newTiles);
+
+        if (newTile.isLand()) {
+            // Claim land for tribe?
+            Settlement settlement;
+            if (newTile.getOwner() == null
+                && serverPlayer.isIndian()
+                && (settlement = unit.getIndianSettlement()) != null
+                && (newTile.getPosition().getDistance(settlement
+                                                      .getTile().getPosition())
+                    < spec.getInteger("model.option.indianClaimRadius")
+                    + settlement.getRadius())) {
+                newTile.setOwner(serverPlayer);
+            }
+
+            // Check for first landing
+            if (serverPlayer.isEuropean()
+                && !serverPlayer.isNewLandNamed()) {
+                String newLand = Messages.getNewLandName(serverPlayer);
+                if (serverPlayer.isAI()) {
+                    // TODO: Not convinced shortcutting the AI like
+                    // this is a good idea, this really should be in
+                    // the AI code.
+                    serverPlayer.setNewLandName(newLand);
+                } else { // Ask player to name the land.
+                    cs.addAttribute(See.only(serverPlayer),
+                                    "nameNewLand", newLand);
+                }
+            }
+
+            // Check for new contacts.
+            ServerPlayer welcomer = null;
+            for (Tile t : newTile.getSurroundingTiles(1, 1)) {
+                if (t == null || !t.isLand()) {
+                    continue; // Invalid tile for contact
+                }
+
+                ServerPlayer other = null;
+                settlement = t.getSettlement();
+                if (settlement != null) {
+                    other = (ServerPlayer) t.getSettlement().getOwner();
+                } else if (t.getFirstUnit() != null) {
+                    other = (ServerPlayer) t.getFirstUnit().getOwner();
+                }
+                if (other == null || other == serverPlayer) {
+                    continue; // No contact
+                }
+
+                // Activate sentries
+                for (Unit u : t.getUnitList()) {
+                    if (u.getState() == UnitState.SENTRY) {
+                        u.setState(UnitState.ACTIVE);
+                        cs.add(See.only(serverPlayer), u);
+                    }
+                }
+
+                // Ignore previously contacted nations.
+                if (serverPlayer.hasContacted(other)) continue;
+
+                // Must be a first contact!
+                if (serverPlayer.isIndian()) {
+                    // Ignore native-to-native contacts.
+                    if (!other.isIndian()) {
+                        String key = getContactKey(other, serverPlayer);
+                        if (key != null) {
+                            cs.addMessage(See.only(other),
+                                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                 key, other, serverPlayer));
+                        }
+                        cs.addHistory(other, new HistoryEvent(turn,
+                                HistoryEvent.EventType.MEET_NATION)
+                                .addStringTemplate("%nation%", serverPlayer.getNationName()));
+                    }
+                } else { // (serverPlayer.isEuropean)
+                    // Initialize alarm for native settlements.
+                    if (other.isIndian() && settlement != null) {
+                        IndianSettlement is = (IndianSettlement) settlement;
+                        if (!is.hasContactedSettlement(serverPlayer)) {
+                            is.makeContactSettlement(serverPlayer);
+                            cs.add(See.only(serverPlayer), is);
+                        }
+                    }
+
+                    // Add first contact messages.
+                    String key = getContactKey(serverPlayer, other);
+                    if (key != null) {
+                        cs.addMessage(See.only(serverPlayer),
+                            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                             key, serverPlayer, other));
+                    }
+
+                    // History event for European players.
+                    cs.addHistory(serverPlayer, new HistoryEvent(turn,
+                            HistoryEvent.EventType.MEET_NATION)
+                            .addStringTemplate("%nation%", other.getNationName()));
+                    // Extra special meeting on first landing!
+                    if (other.isIndian()
+                        && !serverPlayer.isNewLandNamed()
+                        && (welcomer == null || newTile.getOwner() == other)) {
+                        welcomer = other;
+                    }
+                }
+
+                // Now make the contact properly.
+                csChangeStance(serverPlayer, Stance.PEACE, other, true, cs);
+                serverPlayer.setTension(other,
+                                        new Tension(Tension.TENSION_MIN));
+                other.setTension(serverPlayer,
+                                 new Tension(Tension.TENSION_MIN));
+            }
+            if (welcomer != null) {
+                cs.addAttribute(See.only(serverPlayer), "welcome",
+                                welcomer.getId());
+                cs.addAttribute(See.only(serverPlayer), "camps",
+                                Integer.toString(welcomer.getNumberOfSettlements()));
+            }
         }
 
-        if (!unit.isDisposed()) {
-            if (newTile.isLand()) {
-                // Claim land for tribe?
-                Settlement settlement;
-                if (newTile.getOwner() == null
-                    && serverPlayer.isIndian()
-                    && (settlement = unit.getIndianSettlement()) != null
-                    && (newTile.getPosition().getDistance(settlement
-                            .getTile().getPosition())
-                        < spec.getInteger("model.option.indianClaimRadius")
-                            + settlement.getRadius())) {
-                    newTile.setOwner(serverPlayer);
-                }
+        // Check for slowing units.
+        Unit slowedBy = getSlowedBy(unit, newTile);
+        if (slowedBy != null) {
+            cs.addAttribute(See.only(serverPlayer), "slowedBy",
+                            slowedBy.getId());
+        }
 
-                // Check for first landing
-                if (serverPlayer.isEuropean()
-                    && !serverPlayer.isNewLandNamed()) {
-                    String newLand = Messages.getNewLandName(serverPlayer);
-                    if (serverPlayer.isAI()) {
-                        // TODO: Not convinced shortcutting the AI like
-                        // this is a good idea, this really should be in
-                        // the AI code.
-                        serverPlayer.setNewLandName(newLand);
-                    } else { // Ask player to name the land.
-                        cs.addAttribute(See.only(serverPlayer),
-                                        "nameNewLand", newLand);
-                    }
-                }
-
-                // Check for new contacts.
-                ServerPlayer welcomer = null;
-                for (Tile t : newTile.getSurroundingTiles(1, 1)) {
-                    if (t == null || !t.isLand()) {
-                        continue; // Invalid tile for contact
-                    }
-
-                    ServerPlayer other = null;
-                    settlement = t.getSettlement();
-                    if (settlement != null) {
-                        other = (ServerPlayer) t.getSettlement().getOwner();
-                    } else if (t.getFirstUnit() != null) {
-                        other = (ServerPlayer) t.getFirstUnit().getOwner();
-                    }
-                    if (other == null || other == serverPlayer) {
-                        continue; // No contact
-                    }
-
-                    // Activate sentries
-                    for (Unit u : t.getUnitList()) {
-                        if (u.getState() == UnitState.SENTRY) {
-                            u.setState(UnitState.ACTIVE);
-                            cs.add(See.only(serverPlayer), u);
-                        }
-                    }
-
-                    // Ignore previously contacted nations.
-                    if (serverPlayer.hasContacted(other)) continue;
-
-                    // Must be a first contact!
-                    if (serverPlayer.isIndian()) {
-                        // Ignore native-to-native contacts.
-                        if (!other.isIndian()) {
-                            String key = getContactKey(other, serverPlayer);
-                            if (key != null) {
-                                cs.addMessage(See.only(other),
-                                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                     key, other, serverPlayer));
-                            }
-                            cs.addHistory(other,
-                                new HistoryEvent(turn,
-                                    HistoryEvent.EventType.MEET_NATION)
-                                    .addStringTemplate("%nation%", serverPlayer.getNationName()));
-                        }
-                    } else { // (serverPlayer.isEuropean)
-                        // Initialize alarm for native settlements.
-                        if (other.isIndian() && settlement != null) {
-                            IndianSettlement is = (IndianSettlement) settlement;
-                            if (!is.hasContactedSettlement(serverPlayer)) {
-                                is.makeContactSettlement(serverPlayer);
-                                cs.add(See.only(serverPlayer), is);
-                            }
-                        }
-
-                        // Add first contact messages.
-                        String key = getContactKey(serverPlayer, other);
-                        if (key != null) {
-                            cs.addMessage(See.only(serverPlayer),
-                                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                 key, serverPlayer, other));
-                        }
-
-                        // History event for European players.
-                        cs.addHistory(serverPlayer,
-                            new HistoryEvent(turn,
-                                HistoryEvent.EventType.MEET_NATION)
-                                .addStringTemplate("%nation%", other.getNationName()));
-                        // Extra special meeting on first landing!
-                        if (other.isIndian()
-                            && !serverPlayer.isNewLandNamed()
-                            && (welcomer == null || newTile.getOwner() == other)) {
-                            welcomer = other;
-                        }
-                    }
-
-                    // Now make the contact properly.
-                    csChangeStance(serverPlayer, Stance.PEACE, other, true, cs);
-                    serverPlayer.setTension(other,
-                                            new Tension(Tension.TENSION_MIN));
-                    other.setTension(serverPlayer,
-                                     new Tension(Tension.TENSION_MIN));
-                }
-                if (welcomer != null) {
-                    cs.addAttribute(See.only(serverPlayer), "welcome",
-                                    welcomer.getId());
-                    cs.addAttribute(See.only(serverPlayer), "camps",
-                        Integer.toString(welcomer.getNumberOfSettlements()));
-                }
-            }
-
-            // Check for slowing units.
-            Unit slowedBy = getSlowedBy(unit, newTile);
-            if (slowedBy != null) {
-                cs.addAttribute(See.only(serverPlayer), "slowedBy",
-                                slowedBy.getId());
-            }
-
-            // Check for region discovery
-            Region region = newTile.getDiscoverableRegion();
-            if (serverPlayer.isEuropean() && region != null) {
-                if (region.isPacific()) {
+        // Check for region discovery
+        Region region = newTile.getDiscoverableRegion();
+        if (serverPlayer.isEuropean() && region != null) {
+            if (region.isPacific()) {
+                cs.addAttribute(See.only(serverPlayer),
+                                "discoverPacific", "true");
+                cs.addRegion(serverPlayer, region, "model.region.pacific");
+            } else {
+                String regionName = Messages.getDefaultRegionName(serverPlayer,
+                                                                  region.getType());
+                if (serverPlayer.isAI()) {
+                    // TODO: here is another dubious AI shortcut.
+                    cs.addRegion(serverPlayer, region, regionName);
+                } else { // Ask player to name the region.
                     cs.addAttribute(See.only(serverPlayer),
-                                    "discoverPacific", "true");
-                    cs.addRegion(serverPlayer, region, "model.region.pacific");
-                } else {
-                    String regionName = Messages.getDefaultRegionName(serverPlayer,
-                                                                      region.getType());
-                    if (serverPlayer.isAI()) {
-                        // TODO: here is another dubious AI shortcut.
-                        cs.addRegion(serverPlayer, region, regionName);
-                    } else { // Ask player to name the region.
-                        cs.addAttribute(See.only(serverPlayer),
-                                        "discoverRegion", regionName);
-                        cs.addAttribute(See.only(serverPlayer),
-                                        "regionType",
-                                        Messages.message(region.getLabel()));
-                    }
+                                    "discoverRegion", regionName);
+                    cs.addAttribute(See.only(serverPlayer),
+                                    "regionType",
+                                    Messages.message(region.getLabel()));
                 }
             }
         }
