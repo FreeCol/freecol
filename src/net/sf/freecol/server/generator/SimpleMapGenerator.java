@@ -756,160 +756,167 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
 
-            // START DEBUG:
-            if (FreeCol.isInFullDebugMode()) {
-                // in debug mode give each player a few more units and a colony
-                UnitType unitType = map.getSpecification().getUnitType("model.unit.galleon");
-                Unit unit4 = new ServerUnit(game, startTile, player, unitType,
-                                            UnitState.ACTIVE);
+            if (!FreeCol.isInFullDebugMode()) continue;
+            // In debug mode give each player a few more units and a colony.
+            UnitType unitType = spec.getUnitType("model.unit.galleon");
+            Unit unit4 = new ServerUnit(game, startTile, player, unitType,
+                                        UnitState.ACTIVE);
 
-                unitType = map.getSpecification().getUnitType("model.unit.privateer");
-                @SuppressWarnings("unused")
-                Unit privateer = new ServerUnit(game, startTile, player,
-                                                unitType, UnitState.ACTIVE);
+            unitType = spec.getUnitType("model.unit.privateer");
+            @SuppressWarnings("unused")
+            Unit privateer = new ServerUnit(game, startTile, player,
+                                            unitType, UnitState.ACTIVE);
 
-                unitType = map.getSpecification().getUnitType("model.unit.freeColonist");
-                @SuppressWarnings("unused")
-                Unit unit5 = new ServerUnit(game, unit4, player, unitType,
-                                            UnitState.SENTRY);
-                unitType = map.getSpecification().getUnitType("model.unit.veteranSoldier");
-                @SuppressWarnings("unused")
-                Unit unit6 = new ServerUnit(game, unit4, player, unitType,
-                                            UnitState.SENTRY);
-                unitType = map.getSpecification().getUnitType("model.unit.jesuitMissionary");
-                @SuppressWarnings("unused")
-                Unit unit7 = new ServerUnit(game, unit4, player, unitType,
-                                            UnitState.SENTRY);
+            unitType = spec.getUnitType("model.unit.freeColonist");
+            @SuppressWarnings("unused")
+            Unit unit5 = new ServerUnit(game, unit4, player, unitType,
+                                        UnitState.SENTRY);
+            unitType = spec.getUnitType("model.unit.veteranSoldier");
+            @SuppressWarnings("unused")
+            Unit unit6 = new ServerUnit(game, unit4, player, unitType,
+                                        UnitState.SENTRY);
+            unitType = spec.getUnitType("model.unit.jesuitMissionary");
+            @SuppressWarnings("unused")
+            Unit unit7 = new ServerUnit(game, unit4, player, unitType,
+                                        UnitState.SENTRY);
 
-                Tile colonyTile = null;
-                Iterator<Position> cti = map.getFloodFillIterator(new Position(x, y));
-                while(cti.hasNext()) {
-                    Tile tempTile = map.getTile(cti.next());
-                    if (map.isPolar(tempTile)) {
-                        // do not place the initial colony at the pole
-                        continue;
-                    }
-                    if (player.canClaimToFoundSettlement(tempTile)) {
-                        colonyTile = tempTile;
+            Tile colonyTile = null;
+            Iterator<Position> cti
+                = map.getFloodFillIterator(new Position(x, y));
+            while (cti.hasNext()) {
+                Tile tempTile = map.getTile(cti.next());
+                if (map.isPolar(tempTile)) {
+                    // do not place the initial colony at the pole
+                    continue;
+                }
+                if (player.canClaimToFoundSettlement(tempTile)) {
+                    colonyTile = tempTile;
+                    break;
+                }
+            }
+
+            if (colonyTile == null) {
+                logger.warning("Could not find a debug colony site.");
+                continue;
+            }
+            for (TileType t : spec.getTileTypeList()) {
+                if (!t.isWater()) {
+                    colonyTile.setType(t);
+                    break;
+                }
+            }
+            unitType = spec.getUnitType("model.unit.expertFarmer");
+            Unit buildColonyUnit = new ServerUnit(game, colonyTile,
+                                                  player, unitType,
+                                                  UnitState.ACTIVE);
+            String colonyName = Messages.message(player.getNationName())
+                + " Colony";
+            Colony colony = new ServerColony(game, player, colonyName, colonyTile);
+            colony.placeSettlement();
+            for (Tile tile : colonyTile.getSurroundingTiles(1)) {
+                if (tile.getSettlement() == null) {
+                    tile.setOwner(player);
+                    tile.setOwningSettlement(colony);
+                }
+            }
+            buildColonyUnit.setState(UnitState.IN_COLONY);
+            buildColonyUnit.setLocation(colony);
+            if (buildColonyUnit.getLocation() instanceof ColonyTile) {
+                Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
+                for (TileType t : spec.getTileTypeList()) {
+                    if (!t.isWater()) {
+                        ct.setType(t);
+                        TileImprovementType plowType = map.getSpecification()
+                            .getTileImprovementType("model.improvement.plow");
+                        TileImprovementType roadType = map.getSpecification()
+                            .getTileImprovementType("model.improvement.road");
+                        TileImprovement road = new TileImprovement(game, ct, roadType);
+                        road.setTurnsToComplete(0);
+                        TileImprovement plow = new TileImprovement(game, ct, plowType);
+                        plow.setTurnsToComplete(0);
+                        ct.setTileItemContainer(new TileItemContainer(game, ct));
+                        ct.getTileItemContainer().addTileItem(road);
+                        ct.getTileItemContainer().addTileItem(plow);
                         break;
                     }
                 }
-
-                if (colonyTile != null) {
-                    for (TileType t : map.getSpecification().getTileTypeList()) {
-                        if (!t.isWater()) {
-                            colonyTile.setType(t);
-                            break;
-                        }
-                    }
-                    unitType = map.getSpecification().getUnitType("model.unit.expertFarmer");
-                    Unit buildColonyUnit = new ServerUnit(game, colonyTile,
-                                                          player, unitType,
-                                                          UnitState.ACTIVE);
-                    String colonyName = Messages.message(player.getNationName()) + " Colony";
-                    Colony colony = new ServerColony(game, player, colonyName, colonyTile);
-                    colony.placeSettlement();
-                    buildColonyUnit.setState(UnitState.IN_COLONY);
-                    buildColonyUnit.setLocation(colony);
-                    if (buildColonyUnit.getLocation() instanceof ColonyTile) {
-                        Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
-                        for (TileType t : map.getSpecification().getTileTypeList()) {
-                            if (!t.isWater()) {
-                                ct.setType(t);
-                                TileImprovementType plowType = map.getSpecification()
-                                    .getTileImprovementType("model.improvement.plow");
-                                TileImprovementType roadType = map.getSpecification()
-                                    .getTileImprovementType("model.improvement.road");
-                                TileImprovement road = new TileImprovement(game, ct, roadType);
-                                road.setTurnsToComplete(0);
-                                TileImprovement plow = new TileImprovement(game, ct, plowType);
-                                plow.setTurnsToComplete(0);
-                                ct.setTileItemContainer(new TileItemContainer(game, ct));
-                                ct.getTileItemContainer().addTileItem(road);
-                                ct.getTileItemContainer().addTileItem(plow);
-                                break;
-                            }
-                        }
-                    }
-                    BuildingType schoolType = map.getSpecification().getBuildingType("model.building.schoolhouse");
-                    Building schoolhouse = new ServerBuilding(game, colony, schoolType);
-                    colony.addBuilding(schoolhouse);
-                    unitType = map.getSpecification().getUnitType("model.unit.masterCarpenter");
-                    while (!schoolhouse.canAdd(unitType)) {
-                        schoolhouse.upgrade();
-                    }
-                    Unit carpenter = new ServerUnit(game, colonyTile, player,
-                                                    unitType, UnitState.ACTIVE);
-                    carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
-
-                    unitType = map.getSpecification().getUnitType("model.unit.elderStatesman");
-                    Unit statesman = new ServerUnit(game, colonyTile, player,
-                                                    unitType, UnitState.ACTIVE);
-                    statesman.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
-
-                    unitType = map.getSpecification().getUnitType("model.unit.expertLumberJack");
-                    Unit lumberjack = new ServerUnit(game, colony, player,
-                                                     unitType, UnitState.ACTIVE);
-                    if (lumberjack.getLocation() instanceof ColonyTile) {
-                        Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
-                        for (TileType t : map.getSpecification().getTileTypeList()) {
-                            if (t.isForested()) {
-                                lt.setType(t);
-                                break;
-                            }
-                        }
-                        lumberjack.setWorkType(lumberjack.getType().getExpertProduction());
-                    }
-
-                    unitType = map.getSpecification().getUnitType("model.unit.seasonedScout");
-                    @SuppressWarnings("unused")
-                    Unit scout = new ServerUnit(game, colonyTile, player,
-                                                unitType, UnitState.ACTIVE);
-
-                    unitType = map.getSpecification().getUnitType("model.unit.veteranSoldier");
-                    @SuppressWarnings("unused")
-                    Unit unit8 = new ServerUnit(game, colonyTile, player,
-                                                unitType, UnitState.ACTIVE);
-
-                    @SuppressWarnings("unused")
-                    Unit unit9 = new ServerUnit(game, colonyTile, player,
-                                                unitType, UnitState.ACTIVE);
-
-                    unitType = map.getSpecification().getUnitType("model.unit.artillery");
-                    @SuppressWarnings("unused")
-                    Unit unit10 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-
-                    @SuppressWarnings("unused")
-                    Unit unit11 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-
-                    @SuppressWarnings("unused")
-                    Unit unit12 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-
-                    unitType = map.getSpecification().getUnitType("model.unit.treasureTrain");
-                    Unit unit13 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-                    unit13.setTreasureAmount(10000);
-
-                    unitType = map.getSpecification().getUnitType("model.unit.wagonTrain");
-                    Unit unit14 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-                    GoodsType cigarsType = map.getSpecification().getGoodsType("model.goods.cigars");
-                    Goods cigards = new Goods(game, unit14, cigarsType, 5);
-                    unit14.add(cigards);
-
-                    unitType = map.getSpecification().getUnitType("model.unit.jesuitMissionary");
-                    @SuppressWarnings("unused")
-                    Unit unit15 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-                    @SuppressWarnings("unused")
-                    Unit unit16 = new ServerUnit(game, colonyTile, player,
-                                                 unitType, UnitState.ACTIVE);
-
-                }
             }
+            BuildingType schoolType = spec.getBuildingType("model.building.schoolhouse");
+            Building schoolhouse = new ServerBuilding(game, colony, schoolType);
+            colony.addBuilding(schoolhouse);
+            unitType = spec.getUnitType("model.unit.masterCarpenter");
+            while (!schoolhouse.canAdd(unitType)) {
+                schoolhouse.upgrade();
+            }
+            Unit carpenter = new ServerUnit(game, colonyTile, player,
+unitType, UnitState.ACTIVE);
+            carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
+
+            unitType = spec.getUnitType("model.unit.elderStatesman");
+            Unit statesman = new ServerUnit(game, colonyTile, player,
+                                            unitType, UnitState.ACTIVE);
+            statesman.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
+
+            unitType = spec.getUnitType("model.unit.expertLumberJack");
+            Unit lumberjack = new ServerUnit(game, colony, player,
+                                             unitType, UnitState.ACTIVE);
+            if (lumberjack.getLocation() instanceof ColonyTile) {
+                Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
+                for (TileType t : spec.getTileTypeList()) {
+                    if (t.isForested()) {
+                        lt.setType(t);
+                        break;
+                    }
+                }
+                lumberjack.setWorkType(lumberjack.getType().getExpertProduction());
+            }
+
+            unitType = spec.getUnitType("model.unit.seasonedScout");
+            @SuppressWarnings("unused")
+                Unit scout = new ServerUnit(game, colonyTile, player,
+                                            unitType, UnitState.ACTIVE);
+
+            unitType = spec.getUnitType("model.unit.veteranSoldier");
+            @SuppressWarnings("unused")
+                Unit unit8 = new ServerUnit(game, colonyTile, player,
+                                            unitType, UnitState.ACTIVE);
+
+            @SuppressWarnings("unused")
+                Unit unit9 = new ServerUnit(game, colonyTile, player,
+                                            unitType, UnitState.ACTIVE);
+
+            unitType = spec.getUnitType("model.unit.artillery");
+            @SuppressWarnings("unused")
+                Unit unit10 = new ServerUnit(game, colonyTile, player,
+                                             unitType, UnitState.ACTIVE);
+
+            @SuppressWarnings("unused")
+                Unit unit11 = new ServerUnit(game, colonyTile, player,
+                                             unitType, UnitState.ACTIVE);
+
+            @SuppressWarnings("unused")
+                Unit unit12 = new ServerUnit(game, colonyTile, player,
+                                             unitType, UnitState.ACTIVE);
+
+            unitType = spec.getUnitType("model.unit.treasureTrain");
+            Unit unit13 = new ServerUnit(game, colonyTile, player,
+                                         unitType, UnitState.ACTIVE);
+            unit13.setTreasureAmount(10000);
+
+            unitType = spec.getUnitType("model.unit.wagonTrain");
+            Unit unit14 = new ServerUnit(game, colonyTile, player,
+                                         unitType, UnitState.ACTIVE);
+            GoodsType cigarsType = spec.getGoodsType("model.goods.cigars");
+            Goods cigards = new Goods(game, unit14, cigarsType, 5);
+            unit14.add(cigards);
+
+            unitType = spec.getUnitType("model.unit.jesuitMissionary");
+            @SuppressWarnings("unused")
+                Unit unit15 = new ServerUnit(game, colonyTile, player,
+                                             unitType, UnitState.ACTIVE);
+            @SuppressWarnings("unused")
+                Unit unit16 = new ServerUnit(game, colonyTile, player,
+                                             unitType, UnitState.ACTIVE);
             // END DEBUG
         }
     }
