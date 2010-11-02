@@ -1926,12 +1926,12 @@
       </rangeOption>
       <!-- Option for setting the number of settlements on the map
            The value indicates the number of land tile per sttlement tile -->
-      <rangeOption id="model.option.settlementNumber" defaultValue="14" localizedLabels="true">
-        <rangeValue label="verySmall" value="20"/>
-        <rangeValue label="small" value="14"/>
-        <rangeValue label="medium" value="12"/>
-        <rangeValue label="large" value="10"/>
-        <rangeValue label="veryLarge" value="8"/>
+      <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
+        <rangeValue label="verySmall" value="10"/>
+        <rangeValue label="small" value="8"/>
+        <rangeValue label="medium" value="7"/>
+        <rangeValue label="large" value="6"/>
+        <rangeValue label="veryLarge" value="5"/>
       </rangeOption>
       <!-- Option for setting the percentage of forests on the map -->
       <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
