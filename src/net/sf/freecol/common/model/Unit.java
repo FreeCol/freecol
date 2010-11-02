@@ -3353,6 +3353,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         workType = getSpecification().getType(in, "workType", GoodsType.class, null);
+        // TODO: remove compatibility code once 0.10.0 has been released
+        GoodsType food = getSpecification().getGoodsType("model.goods.food");
+        GoodsType grain = getSpecification().getGoodsType("model.goods.grain");
+        if (food.equals(workType)) {
+            workType = grain;
+        }
+        // end TODO
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
