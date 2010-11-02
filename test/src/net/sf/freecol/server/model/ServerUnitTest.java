@@ -92,19 +92,19 @@ public class ServerUnitTest extends FreeColTestCase {
                                           UnitState.ACTIVE);
 
         // make sure unit has all moves left
-        ServerTestHelper.newTurn((ServerPlayer)scout.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals(scout.getInitialMovesLeft(), scout.getMovesLeft());
         int colonistMoves = scout.getMovesLeft();
         scout.changeEquipment(horsesType, 1);
 
-        ServerTestHelper.newTurn((ServerPlayer)scout.getOwner());
+        ServerTestHelper.newTurn();
 
         assertTrue("Scout should have more moves than a colonist",
                    scout.getMovesLeft() > colonistMoves);
         scout.changeEquipment(horsesType, -1);
 
-        ServerTestHelper.newTurn((ServerPlayer)scout.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals(scout.getMovesLeft(), colonistMoves);
     }
@@ -145,7 +145,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         // Advance to finish
         while (hardyPioneer.getWorkLeft() > 0) {
-            ServerTestHelper.newTurn((ServerPlayer)dutch);
+            ServerTestHelper.newTurn();
         }
 
         // Pioneer finished work
@@ -194,7 +194,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5, 8)), soldier.getLocation());
 
         // One turn to check production
-        ServerTestHelper.newTurn((ServerPlayer)dutch);
+        ServerTestHelper.newTurn();
 
         assertEquals(false, plain58.hasImprovement(plow));
         assertEquals(8, colony.getGoodsCount(foodType));
@@ -210,7 +210,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         int n = 0;
         while (hardyPioneer.getWorkLeft() > 0) {
-            ServerTestHelper.newTurn((ServerPlayer)dutch);
+            ServerTestHelper.newTurn();
             n++;
         }
 
@@ -222,7 +222,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(8 + n * 8, colony.getGoodsCount(foodType));
 
         // Advance last turn
-        ServerTestHelper.newTurn((ServerPlayer)dutch);
+        ServerTestHelper.newTurn();
 
         assertEquals(true, plain58.hasImprovement(plow));
         assertEquals(5 + 6, colony.getFoodProduction());
@@ -280,7 +280,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(8, hardyPioneer3.getWorkLeft());
 
         while (roadImprovement.getTurnsToComplete() > 0) {
-            ServerTestHelper.newTurn((ServerPlayer)dutch);
+            ServerTestHelper.newTurn();
         }
 
         // After: both pioneers building road have used up their tools
@@ -307,7 +307,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         // Finish
         while (hardyPioneer3.getWorkLeft() > 0) {
-            ServerTestHelper.newTurn((ServerPlayer)dutch);
+            ServerTestHelper.newTurn();
         }
 
         assertTrue(clearImprovement.isComplete());
@@ -332,7 +332,7 @@ public class ServerUnitTest extends FreeColTestCase {
         if (loc == null) loc = colonist.getWorkTile();
 
         // produces goods
-        ServerTestHelper.newTurn((ServerPlayer)colonist.getOwner());
+        ServerTestHelper.newTurn();
 
         assertTrue("Colonist should have gained some experience",
                    colonist.getExperience() > 0);
@@ -373,7 +373,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertFalse("Unit should not be an expert", isExpert);
 
         // Make upgrade
-        ServerTestHelper.newTurn((ServerPlayer)colonist.getOwner());
+        ServerTestHelper.newTurn();
         assertTrue(colonist.getExperience() > expectXP);
 
         // verify upgrade

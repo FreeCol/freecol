@@ -1204,7 +1204,7 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExploredBy(french, true);
         Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType,
                                 UnitState.ACTIVE, horses, muskets);
-        ServerTestHelper.newTurn((ServerPlayer) dragoon.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals("Dragoon has 12 moves",
                      12, dragoon.getInitialMovesLeft());
@@ -1862,7 +1862,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("model.building.stockade",
                      father.getEvents().get(0).getValue());
         igc.addFoundingFather((ServerPlayer) player, father);
-        ServerTestHelper.newTurn((ServerPlayer) player);
+        ServerTestHelper.newTurn();
         assertNull(colony.getBuilding(stockadeType));
 
         // increasing population to 3 should give access to stockade
@@ -1871,7 +1871,7 @@ public class InGameControllerTest extends FreeColTestCase {
         // set the unit to work making bells
         unit.setWorkType(bellsType);
         unit.setLocation(colony.getBuildingsForProducing(bellsType).get(0));
-        ServerTestHelper.newTurn((ServerPlayer) player);
+        ServerTestHelper.newTurn();
 
         assertNotNull(colony.getBuilding(stockadeType));
     }
@@ -1893,7 +1893,7 @@ public class InGameControllerTest extends FreeColTestCase {
         igc.addFoundingFather(dutch, father);
 
         Colony colony = getStandardColony(4);
-        ServerTestHelper.newTurn(dutch);
+        ServerTestHelper.newTurn();
         assertTrue(colony.getBuilding(press) != null);
     }
 }

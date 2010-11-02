@@ -102,7 +102,7 @@ public class ServerColonyTest extends FreeColTestCase {
         int foodExpected = foodStored - colony.getFoodConsumption()
             + colony.getFoodProduction();
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals("Unexpected value for remaining food, ",
                      foodExpected, colony.getFoodCount());
@@ -210,7 +210,7 @@ public class ServerColonyTest extends FreeColTestCase {
 
         assertEquals("Wrong number of units in colony",unitsBeforeNewTurn,colony.getUnitCount());
 
-        ServerTestHelper.newTurn(dutch);
+        ServerTestHelper.newTurn();
 
         assertEquals("Wrong number of units in colony",unitsBeforeNewTurn-1,colony.getUnitCount());
 
@@ -245,7 +245,7 @@ public class ServerColonyTest extends FreeColTestCase {
         assertFalse("Colony should not have warehouse",
                     colony.getWarehouse().getType() == warehouseType);
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertTrue("Colony should have warehouse",
                    colony.getWarehouse().getType() == warehouseType);
@@ -278,7 +278,7 @@ public class ServerColonyTest extends FreeColTestCase {
         assertFalse("Colony should not have lumber mill",
                     colony.getBuilding(lumberMillType).getType() == lumberMillType);
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertFalse("Colony should not have lumber mill",
                     colony.getBuilding(lumberMillType).getType() == lumberMillType);
@@ -308,7 +308,7 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals("Colony shold not have any work production(hammers) initially, ",
                      initialHammers, colony.getGoodsCount(hammerGoodsType));
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals("Colony shold not have any work production(hammers) after, ",
                      initialHammers, colony.getGoodsCount(hammerGoodsType));
@@ -340,7 +340,7 @@ public class ServerColonyTest extends FreeColTestCase {
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         GoodsType crossType = spec().getGoodsType("model.goods.crosses");
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals(population, colony.getUnitCount());
         assertEquals(4, colony.getProductionOf(bellsType));
@@ -402,7 +402,7 @@ public class ServerColonyTest extends FreeColTestCase {
         // Test current condition, no warnings
         assertTrue("Setup error, no messages should have bee received yet", colony.getOwner().getModelMessages().isEmpty());
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertEquals("Player should not have received any messages",
                      0, colony.getOwner().getModelMessages().size());
@@ -410,7 +410,7 @@ public class ServerColonyTest extends FreeColTestCase {
         // Simulate consumption of food
         colony.getGoodsContainer().removeGoods(foodGoodsType, 1);
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         // Test new condition food below limits
         assertEquals("Player should have received one message",
@@ -421,7 +421,7 @@ public class ServerColonyTest extends FreeColTestCase {
         colony.getGoodsContainer().addGoods(foodGoodsType, overfullLevel);
         colony.getOwner().clearModelMessages();
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
 
         assertTrue("Food does not have a storage limit", foodGoodsType.limitIgnored());
         assertEquals("Player should not receive a message",

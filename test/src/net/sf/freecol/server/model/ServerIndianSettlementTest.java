@@ -62,7 +62,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         int foodConsumed = camp.getFoodConsumption();
         assertTrue("Food Produced should be more the food consumed",foodProduced > foodConsumed);
 
-        ServerTestHelper.newTurn((ServerPlayer) camp.getOwner());
+        ServerTestHelper.newTurn();
 
         int foodRemaining = Math.max(foodProduced - foodConsumed, 0);
         assertEquals("Unexpected value for remaining food, ", foodRemaining,camp.getFoodCount());
@@ -95,7 +95,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
                                          foodAvail);
         assertTrue("Horses should breed", expectedHorseProd > 0);
 
-        ServerTestHelper.newTurn((ServerPlayer) camp.getOwner());
+        ServerTestHelper.newTurn();
 
         int horsesBred = camp.getGoodsCount(horsesType) - initialHorses;
         assertEquals("Wrong number of horses bred",
@@ -137,7 +137,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         int initialHorses = 2;
         camp1.addGoods(horsesType, initialHorses);
 
-        ServerTestHelper.newTurn((ServerPlayer) camp1.getOwner());
+        ServerTestHelper.newTurn();
 
         int expectedHorsesBreeded = 0;
         int horsesBreeded = camp1.getGoodsCount(horsesType) - initialHorses;

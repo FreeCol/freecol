@@ -90,8 +90,8 @@ public class SerializationTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         Player player = game.getPlayer("model.nation.dutch");
 
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
-        ServerTestHelper.newTurn((ServerPlayer) colony.getOwner());
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
 
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
