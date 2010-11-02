@@ -323,13 +323,8 @@ public class SimpleMapGenerator implements MapGenerator {
                             && !t.hasLostCityRumour()
                             && t.getSettlement() == null
                             && t.getUnitCount() == 0) {
+                        t.add(new LostCityRumour(t.getGame(), t));
                         counter++;
-                        LostCityRumour r = new LostCityRumour(t.getGame(), t);
-                        if (r.chooseType(null, difficulty, random)
-                            == LostCityRumour.RumourType.MOUNDS) {
-                            r.setType(LostCityRumour.RumourType.MOUNDS);
-                        }
-                        t.add(r);
                         break;
                     }
                 }
