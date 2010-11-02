@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -28,49 +27,22 @@ import net.sf.freecol.common.model.Unit;
 */
 public abstract class UnitAction extends MapboardAction {
 
-    private Unit unit = null;
-
     /**
      * Creates a new <code>UnitAction</code>.
      * @param freeColClient The main controller object for the client
      * @param id The id of this action
      */
     protected UnitAction(FreeColClient freeColClient, String id) {
-        this(freeColClient, id, null);
-    }
-
-    /**
-     * Creates a new <code>UnitAction</code>.
-     * @param freeColClient The main controller object for the client
-     * @param id The id of this action
-     * @param unit an <code>Unit</code> value
-     */
-    protected UnitAction(FreeColClient freeColClient, String id, Unit unit) {
         super(freeColClient, id);
-        this.unit = unit;
-    }
-
-    /**
-     * Returns the <code>Unit</code> this action refers to.
-     *
-     * @return an <code>Unit</code> value
-     */
-    public Unit getUnit() {
-        return (unit == null)
-            ? getFreeColClient().getGUI().getActiveUnit()
-            : unit;
     }
 
     /**
      * Checks if this action should be enabled.
-     *
+     * 
      * @return <code>false</code> if there is no active unit.
      */
     protected boolean shouldBeEnabled() {
-        return getFreeColClient().getCanvas() != null
-            && (getFreeColClient().getGame() == null
-                || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer())
-            && getUnit() != null;
+        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
     }
 
 }

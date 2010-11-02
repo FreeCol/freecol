@@ -24,53 +24,31 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
- * An action to change the state of a unit.
- */
-public class UnitStateChangeAction extends UnitAction {
-
-    public static final String id = "stateChangeAction";
-
-    private UnitState state;
-
+* An action to set sentry state to the active unit.
+*/
+public class SentryAction extends UnitAction {
+    
+    public static final String id = "sentryAction";
+    
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
-     * @param unitState an <code>UnitState</code> value
      */
-    public UnitStateChangeAction(FreeColClient freeColClient, UnitState unitState) {
-        this(freeColClient, null, unitState);
+    public SentryAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+        addImageIcons("sentry");
     }
-
-    /**
-     * Creates this action.
-     * @param freeColClient The main controller object for the client.
-     * @param unitState an <code>UnitState</code> value
-     */
-    public UnitStateChangeAction(FreeColClient freeColClient, Unit unit, UnitState unitState) {
-        super(freeColClient, unitState.getId() + "Action", unit);
-        this.state = unitState;
-        addImageIcons(unitState.getId());
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>false</code> if there is no active unit.
-     */
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getUnit().checkSetState(state);
-    }
-
+    
     /**
      * Applies this action.
      * @param actionEvent The <code>ActionEvent</code>.
-     */
+     */    
     public void actionPerformed(ActionEvent actionEvent) {
-        getFreeColClient().getInGameController().changeState(getUnit(), state);
+        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(),
+                                                             UnitState.SENTRY);
     }
-
+    
 }

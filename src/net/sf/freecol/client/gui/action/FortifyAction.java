@@ -21,22 +21,36 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
+
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
- * An action for clearing the active unit's orders.
+ * An action for fortifying the active unit.
  */
-public class ClearOrdersAction extends UnitAction {
+public class FortifyAction extends UnitAction {
 
-    public static final String id = "clearOrdersAction";
+    public static final String id = "fortifyAction";
+
 
     /**
      * Creates this action.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    ClearOrdersAction(FreeColClient freeColClient) {
+    FortifyAction(FreeColClient freeColClient) {
         super(freeColClient, id);
+        addImageIcons("fortify");
+    }
+
+    /**
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if there is an active unit.
+     */
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled()
+            && getFreeColClient().getGUI().getActiveUnit().checkSetState(UnitState.FORTIFYING);
     }
 
     /**
@@ -45,6 +59,7 @@ public class ClearOrdersAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().clearOrders(getFreeColClient().getGUI().getActiveUnit());
+        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(),
+                UnitState.FORTIFYING);
     }
 }

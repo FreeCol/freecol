@@ -26,10 +26,8 @@ import java.awt.event.KeyEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
-import net.sf.freecol.common.model.FreeColGameObjectType;
 
 
 /**
@@ -37,7 +35,7 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
  */
 public class ColopediaAction extends FreeColAction {
 
-    public static final String id = "colopediaAction";
+    public static final String id = "colopediaAction.";
 
     public static final int[] mnemonics = new int[] {
         KeyEvent.VK_T,
@@ -51,36 +49,24 @@ public class ColopediaAction extends FreeColAction {
         KeyEvent.VK_A
     };
 
-    private PanelType panelType = null;
-    private FreeColGameObjectType object = null;
-
+    private PanelType panelType;
+    
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
-     * @param panelType a <code>PanelType</code> value
      */
-    public ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
-        super(freeColClient, id + "." + panelType);
+    ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
+        super(freeColClient, id + panelType);
         this.panelType = panelType;
         setMnemonic(mnemonics[panelType.ordinal()]);
     }
-
-    /**
-     * Creates this action.
-     * @param freeColClient The main controller object for the client.
-     */
-    public ColopediaAction(FreeColClient freeColClient, FreeColGameObjectType object) {
-        super(freeColClient, id);
-        putValue(NAME, Messages.message(id + ".name", "%object%", Messages.getName(object)));
-        this.object = object;
-    }
-
+    
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = freeColClient.getCanvas();
-        canvas.showPanel(new ColopediaPanel(canvas, panelType, object));
+        canvas.showPanel(new ColopediaPanel(canvas, panelType, null));
     }
 }

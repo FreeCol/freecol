@@ -28,7 +28,6 @@ import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -40,18 +39,11 @@ public class ActionManager extends OptionGroup {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
-    public static final UnitState[] STATES = new UnitState[] {
-        UnitState.ACTIVE,
-        UnitState.FORTIFYING,
-        UnitState.SENTRY,
-        UnitState.SKIPPED
-    };
-
     private FreeColClient freeColClient;
 
     /**
      * Creates a new <code>ActionManager</code>.
-     *
+     * 
      * @param freeColClient The main client controller.
      */
     public ActionManager(FreeColClient freeColClient) {
@@ -67,7 +59,7 @@ public class ActionManager extends OptionGroup {
     public void initializeActions() {
         removeAll();
         // keep this list alphabetized.
-
+        
         add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
@@ -92,6 +84,7 @@ public class ActionManager extends OptionGroup {
         add(new EuropeAction(freeColClient));
         add(new ExecuteGotoOrdersAction(freeColClient));
         add(new FindSettlementAction(freeColClient));
+        add(new FortifyAction(freeColClient));
         add(new GotoAction(freeColClient));
         add(new GotoTileAction(freeColClient));
         add(new LoadAction(freeColClient));
@@ -129,16 +122,15 @@ public class ActionManager extends OptionGroup {
         add(new RetireAction(freeColClient));
         add(new SaveAction(freeColClient));
         add(new ScaleMapAction(freeColClient));
+        add(new SentryAction(freeColClient));
         add(new ShowDifficultyAction(freeColClient));
         add(new ShowGameOptionsAction(freeColClient));
         add(new ShowMainAction(freeColClient));
         add(new ShowMapGeneratorOptionsAction(freeColClient));
+        add(new SkipUnitAction(freeColClient));
         add(new TilePopupAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
         add(new TradeRouteAction(freeColClient));
-        for (UnitState state : STATES) {
-            add(new UnitStateChangeAction(freeColClient, state));
-        }
         add(new UnloadAction(freeColClient));
         add(new WaitAction(freeColClient));
         add(new ZoomInAction(freeColClient));
@@ -161,7 +153,7 @@ public class ActionManager extends OptionGroup {
 
     /**
      * Adds the given <code>FreeColAction</code>.
-     *
+     * 
      * @param freeColAction The <code>FreeColAction</code> that should be
      *            added to this <code>ActionManager</code>.
      */
@@ -172,7 +164,7 @@ public class ActionManager extends OptionGroup {
     /**
      * Gets the <code>FreeColAction</code> specified by the given
      * <code>id</code>.
-     *
+     * 
      * @param id The string identifying the action.
      * @return The <code>FreeColAction</code>.
      */
@@ -180,13 +172,9 @@ public class ActionManager extends OptionGroup {
         return (FreeColAction) super.getOption(id);
     }
 
-    public FreeColAction getAction(UnitState state) {
-        return (FreeColAction) super.getOption(state.getId() + "Action");
-    }
-
     /**
      * Updates every <code>FreeColAction</code> this object keeps.
-     *
+     * 
      * @see FreeColAction
      */
     public void update() {

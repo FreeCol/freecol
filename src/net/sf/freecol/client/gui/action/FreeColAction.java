@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -77,7 +76,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Creates a new <code>FreeColAction</code>.
-     *
+     * 
      * @param freeColClient The main controller object for the client.
      * @param id a <code>String</code> value
      */
@@ -104,7 +103,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Gets the mnemonic to be used for selecting this action
-     *
+     * 
      * @return The mnemonic of the action
      */
     public Integer getMnemonic() {
@@ -122,7 +121,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Gets the main controller object for the client.
-     *
+     * 
      * @return The main controller object for the client.
      */
     protected FreeColClient getFreeColClient() {
@@ -130,22 +129,14 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     }
 
     protected void addImageIcons(String key) {
-        Image image = ResourceManager.getImage("orderButton.normal." + key);
-        if (image != null) {
-            putValue(BUTTON_IMAGE, new ImageIcon(image));
-        }
-        image = ResourceManager.getImage("orderButton.highlighted." + key);
-        if (image != null) {
-            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(image));
-        }
-        image = ResourceManager.getImage("orderButton.pressed." + key);
-        if (image != null) {
-            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(image));
-        }
-        image = ResourceManager.getImage("orderButton.disabled." + key);
-        if (image != null) {
-            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon());
-        }
+        putValue(BUTTON_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.normal." + key)));
+        putValue(BUTTON_ROLLOVER_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.highlighted." + key)));
+        putValue(BUTTON_PRESSED_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.pressed." + key)));
+        putValue(BUTTON_DISABLED_IMAGE,
+                 new ImageIcon(ResourceManager.getImage("orderButton.disabled." + key)));
     }
 
     /**
@@ -161,7 +152,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Checks if this action should be enabled.
-     *
+     * 
      * @return <code>false</code> if the
      *         {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} is
      *         visible and <code>true</code> otherwise. This method should be
@@ -175,7 +166,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Sets a keyboard accelerator.
-     *
+     * 
      * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
      *            is the same as disabling the keyboard accelerator.
      */
@@ -185,7 +176,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Gets the keyboard accelerator for this option.
-     *
+     * 
      * @return The <code>KeyStroke</code> or <code>null</code> if the
      *         keyboard accelerator is disabled.
      */
@@ -196,7 +187,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     /**
      * Gives a short description of this <code>Option</code>. Can for
      * instance be used as a tooltip text.
-     *
+     * 
      * @return A short description of this action.
      */
     public String getShortDescription() {
@@ -205,7 +196,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Returns a textual representation of this object.
-     *
+     * 
      * @return The name of this <code>Option</code>.
      * @see #getName
      */
@@ -215,7 +206,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Returns the id of this <code>Option</code>.
-     *
+     * 
      * @return An unique identifier for this action.
      */
     public String getId() {
@@ -224,7 +215,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Returns the name of this <code>Option</code>.
-     *
+     * 
      * @return The name as provided in the constructor.
      */
     public String getName() {
@@ -235,7 +226,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * Creates a <code>String</code> that keeps the attributes given
      * <code>KeyStroke</code>. This <code>String</code> can be used to
      * store the key stroke in an XML-file.
-     *
+     * 
      * @param keyStroke The <code>KeyStroke</code>.
      * @return A <code>String</code> that produces a key stroke equal to the
      *         given <code>KeyStroke</code> if passed as a parameter to
@@ -247,11 +238,11 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         } else
             return keyStroke.toString();
     }
-
+    
     /**
      * Should this option be updated directly so that
      * changes may be previewes?
-     *
+     * 
      * @return <code>false</code>.
      */
     public boolean isPreviewEnabled() {
@@ -261,7 +252,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     *
+     * 
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -278,7 +269,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     *
+     * 
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -302,7 +293,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     *
+     * 
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -313,7 +304,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     *
+     * 
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -324,7 +315,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     *
+     * 
      * @param document The <code>Document</code>.
      * @return An XML-representation of this object.
      */
@@ -402,7 +393,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * assign this listener to the JMenuItem they are a part of. This captures
      * the mnemonic key press and keeps other menus from processing keys meant
      * for other actions.
-     *
+     * 
      * @author johnathanj
      */
     public class InnerMenuKeyListener implements MenuKeyListener {

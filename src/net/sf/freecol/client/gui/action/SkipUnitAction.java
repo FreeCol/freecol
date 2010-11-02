@@ -21,22 +21,26 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
+
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
- * An action for clearing the active unit's orders.
+ * An action for skipping the active unit.
  */
-public class ClearOrdersAction extends UnitAction {
+public class SkipUnitAction extends UnitAction {
 
-    public static final String id = "clearOrdersAction";
+    public static final String id = "skipUnitAction";
+
 
     /**
      * Creates this action.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    ClearOrdersAction(FreeColClient freeColClient) {
+    SkipUnitAction(FreeColClient freeColClient) {
         super(freeColClient, id);
+        addImageIcons("done");
     }
 
     /**
@@ -45,6 +49,7 @@ public class ClearOrdersAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().clearOrders(getFreeColClient().getGUI().getActiveUnit());
+        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), 
+                                                             UnitState.SKIPPED);
     }
 }

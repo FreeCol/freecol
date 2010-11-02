@@ -53,16 +53,16 @@ import org.w3c.dom.Element;
 /**
  * Represents all pieces that can be moved on the map-board. This includes:
  * colonists, ships, wagon trains e.t.c.
- *
+ * 
  * <br>
  * <br>
- *
+ * 
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
 public class Unit extends FreeColGameObject implements Locatable, Location, Ownable, Nameable {
     private static Comparator<Unit> skillLevelComp  = null;
-
+    
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
     /**
@@ -74,37 +74,26 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String EQUIPMENT_CHANGE = "EQUIPMENT_CHANGE";
-
+    
     /**
      * A state a Unit can have.
      */
     public static enum UnitState {
-        ACTIVE("active"),
-        FORTIFIED(null),
-        SENTRY("sentry"),
-        IN_COLONY(null),
-        IMPROVING(null),
-        TO_EUROPE(null),
-        TO_AMERICA(null),
-        FORTIFYING("fortify"),
-        SKIPPED("wait");
-
-        private String id;
-
-        UnitState(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
+        ACTIVE,
+        FORTIFIED,
+        SENTRY,
+        IN_COLONY,
+        IMPROVING,
+        TO_EUROPE,
+        TO_AMERICA,
+        FORTIFYING,
+        SKIPPED
     }
 
     /** The roles a Unit can have. */
     public static enum Role {
         DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
-
+    
         public String getId() {
             return toString().toLowerCase(Locale.US);
         }
@@ -112,7 +101,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * A move type.
-     *
+     * 
      * @see Unit#getMoveType(Map.Direction)
      */
     public static enum MoveType {
@@ -186,7 +175,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     protected Role role = Role.DEFAULT;
 
-    /**
+    /** 
      * The number of turns until the work is finished, or '-1' if a
      * Unit can stay in its state forever.
      */
@@ -242,7 +231,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * The amount of goods carried by this unit. This variable is only used by
      * the clients. A negative value signals that the variable is not in use.
-     *
+     * 
      * @see #getVisibleGoodsCount()
      */
     protected int visibleGoodsCount;
@@ -267,7 +256,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Constructor for ServerUnit.
-     *
+     * 
      * @param game The <code>Game</code> in which this unit belongs.
      */
     protected Unit(Game game) {
@@ -276,7 +265,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Initialize this object from an XML-representation of this object.
-     *
+     * 
      * @param game The <code>Game</code> in which this <code>Unit</code>
      *            belong.
      * @param in The input stream containing the XML.
@@ -289,7 +278,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Initialize this object from an XML-representation of this object.
-     *
+     * 
      * @param game The <code>Game</code> in which this <code>Unit</code>
      *            belong.
      * @param e An XML-element that will be used to initialize this object.
@@ -304,7 +293,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     *
+     * 
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -332,7 +321,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns a name for this unit, as a location.
-     *
+     * 
      * @return A name for this unit, as a location.
      */
     public StringTemplate getLocationName() {
@@ -352,7 +341,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Get the <code>UnitType</code> value.
-     *
+     * 
      * @return an <code>UnitType</code> value
      */
     public final UnitType getType() {
@@ -362,7 +351,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Returns the current amount of treasure in this unit. Should be type of
      * TREASURE_TRAIN.
-     *
+     * 
      * @return The amount of treasure.
      */
     public int getTreasureAmount() {
@@ -375,7 +364,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * The current amount of treasure in this unit. Should be type of
      * TREASURE_TRAIN.
-     *
+     * 
      * @param amt The amount of treasure
      */
     public void setTreasureAmount(int amt) {
@@ -406,7 +395,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Get the <code>TradeRoute</code> value.
-     *
+     * 
      * @return a <code>TradeRoute</code> value
      */
     public final TradeRoute getTradeRoute() {
@@ -415,7 +404,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Set the <code>TradeRoute</code> value.
-     *
+     * 
      * @param newTradeRoute The new TradeRoute value.
      */
     public final void setTradeRoute(final TradeRoute newTradeRoute) {
@@ -431,7 +420,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Get the stop the unit is heading for or at.
-     *
+     * 
      * @return The target stop.
      */
     public Stop getStop() {
@@ -483,7 +472,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Checks if the treasure train can be cashed in at it's current
      * <code>Location</code>.
-     *
+     * 
      * @return <code>true</code> if the treasure train can be cashed in.
      * @exception IllegalStateException if this unit is not a treasure train.
      */
@@ -494,7 +483,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Checks if the treasure train can be cashed in at the given
      * <code>Location</code>.
-     *
+     * 
      * @param loc The <code>Location</code>.
      * @return <code>true</code> if the treasure train can be cashed in.
      * @exception IllegalStateException if this unit is not a treasure train.
@@ -549,7 +538,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Checks if this <code>Unit</code> is a `colonist'.  A unit is a
      * colonist if it is European and can build a new <code>Colony</code>.
-     *
+     * 
      * @return <i>true</i> if this unit is a colonist and <i>false</i>
      *         otherwise.
      */
@@ -572,7 +561,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the number of turns this unit has to train to educate a student.
      * This value is only meaningful for units that can be put in a school.
-     *
+     * 
      * @return The turns of training needed to teach its current type to a free
      *         colonist or to promote an indentured servant or a petty criminal.
      * @see #getTurnsOfTraining
@@ -592,7 +581,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the number of turns this unit has to train to educate a student.
      * This value is only meaningful for units that can be put in a school.
-     *
+     * 
      * @return The turns of training needed to teach its current type to a free
      *         colonist or to promote an indentured servant or a petty criminal.
      * @see #getTurnsOfTraining
@@ -614,7 +603,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Gets the UnitType which a teacher is teaching to a student.
      * This value is only meaningful for teachers that can be put in a
      * school.
-     *
+     * 
      * @param typeTeacher the unit type of the teacher
      * @param typeStudent the unit type of the student
      * @return an <code>UnitType</code> value
@@ -632,7 +621,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the skill level.
-     *
+     * 
      * @return The level of skill for this unit. A higher value signals a more
      *         advanced type of units.
      */
@@ -642,7 +631,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the skill level of the given type of <code>Unit</code>.
-     *
+     * 
      * @param unitType The type of <code>Unit</code>.
      * @return The level of skill for the given unit. A higher value signals a
      *         more advanced type of units.
@@ -654,12 +643,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         return 0;
     }
-
+    
     public static Comparator<Unit> getSkillLevelComparator(){
         if(skillLevelComp != null){
             return skillLevelComp;
         }
-
+        
         // Create comparator to sort units by skill level
         // Prefer unit with less qualifications
         skillLevelComp = new Comparator<Unit>(){
@@ -673,13 +662,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 return 0;
             }
         };
-
+        
         return skillLevelComp;
     }
 
     /**
      * Gets the number of turns this unit has been training.
-     *
+     * 
      * @return The number of turns of training this <code>Unit</code> has
      *         given.
      * @see #setTurnsOfTraining
@@ -691,7 +680,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the number of turns this unit has been training.
-     *
+     * 
      * @param turnsOfTraining The number of turns of training this
      *            <code>Unit</code> has given.
      * @see #getNeededTurnsOfTraining
@@ -702,7 +691,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the experience of this <code>Unit</code> at its current workType.
-     *
+     * 
      * @return The experience of this <code>Unit</code> at its current
      *         workType.
      * @see #modifyExperience
@@ -725,7 +714,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Modifies the experience of this <code>Unit</code> at its current
      * workType.
-     *
+     * 
      * @param value The value by which to modify the experience of this
      *            <code>Unit</code>.
      * @see #getExperience
@@ -769,7 +758,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // EquipmentType abilities always apply
         for (EquipmentType equipmentType : equipment.keySet()) {
             result.addAll(equipmentType.getFeatureContainer().getAbilitySet(id));
-            // player abilities may also apply to equipment (missionary)
+            // player abilities may also apply to equipment (missionary) 
             result.addAll(getOwner().getFeatureContainer()
                           .getAbilitySet(id, equipmentType, getGame().getTurn()));
         }
@@ -793,13 +782,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // EquipmentType modifiers always apply
         for (EquipmentType equipmentType : equipment.keySet()) {
             result.addAll(equipmentType.getFeatureContainer().getModifierSet(id));
-            // player modifiers may also apply to equipment (unused)
+            // player modifiers may also apply to equipment (unused) 
             result.addAll(getOwner().getFeatureContainer()
                           .getModifierSet(id, equipmentType, getGame().getTurn()));
         }
         return result;
     }
-
+    
     /**
      * Add the given Feature to the Features Map. If the Feature given
      * can not be combined with a Feature with the same ID already
@@ -851,7 +840,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if(oldStudent == newStudent){
             return;
         }
-
+        
         if (newStudent == null) {
             this.student = null;
             if(oldStudent != null && oldStudent.getTeacher() == this){
@@ -889,7 +878,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if(newTeacher == oldTeacher){
             return;
         }
-
+        
         if (newTeacher == null) {
             this.teacher = null;
             if(oldTeacher != null && oldTeacher.getStudent() == this){
@@ -957,7 +946,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the type of goods this unit has accrued experience producing.
-     *
+     * 
      * @return The type of goods this unit would produce.
      */
     public GoodsType getExperienceType() {
@@ -966,7 +955,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the type of goods this unit is producing in its current occupation.
-     *
+     * 
      * @return The type of goods this unit would produce.
      */
     public GoodsType getWorkType() {
@@ -978,7 +967,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the type of goods this unit is producing in its current occupation.
-     *
+     * 
      * @param type The type of goods to attempt to produce.
      */
     public void setWorkType(GoodsType type) {
@@ -993,10 +982,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 if (getLocation() instanceof ColonyTile) {
                     ColonyTile colonyTile = (ColonyTile) getLocation();
                     if (oldWorkType != null) {
-                        colonyTile.firePropertyChange(oldWorkType.getId(),
+                        colonyTile.firePropertyChange(oldWorkType.getId(), 
                                                       colonyTile.getProductionOf(this, oldWorkType), null);
                     }
-                    colonyTile.firePropertyChange(type.getId(),
+                    colonyTile.firePropertyChange(type.getId(), 
                                                   null, colonyTile.getProductionOf(this, type));
                 }
             }
@@ -1020,7 +1009,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns the destination of this unit.
-     *
+     * 
      * @return The destination of this unit.
      */
     public Location getDestination() {
@@ -1029,7 +1018,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the destination of this unit.
-     *
+     * 
      * @param newDestination The new destination of this unit.
      */
     public void setDestination(Location newDestination) {
@@ -1040,13 +1029,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Finds a shortest path from the current <code>Tile</code> to the one
      * specified. Only paths on water are allowed if <code>isNaval()</code>
      * and only paths on land if not.
-     *
+     * 
      * <br>
      * <br>
-     *
+     * 
      * The <code>Tile</code> at the <code>end</code> will not be checked
      * against the legal moves of this <code>Unit</code>.
-     *
+     * 
      * @param end The <code>Tile</code> in which the path ends.
      * @return A <code>PathNode</code> for the first tile in the path. Calling
      *         {@link PathNode#getTile} on this object, will return the
@@ -1069,7 +1058,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Finds a shortest path from the current <code>Tile</code> to the one
      * specified. Only paths on water are allowed if <code>isNaval()</code>
      * and only paths on land if not.
-     *
+     * 
      * @param start The <code>Tile</code> in which the path starts.
      * @param end The <code>Tile</code> in which the path ends.
      * @return A <code>PathNode</code> for the first tile in the path.
@@ -1086,7 +1075,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Returns the number of turns this <code>Unit</code> will have to use in
      * order to reach the given <code>Tile</code>.
-     *
+     * 
      * @param end The <code>Tile</code> to be reached by this
      *            <code>Unit</code>.
      * @return The number of turns it will take to reach the <code>end</code>,
@@ -1099,7 +1088,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Returns the number of turns this <code>Unit</code> will have to use in
      * order to reach the given <code>Tile</code>.
-     *
+     * 
      * @param start The <code>Tile</code> to start the search from.
      * @param end The <code>Tile</code> to be reached by this
      *            <code>Unit</code>.
@@ -1128,11 +1117,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         return INFINITY;
     }
-
+    
     /**
      * Returns the number of turns this <code>Unit</code> will have to use in
      * order to reach the given <code>Location</code>.
-     *
+     * 
      * @param destination The destination for this unit.
      * @return The number of turns it will take to reach the <code>destination</code>,
      *         or <code>INFINITY</code> if no path can be found.
@@ -1141,7 +1130,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (destination == null) {
             logger.log(Level.WARNING, "destination == null", new Throwable());
         }
-
+        
         if (getTile() == null) {
             if (destination.getTile() == null) {
                 return 0;
@@ -1152,7 +1141,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 p = getGame().getMap().findPath(this, (Tile) carrier.getEntryLocation(), destination.getTile(), carrier);
             } else {
                 // TODO: Use a standard carrier with four move points as a the unit's carrier:
-                p = getGame().getMap().findPath((Tile) getOwner().getEntryLocation(), destination.getTile(),
+                p = getGame().getMap().findPath((Tile) getOwner().getEntryLocation(), destination.getTile(), 
                                                 Map.PathType.BOTH_LAND_AND_SEA);
             }
             if (p != null) {
@@ -1161,12 +1150,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 return INFINITY;
             }
         }
-
+        
         if (destination.getTile() == null) {
             // TODO: Find a path (and determine distance) to Europe:
             return 10;
         }
-
+        
         return getTurnsToReach(destination.getTile());
     }
 
@@ -1175,7 +1164,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * <code>Tile</code>. A call to {@link #getMoveType(Tile)} will return
      * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
-     *
+     * 
      * @param target The <code>Tile</code> this <code>Unit</code> will move
      *            onto.
      * @return The cost of moving this unit onto the given <code>Tile</code>.
@@ -1191,7 +1180,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * {@link #getMoveType(Tile, Tile, int)} will return
      * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
-     *
+     * 
      * @param from The <code>Tile</code> this <code>Unit</code> will move
      *            from.
      * @param target The <code>Tile</code> this <code>Unit</code> will move
@@ -1223,7 +1212,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the type of a move made in a specified direction.
-     *
+     * 
      * @param direction The <code>Direction</code> of the move.
      * @return The move type.
      */
@@ -1240,18 +1229,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the type of a move that is made when moving from one tile
      * to another.
-     *
+     * 
      * @param target The target <code>Tile</code> of the move.
      * @return The move type.
      */
     public MoveType getMoveType(Tile target) {
         return getMoveType(getTile(), target, getMovesLeft());
     }
-
+    
     /**
      * Gets the type of a move that is made when moving from one tile
      * to another.
-     *
+     * 
      * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
      * @param ml The amount of moves this unit has left.
@@ -1264,7 +1253,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the type of a move that is made when moving from one tile
      * to another.
-     *
+     * 
      * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
      * @param ml The amount of moves this unit has left.
@@ -1301,7 +1290,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Gets the type of a move that is made when moving from one tile
      * to another, without checking if the unit has moves left or
      * logging errors.
-     *
+     * 
      * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
      * @param ignoreEnemyUnits Should be <code>true</code> if enemy
@@ -1319,7 +1308,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Gets the type of a move that is made when moving from one tile
      * to another, without checking if the unit has moves left or
      * logging errors.
-     *
+     * 
      * @param target The target <code>Tile</code> of the move.
      * @return The move type, which will be one of the extended illegal move
      *         types on failure.
@@ -1335,7 +1324,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the type of a move made in a specified direction,
      * without checking if the unit has moves left or logging errors.
-     *
+     * 
      * @param direction The direction of the move.
      * @return The move type.
      */
@@ -1396,7 +1385,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the type of a move that is made when moving a land unit to
      * from one tile to another.
-     *
+     * 
      * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
      * @param ignoreEnemyUnits Should be <code>true</code> if enemy
@@ -1509,7 +1498,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (!allowMoveFrom(from))
                 ? MoveType.MOVE_NO_ACCESS_WATER
-                : (!getType().canBeUpgraded(null, ChangeType.NATIVES))
+                : (!getType().canBeUpgraded(null, ChangeType.NATIVES)) 
                 ? MoveType.MOVE_NO_ACCESS_SKILL
                 : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
         } else {
@@ -1589,7 +1578,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the <code>movesLeft</code>.
-     *
+     * 
      * @param movesLeft The new amount of moves left this <code>Unit</code>
      *            should have. If <code>movesLeft < 0</code> then
      *            <code>movesLeft = 0</code>.
@@ -1605,7 +1594,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the amount of space this <code>Unit</code> takes when put on a
      * carrier.
-     *
+     * 
      * @return The space this <code>Unit</code> takes.
      */
     public int getSpaceTaken() {
@@ -1615,7 +1604,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the line of sight of this <code>Unit</code>. That is the distance
      * this <code>Unit</code> can spot new tiles, enemy unit e.t.c.
-     *
+     * 
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
@@ -1635,10 +1624,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public boolean isOnCarrier(){
         return(this.getLocation() instanceof Unit);
     }
-
+    
     /**
      * Sets the given state to all the units that si beeing carried.
-     *
+     * 
      * @param state The state.
      */
     public void setStateToAllChildren(UnitState state) {
@@ -1649,7 +1638,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Set movesLeft to 0 if has some spent moves and it's in a colony
-     *
+     * 
      * @see #add(Locatable)
      * @see #remove(Locatable)
      */
@@ -1660,7 +1649,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Adds a locatable to this <code>Unit</code>.
-     *
+     * 
      * @param locatable The <code>Locatable</code> to add to this
      *            <code>Unit</code>.
      */
@@ -1675,10 +1664,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 logger.warning("Tried to add a 'Locatable' already in the carrier.");
                 return;
             }
-
+            
             if (units.equals(Collections.emptyList())) {
                 units = new ArrayList<Unit>();
-            }
+            } 
             units.add(unit);
             unit.setState(UnitState.SENTRY);
             firePropertyChange(CARGO_CHANGE, null, locatable);
@@ -1699,7 +1688,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Removes a <code>Locatable</code> from this <code>Unit</code>.
-     *
+     * 
      * @param locatable The <code>Locatable</code> to remove from this
      *            <code>Unit</code>.
      */
@@ -1722,7 +1711,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Checks if this <code>Unit</code> contains the specified
      * <code>Locatable</code>.
-     *
+     * 
      * @param locatable The <code>Locatable</code> to test the presence of.
      * @return
      *            <ul>
@@ -1745,7 +1734,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Checks wether or not the specified locatable may be added to this
      * <code>Unit</code>. The locatable cannot be added is this
      * <code>Unit</code> if it is not a carrier or if there is no room left.
-     *
+     * 
      * @param locatable The <code>Locatable</code> to test the addabillity of.
      * @return The result.
      */
@@ -1783,7 +1772,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the amount of Units at this Location.
-     *
+     * 
      * @return The amount of Units at this Location.
      */
     public int getUnitCount() {
@@ -1793,7 +1782,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the first <code>Unit</code> beeing carried by this
      * <code>Unit</code>.
-     *
+     * 
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
@@ -1807,7 +1796,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets the last <code>Unit</code> beeing carried by this
      * <code>Unit</code>.
-     *
+     * 
      * @return The <code>Unit</code>.
      */
     public Unit getLastUnit() {
@@ -1820,7 +1809,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Checks if this unit is visible to the given player.
-     *
+     * 
      * @param player The <code>Player</code>.
      * @return <code>true</code> if this <code>Unit</code> is visible to the
      *         given <code>Player</code>.
@@ -1829,16 +1818,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if(player == getOwner()){
             return true;
         }
-
+        
         Tile unitTile = getTile();
         if(unitTile == null){
             return false;
         }
-
+        
         if(!player.canSee(unitTile)){
             return false;
         }
-
+        
         Settlement settlement = unitTile.getSettlement();
         if(settlement != null && settlement.getOwner() != player){
             return false;
@@ -1847,14 +1836,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if(isOnCarrier() && ((Unit) getLocation()).getOwner() != player){
             return false;
         }
-
+        
         return true;
     }
 
     /**
      * Gets a <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Location</code>.
-     *
+     * 
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
@@ -1868,7 +1857,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Gets a <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Location</code>.
-     *
+     * 
      * @return The <code>Iterator</code>.
      */
     public Iterator<Goods> getGoodsIterator() {
@@ -1878,7 +1867,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return EmptyIterator.getInstance();
         }
     }
-
+    
     /**
      * Returns a <code>List</code> containing the goods carried by this unit.
      * @return a <code>List</code> containing the goods carried by this unit.
@@ -1941,12 +1930,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 }
             }
         }
-
+        
         setWorkImprovement(improvement);
         setState(UnitState.IMPROVING);
         // No need to set Location, stay at the tile it is on.
     }
-
+    
     /**
      * Sets the units location without updating any other variables
      * @param newLocation The new Location
@@ -1957,7 +1946,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the location of this Unit.
-     *
+     * 
      * @param newLocation The new Location of the Unit.
      */
     public void setLocation(Location newLocation) {
@@ -1965,7 +1954,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         Location oldLocation = location;
         Colony oldColony = this.getColony();
         Colony newColony = null;
-
+        
         if (location != null) {
             location.remove(this);
         }
@@ -2026,7 +2015,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the <code>IndianSettlement</code> that owns this unit.
-     *
+     * 
      * @param indianSettlement The <code>IndianSettlement</code> that should
      *            now be owning this <code>Unit</code>.
      */
@@ -2044,7 +2033,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the <code>IndianSettlement</code> that owns this unit.
-     *
+     * 
      * @return The <code>IndianSettlement</code>.
      */
     public IndianSettlement getIndianSettlement() {
@@ -2053,7 +2042,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the location of this Unit.
-     *
+     * 
      * @return The location of this Unit.
      */
     public Location getLocation() {
@@ -2081,7 +2070,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * <code>EquipmentType</code> at the current
      * <code>Location</code>. This is the case if all requirements of
      * the EquipmentType are met.
-     *
+     * 
      * @param equipmentType an <code>EquipmentType</code> value
      * @return whether this unit can be equipped with the given
      *         <code>EquipmentType</code> at the current location.
@@ -2151,39 +2140,39 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Checks if this <code>Unit</code> is located in Europe. That is; either
      * directly or onboard a carrier which is in Europe.
-     *
+     * 
      * @return The result.
      */
     public boolean isInEurope() {
         if (location instanceof Unit) {
             return ((Unit) location).isInEurope();
         }
-
+        
         if(!(getLocation() instanceof Europe)){
             return false;
         }
-
+        
         if(isBetweenEuropeAndNewWorld()){
             return false;
         }
         return true;
     }
-
+    
     /**
      * Checks if this <code>Unit</code> is either a carrier or on one, bound to/from Europe
-     *
+     * 
      * @return The result.
      */
     public boolean isBetweenEuropeAndNewWorld() {
         if (location instanceof Unit) {
             return ((Unit) location).isBetweenEuropeAndNewWorld();
         }
-
+        
         if(!(getLocation() instanceof Europe)){
             return false;
         }
-
-        if(getState() == UnitState.TO_EUROPE
+        
+        if(getState() == UnitState.TO_EUROPE 
                 || getState() == UnitState.TO_AMERICA){
             return true;
         }
@@ -2192,7 +2181,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
-     *
+     * 
      * @return 'true' if this unit can carry goods or other units,
      * 'false' otherwise.
      */
@@ -2203,7 +2192,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the owner of this Unit.
-     *
+     * 
      * @return The owner of this Unit.
      */
     public Player getOwner() {
@@ -2224,12 +2213,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the owner of this Unit.
-     *
+     * 
      * @param owner The new owner of this Unit.
      */
     public void setOwner(Player owner) {
         Player oldOwner = this.owner;
-
+        
         // safeguard
         if (oldOwner == owner) {
             return;
@@ -2247,12 +2236,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         // This need to be set right away
         this.owner = owner;
-        // If its a carrier, we need to update the units it has loaded
+        // If its a carrier, we need to update the units it has loaded 
         //before finishing with it
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
         }
-
+                
         if(oldOwner != null){
             oldOwner.removeUnit(this);
             oldOwner.modifyScore(-getType().getScoreValue());
@@ -2276,7 +2265,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the type of the unit.
-     *
+     * 
      * @param newUnitType The new type of the unit.
      */
     public void setType(UnitType newUnitType) {
@@ -2351,7 +2340,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         return result;
     }
-
+        
 
     /**
      * Return a description of the unit's equipment.
@@ -2385,7 +2374,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the amount of moves this unit has at the beginning of each turn.
-     *
+     * 
      * @return The amount of moves this unit has at the beginning of each turn.
      */
     public int getInitialMovesLeft() {
@@ -2395,7 +2384,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the hitpoints for this unit.
-     *
+     * 
      * @param hitpoints The hitpoints this unit has. This is currently only used
      *            for damaged ships, but might get an extended use later.
      * @see UnitType#getHitPoints
@@ -2409,7 +2398,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns the hitpoints.
-     *
+     * 
      * @return The hitpoints this unit has. This is currently only used for
      *         damaged ships, but might get an extended use later.
      * @see UnitType#getHitPoints
@@ -2420,7 +2409,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Checks if this unit is under repair.
-     *
+     * 
      * @return <i>true</i> if under repair and <i>false</i> otherwise.
      */
     public boolean isUnderRepair() {
@@ -2429,7 +2418,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns a String representation of this Unit.
-     *
+     * 
      * @return A String representation of this Unit.
      */
     public String toString() {
@@ -2459,7 +2448,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Checks if this <code>Unit</code> is naval.
-     *
+     * 
      * @return <i>true</i> if this Unit is a naval Unit and <i>false</i>
      *         otherwise.
      */
@@ -2469,7 +2458,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the state of this <code>Unit</code>.
-     *
+     * 
      * @return The state of this <code>Unit</code>.
      */
     public UnitState getState() {
@@ -2478,7 +2467,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the <code>Role</code> of this <code>Unit</code>.
-     *
+     * 
      * @return The <code>role</code> of this <code>Unit</code>.
      */
     public Role getRole() {
@@ -2515,13 +2504,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             setStateUnchecked(UnitState.ACTIVE);
             setMovesLeft(0);
         }
-
+        
         //Check for role change for reseting the experience
         // Soldier and Dragoon are compatible, no loss of experience
-        boolean keepExperience = (role == oldRole) ||
+        boolean keepExperience = (role == oldRole) || 
                                  (role == Role.SOLDIER && oldRole == Role.DRAGOON) ||
                                  (role == Role.DRAGOON && oldRole == Role.SOLDIER);
-
+        
         if(!keepExperience){
             experience = 0;
         }
@@ -2529,7 +2518,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Checks if a <code>Unit</code> can get the given state set.
-     *
+     * 
      * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
      *            FORTIFIED, ...}.
      * @return 'true' if the Unit's state can be changed to the new value,
@@ -2551,7 +2540,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
             return false;
         case FORTIFYING:
-            return (getMovesLeft() > 0 && !isInEurope());
         case SKIPPED:
             return (getMovesLeft() > 0);
         case TO_EUROPE:
@@ -2569,12 +2557,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Sets a new state for this unit and initializes the amount of work the
      * unit has left.
-     *
+     * 
      * If the work needs turns to be completed (for instance when plowing), then
      * the moves the unit has still left will be used up. Some work (basically
      * building a road with a hardy pioneer) might actually be finished already
      * in this method-call, in which case the state is set back to UnitState.ACTIVE.
-     *
+     * 
      * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
      *            UnitState.FORTIFIED, ...}.
      */
@@ -2593,7 +2581,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Cleanup the old UnitState, for example destroy the
         // TileImprovment being built by a pioneer.
         switch (state) {
-        case IMPROVING:
+        case IMPROVING: 
             if (workLeft > 0) {
                 if (!workImprovement.isComplete()) {
                     workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
@@ -2660,7 +2648,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Checks if this <code>Unit</code> can be moved to Europe.
-     *
+     * 
      * @return <code>true</code> if this unit can move to Europe.
      */
     public boolean canMoveToEurope() {
@@ -2678,7 +2666,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         if (surroundingTiles.size() != 8) {
             // TODO: the new carribean map has no south pole, and this allows moving to europe
-            // via the bottom edge of the map, which is approximately the equator line.
+            // via the bottom edge of the map, which is approximately the equator line. 
             // Should we enforce moving to europe requires high seas, and no movement via north/south poles?
             return true;
         } else {
@@ -2695,7 +2683,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Check if this unit can build a colony.  Does not consider whether
      * the tile where the unit is located is suitable,
      * @see #Player.canClaimToFoundSettlement.
-     *
+     * 
      * @return <code>true</code> if this unit can build a colony.
      */
     public boolean canBuildColony() {
@@ -2707,7 +2695,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Returns the Tile where this Unit is located. Or null if its location is
      * Europe.
-     *
+     * 
      * @return The Tile where this Unit is located. Or null if its location is
      *         Europe.
      */
@@ -2717,7 +2705,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns the amount of space left on this Unit.
-     *
+     * 
      * @return The amount of units/goods than can be moved onto this Unit.
      */
     public int getSpaceLeft() {
@@ -2734,7 +2722,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns the amount of goods that is carried by this unit.
-     *
+     * 
      * @return The amount of goods carried by this <code>Unit</code>. This
      *         value might different from the one returned by
      *         {@link #getGoodsCount()} when the model is
@@ -2756,7 +2744,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Move the given unit to the front of this carrier (make sure it'll be the
      * first unit in this unit's unit list).
-     *
+     * 
      * @param u The unit to move to the front.
      */
     public void moveToFront(Unit u) {
@@ -2785,7 +2773,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Get the number of turns of work left.
-     *
+     * 
      * @return The number of turns of work left.
      */
     public int getWorkTurnsLeft() {
@@ -2798,7 +2786,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Sets the <code>Location</code> in which this unit will be put when
      * returning from {@link Europe}.
-     *
+     * 
      * @param entryLocation The <code>Location</code>.
      * @see #getEntryLocation
      */
@@ -2811,7 +2799,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * returning from {@link Europe}. If this <code>Unit</code> has not not
      * been outside europe before, it will return the default value from the
      * {@link Player} owning this <code>Unit</code>.
-     *
+     * 
      * @return The <code>Location</code>.
      * @see Player#getEntryLocation
      * @see #getVacantEntryLocation
@@ -2821,20 +2809,61 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+<<<<<<< .working
+=======
+     * Gets the <code>Location</code> in which this unit will be put when
+     * returning from {@link Europe}. If this <code>Unit</code> has not not
+     * been outside europe before, it will return the default value from the
+     * {@link Player} owning this <code>Unit</code>. If the tile is occupied
+     * by a enemy unit, then a nearby tile is choosen.
+     * 
+     * <br>
+     * <br>
+     * <i>WARNING:</i> Only the server has the information to determine which
+     * <code>Tile</code> is occupied. Use
+     * {@link ModelController#setToVacantEntryLocation} instead.
+     * 
+     * @return The <code>Location</code>.
+     * @see #getEntryLocation
+     */
+    // TODO: shouldn't this be somewhere else?
+    public Location getVacantEntryLocation() {
+        Tile l = (Tile) getEntryLocation();
+
+        if (l.getFirstUnit() != null && l.getFirstUnit().getOwner() != getOwner()) {
+            int radius = 1;
+            while (true) {
+                Iterator<Position> i = getGame().getMap().getCircleIterator(l.getPosition(), false, radius);
+                while (i.hasNext()) {
+                    Tile l2 = getGame().getMap().getTile(i.next());
+                    if (l2.getFirstUnit() == null || l2.getFirstUnit().getOwner() == getOwner()) {
+                        return l2;
+                    }
+                }
+
+                radius++;
+            }
+        }
+
+        return l;
+    }
+
+    /**
+>>>>>>> .merge-right.r7577
      * Checks if this is an defensive unit. That is: a unit which can be used to
      * defend a <code>Settlement</code>.
-     *
+     * 
      * <br><br>
-     *
+     * 
      * Note! As this method is used by the AI it really means that the unit can
      * defend as is. To be specific an unarmed colonist is not defensive yet,
      * even if Paul Revere and stockpiled muskets are available. That check is
      * only performed on an actual attack.
-     *
+     * 
      * <br><br>
-     *
+     * 
      * A settlement is lost when there are no more defensive units.
-     *
+     * 
      * @return <code>true</code> if this is a defensive unit meaning it can be
      *         used to defend a <code>Colony</code>. This would normally mean
      *         that a defensive unit also will be
@@ -2854,7 +2883,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns true if this unit can carry treasure (like a treasure train)
-     *
+     * 
      * @return <code>true</code> if this <code>Unit</code> is capable of
      *         carrying treasure.
      */
@@ -2864,7 +2893,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Returns true if this unit is a ship that can capture enemy goods.
-     *
+     * 
      * @return <code>true</code> if this <code>Unit</code> is capable of
      *         capturing goods.
      */
@@ -2895,7 +2924,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the Colony this unit is in.
-     *
+     * 
      * @return The Colony it's in, or null if it is not in a Colony
      */
     public Colony getColony() {
@@ -2903,10 +2932,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return (location != null ? location.getColony() : null);
     }
 
-    /**
+    /** 
      * Given a type of goods to produce in the field and a tile,
      * returns the unit's potential to produce goods.
-     *
+     * 
      * @param goodsType The type of goods to be produced.
      * @param base an <code>int</code> value
      * @return The potential amount of goods to be farmed.
@@ -3152,14 +3181,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     *
+     * 
      * <br>
      * <br>
-     *
+     * 
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     *
+     * 
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -3196,7 +3225,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
         out.writeAttribute("attrition", Integer.toString(attrition));
-
+        
         writeAttribute(out, "student", student);
         writeAttribute(out, "teacher", teacher);
 
@@ -3227,7 +3256,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             out.writeAttribute("tradeRoute", tradeRoute.getId());
             out.writeAttribute("currentStop", String.valueOf(currentStop));
         }
-
+        
         writeFreeColGameObject(workImprovement, out, player, showAll, toSavedGame);
 
         // Do not show enemy units hidden in a carrier:
@@ -3257,7 +3286,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Initialize this object from an XML-representation of this object.
-     *
+     * 
      * @param in The input stream with the XML.
      * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
      */
@@ -3391,7 +3420,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 workImprovement = updateFreeColGameObject(in, TileImprovement.class);
             }
         }
-
+        
         if (goodsContainer == null && canCarryGoods()) {
             logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
             goodsContainer = new GoodsContainer(getGame(), this);

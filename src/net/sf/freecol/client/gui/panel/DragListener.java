@@ -39,10 +39,6 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.action.ClearOrdersAction;
-import net.sf.freecol.client.gui.action.ColopediaAction;
-import net.sf.freecol.client.gui.action.UnitStateChangeAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -176,9 +172,11 @@ public final class DragListener extends MouseAdapter {
         JPopupMenu menu = new JPopupMenu("Unit");
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit, 0.66);
 
-        ColopediaAction action = new ColopediaAction(canvas.getClient(), tempUnit.getType());
-        JMenuItem name = new JMenuItem(action);
-        name.setIcon(unitIcon);
+        JMenuItem name = new JMenuItem(Messages.message(tempUnit.getLabel()) + " (" +
+                                       Messages.message("menuBar.colopedia") + ")",
+                                       unitIcon);
+        name.setActionCommand(UnitAction.COLOPEDIA.toString());
+        name.addActionListener(unitLabel);
         menu.add(name);
         menu.addSeparator();
 
@@ -381,36 +379,52 @@ public final class DragListener extends MouseAdapter {
 
     private boolean addCommandItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
+        final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
 
-        if (tempUnit.isBetweenEuropeAndNewWorld()) {
-            return false;
-        } else {
-            for (UnitState state : ActionManager.STATES) {
-                UnitStateChangeAction action = new UnitStateChangeAction(canvas.getClient(), tempUnit, state);
-                action.update();
-                JMenuItem menuItem = new JMenuItem(action);
-                menu.add(menuItem);
-            }
+        JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
+        menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
+        menuItem.addActionListener(unitLabel);
+        menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE
+                                && !isUnitBetweenEuropeAndNewWorld);
+        menu.add(menuItem);
 
-            UnitState unitState = tempUnit.getState();
-
-            ClearOrdersAction action = new ClearOrdersAction(canvas.getClient(), tempUnit);
-            action.update();
-            JMenuItem menuItem = new JMenuItem(action);
+        if (!(tempUnit.getLocation() instanceof Europe)) {
+            menuItem = new JMenuItem(Messages.message("fortifyUnit"));
+            menuItem.setActionCommand(UnitAction.FORTIFY.toString());
+            menuItem.addActionListener(unitLabel);
+            menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
+                                && !(tempUnit.getState() == UnitState.FORTIFIED ||
+                                     tempUnit.getState() == UnitState.FORTIFYING));
             menu.add(menuItem);
-
-            if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
-                menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
-                menuItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            canvas.getClient().getInGameController()
-                                .checkCashInTreasureTrain(tempUnit);
-                        }
-                    });
-                menu.add(menuItem);
-            }
-            return true;
         }
+
+        UnitState unitState = tempUnit.getState();
+        menuItem = new JMenuItem(Messages.message("sentryUnit"));
+        menuItem.setActionCommand(UnitAction.SENTRY.toString());
+        menuItem.addActionListener(unitLabel);
+        menuItem.setEnabled(unitState != UnitState.SENTRY
+                                && !isUnitBetweenEuropeAndNewWorld);
+        menu.add(menuItem);
+
+        boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
+        menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
+        menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
+        menuItem.addActionListener(unitLabel);
+        menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
+                                && !isUnitBetweenEuropeAndNewWorld);
+        menu.add(menuItem);
+
+        if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
+            menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        canvas.getClient().getInGameController()
+                            .checkCashInTreasureTrain(tempUnit);
+                    }
+                });
+            menu.add(menuItem);
+        }
+        return true;
     }
 
 
