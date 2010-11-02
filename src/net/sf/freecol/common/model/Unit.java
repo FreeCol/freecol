@@ -2821,44 +2821,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Gets the <code>Location</code> in which this unit will be put when
-     * returning from {@link Europe}. If this <code>Unit</code> has not not
-     * been outside europe before, it will return the default value from the
-     * {@link Player} owning this <code>Unit</code>. If the tile is occupied
-     * by a enemy unit, then a nearby tile is choosen.
-     *
-     * <br>
-     * <br>
-     * <i>WARNING:</i> Only the server has the information to determine which
-     * <code>Tile</code> is occupied. Use
-     * {@link ModelController#setToVacantEntryLocation} instead.
-     *
-     * @return The <code>Location</code>.
-     * @see #getEntryLocation
-     */
-    // TODO: shouldn't this be somewhere else?
-    public Location getVacantEntryLocation() {
-        Tile l = (Tile) getEntryLocation();
-
-        if (l.getFirstUnit() != null && l.getFirstUnit().getOwner() != getOwner()) {
-            int radius = 1;
-            while (true) {
-                Iterator<Position> i = getGame().getMap().getCircleIterator(l.getPosition(), false, radius);
-                while (i.hasNext()) {
-                    Tile l2 = getGame().getMap().getTile(i.next());
-                    if (l2.getFirstUnit() == null || l2.getFirstUnit().getOwner() == getOwner()) {
-                        return l2;
-                    }
-                }
-
-                radius++;
-            }
-        }
-
-        return l;
-    }
-
-    /**
      * Checks if this is an defensive unit. That is: a unit which can be used to
      * defend a <code>Settlement</code>.
      *

@@ -68,8 +68,6 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -1197,8 +1195,8 @@ public final class InGameController extends Controller {
             t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
                     public void run() {
                         ChangeSet cs = new ChangeSet();
-                        csChangeStance(serverPlayer, Stance.WAR, enemy,
-                                       enemy.isEuropean(), cs);
+                        serverPlayer.csChangeStance(Stance.WAR, enemy,
+                                                    enemy.isEuropean(), cs);
                         cs.add(See.only(serverPlayer),
                                ChangePriority.CHANGE_EARLY,
                                new MonarchActionMessage(enemy));
@@ -1337,62 +1335,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Change stance and collect changes that need updating.
-     *
-     * @param player The originating <code>Player</code>.
-     * @param stance The new <code>Stance</code>.
-     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
-     * @param symmetric If true, change the otherPlayer stance as well.
-     * @param cs A <code>ChangeSet</code> containing the changes.
-     * @return True if there was a change in stance at all.
-     */
-    private boolean csChangeStance(Player player, Stance stance,
-                                   Player otherPlayer, boolean symmetric,
-                                   ChangeSet cs) {
-        boolean change = false;
-        Stance old = player.getStance(otherPlayer);
-
-        if (old != stance) {
-            try {
-                int modifier = old.getTensionModifier(stance);
-                player.setStance(otherPlayer, stance);
-                if (modifier != 0) {
-                    cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
-                           player.modifyTension(otherPlayer, modifier));
-                }
-                cs.addStance(See.perhaps(), player, stance, otherPlayer);
-                change = true;
-                logger.finest("Stance change " + player.getName()
-                              + " " + old.toString()
-                              + " -> " + stance.toString()
-                              + " wrt " + otherPlayer.getName());
-            } catch (IllegalStateException e) { // Catch illegal transitions
-                logger.log(Level.WARNING, "Illegal stance transition", e);
-            }
-        }
-        if (symmetric && (old = otherPlayer.getStance(player)) != stance) {
-            try {
-                int modifier = old.getTensionModifier(stance);
-                otherPlayer.setStance(player, stance);
-                if (modifier != 0) {
-                    cs.add(See.only(null).perhaps((ServerPlayer) player),
-                           otherPlayer.modifyTension(player, modifier));
-                }
-                cs.addStance(See.perhaps(), otherPlayer, stance, player);
-                change = true;
-                logger.finest("Stance change " + otherPlayer.getName()
-                              + " " + old.toString()
-                              + " -> " + stance.toString()
-                              + " wrt " + player.getName());
-            } catch (IllegalStateException e) { // Catch illegal transitions
-                logger.log(Level.WARNING, "Illegal stance transition", e);
-            }
-        }
-
-        return change;
-    }
-
-    /**
      * Change stance and inform all but the originating player.
      *
      * @param player The originating <code>Player</code>.
@@ -1404,8 +1346,9 @@ public final class InGameController extends Controller {
     public void changeStance(Player player, Stance stance,
                              Player otherPlayer, boolean symmetric) {
         ChangeSet cs = new ChangeSet();
-        if (csChangeStance(player, stance, otherPlayer, symmetric, cs)) {
-            sendToOthers((ServerPlayer) player, cs);
+        ServerPlayer serverPlayer = (ServerPlayer) player;
+        if (serverPlayer.csChangeStance(stance, otherPlayer, symmetric, cs)) {
+            sendToOthers(serverPlayer, cs);
         }
     }
 
@@ -1613,7 +1556,7 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%newNation%", serverPlayer.getNationName())
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
-        csChangeStance(serverPlayer, Stance.WAR, refPlayer, false, cs);
+        serverPlayer.csChangeStance(Stance.WAR, refPlayer, false, cs);
 
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
@@ -1633,8 +1576,8 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         // The rebels have won.
-        if (!csChangeStance(serverPlayer, Stance.PEACE, independent,
-                            true, cs)) {
+        if (!serverPlayer.csChangeStance(Stance.PEACE, independent,
+                                         true, cs)) {
             return Message.clientError("Unable to make peace!?!");
         }
         independent.setPlayerType(PlayerType.INDEPENDENT);
@@ -2203,314 +2146,6 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
-
-    /**
-     * If a unit moves, check if an opposing naval unit slows it down.
-     * Note that the unit moves are reduced here.
-     *
-     * @param unit The <code>Unit</code> that is moving.
-     * @param newTile The <code>Tile</code> the unit is moving to.
-     * @return Either an enemy unit that causes a slowdown, or null if none.
-     */
-    private Unit getSlowedBy(Unit unit, Tile newTile) {
-        Player player = unit.getOwner();
-        Game game = unit.getGame();
-        CombatModel combatModel = game.getCombatModel();
-        boolean pirate = unit.hasAbility("model.ability.piracy");
-        Unit attacker = null;
-        float attackPower = 0, totalAttackPower = 0;
-
-        if (!unit.isNaval() || unit.getMovesLeft() <= 0) return null;
-        for (Tile tile : newTile.getSurroundingTiles(1)) {
-            // Ships in settlements do not slow enemy ships, but:
-            // TODO should a fortress slow a ship?
-            Player enemy;
-            if (tile.isLand()
-                || tile.getColony() != null
-                || tile.getFirstUnit() == null
-                || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
-            for (Unit enemyUnit : tile.getUnitList()) {
-                if ((pirate || enemyUnit.hasAbility("model.ability.piracy")
-                     || (enemyUnit.isOffensiveUnit() && player.atWarWith(enemy)))
-                    && enemyUnit.isNaval()
-                    && combatModel.getOffencePower(enemyUnit, unit) > attackPower) {
-                    attackPower = combatModel.getOffencePower(enemyUnit, unit);
-                    totalAttackPower += attackPower;
-                    attacker = enemyUnit;
-                }
-            }
-        }
-        if (attacker != null) {
-            float defencePower = combatModel.getDefencePower(attacker, unit);
-            float totalProbability = totalAttackPower + defencePower;
-            if (Utils.randomInt(logger, "Slowed", random,
-                                Math.round(totalProbability) + 1)
-                < totalAttackPower) {
-                int diff = Math.max(0, Math.round(totalAttackPower - defencePower));
-                int moves = Math.min(9, 3 + diff / 3);
-                unit.setMovesLeft(unit.getMovesLeft() - moves);
-                logger.info(unit.getId()
-                            + " slowed by " + attacker.getId()
-                            + " by " + Integer.toString(moves) + " moves.");
-            } else {
-                attacker = null;
-            }
-        }
-        return attacker;
-    }
-
-    /**
-     * Explores a lost city, finding a native burial ground.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is exploring.
-     * @param unit The <code>Unit</code> that is exploring.
-     * @param cs A <code>ChangeSet</code> to add changes to.
-     */
-    private void csNativeBurialGround(ServerPlayer serverPlayer, Unit unit,
-                                      ChangeSet cs) {
-        Tile tile = unit.getTile();
-        Player indianPlayer = tile.getOwner();
-        cs.add(See.only(serverPlayer),
-               indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit()));
-        cs.add(See.only(serverPlayer), indianPlayer);
-        cs.addMessage(See.only(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                             "lostCityRumour.BurialGround",
-                             serverPlayer, unit)
-                .addStringTemplate("%nation%", indianPlayer.getNationName()));
-    }
-
-    /**
-     * Explore a lost city.
-     *
-     * @param unit The <code>Unit</code> that is exploring.
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param cs A <code>ChangeSet</code> to add changes to.
-     */
-    private void exploreLostCityRumour(ServerPlayer serverPlayer, Unit unit,
-                                       ChangeSet cs) {
-        Tile tile = unit.getTile();
-        LostCityRumour lostCity = tile.getLostCityRumour();
-        if (lostCity == null) return;
-
-        Game game = unit.getGame();
-        Specification spec = game.getSpecification();
-        int difficulty = spec.getInteger("model.option.rumourDifficulty");
-        int dx = 10 - difficulty;
-        UnitType unitType;
-        Unit newUnit = null;
-        List<UnitType> treasureUnitTypes
-            = spec.getUnitTypesWithAbility("model.ability.carryTreasure");
-
-        RumourType rumour = lostCity.getType();
-        if (rumour == null) {
-            rumour = lostCity.chooseType(unit, difficulty, random);
-        }
-        // Filter out failing cases that could only occur if the
-        // type was explicitly set in debug mode.
-        switch (rumour) {
-        case BURIAL_GROUND: case MOUNDS:
-            if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
-                rumour = RumourType.NOTHING;
-            }
-            break;
-        case LEARN:
-            if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
-                rumour = RumourType.NOTHING;
-            }
-            break;
-        default:
-            break;
-        }
-
-        // Mounds are a special case that degrade to other cases.
-        boolean mounds = rumour == RumourType.MOUNDS;
-        if (mounds) {
-            boolean done = false;
-            boolean burial = false;
-            while (!done) {
-                rumour = lostCity.chooseType(unit, difficulty, random);
-                switch (rumour) {
-                case EXPEDITION_VANISHES: case NOTHING: case TRIBAL_CHIEF:
-                case RUINS:
-                    done = true;
-                    break;
-                case BURIAL_GROUND:
-                    if (tile.getOwner() != null && tile.getOwner().isIndian()
-                        && !burial) {
-                        csNativeBurialGround(serverPlayer, unit, cs);
-                        burial = true;
-                    }
-                    break;
-                default:
-                    ; // unacceptable result for mounds
-                }
-            }
-        }
-
-        logger.info("Unit " + unit.getId() + " is exploring rumour " + rumour);
-        switch (rumour) {
-        case BURIAL_GROUND:
-            csNativeBurialGround(serverPlayer, unit, cs);
-            break;
-        case EXPEDITION_VANISHES:
-            cs.addDispose(serverPlayer, tile, unit);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 "lostCityRumour.ExpeditionVanishes",
-                                 serverPlayer));
-            break;
-        case NOTHING:
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 ((mounds) ? "lostCityRumour.moundsNothing"
-                                  : "lostCityRumour.Nothing"),
-                                 serverPlayer, unit));
-            break;
-        case LEARN:
-            StringTemplate oldName = unit.getLabel();
-            List<UnitType> learnTypes = unit.getType().getUnitTypesLearntInLostCity();
-            unitType = Utils.getRandomMember(logger, "Choose learn",
-                                             learnTypes, random);
-            unit.setType(unitType);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 "lostCityRumour.Learn",
-                                 serverPlayer, unit)
-                    .addStringTemplate("%unit%", oldName)
-                    .add("%type%", unit.getType().getNameKey()));
-            break;
-        case TRIBAL_CHIEF:
-            int chiefAmount = Utils.randomInt(logger, "Chief base amount",
-                                              random, dx * 10) + dx * 5;
-            serverPlayer.modifyGold(chiefAmount);
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                          "gold", "score");
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 ((mounds) ? "lostCityRumour.moundsTrinkets"
-                                  : "lostCityRumour.TribalChief"),
-                                 serverPlayer, unit)
-                    .addAmount("%money%", chiefAmount));
-            break;
-        case COLONIST:
-            List<UnitType> foundTypes = spec.getUnitTypesWithAbility("model.ability.foundInLostCity");
-            unitType = Utils.getRandomMember(logger, "Choose found",
-                                             foundTypes, random);
-            newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
-                                     UnitState.ACTIVE);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 "lostCityRumour.Colonist",
-                                 serverPlayer, newUnit));
-            break;
-        case CIBOLA:
-            String cityName = game.getCityOfCibola();
-            if (cityName != null) {
-                int treasureAmount = Utils.randomInt(logger,
-                    "Base treasure amount", random, dx * 600) + dx * 300;
-                unitType = Utils.getRandomMember(logger, "Choose train",
-                                                 treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
-                                         UnitState.ACTIVE);
-                newUnit.setTreasureAmount(treasureAmount);
-                cs.addMessage(See.only(serverPlayer),
-                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                     "lostCityRumour.Cibola",
-                                     serverPlayer, newUnit)
-                        .add("%city%", cityName)
-                        .addAmount("%money%", treasureAmount));
-                cs.addHistory(serverPlayer,
-                    new HistoryEvent(game.getTurn(),
-                                     HistoryEvent.EventType.CITY_OF_GOLD)
-                        .add("%city%", cityName)
-                        .addAmount("%treasure%", treasureAmount));
-                break;
-            }
-            // Fall through, found all the cities of gold.
-        case RUINS:
-            int ruinsAmount = Utils.randomInt(logger,
-                "Base ruins amount", random, dx * 2) * 300 + 50;
-            if (ruinsAmount < 500) { // TODO remove magic number
-                serverPlayer.modifyGold(ruinsAmount);
-                cs.addPartial(See.only(serverPlayer), serverPlayer,
-                              "gold", "score");
-            } else {
-                unitType = Utils.getRandomMember(logger, "Choose train",
-                                                 treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
-                                         UnitState.ACTIVE);
-                newUnit.setTreasureAmount(ruinsAmount);
-            }
-            cs.addMessage(See.only(serverPlayer),
-                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                  ((mounds) ? "lostCityRumour.moundsTreasure"
-                                   : "lostCityRumour.Ruins"),
-                                  serverPlayer, ((newUnit != null) ? newUnit : unit))
-                     .addAmount("%money%", ruinsAmount));
-            break;
-        case FOUNTAIN_OF_YOUTH:
-            Europe europe = serverPlayer.getEurope();
-            if (europe == null) {
-                cs.addMessage(See.only(serverPlayer),
-                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                      "lostCityRumour.FountainOfYouthWithoutEurope",
-                                      serverPlayer, unit));
-            } else {
-                if (serverPlayer.hasAbility("model.ability.selectRecruit")
-                    && !serverPlayer.isAI()) { // TODO: let the AI select
-                    // Remember, and ask player to select
-                    serverPlayer.setRemainingEmigrants(dx);
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "fountainOfYouth", Integer.toString(dx));
-                } else {
-                    List<RandomChoice<UnitType>> recruitables
-                        = serverPlayer.generateRecruitablesList();
-                    for (int k = 0; k < dx; k++) {
-                        UnitType type = RandomChoice
-                            .getWeightedRandom(logger,
-                                "Choose FoY", random, recruitables);
-                        new ServerUnit(game, europe, serverPlayer, type,
-                                       UnitState.ACTIVE);
-                    }
-                    cs.add(See.only(serverPlayer), europe);
-                }
-                cs.addMessage(See.only(serverPlayer),
-                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                      "lostCityRumour.FountainOfYouth",
-                                      serverPlayer, unit));
-            }
-            break;
-        case NO_SUCH_RUMOUR: case MOUNDS:
-        default:
-            logger.warning("Bogus rumour type: " + rumour);
-            break;
-        }
-        tile.removeLostCityRumour();
-    }
-
-    /**
-     * Check for a special contact panel for a nation.  If not found,
-     * check for a more general one if allowed.
-     *
-     * @param player A European <code>Player</code> making contact.
-     * @param other The <code>Player</code> nation to being contacted.
-     * @return An <code>EventPanel</code> key, or null if none appropriate.
-     */
-    private String getContactKey(Player player, Player other) {
-        String key = "EventPanel.MEETING_" + other.getNationNameKey();
-        if (!Messages.containsKey(key)) {
-            if (other.isEuropean()) {
-                key = (player.hasContactedEuropeans()) ? null
-                    : "EventPanel.MEETING_EUROPEANS";
-            } else {
-                key = (player.hasContactedIndians()) ? null
-                    : "EventPanel.MEETING_NATIVES";
-            }
-        }
-        return key;
-    }
-
     /**
      * Move a unit.
      *
@@ -2521,213 +2156,9 @@ public final class InGameController extends Controller {
      */
     public Element move(ServerPlayer serverPlayer, Unit unit, Tile newTile) {
         ChangeSet cs = new ChangeSet();
-        csMove(serverPlayer, unit, newTile, cs);
+        ((ServerUnit) unit).csMove(newTile, random, cs);
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
-    }
-
-    /**
-     * Move a unit.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is moving.
-     * @param unit The <code>Unit</code> to move.
-     * @param newTile The <code>Tile</code> to move to.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private void csMove(ServerPlayer serverPlayer, Unit unit, Tile newTile,
-                        ChangeSet cs) {
-        Game game = getGame();
-        Specification spec = game.getSpecification();
-        Turn turn = game.getTurn();
-
-        // Plan to update tiles that could not be seen before but will
-        // now be within the line-of-sight.
-        List<FreeColGameObject> newTiles = new ArrayList<FreeColGameObject>();
-        int los = unit.getLineOfSight();
-        for (Tile tile : newTile.getSurroundingTiles(los)) {
-            if (!serverPlayer.canSee(tile)) newTiles.add(tile);
-        }
-
-        // Update unit state.
-        Location oldLocation = unit.getLocation();
-        unit.setState(UnitState.ACTIVE);
-        unit.setStateToAllChildren(UnitState.SENTRY);
-        if (oldLocation instanceof Unit) {
-            unit.setMovesLeft(0); // Disembark always consumes all moves.
-        } else {
-            if (unit.getMoveCost(newTile) <= 0) {
-                logger.warning("Move of unit: " + unit.getId()
-                               + " from: " + oldLocation.getTile().getId()
-                               + " to: " + newTile.getId()
-                               + " has bogus cost: " + unit.getMoveCost(newTile));
-                unit.setMovesLeft(0);
-            }
-            unit.setMovesLeft(unit.getMovesLeft() - unit.getMoveCost(newTile));
-        }
-
-
-        // Do the move and explore a rumour if needed.
-        unit.setLocation(newTile);
-        if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
-            exploreLostCityRumour(serverPlayer, unit, cs);
-        }
-
-        // Always update old location and new tile (making sure the
-        // move is always visible even if the unit dies), and always
-        // add the animation.  However dead units make no discoveries.
-        cs.addMove(See.perhaps().always(serverPlayer), unit,
-                   oldLocation, newTile);
-        cs.add(See.perhaps().always(serverPlayer),
-               (FreeColGameObject) oldLocation);
-        cs.add(See.perhaps().always(serverPlayer), newTile);
-        if (unit.isDisposed()) return;
-        cs.add(See.only(serverPlayer), newTiles);
-
-        if (newTile.isLand()) {
-            // Claim land for tribe?
-            Settlement settlement;
-            if (newTile.getOwner() == null
-                && serverPlayer.isIndian()
-                && (settlement = unit.getIndianSettlement()) != null
-                && (newTile.getPosition().getDistance(settlement
-                                                      .getTile().getPosition())
-                    < spec.getInteger("model.option.indianClaimRadius")
-                    + settlement.getRadius())) {
-                newTile.setOwner(serverPlayer);
-            }
-
-            // Check for first landing
-            if (serverPlayer.isEuropean()
-                && !serverPlayer.isNewLandNamed()) {
-                String newLand = Messages.getNewLandName(serverPlayer);
-                if (serverPlayer.isAI()) {
-                    // TODO: Not convinced shortcutting the AI like
-                    // this is a good idea, this really should be in
-                    // the AI code.
-                    serverPlayer.setNewLandName(newLand);
-                } else { // Ask player to name the land.
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "nameNewLand", newLand);
-                }
-            }
-
-            // Check for new contacts.
-            ServerPlayer welcomer = null;
-            for (Tile t : newTile.getSurroundingTiles(1, 1)) {
-                if (t == null || !t.isLand()) {
-                    continue; // Invalid tile for contact
-                }
-
-                ServerPlayer other = null;
-                settlement = t.getSettlement();
-                if (settlement != null) {
-                    other = (ServerPlayer) t.getSettlement().getOwner();
-                } else if (t.getFirstUnit() != null) {
-                    other = (ServerPlayer) t.getFirstUnit().getOwner();
-                }
-                if (other == null || other == serverPlayer) {
-                    continue; // No contact
-                }
-
-                // Activate sentries
-                for (Unit u : t.getUnitList()) {
-                    if (u.getState() == UnitState.SENTRY) {
-                        u.setState(UnitState.ACTIVE);
-                        cs.add(See.only(serverPlayer), u);
-                    }
-                }
-
-                // Ignore previously contacted nations.
-                if (serverPlayer.hasContacted(other)) continue;
-
-                // Must be a first contact!
-                if (serverPlayer.isIndian()) {
-                    // Ignore native-to-native contacts.
-                    if (!other.isIndian()) {
-                        String key = getContactKey(other, serverPlayer);
-                        if (key != null) {
-                            cs.addMessage(See.only(other),
-                                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                 key, other, serverPlayer));
-                        }
-                        cs.addHistory(other, new HistoryEvent(turn,
-                                HistoryEvent.EventType.MEET_NATION)
-                                .addStringTemplate("%nation%", serverPlayer.getNationName()));
-                    }
-                } else { // (serverPlayer.isEuropean)
-                    // Initialize alarm for native settlements.
-                    if (other.isIndian() && settlement != null) {
-                        IndianSettlement is = (IndianSettlement) settlement;
-                        if (!is.hasContactedSettlement(serverPlayer)) {
-                            is.makeContactSettlement(serverPlayer);
-                            cs.add(See.only(serverPlayer), is);
-                        }
-                    }
-
-                    // Add first contact messages.
-                    String key = getContactKey(serverPlayer, other);
-                    if (key != null) {
-                        cs.addMessage(See.only(serverPlayer),
-                            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                             key, serverPlayer, other));
-                    }
-
-                    // History event for European players.
-                    cs.addHistory(serverPlayer, new HistoryEvent(turn,
-                            HistoryEvent.EventType.MEET_NATION)
-                            .addStringTemplate("%nation%", other.getNationName()));
-                    // Extra special meeting on first landing!
-                    if (other.isIndian()
-                        && !serverPlayer.isNewLandNamed()
-                        && (welcomer == null || newTile.getOwner() == other)) {
-                        welcomer = other;
-                    }
-                }
-
-                // Now make the contact properly.
-                csChangeStance(serverPlayer, Stance.PEACE, other, true, cs);
-                serverPlayer.setTension(other,
-                                        new Tension(Tension.TENSION_MIN));
-                other.setTension(serverPlayer,
-                                 new Tension(Tension.TENSION_MIN));
-            }
-            if (welcomer != null) {
-                cs.addAttribute(See.only(serverPlayer), "welcome",
-                                welcomer.getId());
-                cs.addAttribute(See.only(serverPlayer), "camps",
-                                Integer.toString(welcomer.getNumberOfSettlements()));
-            }
-        }
-
-        // Check for slowing units.
-        Unit slowedBy = getSlowedBy(unit, newTile);
-        if (slowedBy != null) {
-            cs.addAttribute(See.only(serverPlayer), "slowedBy",
-                            slowedBy.getId());
-        }
-
-        // Check for region discovery
-        Region region = newTile.getDiscoverableRegion();
-        if (serverPlayer.isEuropean() && region != null) {
-            if (region.isPacific()) {
-                cs.addAttribute(See.only(serverPlayer),
-                                "discoverPacific", "true");
-                cs.addRegion(serverPlayer, region, "model.region.pacific");
-            } else {
-                String regionName = Messages.getDefaultRegionName(serverPlayer,
-                                                                  region.getType());
-                if (serverPlayer.isAI()) {
-                    // TODO: here is another dubious AI shortcut.
-                    cs.addRegion(serverPlayer, region, regionName);
-                } else { // Ask player to name the region.
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "discoverRegion", regionName);
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "regionType",
-                                    Messages.message(region.getLabel()));
-                }
-            }
-        }
     }
 
     /**
@@ -3323,17 +2754,17 @@ public final class InGameController extends Controller {
         } else if (defender.hasAbility("model.ability.piracy")) {
             ; // do nothing
         } else if (attackerPlayer.isEuropean() && defenderPlayer.isEuropean()) {
-            csChangeStance(attackerPlayer, Stance.WAR, defenderPlayer,
-                           true, cs);
+            attackerPlayer.csChangeStance(Stance.WAR, defenderPlayer,
+                                          true, cs);
         } else if (burnedNativeCapital) {
-            csChangeStance(attackerPlayer, Stance.PEACE, defenderPlayer,
-                           true, cs);
+            attackerPlayer.csChangeStance(Stance.PEACE, defenderPlayer,
+                                          true, cs);
             defenderPlayer.setTension(attackerPlayer,
                                       new Tension(Tension.SURRENDERED));
         } else { // At least one player is non-European
             if (attackerPlayer.isEuropean()) {
-                csChangeStance(attackerPlayer, Stance.WAR, defenderPlayer,
-                               false, cs);
+                attackerPlayer.csChangeStance(Stance.WAR, defenderPlayer,
+                                              false, cs);
             } else if (attackerPlayer.isIndian()) {
                 if (result == CombatResult.WIN) {
                     attackerTension -= Tension.TENSION_ADD_MINOR;
@@ -3342,8 +2773,8 @@ public final class InGameController extends Controller {
                 }
             }
             if (defenderPlayer.isEuropean()) {
-                csChangeStance(defenderPlayer, Stance.WAR, attackerPlayer,
-                               false, cs);
+                defenderPlayer.csChangeStance(Stance.WAR, attackerPlayer,
+                                              false, cs);
             } else if (defenderPlayer.isIndian()) {
                 if (result == CombatResult.WIN) {
                     defenderTension += Tension.TENSION_ADD_MINOR;
@@ -3366,7 +2797,7 @@ public final class InGameController extends Controller {
         // Move the attacker if required.
         if (moveAttacker) {
             attackerUnit.setMovesLeft(attackerUnit.getInitialMovesLeft());
-            csMove(attackerPlayer, attackerUnit, defenderTile, cs);
+            ((ServerUnit) attackerUnit).csMove(defenderTile, random, cs);
             // Move adds in updates for the tiles, but...
             attackerTileDirty = defenderTileDirty = false;
             // ...with visibility of perhaps().
@@ -3538,20 +2969,20 @@ public final class InGameController extends Controller {
         // Hand over the colony
         colony.changeOwner(attackerPlayer);
 
-        // Process all the surrounding tiles
-        int radius = Math.max(colony.getRadius(), colony.getLineOfSight());
-        for (Tile t : colony.getTile().getSurroundingTiles(radius)) {
-            if (t == colony.getTile() || t == attacker.getTile()) {
-                ; // Will be updated when the attacker moves in
-            } else if (t.getOwningSettlement() == colony) {
-                // Tile changed owner
-                cs.add(See.perhaps().always(colonyPlayer), t);
-            } else if (!attackerPlayer.hasExplored(t)) {
+        // Inform former owner of loss of owned tiles, and process possible
+        // increase in line of sight.  Leave other exploration etc to csMove.
+        for (Tile t : colony.getOwnedTiles()) {
+            cs.add(See.only(colonyPlayer), t);
+        }
+        if (colony.getLineOfSight() > attacker.getLineOfSight()) {
+            for (Tile t : tile.getSurroundingTiles(attacker.getLineOfSight(),
+                                                   colony.getLineOfSight())) {
                 // New owner has now explored within settlement line of sight.
                 attackerPlayer.setExplored(t);
                 cs.add(See.only(attackerPlayer), t);
             }
         }
+
         cs.addAttribute(See.only(attackerPlayer), "sound",
                         "sound.event.captureColony");
     }
@@ -5624,7 +5055,7 @@ public final class InGameController extends Controller {
             // owner too.
             Stance stance = tradeItem.getStance();
             if (stance != null
-                && !csChangeStance(serverPlayer, stance, other, true, cs)) {
+                && !serverPlayer.csChangeStance(stance, other, true, cs)) {
                 logger.warning("Stance trade failure");
             }
             Colony colony = tradeItem.getColony();

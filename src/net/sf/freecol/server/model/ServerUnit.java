@@ -21,6 +21,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -29,28 +30,41 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.LostCityRumour;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerModelObject;
 
@@ -194,7 +208,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         if (getWorkLeft() > 0) {
             unitDirty = true;
-            tileDirty = csDoAssignedWork(cs);
+            tileDirty = csDoAssignedWork(random, cs);
         }
 
         if (getState() == UnitState.SKIPPED) {
@@ -216,10 +230,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * building a road, or fortifying themselves) is updated in this
      * method.
      *
+     * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if the tile under the unit needs an update.
      */
-    private boolean csDoAssignedWork(ChangeSet cs) {
+    private boolean csDoAssignedWork(Random random, ChangeSet cs) {
         ServerPlayer owner = (ServerPlayer) getOwner();
 
         switch (getState()) {
@@ -270,8 +285,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 break;
             case TO_AMERICA:
                 logger.info(toString() + " arrives in America");
-                getGame().getModelController().setToVacantEntryLocation(this);
-                setState(UnitState.ACTIVE);
+                csMove(getVacantEntryLocation(random), random, cs);
                 break;
             case FORTIFYING:
                 setState(UnitState.FORTIFIED);
@@ -368,6 +382,547 @@ public class ServerUnit extends Unit implements ServerModelObject {
         cs.addPartial(See.only(owner), this, "hitpoints");
     }
 
+    /**
+     * Finds a suitable tile to put this unit on return from Europe.
+     * If this unit has not not been outside Europe before, it will
+     * return the default value from the owner.
+     *
+     * @param random A pseudo-random number source.
+     * @return A suitable entry location for this unit.
+     * @see #getEntryLocation
+     */
+    public Tile getVacantEntryLocation(Random random) {
+        Tile tile = (Tile) getEntryLocation();
+        if (tile.getFirstUnit() == null
+            || tile.getFirstUnit().getOwner() == getOwner()) return tile;
+
+        Map map = getGame().getMap();
+        for (int r = 1; true; r++) {
+            List<Tile> tiles = tile.getSurroundingTiles(r, r);
+            Collections.shuffle(tiles, random);
+            for (Tile t : tiles) {
+                if (t.getFirstUnit() == null
+                    || t.getFirstUnit().getOwner() == getOwner()) {
+                    return t;
+                }
+            }
+        }
+    }
+
+    /**
+     * If a unit moves, check if an opposing naval unit slows it down.
+     * Note that the unit moves are reduced here.
+     *
+     * @param newTile The <code>Tile</code> the unit is moving to.
+     * @param random A pseudo-random number source.
+     * @return Either an enemy unit that causes a slowdown, or null if none.
+     */
+    private Unit getSlowedBy(Tile newTile, Random random) {
+        Player player = getOwner();
+        Game game = getGame();
+        CombatModel combatModel = game.getCombatModel();
+        boolean pirate = hasAbility("model.ability.piracy");
+        Unit attacker = null;
+        float attackPower = 0, totalAttackPower = 0;
+
+        if (!isNaval() || getMovesLeft() <= 0) return null;
+        for (Tile tile : newTile.getSurroundingTiles(1)) {
+            // Ships in settlements do not slow enemy ships, but:
+            // TODO should a fortress slow a ship?
+            Player enemy;
+            if (tile.isLand()
+                || tile.getColony() != null
+                || tile.getFirstUnit() == null
+                || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
+            for (Unit enemyUnit : tile.getUnitList()) {
+                if ((pirate || enemyUnit.hasAbility("model.ability.piracy")
+                     || (enemyUnit.isOffensiveUnit() && player.atWarWith(enemy)))
+                    && enemyUnit.isNaval()
+                    && combatModel.getOffencePower(enemyUnit, this) > attackPower) {
+                    attackPower = combatModel.getOffencePower(enemyUnit, this);
+                    totalAttackPower += attackPower;
+                    attacker = enemyUnit;
+                }
+            }
+        }
+        if (attacker != null) {
+            float defencePower = combatModel.getDefencePower(attacker, this);
+            float totalProbability = totalAttackPower + defencePower;
+            if (Utils.randomInt(logger, "Slowed", random,
+                                Math.round(totalProbability) + 1)
+                < totalAttackPower) {
+                int diff = Math.max(0, Math.round(totalAttackPower - defencePower));
+                int moves = Math.min(9, 3 + diff / 3);
+                setMovesLeft(getMovesLeft() - moves);
+                logger.info(getId() + " slowed by " + attacker.getId()
+                            + " by " + Integer.toString(moves) + " moves.");
+            } else {
+                attacker = null;
+            }
+        }
+        return attacker;
+    }
+
+    /**
+     * Explores a lost city, finding a native burial ground.
+     *
+     * @param cs A <code>ChangeSet</code> to add changes to.
+     */
+    private void csNativeBurialGround(ChangeSet cs) {
+        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        Tile tile = getTile();
+        Player indianPlayer = tile.getOwner();
+        cs.add(See.only(serverPlayer),
+               indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit()));
+        cs.add(See.only(serverPlayer), indianPlayer);
+        cs.addMessage(See.only(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                             "lostCityRumour.BurialGround",
+                             serverPlayer, this)
+                .addStringTemplate("%nation%", indianPlayer.getNationName()));
+    }
+
+    /**
+     * Explore a lost city.
+     *
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to add changes to.
+     */
+    private void csExploreLostCityRumour(Random random, ChangeSet cs) {
+        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        Tile tile = getTile();
+        LostCityRumour lostCity = tile.getLostCityRumour();
+        if (lostCity == null) return;
+
+        Game game = getGame();
+        Specification spec = game.getSpecification();
+        int difficulty = spec.getInteger("model.option.rumourDifficulty");
+        int dx = 10 - difficulty;
+        UnitType unitType;
+        Unit newUnit = null;
+        List<UnitType> treasureUnitTypes
+            = spec.getUnitTypesWithAbility("model.ability.carryTreasure");
+
+        RumourType rumour = lostCity.getType();
+        if (rumour == null) {
+            rumour = lostCity.chooseType(this, difficulty, random);
+        }
+        // Filter out failing cases that could only occur if the
+        // type was explicitly set in debug mode.
+        switch (rumour) {
+        case BURIAL_GROUND: case MOUNDS:
+            if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
+                rumour = RumourType.NOTHING;
+            }
+            break;
+        case LEARN:
+            if (getType().getUnitTypesLearntInLostCity().isEmpty()) {
+                rumour = RumourType.NOTHING;
+            }
+            break;
+        default:
+            break;
+        }
+
+        // Mounds are a special case that degrade to other cases.
+        boolean mounds = rumour == RumourType.MOUNDS;
+        if (mounds) {
+            boolean done = false;
+            boolean burial = false;
+            while (!done) {
+                rumour = lostCity.chooseType(this, difficulty, random);
+                switch (rumour) {
+                case EXPEDITION_VANISHES: case NOTHING: case TRIBAL_CHIEF:
+                case RUINS:
+                    done = true;
+                    break;
+                case BURIAL_GROUND:
+                    if (tile.getOwner() != null && tile.getOwner().isIndian()
+                        && !burial) {
+                        csNativeBurialGround(cs);
+                        burial = true;
+                    }
+                    break;
+                default:
+                    ; // unacceptable result for mounds
+                }
+            }
+        }
+
+        logger.info("Unit " + getId() + " is exploring rumour " + rumour);
+        switch (rumour) {
+        case BURIAL_GROUND:
+            csNativeBurialGround(cs);
+            break;
+        case EXPEDITION_VANISHES:
+            cs.addDispose(serverPlayer, tile, this);
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                 "lostCityRumour.ExpeditionVanishes",
+                                 serverPlayer));
+            break;
+        case NOTHING:
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                 ((mounds) ? "lostCityRumour.moundsNothing"
+                                  : "lostCityRumour.Nothing"),
+                                 serverPlayer, this));
+            break;
+        case LEARN:
+            StringTemplate oldName = getLabel();
+            List<UnitType> learnTypes = getType().getUnitTypesLearntInLostCity();
+            unitType = Utils.getRandomMember(logger, "Choose learn",
+                                             learnTypes, random);
+            setType(unitType);
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                 "lostCityRumour.Learn",
+                                 serverPlayer, this)
+                    .addStringTemplate("%unit%", oldName)
+                    .add("%type%", getType().getNameKey()));
+            break;
+        case TRIBAL_CHIEF:
+            int chiefAmount = Utils.randomInt(logger, "Chief base amount",
+                                              random, dx * 10) + dx * 5;
+            serverPlayer.modifyGold(chiefAmount);
+            cs.addPartial(See.only(serverPlayer), serverPlayer,
+                          "gold", "score");
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                 ((mounds) ? "lostCityRumour.moundsTrinkets"
+                                  : "lostCityRumour.TribalChief"),
+                                 serverPlayer, this)
+                    .addAmount("%money%", chiefAmount));
+            break;
+        case COLONIST:
+            List<UnitType> foundTypes = spec.getUnitTypesWithAbility("model.ability.foundInLostCity");
+            unitType = Utils.getRandomMember(logger, "Choose found",
+                                             foundTypes, random);
+            newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
+                                     UnitState.ACTIVE);
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                 "lostCityRumour.Colonist",
+                                 serverPlayer, newUnit));
+            break;
+        case CIBOLA:
+            String cityName = game.getCityOfCibola();
+            if (cityName != null) {
+                int treasureAmount = Utils.randomInt(logger,
+                    "Base treasure amount", random, dx * 600) + dx * 300;
+                unitType = Utils.getRandomMember(logger, "Choose train",
+                                                 treasureUnitTypes, random);
+                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
+                                         UnitState.ACTIVE);
+                newUnit.setTreasureAmount(treasureAmount);
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                     "lostCityRumour.Cibola",
+                                     serverPlayer, newUnit)
+                        .add("%city%", cityName)
+                        .addAmount("%money%", treasureAmount));
+                cs.addHistory(serverPlayer,
+                    new HistoryEvent(game.getTurn(),
+                                     HistoryEvent.EventType.CITY_OF_GOLD)
+                        .add("%city%", cityName)
+                        .addAmount("%treasure%", treasureAmount));
+                break;
+            }
+            // Fall through, found all the cities of gold.
+        case RUINS:
+            int ruinsAmount = Utils.randomInt(logger,
+                "Base ruins amount", random, dx * 2) * 300 + 50;
+            if (ruinsAmount < 500) { // TODO remove magic number
+                serverPlayer.modifyGold(ruinsAmount);
+                cs.addPartial(See.only(serverPlayer), serverPlayer,
+                              "gold", "score");
+            } else {
+                unitType = Utils.getRandomMember(logger, "Choose train",
+                                                 treasureUnitTypes, random);
+                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
+                                         UnitState.ACTIVE);
+                newUnit.setTreasureAmount(ruinsAmount);
+            }
+            cs.addMessage(See.only(serverPlayer),
+                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                  ((mounds) ? "lostCityRumour.moundsTreasure"
+                                   : "lostCityRumour.Ruins"),
+                                  serverPlayer, ((newUnit != null) ? newUnit
+                                                 : this))
+                     .addAmount("%money%", ruinsAmount));
+            break;
+        case FOUNTAIN_OF_YOUTH:
+            Europe europe = serverPlayer.getEurope();
+            if (europe == null) {
+                cs.addMessage(See.only(serverPlayer),
+                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                      "lostCityRumour.FountainOfYouthWithoutEurope",
+                                      serverPlayer, this));
+            } else {
+                if (serverPlayer.hasAbility("model.ability.selectRecruit")
+                    && !serverPlayer.isAI()) { // TODO: let the AI select
+                    // Remember, and ask player to select
+                    serverPlayer.setRemainingEmigrants(dx);
+                    cs.addAttribute(See.only(serverPlayer),
+                                    "fountainOfYouth", Integer.toString(dx));
+                } else {
+                    List<RandomChoice<UnitType>> recruitables
+                        = serverPlayer.generateRecruitablesList();
+                    for (int k = 0; k < dx; k++) {
+                        UnitType type = RandomChoice
+                            .getWeightedRandom(logger,
+                                "Choose FoY", random, recruitables);
+                        new ServerUnit(game, europe, serverPlayer, type,
+                                       UnitState.ACTIVE);
+                    }
+                    cs.add(See.only(serverPlayer), europe);
+                }
+                cs.addMessage(See.only(serverPlayer),
+                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                      "lostCityRumour.FountainOfYouth",
+                                      serverPlayer, this));
+            }
+            break;
+        case NO_SUCH_RUMOUR: case MOUNDS:
+        default:
+            logger.warning("Bogus rumour type: " + rumour);
+            break;
+        }
+        tile.removeLostCityRumour();
+    }
+
+    /**
+     * Check for a special contact panel for a nation.  If not found,
+     * check for a more general one if allowed.
+     *
+     * @param player A European <code>Player</code> making contact.
+     * @param other The <code>Player</code> nation to being contacted.
+     * @return An <code>EventPanel</code> key, or null if none appropriate.
+     */
+    private String getContactKey(Player player, Player other) {
+        String key = "EventPanel.MEETING_" + other.getNationNameKey();
+        if (!Messages.containsKey(key)) {
+            if (other.isEuropean()) {
+                key = (player.hasContactedEuropeans()) ? null
+                    : "EventPanel.MEETING_EUROPEANS";
+            } else {
+                key = (player.hasContactedIndians()) ? null
+                    : "EventPanel.MEETING_NATIVES";
+            }
+        }
+        return key;
+    }
+
+    /**
+     * Move a unit.
+     *
+     * @param newTile The <code>Tile</code> to move to.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csMove(Tile newTile, Random random, ChangeSet cs) {
+        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        Game game = getGame();
+        Specification spec = game.getSpecification();
+        Turn turn = game.getTurn();
+
+        // Plan to update tiles that could not be seen before but will
+        // now be within the line-of-sight.
+        List<FreeColGameObject> newTiles = new ArrayList<FreeColGameObject>();
+        int los = getLineOfSight();
+        for (Tile tile : newTile.getSurroundingTiles(los)) {
+            if (!serverPlayer.canSee(tile)) newTiles.add(tile);
+        }
+
+        // Update unit state.
+        Location oldLocation = getLocation();
+        setState(UnitState.ACTIVE);
+        setStateToAllChildren(UnitState.SENTRY);
+        if (oldLocation instanceof Europe) {
+            ; // Do not try to calculate move cost from Europe!
+        } else if (oldLocation instanceof Unit) {
+            setMovesLeft(0); // Disembark always consumes all moves.
+        } else {
+            if (getMoveCost(newTile) <= 0) {
+                logger.warning("Move of unit: " + getId()
+                               + " from: " + ((oldLocation == null) ? "null"
+                                              : oldLocation.getTile().getId())
+                               + " to: " + newTile.getId()
+                               + " has bogus cost: " + getMoveCost(newTile));
+                setMovesLeft(0);
+            }
+            setMovesLeft(getMovesLeft() - getMoveCost(newTile));
+        }
+
+
+        // Do the move and explore a rumour if needed.
+        setLocation(newTile);
+        if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
+            csExploreLostCityRumour(random, cs);
+        }
+
+        // Unless moving in from Europe, update the old location and
+        // make sure the move is always visible even if the unit
+        // dies, including the animation.  However dead units
+        // make no discoveries.  Always update the new tile.
+        if (oldLocation instanceof Europe) {
+            ; // TODO: add message?
+        } else {
+            cs.addMove(See.perhaps().always(serverPlayer), this,
+                       oldLocation, newTile);
+            cs.add(See.perhaps().always(serverPlayer),
+                   (FreeColGameObject) oldLocation);
+        }
+        cs.add(See.perhaps().always(serverPlayer), newTile);
+        if (isDisposed()) return;
+        cs.add(See.only(serverPlayer), newTiles);
+
+        if (newTile.isLand()) {
+            // Claim land for tribe?
+            Settlement settlement;
+            if (newTile.getOwner() == null
+                && serverPlayer.isIndian()
+                && (settlement = getIndianSettlement()) != null
+                && (newTile.getPosition().getDistance(settlement
+                                                      .getTile().getPosition())
+                    < spec.getInteger("model.option.indianClaimRadius")
+                    + settlement.getRadius())) {
+                newTile.setOwner(serverPlayer);
+            }
+
+            // Check for first landing
+            if (serverPlayer.isEuropean()
+                && !serverPlayer.isNewLandNamed()) {
+                String newLand = Messages.getNewLandName(serverPlayer);
+                if (serverPlayer.isAI()) {
+                    // TODO: Not convinced shortcutting the AI like
+                    // this is a good idea, this really should be in
+                    // the AI code.
+                    serverPlayer.setNewLandName(newLand);
+                } else { // Ask player to name the land.
+                    cs.addAttribute(See.only(serverPlayer),
+                                    "nameNewLand", newLand);
+                }
+            }
+
+            // Check for new contacts.
+            ServerPlayer welcomer = null;
+            for (Tile t : newTile.getSurroundingTiles(1, 1)) {
+                if (t == null || !t.isLand()) {
+                    continue; // Invalid tile for contact
+                }
+
+                ServerPlayer other = null;
+                settlement = t.getSettlement();
+                if (settlement != null) {
+                    other = (ServerPlayer) t.getSettlement().getOwner();
+                } else if (t.getFirstUnit() != null) {
+                    other = (ServerPlayer) t.getFirstUnit().getOwner();
+                }
+                if (other == null || other == serverPlayer) {
+                    continue; // No contact
+                }
+
+                // Activate sentries
+                for (Unit u : t.getUnitList()) {
+                    if (u.getState() == UnitState.SENTRY) {
+                        u.setState(UnitState.ACTIVE);
+                        cs.add(See.only(serverPlayer), u);
+                    }
+                }
+
+                // Ignore previously contacted nations.
+                if (serverPlayer.hasContacted(other)) continue;
+
+                // Must be a first contact!
+                if (serverPlayer.isIndian()) {
+                    // Ignore native-to-native contacts.
+                    if (!other.isIndian()) {
+                        String key = getContactKey(other, serverPlayer);
+                        if (key != null) {
+                            cs.addMessage(See.only(other),
+                                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                 key, other, serverPlayer));
+                        }
+                        cs.addHistory(other, new HistoryEvent(turn,
+                                HistoryEvent.EventType.MEET_NATION)
+                                .addStringTemplate("%nation%", serverPlayer.getNationName()));
+                    }
+                } else { // (serverPlayer.isEuropean)
+                    // Initialize alarm for native settlements.
+                    if (other.isIndian() && settlement != null) {
+                        IndianSettlement is = (IndianSettlement) settlement;
+                        if (!is.hasContactedSettlement(serverPlayer)) {
+                            is.makeContactSettlement(serverPlayer);
+                            cs.add(See.only(serverPlayer), is);
+                        }
+                    }
+
+                    // Add first contact messages.
+                    String key = getContactKey(serverPlayer, other);
+                    if (key != null) {
+                        cs.addMessage(See.only(serverPlayer),
+                            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                             key, serverPlayer, other));
+                    }
+
+                    // History event for European players.
+                    cs.addHistory(serverPlayer, new HistoryEvent(turn,
+                            HistoryEvent.EventType.MEET_NATION)
+                            .addStringTemplate("%nation%", other.getNationName()));
+                    // Extra special meeting on first landing!
+                    if (other.isIndian()
+                        && !serverPlayer.isNewLandNamed()
+                        && (welcomer == null || newTile.getOwner() == other)) {
+                        welcomer = other;
+                    }
+                }
+
+                // Now make the contact properly.
+                serverPlayer.csChangeStance(Stance.PEACE, other, true, cs);
+                serverPlayer.setTension(other,
+                                        new Tension(Tension.TENSION_MIN));
+                other.setTension(serverPlayer,
+                                 new Tension(Tension.TENSION_MIN));
+            }
+            if (welcomer != null) {
+                cs.addAttribute(See.only(serverPlayer), "welcome",
+                                welcomer.getId());
+                cs.addAttribute(See.only(serverPlayer), "camps",
+                                Integer.toString(welcomer.getNumberOfSettlements()));
+            }
+        }
+
+        // Check for slowing units.
+        Unit slowedBy = getSlowedBy(newTile, random);
+        if (slowedBy != null) {
+            cs.addAttribute(See.only(serverPlayer), "slowedBy",
+                            slowedBy.getId());
+        }
+
+        // Check for region discovery
+        Region region = newTile.getDiscoverableRegion();
+        if (serverPlayer.isEuropean() && region != null) {
+            if (region.isPacific()) {
+                cs.addAttribute(See.only(serverPlayer),
+                                "discoverPacific", "true");
+                cs.addRegion(serverPlayer, region, "model.region.pacific");
+            } else {
+                String regionName = Messages.getDefaultRegionName(serverPlayer,
+                                                                  region.getType());
+                if (serverPlayer.isAI()) {
+                    // TODO: here is another dubious AI shortcut.
+                    cs.addRegion(serverPlayer, region, regionName);
+                } else { // Ask player to name the region.
+                    cs.addAttribute(See.only(serverPlayer),
+                                    "discoverRegion", regionName);
+                    cs.addAttribute(See.only(serverPlayer),
+                                    "regionType",
+                                    Messages.message(region.getLabel()));
+                }
+            }
+        }
+    }
 
     /**
      * Returns the tag name of the root element representing this object.

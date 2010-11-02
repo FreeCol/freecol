@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -737,6 +738,61 @@ public class ServerPlayer extends Player implements ServerModelObject {
             ((ServerModelObject) unit).csNewTurn(random, cs);
         }
     }
+
+    /**
+     * Change stance and collect changes that need updating.
+     *
+     * @param stance The new <code>Stance</code>.
+     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @param symmetric If true, change the otherPlayer stance as well.
+     * @param cs A <code>ChangeSet</code> containing the changes.
+     * @return True if there was a change in stance at all.
+     */
+    public boolean csChangeStance(Stance stance, Player otherPlayer,
+                                  boolean symmetric, ChangeSet cs) {
+        boolean change = false;
+        Stance old = getStance(otherPlayer);
+
+        if (old != stance) {
+            try {
+                int modifier = old.getTensionModifier(stance);
+                setStance(otherPlayer, stance);
+                if (modifier != 0) {
+                    cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
+                           modifyTension(otherPlayer, modifier));
+                }
+                cs.addStance(See.perhaps(), this, stance, otherPlayer);
+                change = true;
+                logger.finest("Stance change " + getName()
+                              + " " + old.toString()
+                              + " -> " + stance.toString()
+                              + " wrt " + otherPlayer.getName());
+            } catch (IllegalStateException e) { // Catch illegal transitions
+                logger.log(Level.WARNING, "Illegal stance transition", e);
+            }
+        }
+        if (symmetric && (old = otherPlayer.getStance(this)) != stance) {
+            try {
+                int modifier = old.getTensionModifier(stance);
+                otherPlayer.setStance(this, stance);
+                if (modifier != 0) {
+                    cs.add(See.only(null).perhaps(this),
+                           otherPlayer.modifyTension(this, modifier));
+                }
+                cs.addStance(See.perhaps(), otherPlayer, stance, this);
+                change = true;
+                logger.finest("Stance change " + otherPlayer.getName()
+                              + " " + old.toString()
+                              + " -> " + stance.toString()
+                              + " wrt " + getName());
+            } catch (IllegalStateException e) { // Catch illegal transitions
+                logger.log(Level.WARNING, "Illegal stance transition", e);
+            }
+        }
+
+        return change;
+    }
+
 
     @Override
     public String toString() {

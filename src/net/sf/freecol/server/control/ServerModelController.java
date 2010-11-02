@@ -116,7 +116,7 @@ public class ServerModelController implements ModelController {
 
             // taskRegister.remove(taskID);
         } else {
-            entryLocation = unit.getVacantEntryLocation();
+            entryLocation = unit.getEntryLocation();
             taskRegister.put(taskID, new TaskEntry(taskID, freeColServer.getGame().getTurn().getNumber(), true,
                     entryLocation));
         }
