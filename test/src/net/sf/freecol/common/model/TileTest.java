@@ -29,43 +29,97 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class TileTest extends FreeColTestCase {
 
-    TileType plains = spec().getTileType("model.tile.plains");
-    TileType desert = spec().getTileType("model.tile.desert");
-    TileType grassland = spec().getTileType("model.tile.grassland");
-    TileType prairie = spec().getTileType("model.tile.prairie");
-    TileType tundra = spec().getTileType("model.tile.tundra");
-    TileType savannah = spec().getTileType("model.tile.savannah");
-    TileType marsh = spec().getTileType("model.tile.marsh");
-    TileType swamp = spec().getTileType("model.tile.swamp");
-    TileType arctic = spec().getTileType("model.tile.arctic");
-    TileType hills = spec().getTileType("model.tile.hills");
-    TileType mountains = spec().getTileType("model.tile.mountains");
-    TileType ocean = spec().getTileType("model.tile.ocean");
-    TileType highSeas = spec().getTileType("model.tile.highSeas");
+    private static final BuildingType townHallType
+        = spec().getBuildingType("model.building.townHall");
 
-    TileType plainsForest = spec().getTileType("model.tile.mixedForest");
-    TileType desertForest = spec().getTileType("model.tile.scrubForest");
-    TileType grasslandForest = spec().getTileType("model.tile.coniferForest");
-    TileType prairieForest = spec().getTileType("model.tile.broadleafForest");
-    TileType tundraForest = spec().getTileType("model.tile.borealForest");
-    TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
-    TileType marshForest = spec().getTileType("model.tile.wetlandForest");
-    TileType swampForest = spec().getTileType("model.tile.rainForest");
+    private static final GoodsType cotton
+        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType fish
+        = spec().getGoodsType("model.goods.fish");
+    private static final GoodsType food
+        = spec().getGoodsType("model.goods.food");
+    private static final GoodsType furs
+        = spec().getGoodsType("model.goods.furs");
+    private static final GoodsType grain
+        = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType lumber
+        = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType ore
+        = spec().getGoodsType("model.goods.ore");
+    private static final GoodsType silver
+        = spec().getGoodsType("model.goods.silver");
+    private static final GoodsType sugar
+        = spec().getGoodsType("model.goods.sugar");
+    private static final GoodsType tobacco
+        = spec().getGoodsType("model.goods.tobacco");
 
-    TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
-    TileImprovementType river = spec().getTileImprovementType("model.improvement.river");
-    TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
-    TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.clearForest");
-    TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
-    TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
+    private static final ResourceType grainResource
+        = spec().getResourceType("model.resource.grain");
+    private static final ResourceType mineralsResource
+        = spec().getResourceType("model.resource.minerals");
+    private static final ResourceType silverResource
+        = spec().getResourceType("model.resource.silver");
+    private static final ResourceType sugarResource
+        = spec().getResourceType("model.resource.sugar");
 
-    GoodsType food = spec().getGoodsType("model.goods.grain");
-    GoodsType fish = spec().getGoodsType("model.goods.fish");
-    GoodsType sugar = spec().getGoodsType("model.goods.sugar");
-    GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-    GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
-    GoodsType lumber = spec().getGoodsType("model.goods.lumber");
-    GoodsType ore = spec().getGoodsType("model.goods.ore");
+    private static final TileImprovementType clearForest
+        = spec().getTileImprovementType("model.improvement.clearForest");
+    private static final TileImprovementType fishBonusLand
+        = spec().getTileImprovementType("model.improvement.fishBonusLand");
+    private static final TileImprovementType fishBonusRiver
+        = spec().getTileImprovementType("model.improvement.fishBonusRiver");
+    private static final TileImprovementType plow
+        = spec().getTileImprovementType("model.improvement.plow");
+    private static final TileImprovementType river
+        = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType road
+        = spec().getTileImprovementType("model.improvement.road");
+
+    private static final TileType arctic
+        = spec().getTileType("model.tile.arctic");
+    private static final TileType desert
+        = spec().getTileType("model.tile.desert");
+    private static final TileType desertForest
+        = spec().getTileType("model.tile.scrubForest");
+    private static final TileType grassland
+        = spec().getTileType("model.tile.grassland");
+    private static final TileType grasslandForest
+        = spec().getTileType("model.tile.coniferForest");
+    private static final TileType highSeas
+        = spec().getTileType("model.tile.highSeas");
+    private static final TileType hills
+        = spec().getTileType("model.tile.hills");
+    private static final TileType marsh
+        = spec().getTileType("model.tile.marsh");
+    private static final TileType marshForest
+        = spec().getTileType("model.tile.wetlandForest");
+    private static final TileType mountains
+        = spec().getTileType("model.tile.mountains");
+    private static final TileType ocean
+        = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
+    private static final TileType plainsForest
+        = spec().getTileType("model.tile.mixedForest");
+    private static final TileType prairie
+        = spec().getTileType("model.tile.prairie");
+    private static final TileType prairieForest
+        = spec().getTileType("model.tile.broadleafForest");
+    private static final TileType savannah
+        = spec().getTileType("model.tile.savannah");
+    private static final TileType savannahForest
+        = spec().getTileType("model.tile.tropicalForest");
+    private static final TileType swamp
+        = spec().getTileType("model.tile.swamp");
+    private static final TileType swampForest
+        = spec().getTileType("model.tile.rainForest");
+    private static final TileType tundra
+        = spec().getTileType("model.tile.tundra");
+    private static final TileType tundraForest
+        = spec().getTileType("model.tile.borealForest");
+
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
 
 
     public void testGetWorkAmount() {
@@ -150,71 +204,65 @@ public class TileTest extends FreeColTestCase {
 
         Game game = getStandardGame();
 
-        Tile tile = new Tile(game, spec().getTileType("model.tile.prairie"), 0, 0);
-        assertEquals(spec().getGoodsType("model.goods.grain"),
-                     tile.getType().getPrimaryGoods().getType());
+        Tile tile = new Tile(game, prairie, 0, 0);
+        assertEquals(grain, tile.getType().getPrimaryGoods().getType());
         assertEquals(3, tile.getPrimaryProduction());
-        assertEquals(spec().getGoodsType("model.goods.cotton"),
-                     tile.getType().getSecondaryGoods().getType());
+        assertEquals(cotton, tile.getType().getSecondaryGoods().getType());
         assertEquals(3, tile.getSecondaryProduction());
 
-        Tile tile2 = new Tile(game, spec().getTileType("model.tile.mixedForest"), 0, 0);
-        assertEquals(spec().getGoodsType("model.goods.grain"),
-                     tile2.getType().getPrimaryGoods().getType());
+        Tile tile2 = new Tile(game, plainsForest, 0, 0);
+        assertEquals(grain, tile2.getType().getPrimaryGoods().getType());
         assertEquals(3, tile2.getPrimaryProduction());
-        assertEquals(spec().getGoodsType("model.goods.furs"),
-                     tile2.getType().getSecondaryGoods().getType());
+        assertEquals(furs, tile2.getType().getSecondaryGoods().getType());
         assertEquals(3, tile2.getSecondaryProduction());
 
     }
 
     public void testPotential() {
         Game game = getStandardGame();
-        Tile tile = new Tile(game, spec().getTileType("model.tile.mountains"), 0, 0);
-        assertEquals(0,tile.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(1,tile.potential(spec().getGoodsType("model.goods.silver"), null));
-        tile.setResource(new Resource(game, tile, spec().getResourceType("model.resource.silver")));
-        assertEquals(0,tile.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(3,tile.potential(spec().getGoodsType("model.goods.silver"), null));
+        Tile tile = new Tile(game, mountains, 0, 0);
+        assertEquals(0,tile.potential(food, null));
+        assertEquals(1,tile.potential(silver, null));
+        tile.setResource(new Resource(game, tile, silverResource));
+        assertEquals(0,tile.potential(food, null));
+        assertEquals(3,tile.potential(silver, null));
     }
 
     public void testMaximumPotential() {
         Game game = getStandardGame();
 
-        Tile tile1 = new Tile(game, spec().getTileType("model.tile.mountains"), 0, 0);
-        assertEquals(0, tile1.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(0, tile1.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(1, tile1.potential(spec().getGoodsType("model.goods.silver"), null));
-        assertEquals(2, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
-        tile1.setResource(new Resource(game, tile1, spec().getResourceType("model.resource.silver")));
-        assertEquals(0, tile1.potential(spec().getGoodsType("model.goods.food"), null));
-        assertEquals(3, tile1.potential(spec().getGoodsType("model.goods.silver"), null));
-        assertEquals(4, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
+        Tile tile1 = new Tile(game, mountains, 0, 0);
+        assertEquals(0, tile1.potential(food, null));
+        assertEquals(0, tile1.getMaximumPotential(food, null));
+        assertEquals(1, tile1.potential(silver, null));
+        assertEquals(2, tile1.getMaximumPotential(silver, null));
+        tile1.setResource(new Resource(game, tile1, silverResource));
+        assertEquals(0, tile1.potential(food, null));
+        assertEquals(3, tile1.potential(silver, null));
+        assertEquals(4, tile1.getMaximumPotential(silver, null));
 
-        Tile tile2 = new Tile(game, spec().getTileType("model.tile.plains"), 0, 1);
-        assertEquals(5, tile2.potential(spec().getGoodsType("model.goods.grain"), null));
-        assertEquals(6, tile2.getMaximumPotential(spec().getGoodsType("model.goods.grain"), null));
-        tile2.setResource(new Resource(game, tile2, spec().getResourceType("model.resource.grain")));
+        Tile tile2 = new Tile(game, plains, 0, 1);
+        assertEquals(5, tile2.potential(grain, null));
+        assertEquals(6, tile2.getMaximumPotential(grain, null));
+        tile2.setResource(new Resource(game, tile2, grainResource));
         // potential assumes expert
-        assertEquals(9, tile2.potential(spec().getGoodsType("model.goods.grain"), null));
-        assertEquals(10, tile2.getMaximumPotential(spec().getGoodsType("model.goods.grain"), null));
+        assertEquals(9, tile2.potential(grain, null));
+        assertEquals(10, tile2.getMaximumPotential(grain, null));
 
-        Tile tile3 = new Tile(game, spec().getTileType("model.tile.mixedForest"), 1, 1);
-        assertEquals(3, tile3.potential(spec().getGoodsType("model.goods.grain"), null));
-        assertEquals(6, tile3.getMaximumPotential(spec().getGoodsType("model.goods.grain"), null));
-
+        Tile tile3 = new Tile(game, plainsForest, 1, 1);
+        assertEquals(3, tile3.potential(grain, null));
+        assertEquals(6, tile3.getMaximumPotential(grain, null));
     }
 
     public void testMovement() {
         Game game = getStandardGame();
-        Tile tile1 = new Tile(game, spec().getTileType("model.tile.plains"), 0, 0);
-        Tile tile2 = new Tile(game, spec().getTileType("model.tile.plains"), 0, 1);
+        Tile tile1 = new Tile(game, plains, 0, 0);
+        Tile tile2 = new Tile(game, plains, 0, 1);
         assertEquals(3, tile1.getMoveCost(tile2));
     }
 
 
     public void testCanHaveImprovement() {
-
         for (TileType tileType : spec().getTileTypeList()) {
 
             if (tileType.isWater()) {
@@ -255,7 +303,6 @@ public class TileTest extends FreeColTestCase {
 
 
     public void testImprovements() throws Exception {
-
         Game game = getStandardGame();
         Map map = getTestMap(plains);
         game.setMap(map);
@@ -289,12 +336,11 @@ public class TileTest extends FreeColTestCase {
         tile2.setType(hills);
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
-
     }
 
     public void testProductionModifiers() throws Exception {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
 
@@ -326,11 +372,11 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
-        tile1.setType(spec().getTileType("model.tile.savannah"));
+        tile1.setType(savannah);
         assertTrue(tile1.hasRoad());
         assertTrue(tile1.hasRiver());
 
-        tile2.setType(spec().getTileType("model.tile.hills"));
+        tile2.setType(hills);
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
 
@@ -339,7 +385,6 @@ public class TileTest extends FreeColTestCase {
         assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar, null), road2.getType()));
         assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
 
-        ResourceType sugarResource = spec().getResourceType("model.resource.sugar");
         tile1.setResource(new Resource(game, tile1, sugarResource));
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), savannah));
@@ -381,35 +426,35 @@ public class TileTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
 
         tile1.setType(savannah);
-        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, grain));
         assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, sugar));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
 
         tile1.setType(marsh);
-        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, grain));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
         assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, tobacco));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
         assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, ore));
 
         tile1.setType(savannahForest);
-        assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, grain));
         assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, sugar));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
         assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, lumber));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
 
         tile1.setType(hills);
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, grain));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
         assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, ore));
 
         tile1.setType(arctic);
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, grain));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
@@ -435,7 +480,7 @@ public class TileTest extends FreeColTestCase {
 
         List<AbstractGoods> sortedPotential = tile1.getSortedPotential();
         // savannah produces more food than sugar
-        assertEquals(food, sortedPotential.get(0).getType());
+        assertEquals(grain, sortedPotential.get(0).getType());
         assertEquals(4, sortedPotential.get(0).getAmount());
         assertEquals(sugar, sortedPotential.get(1).getType());
         assertEquals(3, sortedPotential.get(1).getAmount());
@@ -448,15 +493,15 @@ public class TileTest extends FreeColTestCase {
         assertEquals(6, sortedPotential.get(0).getAmount());
 
         sortedPotential = tile1.getSortedPotential(farmer, dutch);
-        assertEquals(food, sortedPotential.get(0).getType());
+        assertEquals(grain, sortedPotential.get(0).getType());
         assertEquals(7, sortedPotential.get(0).getAmount());
-        assertTrue(market.getSalePrice(food, 7) > market.getSalePrice(sugar, 3));
+        assertTrue(market.getSalePrice(grain, 7) > market.getSalePrice(sugar, 3));
 
         tile1.setType(plains);
 
         // plains produces more food than sugar
-        assertEquals(food, tile1.getSortedPotential().get(0).getType());
-        assertEquals(food, tile1.getSortedPotential(farmer, dutch).get(0).getType());
+        assertEquals(grain, tile1.getSortedPotential().get(0).getType());
+        assertEquals(grain, tile1.getSortedPotential(farmer, dutch).get(0).getType());
         assertEquals(cotton, tile1.getSortedPotential(cottonPlanter, dutch).get(0).getType());
 
         tile1.setType(ocean);
@@ -472,8 +517,6 @@ public class TileTest extends FreeColTestCase {
     */
 
     public void testArctic() {
-        TileType arctic = spec().getTileType("model.tile.arctic");
-
         arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.veryEasy"));
         assertTrue(arctic.canSettle());
         assertEquals(2, arctic.getPrimaryGoods().getAmount());
@@ -498,39 +541,39 @@ public class TileTest extends FreeColTestCase {
         assertTrue(arctic.canSettle());
         assertNull(arctic.getPrimaryGoods());
         assertNull(arctic.getSecondaryGoods());
-
-
     }
 
     public void testMinerals() {
         Game game = getGame();
         Map map = getTestMap(tundra);
-    	game.setMap(map);
+        game.setMap(map);
 
-    	Colony colony = getStandardColony();
+        Colony colony = getStandardColony();
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
-        ResourceType minerals = spec().getResourceType("model.resource.minerals");
-        tile.setResource(new Resource(game, tile, minerals));
-        GoodsType silver = spec().getGoodsType("model.goods.silver");
-        UnitType colonist = spec().getUnitType("model.unit.freeColonist");
+        ColonyTile colonyTile = colony.getColonyTile(tile);
+        tile.setResource(new Resource(game, tile, mineralsResource));
+        if (colonyTile.getUnit() != null) {
+            colonyTile.getUnit().setLocation(colony.getBuilding(townHallType));
+        }
+        assertNull(colonyTile.getUnit());
 
         Unit unit = colony.getUnitList().get(0);
-        assertEquals(colonist, unit.getType());
+        assertEquals(colonistType, unit.getType());
         assertTrue(silver.isFarmed());
-        assertEquals(0, tundra.getProductionOf(silver, colonist));
-        assertEquals(1, tile.potential(silver, colonist));
-
-        ColonyTile colonyTile = colony.getColonyTile(tile);
+        assertEquals(0, tundra.getProductionOf(silver, colonistType));
+        assertEquals(1, tile.potential(silver, colonistType));
 
         Set<Modifier> modifiers = tile.getProductionBonus(silver, unit.getType());
         assertFalse(modifiers.isEmpty());
 
         assertEquals(1, colonyTile.getProductionOf(unit, silver));
+        assertEquals(colonyTile.getWorkTile().getOwningSettlement(), colony);
+        assertTrue(colonyTile.canBeWorked());
+        assertTrue(colonyTile.canAdd(unit));
         assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, false, silver));
     }
 
     public void testZIndex() {
-
         assertTrue(GUI.OVERLAY_INDEX < GUI.FOREST_INDEX);
         assertTrue(GUI.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);
         assertTrue(TileItem.RESOURCE_ZINDEX < TileItem.RUMOUR_ZINDEX);
@@ -538,7 +581,6 @@ public class TileTest extends FreeColTestCase {
         assertTrue(river.getZIndex() < road.getZIndex());
         assertTrue(GUI.FOREST_INDEX < road.getZIndex());
         assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
-
     }
 
 }

@@ -282,11 +282,12 @@ public class ColonyTile extends FreeColGameObject
         Player player = getOwner();
 
         // Not workable if there is a settlement, hostile occupation,
-        // unable to work water, or lost city rumour to Europeans.
+        // or can not be claimed.
         Tile tile = getWorkTile();
         if (tile.getSettlement() != null
             || tile.getOccupyingUnit() != null
-            || !player.canOwnTile(tile)) {
+            || (tile.getOwningSettlement() != colony
+                && !player.canClaimForSettlement(tile))) {
             return false;
         }
 

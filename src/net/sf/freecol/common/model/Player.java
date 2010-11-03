@@ -1045,7 +1045,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * The tile must be ownable by this player, not currently owned,
      * or owned by this player and not by a settlement, unless it is a
-     * colony that is not using the tile.  Got that?
+     * colony that is not using the tile, or owned by someone else
+     * who does not want anything for it.  Got that?
      *
      * @param tile The <code>Tile</code> to try to claim.
      * @return True if the tile can be claimed.
@@ -1057,7 +1058,9 @@ public class Player extends FreeColGameObject implements Nameable {
                     && (tile.getOwningSettlement() == null
                         || (tile.getOwningSettlement() instanceof Colony
                             && !(((Colony) tile.getOwningSettlement())
-                                 .isTileInUse(tile))))));
+                                 .isTileInUse(tile)))))
+                || (tile.getOwner() != null && tile.getOwner() != this
+                    && getLandPrice(tile) == 0));
     }
 
     /**

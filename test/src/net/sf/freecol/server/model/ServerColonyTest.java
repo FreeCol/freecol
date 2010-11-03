@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -68,25 +69,17 @@ public class ServerColonyTest extends FreeColTestCase {
     private static final GoodsType foodGoodsType
         = spec().getGoodsType("model.goods.food");
 
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
+
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
 
 
     public void testFoodConsumption() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
-
+        Map map = getTestMap(plains);
+        Game game = ServerTestHelper.startServerGame(map);
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Tile[][] tiles = new Tile[10][15];
-
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
-        game.setMap(map);
-
         // Setting test colony and colonist
         Colony colony = FreeColTestUtils.getColonyBuilder()
             .colonyTile(map.getTile(5, 8)).build();
@@ -103,7 +96,6 @@ public class ServerColonyTest extends FreeColTestCase {
             + colony.getFoodProduction();
 
         ServerTestHelper.newTurn();
-
         assertEquals("Unexpected value for remaining food, ",
                      foodExpected, colony.getFoodCount());
     }

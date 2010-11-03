@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
@@ -37,6 +38,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -51,12 +53,15 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class ServerUnitTest extends FreeColTestCase {
 
+    private static final BuildingType townHallType
+        = spec().getBuildingType("model.building.townHall");
+
     private static final EquipmentType horsesType
         = spec().getEquipmentType("model.equipment.horses");
     private static final EquipmentType toolsType
         = spec().getEquipmentType("model.equipment.tools");
 
-    private static final GoodsType foodType
+    private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
 
     private static final TileImprovementType road
@@ -351,10 +356,26 @@ public class ServerUnitTest extends FreeColTestCase {
         assertTrue(errMsg, colonist.getType() == colonistType);
 
         // set colonist as farmer
-        ColonyTile workTile = colony.getColonyTile(colony.getTile().getNeighbourOrNull(Direction.N));
-        colonist.setLocation(workTile);
-        colonist.setWorkType(foodType);
-        assertEquals("Wrong work allocation", foodType,colonist.getWorkType());
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
+        assertTrue(colony.getOwner().canOwnTile(tile));
+        ColonyTile colonyTile = colony.getColonyTile(tile);
+        if (colonyTile.getUnit() != null) {
+            colonyTile.getUnit().setLocation(colony.getBuilding(townHallType));
+        }
+        assertTrue(colonyTile.canBeWorked());
+        colonist.setLocation(colonyTile);
+        colonist.setWorkType(grainType);
+        assertEquals("Wrong work allocation",
+                     grainType, colonist.getWorkType());
+        assertEquals(colonyTile.getUnit(), colonist);
+        // Will colonist gain experience?
+        assertTrue(colonyTile.getProductionOf(colonist.getWorkType()) > 0);
+        // Can colonist be upgraded
+        UnitType learn = spec().getExpertForProducing(colonist.getWorkType());
+        assertNotNull(learn);
+        assertTrue(learn != colonist.getType());
+        assertTrue(colonist.getType().canBeUpgraded(learn,
+                                                    ChangeType.EXPERIENCE));
 
         // set some experience
         int expectXP = 10;
