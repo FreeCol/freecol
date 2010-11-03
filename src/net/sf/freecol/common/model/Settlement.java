@@ -405,10 +405,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         Tile settlementTile = getTile();
         ArrayList<Tile> tiles = new ArrayList<Tile>();
         for (Tile t : settlementTile.getSurroundingTiles(getRadius())) {
-            if (t.getOwningSettlement() == this
-                || (t.getOwningSettlement() == null && t.getOwner() == owner)) {
-                tiles.add(t);
-            }
+            if (t.getOwningSettlement() == this) tiles.add(t);
         }
         tiles.add(settlementTile);
         return tiles;

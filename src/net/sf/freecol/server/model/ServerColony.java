@@ -113,16 +113,8 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         ColonyTile colonyTile = new ServerColonyTile(game, this, tile);
         colonyTiles.add(colonyTile);
-        for (Direction direction : Direction.values()) {
-            Tile t = tile.getNeighbourOrNull(direction);
-            if (t == null) {
-                continue;
-            }
-            if (t.getOwner() == null) {
-                t.setOwner(owner);
-            }
-            colonyTile = new ServerColonyTile(game, this, t);
-            colonyTiles.add(colonyTile);
+        for (Tile t : tile.getSurroundingTiles(getRadius())) {
+            colonyTiles.add(new ServerColonyTile(game, this, t));
             if (t.getType().isWater()) {
                 landLocked = false;
             }
