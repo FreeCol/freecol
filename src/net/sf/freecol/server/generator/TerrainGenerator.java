@@ -177,8 +177,10 @@ public class TerrainGenerator {
             if (mapHasLand) {
                 createMountains(map);
                 findLakes(map);
-                createRivers(map);
+                // Create the rivers *after* the land regions as
+                // rivers are child regions of the surrounding lands.
                 createLandRegions(map);
+                createRivers(map);
             }
         }
 
