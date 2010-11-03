@@ -183,7 +183,7 @@ public final class FreeColServer {
     private String name;
 
     /** The private provider for random numbers. */
-    private Random random = new Random(new SecureRandom().nextLong());
+    private Random random = null;
 
     /** Did the integrity check succeed */
     private boolean integrity = false;
@@ -233,13 +233,14 @@ public final class FreeColServer {
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
+        this.random = new Random(new SecureRandom().nextLong());
 
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
-        inGameController = new InGameController(this);
+        inGameController = new InGameController(this, random);
 
         game = new ServerGame(modelController, specification);
         game.setNationOptions(new NationOptions(specification, advantages));
@@ -285,7 +286,6 @@ public final class FreeColServer {
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
-        inGameController = new InGameController(this);
 
         try {
             server = new Server(this, port);
@@ -305,6 +305,10 @@ public final class FreeColServer {
             fe.initCause(e);
             throw fe;
         }
+        if (random == null) {
+            this.random = new Random(new SecureRandom().nextLong());
+        }
+        inGameController = new InGameController(this, random);
         mapGenerator = new SimpleMapGenerator(random, getSpecification());
 
         updateMetaServer(true);

@@ -167,11 +167,12 @@ public final class InGameController extends Controller {
      * The constructor to use.
      * 
      * @param freeColServer The main server object.
+     * @param random The pseudo-random number source to use.
      */
-    public InGameController(FreeColServer freeColServer) {
+    public InGameController(FreeColServer freeColServer, Random random) {
         super(freeColServer);
 
-        random = freeColServer.getServerRandom();
+        this.random = random;
     }
 
     /**
