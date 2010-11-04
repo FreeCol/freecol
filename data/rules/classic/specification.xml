@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.51 -->
+<!-- specification version 0.53 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -560,7 +560,7 @@
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.clearForest" add-work-turns="2"
                           expended-equipment-type="model.equipment.tools" expended-amount="1"
-                          deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1">
+                          deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1" exposeResourcePercent="5">
       <scope method-name="isForested" method-value="true" />
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
       <change from="model.tile.coniferForest"   to="model.tile.grassland"/>

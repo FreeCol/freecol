@@ -269,6 +269,7 @@
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
 

@@ -46,6 +46,8 @@ import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -54,6 +56,8 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -290,68 +294,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             case FORTIFYING:
                 setState(UnitState.FORTIFIED);
                 break;
-            case IMPROVING: // Deliver goods if any
-                GoodsType deliver = getWorkImprovement().getDeliverGoodsType();
-                if (deliver != null) {
-                    int amount = getTile().potential(deliver, getType())
-                        * getWorkImprovement().getDeliverAmount();
-                    if (getType().hasAbility("model.ability.expertPioneer")) {
-                        amount *= 2;
-                    }
-                    Settlement settlement = getTile().getSettlement();
-                    if (settlement != null
-                        && (ServerPlayer) settlement.getOwner() == owner) {
-                        settlement.addGoods(deliver, amount);
-                    } else {
-                        List<Settlement> adjacent = new ArrayList<Settlement>();
-                        for (Tile t : getTile().getSurroundingTiles(1)) {
-                            if (t.getSettlement() != null
-                                && (ServerPlayer) t.getSettlement().getOwner()
-                                == owner) {
-                                adjacent.add(t.getSettlement());
-                            }
-                        }
-                        if (adjacent.size() > 0) {
-                            int deliverPerCity = amount / adjacent.size();
-                            for (Settlement s : adjacent) {
-                                s.addGoods(deliver, deliverPerCity);
-                            }
-                            // Add residue to first adjacent settlement.
-                            adjacent.get(0).addGoods(deliver,
-                                                     amount % adjacent.size());
-                        }
-                    }
-                }
-
-                // Finish up
-                TileImprovement ti = getWorkImprovement();
-                EquipmentType type = ti.getExpendedEquipmentType();
-                changeEquipment(type, -ti.getExpendedAmount());
-                for (Unit unit : getTile().getUnitList()) {
-                    if (unit.getWorkImprovement() != null
-                        && unit.getWorkImprovement().getType() == ti.getType()
-                        && unit.getState() == UnitState.IMPROVING) {
-                        unit.setWorkLeft(-1);
-                        unit.setWorkImprovement(null);
-                        unit.setState(UnitState.ACTIVE);
-                        unit.setMovesLeft(0);
-                    }
-                }
-                // TODO: make this more generic, currently assumes tools used
-                EquipmentType tools = getSpecification()
-                    .getEquipmentType("model.equipment.tools");
-                if (type == tools && getEquipmentCount(tools) == 0) {
-                    StringTemplate locName
-                        = getLocation().getLocationNameFor(owner);
-                    String messageId = (getType().getDefaultEquipmentType() == type)
-                        ? getType() + ".noMoreTools"
-                        : "model.unit.noMoreTools";
-                    cs.addMessage(See.only(owner),
-                        new ModelMessage(ModelMessage.MessageType.WARNING,
-                                         messageId, this)
-                                  .addStringTemplate("%unit%", getLabel())
-                                  .addStringTemplate("%location%", locName));
-                }
+            case IMPROVING:
+                csImproveTile(random, cs);
                 return true;
             default:
                 logger.warning("Unknown work completed, state=" + getState());
@@ -360,6 +304,107 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
         return false;
+    }
+
+    /**
+     * Completes a tile improvement.
+     *
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csImproveTile(Random random, ChangeSet cs) {
+        Tile tile = getTile();
+        GoodsType deliver = getWorkImprovement().getDeliverGoodsType();
+        if (deliver != null) { // Deliver goods if any
+            int amount = tile.potential(deliver, getType())
+                * getWorkImprovement().getDeliverAmount();
+            if (getType().hasAbility("model.ability.expertPioneer")) {
+                amount *= 2;
+            }
+            Settlement settlement = tile.getSettlement();
+            if (settlement != null
+                && (ServerPlayer) settlement.getOwner() == owner) {
+                settlement.addGoods(deliver, amount);
+            } else {
+                List<Settlement> adjacent = new ArrayList<Settlement>();
+                for (Tile t : tile.getSurroundingTiles(1)) {
+                    if (t.getSettlement() != null
+                        && (ServerPlayer) t.getSettlement().getOwner()
+                        == owner) {
+                        adjacent.add(t.getSettlement());
+                    }
+                }
+                if (adjacent.size() > 0) {
+                    int deliverPerCity = amount / adjacent.size();
+                    for (Settlement s : adjacent) {
+                        s.addGoods(deliver, deliverPerCity);
+                    }
+                    // Add residue to first adjacent settlement.
+                    adjacent.get(0).addGoods(deliver,
+                                             amount % adjacent.size());
+                }
+            }
+        }
+
+        // Finish up
+        TileImprovement ti = getWorkImprovement();
+        TileType changeType = ti.getChange(tile.getType());
+        if (changeType != null) {
+            // Changes like clearing a forest need to be completed,
+            // whereas for changes like road building the improvement
+            // is already added and now complete.
+            tile.setType(changeType);
+        }
+
+        // Does a resource get exposed?
+        TileImprovementType tileImprovementType = ti.getType();
+        int exposeResource = tileImprovementType.getExposeResourcePercent();
+        if (exposeResource > 0 && !tile.hasResource()) {
+            if (Utils.randomInt(logger, "Expose resource", random, 100)
+                < exposeResource) {
+                ResourceType resType = RandomChoice.getWeightedRandom(logger,
+                        "Resource type", random,
+                        tile.getType().getWeightedResources());
+                int minValue = resType.getMinValue();
+                int maxValue = resType.getMaxValue();
+                int value = minValue + ((minValue == maxValue) ? 0
+                        : Utils.randomInt(logger, "Resource quantity",
+                                          random,
+                                          maxValue - minValue + 1));
+                tile.setResource(new Resource(getGame(), tile, resType,
+                                              value));
+            }
+        }
+
+        // Expend equipment
+        EquipmentType type = ti.getExpendedEquipmentType();
+        changeEquipment(type, -ti.getExpendedAmount());
+        for (Unit unit : tile.getUnitList()) {
+            if (unit.getWorkImprovement() != null
+                && unit.getWorkImprovement().getType() == ti.getType()
+                && unit.getState() == UnitState.IMPROVING) {
+                unit.setWorkLeft(-1);
+                unit.setWorkImprovement(null);
+                unit.setState(UnitState.ACTIVE);
+                unit.setMovesLeft(0);
+            }
+        }
+        // TODO: make this more generic, currently assumes tools used
+        EquipmentType tools = getSpecification()
+            .getEquipmentType("model.equipment.tools");
+        if (type == tools && getEquipmentCount(tools) == 0) {
+            ServerPlayer owner = (ServerPlayer) getOwner();
+            StringTemplate locName
+                = getLocation().getLocationNameFor(owner);
+            String messageId = (getType().getDefaultEquipmentType() == type)
+                ? getType() + ".noMoreTools"
+                : "model.unit.noMoreTools";
+            cs.addMessage(See.only(owner),
+                          new ModelMessage(ModelMessage.MessageType.WARNING,
+                                           messageId, this)
+                          .addStringTemplate("%unit%", getLabel())
+                          .addStringTemplate("%location%", locName));
+        }
     }
 
     /**

@@ -58,6 +58,10 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     private int zIndex;
 
+    // Does this improvement expose a resource when completed
+    // (should only apply to clearing forests).
+    private int exposeResourcePercent;
+
     /**
      * The scopes define which TileTypes support this improvement. An
      * eligible TileType must match all scopes.
@@ -281,6 +285,16 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return cost;
     }
 
+    /**
+     * Gets the percent chance that this tile improvement can expose
+     * a resource on the tile.
+     *
+     * @return The exposure chance.
+     */
+    public int getExposeResourcePercent() {
+        return exposeResourcePercent;
+    }
+
     // ------------------------------------------------------------ API methods
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
@@ -294,6 +308,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
                                                              TileImprovementType.class, null);
 
         zIndex = getAttribute(in, "zIndex", 0);
+        exposeResourcePercent = getAttribute(in, "exposeResourcePercent", 0);
 
         expendedEquipmentType = getSpecification().getType(in, "expended-equipment-type",
                                                            EquipmentType.class, null);
@@ -344,6 +359,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
         out.writeAttribute("movement-cost", Integer.toString(movementCost));
         out.writeAttribute("magnitude", Integer.toString(magnitude));
         out.writeAttribute("zIndex", Integer.toString(zIndex));
+        out.writeAttribute("exposeResourcePercent",
+                           Integer.toString(exposeResourcePercent));
         if (requiredImprovementType != null) {
             out.writeAttribute("required-improvement", requiredImprovementType.getId());
         }

@@ -73,6 +73,8 @@ public class ServerUnitTest extends FreeColTestCase {
 
     private static final TileType plains
         = spec().getTileType("model.tile.plains");
+    private static final TileType savannah
+        = spec().getTileType("model.tile.savannah");
     private static final TileType savannahForest
         = spec().getTileType("model.tile.tropicalForest");
 
@@ -247,21 +249,21 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(map);
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        Tile plain = map.getTile(5, 8);
+        Tile tile = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
 
-        ServerUnit hardyPioneer1 = new ServerUnit(game, plain, dutch,
+        ServerUnit hardyPioneer1 = new ServerUnit(game, tile, dutch,
                                                   pioneerType,
                                                   UnitState.ACTIVE);
-        ServerUnit hardyPioneer2 = new ServerUnit(game, plain, dutch,
+        ServerUnit hardyPioneer2 = new ServerUnit(game, tile, dutch,
                                                   pioneerType,
                                                   UnitState.ACTIVE);
-        ServerUnit hardyPioneer3 = new ServerUnit(game, plain, dutch,
+        ServerUnit hardyPioneer3 = new ServerUnit(game, tile, dutch,
                                                   pioneerType,
                                                   UnitState.ACTIVE);
 
         // Before
-        assertEquals(false, plain.hasRoad());
+        assertEquals(false, tile.hasRoad());
         assertEquals(3, hardyPioneer1.getMovesLeft());
         assertEquals(-1, hardyPioneer1.getWorkLeft());
         assertEquals(100, hardyPioneer1.getEquipmentCount(toolsType) * 20);
@@ -272,11 +274,11 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(UnitState.ACTIVE, hardyPioneer2.getState());
 
         // Now do it
-        plain.setOwner(dutch);
-        TileImprovement roadImprovement = new TileImprovement(game, plain, road);
-        TileImprovement clearImprovement = new TileImprovement(game, plain, clear);
-        plain.add(roadImprovement);
-        plain.add(clearImprovement);
+        tile.setOwner(dutch);
+        TileImprovement roadImprovement = new TileImprovement(game, tile, road);
+        TileImprovement clearImprovement = new TileImprovement(game, tile, clear);
+        tile.add(roadImprovement);
+        tile.add(clearImprovement);
         hardyPioneer1.work(roadImprovement);
         hardyPioneer2.work(roadImprovement);
         hardyPioneer3.work(clearImprovement);
@@ -289,7 +291,7 @@ public class ServerUnitTest extends FreeColTestCase {
         }
 
         // After: both pioneers building road have used up their tools
-        assertTrue(plain.hasRoad());
+        assertTrue(tile.hasRoad());
         assertTrue(roadImprovement.isComplete());
         assertFalse(clearImprovement.isComplete());
 
@@ -316,6 +318,7 @@ public class ServerUnitTest extends FreeColTestCase {
         }
 
         assertTrue(clearImprovement.isComplete());
+        assertEquals(savannah, tile.getType());
         assertEquals(0, hardyPioneer3.getMovesLeft());
         assertEquals(-1, hardyPioneer3.getWorkLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer3.getState());
@@ -400,5 +403,47 @@ public class ServerUnitTest extends FreeColTestCase {
         // verify upgrade
         isExpert = colonist.getType() == expertFarmerType;
         assertTrue("Unit should now be an expert", isExpert);
+    }
+
+    public void testExposeResource() {
+        Map map = getTestMap(savannahForest);
+        Game game = ServerTestHelper.startServerGame(map);
+
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        Tile tile = map.getTile(5, 8);
+        tile.setOwner(dutch);
+        tile.setExploredBy(dutch, true);
+
+        // Almost clear the tile
+        ServerUnit hardyPioneer = new ServerUnit(game, tile, dutch,
+                                                 pioneerType,
+                                                 UnitState.ACTIVE, toolsType);
+        TileImprovement clearImprovement
+            = new TileImprovement(game, tile, clear);
+        tile.add(clearImprovement);
+        hardyPioneer.work(clearImprovement);
+
+        // Verify initial state
+        assertEquals(8, hardyPioneer.getWorkLeft());
+        assertEquals(savannahForest, tile.getType());
+        assertFalse(tile.hasResource());
+
+        // Almost finish clearing
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+
+        // We need a deterministic random
+        List<Integer> setValues = new ArrayList<Integer>();
+        setValues.add(1);
+        MockPseudoRandom mockRandom = new MockPseudoRandom(setValues, true);
+        ServerTestHelper.setRandom(mockRandom);
+
+        // Finish clearing
+        ServerTestHelper.newTurn();
+
+        // Verify clearing succeeded and has revealed a resource
+        assertEquals(savannah, tile.getType());
+        assertTrue(tile.hasResource());
     }
 }

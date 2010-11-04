@@ -50,7 +50,8 @@ public class MockPseudoRandom extends Random {
         int number = getNext();
         if (number < 0) return random.nextInt(n);
         if (number >= n) {
-            throw new IllegalArgumentException("Number in queue is bigger than " + n);
+            throw new IllegalArgumentException("Number in queue (" + number
+                                               + ") is >= " + n);
         }
         return number;
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.50
+<!-- XSD for specification version 0.53
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -28,6 +28,7 @@
      0.50: allow OptionGroups to contain OptionGroups
      0.51: remove improvementaction-type and difficultyLevels
      0.52: add upkeep attribute to building-type
+     0.53: add exposeResourcePercent attribute to tileimprovement-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -275,6 +276,7 @@
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
 
