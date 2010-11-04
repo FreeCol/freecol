@@ -272,6 +272,27 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Sometimes units appear which the client does not know about,
+     * and are passed in as the children of the parent element.
+     *
+     * @param game The <code>Game</code> to add the unit to.
+     * @param element The <code>Element</code> to find a unit in.
+     * @param id The id of the unit to find.
+     * @return A unit or null if none found.
+     */
+    private static Unit selectUnitFromElement(Game game, Element element,
+                                              String id) {
+        NodeList nodes = element.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            if (id.equals(e.getAttribute("ID"))) {
+                return new Unit(game, e);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Handles an "animateMove"-message. This only performs animation,
      * if required. It does not actually change unit positions, which
      * happens in an "update".
@@ -293,7 +314,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
         if (unit == null
-            && (unit = getUnitFromElement(game, element)) == null) {
+            && (unit = selectUnitFromElement(game, element, unitId)) == null) {
             logger.warning("Animation"
                            + " for: " + client.getMyPlayer().getId()
                            + " incorrectly omitted unit: " + unitId);
@@ -345,7 +366,8 @@ public final class InGameInputHandler extends InputHandler {
         String attackerId = element.getAttribute("attacker");
         Unit attacker = (Unit) game.getFreeColGameObjectSafely(attackerId);
         if (attacker == null
-            && (attacker = getUnitFromElement(game, element)) == null) {
+            && (attacker = selectUnitFromElement(game, element,
+                                                 attackerId)) == null) {
             logger.warning("Attack animation"
                            + " for: " + client.getMyPlayer().getId()
                            + " incorrectly omitted attacker: " + attackerId);
@@ -354,7 +376,8 @@ public final class InGameInputHandler extends InputHandler {
         String defenderId = element.getAttribute("defender");
         Unit defender = (Unit) game.getFreeColGameObjectSafely(defenderId);
         if (defender == null
-            && (defender = getUnitFromElement(game, element)) == null) {
+            && (defender = selectUnitFromElement(game, element,
+                                                 defenderId)) == null) {
             logger.warning("Attack animation"
                            + " for: " + client.getMyPlayer().getId()
                            + " incorrectly omitted defender: " + defenderId);

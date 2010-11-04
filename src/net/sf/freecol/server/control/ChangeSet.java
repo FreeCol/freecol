@@ -294,7 +294,8 @@ public class ChangeSet {
             if (!attacker.isVisibleTo(serverPlayer)) {
                 element.appendChild(attacker.toXMLElement(serverPlayer, doc,
                                                           false, false));
-            } else if (!defender.isVisibleTo(serverPlayer)) {
+            }
+            if (!defender.isVisibleTo(serverPlayer)) {
                 element.appendChild(defender.toXMLElement(serverPlayer, doc,
                                                           false, false));
             }
