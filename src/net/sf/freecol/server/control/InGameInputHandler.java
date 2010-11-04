@@ -98,6 +98,7 @@ import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.PayForBuildingMessage;
+import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -432,6 +433,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new SetGoodsLevelsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
+        register(PutOutsideColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new PutOutsideColonyMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
         register("foreignAffairs", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
@@ -464,12 +471,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return changeState(connection, element);
-            }
-        });
-        register("putOutsideColony", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return putOutsideColony(connection, element);
             }
         });
         register("getNewTradeRoute", new NetworkRequestHandler() {
@@ -770,33 +771,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         InGameController igc = getFreeColServer().getInGameController();
         igc.sendToOthers(player, oldTile);
         return null;
-    }
-
-    /**
-     * Handles a "putOutsideColony"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param putOutsideColonyElement The element containing the request.
-     */
-    private Element putOutsideColony(Connection connection, Element putOutsideColonyElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(putOutsideColonyElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Location oldLocation = unit.getLocation();
-        unit.putOutsideColony();
-        // Don't send updated tile! Other players can't see the unit.
-        Element updateElement = Message.createNewRootElement("update");
-        updateElement.appendChild(unit.getTile().toXMLElement(player, updateElement.getOwnerDocument()));
-        if (oldLocation instanceof Building) {
-            updateElement.appendChild(((Building) oldLocation)
-                                      .toXMLElement(player, updateElement.getOwnerDocument()));
-        } else if (oldLocation instanceof ColonyTile) {
-            updateElement.appendChild(((ColonyTile) oldLocation)
-                                      .toXMLElement(player, updateElement.getOwnerDocument()));
-        }
-        return updateElement;
     }
 
     /**

@@ -130,6 +130,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.PayForBuildingMessage;
+import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -4039,6 +4040,7 @@ public final class InGameController implements NetworkConstants {
         return true;
     }
 
+
     /**
      * Puts the specified unit outside the colony.
      *
@@ -4046,39 +4048,46 @@ public final class InGameController implements NetworkConstants {
      * @return <i>true</i> if the unit was successfully put outside the colony.
      */
     public boolean putOutsideColony(Unit unit) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            throw new IllegalStateException("Not your turn.");
-        } else if (unit.getColony() == null) {
-            throw new IllegalStateException("Unit is not in colony.");
-        } else if (!unit.getColony().canReducePopulation()) {
-            throw new IllegalStateException("Colony can not reduce population.");
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
         }
 
         Colony colony = unit.getColony();
-        colony.updatePopulation(-1);
-        Location oldLocation = unit.getLocation();
-
-        Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-        putOutsideColonyElement.setAttribute("unit", unit.getId());
-
-        Client client = freeColClient.getClient();
-        Element reply = client.ask(putOutsideColonyElement);
-        if (reply != null && reply.getTagName().equals("update")) {
-            freeColClient.getInGameInputHandler().update(reply);
-            // TODO: this really should be handled by the update
-            if (oldLocation instanceof Building) {
-                ((Building) oldLocation).firePropertyChange(Building.UNIT_CHANGE, unit, null);
-            } else if (oldLocation instanceof ColonyTile) {
-                ((ColonyTile) oldLocation).firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
-            }
-            unit.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
-        } else {
-            logger.warning("putOutsideColony message missing update");
+        if (colony == null) {
+            throw new IllegalStateException("Unit is not in colony.");
+        } else if (!colony.canReducePopulation()) {
+            return false;
         }
 
+        int oldPop = colony.getUnitCount();
+        Location oldLoc = unit.getLocation();
+        if (askPutOutsideColony(unit)) {
+            fireColonyChanges(colony, oldPop, unit, oldLoc);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Server query-response for putting a unit outside a colony.
+     *
+     * @param unit The <code>Unit</code> to put out.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askPutOutsideColony(Unit unit) {
+        Client client = freeColClient.getClient();
+        PutOutsideColonyMessage message = new PutOutsideColonyMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
         return true;
     }
+
 
     /**
      * Changes the work type of this <code>Unit</code>.

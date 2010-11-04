@@ -5629,6 +5629,7 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
      * @param type The <code>UnitType</code> to train.
+     * @return An <code>Element</code> encapsulating this action.
      */
     public Element trainUnitInEurope(ServerPlayer serverPlayer, UnitType type) {
         Europe europe = serverPlayer.getEurope();
@@ -5659,6 +5660,7 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
      * @param colony The <code>Colony</code> to set the queue of.
      * @param queue The new build queue.
+     * @return An <code>Element</code> encapsulating this action.
      */
     public Element setBuildQueue(ServerPlayer serverPlayer, Colony colony,
                                  List<BuildableType> queue) {
@@ -5677,11 +5679,34 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
      * @param colony The <code>Colony</code> to set the goods levels in.
      * @param exportData The new <code>ExportData</code>.
+     * @return An <code>Element</code> encapsulating this action.
      */
     public Element setGoodsLevels(ServerPlayer serverPlayer, Colony colony,
                                   ExportData exportData) {
         colony.setExportData(exportData);
         return new ChangeSet().add(See.only(serverPlayer), colony)
             .build(serverPlayer);
+    }
+
+
+    /**
+     * Put outside colony.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to be put out.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
+        Tile tile = unit.getTile();
+        Colony colony = unit.getColony();
+        unit.setState(UnitState.ACTIVE);
+        unit.setLocation(tile);
+
+        // Full tile update for the player, the rest get their limited
+        // view of the colony so that population changes.
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(serverPlayer), tile);
+        cs.add(See.perhaps().except(serverPlayer), colony);
+        return cs.build(serverPlayer);
     }
 }
