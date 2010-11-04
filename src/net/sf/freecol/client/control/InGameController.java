@@ -137,6 +137,7 @@ import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
+import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
@@ -3892,15 +3893,25 @@ public final class InGameController implements NetworkConstants {
      * @param goodsType The goods for which to set the settings.
      */
     public void setGoodsLevels(Colony colony, GoodsType goodsType) {
+        askSetGoodsLevels(colony, colony.getExportData(goodsType));
+    }
+
+    /**
+     * Server query-response for setting goods levels.
+     *
+     * @param colony The <code>Colony</code> where the levels are set.
+     * @param data The <code>ExportData</code> setting.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askSetGoodsLevels(Colony colony, ExportData data) {
         Client client = freeColClient.getClient();
-        ExportData data = colony.getExportData(goodsType);
+        SetGoodsLevelsMessage message = new SetGoodsLevelsMessage(colony, data);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
 
-        Element setGoodsLevelsElement = Message.createNewRootElement("setGoodsLevels");
-        setGoodsLevelsElement.setAttribute("colony", colony.getId());
-        setGoodsLevelsElement.appendChild(data.toXMLElement(colony.getOwner(), setGoodsLevelsElement
-                                                            .getOwnerDocument()));
-
-        client.sendAndWait(setGoodsLevelsElement);
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**

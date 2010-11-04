@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
+import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -5669,4 +5670,18 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
+
+    /**
+     * Set goods levels.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
+     * @param colony The <code>Colony</code> to set the goods levels in.
+     * @param exportData The new <code>ExportData</code>.
+     */
+    public Element setGoodsLevels(ServerPlayer serverPlayer, Colony colony,
+                                  ExportData exportData) {
+        colony.setExportData(exportData);
+        return new ChangeSet().add(See.only(serverPlayer), colony)
+            .build(serverPlayer);
+    }
 }

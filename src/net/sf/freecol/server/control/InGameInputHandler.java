@@ -105,6 +105,7 @@ import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
+import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
@@ -425,15 +426,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
-        register(StatisticsMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return getServerStatistics(connection, element);
-            }
-        });
-        register("setGoodsLevels", new CurrentPlayerNetworkRequestHandler() {
+        register(SetGoodsLevelsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return setGoodsLevels(connection, element);
+                return new SetGoodsLevelsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("foreignAffairs", new NetworkRequestHandler() {
@@ -499,6 +495,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register("assignTeacher", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return assignTeacher(connection, element);
+            }
+        });
+        register(StatisticsMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return getServerStatistics(connection, element);
             }
         });
 
@@ -796,31 +797,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                       .toXMLElement(player, updateElement.getOwnerDocument()));
         }
         return updateElement;
-    }
-
-    /**
-     * Handles a "setGoodsLevels"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param setGoodsLevelsElement The element containing the request.
-     */
-    private Element setGoodsLevels(Connection connection, Element setGoodsLevelsElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) getGame().getFreeColGameObject(setGoodsLevelsElement.getAttribute("colony"));
-        if (colony == null) {
-            throw new IllegalArgumentException("Found no colony with ID " + setGoodsLevelsElement.getAttribute("colony"));
-        } else if (colony.getOwner() != player) {
-            throw new IllegalStateException("Not your colony!");
-            /**
-             * we don't really care whether the colony has a custom house } else
-             * if (!colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) { throw
-             * new IllegalStateException("Colony has no custom house!");
-             */
-        }
-        ExportData exportData = new ExportData();
-        exportData.readFromXMLElement((Element) setGoodsLevelsElement.getChildNodes().item(0));
-        colony.setExportData(exportData);
-        return null;
     }
 
     /**
