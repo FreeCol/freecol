@@ -130,8 +130,10 @@
                 stored-as="model.goods.food" is-food="true" />
     <goods-type id="model.goods.grain" is-farmed="true" storable="false"
                 stored-as="model.goods.food" is-food="true" />
+    <!--
     <goods-type id="model.goods.meat" is-farmed="true" storable="false"
                 stored-as="model.goods.food" is-food="true" />
+    -->
     <goods-type id="model.goods.bells" is-farmed="false" ignore-limit="true" storable="false">
       <modifier id="model.modifier.liberty" type="multiplicative" value="1"/>
     </goods-type>
@@ -144,8 +146,8 @@
 
   <resource-types>
     <resource-type id="model.resource.game">
-      <modifier id="model.goods.meat" type="additive" value="2"/>
-      <modifier id="model.goods.meat" type="additive" value="2">
+      <modifier id="model.goods.grain" type="additive" value="2"/>
+      <modifier id="model.goods.grain" type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
       <modifier id="model.goods.furs" type="additive" value="2"/>
