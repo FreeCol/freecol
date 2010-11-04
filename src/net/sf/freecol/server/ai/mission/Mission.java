@@ -312,11 +312,7 @@ public abstract class Mission extends AIObject {
     */
     public Tile getTransportDestination() {
         if (getUnit().getTile() == null) {
-            if (getUnit().isOnCarrier()) {
-                return (Tile) ((Unit) getUnit().getLocation()).getEntryLocation();
-            } else {
-                return (Tile) getUnit().getOwner().getEntryLocation();
-            }
+            return ((getUnit().isOnCarrier()) ? ((Unit) getUnit().getLocation()) : getUnit()).getFullEntryLocation();
         } else if (!getUnit().isOnCarrier()) {
             return null;
         }

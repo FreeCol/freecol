@@ -485,32 +485,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-    * Resets this player's explored tiles. This is done by setting
-    * all the tiles within a {@link Unit}s line of sight visible.
-    * The other tiles are made unvisible.
-    *
-    * @param map The <code>Map</code> to reset the explored tiles on.
-    * @see #hasExplored
-    */
+     * Resets this player's explored tiles. This is done by setting
+     * all the tiles within a {@link Unit}s line of sight visible.
+     * The other tiles are made unvisible.
+     *
+     * @param map The <code>Map</code> to reset the explored tiles on.
+     * @see #hasExplored
+     */
     public void resetExploredTiles(Map map) {
         if (map != null) {
             for (Unit unit : getUnits()) {
-                setExplored(unit.getTile());
+                Tile tile = unit.getTile();
+                setExplored(tile);
 
-                int radius;
-                if (unit.getColony() != null) {
-                    radius = 2; // TODO: magic number
-                } else {
-                    radius = unit.getLineOfSight();
-                }
-
-                for (Tile tile: unit.getTile().getSurroundingTiles(radius)) {
-                    setExplored(tile);
+                int radius = (unit.getColony() != null)
+                    ? unit.getColony().getLineOfSight()
+                    : unit.getLineOfSight();
+                for (Tile t: tile.getSurroundingTiles(radius)) {
+                    setExplored(t);
                 }
             }
-
         }
-
     }
 
     /**
@@ -527,26 +522,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
 
     /**
-    * Sets the given tile to be explored by this player and updates the player's
-    * information about the tile.
-    *
-    * @see Tile#updatePlayerExploredTile(Player)
-    */
+     * Sets the given tile to be explored by this player and updates
+     * the player's information about the tile.
+     *
+     * @see Tile#updatePlayerExploredTile(Player)
+     */
     public void setExplored(Tile tile) {
         tile.setExploredBy(this, true);
     }
 
 
     /**
-    * Sets the tiles within the given <code>Unit</code>'s line of
-    * sight to be explored by this player.
-    *
-    * @param unit The <code>Unit</code>.
-    * @see #setExplored(Tile)
-    * @see #hasExplored
-    */
+     * Sets the tiles within the given <code>Unit</code>'s line of
+     * sight to be explored by this player.
+     *
+     * @param unit The <code>Unit</code>.
+     * @see #setExplored(Tile)
+     * @see #hasExplored
+     */
     public void setExplored(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null || unit.getTile() == null) {
+        if (getGame() == null || getGame().getMap() == null || unit == null
+            || unit.getLocation() == null || unit.getTile() == null) {
             return;
         }
 
@@ -554,13 +550,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
             resetCanSeeTiles();
         }
 
-        setExplored(unit.getTile());
-        canSeeTiles[unit.getTile().getX()][unit.getTile().getY()] = true;
+        Tile tile = unit.getTile();
+        setExplored(tile);
+        canSeeTiles[tile.getX()][tile.getY()] = true;
 
-        for (Tile tile: unit.getTile().getSurroundingTiles(unit.getLineOfSight())) {
-            setExplored(tile);
+        for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
+            setExplored(t);
             if (canSeeTiles != null) {
-                canSeeTiles[tile.getX()][tile.getY()] = true;
+                canSeeTiles[t.getX()][t.getY()] = true;
             } else {
                 invalidateCanSeeTiles();
             }

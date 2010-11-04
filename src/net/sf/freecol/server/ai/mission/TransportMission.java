@@ -325,8 +325,9 @@ public class TransportMission extends Mission {
             if (carrier.getLocation().getTile() == newSource.getTile()) {
                 distToSource = 0;
             } else {
-                distToSource = getDistanceTo(newTransportable, ((carrier.getTile() != null) ? carrier.getTile()
-                        : carrier.getEntryLocation().getTile()), true);
+                Tile t = (carrier.getTile() != null) ? carrier.getTile()
+                    : carrier.getFullEntryLocation();
+                distToSource = getDistanceTo(newTransportable, t, true);
                 // Sanitation
                 // Carrier cant reach source
                 if(distToSource == Map.COST_INFINITY){
@@ -1086,7 +1087,7 @@ public class TransportMission extends Mission {
         Locatable locatable = transportable.getTransportLocatable();
 
         if (start == null || start.getTile() == null) {
-            start = getUnit().getEntryLocation();
+            start = getUnit().getFullEntryLocation();
         }
 
         Location destination;

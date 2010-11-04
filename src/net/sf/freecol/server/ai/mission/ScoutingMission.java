@@ -220,7 +220,7 @@ public class ScoutingMission extends Mission {
 
     private void updateTransportDestination() {
         if (getUnit().getTile() == null) {
-            transportDestination = (Tile) getUnit().getOwner().getEntryLocation();
+            transportDestination = getUnit().getFullEntryLocation();
         } else if (getUnit().isOnCarrier()) {
             GoalDecider destinationDecider = new GoalDecider() {
                 private PathNode best = null;

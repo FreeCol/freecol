@@ -134,12 +134,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     public InGameInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // TODO: move and simplify methods later, for now just delegate
-        register("getVacantEntryLocation", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return getVacantEntryLocation(connection, element);
-            }
-        });
         register(SetDestinationMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return new SetDestinationMessage(getGame(), element).handle(freeColServer, connection);
             }
@@ -247,6 +243,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         });
         register(AbandonColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new AbandonColonyMessage(getGame(), element).handle(freeColServer, player, connection);
             }
@@ -287,34 +284,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new WorkMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("changeWorkType", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return changeWorkType(connection, element);
-            }
-        });
-        register("workImprovement", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return workImprovement(connection, element);
-            }
-        });
         register(SetBuildQueueMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new SetBuildQueueMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register("changeState", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return changeState(connection, element);
-            }
-        });
-        register("putOutsideColony", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return putOutsideColony(connection, element);
             }
         });
         register(ClearSpecialityMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -333,12 +306,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new NewRegionNameMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register("endTurn", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return endTurn(connection, element);
             }
         });
         register(DisbandUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -425,12 +392,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new PayArrearsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("setGoodsLevels", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return setGoodsLevels(connection, element);
-            }
-        });
         register(DeclareIndependenceMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -441,6 +402,38 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new GiveIndependenceMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(RenameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new RenameMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(UpdateCurrentStopMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return new UpdateCurrentStopMessage(getGame(), element).handle(freeColServer, connection);
+            }
+        });
+        register(DiplomacyMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return new DiplomacyMessage(getGame(), element).handle(freeColServer, connection);
+            }
+        });
+        register(SpySettlementMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
+            }
+        });
+        register(StatisticsMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return getServerStatistics(connection, element);
+            }
+        });
+        register("setGoodsLevels", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return setGoodsLevels(connection, element);
             }
         });
         register("foreignAffairs", new NetworkRequestHandler() {
@@ -459,10 +452,28 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getREFUnits(connection, element);
             }
         });
-        register(RenameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+        register("changeWorkType", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return new RenameMessage(getGame(), element).handle(freeColServer, player, connection);
+                return changeWorkType(connection, element);
+            }
+        });
+        register("workImprovement", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return workImprovement(connection, element);
+            }
+        });
+        register("changeState", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return changeState(connection, element);
+            }
+        });
+        register("putOutsideColony", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return putOutsideColony(connection, element);
             }
         });
         register("getNewTradeRoute", new NetworkRequestHandler() {
@@ -485,34 +496,20 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return assignTradeRoute(connection, element);
             }
         });
-        register(UpdateCurrentStopMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return new UpdateCurrentStopMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register(DiplomacyMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return new DiplomacyMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register(SpySettlementMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register("continuePlaying", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return continuePlaying(connection, element);
-            }
-        });
         register("assignTeacher", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return assignTeacher(connection, element);
             }
         });
-        register(StatisticsMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return getServerStatistics(connection, element);
+
+        // Trivial comms that do not merit their own Message-type
+        register("endTurn", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                FreeColServer server = getFreeColServer();
+                ServerPlayer serverPlayer = server.getPlayer(connection);
+                server.getInGameController().endTurn(serverPlayer);
+                return null;
             }
         });
         register("retire", new NetworkRequestHandler() {
@@ -522,62 +519,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return server.getInGameController().retire(serverPlayer);
             }
         });
-    }
-
-
-    // TODO: Remove these when their local users migrate out.
-    // There are copies in InGameController.
-    /**
-     * Get a list of all server players, optionally excluding the supplied one.
-     *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
-     * @return A list of all connected server players except one.
-     */
-    private List<ServerPlayer> getOtherPlayers(ServerPlayer serverPlayer) {
-        List<ServerPlayer> result = new ArrayList<ServerPlayer>();
-        for (Player otherPlayer : getGame().getPlayers()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
-            if (!enemyPlayer.equals(serverPlayer)
-                && enemyPlayer.isConnected()) {
-                result.add(enemyPlayer);
+        register("continuePlaying", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                FreeColServer server = getFreeColServer();
+                ServerPlayer serverPlayer = server.getPlayer(connection);
+                return server.getInGameController()
+                    .continuePlaying(serverPlayer);
             }
-        }
-        return result;
+        });
     }
 
-    /**
-     * Handles a "getVacantEntryLocation"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element getVacantEntryLocation(Connection connection, Element element) {
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Player owner = unit.getOwner();
-        ServerPlayer askingPlayer = getFreeColServer().getPlayer(connection);
-        Location entryLocation = unit.getEntryLocation();
-        if (owner != askingPlayer) {
-            /**
-             * WARNING: this is a gruesome hack to prevent a game
-             * crash when the client tries to move AI units. As this
-             * should never happen, we need to find out why it does.
-             */
-            if (entryLocation == null) {
-                throw new IllegalStateException("Unit " + unit.getId() + " with owner " + owner
-                                                + " not owned by " + askingPlayer
-                                                + ", refusing to get vacant location!");
-            } else {
-                logger.warning("Unit " + unit.getId() + " with owner " + owner
-                               + " not owned by " + askingPlayer
-                               + ", entry location is " + entryLocation.getId());
-            }
-        } else {
-            entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
-        }
-        Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
-        reply.setAttribute("location", entryLocation.getId());
-        return reply;
-    }
 
     /**
      * Handles a "getNewTradeRoute"-message from a client.
@@ -873,19 +824,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles an "endTurn" notification from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element endTurn(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        getFreeColServer().getInGameController().endTurn(player);
-        return null;
-    }
-
-
-    /**
      * Handles a "foreignAffairs"-message.
      * 
      * @param connection The <code>Connection</code> the message was received
@@ -1007,33 +945,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(unit.toXMLElement(player,reply.getOwnerDocument()));
         }
         return reply;
-    }
-
-    /**
-     * Handles an "continuePlaying"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element continuePlaying(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        if (!getFreeColServer().isSingleplayer()) {
-            throw new IllegalStateException("Can't continue playing in multiplayer!");
-        }
-        if (player != getFreeColServer().getInGameController().checkForWinner()) {
-            throw new IllegalStateException("Can't continue playing! Player "
-                    + player.getName() + " hasn't won the game");
-        }
-        Specification spec = getGame().getSpecification();
-        spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF).setValue(false);
-        spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS).setValue(false);
-        spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS).setValue(false);
-        
-        // victory panel is shown after end turn, end turn again to start turn of next player
-        final ServerPlayer currentPlayer = (ServerPlayer) getFreeColServer().getGame().getCurrentPlayer();
-        getFreeColServer().getInGameController().endTurn(currentPlayer);
-        return null;
     }
 
     /**

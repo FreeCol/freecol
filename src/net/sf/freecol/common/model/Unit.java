@@ -1138,10 +1138,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             final PathNode p;
             if (isOnCarrier()) {
                 final Unit carrier = (Unit) getLocation();
-                p = getGame().getMap().findPath(this, (Tile) carrier.getEntryLocation(), destination.getTile(), carrier);
+                Tile start = carrier.getFullEntryLocation();
+                p = getGame().getMap().findPath(this, start,
+                                                destination.getTile(), carrier);
             } else {
-                // TODO: Use a standard carrier with four move points as a the unit's carrier:
-                p = getGame().getMap().findPath((Tile) getOwner().getEntryLocation(), destination.getTile(), 
+                // TODO: Use a standard carrier with four move points
+                // as a the unit's carrier:
+                Tile start = getOwner().getEntryLocation().getTile();
+                p = getGame().getMap().findPath(start, destination.getTile(),
                                                 Map.PathType.BOTH_LAND_AND_SEA);
             }
             if (p != null) {
@@ -2543,9 +2547,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         case SKIPPED:
             return (getMovesLeft() > 0);
         case TO_EUROPE:
-            return isNaval() &&
-                ((location instanceof Europe) && (getState() == UnitState.TO_AMERICA)) ||
-                (getEntryLocation() == getLocation());
+            return isNaval()
+                && ((location instanceof Europe)
+                    && (getState() == UnitState.TO_AMERICA))
+                || (getEntryLocation() == getLocation());
         case TO_AMERICA:
             return (location instanceof Europe && isNaval() && !isUnderRepair());
         default:
@@ -2784,10 +2789,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Sets the <code>Location</code> in which this unit will be put when
+     * Sets the entry location in which this unit will be put when
      * returning from {@link Europe}.
      * 
-     * @param entryLocation The <code>Location</code>.
+     * @param entryLocation The entry location.
      * @see #getEntryLocation
      */
     public void setEntryLocation(Location entryLocation) {
@@ -2795,61 +2800,27 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Gets the <code>Location</code> in which this unit will be put when
-     * returning from {@link Europe}. If this <code>Unit</code> has not not
-     * been outside europe before, it will return the default value from the
-     * {@link Player} owning this <code>Unit</code>.
-     * 
-     * @return The <code>Location</code>.
-     * @see Player#getEntryLocation
-     * @see #getVacantEntryLocation
+     * Gets the entry location for this unit to use when returning from
+     * {@link Europe}.
+     *
+     * @return The entry location.
      */
     public Location getEntryLocation() {
-        return (entryLocation != null) ? entryLocation : getOwner().getEntryLocation();
+        return entryLocation;
     }
 
     /**
-<<<<<<< .working
-=======
-     * Gets the <code>Location</code> in which this unit will be put when
-     * returning from {@link Europe}. If this <code>Unit</code> has not not
-     * been outside europe before, it will return the default value from the
-     * {@link Player} owning this <code>Unit</code>. If the tile is occupied
-     * by a enemy unit, then a nearby tile is choosen.
-     * 
-     * <br>
-     * <br>
-     * <i>WARNING:</i> Only the server has the information to determine which
-     * <code>Tile</code> is occupied. Use
-     * {@link ModelController#setToVacantEntryLocation} instead.
-     * 
-     * @return The <code>Location</code>.
-     * @see #getEntryLocation
+     * Gets the entry tile for this unit, or if null the default
+     * entry location for the owning player.
+     *
+     * @return The entry tile.
      */
-    // TODO: shouldn't this be somewhere else?
-    public Location getVacantEntryLocation() {
-        Tile l = (Tile) getEntryLocation();
-
-        if (l.getFirstUnit() != null && l.getFirstUnit().getOwner() != getOwner()) {
-            int radius = 1;
-            while (true) {
-                Iterator<Position> i = getGame().getMap().getCircleIterator(l.getPosition(), false, radius);
-                while (i.hasNext()) {
-                    Tile l2 = getGame().getMap().getTile(i.next());
-                    if (l2.getFirstUnit() == null || l2.getFirstUnit().getOwner() == getOwner()) {
-                        return l2;
-                    }
-                }
-
-                radius++;
-            }
-        }
-
-        return l;
+    public Tile getFullEntryLocation() {
+        return (entryLocation == null) ? owner.getEntryLocation().getTile()
+            : (Tile) entryLocation;
     }
 
     /**
->>>>>>> .merge-right.r7577
      * Checks if this is an defensive unit. That is: a unit which can be used to
      * defend a <code>Settlement</code>.
      * 

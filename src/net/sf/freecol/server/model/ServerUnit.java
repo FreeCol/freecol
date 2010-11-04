@@ -391,8 +391,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @return A suitable entry location for this unit.
      * @see #getEntryLocation
      */
-    public Tile getVacantEntryLocation(Random random) {
-        Tile tile = (Tile) getEntryLocation();
+    private Tile getVacantEntryLocation(Random random) {
+        Tile tile = getFullEntryLocation();
         if (tile.getFirstUnit() == null
             || tile.getFirstUnit().getOwner() == getOwner()) return tile;
 

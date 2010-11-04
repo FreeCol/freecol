@@ -176,10 +176,13 @@ public class PioneeringMission extends Mission {
         
         final Tile startTile;
         if (getUnit().getTile() == null) {
-            if (getUnit().isOnCarrier()) {
-                startTile = (Tile) ((Unit) getUnit().getLocation()).getEntryLocation();
-            } else {
-                startTile = (Tile) getUnit().getOwner().getEntryLocation();
+            startTile = ((getUnit().isOnCarrier())
+                         ? ((Unit) getUnit().getLocation())
+                         : getUnit()).getFullEntryLocation();
+            if (startTile == null) {
+                logger.warning("Unable to determine entry location for: "
+                               + getUnit().toString());
+                return;
             }
         } else {
             startTile = getUnit().getTile();

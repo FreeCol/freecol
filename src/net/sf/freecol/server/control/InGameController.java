@@ -1408,6 +1408,35 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Continue playing after winning.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that plays on.
+     * @return Null.
+     */
+    public Element continuePlaying(ServerPlayer serverPlayer) {
+        if (!getFreeColServer().isSingleplayer()) {
+            logger.warning("Can not continue playing in multiplayer!");
+        } else if (serverPlayer != checkForWinner()) {
+            logger.warning("Can not continue playing, as "
+                           + serverPlayer.getName()
+                           + " has not won the game!");
+        } else {
+            Specification spec = getGame().getSpecification();
+            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF)
+                .setValue(false);
+            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS)
+                .setValue(false);
+            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS)
+                .setValue(false);
+            // The victory panel is shown after end turn, end turn again
+            // to start turn of next player.
+            endTurn((ServerPlayer) getGame().getCurrentPlayer());
+        }
+        return null;
+    }
+
+
+    /**
      * Cash in a treasure train.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is cashing in.

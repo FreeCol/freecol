@@ -225,11 +225,7 @@ public class BuildColonyMission extends Mission {
      */
     public Tile getTransportDestination() {
         if (target == null) {
-            if (getUnit().isOnCarrier()) {
-                return (Tile) ((Unit) getUnit().getLocation()).getEntryLocation();
-            } else {
-                return (Tile) getUnit().getOwner().getEntryLocation();
-            }
+            return ((getUnit().isOnCarrier()) ? ((Unit) getUnit().getLocation()) : getUnit()).getFullEntryLocation();
         }
 
         if (getUnit().isOnCarrier()) {
@@ -278,7 +274,7 @@ public class BuildColonyMission extends Mission {
             Unit carrier = (Unit) unit.getLocation();
             startTile = carrier.getTile();
         } else if (unit.getLocation() instanceof Europe) {
-            startTile = (Tile) unit.getEntryLocation();
+            startTile = unit.getFullEntryLocation();
         } else {
             startTile = unit.getTile();
         }

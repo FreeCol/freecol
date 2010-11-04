@@ -526,10 +526,12 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         // Determine starting tile:
         Tile startTile = unit.getTile();
         if (startTile == null) {
-            if (unit.isOnCarrier()) {
-                startTile = (Tile) ((Unit) unit.getLocation()).getEntryLocation();
-            } else {
-                startTile = (Tile) unit.getOwner().getEntryLocation();
+            startTile = ((unit.isOnCarrier()) ? ((Unit) unit.getLocation())
+                         : unit).getFullEntryLocation();
+            if (startTile == null) {
+                logger.warning("Unable to determine entry location for: "
+                               + unit.toString());
+                return;
             }
         }
         /*

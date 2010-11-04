@@ -39,45 +39,9 @@ import net.sf.freecol.server.model.ServerBuilding;
 
 
 public class MockModelController implements ModelController {
-    private MockPseudoRandom setPseudoRandom = null;
     
-    public void exploreTiles(Player player, ArrayList<Tile> tiles) {
-        // TODO Auto-generated method stub
-		
-    }
-
     public TradeRoute getNewTradeRoute(Player player) {
         // TODO Auto-generated method stub
         return null;
     }
-
-    public Random getPseudoRandom() {
-        return (setPseudoRandom != null) ? setPseudoRandom : new Random(0);
-    }
-    
-    public void setPseudoRandom(MockPseudoRandom newPseudoRandom){
-        setPseudoRandom = newPseudoRandom;
-    }
-
-    public Location setToVacantEntryLocation(Unit unit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * All objects receive a new turn. 
-     */
-    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {
-        return true;
-    }
-
-    public Building createBuilding(String taskID, Colony colony, BuildingType type) {
-        // TODO Auto-generated method stub
-        return new ServerBuilding(colony.getGame(), colony, type);
-    }
-
-    public void tileImprovementFinished(Unit unit, TileImprovement improvement) {
-        // TODO Auto-generated method stub
-    }
-
 }

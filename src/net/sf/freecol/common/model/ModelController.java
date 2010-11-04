@@ -42,34 +42,6 @@ import net.sf.freecol.common.model.Player.Stance;
 public interface ModelController {
 
     /**
-    * Puts the specified <code>Unit</code> in America.
-    * @param unit The <code>Unit</code>.
-    * @return The <code>Location</code> where the <code>Unit</code> appears.
-    */
-    public Location setToVacantEntryLocation(Unit unit);
-
-    /**
-    * Tells the <code>ModelController</code> that an internal
-    * change (that is; not caused by the control) has occured in the model.
-    */
-    //public void update(Tile tile);
-    
-
-    /**
-    * Explores the given tiles for the given player.
-    * @param player The <code>Player</code> that should see more tiles.
-    * @param tiles The tiles to explore.
-    */
-    public void exploreTiles(Player player, ArrayList<Tile> tiles);
-    
-    /**
-     * Tells the <code>ModelController</code> that a tile improvement was finished
-     * @param unit an <code>Unit</code> value
-     * @param improvement a <code>TileImprovement</code> value
-     */
-    public void tileImprovementFinished(Unit unit, TileImprovement improvement);
-    
-    /**
      * Get a new <code>TradeRoute</code> object.
      */
     public TradeRoute getNewTradeRoute(Player player);

@@ -689,18 +689,19 @@ public final class FreeColClient {
     public boolean retire() {
         Element retireElement = Message.createNewRootElement("retire");
         Element reply = client.ask(retireElement);
-        boolean result = reply != null && "true".equals(reply.getAttribute("highScore"));
+        boolean result = reply != null
+            && "true".equals(reply.getAttribute("highScore"));
         return result;
     }
 
 
     /**
-     * Continue playing after win the game
+     * Continue playing after winning the game.
      */
     public void continuePlaying() {
-        Element continueElement = Message.createNewRootElement("continuePlaying");
-        client.send(continueElement);
+        client.send(Message.createNewRootElement("continuePlaying"));
     }
+
 
     /**
      * Checks if this client is the game admin.

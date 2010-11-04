@@ -21,6 +21,7 @@ package net.sf.freecol.server.generator;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
@@ -57,7 +58,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
 
         for (Nation n : spec().getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
@@ -85,7 +86,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
         Nation nation = spec().getNation("model.nation.dutch");
 
         g.addPlayer(new ServerPlayer(g, nation.getType().getNameKey(), false, nation, null, null));
@@ -116,7 +117,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
 
         // Apply the difficulty level
         //spec().applyDifficultyLevel("model.difficulty.medium");
@@ -179,7 +180,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game g = new ServerGame(mmc, spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
-        MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
 
         Vector<Player> players = new Vector<Player>();
 
@@ -224,7 +225,7 @@ public class MapGeneratorTest extends FreeColTestCase {
          */
         MockModelController mmc = new MockModelController();
         Game g = new ServerGame(mmc, spec());
-        MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
             if (importFile.getName().endsWith(".fsg")) {
@@ -246,7 +247,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         MockModelController mmc = new MockModelController();
         Game game = new ServerGame(mmc, spec());
-        MapGenerator gen = new SimpleMapGenerator(mmc.getPseudoRandom(), spec());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
         try {
             gen.createMap(game);
         } catch (FreeColException e) {
