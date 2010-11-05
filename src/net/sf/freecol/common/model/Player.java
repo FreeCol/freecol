@@ -1090,7 +1090,9 @@ public class Player extends FreeColGameObject implements Nameable {
                     && hasZeroSettlements())
                 || ("model.option.buildOnNativeLand.firstAndUncontacted".equals(build)
                     && hasZeroSettlements()
-                    && tile.getOwner().getStance(this) == Stance.UNCONTACTED));
+                    && (tile.getOwner() == null
+                        || tile.getOwner().getStance(this)
+                        == Stance.UNCONTACTED)));
     }
 
     /**
