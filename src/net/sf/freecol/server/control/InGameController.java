@@ -5709,4 +5709,25 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps().except(serverPlayer), colony);
         return cs.build(serverPlayer);
     }
+
+
+    /**
+     * Change work type.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to change the work type of.
+     * @param type The new <code>GoodsType</code> to produce.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element changeWorkType(ServerPlayer serverPlayer, Unit unit,
+                                  GoodsType type) {
+        if (unit.getWorkType() != type) {
+            unit.setExperience(0);
+            unit.setWorkType(type);
+        }
+
+        // Private update of the unit.
+        return new ChangeSet().add(See.only(serverPlayer), unit)
+            .build(serverPlayer);
+    }
 }

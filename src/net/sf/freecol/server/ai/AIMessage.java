@@ -27,6 +27,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -35,6 +36,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.AttackMessage;
+import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
@@ -103,6 +105,20 @@ public class AIMessage {
         AIPlayer owner = aiUnit.getOwner();
         return sendMessage(owner.getConnection(),
                            new AttackMessage(aiUnit.getUnit(), direction));
+    }
+
+
+    /**
+     * An AIUnit changes its work type.
+     *
+     * @param aiUnit The <code>AIUnit</code> to change the work type of.
+     * @param type The <code>GoodsType</code> to produce.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askChangeWorkType(AIUnit aiUnit, GoodsType type) {
+        AIPlayer owner = aiUnit.getOwner();
+        return sendMessage(owner.getConnection(),
+                           new ChangeWorkTypeMessage(aiUnit.getUnit(), type));
     }
 
     /**

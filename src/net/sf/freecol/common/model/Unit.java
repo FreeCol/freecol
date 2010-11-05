@@ -971,25 +971,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param type The type of goods to attempt to produce.
      */
     public void setWorkType(GoodsType type) {
-        if (type == null) {
-            throw new IllegalStateException("GoodsType must not be 'null'.");
-        } else if (workType != type) {
-            logger.finest("resetting experience for " + this);
-            experience = 0;
-            if (type.isFarmed()) {
-                GoodsType oldWorkType = workType;
-                workType = type;
-                if (getLocation() instanceof ColonyTile) {
-                    ColonyTile colonyTile = (ColonyTile) getLocation();
-                    if (oldWorkType != null) {
-                        colonyTile.firePropertyChange(oldWorkType.getId(), 
-                                                      colonyTile.getProductionOf(this, oldWorkType), null);
-                    }
-                    colonyTile.firePropertyChange(type.getId(), 
-                                                  null, colonyTile.getProductionOf(this, type));
-                }
-            }
-        }
+        workType = type;
     }
 
     /**

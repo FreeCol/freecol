@@ -589,23 +589,6 @@ public class UnitTest extends FreeColTestCase {
         assertFalse("Soldier should not be working in central tile",workTile == colony.getColonyTile(colonyTile));
     }
     
-    public void testUnitLosesExperienceWithWorkChange() {
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        game.setMap(map);
-                
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch, colonistType,
-                                       UnitState.ACTIVE);
-        
-        colonist.setWorkType(foodType);
-        colonist.modifyExperience(10);
-        assertTrue("Colonist should some initial experience",colonist.getExperience() > 0);
-        
-        colonist.setWorkType(cottonType);
-        assertTrue("Colonist should have lost all experience",colonist.getExperience() == 0);
-    }
-    
     public void testUnitLosesExperienceWithRoleChange() {
         Game game = getStandardGame();
         Map map = getTestMap();

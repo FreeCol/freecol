@@ -99,6 +99,7 @@ import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
+import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
@@ -3977,6 +3978,7 @@ public final class InGameController implements NetworkConstants {
         return true;
     }
 
+
     /**
      * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
      *
@@ -4087,21 +4089,45 @@ public final class InGameController implements NetworkConstants {
      * @param workType The new <code>GoodsType</code> to produce.
      */
     public void changeWorkType(Unit unit, GoodsType workType) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
-        Client client = freeColClient.getClient();
-
-        Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
-        changeWorkTypeElement.setAttribute("unit", unit.getId());
-        changeWorkTypeElement.setAttribute("workType", workType.getId());
-
-        unit.setWorkType(workType);
-
-        client.sendAndWait(changeWorkTypeElement);
+        GoodsType oldWorkType = unit.getWorkType();
+        if (askChangeWorkType(unit, workType)) {
+            if (unit.getLocation() instanceof ColonyTile) {
+                ColonyTile colonyTile = (ColonyTile) unit.getLocation();
+                if (oldWorkType != null) {
+                    colonyTile.firePropertyChange(oldWorkType.getId(),
+                        colonyTile.getProductionOf(unit, oldWorkType), null);
+                }
+                colonyTile.firePropertyChange(workType.getId(),
+                    null, colonyTile.getProductionOf(unit, workType));
+            }
+        }
     }
+
+    /**
+     * Server query-response for changing work type.
+     *
+     * @param unit The <code>Unit</code> to change the work type of.
+     * @param workType The new <code>GoodsType</code> to produce.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askChangeWorkType(Unit unit, GoodsType workType) {
+        Client client = freeColClient.getClient();
+        ChangeWorkTypeMessage message = new ChangeWorkTypeMessage(unit,
+                                                                  workType);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Changes the work type of this <code>Unit</code>.

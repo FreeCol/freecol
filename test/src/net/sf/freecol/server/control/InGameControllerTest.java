@@ -91,6 +91,8 @@ public class InGameControllerTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.bells");
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
     private static final GoodsType musketType
         = spec().getGoodsType("model.goods.muskets");
     private static final GoodsType horsesType
@@ -1896,4 +1898,24 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
         assertTrue(colony.getBuilding(press) != null);
     }
+
+    public void testUnitLosesExperienceWithWorkChange() {
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
+                                       colonistType, UnitState.ACTIVE);
+
+        colonist.setWorkType(foodType);
+        colonist.modifyExperience(10);
+        assertTrue("Colonist should some initial experience",
+                   colonist.getExperience() > 0);
+
+        igc.changeWorkType(dutch, colonist, cottonType);
+        assertTrue("Colonist should have lost all experience",
+                   colonist.getExperience() == 0);
+    }
+
 }
