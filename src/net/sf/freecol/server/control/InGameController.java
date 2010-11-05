@@ -5759,4 +5759,21 @@ public final class InGameController extends Controller {
         return new ChangeSet().add(See.only(serverPlayer), tile)
             .build(serverPlayer);
     }
+
+
+    /**
+     * Change a units state.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to change the state of.
+     * @param state The new <code>UnitState</code>.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element changeState(ServerPlayer serverPlayer, Unit unit,
+                               UnitState state) {
+        unit.setState(state);
+
+        // Others might be able to see the unit.
+        return new ChangeSet().add(See.perhaps(), unit).build(serverPlayer);
+    }
 }

@@ -336,16 +336,10 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 if (!u.isArmed() && u.canBeEquippedWith(muskets)) {
                     recruitCount--;
                     AIMessage.askEquipUnit(getAIUnit(u), muskets, 1);
-                    Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-                    putOutsideColonyElement.setAttribute("unit", u.getId());
-                    u.putOutsideColony();
-                    sendAndWaitSafely(putOutsideColonyElement);
+                    AIMessage.askPutOutsideColony(getAIUnit(u));
                     // Check if the unit can fortify before sending the order
                     if (u.checkSetState(UnitState.FORTIFYING)) {
-                        Element changeStateElement = Message.createNewRootElement("changeState");
-                        changeStateElement.setAttribute("unit", u.getId());
-                        changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
-                        sendAndWaitSafely(changeStateElement);
+                        AIMessage.askChangeState(getAIUnit(u), UnitState.FORTIFYING);
                     }
                     olddefenders++;
                     if (!u.isMounted() && u.canBeEquippedWith(horses)) {

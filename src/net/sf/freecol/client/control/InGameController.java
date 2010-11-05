@@ -99,6 +99,7 @@ import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
+import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChatMessage;
@@ -4182,6 +4183,69 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Changes the state of this <code>Unit</code>.
+     *
+     * @param unit The <code>Unit</code>
+     * @param state The state of the unit.
+     */
+    public void changeState(Unit unit, UnitState state) {
+        Player player = freeColClient.getMyPlayer();
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        if (!unit.checkSetState(state)) {
+            return; // Don't bother (and don't log, this is not exceptional)
+        }
+
+        // Check if this is a hostile fortification, and give the player
+        // a chance to confirm.
+        if (state == UnitState.FORTIFYING && unit.isOffensiveUnit()
+            && !unit.hasAbility("model.ability.piracy")) {
+            Tile tile = unit.getTile();
+            if (tile != null && tile.getOwningSettlement() != null) {
+                Player enemy = tile.getOwningSettlement().getOwner();
+                if (player != enemy
+                    && player.getStance(enemy) != Stance.ALLIANCE) {
+                    if (!confirmHostileAction(unit, tile)) return; // Aborted
+                }
+            }
+        }
+
+        if (askChangeState(unit, state)) {
+            if (!canvas.isShowingSubPanel()
+                && (unit.getMovesLeft() == 0
+                    || unit.getState() == UnitState.SENTRY
+                    || unit.getState() == UnitState.SKIPPED)) {
+                nextActiveUnit();
+            } else {
+                canvas.refresh();
+            }
+        }
+    }
+
+    /**
+     * Server query-response for changing unit state.
+     *
+     * @param unit The <code>Unit</code> to change the state of.
+     * @param state The new <code>UnitState</code>.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askChangeState(Unit unit, UnitState state) {
+        Client client = freeColClient.getClient();
+        ChangeStateMessage message = new ChangeStateMessage(unit, state);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+
+    /**
      * Assigns a unit to a teacher <code>Unit</code>.
      *
      * @param student an <code>Unit</code> value
@@ -4264,53 +4328,6 @@ public final class InGameController implements NetworkConstants {
         return true;
     }
 
-    /**
-     * Changes the state of this <code>Unit</code>.
-     *
-     * @param unit The <code>Unit</code>
-     * @param state The state of the unit.
-     */
-    public void changeState(Unit unit, UnitState state) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        Client client = freeColClient.getClient();
-        if (!(unit.checkSetState(state))) {
-            return; // Don't bother (and don't log, this is not exceptional)
-        }
-        if (state == UnitState.FORTIFYING && unit.isOffensiveUnit() &&
-            !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
-            Tile tile = unit.getTile();
-            if (tile != null && tile.getOwningSettlement() != null) { // check stance with settlement's owner
-                Player myPlayer = unit.getOwner();
-                Player enemy = tile.getOwningSettlement().getOwner();
-                if (myPlayer != enemy && myPlayer.getStance(enemy) != Stance.ALLIANCE
-                    && !confirmHostileAction(unit, tile.getOwningSettlement().getTile())) { // player has aborted
-                    return;
-                }
-            }
-        }
-
-        unit.setState(state);
-
-        // NOTE! The call to nextActiveUnit below can lead to the dreaded
-        // "not your turn" error, so let's finish networking first.
-        Element changeStateElement = Message.createNewRootElement("changeState");
-        changeStateElement.setAttribute("unit", unit.getId());
-        changeStateElement.setAttribute("state", state.toString());
-        client.sendAndWait(changeStateElement);
-
-        if (!freeColClient.getCanvas().isShowingSubPanel() &&
-            (unit.getMovesLeft() == 0 || unit.getState() == UnitState.SENTRY ||
-             unit.getState() == UnitState.SKIPPED)) {
-            nextActiveUnit();
-        } else {
-            freeColClient.getCanvas().refresh();
-        }
-
-    }
 
     /**
      * Clears the orders of the given <code>Unit</code> The orders are cleared

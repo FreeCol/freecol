@@ -173,15 +173,7 @@ public class DefendSettlementMission extends Mission {
             if (unit.getState() != UnitState.FORTIFIED
                     && unit.getState() != UnitState.FORTIFYING
                     && unit.checkSetState(UnitState.FORTIFYING)) {
-                Element changeStateElement = Message.createNewRootElement("changeState");
-                changeStateElement.setAttribute("unit", unit.getId());
-                changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
-                try {
-                    logger.log(Level.FINEST, "Sending fortity request...");
-                    connection.sendAndWait(changeStateElement);
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Couldn't fortify unit!", e);
-                }
+                AIMessage.askChangeState(getAIUnit(), UnitState.FORTIFYING);
             }
         }
     }

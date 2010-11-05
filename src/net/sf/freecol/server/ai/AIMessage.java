@@ -34,9 +34,11 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.AttackMessage;
+import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
@@ -46,6 +48,7 @@ import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
+import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -107,6 +110,20 @@ public class AIMessage {
         AIPlayer owner = aiUnit.getOwner();
         return sendMessage(owner.getConnection(),
                            new AttackMessage(aiUnit.getUnit(), direction));
+    }
+
+
+    /**
+     * An AIUnit changes state.
+     *
+     * @param aiUnit The <code>AIUnit</code> to change the state of.
+     * @param state The new <code>UnitState</code>.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askChangeState(AIUnit aiUnit, UnitState state) {
+        AIPlayer owner = aiUnit.getOwner();
+        return sendMessage(owner.getConnection(),
+                           new ChangeStateMessage(aiUnit.getUnit(), state));
     }
 
 
@@ -233,6 +250,19 @@ public class AIMessage {
         AIPlayer owner = aiUnit.getOwner();
         return sendMessage(owner.getConnection(),
                            new MoveMessage(aiUnit.getUnit(), direction));
+    }
+
+
+   /**
+     * An AIUnit is put outside a colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to put out.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askPutOutsideColony(AIUnit aiUnit) {
+        AIPlayer owner = aiUnit.getOwner();
+        return sendMessage(owner.getConnection(),
+                           new PutOutsideColonyMessage(aiUnit.getUnit()));
     }
 
 

@@ -65,6 +65,7 @@ import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
+import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
@@ -455,6 +456,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     .handle(freeColServer, player, connection);
             }
         });
+        register(ChangeStateMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new ChangeStateMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }
+        });
         register("foreignAffairs", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
@@ -469,12 +478,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return getREFUnits(connection, element);
-            }
-        });
-        register("changeState", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return changeState(connection, element);
             }
         });
         register("getNewTradeRoute", new NetworkRequestHandler() {
@@ -675,42 +678,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             teacher.getStudent().setTeacher(null);
         }
         teacher.setStudent(student);
-        return null;
-    }
-
-    /**
-     * Handles a "changeState"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param changeStateElement The element containing the request.
-     * @return null (always).
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element changeState(Connection connection, Element changeStateElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObjectSafely(changeStateElement.getAttribute("unit"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + changeStateElement.getAttribute("unit"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        UnitState state = Enum.valueOf(UnitState.class, changeStateElement.getAttribute("state"));
-        Tile oldTile = unit.getTile();
-        if (unit.checkSetState(state)) {
-            unit.setState(state);
-        } else {
-            logger.warning("Can't set state " + state + " for unit " + unit + " with current state " + unit.getState()
-                    + " and " + unit.getMovesLeft() + " moves left belonging to " + player
-                    + ". Possible cheating attempt (or bug)?");
-        }
-        // Send the updated tile anyway, we may have a synchronization issue
-        InGameController igc = getFreeColServer().getInGameController();
-        igc.sendToOthers(player, oldTile);
         return null;
     }
 
