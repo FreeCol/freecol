@@ -88,9 +88,7 @@ public class ChangeStateMessage extends Message {
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
-        }
+        // Do not test if it is on the map, units in Europe can change state.
 
         UnitState state;
         try {
