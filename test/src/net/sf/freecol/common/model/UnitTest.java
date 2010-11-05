@@ -34,161 +34,44 @@ import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class UnitTest extends FreeColTestCase {
 
-    TileType plains = spec().getTileType("model.tile.plains");
-    TileType desert = spec().getTileType("model.tile.desert");
-    TileType grassland = spec().getTileType("model.tile.grassland");
-    TileType prairie = spec().getTileType("model.tile.prairie");
-    TileType tundra = spec().getTileType("model.tile.tundra");
-    TileType savannah = spec().getTileType("model.tile.savannah");
-    TileType marsh = spec().getTileType("model.tile.marsh");
-    TileType swamp = spec().getTileType("model.tile.swamp");
-    TileType arctic = spec().getTileType("model.tile.arctic");
-    TileType ocean = spec().getTileType("model.tile.ocean");    
+    private static final BuildingType carpenterHouseType
+        = spec().getBuildingType("model.building.carpenterHouse");
+
+    private static final EquipmentType horsesType
+        = spec().getEquipmentType("model.equipment.horses");
+    private static final EquipmentType musketsType
+        = spec().getEquipmentType("model.equipment.muskets");
+    private static final EquipmentType toolsType
+        = spec().getEquipmentType("model.equipment.tools");
+
+    private static final GoodsType cottonType
+        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
+
+    private static final TileType ocean
+        = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
+
+    private static final UnitType artilleryType
+        = spec().getUnitType("model.unit.artillery");
+    private static final UnitType caravelType
+        = spec().getUnitType("model.unit.caravel");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertFarmerType
+        = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType hardyPioneerType
+        = spec().getUnitType("model.unit.hardyPioneer");
+    private static final UnitType soldierType
+        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType wagonType
+        = spec().getUnitType("model.unit.wagonTrain");
     
-    TileType plainsForest = spec().getTileType("model.tile.mixedForest");
-    TileType desertForest = spec().getTileType("model.tile.scrubForest");
-    TileType grasslandForest = spec().getTileType("model.tile.coniferForest");
-    TileType prairieForest = spec().getTileType("model.tile.broadleafForest");
-    TileType tundraForest = spec().getTileType("model.tile.borealForest");
-    TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
-    TileType marshForest = spec().getTileType("model.tile.wetlandForest");
-    TileType swampForest = spec().getTileType("model.tile.rainForest");
-    TileType hills = spec().getTileType("model.tile.hills");
-    TileType mountains = spec().getTileType("model.tile.mountains");
 
-    TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
-    TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
-    TileImprovementType clear = spec().getTileImprovementType("model.improvement.clearForest");
-
-    EquipmentType toolsType = spec().getEquipmentType("model.equipment.tools");
-    EquipmentType horsesType = spec().getEquipmentType("model.equipment.horses");
-    EquipmentType musketsType = spec().getEquipmentType("model.equipment.muskets");
-
-    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
-    UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
-    UnitType galleonType = spec().getUnitType("model.unit.galleon");
-    UnitType caravelType = spec().getUnitType("model.unit.caravel");
-    UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
-    UnitType soldierType = spec().getUnitType("model.unit.veteranSoldier");
-    UnitType artilleryType = spec().getUnitType("model.unit.artillery");
-    
-    GoodsType foodType = spec().getGoodsType("model.goods.food");
-    GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
-
-    BuildingType carpenterHouseType = spec().getBuildingType("model.building.carpenterHouse");
-    
-    public static int getWorkLeftForPioneerWork(UnitType unitType,
-                                                TileType tileType,
-                                                TileImprovementType whichWork) {
-        Game game = getStandardGame();
-
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Tile tile = new Tile(game, tileType, 0, 0);
-        EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
-        Unit unit = new ServerUnit(game, tile, dutch, unitType,
-                                   UnitState.ACTIVE,
-                                   tools, tools, tools, tools, tools);
-        tile.setOwner(dutch);
-        TileImprovement improvement = tile.findTileImprovementType(whichWork);
-        if (improvement == null) {
-            improvement = new TileImprovement(game, tile, whichWork);
-            tile.add(improvement);
-        }
-        unit.work(improvement);
-
-        return unit.getWorkTurnsLeft();
-    }
-
-    /**
-     * Check for basic time requirements...
-     * 
-     */
-    public void testDoAssignedWorkAmateurAndHardyPioneer() {
-    	
-        { // Savanna
-            assertEquals(8, getWorkLeftForPioneerWork(colonistType, savannahForest, clear));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, savannahForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, savannah, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, savannah, road));
-
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannah, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, savannah, road));
-        }
-
-        { // Tundra
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, tundraForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, tundraForest, road));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, tundra, plow));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, tundra, road));
-
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, tundra, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundra, road));
-        }
-
-        { // Plains
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, plainsForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, plainsForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, plains, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, plains, road));
-
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, plains, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plains, road));
-        }
-
-        { // Hill
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, hills, road));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, hills, road));
-        }
-
-        { // Mountain
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, mountains, road));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, mountains, road));
-        }
-
-        { // Marsh
-            assertEquals(8, getWorkLeftForPioneerWork(colonistType, marshForest, clear));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, marshForest, road));
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, marsh, plow));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, marsh, road));
-
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, road));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, marsh, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marsh, road));
-        }
-
-        { // Desert
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, desertForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, desertForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, desert, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, desert, road));
-
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, desert, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desert, road));
-        }
-
-        { // Swamp
-            assertEquals(9, getWorkLeftForPioneerWork(colonistType, swampForest, clear));
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, swampForest, road));
-            assertEquals(9, getWorkLeftForPioneerWork(colonistType, swamp, plow));
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, swamp, road));
-
-            assertEquals(5, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(hardyPioneerType, swamp, plow));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, swamp, road));
-        }
-    }
-    
     /**
      * Test unit for colonist status
      * 
@@ -393,7 +276,6 @@ public class UnitTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player sioux = game.getPlayer("model.nation.sioux");
 
-        TileType plains = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plains, true);
         game.setMap(map);
         Tile tile1 = map.getTile(10, 4);

@@ -353,58 +353,23 @@ public class PioneeringMission extends Mission {
     }
 
     private void makeImprovement(Connection connection) {
-        if(getUnit().getState() == UnitState.IMPROVING){
-            getUnit().setMovesLeft(0);
+        Unit unit = getUnit();
+
+        if (unit.getState() == UnitState.IMPROVING){
+            unit.setMovesLeft(0);
             return;
         }
         
-        if (getUnit().checkSetState(UnitState.IMPROVING)) {
+        if (unit.checkSetState(UnitState.IMPROVING)) {
             // start improving now
-            int price = getUnit().getOwner().getLandPrice(getUnit().getTile());
+            int price = unit.getOwner().getLandPrice(unit.getTile());
             // Buy the land from the Indians first?
             if (price > 0) {
                 // TODO: the AI should buy the land, to avoid indian wars
             }
             // ask to create the TileImprovement
-            Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
-            changeWorkTypeElement.setAttribute("unit", getUnit().getId());
-            changeWorkTypeElement.setAttribute("improvementType", tileImprovementPlan.getType().getId());
-            Element reply = null;
-            try {
-                reply = connection.ask(changeWorkTypeElement);
-            } catch (IOException e) {
-                logger.warning("Could not send message!");
-            }
-            if (reply==null || !reply.getTagName().equals("workImprovementConfirmed")) {
-                throw new IllegalStateException("Failed to make improvement");
-            }
-            
-            // get the TileItemContainer
-            Element containerElement = (Element)reply.getElementsByTagName(TileItemContainer.getXMLElementTagName()).item(0);
-            if (containerElement != null) {
-                TileItemContainer container = (TileItemContainer) getGame().getFreeColGameObject(containerElement.getAttribute("ID"));
-                if (container == null) {
-                    container = new TileItemContainer(getGame(), getUnit().getTile(), containerElement);
-                    getUnit().getTile().setTileItemContainer(container);
-                } else {
-                    container.readFromXMLElement(containerElement);
-                }
-            }
-            
-            // get the TileImprovement
-            Element improvementElement = (Element)reply.getElementsByTagName(TileImprovement.getXMLElementTagName()).item(0);
-            if (improvementElement==null) {
-                throw new IllegalStateException("Failed to make improvement");
-            }
- 
-            TileImprovement improvement = (TileImprovement) getGame().getFreeColGameObject(improvementElement.getAttribute("ID"));
-            if (improvement == null) {
-                improvement = new TileImprovement(getGame(), improvementElement);
-                getUnit().getTile().add(improvement);
-            } else {
-                improvement.readFromXMLElement(improvementElement);
-            }
-            getUnit().work(improvement);
+            AIMessage.askChangeWorkImprovementType(getAIUnit(),
+                tileImprovementPlan.getType());
         }
     }
 

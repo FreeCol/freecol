@@ -976,7 +976,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Gets the TileImprovement that this pioneer is contributing to.
-     * @return The <code>TileImprovement</code>
+     *
+     * @return The <code>TileImprovement</code> the pioneer is working on.
      */
     public TileImprovement getWorkImprovement() {
         return workImprovement;
@@ -984,6 +985,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Sets the TileImprovement that this pioneer is contributing to.
+     *
+     * @param imp The new <code>TileImprovement</code> the pioneer is to
+     *     work on.
      */
     public void setWorkImprovement(TileImprovement imp) {
         workImprovement = imp;
@@ -1868,58 +1872,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     public GoodsContainer getGoodsContainer() {
         return goodsContainer;
-    }
-
-    /**
-     * Sets this unit to work at this TileImprovement.
-     *
-     * @param improvement The <code>TileImprovement</code> to work on.
-     * @exception IllegalStateException If the
-     *     <code>TileImprovement</code> is on another {@link Tile}
-     *     than this <code>Unit</code> or is not a valid pioneer.
-     */
-    public void work(TileImprovement improvement) {
-        if (!hasAbility("model.ability.improveTerrain")) {
-            throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
-        } else if (improvement == null) {
-            // TODO: Check whether and why improvement can be null
-            // here - possible bug in caller?
-            throw new IllegalArgumentException("Improvement must not be 'null'.");
-        } else {
-            TileImprovementType impType = improvement.getType();
-            // Is this a valid ImprovementType?
-            if (impType == null) {
-                throw new IllegalArgumentException("ImprovementType must not be 'null'.");
-            } else if (impType.isNatural()) {
-                throw new IllegalArgumentException("ImprovementType must not be natural.");
-            } else if (!impType.isTileTypeAllowed(getTile().getType())) {
-                // Check if improvement can be performed on this TileType
-                throw new IllegalArgumentException(impType + " not allowed on "
-                                                   + getTile().getType());
-            } else {
-                // TODO: This does not check if the tile (not TileType
-                // accepts the improvement).  Check if there is an
-                // existing Improvement of this type
-                TileImprovement oldImprovement = getTile().findTileImprovementType(impType);
-                if (oldImprovement == null) {
-                    // No improvement found, check if worker can do it
-                    if (!impType.isWorkerAllowed(this)) {
-                        throw new IllegalArgumentException(toString() + " not allowed to perform "
-                                                           + improvement.toString());
-                    }
-                } else {
-                    // Has improvement, check if worker can contribute to it
-                    if (!oldImprovement.isWorkerAllowed(this)) {
-                        throw new IllegalArgumentException(toString() + " not allowed to perform "
-                                                           + improvement.toString());
-                    }
-                }
-            }
-        }
-        
-        setWorkImprovement(improvement);
-        setState(UnitState.IMPROVING);
-        // No need to set Location, stay at the tile it is on.
     }
     
     /**

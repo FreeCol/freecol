@@ -99,6 +99,7 @@ import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
+import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
@@ -4135,51 +4136,50 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code>
      * @param improvementType a <code>TileImprovementType</code> value
      */
-    public void changeWorkImprovementType(Unit unit, TileImprovementType improvementType) {
+    public void changeWorkImprovementType(Unit unit,
+                                          TileImprovementType improvementType) {
         Player player = freeColClient.getMyPlayer();
         if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
-        if (!(unit.checkSetState(UnitState.IMPROVING))) {
+        if (!unit.checkSetState(UnitState.IMPROVING)
+            || improvementType.isNatural()) {
             return; // Don't bother (and don't log, this is not exceptional)
         }
 
         Tile tile = unit.getTile();
-        if (!improvementType.isNatural() && player != tile.getOwner()) {
+        if (player != tile.getOwner()) {
             if (!claimLand(tile, null, 0)) return;
         }
 
-        Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
-        changeWorkTypeElement.setAttribute("unit", unit.getId());
-        changeWorkTypeElement.setAttribute("improvementType", improvementType.getId());
-
-        Element reply = freeColClient.getClient().ask(changeWorkTypeElement);
-        Element containerElement = getChildElement(reply, TileItemContainer.getXMLElementTagName());
-        if (containerElement != null) {
-            TileItemContainer container = (TileItemContainer) freeColClient.getGame()
-                .getFreeColGameObject(containerElement.getAttribute("ID"));
-            if (container == null) {
-                container = new TileItemContainer(freeColClient.getGame(), unit.getTile(), containerElement);
-                unit.getTile().setTileItemContainer(container);
-            } else {
-                container.readFromXMLElement(containerElement);
-            }
+        if (askChangeWorkImprovementType(unit, improvementType)) {
+            ;// Redisplay should work
         }
-        Element improvementElement = getChildElement(reply, TileImprovement.getXMLElementTagName());
-        if (improvementElement != null) {
-            TileImprovement improvement = (TileImprovement) freeColClient.getGame()
-                .getFreeColGameObject(improvementElement.getAttribute("ID"));
-            if (improvement == null) {
-                improvement = new TileImprovement(freeColClient.getGame(), improvementElement);
-                unit.getTile().add(improvement);
-            } else {
-                improvement.readFromXMLElement(improvementElement);
-            }
-            unit.work(improvement);
-        }
+        nextActiveUnit();
     }
+
+    /**
+     * Server query-response for changing work improvement type.
+     *
+     * @param unit The <code>Unit</code> to change the work type of.
+     * @param type The new <code>TileImprovementType</code> to work on.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askChangeWorkImprovementType(Unit unit,
+                                                 TileImprovementType type) {
+        Client client = freeColClient.getClient();
+        ChangeWorkImprovementTypeMessage message
+            = new ChangeWorkImprovementTypeMessage(unit, type);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Assigns a unit to a teacher <code>Unit</code>.

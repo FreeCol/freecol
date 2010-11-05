@@ -32,11 +32,13 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
+import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
@@ -121,6 +123,22 @@ public class AIMessage {
                            new ChangeWorkTypeMessage(aiUnit.getUnit(), type));
     }
 
+
+   /**
+     * An AIUnit changes its work improvement type.
+     *
+     * @param aiUnit The <code>AIUnit</code> to change the work type of.
+     * @param type The <code>TileImprovementType</code> to produce.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askChangeWorkImprovementType(AIUnit aiUnit,
+                                                  TileImprovementType type) {
+        AIPlayer owner = aiUnit.getOwner();
+        return sendMessage(owner.getConnection(),
+            new ChangeWorkImprovementTypeMessage(aiUnit.getUnit(), type));
+    }
+
+
     /**
      * An AIUnit delivers a gift.
      *
@@ -137,6 +155,7 @@ public class AIMessage {
                                                   settlement, goods));
     }
 
+
     /**
      * Change the equipment of a unit.
      *
@@ -152,6 +171,7 @@ public class AIMessage {
                            new EquipUnitMessage(aiUnit.getUnit(), type,
                                                 amount));
     }
+
 
     /**
      * Establishes a mission in the given direction.
@@ -170,6 +190,7 @@ public class AIMessage {
                                                  denounce));
     }
 
+
     /**
      * Gives independence to a player.
      *
@@ -182,6 +203,7 @@ public class AIMessage {
         return sendMessage(aiPlayer.getConnection(),
                            new GiveIndependenceMessage(player));
     }
+
 
     /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
@@ -199,6 +221,7 @@ public class AIMessage {
                                                    goods, gold));
     }
 
+
     /**
      * Moves an AIUnit in the given direction.
      *
@@ -212,6 +235,7 @@ public class AIMessage {
                            new MoveMessage(aiUnit.getUnit(), direction));
     }
 
+
     /**
      * Set a unit to work in a work location.
      *
@@ -224,4 +248,5 @@ public class AIMessage {
         return sendMessage(owner.getConnection(),
                            new WorkMessage(aiUnit.getUnit(), workLocation));
     }
+
 }

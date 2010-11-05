@@ -65,6 +65,7 @@ import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
+import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
@@ -446,6 +447,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new ChangeWorkTypeMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
+        register(ChangeWorkImprovementTypeMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new ChangeWorkImprovementTypeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }
+        });
         register("foreignAffairs", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
@@ -460,12 +469,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return getREFUnits(connection, element);
-            }
-        });
-        register("workImprovement", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return workImprovement(connection, element);
             }
         });
         register("changeState", new CurrentPlayerNetworkRequestHandler() {
@@ -632,45 +635,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setTradeRoute(tradeRoute);
         }
         return null;
-    }
-
-    /**
-     * Handles a "changeWorkType"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param workElement The element containing the request.
-     */
-    private Element workImprovement(Connection connection, Element workElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile tile = unit.getTile();
-
-        String improvementTypeString = workElement.getAttribute("improvementType");
-        if (improvementTypeString != null) {
-            Element reply = Message.createNewRootElement("workImprovementConfirmed");
-
-            if (tile.getTileItemContainer() == null) {
-                tile.setTileItemContainer(new TileItemContainer(tile.getGame(), tile));
-                reply.appendChild(tile.getTileItemContainer().toXMLElement(player, reply.getOwnerDocument()));
-            }
-
-            TileImprovementType type = getGame().getSpecification().getTileImprovementType(improvementTypeString);
-            TileImprovement improvement = unit.getTile().findTileImprovementType(type);
-            if (improvement == null) {
-                // create new improvement
-                improvement = new TileImprovement(getGame(), unit.getTile(), type);
-                unit.getTile().add(improvement);
-            }
-            reply.appendChild(improvement.toXMLElement(player, reply.getOwnerDocument()));
-            unit.work(improvement);
-            return reply;
-        } else {
-            return null;
-        }
-
     }
 
     /**

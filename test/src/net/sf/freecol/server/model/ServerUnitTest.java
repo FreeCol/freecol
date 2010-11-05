@@ -61,6 +61,8 @@ public class ServerUnitTest extends FreeColTestCase {
     private static final EquipmentType toolsType
         = spec().getEquipmentType("model.equipment.tools");
 
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
 
@@ -122,6 +124,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testDoAssignedWorkHardyPioneerPlowPlain() {
         Map map = getTestMap(plains);
         Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Tile plain = map.getTile(5, 8);
@@ -139,10 +142,10 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(-1, hardyPioneer.getWorkLeft());
         assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
 
-        TileImprovement plowImprovement
-            = new TileImprovement(game, plain, plow);
-        plain.add(plowImprovement);
-        hardyPioneer.work(plowImprovement);
+        //TileImprovement plowImprovement
+        //    = new TileImprovement(game, plain, plow);
+        //plain.add(plowImprovement);
+        igc.changeWorkImprovementType(dutch, hardyPioneer, plow);
 
         assertFalse(plain.hasImprovement(plow));
         assertEquals(0, hardyPioneer.getMovesLeft());
@@ -166,6 +169,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testColonyProfitFromEnhancement() {
         Map map = getTestMap(plains);
         Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         map.getTile(5, 8).setExploredBy(dutch, true);
@@ -183,7 +187,6 @@ public class ServerUnitTest extends FreeColTestCase {
 
         ServerColony colony = new ServerColony(game, dutch, "New Amsterdam",
                                                soldier.getTile());
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
 
         soldier.setWorkType(foodType);
         nonServerBuildColony(soldier, colony);
@@ -210,10 +213,10 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(5 + 5, colony.getFoodProduction());
 
         // Start Plowing
-        TileImprovement plowImprovement
-            = new TileImprovement(game, plain58, plow);
-        plain58.add(plowImprovement);
-        hardyPioneer.work(plowImprovement);
+        //TileImprovement plowImprovement
+        //    = new TileImprovement(game, plain58, plow);
+        //plain58.add(plowImprovement);
+        igc.changeWorkImprovementType(dutch, hardyPioneer, plow);
 
         int n = 0;
         while (hardyPioneer.getWorkLeft() > 0) {
@@ -247,6 +250,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testDoAssignedWorkHardyPioneerBuildRoad() {
         Map map = getTestMap(savannahForest);
         Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(5, 8);
@@ -275,17 +279,14 @@ public class ServerUnitTest extends FreeColTestCase {
 
         // Now do it
         tile.setOwner(dutch);
-        TileImprovement roadImprovement = new TileImprovement(game, tile, road);
-        TileImprovement clearImprovement = new TileImprovement(game, tile, clear);
-        tile.add(roadImprovement);
-        tile.add(clearImprovement);
-        hardyPioneer1.work(roadImprovement);
-        hardyPioneer2.work(roadImprovement);
-        hardyPioneer3.work(clearImprovement);
+        igc.changeWorkImprovementType(dutch, hardyPioneer1, road);
+        igc.changeWorkImprovementType(dutch, hardyPioneer2, road);
+        igc.changeWorkImprovementType(dutch, hardyPioneer3, clear);
         assertEquals(6, hardyPioneer1.getWorkLeft());
         assertEquals(6, hardyPioneer2.getWorkLeft());
         assertEquals(8, hardyPioneer3.getWorkLeft());
 
+        TileImprovement roadImprovement = tile.getRoad();
         while (roadImprovement.getTurnsToComplete() > 0) {
             ServerTestHelper.newTurn();
         }
@@ -293,7 +294,7 @@ public class ServerUnitTest extends FreeColTestCase {
         // After: both pioneers building road have used up their tools
         assertTrue(tile.hasRoad());
         assertTrue(roadImprovement.isComplete());
-        assertFalse(clearImprovement.isComplete());
+        assertEquals(savannahForest, tile.getType());
 
         //assertEquals(0, hardyPioneer1.getMovesLeft());
         assertEquals(-1, hardyPioneer1.getWorkLeft());
@@ -317,7 +318,6 @@ public class ServerUnitTest extends FreeColTestCase {
             ServerTestHelper.newTurn();
         }
 
-        assertTrue(clearImprovement.isComplete());
         assertEquals(savannah, tile.getType());
         assertEquals(0, hardyPioneer3.getMovesLeft());
         assertEquals(-1, hardyPioneer3.getWorkLeft());
@@ -408,6 +408,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testExposeResource() {
         Map map = getTestMap(savannahForest);
         Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(5, 8);
@@ -418,10 +419,10 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerUnit hardyPioneer = new ServerUnit(game, tile, dutch,
                                                  pioneerType,
                                                  UnitState.ACTIVE, toolsType);
-        TileImprovement clearImprovement
-            = new TileImprovement(game, tile, clear);
-        tile.add(clearImprovement);
-        hardyPioneer.work(clearImprovement);
+        //TileImprovement clearImprovement
+        //    = new TileImprovement(game, tile, clear);
+        //tile.add(clearImprovement);
+        igc.changeWorkImprovementType(dutch, hardyPioneer, clear);
 
         // Verify initial state
         assertEquals(8, hardyPioneer.getWorkLeft());

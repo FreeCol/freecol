@@ -92,6 +92,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
@@ -5728,6 +5730,33 @@ public final class InGameController extends Controller {
 
         // Private update of the unit.
         return new ChangeSet().add(See.only(serverPlayer), unit)
+            .build(serverPlayer);
+    }
+
+
+    /**
+     * Change improvement work type.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to change the work type of.
+     * @param type The new <code>TileImprovementType</code> to produce.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element changeWorkImprovementType(ServerPlayer serverPlayer,
+                                             Unit unit,
+                                             TileImprovementType type) {
+        Tile tile = unit.getTile();
+        TileImprovement improvement = tile.findTileImprovementType(type);
+        if (improvement == null) { // Create the new improvement.
+            improvement = new TileImprovement(getGame(), tile, type);
+            tile.add(improvement);
+        }
+
+        unit.setWorkImprovement(improvement);
+        unit.setState(UnitState.IMPROVING);
+
+        // Private update of the tile.
+        return new ChangeSet().add(See.only(serverPlayer), tile)
             .build(serverPlayer);
     }
 }
