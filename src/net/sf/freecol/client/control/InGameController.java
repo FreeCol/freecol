@@ -1208,7 +1208,7 @@ public final class InGameController implements NetworkConstants {
         if (tile.getColony() != null) {
             askJoinColony(unit, tile.getColony());
             return;
-        } else if (!tile.isSettleable()) {
+        } else if (!player.canClaimToFoundSettlement(tile)) {
             canvas.showInformationMessage("buildColony.badTile");
             return;
         }
@@ -1219,13 +1219,6 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         
-        // Claim the land if it is not free.
-        if (tile.getOwner() != null && tile.getOwner() != player) {
-            if (!claimLand(tile, null, 0)) {
-                return;
-            }
-        }
-
         // Get and check the name.
         String name = player.getSettlementName();
         if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
@@ -3231,7 +3224,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         Player owner = tile.getOwner();
-        int price = (owner == null) ? 0 : player.getLandPrice(tile);
+        int price = ((colony != null) ? player.canClaimForSettlement(tile)
+                     : player.canClaimForImprovement(tile)) ? 0
+            : player.getLandPrice(tile);
         if (price < 0) { // not for sale
             return false;
         } else if (price > 0) { // for sale by natives
@@ -4004,12 +3999,8 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage("tileHasRumour");
                 return;
             }
-            if ((tile.getOwner() != unit.getOwner()
-                 || tile.getOwningSettlement() != colony)
-                && !claimLand(tile, colony, 0)) {
-                logger.warning("Unit " + unit.getId()
-                               + " is unable to claim tile " + tile.toString());
-                return;
+            if (tile.getOwner() != unit.getOwner()) {
+                if (!claimLand(tile, colony, 0)) return;
             }
         }
 
@@ -4119,7 +4110,8 @@ public final class InGameController implements NetworkConstants {
      * @param improvementType a <code>TileImprovementType</code> value
      */
     public void changeWorkImprovementType(Unit unit, TileImprovementType improvementType) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
@@ -4128,12 +4120,9 @@ public final class InGameController implements NetworkConstants {
             return; // Don't bother (and don't log, this is not exceptional)
         }
 
-        if (!improvementType.isNatural()
-            && freeColClient.getMyPlayer() != unit.getTile().getOwner()
-            && !claimLand(unit.getTile(), null, 0)) {
-            logger.warning("Unit " + unit.getId()
-                           + " is unable to claim tile " + unit.getTile().toString());
-            return;
+        Tile tile = unit.getTile();
+        if (!improvementType.isNatural() && player != tile.getOwner()) {
+            if (!claimLand(tile, null, 0)) return;
         }
 
         Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");

@@ -755,21 +755,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Can the ownership of this tile be claimed?
-     * Quick test that does not handle the curly case of tile transfer between
-     * colonies, or guarantee success (natives may want to be paid), but
-     * just that success is possible.
-     *
-     * @param player The <code>Player</code> that may wish to claim the tile.
-     *
-     * @return True if the tile ownership can be claimed.
-     */
-    public boolean claimable(Player player) {
-        Player owner = getOwner();
-        return owner == null || owner == player || player.getLandPrice(this) >= 0;
-    }
-
-    /**
      * Returns the river on this <code>Tile</code> if any
      * @return River <code>TileImprovement</code>
      */

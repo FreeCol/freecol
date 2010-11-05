@@ -298,7 +298,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public void placeSettlement() {
         List<Tile> tiles = getGame().getMap().getClaimableTiles(owner, tile,
                                                                 getRadius());
-        if (tiles.isEmpty() || tiles.get(0) != tile) {
+        if (!tiles.contains(tile)) {
             throw new IllegalStateException("Can not claim center tile");
         }
         tile.setSettlement(this);

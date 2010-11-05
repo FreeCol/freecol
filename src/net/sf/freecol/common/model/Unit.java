@@ -2539,7 +2539,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return getState() == UnitState.FORTIFYING;
         case IMPROVING:
             if (location instanceof Tile
-                && location.getTile().claimable(getOwner())) {
+                && getOwner().canClaimForImprovement(location.getTile())) {
                 return getMovesLeft() > 0;
             }
             return false;

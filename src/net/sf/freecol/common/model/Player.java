@@ -1070,7 +1070,61 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the tile can be claimed.
      */
     public boolean canClaimToFoundSettlement(Tile tile) {
-        return tile.isSettleable() && canClaimForSettlement(tile);
+        return tile.isSettleable()
+            && (canClaimFreeCenterTile(tile) || canClaimForSettlement(tile));
+    }
+
+    /**
+     * Is this tile claimable for a colony center tile under the
+     * special provisions of the model.option.buildOnNativeLand option.
+     *
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be claimed.
+     */
+    private boolean canClaimFreeCenterTile(Tile tile) {
+        String build = getGame().getSpecification()
+            .getStringOption("model.option.buildOnNativeLand").getValue();
+        return isEuropean()
+            && ("model.option.buildOnNativeLand.always".equals(build)
+                || ("model.option.buildOnNativeLand.first".equals(build)
+                    && hasZeroSettlements())
+                || ("model.option.buildOnNativeLand.firstAndUncontacted".equals(build)
+                    && hasZeroSettlements()
+                    && tile.getOwner().getStance(this) == Stance.UNCONTACTED));
+    }
+
+    /**
+     * The second and third cases of buildOnNative land need to test
+     * if the player has no settlements yet.  We can not just check
+     * getNumberOfSettlements() == 0 because by the time the
+     * settlement is being placed and we are collecting the tiles to
+     * claim, the settlement already exists and thus
+     * getNumberOfSettlements will return 1--- so we have to check if
+     * that one settlement is located at the tile being tested.
+     *
+     * @return True if the player has no settlements (on the map) yet.
+     */
+    private boolean hasZeroSettlements() {
+        List<Settlement> settlements = getSettlements();
+        return settlements.isEmpty()
+            || (settlements.size() == 1
+                && settlements.get(0).getTile().getSettlement() == null);
+    }
+
+    /**
+     * Can the ownership of this tile be claimed for the purposes of
+     * making an improvement.  Quick test that does not handle the
+     * curly case of tile transfer between colonies, or guarantee
+     * success (natives may want to be paid), but just that success is
+     * possible.
+     *
+     * @param tile The <code>Tile</code> to consider.
+     *
+     * @return True if the tile ownership can be claimed.
+     */
+    public boolean canClaimForImprovement(Tile tile) {
+        Player owner = tile.getOwner();
+        return owner == null || owner == this || getLandPrice(tile) == 0;
     }
 
     /**
@@ -1238,17 +1292,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 return 0; // Claim abandoned or only by tile improvement
             }
         } // Else, native ownership
-        String build = getGame().getSpecification()
-            .getStringOption("model.option.buildOnNativeLand").getValue();
-        if (build.equals("model.option.buildOnNativeLand.always")
-            || (build.equals("model.option.buildOnNativeLand.first")
-                && getNumberOfSettlements() == 0)
-            || (build.equals("model.option.buildOnNativeLand.firstAndUncontacted")
-                && getNumberOfSettlements() == 0
-                && nationOwner.getStance(this) == Stance.UNCONTACTED)) {
-            return 0;
-        }
-
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             price += tile.potential(type, null);
         }
