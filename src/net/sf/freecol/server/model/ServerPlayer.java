@@ -734,6 +734,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Unit unit : new ArrayList<Unit>(getUnits())) {
             ((ServerModelObject) unit).csNewTurn(random, cs);
         }
+
+        if (isEuropean()) { // Update liberty and immigration
+            cs.addPartial(See.only(this), this, "liberty", "immigration");
+        }
     }
 
     /**

@@ -470,15 +470,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Try to update minimally.
         if (tileDirty) {
             cs.add(See.perhaps(), getTile());
-        } else if (colonyDirty || buildQueue.size() != queueLength) {
-            cs.add(See.only(owner), this);
         } else {
-            if (container.hasChanged()) {
-                cs.add(See.only(owner), container);
-            }
-            for (FreeColGameObject fcgo : updates) {
-                cs.add(See.only(owner), fcgo);
-            }
+            cs.add(See.only(owner), this);
         }
     }
 
