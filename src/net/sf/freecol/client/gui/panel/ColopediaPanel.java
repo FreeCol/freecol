@@ -51,6 +51,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.StyleConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -111,6 +112,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     private JTree tree;
 
+    private Map<String, DefaultMutableTreeNode> nodeMap =
+        new HashMap<String, DefaultMutableTreeNode>();
+
     /**
      * The saved size of this panel.
      */
@@ -167,6 +171,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         add(okButton, "newline 20, span, tag ok");
 
         setPreferredSize(savedSize);
+        tree = buildTree();
         initialize(panelType, objectType);
     }
 
@@ -195,9 +200,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param type - the FreeColGameObjectType of the item to be displayed
      */
     public void initialize(PanelType panelType, FreeColGameObjectType type) {
-        listPanel.removeAll();
         detailPanel.removeAll();
-        tree = buildTree();
         tree.expandRow(panelType.ordinal());
         selectDetail(panelType, type);
         detailPanel.validate();
@@ -434,6 +437,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                                                                      buildingIcon));
                 buildingHash.put(buildingType, item);
                 parent.add(item);
+                nodeMap.put(buildingType.getId(), item);
             } else {
                 buildingTypes.add(buildingType);
             }
@@ -450,6 +454,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                                                                          name,
                                                                          buildingIcon));
                     node.add(item);
+                    nodeMap.put(buildingType.getId(), item);
                     buildingHash.put(buildingType, item);
                     iterator.remove();
                 }
@@ -477,6 +482,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS, typeName));
 
             parent.add(node);
+            nodeMap.put(fatherType.toString(), node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
                 buildFatherItem(father, node);
             }
@@ -522,6 +528,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, name, icon));
         parent.add(item);
+        nodeMap.put(tileType.getId(), item);
     }
 
     /**
@@ -536,6 +543,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(resType, name, icon));
         parent.add(item);
+        nodeMap.put(resType.getId(), item);
     }
 
     /**
@@ -551,6 +559,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(unitType, name, icon));
         parent.add(item);
+        nodeMap.put(unitType.getId(), item);
     }
 
     /**
@@ -565,6 +574,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType, name, icon));
         parent.add(item);
+        nodeMap.put(goodsType.getId(), item);
     }
 
     /**
@@ -579,6 +589,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather, name, icon));
         parent.add(item);
+        nodeMap.put(foundingFather.getId(), item);
     }
 
     /**
@@ -593,6 +604,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(nation, name, icon));
         parent.add(item);
+        nodeMap.put(nation.getId(), item);
     }
 
     /**
@@ -608,6 +620,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         DefaultMutableTreeNode item =
             new DefaultMutableTreeNode(new ColopediaTreeItem(nationType, name, icon));
         parent.add(item);
+        nodeMap.put(nationType.getId(), item);
     }
 
     private JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
@@ -1385,8 +1398,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (OK.equals(command)) {
             getCanvas().remove(this);
         } else {
-            FreeColGameObjectType type = getSpecification().getType(command);
-            initialize(type);
+            DefaultMutableTreeNode node = nodeMap.get(command);
+            tree.collapsePath(tree.getSelectionPath().getParentPath());
+            tree.scrollPathToVisible(new TreePath(node.getPath()));
+            initialize(getSpecification().getType(command));
         }
     }
 
