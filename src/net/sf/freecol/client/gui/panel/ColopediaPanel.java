@@ -368,7 +368,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildTerrainSubtree(DefaultMutableTreeNode parent) {
         for (TileType t : getSpecification().getTileTypeList()) {
-            buildTerrainItem(t, parent);
+            ImageIcon icon = new ImageIcon(getLibrary().getCompoundTerrainImage(t, 0.25));
+            parent.add(buildItem(t, icon));
         }
     }
 
@@ -378,7 +379,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildResourceSubtree(DefaultMutableTreeNode parent) {
         for (ResourceType r : getSpecification().getResourceTypeList()) {
-            buildResourceItem(r, parent);
+            ImageIcon icon = getLibrary().getScaledBonusImageIcon(r, 0.75f);
+            parent.add(buildItem(r, icon));
         }
     }
 
@@ -390,7 +392,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         for (UnitType u : getSpecification().getUnitTypeList()) {
             if (u.getSkill() <= 0 ||
                 u.hasAbility("model.ability.expertSoldier")) {
-                buildUnitItem(u, 0.5f, parent);
+                ImageIcon icon = getLibrary().getUnitImageIcon(u, 0.5);
+                parent.add(buildItem(u, icon));
             }
         }
     }
@@ -401,7 +404,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildGoodsSubtree(DefaultMutableTreeNode parent) {
         for (GoodsType g : getSpecification().getGoodsTypeList()) {
-            buildGoodsItem(g, parent);
+            ImageIcon icon = getLibrary().getScaledGoodsImageIcon(g, 0.75f);
+            parent.add(buildItem(g, icon));
         }
     }
 
@@ -412,7 +416,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     private void buildSkillsSubtree(DefaultMutableTreeNode parent) {
         for (UnitType u : getSpecification().getUnitTypeList()) {
             if (u.getSkill() > 0) {
-                buildUnitItem(u, 0.5f, parent);
+                ImageIcon icon = getLibrary().getUnitImageIcon(u, 0.5);
+                parent.add(buildItem(u, icon));
             }
         }
     }
@@ -484,7 +489,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             parent.add(node);
             nodeMap.put(fatherType.toString(), node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
-                buildFatherItem(father, node);
+                ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
+                parent.add(buildItem(father, icon));
             }
         }
     }
@@ -494,11 +500,12 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildNationsSubtree(DefaultMutableTreeNode parent) {
-        for (Nation type : getSpecification().getEuropeanNations()) {
-            buildNationItem(type, parent);
-        }
-        for (Nation type : getSpecification().getIndianNations()) {
-            buildNationItem(type, parent);
+        List<Nation> nations = new ArrayList<Nation>();
+        nations.addAll(getSpecification().getEuropeanNations());
+        nations.addAll(getSpecification().getIndianNations());
+        for (Nation type : nations) {
+            ImageIcon icon = new ImageIcon(getLibrary().getCoatOfArmsImage(type, 0.5));
+            parent.add(buildItem(type, icon));
         }
     }
 
@@ -512,115 +519,17 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
         for (NationType type : nations) {
-            buildNationTypeItem(type, parent);
+            ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
+            parent.add(buildItem(type, icon));
         }
     }
 
-    /**
-     * Builds the button for the given tile.
-     *
-     * @param tileType - the TileType
-     * @param parent - the parent node
-     */
-    private void buildTerrainItem(TileType tileType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = new ImageIcon(getLibrary().getCompoundTerrainImage(tileType, 0.25));
-        String name = Messages.message(tileType.getNameKey());
+    private DefaultMutableTreeNode buildItem(FreeColGameObjectType type, ImageIcon icon) {
+        String name = Messages.getName(type);
         DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, name, icon));
-        parent.add(item);
-        nodeMap.put(tileType.getId(), item);
-    }
-
-    /**
-     * Builds the button for the given resource.
-     *
-     * @param resType - the ResourceType
-     * @param parent - the parent node
-     */
-    private void buildResourceItem(ResourceType resType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = getLibrary().getScaledBonusImageIcon(resType, 0.75f);
-        String name = Messages.message(resType.getNameKey());
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(resType, name, icon));
-        parent.add(item);
-        nodeMap.put(resType.getId(), item);
-    }
-
-    /**
-     * Builds the button for the given unit.
-     *
-     * @param unitType
-     * @param scale
-     * @param parent
-     */
-    private void buildUnitItem(UnitType unitType, float scale, DefaultMutableTreeNode parent) {
-        ImageIcon icon = getLibrary().getUnitImageIcon(unitType, 0.5);
-        String name = Messages.message(unitType.getNameKey());
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(unitType, name, icon));
-        parent.add(item);
-        nodeMap.put(unitType.getId(), item);
-    }
-
-    /**
-     * Builds the button for the given goods.
-     *
-     * @param goodsType The GoodsType
-     * @param parent The parent tree node
-     */
-    private void buildGoodsItem(GoodsType goodsType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = getLibrary().getScaledGoodsImageIcon(goodsType, 0.75f);
-        String name = Messages.message(goodsType.getNameKey());
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType, name, icon));
-        parent.add(item);
-        nodeMap.put(goodsType.getId(), item);
-    }
-
-    /**
-     * Builds the button for the given founding father.
-     *
-     * @param foundingFather
-     * @param parent
-     */
-    private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
-        String name = Messages.message(foundingFather.getNameKey());
-        ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather, name, icon));
-        parent.add(item);
-        nodeMap.put(foundingFather.getId(), item);
-    }
-
-    /**
-     * Builds the button for the given nation.
-     *
-     * @param nation
-     * @param parent
-     */
-    private void buildNationItem(Nation nation, DefaultMutableTreeNode parent) {
-        String name = Messages.message(nation.getNameKey());
-        ImageIcon icon = new ImageIcon(getLibrary().getCoatOfArmsImage(nation, 0.5));
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(nation, name, icon));
-        parent.add(item);
-        nodeMap.put(nation.getId(), item);
-    }
-
-    /**
-     * Builds the button for the given nation type.
-     *
-     * @param nationType
-     * @param parent
-     */
-    private void buildNationTypeItem(NationType nationType, DefaultMutableTreeNode parent) {
-        String name = Messages.message(nationType.getNameKey());
-        //ImageIcon icon = getLibrary().getCoatOfArmsImageIcon(nation);
-        ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(nationType, name, icon));
-        parent.add(item);
-        nodeMap.put(nationType.getId(), item);
+            new DefaultMutableTreeNode(new ColopediaTreeItem(type, name, icon));
+        nodeMap.put(type.getId(), item);
+        return item;
     }
 
     private JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
