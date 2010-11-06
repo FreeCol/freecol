@@ -137,11 +137,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         add(header, "span, align center");
 
         listPanel = new JPanel() {
-            @Override
-            public String getUIClassID() {
-                return "ColopediaPanelUI";
-            }
-        };
+                @Override
+                public String getUIClassID() {
+                    return "ColopediaPanelUI";
+                }
+            };
         listPanel.setOpaque(true);
         JScrollPane sl = new JScrollPane(listPanel,
                                          JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -151,11 +151,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         add(sl);
 
         detailPanel = new JPanel() {
-            @Override
-            public String getUIClassID() {
-                return "ColopediaPanelUI";
-            }
-        };
+                @Override
+                public String getUIClassID() {
+                    return "ColopediaPanelUI";
+                }
+            };
         detailPanel.setOpaque(true);
         JScrollPane detail = new JScrollPane(detailPanel,
                                              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -246,7 +246,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     }
 
 
-   public void selectDetail(PanelType panelType, FreeColGameObjectType type) {
+    public void selectDetail(PanelType panelType, FreeColGameObjectType type) {
+
+        detailPanel.removeAll();
+
         switch (panelType) {
         case TERRAIN:
             buildTerrainDetail((TileType) type);
@@ -271,7 +274,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             buildNationDetail((Nation) type);
             break;
         case NATION_TYPES:
-            buildNationTypeDetail((NationType) type);
+            if (type instanceof EuropeanNationType) {
+                buildEuropeanNationTypeDetail((EuropeanNationType) type);
+            } else if (type instanceof IndianNationType) {
+                buildIndianNationTypeDetail((IndianNationType) type);
+            }
             break;
         default:
             break;
@@ -334,11 +341,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel) {
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(200, super.getPreferredSize().height);
-            }
-        };
+                @Override
+                public Dimension getPreferredSize() {
+                    return new Dimension(200, super.getPreferredSize().height);
+                }
+            };
         tree.setRootVisible(false);
         tree.setCellRenderer(new ColopediaTreeCellRenderer());
         tree.setOpaque(false);
@@ -649,8 +656,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildTerrainDetail(TileType tileType) {
 
-        detailPanel.removeAll();
-
         if (tileType == null) {
             return;
         }
@@ -727,8 +732,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildResourceDetail(ResourceType type) {
 
-        detailPanel.removeAll();
-
         if (type == null) {
             return;
         }
@@ -779,8 +782,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param type - the UnitType
      */
     private void buildUnitDetail(UnitType type) {
-
-        detailPanel.removeAll();
 
         if (type == null) {
             return;
@@ -909,8 +910,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildGoodsDetail(GoodsType type) {
 
-        detailPanel.removeAll();
-
         if (type == null) {
             return;
         }
@@ -980,8 +979,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param buildingType The BuildingType
      */
     private void buildBuildingDetail(BuildingType buildingType) {
-
-        detailPanel.removeAll();
 
         if (buildingType == null) {
             return;
@@ -1121,8 +1118,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildFatherDetail(FoundingFather father) {
 
-        detailPanel.removeAll();
-
         if (father == null) {
             return;
         }
@@ -1161,8 +1156,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildNationDetail(Nation nation) {
 
-        detailPanel.removeAll();
-
         if (nation == null) {
             return;
         }
@@ -1199,25 +1192,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     /**
      * Builds the details panel for the given nation type.
      *
-     * @param nationType - the NationType
-     */
-    private void buildNationTypeDetail(NationType nationType) {
-        if (nationType instanceof EuropeanNationType) {
-            buildEuropeanNationTypeDetail((EuropeanNationType) nationType);
-        } else if (nationType instanceof IndianNationType) {
-            buildIndianNationTypeDetail((IndianNationType) nationType);
-        }
-    }
-
-
-    /**
-     * Builds the details panel for the given nation type.
-     *
      * @param nationType - the EuropeanNationType
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType) {
-
-        detailPanel.removeAll();
 
         if (nationType == null) {
             return;
@@ -1280,8 +1257,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param nationType - the IndianNationType
      */
     private void buildIndianNationTypeDetail(IndianNationType nationType) {
-
-        detailPanel.removeAll();
 
         if (nationType == null) {
             return;
