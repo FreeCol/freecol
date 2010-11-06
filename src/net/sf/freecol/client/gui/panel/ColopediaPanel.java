@@ -250,38 +250,41 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.removeAll();
 
-        switch (panelType) {
-        case TERRAIN:
-            buildTerrainDetail((TileType) type);
-            break;
-        case RESOURCES:
-            buildResourceDetail((ResourceType) type);
-            break;
-        case UNITS:
-        case SKILLS:
-            buildUnitDetail((UnitType) type);
-            break;
-        case GOODS:
-            buildGoodsDetail((GoodsType) type);
-            break;
-        case BUILDINGS:
-            buildBuildingDetail((BuildingType) type);
-            break;
-        case FATHERS:
-            buildFatherDetail((FoundingFather) type);
-            break;
-        case NATIONS:
-            buildNationDetail((Nation) type);
-            break;
-        case NATION_TYPES:
-            if (type instanceof EuropeanNationType) {
-                buildEuropeanNationTypeDetail((EuropeanNationType) type);
-            } else if (type instanceof IndianNationType) {
-                buildIndianNationTypeDetail((IndianNationType) type);
+        if (type != null) {
+
+            switch (panelType) {
+            case TERRAIN:
+                buildTerrainDetail((TileType) type);
+                break;
+            case RESOURCES:
+                buildResourceDetail((ResourceType) type);
+                break;
+            case UNITS:
+            case SKILLS:
+                buildUnitDetail((UnitType) type);
+                break;
+            case GOODS:
+                buildGoodsDetail((GoodsType) type);
+                break;
+            case BUILDINGS:
+                buildBuildingDetail((BuildingType) type);
+                break;
+            case FATHERS:
+                buildFatherDetail((FoundingFather) type);
+                break;
+            case NATIONS:
+                buildNationDetail((Nation) type);
+                break;
+            case NATION_TYPES:
+                if (type instanceof EuropeanNationType) {
+                    buildEuropeanNationTypeDetail((EuropeanNationType) type);
+                } else if (type instanceof IndianNationType) {
+                    buildIndianNationTypeDetail((IndianNationType) type);
+                }
+                break;
+            default:
+                break;
             }
-            break;
-        default:
-            break;
         }
     }
 
@@ -656,10 +659,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildTerrainDetail(TileType tileType) {
 
-        if (tileType == null) {
-            return;
-        }
-
         detailPanel.setLayout(new MigLayout("wrap 4, gap 20", "[][]push[][]", ""));
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
@@ -732,10 +731,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildResourceDetail(ResourceType type) {
 
-        if (type == null) {
-            return;
-        }
-
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
         JLabel name = localizedLabel(type.getNameKey());
@@ -782,10 +777,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param type - the UnitType
      */
     private void buildUnitDetail(UnitType type) {
-
-        if (type == null) {
-            return;
-        }
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
@@ -910,10 +901,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildGoodsDetail(GoodsType type) {
 
-        if (type == null) {
-            return;
-        }
-
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gap 20", "", ""));
 
         JLabel name = localizedLabel(type.getNameKey());
@@ -979,10 +966,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param buildingType The BuildingType
      */
     private void buildBuildingDetail(BuildingType buildingType) {
-
-        if (buildingType == null) {
-            return;
-        }
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
@@ -1118,10 +1101,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildFatherDetail(FoundingFather father) {
 
-        if (father == null) {
-            return;
-        }
-
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
         JLabel name = new JLabel(Messages.message(father.getNameKey())
@@ -1156,9 +1135,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildNationDetail(Nation nation) {
 
-        if (nation == null) {
-            return;
-        }
         NationType currentNationType = nation.getType();;
         for (Player player : getGame().getPlayers()) {
             if (player.getNation() == nation) {
@@ -1195,10 +1171,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param nationType - the EuropeanNationType
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType) {
-
-        if (nationType == null) {
-            return;
-        }
 
         Set<Ability> abilities = nationType.getFeatureContainer().getAbilities();
         Set<Modifier> modifiers = nationType.getFeatureContainer().getModifiers();
@@ -1257,10 +1229,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param nationType - the IndianNationType
      */
     private void buildIndianNationTypeDetail(IndianNationType nationType) {
-
-        if (nationType == null) {
-            return;
-        }
 
         List<RandomChoice<UnitType>> skills = nationType.getSkills();
 
