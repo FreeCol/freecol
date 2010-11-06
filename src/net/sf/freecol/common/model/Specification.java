@@ -1145,6 +1145,7 @@ public final class Specification {
             FreeColTcFile parent = new FreeColTcFile(parentId);
             try {
                 load(parent.getSpecificationInputStream());
+                initialized = false;
             } catch(Exception e) {
                 logger.warning("Failed to load parent specification " + parentId);
             }
@@ -1172,6 +1173,7 @@ public final class Specification {
         if (difficultyLevel != null) {
             applyDifficultyLevel(difficultyLevel);
         }
+        initialized = true;
     }
 
     public static String getXMLElementTagName() {
