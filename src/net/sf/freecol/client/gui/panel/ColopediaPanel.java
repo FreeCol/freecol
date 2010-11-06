@@ -907,8 +907,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
+        /**
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.isFarmed")));
         detailPanel.add(new JLabel(Messages.message(type.isFarmed() ? "yes" : "no")));
+        **/
 
         if (type.isFarmed()) {
             List<TileImprovementType> improvements = new ArrayList<TileImprovementType>();
