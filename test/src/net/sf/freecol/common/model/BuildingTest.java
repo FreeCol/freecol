@@ -38,10 +38,10 @@ public class BuildingTest extends FreeColTestCase {
     BuildingType newspaperType = spec().getBuildingType("model.building.newspaper");
 
     public void testCanBuildNext() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
-    	Colony colony = getStandardColony();
+        Colony colony = getStandardColony();
 
         // First check with a building that can be fully built with a
         // normal colony
@@ -54,12 +54,7 @@ public class BuildingTest extends FreeColTestCase {
         warehouse.upgrade();
         assertFalse(warehouse.canBuildNext());
 
-        try {
-        	warehouse.upgrade();
-        	fail();
-        } catch (IllegalStateException e){
-        	// Should throw exception
-        }
+        assertFalse(warehouse.upgrade());
         assertFalse(warehouse.canBuildNext());
 
         // Check whether population restrictions work

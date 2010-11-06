@@ -299,22 +299,35 @@ public class ServerColony extends Colony implements ServerModelObject {
             } else if (buildable instanceof BuildingType) {
                 BuildingType type = (BuildingType) buildable;
                 BuildingType from = type.getUpgradesFrom();
+                boolean success;
                 if (from == null) {
                     addBuilding(new ServerBuilding(getGame(), this, type));
                     colonyDirty = true;
+                    success = true;
                 } else {
                     Building building = getBuilding(from);
-                    building.upgrade();
-                    updates.add(building);
-                }
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                     "model.colony.buildingReady",
+                    if (building.upgrade()) {
+                        updates.add(building);
+                        success = true;
+                    } else {
+                        cs.addMessage(See.only(owner),
+                            new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                     "colonyPanel.unbuildable",
                                      this)
                               .addName("%colony%", getName())
-                              .add("%building%", buildable.getNameKey()));
+                              .add("%object%", buildable.getNameKey()));
+                        success = false;
+                    }
+                }
+                if (success) {
+                    cs.addMessage(See.only(owner),
+                        new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                         "model.colony.buildingReady",
+                                         this)
+                                  .addName("%colony%", getName())
+                                  .add("%building%", buildable.getNameKey()));
+                }
                 buildQueue.remove(0);
-
             } else {
                 throw new IllegalStateException("Bogus buildable: "
                                                 + buildable);

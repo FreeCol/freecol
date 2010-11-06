@@ -246,12 +246,15 @@ public class Building extends FreeColGameObject
     /**
      * Upgrades this building to next level (is set to UpgradesTo
      * attribute in BuildingType)
+     *
+     * @return True if the upgrade succeeds.
      */
-    public void upgrade() {
-        if (!canBuildNext()) {
-            throw new IllegalStateException("Cannot upgrade this building.");
+    public boolean upgrade() {
+        if (canBuildNext()) {
+            setType(buildingType.getUpgradesTo());
+            return true;
         }
-        setType(buildingType.getUpgradesTo());
+        return false;
     }
 
     private void setType(final BuildingType newBuildingType) {
