@@ -5776,4 +5776,34 @@ public final class InGameController extends Controller {
         // Others might be able to see the unit.
         return new ChangeSet().add(See.perhaps(), unit).build(serverPlayer);
     }
+
+
+    /**
+     * Assign a student to a teacher.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param student The student <code>Unit</code>.
+     * @param teacher The teacher <code>Unit</code>.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element assignTeacher(ServerPlayer serverPlayer, Unit student,
+                                 Unit teacher) {
+        Unit oldStudent = teacher.getStudent();
+        Unit oldTeacher = student.getTeacher();
+
+        // Only update units that changed their teaching situation.
+        ChangeSet cs = new ChangeSet();
+        if (oldTeacher != null) {
+            oldTeacher.setStudent(null);
+            cs.add(See.only(serverPlayer), oldTeacher);
+        }
+        if (oldStudent != null) {
+            oldStudent.setTeacher(null);
+            cs.add(See.only(serverPlayer), oldStudent);
+        }
+        student.setTeacher(teacher);
+        teacher.setStudent(student);
+        cs.add(See.only(serverPlayer), student, teacher);
+        return cs.build(serverPlayer);
+    }
 }

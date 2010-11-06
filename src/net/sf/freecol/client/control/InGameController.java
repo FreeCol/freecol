@@ -93,6 +93,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
+import net.sf.freecol.common.networking.AssignTeacherMessage;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
@@ -4253,45 +4254,48 @@ public final class InGameController implements NetworkConstants {
      */
     public void assignTeacher(Unit student, Unit teacher) {
         Player player = freeColClient.getMyPlayer();
-
         if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
-        if (!student.canBeStudent(teacher)) {
-            throw new IllegalStateException("Unit can not be student!");
-        }
-        if (!teacher.getColony().canTrain(teacher)) {
-            throw new IllegalStateException("Unit can not be teacher!");
-        }
-        if (student.getOwner() != player) {
-            throw new IllegalStateException("Student is not your unit!");
-        }
-        if (teacher.getOwner() != player) {
-            throw new IllegalStateException("Teacher is not your unit!");
-        }
-        if (student.getColony() != teacher.getColony()) {
-            throw new IllegalStateException("Student and teacher are not in the same colony!");
-        }
-        if (!(student.getLocation() instanceof WorkLocation)) {
-            throw new IllegalStateException("Student is not in a WorkLocation!");
+
+        if (student == null
+            || student.getOwner() != player
+            || student.getColony() == null
+            || !(student.getLocation() instanceof WorkLocation)
+            || teacher == null
+            || teacher.getOwner() != player
+            || !student.canBeStudent(teacher)
+            || teacher.getColony() == null
+            || student.getColony() != teacher.getColony()
+            || !teacher.getColony().canTrain(teacher)) {
+            return;
         }
 
-        Element assignTeacherElement = Message.createNewRootElement("assignTeacher");
-        assignTeacherElement.setAttribute("student", student.getId());
-        assignTeacherElement.setAttribute("teacher", teacher.getId());
-
-        if (student.getTeacher() != null) {
-            student.getTeacher().setStudent(null);
+        if (askAssignTeacher(student, teacher)) {
+            ; // should be done, do not need nextActiveUnit
         }
-        student.setTeacher(teacher);
-        if (teacher.getStudent() != null) {
-            teacher.getStudent().setTeacher(null);
-        }
-        teacher.setStudent(student);
-
-        freeColClient.getClient().sendAndWait(assignTeacherElement);
     }
+
+    /**
+     * Server query-response for assigning a teacher.
+     *
+     * @param student The student <code>Unit</code>.
+     * @param teacher The teacher <code>Unit</code>.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askAssignTeacher(Unit student, Unit teacher) {
+        Client client = freeColClient.getClient();
+        AssignTeacherMessage message
+            = new AssignTeacherMessage(student, teacher);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Changes the current construction project of a <code>Colony</code>.

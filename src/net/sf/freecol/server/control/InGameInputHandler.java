@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
+import net.sf.freecol.common.networking.AssignTeacherMessage;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
@@ -139,373 +140,488 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     public InGameInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // TODO: move and simplify methods later, for now just delegate
-        register(SetDestinationMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            @Override
-            public Element handle(Connection connection, Element element) {
-                return new SetDestinationMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register(MoveMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new MoveMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(AskSkillMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new AskSkillMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(AttackMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new AttackMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(EmbarkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new EmbarkMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(LearnSkillMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new LearnSkillMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(ScoutIndianSettlementMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new ScoutIndianSettlementMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(MissionaryMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new MissionaryMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(InciteMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new InciteMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(DemandTributeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new DemandTributeMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(DisembarkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new DisembarkMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(LoadCargoMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new LoadCargoMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(UnloadCargoMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new UnloadCargoMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(LootCargoMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new LootCargoMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(BuyGoodsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new BuyGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(SellGoodsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new SellGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(MoveToAmericaMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new MoveToAmericaMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(MoveToEuropeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new MoveToEuropeMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(AbandonColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new AbandonColonyMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(BuildColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new BuildColonyMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(JoinColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new JoinColonyMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(EmigrateUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new EmigrateUnitMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(TrainUnitInEuropeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new TrainUnitInEuropeMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(EquipUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new EquipUnitMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(WorkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new WorkMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(SetBuildQueueMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new SetBuildQueueMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(ClearSpecialityMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new ClearSpecialityMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(NewLandNameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new NewLandNameMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(NewRegionNameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new NewRegionNameMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(DisbandUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new DisbandUnitMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(CashInTreasureTrainMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new CashInTreasureTrainMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(GetTransactionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new GetTransactionMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(CloseTransactionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new CloseTransactionMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(GoodsForSaleMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new GoodsForSaleMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(BuyPropositionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new BuyPropositionMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(SellPropositionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new SellPropositionMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(BuyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new BuyMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(SellMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new SellMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(DeliverGiftMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new DeliverGiftMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(IndianDemandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new IndianDemandMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(ClaimLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new ClaimLandMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(PayForBuildingMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new PayForBuildingMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(PayArrearsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new PayArrearsMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(DeclareIndependenceMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new DeclareIndependenceMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(GiveIndependenceMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new GiveIndependenceMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(RenameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new RenameMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(UpdateCurrentStopMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return new UpdateCurrentStopMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register(DiplomacyMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return new DiplomacyMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register(SpySettlementMessage.getXMLElementTagName(), new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register(SetGoodsLevelsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new SetGoodsLevelsMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(PutOutsideColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new PutOutsideColonyMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(ChangeWorkTypeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new ChangeWorkTypeMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(ChangeWorkImprovementTypeMessage.getXMLElementTagName(),
+        // TODO: check that NRHs and CPNRHs are sensibly chosen
+
+        register(AbandonColonyMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
             @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new ChangeWorkImprovementTypeMessage(getGame(), element)
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new AbandonColonyMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
-            }
-        });
+            }});
+        register(AskSkillMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new AskSkillMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(AssignTeacherMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new AssignTeacherMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(AttackMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new AttackMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(BuildColonyMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new BuildColonyMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(BuyMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new BuyMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(BuyGoodsMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new BuyGoodsMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(BuyPropositionMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new BuyPropositionMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(CashInTreasureTrainMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new CashInTreasureTrainMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
         register(ChangeStateMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
             @Override
-            public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
                 return new ChangeStateMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
-            }
-        });
-        register("foreignAffairs", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return foreignAffairs(connection, element);
-            }
-        });
-        register("highScores", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return highScores(connection, element);
-            }
-        });
-        register("getREFUnits", new CurrentPlayerNetworkRequestHandler() {
+            }});
+        register(ChangeWorkImprovementTypeMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
             @Override
-            public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ChangeWorkImprovementTypeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(ChangeWorkTypeMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ChangeWorkTypeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(ClaimLandMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ClaimLandMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(ClearSpecialityMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ClearSpecialityMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(CloseTransactionMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new CloseTransactionMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(DeclareIndependenceMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new DeclareIndependenceMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(DeliverGiftMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new DeliverGiftMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(DemandTributeMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new DemandTributeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(DisbandUnitMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new DisbandUnitMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(DisembarkMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new DisembarkMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(EmbarkMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new EmbarkMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(EmigrateUnitMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new EmigrateUnitMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(EquipUnitMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new EquipUnitMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(GetTransactionMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new GetTransactionMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(GiveIndependenceMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new GiveIndependenceMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(GoodsForSaleMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new GoodsForSaleMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(InciteMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new InciteMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(IndianDemandMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new IndianDemandMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(JoinColonyMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new JoinColonyMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(LearnSkillMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new LearnSkillMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(LoadCargoMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new LoadCargoMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(LootCargoMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new LootCargoMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(MissionaryMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new MissionaryMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(MoveMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new MoveMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(MoveToAmericaMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new MoveToAmericaMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(MoveToEuropeMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new MoveToEuropeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(NewLandNameMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new NewLandNameMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(NewRegionNameMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new NewRegionNameMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(PayArrearsMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new PayArrearsMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(PayForBuildingMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new PayForBuildingMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(PutOutsideColonyMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new PutOutsideColonyMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(RenameMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new RenameMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(ScoutIndianSettlementMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ScoutIndianSettlementMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(SellMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new SellMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(SellGoodsMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new SellGoodsMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(SellPropositionMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new SellPropositionMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(SetBuildQueueMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new SetBuildQueueMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(SetGoodsLevelsMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new SetGoodsLevelsMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(TrainUnitInEuropeMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new TrainUnitInEuropeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(UnloadCargoMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new UnloadCargoMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(WorkMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new WorkMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+
+        // NetworkRequestHandlers
+        register(DiplomacyMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new DiplomacyMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
+        register(SetDestinationMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new SetDestinationMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
+        register(SpySettlementMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new SpySettlementMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
+        register(UpdateCurrentStopMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new UpdateCurrentStopMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
+
+        register("getREFUnits",
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
                 return getREFUnits(connection, element);
             }
         });
-        register("getNewTradeRoute", new NetworkRequestHandler() {
+
+        register("foreignAffairs",
+                 new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return foreignAffairs(connection, element);
+            }});
+        register("highScores",
+                 new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return highScores(connection, element);
+            }});
+        register("getNewTradeRoute",
+                 new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return getNewTradeRoute(connection, element);
-            }
-        });
-        register("updateTradeRoute", new NetworkRequestHandler() {
+            }});
+        register("updateTradeRoute",
+                 new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return updateTradeRoute(connection, element);
-            }
-        });
-        register("setTradeRoutes", new NetworkRequestHandler() {
+            }});
+        register("setTradeRoutes",
+                 new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return setTradeRoutes(connection, element);
-            }
-        });
-        register("assignTradeRoute", new NetworkRequestHandler() {
+            }});
+        register("assignTradeRoute",
+                 new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return assignTradeRoute(connection, element);
-            }
-        });
-        register("assignTeacher", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return assignTeacher(connection, element);
-            }
-        });
-        register(StatisticsMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            }});
+        register(StatisticsMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return getServerStatistics(connection, element);
             }
@@ -514,18 +630,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // Trivial comms that do not merit their own Message-type
         register("endTurn", new CurrentPlayerNetworkRequestHandler() {
             @Override
-            public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
                 FreeColServer server = getFreeColServer();
                 ServerPlayer serverPlayer = server.getPlayer(connection);
                 server.getInGameController().endTurn(serverPlayer);
                 return null;
-            }
-        });
-        register("retire", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                FreeColServer server = getFreeColServer();
-                ServerPlayer serverPlayer = server.getPlayer(connection);
-                return server.getInGameController().retire(serverPlayer);
             }
         });
         register("continuePlaying", new NetworkRequestHandler() {
@@ -534,6 +644,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 ServerPlayer serverPlayer = server.getPlayer(connection);
                 return server.getInGameController()
                     .continuePlaying(serverPlayer);
+            }
+        });
+        register("retire", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                FreeColServer server = getFreeColServer();
+                ServerPlayer serverPlayer = server.getPlayer(connection);
+                return server.getInGameController().retire(serverPlayer);
             }
         });
     }
@@ -637,47 +754,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             unit.setTradeRoute(tradeRoute);
         }
-        return null;
-    }
-
-    /**
-     * Handles a "assignTeacher"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param workElement The element containing the request.
-     */
-    private Element assignTeacher(Connection connection, Element workElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit student = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("student"));
-        Unit teacher = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("teacher"));
-
-        if (!student.canBeStudent(teacher)) {
-            throw new IllegalStateException("Unit can not be student!");
-        }
-        if (!teacher.getColony().canTrain(teacher)) {
-            throw new IllegalStateException("Unit can not be teacher!");
-        }
-        if (student.getOwner() != player) {
-            throw new IllegalStateException("Student is not your unit!");
-        }
-        if (teacher.getOwner() != player) {
-            throw new IllegalStateException("Teacher is not your unit!");
-        }
-        if (student.getColony() != teacher.getColony()) {
-            throw new IllegalStateException("Student and teacher are not in the same colony!");
-        }
-        if (!(student.getLocation() instanceof WorkLocation)) {
-            throw new IllegalStateException("Student is not in a WorkLocation!");
-        }
-        // No reason to send an update to other players: this is always hidden.
-        if (student.getTeacher() != null) {
-            student.getTeacher().setStudent(null);
-        }
-        student.setTeacher(teacher);
-        if (teacher.getStudent() != null) {
-            teacher.getStudent().setTeacher(null);
-        }
-        teacher.setStudent(student);
         return null;
     }
 
