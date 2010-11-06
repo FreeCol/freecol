@@ -24,6 +24,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -57,8 +58,6 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
      */
     public ReportContinentalCongressPanel(Canvas parent) {
         super(parent, title);
-
-        //reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
 
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);
@@ -94,7 +93,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         Map<FoundingFatherType, JPanel> panels =
             new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
         for (FoundingFatherType type : FoundingFatherType.values()) {
-            JPanel panel = new JPanel();
+            JPanel panel = new JPanel(new MigLayout("wrap 2, flowy", "[center]"));
             panels.put(type, panel);
             JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -109,13 +108,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             } else {
                 image = ResourceManager.getGrayscaleImage(father.getId() + ".image", 1);
             }
-            JLabel fatherLabel = new JLabel(Messages.message(father.getNameKey()),
-                                            new ImageIcon(image),
-                                            JLabel.CENTER);
-            fatherLabel.setVerticalTextPosition(JLabel.TOP);
-            fatherLabel.setHorizontalTextPosition(JLabel.CENTER);
-            fatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
-            panel.add(fatherLabel);
+            panel.add(new JLabel(new ImageIcon(image)));
+            JButton button = getLinkButton(Messages.message(father.getNameKey()), null, father.getId());
+            button.addActionListener(this);
+            panel.add(button);
         }
 
         setMainComponent(tabs);

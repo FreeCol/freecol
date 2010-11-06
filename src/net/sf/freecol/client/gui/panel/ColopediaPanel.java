@@ -91,11 +91,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
-    public static enum PanelType { TERRAIN, RESOURCES, UNITS, GOODS, 
+    public static enum PanelType { TERRAIN, RESOURCES, UNITS, GOODS,
             SKILLS, BUILDINGS, FATHERS, NATIONS, NATION_TYPES }
 
     private static final Font arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
-    private static final DecimalFormat modifierFormat = 
+    private static final DecimalFormat modifierFormat =
         new DecimalFormat("0.##");
 
     private final String none;
@@ -119,11 +119,15 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ColopediaPanel(Canvas parent, PanelType panelType, FreeColGameObjectType objectType) {
         super(parent);
+
+        if (panelType == null) {
+            panelType = getPanelType(objectType);
+        }
 
         none = Messages.message("none");
 
@@ -139,7 +143,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         };
         listPanel.setOpaque(true);
-        JScrollPane sl = new JScrollPane(listPanel, 
+        JScrollPane sl = new JScrollPane(listPanel,
                                          JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sl.getVerticalScrollBar().setUnitIncrement(16);
@@ -186,7 +190,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Prepares this panel to be displayed.
-     * 
+     *
      * @param panelType - the panel type
      * @param type - the FreeColGameObjectType of the item to be displayed
      */
@@ -201,30 +205,43 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Prepares this panel to be displayed.
-     * 
+     *
      * @param type - the FreeColGameObjectType of the item to be displayed
      */
     public void initialize(FreeColGameObjectType type) {
+        initialize(getPanelType(type), type);
+    }
+
+    /**
+     * Returns the <code>PanelType</code> to be used for the given
+     * <code>FreeColGameObjectType</code>.
+     *
+     * @param type - the FreeColGameObjectType of the item to be displayed
+     * @return the PanelType
+     */
+    public PanelType getPanelType(FreeColGameObjectType type) {
         if (type instanceof TileType) {
-            initialize(PanelType.TERRAIN, type);
+            return PanelType.TERRAIN;
         } else if (type instanceof ResourceType) {
-            initialize(PanelType.RESOURCES, type);
+            return PanelType.RESOURCES;
         } else if (type instanceof UnitType) {
             if (((UnitType) type).hasSkill()) {
-                initialize(PanelType.SKILLS, type);
+                return PanelType.SKILLS;
             } else {
-                initialize(PanelType.UNITS, type);
+                return PanelType.UNITS;
             }
         } else if (type instanceof GoodsType) {
-            initialize(PanelType.GOODS, type);
+            return PanelType.GOODS;
         } else if (type instanceof BuildingType) {
-            initialize(PanelType.BUILDINGS, type);
+            return PanelType.BUILDINGS;
         } else if (type instanceof FoundingFather) {
-            initialize(PanelType.FATHERS, type);
+            return PanelType.FATHERS;
         } else if (type instanceof Nation) {
-            initialize(PanelType.NATIONS, type);
+            return PanelType.NATIONS;
         } else if (type instanceof NationType) {
-            initialize(PanelType.NATION_TYPES, type);
+            return PanelType.NATION_TYPES;
+        } else {
+            return null;
         }
     }
 
@@ -260,61 +277,61 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             break;
         }
     }
- 
+
     /**
      * Builds the JTree which represents the navigation menu and then returns it
-     * 
+     *
      * @return The navigation tree.
      */
     private JTree buildTree() {
         DefaultMutableTreeNode root;
         root = new DefaultMutableTreeNode(new ColopediaTreeItem(null, Messages.message("menuBar.colopedia")));
-        
+
         DefaultMutableTreeNode terrain;
         terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN));
         buildTerrainSubtree(terrain);
         root.add(terrain);
-        
+
         DefaultMutableTreeNode resource;
         resource = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.RESOURCES));
         buildResourceSubtree(resource);
         root.add(resource);
-        
+
         DefaultMutableTreeNode units =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS));
         buildUnitSubtree(units);
         root.add(units);
-        
+
         DefaultMutableTreeNode goods =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS));
         buildGoodsSubtree(goods);
         root.add(goods);
-        
+
         DefaultMutableTreeNode skills =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS));
         buildSkillsSubtree(skills);
         root.add(skills);
-        
+
         DefaultMutableTreeNode buildings =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS));
         buildBuildingSubtree(buildings);
         root.add(buildings);
-        
+
         DefaultMutableTreeNode fathers =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS));
         buildFathersSubtree(fathers);
         root.add(fathers);
-        
+
         DefaultMutableTreeNode nations =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATIONS));
         buildNationsSubtree(nations);
         root.add(nations);
-        
+
         DefaultMutableTreeNode nationTypes =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATION_TYPES));
         buildNationTypesSubtree(nationTypes);
         root.add(nationTypes);
-        
+
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel) {
             @Override
@@ -326,12 +343,12 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         tree.setCellRenderer(new ColopediaTreeCellRenderer());
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
-        
+
         listPanel.add(tree);
 
         return tree;
     }
-    
+
     /**
      * Builds the buttons for all the tiles.
      * @param parent
@@ -341,7 +358,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             buildTerrainItem(t, parent);
         }
     }
-    
+
     /**
      * Builds the buttons for all the resources.
      * @param parent
@@ -351,7 +368,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             buildResourceItem(r, parent);
         }
     }
-    
+
     /**
      * Builds the buttons for all the units.
      * @param parent
@@ -364,7 +381,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         }
     }
-    
+
     /**
      * Builds the buttons for all the goods.
      * @param parent
@@ -374,7 +391,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             buildGoodsItem(g, parent);
         }
     }
-    
+
     /**
      * Builds the buttons for all the skills.
      * @param parent
@@ -386,7 +403,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         }
     }
-    
+
     /**
      * Builds the buttons for all the buildings.
      * @param parent
@@ -402,7 +419,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.message(buildingType.getNameKey());
                 DefaultMutableTreeNode item =
-                    new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
+                    new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType,
                                                                      name,
                                                                      buildingIcon));
                 buildingHash.put(buildingType, item);
@@ -419,7 +436,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 if (node != null) {
                     String name = Messages.message(buildingType.getNameKey());
                     DefaultMutableTreeNode item =
-                        new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
+                        new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType,
                                                                          name,
                                                                          buildingIcon));
                     node.add(item);
@@ -430,7 +447,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         }
     }
-    
+
     /**
      * Builds the buttons for all the founding fathers.
      * @param parent
@@ -446,16 +463,16 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String typeName = Messages.message(FoundingFather.getTypeKey(fatherType));
-            DefaultMutableTreeNode node = 
+            DefaultMutableTreeNode node =
                 new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS, typeName));
-                                                                 
+
             parent.add(node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
                 buildFatherItem(father, node);
             }
         }
     }
-    
+
     /**
      * Builds the buttons for all the nations.
      * @param parent
@@ -468,7 +485,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             buildNationItem(type, parent);
         }
     }
-    
+
     /**
      * Builds the buttons for all the nation types.
      * @param parent
@@ -482,10 +499,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             buildNationTypeItem(type, parent);
         }
     }
-    
+
     /**
      * Builds the button for the given tile.
-     * 
+     *
      * @param tileType - the TileType
      * @param parent - the parent node
      */
@@ -496,10 +513,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, name, icon));
         parent.add(item);
     }
-    
+
     /**
      * Builds the button for the given resource.
-     * 
+     *
      * @param resType - the ResourceType
      * @param parent - the parent node
      */
@@ -510,10 +527,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             new DefaultMutableTreeNode(new ColopediaTreeItem(resType, name, icon));
         parent.add(item);
     }
-    
+
     /**
      * Builds the button for the given unit.
-     * 
+     *
      * @param unitType
      * @param scale
      * @param parent
@@ -525,10 +542,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             new DefaultMutableTreeNode(new ColopediaTreeItem(unitType, name, icon));
         parent.add(item);
     }
-    
+
     /**
      * Builds the button for the given goods.
-     * 
+     *
      * @param goodsType The GoodsType
      * @param parent The parent tree node
      */
@@ -539,10 +556,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType, name, icon));
         parent.add(item);
     }
-    
+
     /**
      * Builds the button for the given founding father.
-     * 
+     *
      * @param foundingFather
      * @param parent
      */
@@ -556,7 +573,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the button for the given nation.
-     * 
+     *
      * @param nation
      * @param parent
      */
@@ -570,7 +587,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the button for the given nation type.
-     * 
+     *
      * @param nationType
      * @param parent
      */
@@ -627,7 +644,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given tile.
-     * 
+     *
      * @param tileType The TileType
      */
     private void buildTerrainDetail(TileType tileType) {
@@ -705,7 +722,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given resource.
-     * 
+     *
      * @param type The ResourceType
      */
     private void buildResourceDetail(ResourceType type) {
@@ -742,7 +759,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                     text += " (" + Utils.join(", ", scopeStrings) + ")";
                 }
             }
-                        
+
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
             JButton goodsButton = getGoodsButton(goodsType, text);
             goodsPanel.add(goodsButton);
@@ -758,7 +775,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given unit.
-     * 
+     *
      * @param type - the UnitType
      */
     private void buildUnitDetail(UnitType type) {
@@ -787,7 +804,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (type.canCarryGoods() || type.canCarryUnits()) {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.capacity")));
             detailPanel.add(new JLabel(Integer.toString(type.getSpace())));
-        } 
+        }
 
         if (type.hasSkill()) {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")));
@@ -795,7 +812,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
             List<BuildingType> schools = new ArrayList<BuildingType>();
             for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
-                if (buildingType.hasAbility("model.ability.teach") && 
+                if (buildingType.hasAbility("model.ability.teach") &&
                     buildingType.canAdd(type)) {
                     schools.add(buildingType);
                 }
@@ -887,7 +904,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given goods.
-     * 
+     *
      * @param type The GoodsType
      */
     private void buildGoodsDetail(GoodsType type) {
@@ -959,7 +976,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given building.
-     * 
+     *
      * @param buildingType The BuildingType
      */
     private void buildBuildingDetail(BuildingType buildingType) {
@@ -988,7 +1005,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
             if (buildingType.getPopulationRequired() > 0) {
                 doc.insertString(doc.getLength(),
-                                 String.valueOf(buildingType.getPopulationRequired()) + " " + 
+                                 String.valueOf(buildingType.getPopulationRequired()) + " " +
                                  Messages.message("colonists") + "\n",
                                  doc.getStyle("regular"));
             }
@@ -1009,7 +1026,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             if (buildingType.getGoodsRequired().size() > 1) {
                 detailPanel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()),
                                 "split " + buildingType.getGoodsRequired().size());
-                
+
                 for (int index = 1; index < buildingType.getGoodsRequired().size(); index++) {
                     goodsRequired = buildingType.getGoodsRequired().get(index);
                     detailPanel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()));
@@ -1099,7 +1116,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given founding father.
-     * 
+     *
      * @param father - the FoundingFather
      */
     private void buildFatherDetail(FoundingFather father) {
@@ -1136,10 +1153,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.revalidate();
         detailPanel.repaint();
     }
-    
+
     /**
      * Builds the details panel for the given nation.
-     * 
+     *
      * @param nation - the Nation
      */
     private void buildNationDetail(Nation nation) {
@@ -1178,10 +1195,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.revalidate();
         detailPanel.repaint();
     }
-    
+
     /**
      * Builds the details panel for the given nation type.
-     * 
+     *
      * @param nationType - the NationType
      */
     private void buildNationTypeDetail(NationType nationType) {
@@ -1195,7 +1212,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given nation type.
-     * 
+     *
      * @param nationType - the EuropeanNationType
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType) {
@@ -1259,7 +1276,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     /**
      * Builds the details panel for the given nation type.
-     * 
+     *
      * @param nationType - the IndianNationType
      */
     private void buildIndianNationTypeDetail(IndianNationType nationType) {
@@ -1313,11 +1330,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.repaint();
     }
 
-    
+
     /**
      * This function analyses a tree selection event and calls the right methods to take care
      * of building the requested unit's details.
-     * 
+     *
      * @param event The incoming TreeSelectionEvent.
      */
     public void valueChanged(TreeSelectionEvent event) {
@@ -1342,7 +1359,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
      * dialogs.
-     * 
+     *
      * @param text The text to display in the text area.
      * @return a text area with standard settings suitable for use in FreeCol
      *         dialogs.
@@ -1386,7 +1403,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     public void appendRequiredAbilities(StyledDocument doc, BuildableType buildableType)
         throws BadLocationException {
         for (Entry<String, Boolean> entry : buildableType.getAbilitiesRequired().entrySet()) {
-            doc.insertString(doc.getLength(), 
+            doc.insertString(doc.getLength(),
                              Messages.message(entry.getKey() + ".name"),
                              doc.getStyle("regular"));
             List<JButton> requiredTypes = new ArrayList<JButton>();
@@ -1415,7 +1432,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -1427,6 +1444,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             initialize(type);
         }
     }
-    
+
 
 }

@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -188,6 +189,13 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
                 getCanvas().showEuropePanel();
             } else if (object instanceof Tile) {
                 getCanvas().getGUI().setFocus(((Tile) object).getPosition());
+            } else if (object == null) {
+                try {
+                    FreeColGameObjectType type = getSpecification().getType(command);
+                    getCanvas().showPanel(new ColopediaPanel(getCanvas(), null, type));
+                } catch(Exception e) {
+                    // there is no such type, but we don't care
+                }
             }
         }
     }
