@@ -200,6 +200,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         // Still room for more
         colony.addGoods(horsesType, 99);
 
+        assertTrue(colony.getFoodProduction() > colony.getFoodConsumption());
+
         assertEquals("Wrong horse production",1, pasture.getProductionOf(horsesType));
         assertEquals("Wrong maximum horse production",9, pasture.getMaximumProduction());
         assertEquals("Wrong net horse production",1, colony.getProductionNetOf(horsesType));

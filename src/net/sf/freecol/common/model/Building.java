@@ -559,7 +559,11 @@ public class Building extends FreeColGameObject
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
+            if ("model.goods.food".equals(getGoodsInputType().getId())) {
+                return getGoodsInputAuto(colony.getFoodProduction());
+            } else {
+                return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
+            }
         } else {
             return Math.min(getMaximumGoodsInput(), getStoredInput());
         }
@@ -578,7 +582,17 @@ public class Building extends FreeColGameObject
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
+            if ("model.goods.food".equals(getGoodsInputType().getId())) {
+                int amount = 0;
+                for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
+                    if (!"model.goods.food".equals(foodType.getId())) {
+                        amount += colony.getProductionNextTurn(foodType);
+                    }
+                }
+                return getGoodsInputAuto(amount);
+            } else {
+                return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
+            }
         } else {
             return Math.min(getMaximumGoodsInput(),
                             getStoredInput() + colony.getProductionNextTurn(getGoodsInputType()));
@@ -705,7 +719,7 @@ public class Building extends FreeColGameObject
      * @param availableInput an <code>int</code> value
      * @return an <code>int</code> value
      */
-    private int getAutoProduction(int availableInput) {
+    protected int getAutoProduction(int availableInput) {
         if (getGoodsOutputType() == null ||
             colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
             return 0;

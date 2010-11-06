@@ -1126,7 +1126,7 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.country" workplaces="0" consumes="model.goods.grain"
+    <building-type id="model.building.country" workplaces="0" consumes="model.goods.food"
                    produces="model.goods.horses" sequence="14">
       <modifier id="model.goods.horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />

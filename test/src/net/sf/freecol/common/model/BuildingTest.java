@@ -359,7 +359,7 @@ public class BuildingTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
-        GoodsType foodType = spec().getGoodsType("model.goods.grain");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
 
@@ -368,7 +368,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(horsesType, pasture.getGoodsOutputType());
 
         // no horses yet
-        assertEquals(10, colony.getProductionOf(foodType));
+        assertEquals(10, colony.getFoodProduction());
         assertEquals(0, pasture.getProductionOf(horsesType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(0, pasture.getGoodsInputNextTurn());

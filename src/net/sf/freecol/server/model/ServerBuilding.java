@@ -122,9 +122,17 @@ public class ServerBuilding extends Building implements ServerModelObject {
 
     private void produceGoods(ChangeSet cs, ServerPlayer owner, int maxInput) {
         final int goodsInput = Math.min(getGoodsInput(), maxInput);
-        final int goodsOutput = getProductionAdding(maxInput);
+        final int goodsOutput = canAutoProduce()
+            ? getAutoProduction(goodsInput)
+            : getProductionAdding(maxInput);
         final GoodsType goodsInputType = getGoodsInputType();
         final GoodsType goodsOutputType = getGoodsOutputType();
+
+        logger.finest(goodsInput + " " +
+                      (goodsInputType == null ? "null" : goodsInputType.getId())
+                      + " ---> "
+                      + goodsOutput + " " +
+                      (goodsOutputType == null ? "null" : goodsOutputType.getId()));
 
         if (goodsInput == 0 && !canAutoProduce()
             && getMaximumGoodsInput() > 0) {

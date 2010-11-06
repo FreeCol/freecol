@@ -159,7 +159,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * The constructor for the panel.
-     * 
+     *
      * @param parent The parent of this panel
      */
     public ColonyPanel(final Canvas parent, Colony colony) {
@@ -263,7 +263,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         fillButton.setActionCommand(String.valueOf(FILL));
         enterPressesWhenFocused(fillButton);
         fillButton.addActionListener(this);
-        
+
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
         enterPressesWhenFocused(warehouseButton);
         warehouseButton.addActionListener(this);
@@ -330,7 +330,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     /**
      * Initialize the data on the window. This is the same as calling:
      * <code>initialize(colony, game, null)</code>.
-     * 
+     *
      * @param colony The <code>Colony</code> to be displayed.
      */
     public void initialize(Colony colony) {
@@ -339,7 +339,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Initialize the data on the window.
-     * 
+     *
      * @param colony The <code>Colony</code> to be displayed.
      * @param preSelectedUnit This <code>Unit</code> will be selected if it is
      *            not <code>null</code> and it is a carrier located in the
@@ -427,18 +427,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private void sortBuildings(List<Building> buildings) {
         Collections.sort(buildings);
     }
-    
+
     private void sortColonies(List<Colony> colonies) {
         Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
     }
 
     public void updateProductionPanel() {
         netProductionPanel.removeAll();
-        
+
         int gross = 0, net = 0;
         Specification spec = getSpecification();
-        
-        
+
+
         // food
         List<AbstractGoods> ratios;
         List<GoodsType> goodsTypes = spec.getFoodGoodsTypeList();
@@ -456,7 +456,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 //            }
 //            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
         }
-        
+
         // liberty
         gross = net = 0;
         goodsTypes = spec.getLibertyGoodsTypeList();
@@ -473,8 +473,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 //            }
 //            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
         }
-        
-        
+
+
         // immigration
         gross = net = 0;
         goodsTypes = spec.getImmigrationGoodsTypeList();
@@ -491,15 +491,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 //            }
 //            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
         }
-        
-        
-        
+
+
+
         List<GoodsType> generalGoods = new ArrayList<GoodsType>(spec.getGoodsTypeList());
         generalGoods.removeAll(spec.getFoodGoodsTypeList());
         generalGoods.removeAll(spec.getLibertyGoodsTypeList());
         generalGoods.removeAll(spec.getImmigrationGoodsTypeList());
         generalGoods.removeAll(spec.getFarmedGoodsTypeList());
-        
+
         // non-storable goods
         goodsTypes = new ArrayList<GoodsType>(generalGoods);
         for (GoodsType goodsType : goodsTypes) {
@@ -511,8 +511,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
             }
         }
-        
-        
+
+
         // farmed goods
         goodsTypes = new ArrayList<GoodsType>(spec.getFarmedGoodsTypeList());
         goodsTypes.removeAll(spec.getFoodGoodsTypeList());
@@ -524,8 +524,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
             }
         }
-        
-        
+
+
         // everything left except military & breedables
         goodsTypes = new ArrayList<GoodsType>(generalGoods);
         for (GoodsType goodsType : goodsTypes) {
@@ -537,8 +537,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
             }
         }
-        
-        
+
+
         // military goods
         goodsTypes = new ArrayList<GoodsType>(generalGoods);
         for (GoodsType goodsType : goodsTypes) {
@@ -550,8 +550,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
             }
         }
-        
-        
+
+
         // breedable things go last
         goodsTypes = new ArrayList<GoodsType>(generalGoods);
         for (GoodsType goodsType : goodsTypes) {
@@ -561,7 +561,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
             }
         }
-        
+
 /*
         GoodsType grain = getSpecification().getGoodsType("model.goods.food");
         int food = 0;
@@ -592,9 +592,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     production = colony.getProductionNetOf(goodsType);
                     netProductionPanel.add(new ProductionLabel(goodsType, production, getCanvas()));
                 }
-            } 
+            }
         }
-        
+
         netProductionPanel.add(new ProductionLabel(grain, food - colony.getFoodConsumption(), getCanvas()), 0);
 
         ProductionMultiplesLabel label = new ProductionMultiplesLabel(foodProduction, getCanvas());
@@ -603,10 +603,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 */
         netProductionPanel.revalidate();
     }
-    
+
     /**
      * Returns the currently select unit.
-     * 
+     *
      * @return The currently select unit.
      */
     public Unit getSelectedUnit() {
@@ -618,7 +618,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Returns the currently select unit.
-     * 
+     *
      * @return The currently select unit.
      */
     public UnitLabel getSelectedUnitLabel() {
@@ -628,7 +628,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     /**
      * Analyzes an event and calls the right external methods to take care of
      * the user's request.
-     * 
+     *
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
@@ -754,7 +754,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Selects a unit that is located somewhere on this panel.
-     * 
+     *
      * @param unit The unit that is being selected.
      */
     public void setSelectedUnit(Unit unit) {
@@ -770,7 +770,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Selects a unit that is located somewhere on this panel.
-     * 
+     *
      * @param unitLabel The unit that is being selected.
      */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
@@ -792,7 +792,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Returns a pointer to the <code>CargoPanel</code>-object in use.
-     * 
+     *
      * @return The <code>CargoPanel</code>.
      */
     public final CargoPanel getCargoPanel() {
@@ -801,7 +801,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Returns a pointer to the <code>WarehousePanel</code>-object in use.
-     * 
+     *
      * @return The <code>WarehousePanel</code>.
      */
     public final WarehousePanel getWarehousePanel() {
@@ -810,7 +810,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Returns a pointer to the <code>TilePanel</code>-object in use.
-     * 
+     *
      * @return The <code>TilePanel</code>.
      */
     public final TilePanel getTilePanel() {
@@ -819,7 +819,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Returns a pointer to the <code>Colony</code>-pointer in use.
-     * 
+     *
      * @return The <code>Colony</code>.
      */
     public synchronized final Colony getColony() {
@@ -828,7 +828,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     /**
      * Set the current colony.
-     * 
+     *
      * @param colony The new colony value.
      */
     private synchronized void setColony(Colony colony) {
@@ -870,7 +870,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         /**
          * Creates this BuildingsPanel.
-         * 
+         *
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
@@ -911,7 +911,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 add(aSingleBuildingPanel);
             }
         }
-        
+
         public void update(){
             initialize();
         }
@@ -935,7 +935,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             /**
              * Creates this ASingleBuildingPanel.
-             * 
+             *
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
@@ -975,7 +975,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * Adds a component to this ASingleBuildingPanel and makes sure that
              * the unit that the component represents gets modified so that it
              * will be located in the colony.
-             * 
+             *
              * @param comp The component to add to this ColonistsPanel.
              * @param editState Must be set to 'true' if the state of the
              *            component that is added (which should be a dropped
@@ -1060,7 +1060,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             revalidate();
             repaint();
         }
-    
+
         public JToolTip createToolTip() {
             return new RebelToolTip(colony, getCanvas());
         }
@@ -1097,7 +1097,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void initialize() {
-            
+
             removeAll();
             if (colony == null) {
                 return;
@@ -1134,7 +1134,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * Adds a component to this OutsideColonyPanel and makes sure that the
          * unit that the component represents gets modified so that it will be
          * located in the colony.
-         * 
+         *
          * @param comp The component to add to this ColonistsPanel.
          * @param editState Must be set to 'true' if the state of the component
          *            that is added (which should be a dropped component
@@ -1196,7 +1196,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public String getUIClassID() {
             return "InPortPanelUI";
         }
-        
+
         public void initialize(Unit selectedUnit) {
             // This is required
             UnitLabel oldSelectedUnitLabel = ColonyPanel.this.getSelectedUnitLabel();
@@ -1206,7 +1206,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
                 ColonyPanel.this.setSelectedUnit(null);
             }
-            
+
             removeAll();
             if (colony == null) {
                 return;
@@ -1218,7 +1218,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if(!unit.isCarrier()){
                     continue;
                 }
-                
+
                 lastCarrier = unit;
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                 TradeRoute tradeRoute = unit.getTradeRoute();
@@ -1234,7 +1234,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
             revalidate();
             repaint();
-            
+
             // last carrier is selected by default, if no other should be
             if(selectedUnit == null && lastCarrier != null){
                 selectedUnit = lastCarrier;
@@ -1255,7 +1255,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         /**
          * Creates this WarehousePanel.
-         * 
+         *
          * @param colonyPanel The panel that holds this WarehousePanel.
          */
         public WarehousePanel(ColonyPanel colonyPanel) {
@@ -1299,7 +1299,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * Adds a component to this WarehousePanel and makes sure that the unit or
          * good that the component represents gets modified so that it is on
          * board the currently selected ship.
-         * 
+         *
          * @param comp The component to add to this WarehousePanel.
          * @param editState Must be set to 'true' if the state of the component
          *            that is added (which should be a dropped component
@@ -1341,7 +1341,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         /**
          * Creates this TilePanel.
-         * 
+         *
          * @param colonyPanel The panel that holds this TilePanel.
          */
         public TilePanel(ColonyPanel colonyPanel) {
@@ -1438,7 +1438,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             (x + y) * getLibrary().getTerrainImage(tileType, 0, 0).getHeight(null) / 2);
                 initialize();
             }
-                
+
             private void initialize() {
 
                 removeAll();
@@ -1472,7 +1472,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             /**
              * Initialized the center of the colony panel tile. The one
              * containing the city.
-             * 
+             *
              */
             private void initializeAsCenterTile() {
 
@@ -1506,7 +1506,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             /**
              * Updates the description label The description label is a tooltip
              * with the terrain type, road and plow indicator if any
-             * 
+             *
              * If a unit is on it update the tooltip of it instead
              */
             private void updateDescriptionLabel(UnitLabel unit, boolean toAdd) {
@@ -1527,7 +1527,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * Adds a component to this CargoPanel and makes sure that the unit
              * or good that the component represents gets modified so that it is
              * on board the currently selected ship.
-             * 
+             *
              * @param comp The component to add to this CargoPanel.
              * @param editState Must be set to 'true' if the state of the
              *            component that is added (which should be a dropped
@@ -1625,7 +1625,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 */
                 return comp;
             }
-    
+
             public void addPropertyChangeListeners() {
                 colonyTile.addPropertyChangeListener(this);
                 Colony colony = colonyTile.getColony();
@@ -1680,7 +1680,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
         }
     }
-    
+
     public void propertyChange(PropertyChangeEvent e) {
         if (!isShowing() || getColony() == null) {
             return;
