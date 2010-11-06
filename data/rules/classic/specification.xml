@@ -80,6 +80,14 @@
     <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
+    <goods-type id="model.goods.grain" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
+    <goods-type id="model.goods.fish" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
+    <!--
+    <goods-type id="model.goods.meat" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
+    -->
     <goods-type id="model.goods.sugar" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
@@ -126,14 +134,6 @@
     <goods-type id="model.goods.muskets" is-farmed="false" made-from="model.goods.tools">
       <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.fish" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
-    <goods-type id="model.goods.grain" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
-    <!--
-    <goods-type id="model.goods.meat" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
-    -->
     <goods-type id="model.goods.bells" is-farmed="false" ignore-limit="true" storable="false">
       <modifier id="model.modifier.liberty" type="multiplicative" value="1"/>
     </goods-type>
