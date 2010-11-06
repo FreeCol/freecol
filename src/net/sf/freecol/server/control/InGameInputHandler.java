@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
@@ -581,15 +580,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     .handle(freeColServer, connection);
             }});
 
-        register("getREFUnits",
-                 new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return getREFUnits(connection, element);
-            }
-        });
-
         register("foreignAffairs",
                  new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
@@ -636,6 +626,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 ServerPlayer serverPlayer = server.getPlayer(connection);
                 server.getInGameController().endTurn(serverPlayer);
                 return null;
+            }
+        });
+        register("getREFUnits",
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                FreeColServer server = getFreeColServer();
+                ServerPlayer serverPlayer = server.getPlayer(connection);
+                return server.getInGameController().getREFUnits(serverPlayer);
             }
         });
         register("continuePlaying", new NetworkRequestHandler() {
@@ -824,59 +824,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("highScoresReport");
         for (HighScore score : getFreeColServer().getHighScores()) {
             reply.appendChild(score.toXMLElement(player, reply.getOwnerDocument()));
-        }
-        return reply;
-    }
-
-
-    /**
-     * Handles a "getREFUnits"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element getREFUnits(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        UnitType defaultType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
-        if (player.getMonarch() == null) {
-            ServerPlayer enemyPlayer = (ServerPlayer) player.getREFPlayer();
-            java.util.Map<UnitType, EnumMap<Role, Integer>> unitHash =
-                new HashMap<UnitType, EnumMap<Role, Integer>>();
-            for (Unit unit : enemyPlayer.getUnits()) {
-                if (unit.isOffensiveUnit()) {
-                    UnitType unitType = defaultType;
-                    if (unit.getType().getOffence() > 0 ||
-                        unit.hasAbility("model.ability.expertSoldier")) {
-                        unitType = unit.getType();
-                    }
-                    EnumMap<Role, Integer> roleMap = unitHash.get(unitType);
-                    if (roleMap == null) {
-                        roleMap = new EnumMap<Role, Integer>(Role.class);
-                    }
-                    Role role = unit.getRole();
-                    Integer count = roleMap.get(role);
-                    if (count == null) {
-                        roleMap.put(role, new Integer(1));
-                    } else {
-                        roleMap.put(role, new Integer(count.intValue() + 1));
-                    }
-                    unitHash.put(unitType, roleMap);
-                }
-            }
-            for (java.util.Map.Entry<UnitType, EnumMap<Role, Integer>> typeEntry : unitHash.entrySet()) {
-                for (java.util.Map.Entry<Role, Integer> roleEntry : typeEntry.getValue().entrySet()) {
-                    units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
-                }
-            }
-        } else {
-            units = player.getMonarch().getREF();
-        }
-
-        Element reply = Message.createNewRootElement("REFUnits");
-        for (AbstractUnit unit : units) {
-            reply.appendChild(unit.toXMLElement(player,reply.getOwnerDocument()));
         }
         return reply;
     }

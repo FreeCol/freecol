@@ -4645,27 +4645,37 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Gathers information about the REF.
+     *
      * @return a <code>List</code> value
      */
     public List<AbstractUnit> getREFUnits() {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return Collections.emptyList();
         }
 
-        Element reply = freeColClient.getClient().ask(Message.createNewRootElement("getREFUnits"));
-        if (reply == null) {
-            return Collections.emptyList();
-        } else {
-            List<AbstractUnit> result = new ArrayList<AbstractUnit>();
-            NodeList childElements = reply.getChildNodes();
-            for (int index = 0; index < childElements.getLength(); index++) {
-                AbstractUnit unit = new AbstractUnit();
-                unit.readFromXMLElement((Element) childElements.item(index));
-                result.add(unit);
-            }
-            return result;
+        return askGetREFUnits();
+    }
+
+    /**
+     * Server query-response for asking about a players REF.
+     *
+     * @return A list of REF units for the player.
+     */
+    private List<AbstractUnit> askGetREFUnits() {
+        Client client = freeColClient.getClient();
+        Element reply = askExpecting(client, Message.createNewRootElement("getREFUnits"), null);
+        if (reply == null) return Collections.emptyList();
+
+        List<AbstractUnit> result = new ArrayList<AbstractUnit>();
+        NodeList childElements = reply.getChildNodes();
+        for (int index = 0; index < childElements.getLength(); index++) {
+            AbstractUnit unit = new AbstractUnit();
+            unit.readFromXMLElement((Element) childElements.item(index));
+            result.add(unit);
         }
+        return result;
     }
 
 

@@ -99,6 +99,7 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -5806,4 +5807,63 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), student, teacher);
         return cs.build(serverPlayer);
     }
+
+    /**
+     * Handles a "getREFUnits"-message.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to query the REF of.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element getREFUnits(ServerPlayer serverPlayer) {
+        Game game = getGame();
+        Specification spec = game.getSpecification();
+        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
+        UnitType defaultType = spec.getUnitType("model.unit.freeColonist");
+
+        if (serverPlayer.getMonarch() == null) {
+            ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();
+            java.util.Map<UnitType, EnumMap<Role, Integer>> unitHash
+                = new HashMap<UnitType, EnumMap<Role, Integer>>();
+            for (Unit unit : REFPlayer.getUnits()) {
+                if (unit.isOffensiveUnit()) {
+                    UnitType unitType = defaultType;
+                    if (unit.getType().getOffence() > 0
+                        || unit.hasAbility("model.ability.expertSoldier")) {
+                        unitType = unit.getType();
+                    }
+                    EnumMap<Role, Integer> roleMap = unitHash.get(unitType);
+                    if (roleMap == null) {
+                        roleMap = new EnumMap<Role, Integer>(Role.class);
+                    }
+                    Role role = unit.getRole();
+                    Integer count = roleMap.get(role);
+                    if (count == null) {
+                        roleMap.put(role, new Integer(1));
+                    } else {
+                        roleMap.put(role, new Integer(count.intValue() + 1));
+                    }
+                    unitHash.put(unitType, roleMap);
+                }
+            }
+            for (java.util.Map.Entry<UnitType, EnumMap<Role, Integer>> typeEntry : unitHash.entrySet()) {
+                for (java.util.Map.Entry<Role, Integer> roleEntry : typeEntry.getValue().entrySet()) {
+                    units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
+                }
+            }
+        } else {
+            units = serverPlayer.getMonarch().getREF();
+        }
+
+        ChangeSet cs = new ChangeSet();
+        cs.addTrivial(See.only(serverPlayer), "getREFUnits",
+                      ChangePriority.CHANGE_NORMAL);
+        Element reply = cs.build(serverPlayer);
+        // TODO: eliminate explicit Element hackery
+        for (AbstractUnit unit : units) {
+            reply.appendChild(unit.toXMLElement(serverPlayer,
+                                                reply.getOwnerDocument()));
+        }
+        return reply;
+    }
+
 }
