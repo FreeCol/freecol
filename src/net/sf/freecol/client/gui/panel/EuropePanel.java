@@ -113,25 +113,19 @@ public final class EuropePanel extends FreeColPanel {
         setFocusCycleRoot(true);
 
         // Use ESCAPE for closing the ColonyPanel:
-        exitButton = new EuropeButton(Messages.message("close"), KeyEvent.VK_ESCAPE,
-                                      EuropeAction.EXIT.toString(), this);
-        EuropeButton trainButton = new EuropeButton(Messages.message("train"), KeyEvent.VK_T,
-                                                    EuropeAction.TRAIN.toString(), this);
-        EuropeButton purchaseButton = new EuropeButton(Messages.message("purchase"), KeyEvent.VK_P,
-                                                       EuropeAction.PURCHASE.toString(), this);
-        EuropeButton recruitButton = new EuropeButton(Messages.message("recruit"), KeyEvent.VK_R,
-                                                      EuropeAction.RECRUIT.toString(), this);
-        EuropeButton unloadButton = new EuropeButton(Messages.message("unload"), KeyEvent.VK_U,
-                                                     EuropeAction.UNLOAD.toString(), this);
-        EuropeButton sailButton = new EuropeButton(Messages.message("sail"), KeyEvent.VK_S,
-                                                   EuropeAction.SAIL.toString(), this);
+        exitButton = new EuropeButton(Messages.message("close"), KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
+        EuropeButton trainButton = new EuropeButton(Messages.message("train"), KeyEvent.VK_T, EuropeAction.TRAIN.toString(), this);
+        EuropeButton purchaseButton = new EuropeButton(Messages.message("purchase"), KeyEvent.VK_P, EuropeAction.PURCHASE.toString(), this);
+        EuropeButton recruitButton = new EuropeButton(Messages.message("recruit"), KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
+        EuropeButton unloadButton = new EuropeButton(Messages.message("unload"), KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
+        EuropeButton sailButton = new EuropeButton(Messages.message("sail"), KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
 
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
         inPortPanel = new InPortPanel();
-        docksPanel = new DocksPanel(this);
         cargoPanel = new EuropeCargoPanel(parent);
         cargoPanel.setParentPanel(this);
+        docksPanel = new DocksPanel(this);
         marketPanel = new MarketPanel(this);
         
         log = new TransactionLog();
@@ -145,8 +139,8 @@ public final class EuropePanel extends FreeColPanel {
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
-        docksPanel.setTransferHandler(defaultTransferHandler);
         cargoPanel.setTransferHandler(defaultTransferHandler);
+        docksPanel.setTransferHandler(defaultTransferHandler);
         marketPanel.setTransferHandler(defaultTransferHandler);
 
         pressListener = new DragListener(this);
@@ -154,35 +148,29 @@ public final class EuropePanel extends FreeColPanel {
         toAmericaPanel.addMouseListener(releaseListener);
         toEuropePanel.addMouseListener(releaseListener);
         inPortPanel.addMouseListener(releaseListener);
+        cargoPanel.addMouseListener(releaseListener);
         docksPanel.addMouseListener(releaseListener);
         marketPanel.addMouseListener(releaseListener);
-        cargoPanel.addMouseListener(releaseListener);
 
         toAmericaPanel.setLayout(new GridLayout(1, 0));
         toEuropePanel.setLayout(new GridLayout(1, 0));
-        inPortPanel.setLayout(new GridLayout(0, 4));
+        inPortPanel.setLayout(new GridLayout(1, 0));
+        cargoPanel.setLayout(new GridLayout(1, 0));
         docksPanel.setLayout(new GridLayout(0, 5));
-        cargoPanel.setLayout(new GridLayout(0, 4));
 
-        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        toAmericaScroll.getVerticalScrollBar().setUnitIncrement( 16 );
-        JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        toEuropeScroll.getVerticalScrollBar().setUnitIncrement( 16 );
-        JScrollPane inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        inPortScroll.getVerticalScrollBar().setUnitIncrement( 16 );
-        JScrollPane docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        docksScroll.getVerticalScrollBar().setUnitIncrement( 16 );
-        JScrollPane cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JScrollPane marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JScrollPane logScroll = new JScrollPane(log, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        logScroll.getVerticalScrollBar().setUnitIncrement( 16 );
+        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        toAmericaScroll.getVerticalScrollBar().setUnitIncrement(16);
+        JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        toEuropeScroll.getVerticalScrollBar().setUnitIncrement(16);
+        JScrollPane inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
+        JScrollPane cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        cargoScroll.getVerticalScrollBar().setUnitIncrement(16);
+        JScrollPane docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        docksScroll.getVerticalScrollBar().setUnitIncrement(16);
+        JScrollPane marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane logScroll = new JScrollPane(log, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
         toAmericaPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("goingToAmerica")));
