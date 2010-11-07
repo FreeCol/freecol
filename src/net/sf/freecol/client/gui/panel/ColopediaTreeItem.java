@@ -39,17 +39,16 @@ class ColopediaTreeItem {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param panelType The panel type.
      */
     ColopediaTreeItem(PanelType panelType) {
         this.panelType = panelType;
         this.text = Messages.message(ColopediaAction.id + panelType + ".name");
     }
-
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param panelType The panel type.
      * @param text The name of the item.
      */
@@ -60,7 +59,7 @@ class ColopediaTreeItem {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param objectType The type represented by this item.
      * @param text The name of the item.
      * @param icon The icon of the item.
@@ -91,7 +90,7 @@ class ColopediaTreeItem {
 
     /**
      * Returns the item's name.
-     * 
+     *
      * @return The item's name
      */
     @Override
@@ -101,7 +100,7 @@ class ColopediaTreeItem {
 
     /**
      * Returns the item's icon.
-     * 
+     *
      * @return the item's icon.
      */
     public ImageIcon getIcon() {

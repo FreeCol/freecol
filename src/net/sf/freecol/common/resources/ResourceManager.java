@@ -42,7 +42,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
  * Class for getting resources (images, audio etc).
  */
 public class ResourceManager {
-    
+
     private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
 
     // the number of different river styles
@@ -52,7 +52,7 @@ public class ResourceManager {
      * The following fields are mappings from resource IDs
      * to resources. A mapping is defined within a specific
      * context. See the comment on each field's setter for
-     * more information: 
+     * more information:
      */
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
@@ -66,17 +66,17 @@ public class ResourceManager {
      * ResourceMapping according to precendence.
      */
     private static ResourceMapping mergedContainer;
-    
+
     private static volatile Thread preloadThread = null;
-    
+
     private static volatile boolean dirty = false;
-    
+
     private static Dimension lastWindowSize;
-    
-    
+
+
     /**
      * Sets the mappings specified in the date/base-directory
-     * @param _baseMapping The mapping between IDs and files. 
+     * @param _baseMapping The mapping between IDs and files.
      */
     public static void setBaseMapping(final ResourceMapping _baseMapping) {
         baseMapping = _baseMapping;
@@ -85,7 +85,7 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified for a Total Conversion (TC).
-     * @param _tcMapping The mapping between IDs and files. 
+     * @param _tcMapping The mapping between IDs and files.
      */
     public static void setTcMapping(final ResourceMapping _tcMapping) {
         tcMapping = _tcMapping;
@@ -94,16 +94,16 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified by mods.
-     * @param _modMappings A list of the mapping between IDs and files. 
+     * @param _modMappings A list of the mapping between IDs and files.
      */
     public static void setModMappings(final List<ResourceMapping> _modMappings) {
         modMappings = _modMappings;
         dirty = true;
     }
-    
+
     /**
      * Sets the mappings specified in a campaign.
-     * @param _campaignMapping The mapping between IDs and files. 
+     * @param _campaignMapping The mapping between IDs and files.
      */
     public static void setCampaignMapping(final ResourceMapping _campaignMapping) {
         campaignMapping = _campaignMapping;
@@ -112,7 +112,7 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified in a scenario.
-     * @param _scenarioMapping The mapping between IDs and files. 
+     * @param _scenarioMapping The mapping between IDs and files.
      */
     public static void setScenarioMapping(final ResourceMapping _scenarioMapping) {
         scenarioMapping = _scenarioMapping;
@@ -122,7 +122,7 @@ public class ResourceManager {
     /**
      * Sets the mappings specified in a game, such as the player colors.
      *
-     * @param _gameMapping The mapping between IDs and resources. 
+     * @param _gameMapping The mapping between IDs and resources.
      */
     public static void setGameMapping(final ResourceMapping _gameMapping) {
         gameMapping = _gameMapping;
@@ -157,10 +157,10 @@ public class ResourceManager {
      * be called when starting the application, as
      * it blocks until resources needed for the first
      * panels have been loaded.
-     * 
+     *
      * It also ensures that the {@link #startBackgroundPreloading(Dimension)
      * background preloading thread} is started.
-     *  
+     *
      * @param windowSize
      */
     public static void preload(final Dimension windowSize) {
@@ -170,7 +170,7 @@ public class ResourceManager {
         lastWindowSize = windowSize;
         updateIfDirty(); // starts: startBackgroundPreloading
     }
-    
+
     /**
      * Starts background preloading of resources.
      * @param windowSize The window size to use when scaling
@@ -197,7 +197,7 @@ public class ResourceManager {
         preloadThread.setPriority(2);
         preloadThread.start();
     }
-    
+
     /**
      * Updates the resource mappings after making changes.
      */
@@ -219,14 +219,14 @@ public class ResourceManager {
         _mergedContainer.addAll(tcMapping);
         _mergedContainer.addAll(campaignMapping);
         _mergedContainer.addAll(scenarioMapping);
-        ListIterator<ResourceMapping> it = modMappings.listIterator(modMappings.size()); 
+        ListIterator<ResourceMapping> it = modMappings.listIterator(modMappings.size());
         while (it.hasPrevious()) {
             _mergedContainer.addAll(it.previous());
         }
         _mergedContainer.addAll(gameMapping);
         mergedContainer = _mergedContainer;
     }
-    
+
     /**
      * Returns the resource of the given type.
      * @param <T> The type of the resource to get.
@@ -240,7 +240,7 @@ public class ResourceManager {
         if (type.isInstance(r)) {
             return type.cast(r);
         }
-        
+
         if (r == null) { // Log only unexpected failures
             if (!resourceId.startsWith("dynamic.")) {
                 logger.finest("getResource(" + resourceId
@@ -265,7 +265,7 @@ public class ResourceManager {
 
     /**
      * Returns the animation specified by the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @return The animation identified by <code>resource</code>
      *      or <code>null</code> if there is no animation
@@ -276,7 +276,7 @@ public class ResourceManager {
         final SZAResource r = getResource(resource, SZAResource.class);
         return (r != null) ? r.getSimpleZippedAnimation() : null;
     }
-    
+
     /**
      * Gets the <code>Video</code> represented by the given resource.
      * @return The <code>Video</code> in it's original size.
@@ -286,10 +286,10 @@ public class ResourceManager {
         final VideoResource r = getResource(resource, VideoResource.class);
         return (r != null) ? r.getVideo() : null;
     }
-    
+
     /**
      * Returns the animation specified by the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @param scale The size of the requested animation (with 1
      *      being normal size, 2 twice the size, 0.5 half the
@@ -306,7 +306,7 @@ public class ResourceManager {
 
     /**
      * Returns the image specified by the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @return The image identified by <code>resource</code>
      *      or <code>null</code> if there is no image
@@ -317,10 +317,10 @@ public class ResourceManager {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage() : null;
     }
-    
+
     /**
      * Returns the image specified by the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
@@ -334,10 +334,10 @@ public class ResourceManager {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(scale) : null;
     }
-    
+
     /**
      * Returns the image specified by the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
@@ -350,11 +350,11 @@ public class ResourceManager {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(size) : null;
     }
-    
+
     /**
      * Returns the a grayscale version of the image specified by
      * the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
@@ -367,10 +367,10 @@ public class ResourceManager {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(size) : null;
     }
-    
+
     /**
      * Returns the grayscale version of the image specified by the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
@@ -388,7 +388,7 @@ public class ResourceManager {
     /**
      * Creates an <code>ImageIcon</code> for the image of
      * the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @return An <code>ImageIcon</code> created with the image
      *      identified by <code>resource</code> or
@@ -404,7 +404,7 @@ public class ResourceManager {
 
     /**
      * Returns the <code>Color</code> with the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @return An <code>Color</code> created with the image
      *      identified by <code>resource</code> or
@@ -420,7 +420,7 @@ public class ResourceManager {
 
     /**
      * Returns the <code>Image</code> with the given name.
-     * 
+     *
      * @param resource The name of the resource to return.
      * @return An <code>Image</code> created with the image
      *      identified by <code>resource</code> or

@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
@@ -61,8 +62,8 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class ImageLibrary {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());    
-    
+    private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
+
     public static final String UNIT_SELECT = "unitSelect.image",
                                DELETE = "delete.image",
                                PLOWED = "model.improvement.plow.image",
@@ -82,7 +83,7 @@ public final class ImageLibrary {
 
     /**
      * The constructor to use.
-     * 
+     *
      */
     public ImageLibrary() {
         this(1);
@@ -112,6 +113,14 @@ public final class ImageLibrary {
         return new ImageLibrary(scalingFactor);
     }
 
+    public Image getImage(FreeColGameObjectType type) {
+        return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
+    }
+
+    public Image getImage(FreeColGameObjectType type, double scale) {
+        return ResourceManager.getImage(type.getId() + ".image", scale);
+    }
+
     /**
      * Returns the portrait of this Founding Father.
      *
@@ -124,7 +133,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the monarch-image for the given tile.
-     * 
+     *
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
@@ -134,7 +143,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the monarch-image icon for the given Nation.
-     * 
+     *
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
@@ -144,7 +153,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the coat-of-arms image for the given Nation.
-     * 
+     *
      * @param nation The nation.
      * @return the coat-of-arms of this nation
      */
@@ -154,7 +163,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the coat-of-arms image for the given Nation.
-     * 
+     *
      * @param nation The nation.
      * @return the coat-of-arms of this nation
      */
@@ -163,12 +172,12 @@ public final class ImageLibrary {
     }
 
     public Image getCoatOfArmsImage(Nation nation, double scale) {
-        return ResourceManager.getImage(nation.getId() + ".coat-of-arms.image", scale);
+        return ResourceManager.getImage(nation.getId() + ".image", scale);
     }
 
     /**
      * Returns the bonus-image for the given tile.
-     * 
+     *
      * @param tile
      * @return the bonus-image for the given tile.
      */
@@ -190,7 +199,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the bonus-ImageIcon at the given index.
-     * 
+     *
      * @param type The type of the bonus-ImageIcon to return.
      */
     public ImageIcon getBonusImageIcon(ResourceType type) {
@@ -204,7 +213,7 @@ public final class ImageLibrary {
 
     /**
      * Converts an image to grayscale
-     * 
+     *
      * @param image Source image to convert
      * @return The image in grayscale
      */
@@ -222,7 +231,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
-     * 
+     *
      * @param type The type of the terrain-image to return.
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
@@ -261,7 +270,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the overlay-image for the given type.
-     * 
+     *
      * @param type The type of the terrain-image to return.
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn.
@@ -284,7 +293,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the terrain-image for the given type.
-     * 
+     *
      * @param type The type of the terrain-image to return.
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn.
@@ -307,7 +316,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the border terrain-image for the given type.
-     * 
+     *
      * @param type The type of the terrain-image to return.
      * @param direction a <code>Direction</code> value
      * @param x The x-coordinate of the location of the tile that is being
@@ -327,7 +336,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the river mouth terrain-image for the direction and magnitude.
-     * 
+     *
      * @param direction a <code>Direction</code> value
      * @param magnitude an <code>int</code> value
      * @param x The x-coordinate of the location of the tile that is being
@@ -343,7 +352,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the river image at the given index.
-     * 
+     *
      * @param index The index of the image to return.
      * @return The image at the given index.
      */
@@ -357,7 +366,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the beach edge image at the given index.
-     * 
+     *
      * @param index The index of the image to return.
      * @return The image at the given index.
      */
@@ -367,7 +376,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the beach corner image at the given index.
-     * 
+     *
      * @param index The index of the image to return.
      * @return The image at the given index.
      */
@@ -377,7 +386,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the forest image for a terrain type.
-     * 
+     *
      * @param type The type of the terrain-image to return.
      * @return The image at the given index.
      */
@@ -391,7 +400,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the image with the given id.
-     * 
+     *
      * @param id The id of the image to return.
      * @return The image.
      */
@@ -405,7 +414,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the image with the given id.
-     * 
+     *
      * @param id The id of the image to return.
      * @return The image.
      */
@@ -415,7 +424,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the goods-image at the given index.
-     * 
+     *
      * @param goodsType The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
@@ -429,7 +438,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the goods-image for a goods type.
-     * 
+     *
      * @param goodsType The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
@@ -439,7 +448,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the scaled goods-ImageIcon for a goods type.
-     * 
+     *
      * @param type The type of the goods-ImageIcon to return.
      * @param scale The scale of the goods-ImageIcon to return.
      * @return The goods-ImageIcon at the given index.
@@ -450,7 +459,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the color of the given player.
-     * 
+     *
      * @param player a <code>Player</code> value
      * @return The color of the given player.
      */
@@ -460,7 +469,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the color chip with the given color.
-     * 
+     *
      * @param ownable an <code>Ownable</code> value
      * @param scale a <code>double</code> value
      * @return The color chip with the given color.
@@ -471,7 +480,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the mission chip with the given color.
-     * 
+     *
      * @param ownable an <code>Ownable</code> value
      * @param expertMission Indicates whether or not the missionary is an
      *            expert.
@@ -490,7 +499,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the alarm chip with the given color.
-     * 
+     *
      * @param alarm The alarm level.
      * @param visited a <code>boolean</code> value
      * @param scale a <code>double</code> value
@@ -507,7 +516,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the width of the terrain-image for a terrain type.
-     * 
+     *
      * @param type The type of the terrain-image.
      * @return The width of the terrain-image at the given index.
      */
@@ -517,7 +526,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the height of the terrain-image for a terrain type.
-     * 
+     *
      * @param type The type of the terrain-image.
      * @return The height of the terrain-image at the given index.
      */
@@ -528,7 +537,7 @@ public final class ImageLibrary {
     /**
      * Returns the height of the terrain-image including overlays and
      * forests for the given terrain type.
-     * 
+     *
      * @param type The type of the terrain-image.
      * @return The height of the terrain-image at the given index.
      */
@@ -548,7 +557,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the graphics that will represent the given settlement.
-     * 
+     *
      * @param settlementType The type of settlement whose graphics type is needed.
      * @return The graphics that will represent the given settlement.
      */
@@ -562,7 +571,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the graphics that will represent the given settlement.
-     * 
+     *
      * @param settlement The settlement whose graphics type is needed.
      * @return The graphics that will represent the given settlement.
      */
@@ -572,7 +581,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the graphics that will represent the given settlement.
-     * 
+     *
      * @param settlement The settlement whose graphics type is needed.
      * @param scale a <code>double</code> value
      * @return The graphics that will represent the given settlement.
@@ -632,7 +641,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the ImageIcon that will represent the given unit.
-     * 
+     *
      * @param unit The unit whose graphics type is needed.
      * @return an <code>ImageIcon</code> value
      */
@@ -663,7 +672,7 @@ public final class ImageLibrary {
 		}
 		return (im == null) ? null : new ImageIcon(im);
     }
-    
+
     /**
      * Returns the ImageIcon that will represent a unit of the given
      * type and role.
@@ -785,7 +794,7 @@ public final class ImageLibrary {
 
     /**
      * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
+     *
      * @param u The <code>Unit</code>
      * @return The <code>Image</code>.
      */
@@ -796,10 +805,10 @@ public final class ImageLibrary {
             return ResourceManager.getImage("path." + getPathType(u) + ".image");
         }
     }
-    
+
     /**
      * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
+     *
      * @param u The <code>Unit</code>
      * @return The <code>Image</code>.
      *
@@ -815,10 +824,10 @@ public final class ImageLibrary {
         }
     }
     */
-    
+
     /**
      * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
+     *
      * @param u The <code>Unit</code>
      * @return The <code>Image</code>.
      */

@@ -54,6 +54,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.action.ColopediaAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -201,7 +202,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     public void initialize(PanelType panelType, FreeColGameObjectType type) {
         detailPanel.removeAll();
-        tree.expandRow(panelType.ordinal());
+        DefaultMutableTreeNode node = nodeMap.get(panelType.toString());
+        tree.expandPath(new TreePath(node.getPath()));
         selectDetail(panelType, type);
         detailPanel.validate();
     }
@@ -304,46 +306,47 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN));
         buildTerrainSubtree(terrain);
         root.add(terrain);
+        nodeMap.put(PanelType.TERRAIN.toString(), terrain);
 
-        DefaultMutableTreeNode resource;
-        resource = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.RESOURCES));
-        buildResourceSubtree(resource);
-        root.add(resource);
+        root.add(buildSubTree(PanelType.RESOURCES, getSpecification().getResourceTypeList(), 0.75));
 
-        DefaultMutableTreeNode units =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS));
-        buildUnitSubtree(units);
-        root.add(units);
+        root.add(buildSubTree(PanelType.GOODS, getSpecification().getGoodsTypeList(), 0.75));
 
-        DefaultMutableTreeNode goods =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS));
-        buildGoodsSubtree(goods);
-        root.add(goods);
+        List<UnitType> units = new ArrayList<UnitType>();
+        List<UnitType> skills = new ArrayList<UnitType>();
+        for (UnitType u : getSpecification().getUnitTypeList()) {
+            if (u.getSkill() <= 0 || u.hasAbility("model.ability.expertSoldier")) {
+                units.add(u);
+            } else {
+                skills.add(u);
+            }
+        }
 
-        DefaultMutableTreeNode skills =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS));
-        buildSkillsSubtree(skills);
-        root.add(skills);
+        root.add(buildSubTree(PanelType.UNITS, units, 0.5));
+        root.add(buildSubTree(PanelType.SKILLS, skills, 0.5));
 
         DefaultMutableTreeNode buildings =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS));
         buildBuildingSubtree(buildings);
         root.add(buildings);
+        nodeMap.put(PanelType.BUILDINGS.toString(), buildings);
 
         DefaultMutableTreeNode fathers =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS));
         buildFathersSubtree(fathers);
         root.add(fathers);
+        nodeMap.put(PanelType.FATHERS.toString(), fathers);
 
-        DefaultMutableTreeNode nations =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATIONS));
-        buildNationsSubtree(nations);
-        root.add(nations);
+        List<Nation> nations = new ArrayList<Nation>();
+        nations.addAll(getSpecification().getEuropeanNations());
+        nations.addAll(getSpecification().getIndianNations());
+        root.add(buildSubTree(PanelType.NATIONS, nations, 0.5));
 
         DefaultMutableTreeNode nationTypes =
             new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATION_TYPES));
         buildNationTypesSubtree(nationTypes);
         root.add(nationTypes);
+        nodeMap.put(PanelType.NATION_TYPES.toString(), nationTypes);
 
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel) {
@@ -362,6 +365,19 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         return tree;
     }
 
+
+    private <T extends FreeColGameObjectType> DefaultMutableTreeNode
+                       buildSubTree(PanelType panelType, List<T> types, double scale) {
+        DefaultMutableTreeNode parent = new DefaultMutableTreeNode(new ColopediaTreeItem(panelType));
+        for (FreeColGameObjectType type : types) {
+            Image image = getLibrary().getImage(type, scale);
+            parent.add(buildItem(type, new ImageIcon(image)));
+        }
+        nodeMap.put(panelType.toString(), parent);
+        return parent;
+    }
+
+
     /**
      * Builds the buttons for all the tiles.
      * @param parent
@@ -370,55 +386,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         for (TileType t : getSpecification().getTileTypeList()) {
             ImageIcon icon = new ImageIcon(getLibrary().getCompoundTerrainImage(t, 0.25));
             parent.add(buildItem(t, icon));
-        }
-    }
-
-    /**
-     * Builds the buttons for all the resources.
-     * @param parent
-     */
-    private void buildResourceSubtree(DefaultMutableTreeNode parent) {
-        for (ResourceType r : getSpecification().getResourceTypeList()) {
-            ImageIcon icon = getLibrary().getScaledBonusImageIcon(r, 0.75f);
-            parent.add(buildItem(r, icon));
-        }
-    }
-
-    /**
-     * Builds the buttons for all the units.
-     * @param parent
-     */
-    private void buildUnitSubtree(DefaultMutableTreeNode parent) {
-        for (UnitType u : getSpecification().getUnitTypeList()) {
-            if (u.getSkill() <= 0 ||
-                u.hasAbility("model.ability.expertSoldier")) {
-                ImageIcon icon = getLibrary().getUnitImageIcon(u, 0.5);
-                parent.add(buildItem(u, icon));
-            }
-        }
-    }
-
-    /**
-     * Builds the buttons for all the goods.
-     * @param parent
-     */
-    private void buildGoodsSubtree(DefaultMutableTreeNode parent) {
-        for (GoodsType g : getSpecification().getGoodsTypeList()) {
-            ImageIcon icon = getLibrary().getScaledGoodsImageIcon(g, 0.75f);
-            parent.add(buildItem(g, icon));
-        }
-    }
-
-    /**
-     * Builds the buttons for all the skills.
-     * @param parent
-     */
-    private void buildSkillsSubtree(DefaultMutableTreeNode parent) {
-        for (UnitType u : getSpecification().getUnitTypeList()) {
-            if (u.getSkill() > 0) {
-                ImageIcon icon = getLibrary().getUnitImageIcon(u, 0.5);
-                parent.add(buildItem(u, icon));
-            }
         }
     }
 
@@ -490,22 +457,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             nodeMap.put(fatherType.toString(), node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
                 ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
-                parent.add(buildItem(father, icon));
+                node.add(buildItem(father, icon));
             }
-        }
-    }
-
-    /**
-     * Builds the buttons for all the nations.
-     * @param parent
-     */
-    private void buildNationsSubtree(DefaultMutableTreeNode parent) {
-        List<Nation> nations = new ArrayList<Nation>();
-        nations.addAll(getSpecification().getEuropeanNations());
-        nations.addAll(getSpecification().getIndianNations());
-        for (Nation type : nations) {
-            ImageIcon icon = new ImageIcon(getLibrary().getCoatOfArmsImage(type, 0.5));
-            parent.add(buildItem(type, icon));
         }
     }
 
@@ -533,7 +486,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     }
 
     private JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
-        JButton button = getLinkButton(text == null ? Messages.message(type.getNameKey()) : text, icon, type.getId());
+        JButton button = getLinkButton(text == null ? Messages.getName(type) : text, icon, type.getId());
         button.addActionListener(this);
         return button;
     }

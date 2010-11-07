@@ -1052,11 +1052,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                                 Integer.toString(getColony().getProductionBonus())));
             royalistLabel.setText(royalistNumber);
             royalistMemberLabel.setText(Integer.toString(getColony().getTory()) + "%");
-            rebelShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getId()
-                                                                       + ".coat-of-arms.image", 0.5)));
-            royalistShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation()
-                                                                          .getRefNation().getId()
-                                                                          + ".coat-of-arms.image", 0.5)));
+            rebelShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(colony.getOwner().getNation(), 0.5)));
+            royalistShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(colony.getOwner().getNation()
+                                                                                 .getRefNation(), 0.5)));
             revalidate();
             repaint();
         }
