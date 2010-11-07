@@ -182,17 +182,9 @@ public final class EuropePanel extends FreeColPanel {
                 .message("docks")));
         inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("inPort")));
-        logScroll.setBorder(BorderFactory.createEmptyBorder());
 
-        // ugly hack to get white background
-        JPanel whitePanel = new JPanel(new MigLayout("fill", "", "")) {
-                public String getUIClassID() {
-                    return "MarketPanelUI";
-                }
-            };
-        whitePanel.setOpaque(false);
-        whitePanel.setBorder(BorderFactory.createEtchedBorder(Color.WHITE, Color.BLACK));
-        whitePanel.add(logScroll, "grow");
+        log.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                       Messages.message("sales")));
 
         marketScroll.getViewport().setOpaque(false);
         marketPanel.setOpaque(false);
@@ -217,7 +209,7 @@ public final class EuropePanel extends FreeColPanel {
         // add(header, "span, center");
         add(toAmericaScroll);
         add(docksScroll, "spany 4");
-        add(whitePanel, "spany 4");
+        add(logScroll, "spany 4");
         add(toEuropeScroll);
         add(inPortScroll);
         add(cargoScroll);
@@ -476,10 +468,6 @@ public final class EuropePanel extends FreeColPanel {
             super(canvas, true);
         }
 
-        @Override
-        public String getUIClassID() {
-            return "EuropeCargoPanelUI";
-        }
     }
 
     /**
@@ -545,9 +533,6 @@ public final class EuropePanel extends FreeColPanel {
             return c;
         }
 
-        public String getUIClassID() {
-            return "ToAmericaPanelUI";
-        }
     }
 
     /**
@@ -595,9 +580,6 @@ public final class EuropePanel extends FreeColPanel {
             return c;
         }
 
-        public String getUIClassID() {
-            return "ToEuropePanelUI";
-        }
     }
 
     /**
@@ -653,9 +635,6 @@ public final class EuropePanel extends FreeColPanel {
             update();
         }
 
-        public String getUIClassID() {
-            return "EuropeInPortPanelUI";
-        }
     }
 
     /**
@@ -709,9 +688,6 @@ public final class EuropePanel extends FreeColPanel {
             update();
         }
 
-        public String getUIClassID() {
-            return "DocksPanelUI";
-        }
     }
 
 
@@ -780,9 +756,6 @@ public final class EuropePanel extends FreeColPanel {
             // Don't remove the marketLabel.
         }
 
-        public String getUIClassID() {
-            return "MarketPanelUI";
-        }
     }
 
     /**
@@ -868,11 +841,6 @@ public final class EuropePanel extends FreeColPanel {
             SwingUtilities.replaceUIInputMap(this, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
             enterPressesWhenFocused(this);
         }
-        /*
-        public String getUIClassID() {
-            return "EuropeButtonUI";
-        }
-        */
     }
 
 }
