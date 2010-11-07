@@ -454,7 +454,8 @@ public class Messages {
                 index = line.indexOf('=');
                 if (index > 0) {
                     String key = line.substring(0, index).trim();
-                    String value = line.substring(index + 1).trim();
+                    String value = line.substring(index + 1).trim()
+                        .replace("\\n", "\n");
                     messageBundle.put(key, value);
                 }
             }
