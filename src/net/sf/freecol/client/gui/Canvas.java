@@ -2231,11 +2231,7 @@ public final class Canvas extends JDesktopPane {
             errorMessage("europe.noGame");
         } else {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
-            JInternalFrame f = addAsSimpleFrame(europePanel);
-            f.setBorder(null);
-            f.setSize(getWidth(), getHeight());
-            f.setLocation(0, 0);
-            f.moveToBack();
+            showSubPanel(europePanel);
         }
     }
 

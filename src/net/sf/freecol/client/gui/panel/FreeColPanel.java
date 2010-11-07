@@ -124,13 +124,13 @@ public class FreeColPanel extends JPanel implements ActionListener {
     public static final Border TOPCELLBORDER =
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    public static final Border CELLBORDER = 
+    public static final Border CELLBORDER =
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    public static final Border LEFTCELLBORDER = 
+    public static final Border LEFTCELLBORDER =
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    public static final Border TOPLEFTCELLBORDER = 
+    public static final Border TOPLEFTCELLBORDER =
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
@@ -167,7 +167,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param parent The <code>Canvas</code> all panels belong to.
      * @param layout The <code>LayoutManager</code> to be used.
      */
@@ -201,7 +201,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
 
     /**
      * Get the <code>Canvas</code> value.
-     * 
+     *
      * @return a <code>Canvas</code> value
      */
     public final Canvas getCanvas() {
@@ -323,7 +323,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
      * dialogs.
-     * 
+     *
      * @param text The text to display in the text area.
      * @return a text area with standard settings suitable for use in FreeCol
      *         dialogs.
@@ -335,7 +335,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
      * dialogs.
-     * 
+     *
      * @param text The text to display in the text area.
      * @param columns an <code>int</code> value
      * @return a text area with standard settings suitable for use in FreeCol
@@ -377,7 +377,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
 
     /**
      * Returns the default header for panels.
-     * 
+     *
      * @param text a <code>String</code> value
      * @return a <code>JLabel</code> value
      */
@@ -418,17 +418,17 @@ public class FreeColPanel extends JPanel implements ActionListener {
         if (cancelButton == null) {
             throw new NullPointerException();
         }
-        
+
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true), "release");
-                
+
         Action cancelAction = cancelButton.getAction();
         getActionMap().put("release", cancelAction);
     }
 
     /**
      * Registers enter key for a JButton.
-     * 
+     *
      * @param button
      */
     public static void enterPressesWhenFocused(JButton button) {
@@ -473,7 +473,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
