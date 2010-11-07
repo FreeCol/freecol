@@ -158,7 +158,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<FreeColGameObject> updates = new ArrayList<FreeColGameObject>();
         GoodsContainer container = getGoodsContainer();
         container.saveState();
-        int queueLength = buildQueue.size();
 
         // Update the colony tiles (hopefully producing food).
         for (ColonyTile colonyTile : colonyTiles) {
@@ -326,6 +325,14 @@ public class ServerColony extends Colony implements ServerModelObject {
                                          this)
                                   .addName("%colony%", getName())
                                   .add("%building%", buildable.getNameKey()));
+                    if (buildQueue.size() == 1) {
+                        cs.addMessage(See.only(owner),
+                            new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                             "model.colony.notBuildingAnything",
+                                             this)
+                                      .addName("%colony%", getName())
+                                      .add("%building%", buildable.getNameKey()));
+                    }
                 }
                 buildQueue.remove(0);
             } else {
@@ -336,6 +343,14 @@ public class ServerColony extends Colony implements ServerModelObject {
             // Having removed something from the build queue, nudge it again
             // to see if there is a problem with the next item if any.
             buildable = csGetBuildable(cs);
+        } else {
+            if (buildQueue.size() == 0) {
+                cs.addMessage(See.only(owner),
+                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                     "model.colony.notBuildingAnything",
+                                     this)
+                              .addName("%colony%", getName()));
+            }
         }
 
         // The other buildings that do not produce building materials can
