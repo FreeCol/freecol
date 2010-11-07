@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -59,6 +60,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
@@ -1506,6 +1508,25 @@ public final class InGameController implements NetworkConstants {
             europe.firePropertyChange(Europe.UNIT_CHANGE, count,
                                       europe.getUnitCount());
         }
+    }
+
+    /**
+     * Recruit a unit from a specified index in Europe.
+     *
+     * @param index The index in Europe to recruit from ([0..2]).
+     */
+    public void recruitUnitInEurope(int index) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        } else if (player.getGold() < player.getRecruitPrice()) {
+            canvas.errorMessage("notEnoughGold");
+            return;
+        }
+
+        emigrate(player, index + 1);
     }
 
     /**
@@ -3867,26 +3888,6 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Recruit a unit from a specified index in Europe.
-     *
-     * @param index The index in Europe to recruit from ([0..2]).
-     */
-    public void recruitUnitInEurope(int index) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        } else if (player.getGold() < player.getRecruitPrice()) {
-            canvas.errorMessage("notEnoughGold");
-            return;
-        }
-
-        emigrate(player, index + 1);
-    }
-
-
-    /**
      * Sets the export settings of the custom house.
      *
      * @param colony The colony with the custom house.
@@ -3913,6 +3914,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getInGameInputHandler().handle(conn, reply);
         return true;
     }
+
 
     /**
      * Change the amount of equipment a unit has.
@@ -4228,6 +4230,51 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Clears the orders of the given unit.
+     * Make the unit active and set a null destination and trade route.
+     *
+     * @param unit The <code>Unit</code> to clear the orders of.
+     * @param True if the orders were cleared.
+     */
+    public boolean clearOrders(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
+        }
+
+        if (unit == null || !unit.checkSetState(UnitState.ACTIVE)) return false;
+
+        // Ask the user for confirmation, as this is a classic mistake.
+        // Cancelling a pioneer terrain improvement is a waste of many turns.
+        if (unit.getState() == UnitState.IMPROVING
+            && !canvas.showConfirmDialog(unit.getTile(),
+                                         "model.unit.confirmCancelWork",
+                                         "yes", "no",
+                                         "%turns%", Integer.toString(unit.getWorkTurnsLeft()))) {
+            return false;
+        }
+
+        clearGotoOrders(unit);
+        assignTradeRoute(unit, TradeRoute.NO_TRADE_ROUTE);
+        return askChangeState(unit, UnitState.ACTIVE);
+    }
+
+    /**
+     * Clears the goto orders of the given unit by setting its destination
+     * to null.
+     *
+     * @param unit The <code>Unit</code>.
+     */
+    public void clearGotoOrders(Unit unit) {
+        if (unit == null) return;
+        if (unit.getDestination() != null) {
+            setDestination(unit, null);
+        }
+    }
+
+    /**
      * Server query-response for changing unit state.
      *
      * @param unit The <code>Unit</code> to change the state of.
@@ -4272,9 +4319,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (askAssignTeacher(student, teacher)) {
-            ; // should be done, do not need nextActiveUnit
-        }
+        askAssignTeacher(student, teacher);
     }
 
     /**
@@ -4332,61 +4377,6 @@ public final class InGameController implements NetworkConstants {
         return true;
     }
 
-
-    /**
-     * Clears the orders of the given <code>Unit</code> The orders are cleared
-     * by making the unit {@link UnitState#ACTIVE} and setting a null destination
-     *
-     * @param unit The <code>Unit</code>.
-     */
-    public void clearOrders(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        if (unit == null) {
-            return;
-        }
-
-        // Ask the user for confirmation, as this is a classic mistake.
-        // Cancelling a pioneer terrain improvement is a waste of many turns.
-        if (unit.getState() == UnitState.IMPROVING
-            && !canvas.showConfirmDialog(unit.getTile(),
-                                         "model.unit.confirmCancelWork",
-                                         "yes", "no",
-                                         "%turns%", Integer.toString(unit.getWorkTurnsLeft()))) {
-            return;
-        }
-
-        /*
-         * report to server, in order not to restore destination if it's
-         * received in a update message
-         */
-        clearGotoOrders(unit);
-        assignTradeRoute(unit, TradeRoute.NO_TRADE_ROUTE);
-        changeState(unit, UnitState.ACTIVE);
-    }
-
-    /**
-     * Clears the orders of the given <code>Unit</code>. The orders are
-     * cleared by making the unit {@link UnitState#ACTIVE}.
-     *
-     * @param unit The <code>Unit</code>.
-     */
-    public void clearGotoOrders(Unit unit) {
-        if (unit == null) {
-            return;
-        }
-
-        /*
-         * report to server, in order not to restore destination if it's
-         * received in a update message
-         */
-        if (unit.getDestination() != null)
-            setDestination(unit, null);
-    }
 
     /**
      * Trains a unit of a specified type in Europe.
@@ -4485,6 +4475,183 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Pays the tax arrears on this type of goods.
+     * 
+     * @param goods The goods for which to pay arrears.
+     * @return True if the arrears were paid.
+     */
+    public boolean payArrears(Goods goods) {
+        return payArrears(goods.getType());
+    }
+
+    /**
+     * Pays the tax arrears on this type of goods.
+     * 
+     * @param type The type of goods for which to pay arrears.
+     * @return True if the arrears were paid.
+     */
+    public boolean payArrears(GoodsType type) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
+        }
+
+        int arrears = player.getArrears(type);
+        if (arrears <= 0) return false;
+        if (player.getGold() < arrears) {
+            canvas.showInformationMessage("model.europe.cantPayArrears",
+                                          "%amount%", String.valueOf(arrears));
+            return false;
+        }
+        if (canvas.showConfirmDialog(null,
+                                     "model.europe.payArrears",
+                                     "ok", "cancel",
+                                     "%replace%", String.valueOf(arrears))
+            && askPayArrears(type) && player.canTrade(type)) {
+            canvas.updateGoldLabel();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Server query-response for tax paying arrears.
+     *
+     * @param type The <code>GoodsType</code> to pay the arrears for.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askPayArrears(GoodsType type) {
+        Client client = freeColClient.getClient();
+        PayArrearsMessage message = new PayArrearsMessage(type);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+
+    /**
+     * Gathers information about the REF.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<AbstractUnit> getREFUnits() {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return Collections.emptyList();
+        }
+
+        return askGetREFUnits();
+    }
+
+    /**
+     * Server query-response for asking about a players REF.
+     *
+     * @return A list of REF units for the player.
+     */
+    private List<AbstractUnit> askGetREFUnits() {
+        Client client = freeColClient.getClient();
+        Element reply = askExpecting(client, Message.createNewRootElement("getREFUnits"), null);
+        if (reply == null) return Collections.emptyList();
+
+        List<AbstractUnit> result = new ArrayList<AbstractUnit>();
+        NodeList childElements = reply.getChildNodes();
+        for (int index = 0; index < childElements.getLength(); index++) {
+            AbstractUnit unit = new AbstractUnit();
+            unit.readFromXMLElement((Element) childElements.item(index));
+            result.add(unit);
+        }
+        return result;
+    }
+
+
+    /**
+     * Retrieves high scores from server.
+     *
+     * @return The list of high scores.
+     */
+    public List<HighScore> getHighScores() {
+        return askGetHighScores();
+    }
+
+    /**
+     * Server query-response for asking for the high scores list.
+     *
+     * @return The list of high scores.
+     */
+    private List<HighScore> askGetHighScores() {
+        Client client = freeColClient.getClient();
+        Element reply = askExpecting(client,
+                Message.createNewRootElement("getHighScores"), null);
+        if (reply == null) return Collections.emptyList();
+
+        List<HighScore> result = new ArrayList<HighScore>();
+        NodeList childElements = reply.getChildNodes();
+        for (int i = 0; i < childElements.getLength(); i++) {
+            try {
+                HighScore score = new HighScore((Element)childElements.item(i));
+                result.add(score);
+            } catch (XMLStreamException e) {
+                logger.warning("Unable to read score element: "
+                               + e.getMessage());
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Gathers information about opponents.
+     *
+     * @return An element describing the other European nations.
+     */
+    public Element getForeignAffairsReport() {
+        return askForeignAffairs();
+    }
+
+    /**
+     * Server query-response for asking for the foreign affairs situation.
+     *
+     * @return An element describing the other European nations.
+     */
+    private Element askForeignAffairs() {
+        Client client = freeColClient.getClient();
+        return askExpecting(client,
+                Message.createNewRootElement("foreignAffairs"), null);
+    }
+
+
+    /**
+     * Retrieves server statistics
+     *
+     * @return The server statistics.
+     */
+    public StatisticsMessage getServerStatistics() {
+        return askStatistics();
+    }
+
+    /**
+     * Server query-response for asking for the server statistics.
+     *
+     * @return The server statistics.
+     */
+    private StatisticsMessage askStatistics() {
+        Client client = freeColClient.getClient();
+        Element reply = askExpecting(client, Message
+            .createNewRootElement(StatisticsMessage.getXMLElementTagName()),
+                                     null);
+        if (reply == null) return null;
+
+        return new StatisticsMessage(reply);
+    }
+
+
+    /**
      * Updates a trade route.
      * 
      * @param route The trade route to update.
@@ -4561,122 +4728,7 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    /**
-     * Pays the tax arrears on this type of goods.
-     * 
-     * @param goods The goods for which to pay arrears.
-     * @return True if the arrears were paid.
-     */
-    public boolean payArrears(Goods goods) {
-        return payArrears(goods.getType());
-    }
 
-    /**
-     * Pays the tax arrears on this type of goods.
-     * 
-     * @param type The type of goods for which to pay arrears.
-     * @return True if the arrears were paid.
-     */
-    public boolean payArrears(GoodsType type) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
-
-        int arrears = player.getArrears(type);
-        if (arrears <= 0) return false;
-        if (player.getGold() < arrears) {
-            canvas.showInformationMessage("model.europe.cantPayArrears",
-                                          "%amount%", String.valueOf(arrears));
-            return false;
-        }
-        if (canvas.showConfirmDialog(null,
-                                     "model.europe.payArrears",
-                                     "ok", "cancel",
-                                     "%replace%", String.valueOf(arrears))
-            && askPayArrears(type) && player.canTrade(type)) {
-            canvas.updateGoldLabel();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Server query-response for tax paying arrears.
-     *
-     * @param type The <code>GoodsType</code> to pay the arrears for.
-     * @return True if the server interaction succeeded.
-     */
-    private boolean askPayArrears(GoodsType type) {
-        Client client = freeColClient.getClient();
-        PayArrearsMessage message = new PayArrearsMessage(type);
-        Element reply = askExpecting(client, message.toXMLElement(), null);
-        if (reply == null) return false;
-
-        Connection conn = client.getConnection();
-        freeColClient.getInGameInputHandler().handle(conn, reply);
-        return true;
-    }
-
-    /**
-     * Purchases a unit of a specified type in Europe.
-     * 
-     * @param unitType The type of unit to be purchased.
-     */
-    public void purchaseUnitFromEurope(UnitType unitType) {
-        trainUnitInEurope(unitType);
-    }
-
-    /**
-     * Gathers information about opponents.
-     */
-    public Element getForeignAffairsReport() {
-        return freeColClient.getClient().ask(Message.createNewRootElement("foreignAffairs"));
-    }
-
-    /**
-     * Retrieves high scores from server.
-     */
-    public Element getHighScores() {
-        return freeColClient.getClient().ask(Message.createNewRootElement("highScores"));
-    }
-
-    /**
-     * Gathers information about the REF.
-     *
-     * @return a <code>List</code> value
-     */
-    public List<AbstractUnit> getREFUnits() {
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return Collections.emptyList();
-        }
-
-        return askGetREFUnits();
-    }
-
-    /**
-     * Server query-response for asking about a players REF.
-     *
-     * @return A list of REF units for the player.
-     */
-    private List<AbstractUnit> askGetREFUnits() {
-        Client client = freeColClient.getClient();
-        Element reply = askExpecting(client, Message.createNewRootElement("getREFUnits"), null);
-        if (reply == null) return Collections.emptyList();
-
-        List<AbstractUnit> result = new ArrayList<AbstractUnit>();
-        NodeList childElements = reply.getChildNodes();
-        for (int index = 0; index < childElements.getLength(); index++) {
-            AbstractUnit unit = new AbstractUnit();
-            unit.readFromXMLElement((Element) childElements.item(index));
-            result.add(unit);
-        }
-        return result;
-    }
 
 
     /**
@@ -4984,16 +5036,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Retrieves server statistics
-     */
-    public StatisticsMessage getServerStatistics() {
-        Element request = Message.createNewRootElement(StatisticsMessage.getXMLElementTagName());
-        Element reply = freeColClient.getClient().ask(request);
-        StatisticsMessage m = new StatisticsMessage(reply);
-        return m;
-    }
-
-    /**
      * Returns a string representation of the given turn suitable for
      * savegame files.
      * @param turn a <code>Turn</code> value
@@ -5012,6 +5054,5 @@ public final class InGameController implements NetworkConstants {
             return Integer.toString(year);
         }
     }
-
 
 }

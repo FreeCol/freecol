@@ -572,6 +572,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new SpySettlementMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
+        register(StatisticsMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new StatisticsMessage(getGame(),
+                                             freeColServer.getAIMain())
+                    .toXMLElement();
+            }});
         register(UpdateCurrentStopMessage.getXMLElementTagName(),
                  new NetworkRequestHandler() {
             @Override
@@ -584,11 +592,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                  new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
-            }});
-        register("highScores",
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return highScores(connection, element);
             }});
         register("getNewTradeRoute",
                  new NetworkRequestHandler() {
@@ -610,47 +613,40 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             public Element handle(Connection connection, Element element) {
                 return assignTradeRoute(connection, element);
             }});
-        register(StatisticsMessage.getXMLElementTagName(),
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return getServerStatistics(connection, element);
-            }
-        });
 
         // Trivial comms that do not merit their own Message-type
         register("endTurn", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                FreeColServer server = getFreeColServer();
-                ServerPlayer serverPlayer = server.getPlayer(connection);
-                server.getInGameController().endTurn(serverPlayer);
-                return null;
-            }
-        });
+                return freeColServer.getInGameController()
+                    .endTurn(freeColServer.getPlayer(connection));
+            }});
         register("getREFUnits",
                  new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                FreeColServer server = getFreeColServer();
-                ServerPlayer serverPlayer = server.getPlayer(connection);
-                return server.getInGameController().getREFUnits(serverPlayer);
-            }
-        });
+                return freeColServer.getInGameController()
+                    .getREFUnits(freeColServer.getPlayer(connection));
+            }});
         register("continuePlaying", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
-                FreeColServer server = getFreeColServer();
-                ServerPlayer serverPlayer = server.getPlayer(connection);
-                return server.getInGameController()
-                    .continuePlaying(serverPlayer);
-            }
-        });
+                return freeColServer.getInGameController()
+                    .continuePlaying(freeColServer.getPlayer(connection));
+            }});
+        register("getHighScores", new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .getHighScores(freeColServer.getPlayer(connection));
+            }});
         register("retire", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
-                FreeColServer server = getFreeColServer();
-                ServerPlayer serverPlayer = server.getPlayer(connection);
-                return server.getInGameController().retire(serverPlayer);
+                return freeColServer.getInGameController()
+                    .retire(freeColServer.getPlayer(connection));
             }
         });
     }
@@ -813,22 +809,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
 
     /**
-     * Handles a "highScores"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element highScores(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Element reply = Message.createNewRootElement("highScoresReport");
-        for (HighScore score : getFreeColServer().getHighScores()) {
-            reply.appendChild(score.toXMLElement(player, reply.getOwnerDocument()));
-        }
-        return reply;
-    }
-
-    /**
      * Handles a "logout"-message.
      * 
      * @param connection The <code>Connection</code> the message was received
@@ -837,10 +817,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *            that holds all the information.
      * @return The reply.
      */
-    @Override
     protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
+        logger.info("Logout by: " + connection
+                    + ((player != null) ? " (" + player.getName() + ") " : ""));
         if (player == null) {
             return null;
         }
@@ -871,22 +851,4 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
-    /*
-     * Method not used, keep in comments. private void sendErrorToAll(String
-     * message, Player player) { Game game = getFreeColServer().getGame();
-     * Iterator enemyPlayerIterator = getGame().getPlayerIterator(); while
-     * (enemyPlayerIterator.hasNext()) { ServerPlayer enemyPlayer =
-     * (ServerPlayer) enemyPlayerIterator.next(); if ((player != null) &&
-     * (player.equals(enemyPlayer)) || enemyPlayer.getConnection() == null) {
-     * continue; } try { Element errorElement = createErrorReply(message);
-     * enemyPlayer.getConnection().send(errorElement); } catch (IOException e) {
-     * logger.warning("Could not send message to: " + enemyPlayer.getName() + "
-     * with connection " + enemyPlayer.getConnection()); } } }
-     */
-
-    private Element getServerStatistics(Connection connection, Element request) {
-        StatisticsMessage m = new StatisticsMessage(getGame(), getFreeColServer().getAIMain());
-        Element reply = m.toXMLElement();
-        return reply;
-    }
 }

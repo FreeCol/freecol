@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -382,8 +383,9 @@ public final class InGameController extends Controller {
      * Ends the turn of the given player.
      * 
      * @param player The player to end the turn of.
+     * @return Null.
      */
-    public void endTurn(ServerPlayer player) {
+    public Element endTurn(ServerPlayer player) {
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer oldPlayer = (ServerPlayer) getGame().getCurrentPlayer();
         
@@ -405,7 +407,7 @@ public final class InGameController extends Controller {
                               ChangePriority.CHANGE_NORMAL,
                               "winner", winner.getId());
                 sendToAll(cs);
-                return;
+                break;
             }
         
             // Keep ending turn for non-AI connected players in debug mode.
@@ -414,6 +416,7 @@ public final class InGameController extends Controller {
                 || player.isAI()
                 || (player.isConnected() && debugOnlyAITurns <= 0)) break;
         }
+        return null;
     }
 
     /**
@@ -5866,4 +5869,22 @@ public final class InGameController extends Controller {
         return reply;
     }
 
+
+    /**
+     * Gets the list of high scores.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element getHighScores(ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        cs.addTrivial(See.only(serverPlayer), "getHighScores",
+                      ChangePriority.CHANGE_NORMAL);
+        Element reply = cs.build(serverPlayer);
+        for (HighScore score : getFreeColServer().getHighScores()) {
+            reply.appendChild(score.toXMLElement(serverPlayer,
+                                                 reply.getOwnerDocument()));
+        }
+        return reply;
+    }
 }
