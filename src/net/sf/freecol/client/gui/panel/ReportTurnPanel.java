@@ -336,6 +336,15 @@ public final class ReportTurnPanel extends ReportPanel {
                         } else {
                             insertText(document, item[1]);
                         }
+                    } else if (var.equals("%repairLocation%")) {
+                        if (messageSource instanceof Europe) {
+                            insertLinkButton(document, player.getEurope(),
+                                             Messages.message(player.getEurope().getNameKey()));
+                        } else if (messageSource instanceof Colony) {
+                            insertLinkButton(document, (Colony) messageSource, item[1]);
+                        } else {
+                            insertText(document, item[1]);
+                        }
                     } else {
                         insertText(document, item[1]);
                     }
