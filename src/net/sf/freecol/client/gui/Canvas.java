@@ -108,6 +108,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -2023,7 +2024,9 @@ public final class Canvas extends JDesktopPane {
         text.append(Messages.message(StringTemplate.template("scoutSettlement.greetings")
                                      .addStringTemplate("%nation%", settlement.getOwner().getNationName())
                                      .addName("%settlement%", settlement.getName())
-                                     .addAmount("%number%", number)));
+                                     .addAmount("%number%", number)
+                                     .add("%settlementType%", ((IndianNationType) settlement.getOwner().getNationType())
+                                          .getSettlementTypeKey() + ".plural")));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
             text.append(Messages.message(StringTemplate.template("scoutSettlement.skill")

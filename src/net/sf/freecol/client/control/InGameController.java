@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
@@ -1761,11 +1762,14 @@ public final class InGameController implements NetworkConstants {
                         ? "welcomeOffer.text" : "welcomeSimple.text";
                     String nation = Messages.message(welcomer.getNationName());
                     String camps = reply.getAttribute("camps");
+                    String type = ((IndianNationType) welcomer.getNationType())
+                        .getSettlementTypeKey() + ".plural";
                     accept = canvas.showConfirmDialog(tile, messageId,
                                                       "welcome.yes",
                                                       "welcome.no",
                                                       "%nation%", nation,
-                                                      "%camps%", camps);
+                                                      "%camps%", camps,
+                                                      "%settlementType%", type);
                 }
             }
 
