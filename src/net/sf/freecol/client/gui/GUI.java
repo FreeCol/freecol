@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -1624,17 +1625,15 @@ public final class GUI {
                             } else if (settlement instanceof IndianSettlement) {
                                 IndianSettlement nativeSettlement = (IndianSettlement) settlement;
                                 if (nativeSettlement.isCapital()) {
-//                                    leftImage = createLabel(g, "\u2606", font, backgroundColor);
-                                             leftImage = createCapitalMarker(nameImage.getHeight(null), 5, backgroundColor);
+                                    leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
                                 }
 
                                 Unit missionary = nativeSettlement.getMissionary();
                                 if (missionary != null) {
                                     boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                                    String cross = expert ? "\u271E" : "\u271D";
                                     backgroundColor = lib.getColor(missionary.getOwner());
                                     backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                                    rightImage = createLabel(g, cross, font, backgroundColor);
+                                    rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
                                 }
                             }
 
@@ -1934,7 +1933,7 @@ public final class GUI {
      * Draws the pentagram indicating a native capital.
      *
      */
-    public Image createCapitalMarker(int extent, int padding, Color backgroundColor) {
+    public Image createCapitalLabel(int extent, int padding, Color backgroundColor) {
         String key = "dynamic.label.nativeCapital"
             + "." + Integer.toHexString(backgroundColor.getRGB());
         Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
@@ -1970,6 +1969,63 @@ public final class GUI {
 //        g.setColor(getForegroundColor(getForegroundColor(backgroundColor)));
         g.setColor(Color.WHITE);
         g.fill(path);
+        ResourceManager.addGameMapping(key, new ImageResource(bi));
+        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+    }
+
+
+    /**
+     * Draws a cross indicating a religious mission is present in the native village.
+     *
+     */
+    public Image createReligiousMissionLabel(int extent, int padding, Color backgroundColor, boolean expertMissionary) {
+        String key = "dynamic.label.religiousMission"
+            + (expertMissionary ? ".expert" : "")
+            + "." + Integer.toHexString(backgroundColor.getRGB());
+        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        if (image != null) {
+            return image;
+        }
+
+        // create path
+        double offset = extent * 0.5;
+        double size = extent - padding - padding;
+        double bar = size / 3.0;
+        double inset = 0.0;
+        double kludge = 0.0;
+        
+        GeneralPath circle = new GeneralPath();
+        GeneralPath cross = new GeneralPath();
+        if (expertMissionary) {
+            // this is meant to represent the eucharist (the -1, +1 thing is a nasty kludge)
+            circle.append(new Ellipse2D.Double(padding-1, padding-1, size+1, size+1), false);
+            inset = 4.0;
+            bar = (size - inset - inset) / 3.0;
+			// more nasty -1, +1 kludges
+			kludge = 1.0;
+        }
+        offset -= 1.0;
+        cross.moveTo(offset, padding + inset - kludge);
+        cross.lineTo(offset, extent - padding - inset);
+        cross.moveTo(offset - bar, padding + bar + inset);
+        cross.lineTo(offset + bar + 1, padding + bar + inset);
+        
+        // draw everything
+        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(backgroundColor);
+        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
+        g.setColor(getForegroundColor(backgroundColor));
+        if (expertMissionary) {
+            g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.draw(circle);
+            g.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        } else {
+            g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        }
+        g.draw(cross);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
