@@ -167,7 +167,7 @@ public final class InGameController implements NetworkConstants {
     private final FreeColClient freeColClient;
 
     private final short UNIT_LAST_MOVE_DELAY = 300;
-    
+
     /**
      * Sets that the turn will be ended when all going-to units have been moved.
      */
@@ -177,7 +177,7 @@ public final class InGameController implements NetworkConstants {
      * If true, then at least one unit has been active and the turn may automatically be ended.
      */
     private boolean canAutoEndTurn = false;
-    
+
     /**
      * Sets that all going-to orders should be executed.
      */
@@ -195,7 +195,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param freeColClient The main controller.
      */
     public InGameController(FreeColClient freeColClient) {
@@ -230,7 +230,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Saves the game to the given file.
-     * 
+     *
      * @param file The <code>File</code>.
      * @return True if the game was saved.
      */
@@ -274,12 +274,12 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getConnectController().loadGame(file);
     }
 
-    
+
     /**
      * Sets the "debug mode" to be active or not. Calls
      * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
      * <code>FreeColMenuBar</code>.
-     * 
+     *
      * @param debug Set to <code>true</code> to enable debug mode.
      */
     public void setInDebugMode(boolean debug) {
@@ -363,7 +363,7 @@ public final class InGameController implements NetworkConstants {
         logger.warning(complaint);
         if (FreeCol.isInDebugMode()) {
             freeColClient.getCanvas().errorMessage(null, complaint);
-        }            
+        }
         return null;
     }
 
@@ -822,7 +822,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Selects a destination for this unit. Europe and the player's
      * colonies are valid destinations.
-     * 
+     *
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
@@ -882,7 +882,7 @@ public final class InGameController implements NetworkConstants {
             if (unit.getDestination() == null) {
                 unit.setDestination(currStop.getLocation());
             }
-        	
+
             String where = Messages.message(currStop.getLocation()
                                             .getLocationName());
             String route = unit.getTradeRoute().getName();
@@ -910,7 +910,7 @@ public final class InGameController implements NetworkConstants {
             clearGotoOrders(unit);
             return;
         }
-        
+
         final Map map = freeColClient.getGame().getMap();
         PathNode path;
         if (destination instanceof Europe) {
@@ -1225,7 +1225,7 @@ public final class InGameController implements NetworkConstants {
             && !showColonyWarnings(tile, unit)) {
             return;
         }
-        
+
         // Get and check the name.
         String name = player.getSettlementName();
         if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
@@ -1295,32 +1295,31 @@ public final class InGameController implements NetworkConstants {
 
         for (Tile newTile: tile.getSurroundingTiles(1)) {
             if (newTile.isLand()) {
-                for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-                    entry.setValue(entry.getValue().intValue() +
-                                   newTile.potential(entry.getKey(), null));
-                }
-                Player tileOwner = newTile.getOwner();
-                if (tileOwner == unit.getOwner()) {
-                    if (newTile.getOwningSettlement() != null) {
-                        // we are using newTile
-                        ownedBySelf = true;
-                    } else {
-                        for (Tile ownTile: newTile.getSurroundingTiles(1)) {
-                            Colony colony = ownTile.getColony();
-                            if (colony != null && colony.getOwner() == unit.getOwner()) {
-                                // newTile can be used from an own colony
-                                ownedBySelf = true;
-                                break;
-                            }
+                landLocked = false;
+            }
+            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+                entry.setValue(entry.getValue().intValue() +
+                               newTile.potential(entry.getKey(), null));
+            }
+            Player tileOwner = newTile.getOwner();
+            if (tileOwner == unit.getOwner()) {
+                if (newTile.getOwningSettlement() != null) {
+                    // we are using newTile
+                    ownedBySelf = true;
+                } else {
+                    for (Tile ownTile: newTile.getSurroundingTiles(1)) {
+                        Colony colony = ownTile.getColony();
+                        if (colony != null && colony.getOwner() == unit.getOwner()) {
+                            // newTile can be used from an own colony
+                            ownedBySelf = true;
+                            break;
                         }
                     }
-                } else if (tileOwner != null && tileOwner.isEuropean()) {
-                    ownedByEuropeans = true;
-                } else if (tileOwner != null) {
-                    ownedByIndians = true;
                 }
-            } else {
-                landLocked = false;
+            } else if (tileOwner != null && tileOwner.isEuropean()) {
+                ownedByEuropeans = true;
+            } else if (tileOwner != null) {
+                ownedByIndians = true;
             }
         }
 
@@ -1334,7 +1333,7 @@ public final class InGameController implements NetworkConstants {
         ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
         if (landLocked) {
             messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                          "buildColony.landLocked", unit, 
+                                          "buildColony.landLocked", unit,
                                           getSpecification().getGoodsType("model.goods.fish")));
         }
         if (food < 8) {
@@ -2977,7 +2976,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
-        
+
         for (;;) {
             if (forSale.isEmpty()) {
                 // There is nothing to sell to the player
@@ -4384,7 +4383,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Trains a unit of a specified type in Europe.
-     * 
+     *
      * @param unitType The type of unit to be trained.
      */
     public void trainUnitInEurope(UnitType unitType) {
@@ -4431,7 +4430,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Buys the remaining hammers and tools for the {@link Building} currently
      * being built in the given <code>Colony</code>.
-     * 
+     *
      * @param colony The {@link Colony} where the building should be bought.
      */
     public void payForBuilding(Colony colony) {
@@ -4480,7 +4479,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Pays the tax arrears on this type of goods.
-     * 
+     *
      * @param goods The goods for which to pay arrears.
      * @return True if the arrears were paid.
      */
@@ -4490,7 +4489,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Pays the tax arrears on this type of goods.
-     * 
+     *
      * @param type The type of goods for which to pay arrears.
      * @return True if the arrears were paid.
      */
@@ -4657,7 +4656,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Updates a trade route.
-     * 
+     *
      * @param route The trade route to update.
      */
     public void updateTradeRoute(TradeRoute route) {
@@ -4676,7 +4675,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Sets the trade routes for this player
-     * 
+     *
      * @param routes The trade routes to set.
      */
     public void setTradeRoutes(List<TradeRoute> routes) {
@@ -4700,7 +4699,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Assigns a trade route to a unit.
-     * 
+     *
      * @param unit The unit to assign a trade route to.
      */
     public void assignTradeRoute(Unit unit) {
@@ -4759,10 +4758,10 @@ public final class InGameController implements NetworkConstants {
         if(unitTile == null){
             return;
         }
-        
+
         freeColClient.getGUI().setFocus(unitTile.getPosition());
     }
-    
+
     /**
      * Executes the units' goto orders.
      */
@@ -4781,7 +4780,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Makes a new unit active. Displays any new <code>ModelMessage</code>s
      * (uses {@link #nextModelMessage}).
-     * 
+     *
      * @param tile The tile to select if no new unit can be made active.
      */
     public void nextActiveUnit(Tile tile) {
@@ -4821,7 +4820,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
         }
-        
+
         GUI gui = freeColClient.getGUI();
         Unit nextActiveUnit = myPlayer.getNextActiveUnit();
 
@@ -4843,7 +4842,7 @@ public final class InGameController implements NetworkConstants {
             } else {
                 gui.setActiveUnit(null);
             }
-            
+
             if (canAutoEndTurn && !endingTurn
                 && freeColClient.getClientOptions().getBoolean(ClientOptions.AUTO_END_TURN)) {
                 endTurn();
@@ -4853,7 +4852,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Ignore this ModelMessage from now on until it is not generated in a turn.
-     * 
+     *
      * @param message a <code>ModelMessage</code> value
      * @param flag whether to ignore the ModelMessage or not
      */
@@ -4876,7 +4875,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Displays the next <code>ModelMessage</code>.
-     * 
+     *
      * @see net.sf.freecol.common.model.ModelMessage ModelMessage
      */
     public void nextModelMessage() {
@@ -4989,7 +4988,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Provides an opportunity to filter the messages delivered to the canvas.
-     * 
+     *
      * @param message the message that is candidate for delivery to the canvas
      * @return true if the message should be delivered
      */
@@ -5020,7 +5019,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Convenience method: returns the first child element with the specified
      * tagname.
-     * 
+     *
      * @param element The <code>Element</code> to search for the child
      *            element.
      * @param tagName The tag name of the child element to be found.
