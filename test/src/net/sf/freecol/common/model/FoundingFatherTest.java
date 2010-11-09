@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;
@@ -50,6 +52,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         FoundingFather father1 = new FoundingFather("father1", spec());
+        father1.setType(FoundingFatherType.TRADE);
         Ability ability = new Ability("some.new.ability");
         spec().addAbility(ability);
         father1.addAbility(ability);
@@ -58,6 +61,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(dutch.hasAbility("some.new.ability"));
 
         FoundingFather father2 = new FoundingFather("father2", spec());
+        father2.setType(FoundingFatherType.TRADE);
         Modifier modifier = new Modifier("some.new.modifier", father2, 2f, Modifier.Type.ADDITIVE);
         father2.addModifier(modifier);
         spec().addModifier(modifier);
@@ -69,6 +73,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(4f, FeatureContainer.applyModifierSet(2, null, modifierSet));
 
         FoundingFather father3 = new FoundingFather("father3", spec());
+        father3.setType(FoundingFatherType.TRADE);
         father3.addModifier(new Modifier("some.new.modifier", father3, 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father3);
 
@@ -76,6 +81,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(6f, dutch.getFeatureContainer().applyModifier(2, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather("father4", spec());
+        father4.setType(FoundingFatherType.TRADE);
         Ability ability2 = new Ability("some.new.ability", false);
         assertFalse(ability.equals(ability2));
         assertFalse(ability.hashCode() == ability2.hashCode());
@@ -339,6 +345,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         FoundingFather newFather = new FoundingFather("father", spec());
+        newFather.setType(FoundingFatherType.TRADE);
 
         Scope dutchScope = new Scope();
         dutchScope.setMethodName("getNationID");

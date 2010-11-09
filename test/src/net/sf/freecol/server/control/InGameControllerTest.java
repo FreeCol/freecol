@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -1814,6 +1815,7 @@ public class InGameControllerTest extends FreeColTestCase {
         units.add(new AbstractUnit(colonistType, Unit.Role.DEFAULT, 1));
         units.add(new AbstractUnit(statesmanType, Unit.Role.DEFAULT, 1));
         FoundingFather father = new FoundingFather("father", spec());
+        father.setType(FoundingFatherType.TRADE);
         father.setUnits(units);
         igc.addFoundingFather(dutch, father);
 
@@ -1833,6 +1835,7 @@ public class InGameControllerTest extends FreeColTestCase {
         colony.getUnitList().get(3).setType(indenturedServantType);
 
         FoundingFather father = new FoundingFather("father", spec());
+        father.setType(FoundingFatherType.TRADE);
         java.util.Map<UnitType, UnitType> upgrades = new HashMap<UnitType, UnitType>();
         upgrades.put(indenturedServantType, colonistType);
         upgrades.put(colonistType, statesmanType);
@@ -1854,6 +1857,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals(null, colony.getBuilding(press));
 
         FoundingFather father = new FoundingFather("father", spec());
+        father.setType(FoundingFatherType.TRADE);
         List<Event> events = new ArrayList<Event>();
         Event event = new Event("model.event.freeBuilding", spec());
         event.setValue("model.building.printingPress");
@@ -1929,6 +1933,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         FoundingFather father = new FoundingFather("father", spec());
+        father.setType(FoundingFatherType.TRADE);
         Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus",
                                            -100f, Modifier.Type.PERCENTAGE);
         Scope pressScope = new Scope();

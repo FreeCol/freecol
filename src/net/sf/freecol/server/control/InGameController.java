@@ -772,8 +772,6 @@ public final class InGameController extends Controller {
         Europe europe = serverPlayer.getEurope();
         boolean europeDirty = false;
 
-        serverPlayer.addFather(father);
-
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
                              "model.player.foundingFatherJoinedCongress",
@@ -807,6 +805,7 @@ public final class InGameController extends Controller {
             if ("model.ability.addTaxToBells".equals(ability.getId())) {
                 // Provoke a tax/liberty recalculation
                 serverPlayer.setTax(serverPlayer.getTax());
+                cs.addPartial(See.only(serverPlayer), serverPlayer, "tax");
             }
         }
 
@@ -898,6 +897,7 @@ public final class InGameController extends Controller {
                 if (!europeDirty && changed) {
                     cs.add(See.only(serverPlayer), europe);
                 }
+
             } else if (eventId.equals("model.event.movementChange")) {
                 for (Unit u : serverPlayer.getUnits()) {
                     if (u.getMovesLeft() > 0) {
@@ -907,8 +907,11 @@ public final class InGameController extends Controller {
                 }
             }
         }
-        // Alas, have to update the whole player to get the father in.
-        cs.add(See.only(serverPlayer), serverPlayer);
+
+        // We do not want to have to update the whole player just
+        // to get the FF into the client.  Use this hack until the
+        // client gets proper containers.
+        cs.addFather(serverPlayer, father);
     }
 
     /**

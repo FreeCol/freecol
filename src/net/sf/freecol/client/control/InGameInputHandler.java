@@ -959,6 +959,10 @@ public final class InGameInputHandler extends InputHandler {
             String tag = e.getTagName();
             if (tag == null) {
                 logger.warning("addObject null tag");
+            } else if (tag == FoundingFather.getXMLElementTagName()) {
+                String id = e.getAttribute("id");
+                FoundingFather father = game.getSpecification().getFoundingFather(id);
+                if (father != null) player.addFather(father);
             } else if (tag == ModelMessage.getXMLElementTagName()) {
                 ModelMessage m = new ModelMessage();
                 m.readFromXMLElement(e);

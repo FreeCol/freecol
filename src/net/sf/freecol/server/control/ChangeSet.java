@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -1010,6 +1011,21 @@ public class ChangeSet {
         changes.add(new ObjectChange(See.perhaps().except(owner), tile));
         changes.add(new RemoveChange(See.perhaps().except(owner), tile,
                                      objects));
+        return this;
+    }
+
+    /**
+     * Helper function to add a founding father addition event to a ChangeSet.
+     * Also adds the father to the owner.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> adding the father.
+     * @param father The <code>FoundingFather</code> to add.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addFather(ServerPlayer serverPlayer,
+                               FoundingFather father) {
+        changes.add(new OwnedChange(See.only(serverPlayer), father));
+        serverPlayer.addFather(father);
         return this;
     }
 
