@@ -4,42 +4,42 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-public class Plunder {
+public class RandomRange {
 
     /**
-     * Probability that a settlement provides plunder.
+     * Probability that the result is not zero.
      */
     private int probability = 0;
 
     /**
-     * Minimum plunder.
+     * Minimum value.
      */
     private int minimum = 0;
 
     /**
-     * Maximum plunder.
+     * Maximum value.
      */
     private int maximum = 0;
 
     /**
-     * Factor to multiply the plunder amount with.
+     * Factor to multiply the value with.
      */
     private int factor = 1;
 
 
-    public Plunder() {
+    public RandomRange() {
         // empty constructor
     }
 
     /**
-     * Creates a new <code>Plunder</code> instance.
+     * Creates a new <code>RandomRange</code> instance.
      *
      * @param probability an <code>int</code> value
      * @param minimum an <code>int</code> value
      * @param maximum an <code>int</code> value
      * @param factor an <code>int</code> value
      */
-    public Plunder(int probability, int minimum, int maximum, int factor) {
+    public RandomRange(int probability, int minimum, int maximum, int factor) {
         this.probability = probability;
         this.minimum = minimum;
         this.maximum = maximum;
@@ -48,11 +48,11 @@ public class Plunder {
 
 
     /**
-     * Creates a new <code>Plunder</code> instance.
+     * Creates a new <code>RandomRange</code> instance.
      *
      * @param in a <code>XMLStreamReader</code> value
      */
-    public Plunder(XMLStreamReader in) throws XMLStreamException {
+    public RandomRange(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in);
     }
 
@@ -145,8 +145,8 @@ public class Plunder {
         }
     }
 
-    public Plunder clone() {
-        return new Plunder(probability, maximum, minimum, factor);
+    public RandomRange clone() {
+        return new RandomRange(probability, maximum, minimum, factor);
     }
 
 
