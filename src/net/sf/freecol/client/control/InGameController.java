@@ -1294,7 +1294,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         for (Tile newTile: tile.getSurroundingTiles(1)) {
-            if (newTile.isLand()) {
+            if (!newTile.isLand()) {
                 landLocked = false;
             }
             for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
