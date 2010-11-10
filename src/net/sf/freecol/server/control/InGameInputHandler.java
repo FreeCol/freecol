@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.AssignTeacherMessage;
+import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
@@ -110,11 +111,13 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
+import net.sf.freecol.common.networking.SetTradeRoutesMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
+import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
@@ -141,6 +144,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // TODO: move and simplify methods later, for now just delegate
         // TODO: check that NRHs and CPNRHs are sensibly chosen
 
+        // Messages that are not specialized are trivial elements identified
+        // by tag name only.
         register(AbandonColonyMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
             @Override
@@ -317,6 +322,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new EmigrateUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
+        register("endTurn", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return freeColServer.getInGameController()
+                    .endTurn(freeColServer.getPlayer(connection));
+            }});
         register(EquipUnitMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
             @Override
@@ -324,6 +336,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                   Element element) {
                 return new EquipUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
+            }});
+        register("getREFUnits",
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return freeColServer.getInGameController()
+                    .getREFUnits(freeColServer.getPlayer(connection));
             }});
         register(GetTransactionMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
@@ -551,6 +571,20 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }});
 
         // NetworkRequestHandlers
+        register(AssignTradeRouteMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new AssignTradeRouteMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
+        register("continuePlaying",
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .continuePlaying(freeColServer.getPlayer(connection));
+            }});
         register(DiplomacyMessage.getXMLElementTagName(),
                  new NetworkRequestHandler() {
             @Override
@@ -558,11 +592,40 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new DiplomacyMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
+        register("getHighScores",
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .getHighScores(freeColServer.getPlayer(connection));
+            }});
+        register("getNewTradeRoute",
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .getNewTradeRoute(freeColServer.getPlayer(connection));
+            }});
+        register("retire",
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .retire(freeColServer.getPlayer(connection));
+            }
+        });
         register(SetDestinationMessage.getXMLElementTagName(),
                  new NetworkRequestHandler() {
             @Override
             public Element handle(Connection connection, Element element) {
                 return new SetDestinationMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
+        register(SetTradeRoutesMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new SetTradeRoutesMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
         register(SpySettlementMessage.getXMLElementTagName(),
@@ -587,171 +650,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new UpdateCurrentStopMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
+        register(UpdateTradeRouteMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new UpdateTradeRouteMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
 
+        // TODO
         register("foreignAffairs",
                  new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
             }});
-        register("getNewTradeRoute",
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return getNewTradeRoute(connection, element);
-            }});
-        register("updateTradeRoute",
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return updateTradeRoute(connection, element);
-            }});
-        register("setTradeRoutes",
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return setTradeRoutes(connection, element);
-            }});
-        register("assignTradeRoute",
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return assignTradeRoute(connection, element);
-            }});
-
-        // Trivial comms that do not merit their own Message-type
-        register("endTurn", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return freeColServer.getInGameController()
-                    .endTurn(freeColServer.getPlayer(connection));
-            }});
-        register("getREFUnits",
-                 new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return freeColServer.getInGameController()
-                    .getREFUnits(freeColServer.getPlayer(connection));
-            }});
-        register("continuePlaying", new NetworkRequestHandler() {
-            @Override
-            public Element handle(Connection connection, Element element) {
-                return freeColServer.getInGameController()
-                    .continuePlaying(freeColServer.getPlayer(connection));
-            }});
-        register("getHighScores", new NetworkRequestHandler() {
-            @Override
-            public Element handle(Connection connection, Element element) {
-                return freeColServer.getInGameController()
-                    .getHighScores(freeColServer.getPlayer(connection));
-            }});
-        register("retire", new NetworkRequestHandler() {
-            @Override
-            public Element handle(Connection connection, Element element) {
-                return freeColServer.getInGameController()
-                    .retire(freeColServer.getPlayer(connection));
-            }
-        });
     }
 
-
-    /**
-     * Handles a "getNewTradeRoute"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element getNewTradeRoute(Connection connection, Element element) {
-        Player player = getFreeColServer().getPlayer(connection);
-        TradeRoute tradeRoute = getFreeColServer().getModelController().getNewTradeRoute(player);
-        Element reply = Message.createNewRootElement("getNewTradeRouteConfirmed");
-        reply.appendChild(tradeRoute.toXMLElement(player, reply.getOwnerDocument()));
-        return reply;
-    }
-
-    /**
-     * Handles a "setTradeRoutes"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element updateTradeRoute(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Element childElement = (Element) element.getChildNodes().item(0);
-        String id = childElement.getAttribute("ID");
-        //TradeRoute clientTradeRoute = new TradeRoute(null, childElement);
-        TradeRoute serverTradeRoute = (TradeRoute) getGame().getFreeColGameObject(id);
-        if (serverTradeRoute == null) {
-            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
-                    + id);
-        }
-        if (serverTradeRoute.getOwner() != player) {
-            throw new IllegalStateException("Not your trade route!");
-        }
-        //serverTradeRoute.updateFrom(clientTradeRoute);
-        serverTradeRoute.readFromXMLElement(childElement);
-        return null;
-    }
-
-    /**
-     * Handles a "updateTradeRoute"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element setTradeRoutes(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
-        
-        NodeList childElements = element.getChildNodes();
-        for(int i = 0; i < childElements.getLength(); i++) {
-            Element childElement = (Element) childElements.item(i);
-            String id = childElement.getAttribute("id");
-            TradeRoute serverTradeRoute = (TradeRoute) getGame().getFreeColGameObject(id);
-            if (serverTradeRoute == null) {
-                throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " + id);
-            }
-            if (serverTradeRoute.getOwner() != player) {
-                throw new IllegalStateException("Not your trade route!");
-            }
-            routes.add(serverTradeRoute);
-        }
-        player.setTradeRoutes(routes);
-        return null;
-    }
-
-    /**
-     * Handles a "assignTradeRoute"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element assignTradeRoute(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        } else if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-
-        String tradeRouteString = element.getAttribute("tradeRoute");
-
-        if (tradeRouteString == null || tradeRouteString == "") {
-            unit.setTradeRoute(null);
-        } else {
-            TradeRoute tradeRoute = (TradeRoute) getGame().getFreeColGameObject(tradeRouteString);
-
-            if (tradeRoute == null) {
-                throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
-                                                   + element.getAttribute("tradeRoute"));
-            }
-            if (tradeRoute.getOwner() != player) {
-                throw new IllegalStateException("Not your trade route!");
-            }
-            unit.setTradeRoute(tradeRoute);
-        }
-        return null;
-    }
 
     /**
      * Handles a "foreignAffairs"-message.

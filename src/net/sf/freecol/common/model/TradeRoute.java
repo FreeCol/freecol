@@ -72,7 +72,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Creates a new <code>TradeRoute</code> instance.
-     *
      */
     private TradeRoute() {}
 
@@ -121,6 +120,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     public synchronized void updateFrom(TradeRoute other) {
         setName(other.getName());
+        setCount(other.getCount());
         stops.clear();
         for (Stop otherStop : other.getStops()) {
             addStop(new Stop(otherStop));

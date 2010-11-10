@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
@@ -945,6 +946,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     public Element addObject(Element element) {
         Game game = getGame();
+        Specification spec = game.getSpecification();
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element) nodes.item(i);
@@ -961,12 +963,8 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("addObject null tag");
             } else if (tag == FoundingFather.getXMLElementTagName()) {
                 String id = e.getAttribute("id");
-                FoundingFather father = game.getSpecification().getFoundingFather(id);
+                FoundingFather father = spec.getFoundingFather(id);
                 if (father != null) player.addFather(father);
-            } else if (tag == ModelMessage.getXMLElementTagName()) {
-                ModelMessage m = new ModelMessage();
-                m.readFromXMLElement(e);
-                player.addModelMessage(m);
             } else if (tag == HistoryEvent.getXMLElementTagName()) {
                 HistoryEvent h = new HistoryEvent();
                 h.readFromXMLElement(e);
@@ -975,6 +973,13 @@ public final class InGameInputHandler extends InputHandler {
                 LastSale s = new LastSale();
                 s.readFromXMLElement(e);
                 player.saveSale(s);
+            } else if (tag == ModelMessage.getXMLElementTagName()) {
+                ModelMessage m = new ModelMessage();
+                m.readFromXMLElement(e);
+                player.addModelMessage(m);
+            } else if (tag == TradeRoute.getXMLElementTagName()) {
+                TradeRoute t = new TradeRoute(game, e);
+                player.getTradeRoutes().add(t);
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }

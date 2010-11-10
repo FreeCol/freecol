@@ -62,27 +62,5 @@ public class ClientModelController implements ModelController {
         this.freeColClient = freeColClient;
     }
 
-    /**
-     * Returns a new <code>TradeRoute</code> object.
-     * 
-     * @return a new <code>TradeRoute</code> object.
-     */
-    public TradeRoute getNewTradeRoute(Player player) {
-        Game game = freeColClient.getGame();
-        Client client = freeColClient.getClient();
-
-        Element getNewTradeRouteElement = Message.createNewRootElement("getNewTradeRoute");
-        Element reply = client.ask(getNewTradeRouteElement);
-
-        if (!reply.getTagName().equals("getNewTradeRouteConfirmed")) {
-            logger.warning("Wrong tag name.");
-            throw new IllegalStateException();
-        }
-
-        Element routeElement = (Element) reply.getElementsByTagName(TradeRoute.getXMLElementTagName()).item(0);
-        TradeRoute tradeRoute = new TradeRoute(game, routeElement);
-
-        return tradeRoute;
-    }
 
 }

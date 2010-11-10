@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -1087,24 +1088,6 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add a sale change to a ChangeSet.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> making the sale.
-     * @param settlement The <code>Settlement</code> that is buying.
-     * @param type The <code>GoodsType</code> bought.
-     * @param price The per unit price.
-     * @return The updated <code>ChangeSet</code>.
-     */
-    public ChangeSet addSale(ServerPlayer serverPlayer, Settlement settlement,
-                             GoodsType type, int price) {
-        Game game = settlement.getGame();
-        LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
-        changes.add(new OwnedChange(See.only(serverPlayer), sale));
-        serverPlayer.saveSale(sale);
-        return this;
-    }
-
-    /**
      * Helper function to add a region discovery to a ChangeSet.
      * Also adds the history to all Europeans.
      *
@@ -1126,6 +1109,24 @@ public class ChangeSet {
     }
 
     /**
+     * Helper function to add a sale change to a ChangeSet.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> making the sale.
+     * @param settlement The <code>Settlement</code> that is buying.
+     * @param type The <code>GoodsType</code> bought.
+     * @param price The per unit price.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addSale(ServerPlayer serverPlayer, Settlement settlement,
+                             GoodsType type, int price) {
+        Game game = settlement.getGame();
+        LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
+        changes.add(new OwnedChange(See.only(serverPlayer), sale));
+        serverPlayer.saveSale(sale);
+        return this;
+    }
+
+    /**
      * Helper function to add a stance change to a ChangeSet.
      *
      * @param vis The visibility of this change.
@@ -1137,6 +1138,21 @@ public class ChangeSet {
     public ChangeSet addStance(See see, Player first, Stance stance,
                                Player second) {
         changes.add(new StanceChange(see, first, stance, second));
+        return this;
+    }
+
+    /**
+     * Helper function to add a new trade route change to a ChangeSet.
+     * Also adds the trade route to the player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> adding the route.
+     * @param tradeRoute The new <code>TradeRoute</code>.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addTradeRoute(ServerPlayer serverPlayer,
+                                   TradeRoute tradeRoute) {
+        changes.add(new OwnedChange(See.only(serverPlayer), tradeRoute));
+        serverPlayer.getTradeRoutes().add(tradeRoute);
         return this;
     }
 

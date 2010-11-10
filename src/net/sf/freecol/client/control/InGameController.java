@@ -97,6 +97,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.AssignTeacherMessage;
+import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
@@ -146,16 +147,20 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
+import net.sf.freecol.common.networking.SetTradeRoutesMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
+import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.common.option.BooleanOption;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 
 /**
  * The controller that will be used while the game is played.
@@ -4259,8 +4264,8 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
+        assignTradeRoute(unit, null);
         clearGotoOrders(unit);
-        assignTradeRoute(unit, TradeRoute.NO_TRADE_ROUTE);
         return askChangeState(unit, UnitState.ACTIVE);
     }
 
@@ -4655,22 +4660,89 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Updates a trade route.
+     * Assigns a trade route to a unit using the trade route dialog.
      *
-     * @param route The trade route to update.
+     * @param unit The <code>Unit</code> to assign a trade route to.
      */
-    public void updateTradeRoute(TradeRoute route) {
-        logger.finest("Entering method updateTradeRoute");
-        /*
-         * if (freeColClient.getGame().getCurrentPlayer() !=
-         * freeColClient.getMyPlayer()) {
-         * freeColClient.getCanvas().showInformationMessage("notYourTurn");
-         * return; }
-         */
-        Element tradeRouteElement = Message.createNewRootElement("updateTradeRoute");
-        tradeRouteElement.appendChild(route.toXMLElement(null, tradeRouteElement.getOwnerDocument()));
-        freeColClient.getClient().sendAndWait(tradeRouteElement);
+    public void assignTradeRoute(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
+        TradeRoute route = canvas.showTradeRouteDialog(unit);
+        if (route == null) return; // Cancelled
+        assignTradeRoute(unit, (route == TradeRoute.NO_TRADE_ROUTE) ? null
+                         : route);
+    }
 
+    /**
+     * Assigns a trade route to a unit.
+     *
+     * @param unit The <code>Unit</code> to assign a trade route to.
+     * @param tradeRoute The <code>TradeRoute</code> to assign.
+     */
+    public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
+        if (tradeRoute == unit.getTradeRoute()) return;
+        if (askAssignTradeRoute(unit, tradeRoute)) {
+            if ((tradeRoute = unit.getTradeRoute()) != null) {
+                Location loc = unit.getLocation();
+                if (loc instanceof Tile) loc = ((Tile) loc).getColony();
+                if (tradeRoute.getStops().get(0).getLocation() == loc) {
+                    followTradeRoute(unit);
+                } else if (freeColClient.getGame().getCurrentPlayer()
+                           == freeColClient.getMyPlayer()) {
+                    moveToDestination(unit);
+                }
+            }
+        }
+    }
+
+    /**
+     * Server query-response for assigning a trade route to a unit.
+     *
+     * @param unit The <code>Unit</code> to assign a trade route to.
+     * @param tradeRoute The <code>TradeRoute</code> to assign.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askAssignTradeRoute(Unit unit, TradeRoute tradeRoute) {
+        Client client = freeColClient.getClient();
+        AssignTradeRouteMessage message
+            = new AssignTradeRouteMessage(unit, tradeRoute);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+    /**
+     * Gets a new trade route for a player.
+     *
+     * @param player The <code>Player</code> to get a new trade route for.
+     * @return A new <code>TradeRoute</code>.
+     */
+    public TradeRoute getNewTradeRoute(Player player) {
+        int n = player.getTradeRoutes().size();
+        if (askGetNewTradeRoute(player)
+            && player.getTradeRoutes().size() == n + 1) {
+            return player.getTradeRoutes().get(n);
+        }
+        return null;
+    }
+
+    /**
+     * Server query-response for creating a new trade route.
+     *
+     * @param player The <code>Player</code> to own the trade route.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askGetNewTradeRoute(Player player) {
+        Client client = freeColClient.getClient();
+        Element element = Message.createNewRootElement("getNewTradeRoute");
+        Element reply = askExpecting(client, element, null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**
@@ -4679,58 +4751,51 @@ public final class InGameController implements NetworkConstants {
      * @param routes The trade routes to set.
      */
     public void setTradeRoutes(List<TradeRoute> routes) {
-        Player myPlayer = freeColClient.getMyPlayer();
-        myPlayer.setTradeRoutes(routes);
-        /*
-         * if (freeColClient.getGame().getCurrentPlayer() !=
-         * freeColClient.getMyPlayer()) {
-         * freeColClient.getCanvas().showInformationMessage("notYourTurn");
-         * return; }
-         */
-        Element tradeRoutesElement = Message.createNewRootElement("setTradeRoutes");
-        for(TradeRoute route : routes) {
-            Element routeElement = tradeRoutesElement.getOwnerDocument().createElement(TradeRoute.getXMLElementTagName());
-            routeElement.setAttribute("id", route.getId());
-            tradeRoutesElement.appendChild(routeElement);
-        }
-        freeColClient.getClient().sendAndWait(tradeRoutesElement);
+        Player player = freeColClient.getMyPlayer();
 
+        askSetTradeRoutes(routes);
     }
 
     /**
-     * Assigns a trade route to a unit.
+     * Server query-response for setting the trade routes.
      *
-     * @param unit The unit to assign a trade route to.
+     * @param routes A list of trade routes to update.
+     * @return True if the server interaction succeeded.
      */
-    public void assignTradeRoute(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        assignTradeRoute(unit, canvas.showTradeRouteDialog(unit));
-    }
-
-    public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
-        if (tradeRoute != null) {
-            Element assignTradeRouteElement = Message.createNewRootElement("assignTradeRoute");
-            assignTradeRouteElement.setAttribute("unit", unit.getId());
-            if (tradeRoute == TradeRoute.NO_TRADE_ROUTE) {
-                unit.setTradeRoute(null);
-                freeColClient.getClient().sendAndWait(assignTradeRouteElement);
-                setDestination(unit, null);
-            } else {
-                unit.setTradeRoute(tradeRoute);
-                assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getId());
-                freeColClient.getClient().sendAndWait(assignTradeRouteElement);
-                Location location = unit.getLocation();
-                if (location instanceof Tile)
-                    location = ((Tile) location).getColony();
-                if (tradeRoute.getStops().get(0).getLocation() == location) {
-                    followTradeRoute(unit);
-                } else if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                    moveToDestination(unit);
-                }
-            }
+    private boolean askSetTradeRoutes(List<TradeRoute> routes) {
+        Client client = freeColClient.getClient();
+        Element request = Message.createNewRootElement("setTradeRoutes");
+        Document doc = request.getOwnerDocument();
+        for (TradeRoute route : routes) {
+            Element element = doc.createElement(TradeRoute.getXMLElementTagName());
+            element.setAttribute("id", route.getId());
+            request.appendChild(element);
         }
+        Element reply = askExpecting(client, request, null);
+        return reply == null;
     }
 
+    /**
+     * Updates a trade route.
+     *
+     * @param route The trade route to update.
+     */
+    public void updateTradeRoute(TradeRoute route) {
+        askUpdateTradeRoute(route);
+    }
+
+    /**
+     * Server query-response for asking for updating the trade route.
+     *
+     * @param route The trade route to update.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askUpdateTradeRoute(TradeRoute route) {
+        Client client = freeColClient.getClient();
+        UpdateTradeRouteMessage message = new UpdateTradeRouteMessage(route);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        return reply == null;
+    }
 
 
 

@@ -96,6 +96,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeItem;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.TypeCountMap;
@@ -5814,8 +5815,50 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
+
     /**
-     * Handles a "getREFUnits"-message.
+     * Assign a trade route to a unit.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The unit <code>Unit</code> to assign to.
+     * @param tradeRoute The <code>TradeRoute</code> to assign.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
+                                    TradeRoute tradeRoute) {
+        unit.setTradeRoute(tradeRoute);
+        if (tradeRoute == null) {
+            unit.setDestination(null);
+        } else {
+            List<Stop> stops = tradeRoute.getStops();
+            if (stops.size() > 0) {
+                unit.setDestination(tradeRoute.getStops().get(0).getLocation());
+                unit.setCurrentStop(0);
+            }
+        }
+
+        // Only visible to the player
+        return new ChangeSet().add(See.only(serverPlayer), unit)
+            .build(serverPlayer);
+    }
+
+
+    /**
+     * Get a new trade route for a player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to get a trade
+     *    route for.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element getNewTradeRoute(ServerPlayer serverPlayer) {
+        return new ChangeSet().addTradeRoute(serverPlayer,
+                new TradeRoute(getGame(), "", serverPlayer))
+            .build(serverPlayer);
+    }
+
+
+    /**
+     * Get a list of abstract REF units for a player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to query the REF of.
      * @return An <code>Element</code> encapsulating this action.

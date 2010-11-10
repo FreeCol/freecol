@@ -100,18 +100,6 @@ public class ServerModelController implements ModelController {
     }
 
     /**
-     * Returns a new <code>TradeRoute</code> object.
-     * 
-     * @return a new <code>TradeRoute</code> object.
-     */
-    public TradeRoute getNewTradeRoute(Player player) {
-        Game game = freeColServer.getGame();
-        TradeRoute t = new TradeRoute(game, "", player);
-        taskRegister.put(t.getId(), new TaskEntry(t.getId(), game.getTurn().getNumber(), true, t));
-        return t;
-    }
-
-    /**
      * A single entry in the task register.
      */
     private static class TaskEntry {

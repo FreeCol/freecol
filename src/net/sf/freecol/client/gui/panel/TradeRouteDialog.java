@@ -100,7 +100,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         newRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Player player = getMyPlayer();
-                    TradeRoute newRoute = parent.getClient().getModelController().getNewTradeRoute(player);
+                    TradeRoute newRoute = getController().getNewTradeRoute(player);
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
                     if (parent.showFreeColDialog(new TradeRouteInputDialog(parent, newRoute))) {
                         listModel.addElement(newRoute);
@@ -197,10 +197,11 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
     
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests.
+     *
+     * @param event The incoming ActionEvent.
+     */
     public void actionPerformed(ActionEvent event) {
         Action action = Enum.valueOf(Action.class, event.getActionCommand());
         switch (action) {
@@ -210,30 +211,30 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
             for (int index = 0; index < listModel.getSize(); index++) {
                 routes.add((TradeRoute) listModel.getElementAt(index));
             }
-            getController().setTradeRoutes(routes);
             setResponse((TradeRoute) tradeRoutes.getSelectedValue());
             break;
         case CANCEL:
             getCanvas().remove(this);
             setResponse(null);
             break;
-        case DEASSIGN:
-        case DELETE:
-        	TradeRoute routeSelected = (TradeRoute) tradeRoutes.getSelectedValue();
-            if(routeSelected != null){
-            	for(Unit unit : routeSelected.getAssignedUnits()){
-            		getController().clearOrders(unit);
-            	}
+        case DEASSIGN: case DELETE:
+            TradeRoute route = (TradeRoute) tradeRoutes.getSelectedValue();
+            if (route != null) {
+                for (Unit unit : route.getAssignedUnits()) {
+                    getController().clearOrders(unit);
+                }
             }
-    		if(action == Action.DEASSIGN){
-            	getCanvas().remove(this);
+            if (action == Action.DEASSIGN) {
+                getCanvas().remove(this);
                 setResponse(TradeRoute.NO_TRADE_ROUTE);
                 return;
-    		}
-
-    		if(routeSelected != null){
-    			listModel.removeElementAt(tradeRoutes.getSelectedIndex());
-    		}	
+            }
+            if (route != null) {
+                listModel.removeElementAt(tradeRoutes.getSelectedIndex());
+                Player player = getMyPlayer();
+                player.getTradeRoutes().remove(route);
+                getController().setTradeRoutes(player.getTradeRoutes());
+            }
             break;
         }        
     }

@@ -41,9 +41,4 @@ import net.sf.freecol.common.model.Player.Stance;
 */
 public interface ModelController {
 
-    /**
-     * Get a new <code>TradeRoute</code> object.
-     */
-    public TradeRoute getNewTradeRoute(Player player);
-
 }
