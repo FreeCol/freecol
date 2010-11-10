@@ -39,7 +39,6 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
-import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.SimpleCombatModel;
 import net.sf.freecol.common.model.Specification;
@@ -64,18 +63,13 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Creates a new game model.
      *
-     * @param modelController A controller object the model can use to make
-     *            actions not allowed from the model (generate random numbers
-     *            etc).
      * @param specification The <code>Specification</code> to use in this game.
      * @see net.sf.freecol.server.FreeColServer#FreeColServer(boolean, boolean,
      *      int, String)
      */
-    public ServerGame(ModelController modelController,
-                      Specification specification) {
+    public ServerGame(Specification specification) {
         super(specification);
 
-        this.modelController = modelController;
         this.combatModel = new SimpleCombatModel();
         currentPlayer = null;
     }
@@ -86,9 +80,6 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * @param freeColGameObjectListener A listener that should be monitoring
      *            this <code>Game</code>.
-     * @param modelController A controller object the model can use to make
-     *            actions not allowed from the model (generate random numbers
-     *            etc).
      * @param in The input stream containing the XML.
      * @param serverStrings A list of server object type,ID pairs to create.
      *            in this <code>Game</code>.
@@ -97,17 +88,13 @@ public class ServerGame extends Game implements ServerModelObject {
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener,
-                      ModelController modelController, XMLStreamReader in,
-                      List<String> serverStrings, Specification specification)
+                      XMLStreamReader in, List<String> serverStrings,
+                      Specification specification)
         throws XMLStreamException {
         super(specification);
 
         setFreeColGameObjectListener(freeColGameObjectListener);
-        this.modelController = modelController;
-        if (modelController != null) {
-            // no model controller when using the map editor
-            this.combatModel = new SimpleCombatModel();
-        }
+        this.combatModel = new SimpleCombatModel();
         this.viewOwner = null;
         this.setGame(this);
 

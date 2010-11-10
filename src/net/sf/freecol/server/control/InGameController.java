@@ -75,7 +75,6 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Market.Access;
-import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
@@ -398,7 +397,6 @@ public final class InGameController extends Controller {
         
         for (;;) {
             player.clearModelMessages();
-            freeColServer.getModelController().clearTaskRegister();
 
             Player winner = checkForWinner();
             if (winner != null

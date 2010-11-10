@@ -161,7 +161,7 @@ public class FreeColTestCase extends TestCase {
      */
     public static Game getStandardGame(String specName) {
         Specification specification = getSpecification(specName);
-        game = new ServerGame(new MockModelController(), specification);
+        game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification, Advantages.SELECTABLE));
 
         specification.applyDifficultyLevel("model.difficulty.medium");

@@ -28,7 +28,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockModelController;
 import net.sf.freecol.util.test.MockPseudoRandom;
 
 

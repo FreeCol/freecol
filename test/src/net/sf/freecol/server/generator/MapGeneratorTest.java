@@ -43,7 +43,6 @@ import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockModelController;
 
 
 public class MapGeneratorTest extends FreeColTestCase {
@@ -51,8 +50,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testWithNoIndians() {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc, spec());
+        Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
         // A new game does not have a map yet
@@ -79,8 +77,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testSinglePlayerOnSmallMap() {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc, spec());
+        Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
         // A new game does not have a map yet
@@ -110,8 +107,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testMapGenerator() {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc, spec());
+        Game g = new ServerGame(spec());
 
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
         // A new game does not have a map yet
@@ -176,8 +172,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testIndianCapital() {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc, spec());
+        Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
@@ -223,8 +218,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         /**
          * Make sure we can import all distributed maps.
          */
-        MockModelController mmc = new MockModelController();
-        Game g = new ServerGame(mmc, spec());
+        Game g = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
@@ -245,8 +239,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Reset import file option value (set by previous tests)
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        MockModelController mmc = new MockModelController();
-        Game game = new ServerGame(mmc, spec());
+        Game game = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
         try {
             gen.createMap(game);

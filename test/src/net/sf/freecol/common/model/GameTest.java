@@ -30,14 +30,13 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockModelController;
 
 
 public class GameTest extends FreeColTestCase {
 
     public void testGame() throws FreeColException {
 
-        Game game = new ServerGame(new MockModelController(), spec());
+        Game game = new ServerGame(spec());
         game.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
         game.setMap(getTestMap());
 
@@ -51,7 +50,7 @@ public class GameTest extends FreeColTestCase {
     }
 
     public void testAddPlayer() {
-        Game game = new ServerGame(new MockModelController(), spec());
+        Game game = new ServerGame(spec());
         NationOptions defaultOptions = new NationOptions(spec(), Advantages.SELECTABLE);
         game.setNationOptions(defaultOptions);
 

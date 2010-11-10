@@ -45,7 +45,6 @@ import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
-import net.sf.freecol.util.test.MockModelController;
 import net.sf.freecol.util.test.MockPseudoRandom;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;

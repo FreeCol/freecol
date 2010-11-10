@@ -25,7 +25,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.util.test.MockModelController;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -171,7 +170,7 @@ public class PlayerTest extends FreeColTestCase {
         // getStandardGame(), except that all European nations are
         // available
         Specification specification = getSpecification("freecol");
-        Game game = new ServerGame(new MockModelController(), specification);
+        Game game = new ServerGame(specification);
         NationOptions nationOptions = new NationOptions(specification, NationOptions.Advantages.SELECTABLE);
         for (Nation nation : specification.getEuropeanNations()) {
             nationOptions.setNationState(nation, NationOptions.NationState.AVAILABLE);

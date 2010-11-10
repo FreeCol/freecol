@@ -95,7 +95,6 @@ import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
-import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
@@ -159,8 +158,6 @@ public final class FreeColServer {
     private final PreGameInputHandler preGameInputHandler;
 
     private final InGameInputHandler inGameInputHandler;
-
-    private final ServerModelController modelController;
 
     private final InGameController inGameController;
 
@@ -235,14 +232,13 @@ public final class FreeColServer {
         this.name = name;
         this.random = new Random(new SecureRandom().nextLong());
 
-        modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
         inGameController = new InGameController(this, random);
 
-        game = new ServerGame(modelController, specification);
+        game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification, advantages));
         mapGenerator = new SimpleMapGenerator(random, specification);
 
@@ -281,7 +277,6 @@ public final class FreeColServer {
         this.name = name;
         //this.nationOptions = nationOptions;
         mapGenerator = null;
-        modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -736,8 +731,8 @@ public final class FreeColServer {
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
-                    game = new ServerGame(null, getModelController(), xsr,
-                                          serverStrings, specification);
+                    game = new ServerGame(null, xsr, serverStrings,
+                                          specification);
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
@@ -889,7 +884,7 @@ public final class FreeColServer {
             final String owner = xsr.getAttributeValue(null, "owner");
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
-                    Game game = new ServerGame(null, null, xsr,
+                    Game game = new ServerGame(null, xsr,
                             new ArrayList<String>(serverStrings),
                             new FreeColTcFile("freecol").getSpecification());
                     Iterator<FreeColGameObject> objs
@@ -1049,16 +1044,6 @@ public final class FreeColServer {
      */
     public InGameController getInGameController() {
         return inGameController;
-    }
-
-    /**
-     * Gets the <code>ModelController</code>.
-     *
-     * @return The controller used for generating random numbers and creating
-     *         new {@link FreeColGameObject}s.
-     */
-    public ServerModelController getModelController() {
-        return modelController;
     }
 
     /**

@@ -98,8 +98,6 @@ public class Game extends FreeColGameObject {
      */
     private boolean spanishSuccession = false;
 
-    protected ModelController modelController;
-
     protected FreeColGameObjectListener freeColGameObjectListener;
 
     /**
@@ -169,9 +167,6 @@ public class Game extends FreeColGameObject {
      * Note that this is used on the client side; the game is really a partial
      * view of the server-side game.
      *
-     * @param modelController A controller object the model can use to make
-     *            actions not allowed from the model (generate random numbers
-     *            etc).
      * @param in The XML stream to read the data from.
      * @param viewOwnerUsername The username of the owner of this view of the
      *            game.
@@ -179,32 +174,13 @@ public class Game extends FreeColGameObject {
      * @see net.sf.freecol.client.control.ConnectController#login(String,
      *      String, int)
      */
-    public Game(ModelController modelController, XMLStreamReader in, String viewOwnerUsername)
+    public Game(XMLStreamReader in, String viewOwnerUsername)
         throws XMLStreamException {
         super(null, in);
 
-        this.modelController = modelController;
         this.combatModel = new SimpleCombatModel();
         readFromXML(in);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
-    }
-
-    /**
-     * Returns the Game's ModelController.
-     *
-     * @return a <code>ModelController</code> value
-     */
-    public ModelController getModelController() {
-        return modelController;
-    }
-
-    /**
-     * Sets the Game's ModelController.
-     *
-     * @param modelController The new <code>ModelController</code>.
-     */
-    public void setModelController(ModelController modelController) {
-        this.modelController = modelController;
     }
 
     /**

@@ -223,7 +223,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
-                    game = new ServerGame(null, null, xsr, serverObjects, specification);
+                    game = new ServerGame(null, xsr, serverObjects, specification);
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level

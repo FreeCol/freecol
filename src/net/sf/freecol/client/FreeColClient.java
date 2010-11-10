@@ -43,7 +43,6 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.control.ClientModelController;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameInputHandler;
@@ -104,8 +103,6 @@ public final class FreeColClient {
 
     private InGameInputHandler inGameInputHandler;
 
-    private ClientModelController modelController;
-    
     private MapEditorController mapEditorController;
     
 
@@ -270,7 +267,6 @@ public final class FreeColClient {
         preGameInputHandler = new PreGameInputHandler(this);
         inGameController = new InGameController(this);
         inGameInputHandler = new InGameInputHandler(this);
-        modelController = new ClientModelController(this);
         mapEditorController = new MapEditorController(this);
 
         removeSplash(splash);
@@ -803,15 +799,6 @@ public final class FreeColClient {
      */
     public InGameInputHandler getInGameInputHandler() {
         return inGameInputHandler;
-    }
-
-    /**
-     * Gets the <code>ClientModelController</code>.
-     * 
-     * @return The <code>ClientModelController</code>.
-     */
-    public ClientModelController getModelController() {
-        return modelController;
     }
 
     /**

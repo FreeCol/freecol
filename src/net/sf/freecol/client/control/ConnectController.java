@@ -261,7 +261,7 @@ public final class ConnectController {
                 boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
 
                 in.nextTag();
-                Game game = new Game(freeColClient.getModelController(), in, username);
+                Game game = new Game(in, username);
                 
                 // this completes the client's view of the spec with options obtained from the server difficulty
                 // it should not be required in the client, to be removed later, when newTurn() only runs in the server
