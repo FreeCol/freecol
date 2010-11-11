@@ -63,7 +63,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * Modifiers whose values increase or decrease over time.
      */
     private float increment;
-    
+
     /**
      * The type of this Modifier
      */
@@ -139,7 +139,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public Modifier(Element element) {
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>Modifier</code> instance.
      *
@@ -150,7 +150,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
         readFromXMLImpl(in, specification);
     }
-    
+
     /**
      * Get the <code>Type</code> value.
      *
@@ -359,16 +359,13 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
+        super.toXML(out, "modifier");
     }
 
     /**
@@ -392,7 +389,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
         }
         index = getAttribute(in, "index", -1);
     }
-    
+
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
 	super.writeAttributes(out);
 	out.writeAttribute(VALUE_TAG, String.valueOf(value));
@@ -410,5 +407,5 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
         return getId() + (getSource() == null ? " " : " (" + getSource().getId() + ") ") +
             type + " " + value;
     }
-    
+
 }

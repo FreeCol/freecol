@@ -326,7 +326,7 @@ public class AIGoods extends AIObject implements Transportable {
                 out.writeAttribute("transport", transport.getId());
             }
         }
-        goods.toXML(out, null);
+        goods.toXML(out);
 
         out.writeEndElement();
     }

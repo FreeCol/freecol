@@ -248,6 +248,7 @@ public class EquipmentType extends BuildableType {
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         maximumCount = getAttribute(in, "maximum-count", 1);
         combatLossPriority = getAttribute(in, "combat-loss-priority", -1);
         String roleString = getAttribute(in, "role", "default");
@@ -298,7 +299,7 @@ public class EquipmentType extends BuildableType {
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

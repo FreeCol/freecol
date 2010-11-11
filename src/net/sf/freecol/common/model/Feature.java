@@ -276,7 +276,7 @@ public abstract class Feature extends FreeColObject {
 
 
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        super.writeAttributes(out);
         if (getSource() != null) {
             out.writeAttribute("source", getSource().getId());
         }
@@ -296,27 +296,9 @@ public abstract class Feature extends FreeColObject {
         }
     }
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @param specification a <code>Specification</code> value
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-        // TODO: get rid of compatibility code
-        if (getId() == null) {
-            setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        }
-        readAttributes(in, specification);
-        readChildren(in);
-    }
-
     protected void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
+        super.readAttributes(in, specification);
         String sourceId = in.getAttributeValue(null, "source");
         if (sourceId == null) {
             setSource(null);
@@ -335,7 +317,7 @@ public abstract class Feature extends FreeColObject {
         }
     }
 
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if (Scope.getXMLElementTagName().equals(childName)) {

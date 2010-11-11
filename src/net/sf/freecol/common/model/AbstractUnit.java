@@ -161,11 +161,10 @@ public class AbstractUnit extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+    public final void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
         number = getAttribute(in, "number", 1);
-        in.nextTag(); // close this element
     }
 
     /**
@@ -177,12 +176,13 @@ public class AbstractUnit extends FreeColObject {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("id", getId());
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
         out.writeAttribute("number", String.valueOf(number));
-        out.writeEndElement();
     }
 
     public static String getXMLElementTagName() {

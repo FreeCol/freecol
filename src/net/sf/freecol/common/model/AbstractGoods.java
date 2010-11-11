@@ -111,11 +111,13 @@ public class AbstractGoods extends FreeColObject {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
 
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         out.writeAttribute("type", getId());
         out.writeAttribute("amount", Integer.toString(amount));
-        out.writeEndElement();
     }
 
     /**

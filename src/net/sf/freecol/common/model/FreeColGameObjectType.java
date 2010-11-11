@@ -228,14 +228,7 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
-    }
-
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        super.toXML(out, tag);
     }
 
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
@@ -258,16 +251,12 @@ public class FreeColGameObjectType extends FreeColObject {
         readChildren(in);
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        // do nothing
-    }
-
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);
         }
     }
-    
+
     /**
      * Reads a common child object, i.e. an Ability or Modifier.
      *
@@ -314,7 +303,7 @@ public class FreeColGameObjectType extends FreeColObject {
             }
         }
     }
-    
+
     /**
      * Use only for debugging purposes! A human-readable and localized name is
      * returned by getName().

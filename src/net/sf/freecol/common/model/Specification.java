@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -225,7 +226,7 @@ public final class Specification {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
             readFromXMLImpl(xsr);
-        } catch (XMLStreamException e) {
+        } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
@@ -1142,12 +1143,12 @@ public final class Specification {
         logger.info("Reading specification " + newId);
         String parentId = xsr.getAttributeValue(null, "extends");
         if (parentId != null) {
-            FreeColTcFile parent = new FreeColTcFile(parentId);
             try {
+                FreeColTcFile parent = new FreeColTcFile(parentId);
                 load(parent.getSpecificationInputStream());
                 initialized = false;
-            } catch(Exception e) {
-                logger.warning("Failed to load parent specification " + parentId);
+            } catch(IOException e) {
+                throw new XMLStreamException("Failed to open parent specification: " + e);
             }
         }
         while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {

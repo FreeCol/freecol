@@ -68,6 +68,7 @@ public final class ResourceType extends FreeColGameObjectType {
     // ------------------------------------------------------------ API methods
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         if (hasAttribute(in, "maximum-value")) {
             maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));
             minValue = getAttribute(in, "minimum-value", 0);

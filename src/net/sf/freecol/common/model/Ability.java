@@ -139,10 +139,7 @@ public final class Ability extends Feature {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
+        super.toXML(out, "ability");
     }
 
     public void readAttributes(XMLStreamReader in, Specification specification)

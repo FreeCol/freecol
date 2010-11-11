@@ -132,6 +132,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
 
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         String extendString = in.getAttributeValue(null, "extends");
         BuildingType parent = (extendString == null) ? this :
             getSpecification().getBuildingType(extendString);
@@ -178,7 +179,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

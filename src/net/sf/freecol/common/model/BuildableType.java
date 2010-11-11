@@ -180,7 +180,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        super.writeAttributes(out);
         if (populationRequired > 1) {
             out.writeAttribute("required-population", Integer.toString(populationRequired));
         }

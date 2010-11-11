@@ -140,7 +140,7 @@ public abstract class FreeColObject {
 
     /**
      * Writes the object to the given file.
-     * 
+     *
      * @param file the save file
      */
     public void save(File file) {
@@ -165,7 +165,7 @@ public abstract class FreeColObject {
             }
         }
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -354,6 +354,13 @@ public abstract class FreeColObject {
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, null, true, false);
+    }
+
+    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
+        out.writeStartElement(tag);
+        writeAttributes(out);
+        writeChildren(out);
+        out.writeEndElement();
     }
 
     /**
@@ -612,20 +619,43 @@ public abstract class FreeColObject {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readAttributes(in);
+        readChildren(in);
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        readAttributes(in, specification);
+        readChildren(in, specification);
+    }
+
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        readAttributes(in, null);
+    }
+
+    protected void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         // TODO: get rid of compatibility code
         if (getId() == null) {
             setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         }
-        readAttributes(in);
-        readChildren(in);
-    }
-
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        // do nothing
     }
 
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        readChildren(in, null);
+    }
+
+    protected void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             // do nothing
         }
@@ -673,7 +703,7 @@ public abstract class FreeColObject {
     }
 
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        // do nothing
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
     }
 
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
