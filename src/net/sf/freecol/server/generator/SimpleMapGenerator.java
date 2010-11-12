@@ -317,7 +317,13 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (map.isPolar(t)) continue; // No polar lost cities
                     if (t.isLand() && !t.hasLostCityRumour()
                         && t.getSettlement() == null && t.getUnitCount() == 0) {
-                        t.add(new LostCityRumour(t.getGame(), t));
+                        LostCityRumour r = new LostCityRumour(t.getGame(), t);
+                        if (r.chooseType(null, difficulty, random)
+                            == LostCityRumour.RumourType.MOUNDS
+                            && t.getOwningSettlement() != null) {
+                            r.setType(LostCityRumour.RumourType.MOUNDS);
+                        }
+                        t.add(r);
                         counter++;
                         break;
                     }
