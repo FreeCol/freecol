@@ -47,6 +47,16 @@ public class SettlementType extends FreeColGameObjectType {
      */
     private int maximumSize = 10;
 
+    /**
+     * The minimum number of tiles to grow this SettlementType.
+     */
+    private int minimumGrow = 1;
+
+    /**
+     * The maximum number of tiles to grown this SettlementType.
+     */
+    private int maximumGrow = 10;
+
 
 
 
