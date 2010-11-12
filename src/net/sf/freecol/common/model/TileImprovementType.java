@@ -40,7 +40,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     private TileImprovementType requiredImprovementType;
 
-    private Set<String> allowedWorkers;
+    private Set<String> allowedWorkers = new HashSet<String>();
     private EquipmentType expendedEquipmentType;
     private int expendedAmount;
     private GoodsType deliverGoodsType;
@@ -298,13 +298,14 @@ public final class TileImprovementType extends FreeColGameObjectType {
     // ------------------------------------------------------------ API methods
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = getAttribute(in, "movement-cost", 0);
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 
-        requiredImprovementType = getSpecification().getType(in, "required-improvement", 
+        requiredImprovementType = getSpecification().getType(in, "required-improvement",
                                                              TileImprovementType.class, null);
 
         zIndex = getAttribute(in, "zIndex", 0);
@@ -315,13 +316,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
         expendedAmount = getAttribute(in, "expended-amount", 0);
         deliverGoodsType = getSpecification().getType(in, "deliver-goods-type", GoodsType.class, null);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
-    }
-
-
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        allowedWorkers = new HashSet<String>();
-        tileTypeChange = new HashMap<TileType, TileType>();
-        super.readChildren(in);
     }
 
     public void readChild(XMLStreamReader in) throws XMLStreamException {
@@ -343,13 +337,13 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

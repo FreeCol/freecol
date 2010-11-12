@@ -136,6 +136,7 @@ public class EuropeanNationType extends NationType {
 
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         String extendString = in.getAttributeValue(null, "extends");
         EuropeanNationType parent = (extendString == null) ? this :
             (EuropeanNationType) getSpecification().getNationType(extendString);
@@ -180,7 +181,7 @@ public class EuropeanNationType extends NationType {
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

@@ -226,6 +226,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         String typeString = in.getAttributeValue(null, "type").toUpperCase(Locale.US);
         type = Enum.valueOf(FoundingFatherType.class, typeString);
 
@@ -273,7 +274,7 @@ public class FoundingFather extends FreeColGameObjectType {
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
  * Represents one of the nations present in the game.
  */
 public class Nation extends FreeColGameObjectType {
-	
+
     public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
     /**
@@ -140,6 +140,7 @@ public class Nation extends FreeColGameObjectType {
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         type = getSpecification().getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         String refId = getAttribute(in, "ref", null);
@@ -151,13 +152,13 @@ public class Nation extends FreeColGameObjectType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

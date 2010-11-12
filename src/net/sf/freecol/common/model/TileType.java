@@ -42,14 +42,15 @@ public final class TileType extends FreeColGameObjectType {
 
     private int basicMoveCost;
     private int basicWorkTurns;
-    
+
     public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE }
-    
+
     private int[] humidity = new int[2];
     private int[] temperature = new int[2];
     private int[] altitude = new int[2];
 
-    private List<RandomChoice<ResourceType>> resourceType;
+    private List<RandomChoice<ResourceType>> resourceType =
+        new ArrayList<RandomChoice<ResourceType>>();
 
 
     /**
@@ -74,7 +75,7 @@ public final class TileType extends FreeColGameObjectType {
      * A list of AbstractGoods produced by this TileType when it is
      * not the colony center tile.
      */
-    private List<AbstractGoods> production;
+    private List<AbstractGoods> production = new ArrayList<AbstractGoods>();
 
     private Map<String, AbstractGoods> primaryGoodsMap =
         new HashMap<String, AbstractGoods>();
@@ -362,18 +363,13 @@ public final class TileType extends FreeColGameObjectType {
     // ------------------------------------------------------------ API methods
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         basicMoveCost = Integer.parseInt(in.getAttributeValue(null, "basic-move-cost"));
         basicWorkTurns = Integer.parseInt(in.getAttributeValue(null, "basic-work-turns"));
         forest = getAttribute(in, "is-forest", false);
         water = getAttribute(in, "is-water", false);
         canSettle = getAttribute(in, "can-settle", !water);
         connected = getAttribute(in, "is-connected", false);
-    }
-        
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        production = new ArrayList<AbstractGoods>();
-        resourceType = new ArrayList<RandomChoice<ResourceType>>();
-        super.readChildren(in);
     }
 
     public void readChild(XMLStreamReader in) throws XMLStreamException {
@@ -418,13 +414,13 @@ public final class TileType extends FreeColGameObjectType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

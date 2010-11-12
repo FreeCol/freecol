@@ -67,7 +67,7 @@ public final class Limit extends FreeColGameObjectType {
         rightHandSide = rhs;
         operator = op;
     }
-    
+
     /**
      * Get the <code>Operator</code> value.
      *
@@ -256,6 +256,7 @@ public final class Limit extends FreeColGameObjectType {
 
     @Override
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         operator = Enum.valueOf(Operator.class, in.getAttributeValue(null, "operator"));
     }
 
@@ -272,18 +273,18 @@ public final class Limit extends FreeColGameObjectType {
             logger.warning("Unsupported child element: " + childName);
         }
     }
-    
+
 
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

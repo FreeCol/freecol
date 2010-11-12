@@ -108,7 +108,7 @@ public class Event extends FreeColGameObjectType {
     }
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
@@ -132,7 +132,7 @@ public class Event extends FreeColGameObjectType {
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        super.readAttributes(in);
         value = in.getAttributeValue(null, VALUE_TAG);
         scoreValue = getAttribute(in, "scoreValue", 0);
     }

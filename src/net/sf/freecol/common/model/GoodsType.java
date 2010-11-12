@@ -60,7 +60,7 @@ public final class GoodsType extends FreeColGameObjectType {
     private GoodsType madeFrom;
     private GoodsType makes;
     private GoodsType storedAs;
-    
+
     private int initialAmount;
     private int initialPrice;
     private int priceDiff;
@@ -186,7 +186,7 @@ public final class GoodsType extends FreeColGameObjectType {
     public boolean isFoodType() {
         return isFood;
     }
-    
+
     public GoodsType outputType() {
         return makes;
     }
@@ -359,6 +359,7 @@ public final class GoodsType extends FreeColGameObjectType {
     // ------------------------------------------------------------ API methods
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         isFarmed = getAttribute(in, "is-farmed", false);
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
@@ -390,13 +391,13 @@ public final class GoodsType extends FreeColGameObjectType {
 
     /**
      * Makes an XML-representation of this object.
-     * 
+     *
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

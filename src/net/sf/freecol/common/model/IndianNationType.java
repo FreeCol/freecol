@@ -243,7 +243,7 @@ public class IndianNationType extends NationType {
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-
+        super.readAttributes(in);
         String extendString = in.getAttributeValue(null, "extends");
         IndianNationType parent = (extendString == null) ? this :
             getSpecification().getType(extendString, IndianNationType.class);
@@ -319,7 +319,7 @@ public class IndianNationType extends NationType {
      *             stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {

@@ -357,6 +357,9 @@ public abstract class FreeColObject {
     }
 
     public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
+        if (tag == null) {
+            System.out.println(getId() + " " + getClass().getName());
+        }
         out.writeStartElement(tag);
         writeAttributes(out);
         writeChildren(out);

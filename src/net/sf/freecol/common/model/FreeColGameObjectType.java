@@ -240,15 +240,9 @@ public class FreeColGameObjectType extends FreeColObject {
         }
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         setAbstractType(getAttribute(in, "abstract", false));
-        readAttributes(in);
-        readChildren(in);
     }
 
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
