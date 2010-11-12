@@ -140,7 +140,6 @@ public final class LastSale extends FreeColObject {
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("when", Integer.toString(when.getNumber()));
         out.writeAttribute("price", Integer.toString(price));
     }
@@ -153,7 +152,6 @@ public final class LastSale extends FreeColObject {
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         when = new Turn(Integer.parseInt(in.getAttributeValue(null, "when")));
         price = Integer.parseInt(in.getAttributeValue(null, "price"));
 
