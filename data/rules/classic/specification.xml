@@ -1556,6 +1556,13 @@
         <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
         <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
         <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
+        <rangeOption id="model.option.settlementNumber" defaultValue="10" localizedLabels="true">
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="8"/>
+          <rangeValue label="medium" value="7"/>
+          <rangeValue label="large" value="6"/>
+          <rangeValue label="veryLarge" value="5"/>
+        </rangeOption>
       </optionGroup>
       <optionGroup id="model.difficulty.easy">
         <integerOption id="model.option.startingMoney" value="300"/>
@@ -1585,6 +1592,13 @@
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
         <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
         <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
+        <rangeOption id="model.option.settlementNumber" defaultValue="8" localizedLabels="true">
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="8"/>
+          <rangeValue label="medium" value="7"/>
+          <rangeValue label="large" value="6"/>
+          <rangeValue label="veryLarge" value="5"/>
+        </rangeOption>
       </optionGroup>
       <optionGroup id="model.difficulty.medium">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1613,6 +1627,13 @@
         <stringOption  id="model.option.tileProduction" value="medium" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
         <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+        <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="8"/>
+          <rangeValue label="medium" value="7"/>
+          <rangeValue label="large" value="6"/>
+          <rangeValue label="veryLarge" value="5"/>
+        </rangeOption>
       </optionGroup>
       <optionGroup id="model.difficulty.hard">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1640,6 +1661,13 @@
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="low" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
+        <rangeOption id="model.option.settlementNumber" defaultValue="6" localizedLabels="true">
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="8"/>
+          <rangeValue label="medium" value="7"/>
+          <rangeValue label="large" value="6"/>
+          <rangeValue label="veryLarge" value="5"/>
+        </rangeOption>
       </optionGroup>
       <optionGroup id="model.difficulty.veryHard">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1667,6 +1695,13 @@
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <stringOption  id="model.option.tileProduction" value="veryLow" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
+        <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="8"/>
+          <rangeValue label="medium" value="7"/>
+          <rangeValue label="large" value="6"/>
+          <rangeValue label="veryLarge" value="5"/>
+        </rangeOption>
       </optionGroup>
       <optionGroup id="model.difficulty.custom">
         <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
@@ -1711,6 +1746,13 @@
         <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
         <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
         <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />
+        <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
+          <rangeValue label="verySmall" value="10"/>
+          <rangeValue label="small" value="8"/>
+          <rangeValue label="medium" value="7"/>
+          <rangeValue label="large" value="6"/>
+          <rangeValue label="veryLarge" value="5"/>
+        </rangeOption>
       </optionGroup>
     </optionGroup>
     <optionGroup id="gameOptions">
@@ -1803,15 +1845,6 @@
           <rangeValue label="medium" value="30"/>
           <rangeValue label="large" value="25"/>
           <rangeValue label="veryLarge" value="20"/>
-        </rangeOption>
-        <!-- Option for setting the number of settlements on the map
-             The value indicates the number of land tile per settlement tile -->
-        <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
         <!-- Option for setting the percentage of forests on the map -->
         <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
