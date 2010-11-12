@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Map.Position;
@@ -1798,6 +1799,18 @@ public class Player extends FreeColGameObject implements Nameable {
     // TODO: remove this again
     public String getNameKey() {
         return getName();
+    }
+
+    /**
+     * Gets the name to display for this player.
+     * TODO: This is a kludge that should be fixed.
+     *
+     * @return The name to display for this player.
+     */
+    public String getDisplayName() {
+        return (getName().startsWith("model.nation."))
+            ? Messages.message(getName())
+            : getName();
     }
 
     /**
