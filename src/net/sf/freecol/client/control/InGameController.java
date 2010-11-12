@@ -113,6 +113,7 @@ import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
+import net.sf.freecol.common.networking.DeclineMoundsMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -2046,15 +2047,41 @@ public final class InGameController implements NetworkConstants {
         // Confirm exploration.
         Canvas canvas = freeColClient.getCanvas();
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        String messageId = (tile.getLostCityRumour().getType()
-                            == LostCityRumour.RumourType.MOUNDS)
-            ? "exploreMoundsRumour.text"
-            : "exploreLostCityRumour.text";
-        if (canvas.showConfirmDialog(unit.getTile(), messageId,
+        if (canvas.showConfirmDialog(unit.getTile(),
+                                     "exploreLostCityRumour.text",
                                      "exploreLostCityRumour.yes",
                                      "exploreLostCityRumour.no")) {
+            if (tile.getLostCityRumour().getType()
+                == LostCityRumour.RumourType.MOUNDS
+                && !canvas.showConfirmDialog(unit.getTile(),
+                                             "exploreMoundsRumour.text",
+                                             "exploreLostCityRumour.yes",
+                                             "exploreLostCityRumour.no")) {
+                askDeclineMounds(unit, direction);
+            }
             moveMove(unit, direction);
         }
+    }
+
+    /**
+     * Server query-response for the special case of deciding to
+     * explore a rumour but then declining not to investigate the
+     * strange mounds.
+     *
+     * @param unit The <code>Unit</code> that is exploring.
+     * @param direction The <code>Direction</code> to move.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askDeclineMounds(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        DeclineMoundsMessage message = new DeclineMoundsMessage(unit,
+                                                                direction);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**

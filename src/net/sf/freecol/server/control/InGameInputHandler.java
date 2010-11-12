@@ -74,6 +74,7 @@ import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
+import net.sf.freecol.common.networking.DeclineMoundsMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -272,6 +273,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new DeclareIndependenceMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(DeclineMoundsMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new DeclineMoundsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(DeliverGiftMessage.getXMLElementTagName(),

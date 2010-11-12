@@ -2186,6 +2186,24 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Decline to investigate strange mounds.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to that is investigating.
+     * @param tile The <code>Tile</code> where the mounds are.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element declineMounds(ServerPlayer serverPlayer, Tile tile) {
+        tile.removeLostCityRumour();
+
+        // Others might see rumour disappear
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.perhaps(), tile);
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
+    }
+
+    /**
      * Move a unit.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is moving.
