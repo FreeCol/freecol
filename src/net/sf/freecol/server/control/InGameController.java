@@ -81,6 +81,7 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -5948,5 +5949,27 @@ public final class InGameController extends Controller {
                                                  reply.getOwnerDocument()));
         }
         return reply;
+    }
+
+
+    /**
+     * Gets a list of nation summaries.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
+     * @param european Get European nations or not.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public List<NationSummary> getForeignAffairs(ServerPlayer serverPlayer,
+                                                 boolean european) {
+        boolean full = serverPlayer
+            .hasAbility("model.ability.betterForeignAffairsReport");
+        Player player = (Player) serverPlayer;
+        List<NationSummary> summaries = new ArrayList<NationSummary>();
+        for (Player p : getGame().getPlayers()) {
+            if (((ServerPlayer) p).getConnection() == null
+                || p.isDead() || p.isEuropean() != european) continue;
+            summaries.add(new NationSummary(p, full || (p == player), player));
+        }
+        return summaries;
     }
 }

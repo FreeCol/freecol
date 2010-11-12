@@ -27,18 +27,17 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 
-import org.w3c.dom.Element;
-
 import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the Foreign Affairs Report.
  */
 public final class ReportForeignAffairPanel extends ReportPanel {
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -53,15 +52,13 @@ public final class ReportForeignAffairPanel extends ReportPanel {
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));
 
-        Element report = getController().getForeignAffairsReport();
-        int number = report.getChildNodes().getLength();
-        for (int i = 0; i < number; i++) {
-            Element enemyElement = (Element) report.getChildNodes().item(i);
+        for (NationSummary ns : getController().getForeignAffairsReport()) {
             JPanel enemyPanel = new JPanel(new MigLayout("gapy 0", "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
-            Player enemy = (Player) getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
+            Player enemy = ns.getPlayer(getGame());
             JLabel coatLabel = new JLabel();
-            final ImageIcon coatOfArms = getLibrary().getCoatOfArmsImageIcon(enemy.getNation());
+            final ImageIcon coatOfArms = getLibrary()
+                .getCoatOfArmsImageIcon(enemy.getNation());
             if (coatOfArms != null) {
                 coatLabel.setIcon(coatOfArms);
             }
@@ -69,36 +66,37 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             enemyPanel.add(localizedLabel(enemy.getNationName()), "wrap 12");
 
             enemyPanel.add(new JLabel(Messages.message("report.stance")), "newline");
-            Stance stance = Enum.valueOf(Stance.class, enemyElement.getAttribute("stance"));
-            enemyPanel.add(new JLabel(Messages.getStanceAsString(stance)));
+            enemyPanel.add(new JLabel(Messages.message(Messages.getStanceAsString(ns.getStance()))));
 
             enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), "newline");
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfColonies")));
+            enemyPanel.add(new JLabel(ns.getNumberOfColonies()));
 
             enemyPanel.add(new JLabel(Messages.message("report.numberOfUnits")), "newline");
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfUnits")));
+            enemyPanel.add(new JLabel(ns.getNumberOfUnits()));
 
             enemyPanel.add(new JLabel(Messages.message("report.militaryStrength")), "newline");
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("militaryStrength")));
+            enemyPanel.add(new JLabel(ns.getMilitaryStrength()));
 
             enemyPanel.add(new JLabel(Messages.message("report.navalStrength")), "newline");
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("navalStrength")));
+            enemyPanel.add(new JLabel(ns.getNavalStrength()));
 
             enemyPanel.add(new JLabel(Messages.message("goldTitle")), "newline");
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("gold")));
+            enemyPanel.add(new JLabel(Integer.toString(ns.getGold())));
 
-            if (enemyElement.hasAttribute("tax")) {
+            String s = ns.getFoundingFathers();
+            if (s != null) {
                 enemyPanel.add(new JLabel(Messages.message("report.continentalCongress.title")), "newline 8");
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("foundingFathers")));
-
+                enemyPanel.add(new JLabel(s));
+            }
+            if ((s = ns.getTax()) != null) {
                 enemyPanel.add(new JLabel(Messages.message("tax")), "newline");
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("tax")));
+                enemyPanel.add(new JLabel(s));
                 enemyPanel.add(new JLabel("%"));
-
+            }
+            if ((s = ns.getSoL()) != null) {
                 enemyPanel.add(new JLabel(Messages.message("report.sonsOfLiberty")), "newline");
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("SoL")));
+                enemyPanel.add(new JLabel(s));
                 enemyPanel.add(new JLabel("%"));
-
             }
             reportPanel.add(enemyPanel);
         }

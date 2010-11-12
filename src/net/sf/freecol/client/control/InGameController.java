@@ -70,6 +70,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -122,6 +123,7 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
+import net.sf.freecol.common.networking.ForeignAffairsMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
@@ -4643,21 +4645,26 @@ public final class InGameController implements NetworkConstants {
     /**
      * Gathers information about opponents.
      *
-     * @return An element describing the other European nations.
+     * @return A list of nation summaries.
      */
-    public Element getForeignAffairsReport() {
+    public List<NationSummary> getForeignAffairsReport() {
         return askForeignAffairs();
     }
 
     /**
      * Server query-response for asking for the foreign affairs situation.
      *
-     * @return An element describing the other European nations.
+     * @return A list of nation summaries.
      */
-    private Element askForeignAffairs() {
+    private List<NationSummary> askForeignAffairs() {
         Client client = freeColClient.getClient();
-        return askExpecting(client,
-                Message.createNewRootElement("foreignAffairs"), null);
+        ForeignAffairsMessage message = new ForeignAffairsMessage(true);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     message.getXMLElementTagName());
+        if (reply == null) return Collections.emptyList();
+
+        Game game = freeColClient.getGame();
+        return new ForeignAffairsMessage(game, reply).getNationSummaries();
     }
 
 

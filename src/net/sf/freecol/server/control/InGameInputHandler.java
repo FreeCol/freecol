@@ -19,43 +19,9 @@
 
 package net.sf.freecol.server.control;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.ExportData;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TileItemContainer;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.AssignTeacherMessage;
@@ -83,6 +49,7 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
+import net.sf.freecol.common.networking.ForeignAffairsMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -120,20 +87,22 @@ import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
 /**
  * Handles the network messages that arrives while
  * {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME in game}.
  */
-public final class InGameInputHandler extends InputHandler implements NetworkConstants {
+public final class InGameInputHandler extends InputHandler
+    implements NetworkConstants {
 
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
+
 
     /**
      * The constructor to use.
@@ -601,6 +570,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new DiplomacyMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
+        register(ForeignAffairsMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new ForeignAffairsMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
         register("getHighScores",
                  new NetworkRequestHandler() {
             @Override
@@ -666,70 +642,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new UpdateTradeRouteMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
-
-        // TODO
-        register("foreignAffairs",
-                 new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return foreignAffairs(connection, element);
-            }});
     }
-
-
-    /**
-     * Handles a "foreignAffairs"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element foreignAffairs(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Element reply = Message.createNewRootElement("foreignAffairsReport");
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (enemyPlayer.getConnection() == null || enemyPlayer.isIndian()
-                || enemyPlayer.isDead()) {
-                continue;
-            }
-            Element enemyElement = reply.getOwnerDocument().createElement("opponent");
-            enemyElement.setAttribute("player", enemyPlayer.getId());
-            int numberOfColonies = enemyPlayer.getSettlements().size();
-            int numberOfUnits = 0;
-            int militaryStrength = 0;
-            int navalStrength = 0;
-            Iterator<Unit> unitIterator = enemyPlayer.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-                numberOfUnits++;
-                if (unit.isNaval()) {
-                    navalStrength += unit.getGame().getCombatModel().getOffencePower(unit, null);
-                } else {
-                    militaryStrength += unit.getGame().getCombatModel().getOffencePower(unit, null);
-                }
-            }
-            Stance stance = enemyPlayer.getStance(player);
-            if (stance == Stance.UNCONTACTED) {
-                stance = Stance.PEACE;
-            }
-            enemyElement.setAttribute("numberOfColonies", String.valueOf(numberOfColonies));
-            enemyElement.setAttribute("numberOfUnits", String.valueOf(numberOfUnits));
-            enemyElement.setAttribute("militaryStrength", String.valueOf(militaryStrength));
-            enemyElement.setAttribute("navalStrength", String.valueOf(navalStrength));
-            enemyElement.setAttribute("stance", String.valueOf(stance));
-            enemyElement.setAttribute("gold", String.valueOf(enemyPlayer.getGold()));
-            if (player.equals(enemyPlayer) ||
-                player.hasAbility("model.ability.betterForeignAffairsReport")) {
-                enemyElement.setAttribute("SoL", String.valueOf(enemyPlayer.getSoL()));
-                enemyElement.setAttribute("foundingFathers", String.valueOf(enemyPlayer.getFatherCount()));
-                enemyElement.setAttribute("tax", String.valueOf(enemyPlayer.getTax()));
-            }
-            reply.appendChild(enemyElement);
-        }
-        return reply;
-    }
-
 
     /**
      * Handles a "logout"-message.
@@ -773,5 +686,4 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         return null;
     }
-
 }

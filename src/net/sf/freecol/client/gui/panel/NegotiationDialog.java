@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
@@ -290,13 +291,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     private void updateDemandItems(){
         // Update the gold amount that can be demanded
         int foreignGold = 0;
-        Element report = getController().getForeignAffairsReport();
-        int number = report.getChildNodes().getLength();
-        for (int i = 0; i < number; i++) {
-            Element enemyElement = (Element) report.getChildNodes().item(i);
-            Player enemy = (Player) getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
-            if (enemy == otherPlayer) {
-                foreignGold = Integer.parseInt(enemyElement.getAttribute("gold"));
+        for (NationSummary ns : getController().getForeignAffairsReport()) {
+            if (ns.getPlayer(getGame()) == otherPlayer) {
+                foreignGold = ns.getGold();
                 break;
             }
         }
