@@ -1624,7 +1624,7 @@ public final class GUI {
                                 }
                             } else if (settlement instanceof IndianSettlement) {
                                 IndianSettlement nativeSettlement = (IndianSettlement) settlement;
-                                if (nativeSettlement.isCapital()) {
+                                if (nativeSettlement.getType().isCapital()) {
                                     leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
                                 }
 
@@ -2516,7 +2516,7 @@ public final class GUI {
                     int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
                     if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                         // Draw the color chip for the settlement.
-                        text = indianSettlement.isCapital() ? "*" : "-";
+                        text = indianSettlement.getType().isCapital() ? "*" : "-";
                         chip = createChip(text, Color.BLACK, background, foreground);
                         g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                         xOffset += chip.getWidth(null) + 2;

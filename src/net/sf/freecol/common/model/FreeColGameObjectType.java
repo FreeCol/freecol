@@ -232,11 +232,13 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        for (Ability ability: featureContainer.getAbilities()) {
-            ability.toXMLImpl(out);
-        }
-        for (Modifier modifier: featureContainer.getModifiers()) {
-            modifier.toXMLImpl(out);
+        if (featureContainer != null) {
+            for (Ability ability: featureContainer.getAbilities()) {
+                ability.toXMLImpl(out);
+            }
+            for (Modifier modifier: featureContainer.getModifiers()) {
+                modifier.toXMLImpl(out);
+            }
         }
     }
 

@@ -20,7 +20,13 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Settlement.SettlementType;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Represents one of the nations present in the game.
@@ -28,19 +34,9 @@ import net.sf.freecol.common.model.Settlement.SettlementType;
 public abstract class NationType extends FreeColGameObjectType {
 
     /**
-     * The type of settlement this Nation has.
+     * The types of settlement this Nation has.
      */
-    private SettlementType typeOfSettlement;
-
-    /**
-     * The radius of this nation type's settlements.
-     */
-    private int settlementRadius = 1;
-
-    /**
-     * The radius of this nation type's capital.
-     */
-    private int capitalRadius = 2;
+    private List<SettlementType> settlementTypes = new ArrayList<SettlementType>();
 
 
     public NationType(String id, Specification specification) {
@@ -53,19 +49,39 @@ public abstract class NationType extends FreeColGameObjectType {
      *
      * @return an <code>SettlementType</code> value
      */
-    public final SettlementType getTypeOfSettlement() {
-        return typeOfSettlement;
+    public final List<SettlementType> getSettlementTypes() {
+        return settlementTypes;
     }
 
     /**
-     * Set the <code>TypeOfSettlement</code> value.
+     * Return the <code>SettlementType</code> of the nation type's
+     * capital.
      *
-     * @param newTypeOfSettlement The new TypeOfSettlement value.
+     * @return a <code>SettlementType</code> value
      */
-    public final void setTypeOfSettlement(final SettlementType newTypeOfSettlement) {
-        this.typeOfSettlement = newTypeOfSettlement;
+    public SettlementType getCapitalType() {
+        return getSettlementType(true);
     }
 
+    public SettlementType getSettlementType(boolean isCapital) {
+
+        for (SettlementType settlementType : settlementTypes) {
+            if (settlementType.isCapital() == isCapital) {
+                return settlementType;
+            }
+        }
+        return null;
+    }
+
+    public SettlementType getSettlementType(String id) {
+
+        for (SettlementType settlementType : settlementTypes) {
+            if (id.equals(settlementType.getId())) {
+                return settlementType;
+            }
+        }
+        return null;
+    }
     /**
      * Whether this is a EuropeanNation, i.e. a player or a REF.
      *
@@ -78,40 +94,22 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     public abstract boolean isREF();
 
-    /**
-     * Get the <code>SettlementRadius</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getSettlementRadius() {
-        return settlementRadius;
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if ("settlement".equals(childName)) {
+            SettlementType settlementType = new SettlementType();
+            settlementType.readFromXML(in);
+            settlementTypes.add(settlementType);
+        } else {
+            super.readChild(in);
+        }
     }
 
-    /**
-     * Set the <code>SettlementRadius</code> value.
-     *
-     * @param newSettlementRadius The new SettlementRadius value.
-     */
-    public final void setSettlementRadius(final int newSettlementRadius) {
-        this.settlementRadius = newSettlementRadius;
-    }
-
-    /**
-     * Get the <code>CapitalRadius</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getCapitalRadius() {
-        return capitalRadius;
-    }
-
-    /**
-     * Set the <code>CapitalRadius</code> value.
-     *
-     * @param newCapitalRadius The new CapitalRadius value.
-     */
-    public final void setCapitalRadius(final int newCapitalRadius) {
-        this.capitalRadius = newCapitalRadius;
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+        for (SettlementType settlementType : settlementTypes) {
+            settlementType.toXML(out, "settlement");
+        }
     }
 
 }

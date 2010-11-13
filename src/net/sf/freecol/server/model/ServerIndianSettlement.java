@@ -160,7 +160,7 @@ public class ServerIndianSettlement extends IndianSettlement
         if (!unitTypes.isEmpty()
             && (getFoodCount() + 4 * getGoodsCount(rumType)
                 > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)
-            && ownedUnits.size() <= getGeneratedUnitCount()) {
+            && ownedUnits.size() <= getType().getMaximumSize()) {
             // Allow one more brave than the initially generated number.
             // This is more than sufficient. Do not increase the amount
             // without discussing it on the developer's mailing list first.

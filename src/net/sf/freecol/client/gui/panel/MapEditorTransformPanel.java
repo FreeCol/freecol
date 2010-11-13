@@ -50,7 +50,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileImprovement;
@@ -149,7 +149,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getLibrary().getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
-        SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();
+        SettlementType settlementType = nativePlayer.getNationType().getCapitalType();
         settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
                                        Messages.message("Settlement"), new SettlementTransform());
         listPanel.add(settlementButton);

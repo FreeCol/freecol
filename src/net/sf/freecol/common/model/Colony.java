@@ -2145,10 +2145,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
-        setName(in.getAttributeValue(null, "name"));
-        owner = getFreeColGameObject(in, "owner", Player.class);
-        tile = getFreeColGameObject(in, "tile", Tile.class);
+        super.readAttributes(in);
         established = new Turn(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);

@@ -50,7 +50,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -71,6 +71,12 @@ public final class ImageLibrary {
                                TILE_OWNED_BY_INDIANS = "nativeLand.image",
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
                                DARKNESS = "halo.dark.image";
+
+
+    private static final String[] stockadeKey = new String[] {
+        null, ".stockade", ".fort", ".fortress"
+    };
+
 
     /**
      * The scaling factor used when creating this
@@ -566,7 +572,7 @@ public final class ImageLibrary {
     }
 
     public Image getSettlementImage(SettlementType settlementType, double scale) {
-        return ResourceManager.getImage(settlementType.toString() + ".image", scale);
+        return ResourceManager.getImage(settlementType.getId() + ".image", scale);
     }
 
     /**
@@ -587,56 +593,37 @@ public final class ImageLibrary {
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(Settlement settlement, double scale) {
+        String key = "";
 
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
 
             // TODO: Put it in specification
             if (colony.isUndead()) {
-                return getSettlementImage(SettlementType.UNDEAD, scale);
+                key = "undead";
             } else {
-                int stockadeLevel = 0;
-                if (colony.getStockade() != null) {
-                    stockadeLevel = colony.getStockade().getLevel();
-                }
                 int unitCount = colony.getUnitCount();
-                switch(stockadeLevel) {
-                case 0:
-                    if (unitCount <= 3) {
-                        return getSettlementImage(SettlementType.SMALL_COLONY, scale);
-                    } else if (unitCount <= 7) {
-                        return getSettlementImage(SettlementType.MEDIUM_COLONY, scale);
-                    } else {
-                        return getSettlementImage(SettlementType.LARGE_COLONY, scale);
-                    }
-                case 1:
-                    if (unitCount > 7) {
-                        return getSettlementImage(SettlementType.LARGE_STOCKADE, scale);
-                    } else if (unitCount > 3) {
-                        return getSettlementImage(SettlementType.MEDIUM_STOCKADE, scale);
-                    } else {
-                        return getSettlementImage(SettlementType.SMALL_STOCKADE, scale);
-                    }
-                case 2:
-                    if (unitCount > 7) {
-                        return getSettlementImage(SettlementType.LARGE_FORT, scale);
-                    } else {
-                        return getSettlementImage(SettlementType.MEDIUM_FORT, scale);
-                    }
-                case 3:
-                    return getSettlementImage(SettlementType.LARGE_FORTRESS, scale);
-                default:
-                    return getSettlementImage(SettlementType.SMALL_COLONY, scale);
+                if (unitCount <= 3) {
+                    key = "small";
+                } else if (unitCount <= 7) {
+                    key = "medium";
+                } else {
+                    key = "large";
                 }
-            }
 
+                if (colony.getStockade() != null) {
+                    key += stockadeKey[colony.getStockade().getLevel()];
+                }
+
+            }
+            key = "model.settlement." + key + ".image";
         } else { // IndianSettlement
-            String key = settlement.getOwner().getNationID()
+            key = settlement.getOwner().getNationID()
                 + (settlement.isCapital() ? ".capital" : ".settlement")
                 + ((((IndianSettlement) settlement).getMissionary() == null) ? "" : ".mission")
                 + ".image";
-            return ResourceManager.getImage(key, scale);
         }
+        return ResourceManager.getImage(key, scale);
     }
 
     /**

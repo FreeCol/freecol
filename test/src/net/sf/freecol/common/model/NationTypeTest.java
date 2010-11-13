@@ -29,15 +29,15 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class NationTypeTest extends FreeColTestCase {
 
     public void testHasType(){
-                
+
         Specification s = spec();
-                
+
         // Make sure that each nation has a type
         for (Nation n : s.getNations()){
             assertNotNull(n.toString(), n.getType());
         }
     }
-        
+
     public void testisRef() {
 
         Specification s = spec();
@@ -77,6 +77,17 @@ public class NationTypeTest extends FreeColTestCase {
         assertFalse(s.getNationType("model.nationType.iroquois").isREF());
         assertFalse(s.getNationType("model.nationType.inca").isREF());
         assertFalse(s.getNationType("model.nationType.aztec").isREF());
+    }
+
+    public void testSettlementType() {
+        for (NationType nationType : spec().getIndianNationTypes()) {
+            assertFalse(nationType.getSettlementTypes().isEmpty());
+            SettlementType settlement = nationType.getSettlementType(false);
+            SettlementType capital = nationType.getSettlementType(true);
+            assertNotNull(nationType.getId(), settlement);
+            assertNotNull(nationType.getId(), capital);
+            assertFalse(nationType.getId(), capital == settlement);
+        }
     }
 
     public void testStartingUnits() {

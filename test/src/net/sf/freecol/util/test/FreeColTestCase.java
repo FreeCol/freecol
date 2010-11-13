@@ -443,149 +443,149 @@ public class FreeColTestCase extends TestCase {
 
     public static class IndianSettlementBuilder{
 
-    	// Required parameter
-    	private final Game game;
+        // Required parameter
+        private final Game game;
 
-    	private Player indianPlayer;
-    	private final String defaultIndianPlayer = "model.nation.tupi";
-    	private String skillTaught;
-    	private int initialBravesInCamp;
-    	private Tile settlementTile;
-      private static int settlementNumber = 1;
+        private Player indianPlayer;
+        private final String defaultIndianPlayer = "model.nation.tupi";
+        private String skillTaught;
+        private int initialBravesInCamp;
+        private Tile settlementTile;
+        private static int settlementNumber = 1;
 
-    	private boolean isCapital;
+        private boolean isCapital;
         private Set<Player> isVisited;
         private Unit residentMissionary;
 
-    	public IndianSettlementBuilder(Game game){
-    		this.game = game;
-    		setStartingParams();
-    	}
+        public IndianSettlementBuilder(Game game){
+            this.game = game;
+            setStartingParams();
+        }
 
-    	private void setStartingParams(){
-    		// Some params can only be set in build(), because the default values
-    		//may not be valid for the game set
-    		// However, the tester himself may set them to valid values later,
-    		//so they are set to null for now
-    		indianPlayer = null;
-        	initialBravesInCamp = 1;
-        	settlementTile = null;
-        	skillTaught = "model.unit.masterCottonPlanter";
-        	isCapital = false;
+        private void setStartingParams(){
+            // Some params can only be set in build(), because the default values
+            //may not be valid for the game set
+            // However, the tester himself may set them to valid values later,
+            //so they are set to null for now
+            indianPlayer = null;
+            initialBravesInCamp = 1;
+            settlementTile = null;
+            skillTaught = "model.unit.masterCottonPlanter";
+            isCapital = false;
             isVisited = new HashSet<Player>();
             residentMissionary = null;
-    	}
+        }
 
-    	public IndianSettlementBuilder player(Player player){
-    		this.indianPlayer = player;
+        public IndianSettlementBuilder player(Player player){
+            this.indianPlayer = player;
 
-			if(indianPlayer == null || !game.getPlayers().contains(player)){
-				throw new IllegalArgumentException("Indian player not in game");
-			}
+            if(indianPlayer == null || !game.getPlayers().contains(player)){
+                throw new IllegalArgumentException("Indian player not in game");
+            }
 
-    		return this;
-    	}
+            return this;
+        }
 
-    	public IndianSettlementBuilder initialBravesInCamp(int nBraves){
-    		if(nBraves <= 0){
-    			throw new IllegalArgumentException("Number of braves must be positive");
-    		}
-    		this.initialBravesInCamp = nBraves;
-    		return this;
-    	}
+        public IndianSettlementBuilder initialBravesInCamp(int nBraves){
+            if(nBraves <= 0){
+                throw new IllegalArgumentException("Number of braves must be positive");
+            }
+            this.initialBravesInCamp = nBraves;
+            return this;
+        }
 
-    	public IndianSettlementBuilder settlementTile(Tile tile){
-    		Tile tileOnMap = this.game.getMap().getTile(tile.getPosition());
-    		if(tile != tileOnMap){
-    			throw new IllegalArgumentException("Given tile not on map");
-    		}
-    		this.settlementTile = tile;
-    		return this;
-    	}
+        public IndianSettlementBuilder settlementTile(Tile tile){
+            Tile tileOnMap = this.game.getMap().getTile(tile.getPosition());
+            if(tile != tileOnMap){
+                throw new IllegalArgumentException("Given tile not on map");
+            }
+            this.settlementTile = tile;
+            return this;
+        }
 
-    	public IndianSettlementBuilder capital(boolean isCapital){
-    		this.isCapital = isCapital;
+        public IndianSettlementBuilder capital(boolean isCapital){
+            this.isCapital = isCapital;
 
-    		return this;
-    	}
+            return this;
+        }
 
-    	public IndianSettlementBuilder isVisitedByPlayer(Player player, boolean isVisited){
-    		if (player != null) {
-                    if (isVisited) {
-                        this.isVisited.add(player);
-                    } else {
-                        this.isVisited.remove(player);
-                    }
-    		}
+        public IndianSettlementBuilder isVisitedByPlayer(Player player, boolean isVisited){
+            if (player != null) {
+                if (isVisited) {
+                    this.isVisited.add(player);
+                } else {
+                    this.isVisited.remove(player);
+                }
+            }
 
-    		return this;
-    	}
+            return this;
+        }
 
-    	public IndianSettlementBuilder missionary(Unit missionary){
-    		this.residentMissionary = missionary;
+        public IndianSettlementBuilder missionary(Unit missionary){
+            this.residentMissionary = missionary;
 
-    		return this;
-    	}
+            return this;
+        }
 
-    	public IndianSettlementBuilder skillToTeach(String skill){
-    		this.skillTaught = skill;
+        public IndianSettlementBuilder skillToTeach(String skill){
+            this.skillTaught = skill;
 
-    		return this;
-    	}
+            return this;
+        }
 
-      private String getSimpleName(Player player, boolean isCapital) {
-          return (isCapital) ? player.getName() + "-capital"
-              : "Settlement-" + settlementNumber++;
-      }
+        private String getSimpleName(Player player, boolean isCapital) {
+            return (isCapital) ? player.getName() + "-capital"
+                : "Settlement-" + settlementNumber++;
+        }
 
-    	public IndianSettlement build(){
-    		UnitType skillToTeach = null;
+        public IndianSettlement build(){
+            UnitType skillToTeach = null;
 
-    		if(skillTaught != null){
-    			skillToTeach = spec().getUnitType(skillTaught);
-    		}
+            if(skillTaught != null){
+                skillToTeach = spec().getUnitType(skillTaught);
+            }
 
-    		UnitType indianBraveType = spec().getUnitType("model.unit.brave");
+            UnitType indianBraveType = spec().getUnitType("model.unit.brave");
 
-    		// indianPlayer not set, get default
-    		if(indianPlayer == null){
-    			indianPlayer = game.getPlayer(defaultIndianPlayer);
-    			if(indianPlayer == null){
-    				throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
-    			}
-    		}
+            // indianPlayer not set, get default
+            if(indianPlayer == null){
+                indianPlayer = game.getPlayer(defaultIndianPlayer);
+                if(indianPlayer == null){
+                    throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
+                }
+            }
 
-    		// settlement tile no set, get default
-    		if(settlementTile == null){
-    			settlementTile = game.getMap().getTile(5, 8);
-    			if(settlementTile == null){
-    				throw new IllegalArgumentException("Default tile not in game");
-    			}
-    		}
+            // settlement tile no set, get default
+            if(settlementTile == null){
+                settlementTile = game.getMap().getTile(5, 8);
+                if(settlementTile == null){
+                    throw new IllegalArgumentException("Default tile not in game");
+                }
+            }
 
-    		IndianSettlement camp
-            = new ServerIndianSettlement(game, indianPlayer,
-                                         getSimpleName(indianPlayer, isCapital),
-                                         settlementTile, isCapital,
-                                         skillToTeach, isVisited,
-                                         residentMissionary);
+            IndianSettlement camp
+                = new ServerIndianSettlement(game, indianPlayer,
+                                             getSimpleName(indianPlayer, isCapital),
+                                             settlementTile, isCapital,
+                                             skillToTeach, isVisited,
+                                             residentMissionary);
 
-    		// Add braves
+            // Add braves
             for(int i=0; i < initialBravesInCamp; i++){
-            	Unit brave = new ServerUnit(game, camp, indianPlayer,
-                                          indianBraveType, UnitState.ACTIVE,
-                                          indianBraveType.getDefaultEquipment());
-            	camp.addOwnedUnit(brave);
+                Unit brave = new ServerUnit(game, camp, indianPlayer,
+                                            indianBraveType, UnitState.ACTIVE,
+                                            indianBraveType.getDefaultEquipment());
+                camp.addOwnedUnit(brave);
             }
             camp.placeSettlement();
             return camp;
-    	}
+        }
 
-    	public IndianSettlementBuilder reset() {
-    		setStartingParams();
+        public IndianSettlementBuilder reset() {
+            setStartingParams();
 
-    		return this;
-    	}
+            return this;
+        }
     }
 
 

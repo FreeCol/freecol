@@ -357,9 +357,6 @@ public abstract class FreeColObject {
     }
 
     public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
-        if (tag == null) {
-            System.out.println(getId() + " " + getClass().getName());
-        }
         out.writeStartElement(tag);
         writeAttributes(out);
         writeChildren(out);
@@ -646,10 +643,12 @@ public abstract class FreeColObject {
 
     protected void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        String newId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         // TODO: get rid of compatibility code
-        if (getId() == null) {
+        if (newId == null) {
             setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        } else {
+            setId(newId);
         }
     }
 

@@ -59,7 +59,7 @@ public class IndianSettlement extends Settlement {
     public static final String ALARM_TAG_NAME = "alarm";
     public static final String MISSIONARY_TAG_NAME = "missionary";
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
-    
+
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
 
@@ -83,7 +83,7 @@ public class IndianSettlement extends Settlement {
 
     /**
      * A map that tells if a player has visited the settlement.
-     * 
+     *
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
@@ -179,7 +179,7 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Initiates a new <code>IndianSettlement</code> 
+     * Initiates a new <code>IndianSettlement</code>
      * with the given ID. The object should later be
      * initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -387,7 +387,7 @@ public class IndianSettlement extends Settlement {
         }
         return false;
     }
-    
+
     /**
      * Returns true if a the given player has visited this settlement
      * to speak with the chief.
@@ -403,7 +403,7 @@ public class IndianSettlement extends Settlement {
     /**
      * Sets the visited status of this settlement to true, indicating
      * that a European player has had a chat with the chief.
-     *    
+     *
      * @param player The visiting <code>Player</code>.
      */
     public void setVisited(Player player) {
@@ -433,7 +433,7 @@ public class IndianSettlement extends Settlement {
     /**
      * Adds the given <code>Unit</code> to the list of units that belongs to this
      * <code>IndianSettlement</code>.
-     * 
+     *
      * @param unit The <code>Unit</code> to be added.
      */
     public void addOwnedUnit(Unit unit) {
@@ -448,9 +448,9 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Gets an iterator over all the units this 
+     * Gets an iterator over all the units this
      * <code>IndianSettlement</code> is owning.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getOwnedUnitsIterator() {
@@ -462,7 +462,7 @@ public class IndianSettlement extends Settlement {
      * Removes the given <code>Unit</code> to the list of units that
      * belongs to this <code>IndianSettlement</code>. Returns true if
      * the Unit was removed.
-     * 
+     *
      * @param unit The <code>Unit</code> to be removed from the
      *       list of the units this <code>IndianSettlement</code>
      *       owns.
@@ -554,13 +554,6 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Gets the kind of Indian settlement.
-     */
-    public SettlementType getTypeOfSettlement() {
-        return ((IndianNationType) owner.getNationType()).getTypeOfSettlement();
-    }
-
-    /**
      * Adds a <code>Locatable</code> to this Location.
      *
      * @param locatable The <code>Locatable</code> to add to this Location.
@@ -616,7 +609,7 @@ public class IndianSettlement extends Settlement {
     public List<Unit> getUnitList() {
         return units;
     }
-    
+
     public Iterator<Unit> getUnitIterator() {
         return units.iterator();
     }
@@ -656,6 +649,10 @@ public class IndianSettlement extends Settlement {
         return defender;
     }
 
+    // TODO: make this work again
+    private int getPriceAddition() {
+        return 3;
+    }
 
     /**
      * Gets the amount of gold this <code>IndianSettlment</code>
@@ -696,12 +693,12 @@ public class IndianSettlement extends Settlement {
     	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
     	EquipmentType armsEqType = getSpecification().getEquipmentType("model.equipment.indian.muskets");
     	EquipmentType horsesEqType = getSpecification().getEquipmentType("model.equipment.indian.horses");
-    	
+
     	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
     	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
         int musketsCurrAvail = getGoodsCount(armsType);
         int horsesCurrAvail = getGoodsCount(horsesType);
-        
+
         if (amount > 100) {
             throw new IllegalArgumentException();
         }
@@ -822,14 +819,14 @@ public class IndianSettlement extends Settlement {
      * is hidden from the clients.
      */
     public void updateWantedGoods() {
-        /* TODO: Try the different types goods in "random" order 
+        /* TODO: Try the different types goods in "random" order
          * (based on the numbers of units on this tile etc): */
         List<GoodsType> goodsTypes = new ArrayList<GoodsType>(getSpecification().getGoodsTypeList());
         Collections.sort(goodsTypes, wantedGoodsComparator);
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
             // Indians do not ask for horses or guns
-            if (goodsType.isMilitaryGoods()) 
+            if (goodsType.isMilitaryGoods())
                 continue;
             // no sense asking for bells or crosses
             if (!goodsType.isStorable())
@@ -842,70 +839,6 @@ public class IndianSettlement extends Settlement {
             }
         }
     }
-
-
-    /**
-     * Get the extra bonus if this is a <code>LONGHOUSE</code>,
-     * <code>CITY</code> or a capital.
-     */
-    private int getPriceAddition() {
-        return getBonusMultiplier() - 1;
-    }
-
-
-    /**
-     * Get general bonus multiplier. This is >1 if this is a <code>LONGHOUSE</code>,
-     * <code>CITY</code> or a capital.
-     * 
-     * @return The bonus multiplier.
-     */
-    public int getBonusMultiplier() {
-        int multiplier = 0;
-        switch (getTypeOfSettlement()) {
-        case INDIAN_CAMP:
-            multiplier = 1;
-            break;
-        case INDIAN_VILLAGE:
-            multiplier = 2;
-            break;
-        case AZTEC_CITY:
-        case INCA_CITY:
-            multiplier = 3;
-            break;
-        default:
-            // No modifier.
-        }
-        if (isCapital()) {
-            multiplier++;
-        }
-        return multiplier;
-    }
-
-
-    /**
-     * Provide some variation in unit count for different types of
-     * <code>IndianSettlement</code>.
-     * 
-     * @return The number of units to generate for this settlement.
-     */
-    public int getGeneratedUnitCount() {
-        int n;
-        switch (getTypeOfSettlement()) {
-        case INDIAN_CAMP:
-            n = 0;
-            break;
-        case INDIAN_VILLAGE:
-            n = 1;
-            break;
-        case AZTEC_CITY: case INCA_CITY:
-            n = 2;
-            break;
-        default:
-            throw new IllegalArgumentException("getTypeOfSettlement() out of range (" + getTypeOfSettlement() + ") in IndianSettlement.getGeneratedUnitCount()");
-        }
-        return 2 * n + 4;
-    }
-
 
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -933,7 +866,7 @@ public class IndianSettlement extends Settlement {
         //TODO: This currently limits production _per_food_type_ to units*3.
         //With multiple food types, this may lead to varying results.
         //If hard-coded limiting makes sense at all, it should be done
-        //after adding up all food types.        
+        //after adding up all food types.
         if (type.isFoodType()) {
             potential = Math.min(potential, ownedUnits.size()*3);
         }
@@ -950,20 +883,20 @@ public class IndianSettlement extends Settlement {
     }
 
     public boolean checkForNewMissionaryConvert() {
-        
+
         /* Increase convert progress and generate convert if needed. */
         if (missionary != null && getGame().getViewOwner() == null) {
             int increment = 8;
-    
+
             // Update increment if missionary is an expert.
             if (missionary.hasAbility("model.ability.expertMissionary")) {
                 increment = 13;
             }
-    
+
             // Increase increment if alarm level is high.
             increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;
-    
+
             if (convertProgress >= 100 && getUnitCount() > 2) {
                 convertProgress = 0;
                 return true;
@@ -1009,23 +942,23 @@ public class IndianSettlement extends Settlement {
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);
     }
-    
+
 
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
@@ -1075,7 +1008,7 @@ public class IndianSettlement extends Settlement {
         }
 
         // attributes end here
-        
+
         goodsContainer.toXML(out, player, showAll, toSavedGame);
 
         if (full) {
@@ -1138,23 +1071,11 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
-        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
-        if (tile == null) {
-            tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
-        }
-        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
-        if (owner == null) {
-            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-        }
-        setCapital(getAttribute(in, "isCapital", false));
-        setName(in.getAttributeValue(null, "name"));
-
+        super.readAttributes(in);
         owner.addSettlement(this);
 
         ownedUnits.clear();
-        
+
         for (int i = 0; i < wantedGoods.length; i++) {
             String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
             String wantedGoodsId = getAttribute(in, tag, null);
@@ -1191,7 +1112,7 @@ public class IndianSettlement extends Settlement {
             } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
                 in.nextTag();
                 missionary = updateFreeColGameObject(in, Unit.class);
-                in.nextTag();                
+                in.nextTag();
             } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -1206,12 +1127,12 @@ public class IndianSettlement extends Settlement {
                 }
             } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
                 Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
-                if(unit.getOwner() != null && unit.getOwner() != owner){
-                	logger.warning("Error in savegame: unit " + unit.getId() + " does not belong to settlement " + getId());
-                }
-                else{
-                	ownedUnits.add(unit);
-                	owner.setUnit(unit);
+                if (unit.getOwner() != null && unit.getOwner() != owner) {
+                    logger.warning("Error in savegame: unit " + unit.getId()
+                                   + " does not belong to settlement " + getId());
+                } else {
+                    ownedUnits.add(unit);
+                    owner.setUnit(unit);
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
@@ -1220,7 +1141,7 @@ public class IndianSettlement extends Settlement {
                     goodsContainer.readFromXML(in);
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
-                }                
+                }
             }
         }
     }
@@ -1228,13 +1149,13 @@ public class IndianSettlement extends Settlement {
 
     /**
      * An Indian settlement is no colony.
-     * 
+     *
      * @return null
      */
     public Colony getColony() {
         return null;
     }
-    
+
     /**
      * Returns an array with goods to sell
      */
@@ -1258,7 +1179,7 @@ public class IndianSettlement extends Settlement {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1309,10 +1230,10 @@ public class IndianSettlement extends Settlement {
         if (price < 1) price = 1;
         return amount * price;
     }
-    
+
     public String toString() {
         StringBuilder s = new StringBuilder(getName());
-        s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")"); 
+        s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")");
         return s.toString();
     }
 
@@ -1323,17 +1244,17 @@ public class IndianSettlement extends Settlement {
     public void tradeGoodsWithSetlement(IndianSettlement settlement) {
         GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
         GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-        
+
         List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
         goodsToTrade.add(armsType);
         goodsToTrade.add(horsesType);
-        
+
         for(GoodsType goods : goodsToTrade){
             int goodsInStock = getGoodsCount(goods);
             if(goodsInStock <= 50){
                 continue;
             }
-            int goodsTraded = goodsInStock / 2;  
+            int goodsTraded = goodsInStock / 2;
             settlement.addGoods(goods, goodsTraded);
             removeGoods(goods, goodsTraded);
         }

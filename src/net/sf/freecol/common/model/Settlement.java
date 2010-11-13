@@ -24,8 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
@@ -45,14 +48,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     public static final int FOOD_PER_COLONIST = 200;
 
-    public static enum SettlementType {
-        SMALL_COLONY, MEDIUM_COLONY, LARGE_COLONY,
-        SMALL_STOCKADE, MEDIUM_STOCKADE, MEDIUM_FORT,
-        LARGE_STOCKADE, LARGE_FORT, LARGE_FORTRESS,
-        UNDEAD,
-        INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
-    }
-
     /** The <code>Player</code> owning this <code>Settlement</code>. */
     protected Player owner;
 
@@ -65,14 +60,14 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     protected GoodsContainer goodsContainer;
 
     /**
-     * Whether this is the capital of the nation.
-     */
-    private boolean isCapital = false;
-
-    /**
      * Contains the abilities and modifiers of this Colony.
      */
     private FeatureContainer featureContainer;
+
+    /**
+     * Describe type here.
+     */
+    private SettlementType type;
 
 
     /**
@@ -95,6 +90,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.owner = owner;
         this.name = name;
         this.tile = tile;
+
+        setType(owner.getNationType().getSettlementType(false));
 
         // Relocate any worker already on the Tile (from another Settlement):
         if (tile.getOwningSettlement() != null) {
@@ -151,6 +148,23 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         super(game, id);
     }
 
+    /**
+     * Get the <code>Type</code> value.
+     *
+     * @return a <code>SettlementType</code> value
+     */
+    public final SettlementType getType() {
+        return type;
+    }
+
+    /**
+     * Set the <code>Type</code> value.
+     *
+     * @param newType The new Type value.
+     */
+    public final void setType(final SettlementType newType) {
+        this.type = newType;
+    }
 
     // TODO: remove this again
     public String getNameKey() {
@@ -183,22 +197,24 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.name = newName;
     }
 
-    /**
+     /**
      * Returns <code>true</code> if this is the Nation's capital.
      *
      * @return <code>true</code> if this is the Nation's capital.
      */
     public boolean isCapital() {
-        return isCapital;
+        return getType().isCapital();
     }
 
-    /**
+     /**
      * Sets the capital value.
      *
      * @param isCapital a <code>boolean</code> value
      */
     public void setCapital(boolean isCapital) {
-        this.isCapital = isCapital;
+        if (isCapital() != isCapital) {
+            setType(owner.getNationType().getSettlementType(isCapital));
+        }
     }
 
 
@@ -463,11 +479,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @return Settlement radius
      */
     public int getRadius() {
-        if (isCapital) {
-            return owner.getNationType().getCapitalRadius();
-        } else {
-            return owner.getNationType().getSettlementRadius();
-        }
+        return getType().getClaimableRadius();
     }
 
     /**
@@ -665,6 +677,29 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             }
         }
         return true;
+    }
+
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+        setName(in.getAttributeValue(null, "name"));
+        owner = getFreeColGameObject(in, "owner", Player.class);
+        tile = getFreeColGameObject(in, "tile", Tile.class);
+
+        // TODO: remove 0.9.x compatibility code
+        String typeStr = in.getAttributeValue(null, "settlementType");
+        if (typeStr == null) {
+            // must be old style
+            String capital = in.getAttributeValue(null, "isCapital");
+            if ("true".equals(capital)) {
+                type = owner.getNationType().getSettlementType(true);
+            } else {
+                type = owner.getNationType().getSettlementType(false);
+            }
+        } else {
+            type = owner.getNationType().getSettlementType(typeStr);
+        }
+        // end compatibility code
+
     }
 
 }

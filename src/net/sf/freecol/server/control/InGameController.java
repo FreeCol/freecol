@@ -86,9 +86,10 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.PlayerExploredTile;
+import net.sf.freecol.common.model.RandomRange;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
@@ -3411,21 +3412,15 @@ public final class InGameController extends Controller {
 
         // Calculate the treasure amount.  Larger if Hernan Cortes is
         // present in the congress, from cities, and capitals.
-        int treasure = Utils.randomInt(logger, "Base treasure factor", random,
-                                       11);
+        SettlementType settlementType = settlement.getType();
+        RandomRange plunder = settlementType.getPlunder();
+        int randomLimit = Utils.randomInt(logger, "Base treasure factor", random,
+                                          plunder.getRandomLimit());
+        int treasure = plunder.getAmount(randomLimit);
         Set<Modifier> modifierSet = attackerPlayer.getFeatureContainer()
             .getModifierSet("model.modifier.nativeTreasureModifier");
         treasure = (int) FeatureContainer
             .applyModifierSet(treasure, game.getTurn(), modifierSet);
-        SettlementType settlementType
-            = ((IndianNationType) nativePlayer.getNationType())
-            .getTypeOfSettlement();
-        // TODO: move following to spec
-        boolean isCity = settlementType == SettlementType.INCA_CITY
-            || settlementType == SettlementType.AZTEC_CITY;
-        treasure = (isCity) ? treasure * 500 + 1000
-            : treasure * 50  + 300;
-        if (settlement.isCapital()) treasure = (treasure * 3) / 2;
 
         // Make the treasure train.
         List<UnitType> unitTypes = game.getSpecification()
@@ -3438,7 +3433,7 @@ public final class InGameController extends Controller {
 
         // This is an atrocity.
         int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
-        if (isCity) atrocities *= 2;
+        if (settlementType.getClaimableRadius() > 1) atrocities *= 2;
         if (settlement.isCapital()) atrocities = (atrocities * 3) / 2;
         attackerPlayer.modifyScore(atrocities);
         cs.addPartial(See.only(attackerPlayer), attackerPlayer, "score");
@@ -4153,9 +4148,10 @@ public final class InGameController extends Controller {
                 result = "tales";
             } else {
                 // ...and the rest are beads.
-                gold = (Utils.randomInt(logger, "Base beads amount", random,
-                                        400) * settlement.getBonusMultiplier())
-                    + 50;
+                RandomRange gifts = settlement.getType().getGifts();
+                int randomLimit = Utils.randomInt(logger, "Base beads amount", random,
+                                                  gifts.getRandomLimit());
+                gold = gifts.getAmount(randomLimit);
                 if (unit.hasAbility("model.ability.expertScout")) {
                     gold = (gold * 11) / 10;
                 }

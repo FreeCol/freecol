@@ -58,6 +58,9 @@ public class SettlementType extends FreeColGameObjectType {
     private int maximumGrow = 10;
 
 
+    public SettlementType() {
+        // empty constructor
+    }
 
 
     /**
@@ -231,12 +234,16 @@ public class SettlementType extends FreeColGameObjectType {
 
     public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
-        plunder.toXML(out, "plunder");
-        gifts.toXML(out, "gifts");
+        if (plunder != null) {
+            plunder.toXML(out, "plunder");
+        }
+        if (gifts != null) {
+            gifts.toXML(out, "gifts");
+        }
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        super.readAttributes(in);
         capital = getAttribute(in, "capital", capital);
         minimumSize = getAttribute(in, "minimumSize", minimumSize);
         maximumSize = getAttribute(in, "maximumSize", maximumSize);

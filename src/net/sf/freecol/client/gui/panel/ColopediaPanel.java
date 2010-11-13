@@ -1125,8 +1125,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                                                     .toLowerCase())));
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nationType.typeOfSettlements")));
-        detailPanel.add(new JLabel(Messages.message(nationType.getSettlementTypeKey()),
-                                   new ImageIcon(getLibrary().getSettlementImage(nationType.getTypeOfSettlement())),
+        detailPanel.add(new JLabel(Messages.message(nationType.getCapitalType().getId() + ".name"),
+                                   new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
                                    SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<String>();

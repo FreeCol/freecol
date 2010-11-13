@@ -44,7 +44,6 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.RandomChoice;
@@ -2265,9 +2264,8 @@ public class Player extends FreeColGameObject implements Nameable {
                     return 0;
                 } else if (tile.getSettlement() != null) {
                     // can build next to an indian settlement, but shouldn't
-                    SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
-                        .getTypeOfSettlement();
-                    if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
+                    SettlementType type = tile.getSettlement().getType();
+                    if (type.getClaimableRadius() > 1) {
                         // really shouldn't build next to cities
                         advantages *= 0.25f;
                     } else {
@@ -2423,9 +2421,8 @@ public class Player extends FreeColGameObject implements Nameable {
                     //already checked: no colony here - if set!=null, it's indian
                     if (set != null) {
                         //penalize building next to native settlement
-                        SettlementType type = ((IndianNationType) set.getOwner().getNationType())
-                            .getTypeOfSettlement();
-                        if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
+                        SettlementType type = set.getType();
+                        if (type.getClaimableRadius() > 1) {
                             // really shouldn't build next to cities
                             advantage *= MOD_ADJ_SETTLEMENT_BIG;
                         } else {

@@ -465,7 +465,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 territory.numberOfSettlements = Math.round(2 * share);
                 break;
             }
-            int radius = territory.player.getNationType().getCapitalRadius();
+            int radius = territory.player.getNationType().getCapitalType().getClaimableRadius();
             ArrayList<Tile> capitalTiles = new ArrayList<Tile>(settlementTiles);
             while (!capitalTiles.isEmpty()) {
                 Tile tile = getClosestTile(territory.getCenter(),
@@ -508,7 +508,8 @@ public class SimpleMapGenerator implements MapGenerator {
             if (tile.getOwner() != null) continue; // No close overlap
 
             Territory territory = getClosestTerritory(tile, territories);
-            int radius = territory.player.getNationType().getSettlementRadius();
+            int radius = territory.player.getNationType().getSettlementType(false)
+                .getClaimableRadius();
             // Insist that the settlement can not be linear
             if (map.getClaimableTiles(territory.player, tile, radius).size()
                 > 2 * radius + 1) {
@@ -625,7 +626,9 @@ public class SimpleMapGenerator implements MapGenerator {
                                          new HashSet<Player>(), null);
         logger.fine("Generated skill: " + settlement.getLearnableSkill());
 
-        int unitCount = settlement.getGeneratedUnitCount();
+        int low = settlement.getType().getMinimumSize();
+        int high = settlement.getType().getMaximumSize();
+        int unitCount = low + random.nextInt(high - low);
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(map.getGame(), settlement, player,

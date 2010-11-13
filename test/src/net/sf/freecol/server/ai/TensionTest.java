@@ -87,7 +87,7 @@ public class TensionTest extends FreeColTestCase {
             newTile.setOwningSettlement(settlement);
             newTile.setOwner(indian);
         }
-        int unitCount = settlement.getGeneratedUnitCount();
+        int unitCount = settlement.getType().getMaximumSize();
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = spec().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(game, settlement, indian, unitType,

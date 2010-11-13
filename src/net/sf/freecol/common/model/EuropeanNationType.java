@@ -31,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -63,7 +62,6 @@ public class EuropeanNationType extends NationType {
 
     public EuropeanNationType(String id, Specification specification) {
         super(id, specification);
-        setTypeOfSettlement(SettlementType.SMALL_COLONY);
     }
 
     /**
@@ -146,6 +144,7 @@ public class EuropeanNationType extends NationType {
             for (Map.Entry<String,Map<String, AbstractUnit>> entry : parent.startingUnitMap.entrySet()) {
                 startingUnitMap.put(entry.getKey(), new HashMap<String, AbstractUnit>(entry.getValue()));
             }
+            getSettlementTypes().addAll(parent.getSettlementTypes());
             getFeatureContainer().add(parent.getFeatureContainer());
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);

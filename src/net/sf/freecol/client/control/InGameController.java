@@ -1769,8 +1769,7 @@ public final class InGameController implements NetworkConstants {
                         ? "welcomeOffer.text" : "welcomeSimple.text";
                     String nation = Messages.message(welcomer.getNationName());
                     String camps = reply.getAttribute("camps");
-                    String type = ((IndianNationType) welcomer.getNationType())
-                        .getSettlementTypeKey() + ".plural";
+                    String type = welcomer.getNationType().getCapitalType().getId() + ".plural";
                     accept = canvas.showConfirmDialog(tile, messageId,
                                                       "welcome.yes",
                                                       "welcome.no",
