@@ -164,7 +164,7 @@ public final class ImageLibrary {
      * @return the coat-of-arms of this nation
      */
     public ImageIcon getCoatOfArmsImageIcon(Nation nation) {
-        return ResourceManager.getImageIcon(nation.getId() + ".coat-of-arms.image");
+        return ResourceManager.getImageIcon(nation.getId() + ".image");
     }
 
     /**
