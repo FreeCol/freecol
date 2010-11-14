@@ -50,12 +50,12 @@ public class SettlementType extends FreeColGameObjectType {
     /**
      * The minimum number of tiles to grow this SettlementType.
      */
-    private int minimumGrow = 1;
+    private int minimumGrowth = 1;
 
     /**
      * The maximum number of tiles to grown this SettlementType.
      */
-    private int maximumGrow = 10;
+    private int maximumGrowth = 10;
 
 
     public SettlementType() {
@@ -182,6 +182,26 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
+     * Get the minimum growth value.
+     *
+     * @return The minimum number of tiles to try to grow this
+     *     settlement type by.
+     */
+    public final int getMinimumGrowth() {
+        return minimumGrowth;
+    }
+
+    /**
+     * Get the maximum growth value.
+     *
+     * @return The maximum number of tiles to try to grow this
+     *     settlement type by.
+     */
+    public final int getMaximumGrowth() {
+        return maximumGrowth;
+    }
+
+    /**
      * Get the <code>Plunder</code> value.
      *
      * @return a <code>RandomRange</code> value
@@ -229,6 +249,8 @@ public class SettlementType extends FreeColGameObjectType {
         out.writeAttribute("visibleRadius", Integer.toString(visibleRadius));
         out.writeAttribute("claimableRadius", Integer.toString(claimableRadius));
         out.writeAttribute("wanderingRadius", Integer.toString(wanderingRadius));
+        out.writeAttribute("minimumGrowth", Integer.toString(minimumGrowth));
+        out.writeAttribute("maximumGrowth", Integer.toString(maximumGrowth));
     }
 
 
@@ -250,6 +272,8 @@ public class SettlementType extends FreeColGameObjectType {
         visibleRadius = getAttribute(in, "visibleRadius", visibleRadius);
         claimableRadius = getAttribute(in, "claimableRadius", claimableRadius);
         wanderingRadius = getAttribute(in, "wanderingRadius", wanderingRadius);
+        minimumGrowth = getAttribute(in, "minimumGrowth", minimumGrowth);
+        maximumGrowth = getAttribute(in, "maximumGrowth", maximumGrowth);
     }
 
     @Override

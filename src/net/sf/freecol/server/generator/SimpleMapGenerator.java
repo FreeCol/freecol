@@ -543,13 +543,17 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
             Collections.shuffle(tiles, random);
-            for (int i = random.nextInt(5 + is.getRadius() * 2) + 1;
-                 i > 0; i--) {
-                Tile tile = findFreeNeighbouringTile(is, tiles, random);
-                if (tile == null) break;
-                tile.setOwner(is.getOwner());
-                tile.setOwningSettlement(is);
-                tiles.add(tile);
+            int minGrow = is.getType().getMinimumGrowth();
+            int maxGrow = is.getType().getMaximumGrowth();
+            if (maxGrow > minGrow) {
+                for (int i = random.nextInt(maxGrow - minGrow) + minGrow;
+                     i > 0; i--) {
+                    Tile tile = findFreeNeighbouringTile(is, tiles, random);
+                    if (tile == null) break;
+                    tile.setOwner(is.getOwner());
+                    tile.setOwningSettlement(is);
+                    tiles.add(tile);
+                }
             }
         }
 

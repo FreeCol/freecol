@@ -1381,13 +1381,17 @@
       <ability id="model.ability.native"/>
     </indian-nation-type>
     <indian-nation-type id="camp" abstract="true" extends="default">
-      <settlement id="model.settlement.camp" capital="false" claimableRadius="1"
-                  minimumSize="4" maximumSize="6">
+      <settlement id="model.settlement.camp" capital="false"
+                  claimableRadius="1"
+                  minimumSize="4" maximumSize="6"
+                  mimimumGrowth="1" maximumGrowth="8">
         <plunder probability="20" minimum="2" maximum="3" factor="100" />
         <gifts probability="100" minimum="2" maximum="3" factor="100" />
       </settlement>
-      <settlement id="model.settlement.camp.capital" capital="true" claimableRadius="2"
-                  minimumSize="6" maximumSize="8">
+      <settlement id="model.settlement.camp.capital" capital="true"
+                  claimableRadius="2"
+                  minimumSize="6" maximumSize="8"
+                  minimumGrowth="2" maximumGrowth="10">
         <plunder probability="100" minimum="2" maximum="4" factor="200" />
         <plunder probability="100" minimum="2" maximum="4" factor="200" />
       </settlement>
@@ -1397,13 +1401,17 @@
                 type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="village" abstract="true" extends="default">
-      <settlement id="model.settlement.village" capital="false" claimableRadius="1"
-                  minimumSize="6" maximumSize="8">
+      <settlement id="model.settlement.village" capital="false"
+                  claimableRadius="1"
+                  minimumSize="6" maximumSize="8"
+                  minimumGrowth="1" maximumGrowth="8">
         <plunder probability="50" minimum="3" maximum="8" factor="100" />
         <gifts probability="100" minimum="3" maximum="8" factor="100" />
       </settlement>
-      <settlement id="model.settlement.village.capital" capital="true" claimableRadius="2"
-                  minimumSize="8" maximumSize="10">
+      <settlement id="model.settlement.village.capital" capital="true"
+                  claimableRadius="2"
+                  minimumSize="8" maximumSize="10"
+                  minimumGrowth="2" maximumGrowth="10">
         <plunder probability="100" minimum="3" maximum="8" factor="200" />
         <plunder probability="100" minimum="3" maximum="8" factor="200" />
       </settlement>
@@ -1481,13 +1489,17 @@
       <skill id="model.unit.masterWeaver" probability="3"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
-      <settlement id="model.settlement.inca" capital="false" claimableRadius="2"
-                  minimumSize="8" maximumSize="12">
+      <settlement id="model.settlement.inca" capital="false"
+                  claimableRadius="2"
+                  minimumSize="8" maximumSize="12"
+                  minimumGrowth="3" maximumGrowth="12">
         <plunder probability="100" minimum="2" maximum="6" factor="2100" />
         <gifts probability="100" minimum="2" maximum="6" factor="200" />
       </settlement>
-      <settlement id="model.settlement.inca.capital" capital="true" claimableRadius="3"
-                  minimumSize="10" maximumSize="12">
+      <settlement id="model.settlement.inca.capital" capital="true"
+                  claimableRadius="3"
+                  minimumSize="10" maximumSize="12"
+                  minimumGrowth="4" maximumGrowth="14">
         <plunder probability="100" minimum="2" maximum="6" factor="3000" />
         <gifts probability="100" minimum="2" maximum="6" factor="300" />
       </settlement>
@@ -1498,13 +1510,17 @@
       <skill id="model.unit.expertOreMiner" probability="3"/>
       <region id="model.region.center" />
       <region id="model.region.east" />
-      <settlement id="model.settlement.aztec.capital" capital="false" claimableRadius="2"
-                  minimumSize="8" maximumSize="12">
+      <settlement id="model.settlement.aztec" capital="false"
+                  claimableRadius="2"
+                  minimumSize="8" maximumSize="12"
+                  minimumGrowth="3" maximumGrowth="12">
         <plunder probability="100" minimum="5" maximum="9" factor="1000" />
         <gifts probability="100" minimum="5" maximum="9" factor="200" />
       </settlement>
-      <settlement id="model.settlement.aztec" capital="true" claimableRadius="3"
-                  minimumSize="10" maximumSize="12">
+      <settlement id="model.settlement.aztec.capital" capital="true"
+                  claimableRadius="3"
+                  minimumSize="10" maximumSize="12"
+                  minimumGrowth="4" maximumGrowth="14">
         <plunder probability="100" minimum="7" maximum="12" factor="1000" />
         <gifts probability="100" minimum="7" maximum="12" factor="300" />
       </settlement>
