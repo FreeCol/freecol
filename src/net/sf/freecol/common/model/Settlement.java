@@ -252,7 +252,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @see Player#canSee(Tile)
      */
     public int getLineOfSight() {
-        return 2;
+        return getType().getVisibleRadius();
     }
 
 
