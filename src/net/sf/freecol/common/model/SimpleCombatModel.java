@@ -68,7 +68,7 @@ public class SimpleCombatModel extends CombatModel {
 
     /**
      * Calculates the odds of success in combat.
-     * 
+     *
      * @param attacker The attacker.
      * @param defender The defender.
      * @return The combat odds.
@@ -76,9 +76,9 @@ public class SimpleCombatModel extends CombatModel {
     public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
                                           FreeColGameObject defender) {
         if (attacker == null || defender == null) {
-            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);    
+            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
         }
-        
+
         float attackPower = getOffencePower(attacker, defender);
         float defencePower = getDefencePower(attacker, defender);
         if (attackPower == 0.0f && defencePower == 0.0f) {
@@ -125,7 +125,7 @@ public class SimpleCombatModel extends CombatModel {
 
     /**
      * Get the defensive power wrt an attacker.
-     * 
+     *
      * @param attacker The attacker.
      * @param defender The defender.
      * @return The defensive power.
@@ -302,12 +302,6 @@ public class SimpleCombatModel extends CombatModel {
             } else {
                 result.addAll(settlement.getFeatureContainer()
                               .getModifierSet(Modifier.DEFENCE, type));
-                result.addAll(defenderPlayer
-                              .getModifierSet(Modifier.SETTLEMENT_DEFENCE, type));
-                if (settlement.isCapital()) {
-                    result.addAll(defenderPlayer
-                                  .getModifierSet(Modifier.CAPITAL_DEFENCE, type));
-                }
             }
 
         } else if (combatIsBombard(attacker, defender)) {
@@ -385,11 +379,7 @@ public class SimpleCombatModel extends CombatModel {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
             } else { // In settlement
-                Player owner = tile.getSettlement().getOwner();
-                result.addAll(owner.getModifierSet(Modifier.SETTLEMENT_DEFENCE));
-                if (tile.getSettlement().isCapital()) {
-                    result.addAll(owner.getModifierSet(Modifier.CAPITAL_DEFENCE));
-                }
+                result.addAll(tile.getSettlement().getModifierSet(Modifier.DEFENCE));
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility("model.ability.bombard")
                     && attackerUnit.getOwner().isIndian()) {

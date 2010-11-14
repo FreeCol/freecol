@@ -29,6 +29,7 @@
      0.51: remove improvementaction-type and difficultyLevels
      0.52: add upkeep attribute to building-type
      0.53: add exposeResourcePercent attribute to tileimprovement-type
+     0.54: add settlement type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -496,6 +497,7 @@
           </xs:element>
           <xs:element ref="ability"/>
           <xs:element ref="modifier"/>
+          <xs:element ref="settlement"/>
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:ID"/>
@@ -510,10 +512,9 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="ability"/>
         <xs:element ref="modifier"/>
+        <xs:element ref="settlement"/>
         <xs:element ref="skill"/>
         <xs:element ref="region"/>
-        <xs:element name="settlement" type="PlunderType"/>
-        <xs:element name="capital" type="PlunderType"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" type="xs:boolean" />
@@ -536,18 +537,6 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="type-of-settlement">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="indian_camp"/>
-            <xs:enumeration value="indian_village"/>
-            <xs:enumeration value="inca_city"/>
-            <xs:enumeration value="aztec_city"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="settlementRadius" type="xs:int" use="optional" />
-      <xs:attribute name="capitalRadius" type="xs:int" use="optional" />
     </xs:complexType>
   </xs:element>
 
@@ -561,6 +550,26 @@
   <xs:element name="region">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="settlement">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="modifier"/>
+        <xs:element name="plunder" type="RandomRange"/>
+        <xs:element name="gifts" type="RandomRange"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="SettlementTypeId"/>
+      <xs:attribute name="capital" type="xs:boolean"/>
+      <xs:attribute name="claimableRadius" type="xs:integer"/>
+      <xs:attribute name="visibleRadius" type="xs:integer"/>
+      <xs:attribute name="wanderingRadius" type="xs:integer"/>
+      <xs:attribute name="minimumSize" type="xs:integer"/>
+      <xs:attribute name="maximumSize" type="xs:integer"/>
+      <xs:attribute name="minimumGrowth" type="xs:integer"/>
+      <xs:attribute name="maximumGrowth" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
 
@@ -865,6 +874,13 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="RandomRange">
+    <xs:attribute name="probability" use="required" type="xs:integer"/>
+    <xs:attribute name="minimum" use="required" type="xs:integer"/>
+    <xs:attribute name="maximum" use="required" type="xs:integer"/>
+    <xs:attribute name="factor" use="required" type="xs:integer"/>
+  </xs:complexType>
+
   <xs:complexType name="ScopeType">
     <xs:attribute name="matchesNull" type="xs:boolean"/>
     <xs:attribute name="matchNegated" type="xs:boolean"/>
@@ -990,6 +1006,12 @@
   <xs:simpleType name="UnitTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.unit\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SettlementTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.settlement(\.[a-zA-Z]+)+" />
     </xs:restriction>
   </xs:simpleType>
 

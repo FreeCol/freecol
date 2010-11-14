@@ -39,8 +39,6 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
 
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
-    public static final String CAPITAL_DEFENCE = "model.modifier.capitalDefence";
-    public static final String SETTLEMENT_DEFENCE = "model.modifier.settlementDefence";
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 

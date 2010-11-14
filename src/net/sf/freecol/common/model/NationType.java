@@ -97,7 +97,8 @@ public abstract class NationType extends FreeColGameObjectType {
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if ("settlement".equals(childName)) {
-            SettlementType settlementType = new SettlementType();
+            String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            SettlementType settlementType = new SettlementType(id, getSpecification());
             settlementType.readFromXML(in);
             settlementTypes.add(settlementType);
         } else {

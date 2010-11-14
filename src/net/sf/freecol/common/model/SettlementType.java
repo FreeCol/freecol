@@ -58,11 +58,6 @@ public class SettlementType extends FreeColGameObjectType {
     private int maximumGrowth = 10;
 
 
-    public SettlementType() {
-        // empty constructor
-    }
-
-
     /**
      * Creates a new <code>SettlementType</code> instance.
      *

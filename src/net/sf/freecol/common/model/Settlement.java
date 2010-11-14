@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -91,6 +92,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.name = name;
         this.tile = tile;
 
+        featureContainer = new FeatureContainer(game.getSpecification());
         setType(owner.getNationType().getSettlementType(false));
 
         // Relocate any worker already on the Tile (from another Settlement):
@@ -105,7 +107,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
                 logger.warning("An unknown type of settlement is already owning the tile.");
             }
         }
-        featureContainer = new FeatureContainer(game.getSpecification());
         owner.addSettlement(this);
     }
 
@@ -163,7 +164,15 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @param newType The new Type value.
      */
     public final void setType(final SettlementType newType) {
+        if (type != null) {
+            featureContainer.remove(type.getFeatureContainer());
+        }
         this.type = newType;
+        featureContainer.add(type.getFeatureContainer());
+    }
+
+    public Set<Modifier> getModifierSet(String key) {
+        return featureContainer.getModifierSet(key);
     }
 
     // TODO: remove this again

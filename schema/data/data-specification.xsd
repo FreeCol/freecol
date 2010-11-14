@@ -1,32 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.50
-     CHANGELOG:
-     0.26: add capture-equipment
-     0.27: add limits
-     0.28: move limits into other elements
-     0.29: add events
-     0.30: extend string options
-     0.31: change difficulty selection for tile types
-     0.32: change difficulty selection for european nation types
-     0.33: add scoreValue to event
-     0.34: add abstract buildable types
-     0.35: remove minimap-color from tile-type
-     0.36: change image-id of improvement action to string
-     0.37: remove art element from tile-type
-     0.38: remove overlay attribute from tileimprovement-type
-     0.39: remove color from nation and add audio options
-     0.40: change tile(s) children of tile improvement to scope
-     0.41: add consumes element to unit-type
-     0.42: remove pathImage attribute from unit-type
-     0.43: add attributes id and extends to specification
-     0.44: add delete element
-     0.45: add delete attribute to upgrade, downgrade, ability and modifier
-     0.46: add undead downgrade
-     0.47: remove index from player
-     0.48: add difficultyLevel attribute for in-game specification
-     0.49: marketData add goods-type attribute and make ID a MarketDataId
-     0.50: allow OptionGroups to contain OptionGroups
-  -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
   <xs:element name="freecol-specification">
@@ -489,6 +461,7 @@
           </xs:element>
           <xs:element ref="ability"/>
           <xs:element ref="modifier"/>
+          <xs:element ref="settlement"/>
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:ID"/>
@@ -504,8 +477,7 @@
         <xs:element ref="ability"/>
         <xs:element ref="modifier"/>
         <xs:element ref="skill"/>
-        <xs:element name="settlement" type="PlunderType"/>
-        <xs:element name="capital" type="PlunderType"/>
+        <xs:element ref="settlement"/>
         <xs:element name="region">
           <xs:complexType>
             <xs:attribute name="id">
@@ -547,18 +519,6 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="type-of-settlement">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="indian_camp"/>
-            <xs:enumeration value="indian_village"/>
-            <xs:enumeration value="inca_city"/>
-            <xs:enumeration value="aztec_city"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="settlementRadius" type="xs:int" use="optional" />
-      <xs:attribute name="capitalRadius" type="xs:int" use="optional" />
     </xs:complexType>
   </xs:element>
 
@@ -566,6 +526,26 @@
     <xs:complexType>
       <xs:attribute name="id" use="required" type="UnitTypeId"/>
       <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="settlement">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="modifier"/>
+        <xs:element name="plunder" type="RandomRange"/>
+        <xs:element name="gifts" type="RandomRange"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="SettlementTypeId"/>
+      <xs:attribute name="capital" type="xs:boolean"/>
+      <xs:attribute name="claimableRadius" type="xs:integer"/>
+      <xs:attribute name="visibleRadius" type="xs:integer"/>
+      <xs:attribute name="wanderingRadius" type="xs:integer"/>
+      <xs:attribute name="minimumSize" type="xs:integer"/>
+      <xs:attribute name="maximumSize" type="xs:integer"/>
+      <xs:attribute name="minimumGrowth" type="xs:integer"/>
+      <xs:attribute name="maximumGrowth" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
 
@@ -639,7 +619,7 @@
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="audioMixerOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
@@ -654,7 +634,7 @@
       <xs:attribute name="previewEnabled" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="rangeValue">
     <xs:complexType>
       <xs:attribute name="label" use="required" type="xs:string"/>
@@ -777,6 +757,13 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="RandomRange">
+    <xs:attribute name="probability" use="required" type="xs:integer"/>
+    <xs:attribute name="minimum" use="required" type="xs:integer"/>
+    <xs:attribute name="maximum" use="required" type="xs:integer"/>
+    <xs:attribute name="factor" use="required" type="xs:integer"/>
+  </xs:complexType>
+
   <xs:complexType name="ScopeType">
     <xs:attribute name="matchesNull" type="xs:boolean"/>
     <xs:attribute name="matchNegated" type="xs:boolean"/>
@@ -854,6 +841,12 @@
   <xs:simpleType name="FoundingFatherId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.foundingFather\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SettlementTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.settlement(\.[a-zA-Z]+)+" />
     </xs:restriction>
   </xs:simpleType>
 
