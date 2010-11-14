@@ -2088,6 +2088,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         out.writeAttribute("ID", getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("tile", tile.getId());
+        out.writeAttribute("settlementType", getType().getId());
         out.writeAttribute("established", Integer.toString(established.getNumber()));
         if (full) {
             out.writeAttribute("owner", owner.getId());
