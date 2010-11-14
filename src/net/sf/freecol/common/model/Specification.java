@@ -80,10 +80,6 @@ public final class Specification {
         new FreeColGameObjectType("model.source.cargoPenalty");
     public static final FreeColGameObjectType AMBUSH_BONUS_SOURCE =
         new FreeColGameObjectType("model.source.ambushBonus");
-    public static final FreeColGameObjectType IN_SETTLEMENT =
-        new FreeColGameObjectType("model.source.inSettlement");
-    public static final FreeColGameObjectType IN_CAPITAL =
-        new FreeColGameObjectType("model.source.inCapital");
 
     // Workaround.  Not really in the specification.
     public static final FreeColGameObjectType COLONY_GOODS_PARTY =
@@ -184,8 +180,6 @@ public final class Specification {
                 BASE_DEFENCE_SOURCE,
                 CARGO_PENALTY_SOURCE,
                 AMBUSH_BONUS_SOURCE,
-                IN_SETTLEMENT,
-                IN_CAPITAL,
                 COLONY_GOODS_PARTY
             }) {
             allTypes.put(source.getId(), source);
