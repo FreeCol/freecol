@@ -41,7 +41,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportForeignAffairPanel(Canvas parent) {
