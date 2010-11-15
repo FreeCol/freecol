@@ -310,7 +310,7 @@ public class LostCityRumour extends TileItem {
             choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
         }
         return RandomChoice.getWeightedRandom(logger,
-            "Explore rumour", random, choices);
+            "Choose rumour", random, choices);
     }
 
     /**
