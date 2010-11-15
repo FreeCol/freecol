@@ -803,7 +803,6 @@ public final class FreeColServer {
 
             // Add a default value for options new to each version.
             if (savegameVersion < 11) {
-                addIntegerOption("model.option.indianClaimRadius", 3);
                 addIntegerOption("model.option.monarchSupport", 2);
                 addStringOption("model.option.buildOnNativeLand",
                                 "model.option.buildOnNativeLand.never");

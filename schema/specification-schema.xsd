@@ -564,6 +564,7 @@
       <xs:attribute name="id" use="required" type="SettlementTypeId"/>
       <xs:attribute name="capital" type="xs:boolean"/>
       <xs:attribute name="claimableRadius" type="xs:integer"/>
+      <xs:attribute name="extraClaimableRadius" type="xs:integer"/>
       <xs:attribute name="visibleRadius" type="xs:integer"/>
       <xs:attribute name="wanderingRadius" type="xs:integer"/>
       <xs:attribute name="minimumSize" type="xs:integer"/>

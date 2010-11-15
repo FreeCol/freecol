@@ -830,8 +830,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 && (settlement = getIndianSettlement()) != null
                 && (newTile.getPosition().getDistance(settlement
                                                       .getTile().getPosition())
-                    < spec.getInteger("model.option.indianClaimRadius")
-                    + settlement.getRadius())) {
+                    < settlement.getRadius()
+                        + settlement.getType().getExtraClaimableRadius())) {
                 newTile.setOwner(serverPlayer);
             }
 

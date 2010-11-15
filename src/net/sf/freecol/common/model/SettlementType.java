@@ -22,6 +22,12 @@ public class SettlementType extends FreeColGameObjectType {
     private int claimableRadius = 1;
 
     /**
+     * The extra radius beyond the claimableRadius where wandering
+     * units may claim as yet unclaimed tiles.
+     */
+    private int extraClaimableRadius = 2;
+
+    /**
      * How far units from this SettlementType may roam.
      */
     private int wanderingRadius = 4;
@@ -150,6 +156,15 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>extraClaimableRadius</code> value.
+     *
+     * @return The extra claimable radius.
+     */
+    public final int getExtraClaimableRadius() {
+        return extraClaimableRadius;
+    }
+
+    /**
      * Set the <code>ClaimableRadius</code> value.
      *
      * @param newClaimableRadius The new ClaimableRadius value.
@@ -243,6 +258,7 @@ public class SettlementType extends FreeColGameObjectType {
         out.writeAttribute("maximumSize", Integer.toString(maximumSize));
         out.writeAttribute("visibleRadius", Integer.toString(visibleRadius));
         out.writeAttribute("claimableRadius", Integer.toString(claimableRadius));
+        out.writeAttribute("extraClaimableRadius", Integer.toString(extraClaimableRadius));
         out.writeAttribute("wanderingRadius", Integer.toString(wanderingRadius));
         out.writeAttribute("minimumGrowth", Integer.toString(minimumGrowth));
         out.writeAttribute("maximumGrowth", Integer.toString(maximumGrowth));
@@ -266,6 +282,7 @@ public class SettlementType extends FreeColGameObjectType {
         maximumSize = getAttribute(in, "maximumSize", maximumSize);
         visibleRadius = getAttribute(in, "visibleRadius", visibleRadius);
         claimableRadius = getAttribute(in, "claimableRadius", claimableRadius);
+        extraClaimableRadius = getAttribute(in, "extraClaimableRadius", extraClaimableRadius);
         wanderingRadius = getAttribute(in, "wanderingRadius", wanderingRadius);
         minimumGrowth = getAttribute(in, "minimumGrowth", minimumGrowth);
         maximumGrowth = getAttribute(in, "maximumGrowth", maximumGrowth);
