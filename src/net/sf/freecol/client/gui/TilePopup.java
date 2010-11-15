@@ -539,7 +539,8 @@ public final class TilePopup extends JPopupMenu {
             Player sPlayer = (Player) sGame.getFreeColGameObject(player.getId());
             Tile sTile = (Tile) sGame.getFreeColGameObject(tile.getId());
             ServerUnit sUnit = new ServerUnit(sGame, sTile, sPlayer,
-                                              unitChoice, UnitState.ACTIVE);
+                                              unitChoice, UnitState.ACTIVE,
+                                              unitChoice.getDefaultEquipment());
             Unit unit = new Unit(game, sUnit.toXMLElement(Message.createNewDocument()));
             tile.add(unit);
             player.invalidateCanSeeTiles();
