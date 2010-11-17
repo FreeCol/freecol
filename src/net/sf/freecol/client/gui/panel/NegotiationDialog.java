@@ -288,15 +288,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         }
     }
     
-    private void updateDemandItems(){
+    private void updateDemandItems() {
         // Update the gold amount that can be demanded
-        int foreignGold = 0;
-        for (NationSummary ns : getController().getForeignAffairsReport()) {
-            if (ns.getPlayer(getGame()) == otherPlayer) {
-                foreignGold = ns.getGold();
-                break;
-            }
-        }
+        NationSummary ns = getController().getNationSummary(otherPlayer);
+        int foreignGold = (ns == null) ? 0 : ns.getGold();
         goldDemand.setAvailableGold(foreignGold);
         
         if(unit.isCarrier()){

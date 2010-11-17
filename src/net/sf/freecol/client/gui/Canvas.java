@@ -2013,18 +2013,19 @@ public final class Canvas extends JDesktopPane {
      * his scout in a native settlement.
      *
      * @param settlement The <code>IndianSettlement</code> to be scouted.
+     * @param number The number of settlements in the settlement owner nation.
      * @return The chosen action, speak, tribute, attack or cancel.
      */
-    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
+    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
         StringBuilder text = new StringBuilder(400);
+        Player owner = settlement.getOwner();
         text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer()))
-                                     .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
+                                     .addStringTemplate("%nation%", owner.getNationName())));
         text.append("\n\n");
-        int number = settlement.getOwner().getNumberOfSettlements();
         text.append(Messages.message(StringTemplate.template("scoutSettlement.greetings")
                                      .addStringTemplate("%nation%", settlement.getOwner().getNationName())
                                      .addName("%settlement%", settlement.getName())
-                                     .addAmount("%number%", number)
+                                     .add("%number%", number)
                                      .add("%settlementType%", settlement.getType().getId() + ".plural")));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {

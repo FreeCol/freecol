@@ -20,8 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -30,31 +33,60 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
 
+/**
+ * A summary of an enemy nation.
+ */
 public class NationSummary extends FreeColObject {
 
-    private String playerId;
+    /**
+     * The number of settlements this player has.
+     */
+    private String numberOfSettlements;
 
-    private String numberOfColonies;
-
+    /**
+     * The number of units this (European) player has.
+     */
     private String numberOfUnits;
 
+    /**
+     * The military strength of this (European) player.
+     */
     private String militaryStrength;
 
+    /**
+     * The naval strength of this (European) player.
+     */
     private String navalStrength;
 
+    /**
+     * The stance of the player toward the requesting player.
+     */
     private String stance;
 
+    /**
+     * The gold this (European) player has.
+     */
     private String gold;
 
+    /**
+     * The (European) player SoL.
+     */
     private String soL;
 
+    /**
+     * The number of founding fathers this (European) player has.
+     */
     private String foundingFathers;
 
+    /**
+     * The tax rate of this (European) player.
+     */
     private String tax;
 
 
@@ -63,44 +95,50 @@ public class NationSummary extends FreeColObject {
      *
      * @param player The <code>Player</code> the player to create the
      *     summary of.
-     * @param full Create full summary or not.
      * @param requester The <code>Player</code> making the request.
      */
-    public NationSummary(Player player, boolean full, Player requester) {
+    public NationSummary(Player player, Player requester) {
         setId("");
-        CombatModel cm = player.getGame().getCombatModel();
-        playerId = player.getId();
-        numberOfColonies = Integer.toString(player.getSettlements().size());
-        int nUnits = 0, sMilitary = 0, sNaval = 0;
-        for (Unit unit : player.getUnits()) {
-            nUnits++;
-            if (unit.isNaval()) {
-                sNaval += cm.getOffencePower(unit, null);
-            } else {
-                sMilitary += cm.getOffencePower(unit, null);
-            }
-        }
-        numberOfUnits = Integer.toString(nUnits);
-        militaryStrength = Integer.toString(sMilitary);
-        navalStrength = Integer.toString(sNaval);
+        numberOfSettlements = Integer.toString(player.getSettlements().size());
         Stance sta = player.getStance(requester);
-        stance = ((sta == Stance.UNCONTACTED) ? Stance.PEACE : sta).toString();
-        gold = Integer.toString(player.getGold());
-        if (full) {
-            soL = Integer.toString(player.getSoL());
-            foundingFathers = Integer.toString(player.getFatherCount());
-            tax = String.valueOf(player.getTax());
+        stance = ((sta == Stance.UNCONTACTED) ? Stance.PEACE
+                  : sta).toString();
+
+        if (player.isEuropean()) {
+            CombatModel cm = player.getGame().getCombatModel();
+            int nUnits = 0, sMilitary = 0, sNaval = 0;
+            for (Unit unit : player.getUnits()) {
+                nUnits++;
+                if (unit.isNaval()) {
+                    sNaval += cm.getOffencePower(unit, null);
+                } else {
+                    sMilitary += cm.getOffencePower(unit, null);
+                }
+            }
+            numberOfUnits = Integer.toString(nUnits);
+            militaryStrength = Integer.toString(sMilitary);
+            navalStrength = Integer.toString(sNaval);
+            gold = Integer.toString(player.getGold());
+            if (player == requester || requester
+                .hasAbility("model.ability.betterForeignAffairsReport")) {
+                soL = Integer.toString(player.getSoL());
+                foundingFathers = Integer.toString(player.getFatherCount());
+                tax = String.valueOf(player.getTax());
+            } else {
+                soL = null;
+                foundingFathers = null;
+                tax = null;
+            }
         } else {
-            soL = null;
-            foundingFathers = null;
-            tax = null;
+            numberOfUnits = militaryStrength = navalStrength = gold = "-1";
+            soL = foundingFathers = tax = null;
         }
     }
 
     /**
      * Creates a new <code>NationSummary</code> instance.
      *
-     * @param element an <code>Element</code> value
+     * @param element An <code>Element</code> value.
      */
     public NationSummary(Element element) {
         readFromXMLElement(element);
@@ -108,14 +146,8 @@ public class NationSummary extends FreeColObject {
 
 
     // Trivial accessors
-
-    public Player getPlayer(Game game) {
-        FreeColGameObject fcgo = game.getFreeColGameObject(playerId);
-        return (fcgo instanceof Player) ? (Player) fcgo : null;
-    }
-
-    public String getNumberOfColonies() {
-        return numberOfColonies;
+    public String getNumberOfSettlements() {
+        return numberOfSettlements;
     }
 
     public String getNumberOfUnits() {
@@ -166,22 +198,26 @@ public class NationSummary extends FreeColObject {
     public void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("player", playerId);
-        out.writeAttribute("numberOfColonies", numberOfColonies);
+        out.writeAttribute("numberOfSettlements", numberOfSettlements);
         out.writeAttribute("numberOfUnits", numberOfUnits);
         out.writeAttribute("militaryStrength", militaryStrength);
         out.writeAttribute("navalStrength", navalStrength);
         out.writeAttribute("stance", stance);
         out.writeAttribute("gold", gold);
-        if (soL != null) out.writeAttribute("SoL", soL);
-        if (foundingFathers != null) out.writeAttribute("foundingFathers", foundingFathers);
-        if (tax != null) out.writeAttribute("tax", tax);
+        if (soL != null) {
+            out.writeAttribute("SoL", soL);
+        }
+        if (foundingFathers != null) {
+            out.writeAttribute("foundingFathers", foundingFathers);
+        }
+        if (tax != null) {
+            out.writeAttribute("tax", tax);
+        }
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-        playerId = getAttribute(in, "player", "");
-        numberOfColonies = getAttribute(in, "numberOfColonies", "");
+        super.readAttributes(in);
+        numberOfSettlements = getAttribute(in, "numberOfSettlements", "");
         numberOfUnits = getAttribute(in, "numberOfUnits", "");
         militaryStrength = getAttribute(in, "militaryStrength", "");
         navalStrength = getAttribute(in, "navalStrength", "");

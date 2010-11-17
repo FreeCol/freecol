@@ -699,7 +699,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of settlements this player has.
      */
     public int getNumberOfSettlements() {
-        return getSettlements().size();
+        return settlements.size();
     }
 
     /**
@@ -866,7 +866,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // Fallback method
         final String base = settlementFallback + "-";
         String name;
-        int i = getNumberOfSettlements()+1;
+        int i = settlements.size() + 1;
         while (game.getSettlement(name = base + Integer.toString(i)) != null) {
             i++;
         }
@@ -1098,11 +1098,11 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * The second and third cases of buildOnNative land need to test
      * if the player has no settlements yet.  We can not just check
-     * getNumberOfSettlements() == 0 because by the time the
+     * that the number of settlement is zero because by the time the
      * settlement is being placed and we are collecting the tiles to
-     * claim, the settlement already exists and thus
-     * getNumberOfSettlements will return 1--- so we have to check if
-     * that one settlement is located at the tile being tested.
+     * claim, the settlement already exists and thus there will
+     * already be one settlement--- so we have to check if that one
+     * settlement is located at the tile being tested.
      *
      * @return True if the player has no settlements (on the map) yet.
      */

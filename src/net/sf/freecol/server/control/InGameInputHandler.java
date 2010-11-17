@@ -49,7 +49,7 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
-import net.sf.freecol.common.networking.ForeignAffairsMessage;
+import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -570,19 +570,19 @@ public final class InGameInputHandler extends InputHandler
                 return new DiplomacyMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
-        register(ForeignAffairsMessage.getXMLElementTagName(),
-                 new NetworkRequestHandler() {
-            @Override
-            public Element handle(Connection connection, Element element) {
-                return new ForeignAffairsMessage(getGame(), element)
-                    .handle(freeColServer, connection);
-            }});
         register("getHighScores",
                  new NetworkRequestHandler() {
             @Override
             public Element handle(Connection connection, Element element) {
                 return freeColServer.getInGameController()
                     .getHighScores(freeColServer.getPlayer(connection));
+            }});
+        register(GetNationSummaryMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new GetNationSummaryMessage(getGame(), element)
+                    .handle(freeColServer, connection);
             }});
         register("getNewTradeRoute",
                  new NetworkRequestHandler() {

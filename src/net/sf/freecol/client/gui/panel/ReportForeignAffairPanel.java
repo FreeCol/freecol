@@ -52,10 +52,12 @@ public final class ReportForeignAffairPanel extends ReportPanel {
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));
 
-        for (NationSummary ns : getController().getForeignAffairsReport()) {
+        for (Player enemy : getGame().getPlayers()) {
+            if (!enemy.isEuropean()) continue;
+            NationSummary ns = getController().getNationSummary(enemy);
+            if (ns == null) continue;
             JPanel enemyPanel = new JPanel(new MigLayout("gapy 0", "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
-            Player enemy = ns.getPlayer(getGame());
             JLabel coatLabel = new JLabel();
             final ImageIcon coatOfArms = getLibrary()
                 .getCoatOfArmsImageIcon(enemy.getNation());
@@ -69,7 +71,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             enemyPanel.add(new JLabel(Messages.message(Messages.getStanceAsString(ns.getStance()))));
 
             enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), "newline");
-            enemyPanel.add(new JLabel(ns.getNumberOfColonies()));
+            enemyPanel.add(new JLabel(ns.getNumberOfSettlements()));
 
             enemyPanel.add(new JLabel(Messages.message("report.numberOfUnits")), "newline");
             enemyPanel.add(new JLabel(ns.getNumberOfUnits()));

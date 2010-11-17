@@ -4133,7 +4133,8 @@ public final class InGameController extends Controller {
                 result = "nothing";
             } else if (skill != null
                        && skill.hasAbility("model.ability.expertScout")
-                       && unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+                       && unit.getType().canBeUpgraded(skill,
+                                                       ChangeType.NATIVES)) {
                 // If the scout can be taught to be an expert it will be.
                 // TODO: in the old code the settlement retains the
                 // teaching ability.  Is this Col1 compliant?
@@ -4149,7 +4150,8 @@ public final class InGameController extends Controller {
             } else {
                 // ...and the rest are beads.
                 RandomRange gifts = settlement.getType().getGifts();
-                int randomLimit = Utils.randomInt(logger, "Base beads amount", random,
+                int randomLimit = Utils.randomInt(logger, "Base beads amount",
+                                                  random,
                                                   gifts.getRandomLimit());
                 gold = gifts.getAmount(randomLimit);
                 if (unit.hasAbility("model.ability.expertScout")) {
@@ -5952,20 +5954,11 @@ public final class InGameController extends Controller {
      * Gets a list of nation summaries.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is querying.
-     * @param european Get European nations or not.
+     * @param player The <code>Player</code> to summarize.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public List<NationSummary> getForeignAffairs(ServerPlayer serverPlayer,
-                                                 boolean european) {
-        boolean full = serverPlayer
-            .hasAbility("model.ability.betterForeignAffairsReport");
-        Player player = (Player) serverPlayer;
-        List<NationSummary> summaries = new ArrayList<NationSummary>();
-        for (Player p : getGame().getPlayers()) {
-            if (((ServerPlayer) p).getConnection() == null
-                || p.isDead() || p.isEuropean() != european) continue;
-            summaries.add(new NationSummary(p, full || (p == player), player));
-        }
-        return summaries;
+    public NationSummary getNationSummary(ServerPlayer serverPlayer,
+                                          Player player) {
+        return new NationSummary(player, serverPlayer);
     }
 }

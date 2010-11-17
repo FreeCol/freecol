@@ -123,7 +123,7 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
-import net.sf.freecol.common.networking.ForeignAffairsMessage;
+import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
@@ -2505,7 +2505,9 @@ public final class InGameController implements NetworkConstants {
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
         // Offer the choices.
-        switch (canvas.showScoutIndianSettlementDialog(settlement)) {
+        NationSummary ns = getNationSummary(settlement.getOwner());
+        String number = (ns == null) ? "1" : ns.getNumberOfSettlements();
+        switch (canvas.showScoutIndianSettlementDialog(settlement, number)) {
         case CANCEL:
             return;
         case INDIAN_SETTLEMENT_ATTACK:
@@ -4642,28 +4644,30 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Gathers information about opponents.
+     * Get the nation summary for a player.
      *
-     * @return A list of nation summaries.
+     * @param player The <code>Player</code> to summarize.
+     * @return A summary of that nation, or null on error.
      */
-    public List<NationSummary> getForeignAffairsReport() {
-        return askForeignAffairs();
+    public NationSummary getNationSummary(Player player) {
+        return askNationSummary(player);
     }
 
     /**
-     * Server query-response for asking for the foreign affairs situation.
+     * Server query-response for asking for the nation summary of a player.
      *
-     * @return A list of nation summaries.
+     * @param player The <code>Player</code> to summarize.
+     * @return A summary of that nation, or null on error.
      */
-    private List<NationSummary> askForeignAffairs() {
+    private NationSummary askNationSummary(Player player) {
         Client client = freeColClient.getClient();
-        ForeignAffairsMessage message = new ForeignAffairsMessage(true);
+        GetNationSummaryMessage message = new GetNationSummaryMessage(player);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      message.getXMLElementTagName());
-        if (reply == null) return Collections.emptyList();
+        if (reply == null) return null;
 
         Game game = freeColClient.getGame();
-        return new ForeignAffairsMessage(game, reply).getNationSummaries();
+        return new GetNationSummaryMessage(game, reply).getNationSummary();
     }
 
 

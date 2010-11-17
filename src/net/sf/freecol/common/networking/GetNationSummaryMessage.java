@@ -19,10 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
@@ -35,60 +32,57 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * The message sent when doing a foreign affairs report.
+ * The message sent when summarizing a nation.
  */
-public class ForeignAffairsMessage extends Message {
+public class GetNationSummaryMessage extends Message {
 
     /**
-     * Cover European nations or native nations?
+     * The id of the player to summarize.
      */
-    private boolean european;
+    private String playerId;
 
     /**
-     * A list of nation summaries.
+     * The summary.
      */
-    private List<NationSummary> summaries;
+    private NationSummary summary;
+
 
     /**
-     * Create a new <code>ForeignAffairsMessage</code>.
-     * Used by the client to request the foreign affairs data.
+     * Create a new <code>GetNationSummaryMessage</code> for the
+     * specified player.
      *
-     * @param european True if the report should cover European players,
-     *     otherwise it covers native players.
+     * @param player The <code>Player</code> to summarize.
      */
-    public ForeignAffairsMessage(boolean european) {
-        this.european = european;
-        summaries = Collections.emptyList();
+    public GetNationSummaryMessage(Player player) {
+        playerId = player.getId();
+        summary = null;
     }
 
     /**
-     * Create a new <code>ForeignAffairsMessage</code> from a
+     * Create a new <code>GetNationSummaryMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public ForeignAffairsMessage(Game game, Element element) {
-        this.european = element.hasAttribute("european");
-        this.summaries = new ArrayList<NationSummary>();
+    public GetNationSummaryMessage(Game game, Element element) {
+        playerId = element.getAttribute("player");
         NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            summaries.add(new NationSummary((Element) nodes.item(i)));
-        }
+        summary = (nodes == null || nodes.getLength() != 1) ? null
+            : new NationSummary((Element) nodes.item(0));
     }
 
     /**
-     * Gets the nation summaries attached to this message.
-     * Client-side helper.
+     * Client side helper to get the summary.
      *
-     * @return The nation summaries.
+     * @return The summary.
      */
-    public List<NationSummary> getNationSummaries() {
-        return summaries;
+    public NationSummary getNationSummary() {
+        return summary;
     }
 
     /**
-     * Handle a "foreignAffairs"-message.
+     * Handle a "getNationSummary"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
@@ -98,23 +92,35 @@ public class ForeignAffairsMessage extends Message {
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = serverPlayer.getGame();
 
-        // Proceed to get the foreign affairs.
-        summaries = server.getInGameController()
-            .getForeignAffairs(serverPlayer, european);
+        Player player;
+        FreeColGameObject fcgo = game.getFreeColGameObjectSafely(playerId);
+        if (fcgo instanceof Player) {
+            player = (Player) fcgo;
+        } else {
+            return Message.clientError("Not a player: " + playerId);
+        }
+        if (player.isIndian() && !serverPlayer.hasContacted(player)) {
+            return Message.clientError("Not contacted: " + playerId);
+        }
+
+        // Proceed to get the summary.
+        summary = server.getInGameController()
+            .getNationSummary(serverPlayer, player);
         return toXMLElement();
     }
 
     /**
-     * Convert this ForeignAffairsMessage to XML.
+     * Convert this GetNationSummaryMessage to XML.
      *
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         Document doc = result.getOwnerDocument();
-        if (european) result.setAttribute("european", "true");
-        for (NationSummary summary : summaries) {
+        result.setAttribute("player", playerId);
+        if (summary != null) {
             result.appendChild(summary.toXMLElement(null, doc));
         }
         return result;
@@ -123,9 +129,9 @@ public class ForeignAffairsMessage extends Message {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "foreignAffairs".
+     * @return "getNationSummary".
      */
     public static String getXMLElementTagName() {
-        return "foreignAffairs";
+        return "getNationSummary";
     }
 }
