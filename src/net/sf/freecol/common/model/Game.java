@@ -365,8 +365,9 @@ public class Game extends FreeColGameObject {
         final WeakReference<FreeColGameObject> wr = new WeakReference<FreeColGameObject>(freeColGameObject);
         final FreeColGameObject old = getFreeColGameObjectSafely(id);
         if (old != null) {
-            throw new IllegalArgumentException("Replacing FreeColGameObject: " + old.getClass() + " with "
-                                               + freeColGameObject.getClass());
+            throw new IllegalArgumentException("Replacing FreeColGameObject "
+                + id + ": " + old.getClass()
+                + " with " + freeColGameObject.getClass());
         }
         freeColGameObjects.put(id, wr);
 

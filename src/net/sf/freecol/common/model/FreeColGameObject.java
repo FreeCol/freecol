@@ -68,7 +68,8 @@ abstract public class FreeColGameObject extends FreeColObject {
         } else if (this instanceof Game) {
             setId("0");
         } else {
-            logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
+            logger.warning("Created 'FreeColGameObject' with 'game == null':"
+                           + this);
         }
 
         uninitialized = false;
