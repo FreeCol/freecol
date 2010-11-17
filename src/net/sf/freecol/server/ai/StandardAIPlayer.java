@@ -719,7 +719,7 @@ public class StandardAIPlayer extends AIPlayer {
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
 
-                    sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
+                    AIMessage.askClearSpeciality(getAIUnit(unit));
                     EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
                     EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
                     AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);

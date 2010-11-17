@@ -623,7 +623,7 @@ public class ColonialAIPlayer extends AIPlayer {
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
                     
-                    sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
+                    AIMessage.askClearSpeciality(getAIUnit(unit));
                     AIMessage.askEquipUnit(getAIUnit(unit), spec.getEquipmentType("model.equipment.horses"), 1);
                     AIMessage.askEquipUnit(getAIUnit(unit), spec.getEquipmentType("model.equipment.muskets"), 1);
                 }

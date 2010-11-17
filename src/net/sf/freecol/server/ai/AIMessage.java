@@ -20,10 +20,13 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
+
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
@@ -34,6 +37,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
@@ -41,7 +45,10 @@ import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
+import net.sf.freecol.common.networking.ClaimLandMessage;
+import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
+import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -49,6 +56,8 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
+import net.sf.freecol.common.networking.SetBuildQueueMessage;
+import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -67,35 +76,78 @@ public class AIMessage {
      *
      * @param connection The <code>Connection</code> to use
      *     when communicating with the server.
+     * @param request The <code>Element</code> to send.
+     * @return True if the message was sent, and a non-null, non-error
+     *     reply returned.
+     */
+    private static boolean sendMessage(Connection connection, Element request) {
+        try {
+            Element reply = connection.ask(request);
+            if (reply == null) {
+                return false;
+            } else if ("error".equals(reply.getTagName())) {
+                String msgID = reply.getAttribute("messageID");
+                String msg = reply.getAttribute("message");
+                String logMessage = "AIMessage." + request.getTagName()
+                    + " error,"
+                    + " messageID: " + ((msgID == null) ? "(null)" : msgID)
+                    + " message: " + ((msg == null) ? "(null)" : msg);
+                logger.warning(logMessage);
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send \""
+                       + request.getTagName() + "\"-message!", e);
+        }
+        return false;
+    }
+
+    /**
+     * Send a message to the server.
+     *
+     * @param connection The <code>Connection</code> to use
+     *     when communicating with the server.
      * @param message The <code>Message</code> to send.
      * @return True if the message was sent, and a non-null, non-error
      *     reply returned.
      */
     private static boolean sendMessage(Connection connection,
                                        Message message) {
-        if (connection != null && message != null) {
-            try {
-                Element request = message.toXMLElement();
-                Element reply = connection.ask(request);
-                if (reply == null) {
-                    return false;
-                } else if ("error".equals(reply.getTagName())) {
-                    String msgID = reply.getAttribute("messageID");
-                    String msg = reply.getAttribute("message");
-                    String logMessage = "AIMessage." + request.getTagName()
-                        + " error,"
-                        + " messageID: " + ((msgID == null) ? "(null)" : msgID)
-                        + " message: " + ((msg == null) ? "(null)" : msg);
-                    logger.warning(logMessage);
-                    return false;
-                }
-                return true;
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not send \""
-                           + message.getType() + "\"-message!", e);
-            }
+        return (connection != null && message != null)
+            ? sendMessage(connection, message.toXMLElement())
+            : false;
+    }
+
+    /**
+     * Send a trivial message.
+     *
+     * @param connection The <code>Connection</code> to send on.
+     * @param tag The tag of the message.
+     * @param attributes Attributes to add to the message.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean sendTrivial(Connection connection, String tag,
+                                      String... attributes) {
+        return sendMessage(connection, makeTrivial(tag, attributes));
+    }
+
+    /**
+     * Make a trivial message.
+     *
+     * @param tag The tag of the message.
+     * @param attributes Attributes to add to the message.
+     * @return The Element encapsulating the message.
+     */
+    public static Element makeTrivial(String tag, String... attributes) {
+        if ((attributes.length & 1) == 1) {
+            throw new IllegalArgumentException("Attributes list must have even length");
         }
-        return false;
+        Element element = Message.createNewRootElement(tag);
+        for (int i = 0; i < attributes.length; i += 2) {
+            element.setAttribute(attributes[i], attributes[i+1]);
+        }
+        return element;
     }
 
 
@@ -107,8 +159,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askAttack(AIUnit aiUnit, Direction direction) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new AttackMessage(aiUnit.getUnit(), direction));
     }
 
@@ -121,8 +172,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeState(AIUnit aiUnit, UnitState state) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new ChangeStateMessage(aiUnit.getUnit(), state));
     }
 
@@ -135,8 +185,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeWorkType(AIUnit aiUnit, GoodsType type) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new ChangeWorkTypeMessage(aiUnit.getUnit(), type));
     }
 
@@ -150,9 +199,36 @@ public class AIMessage {
      */
     public static boolean askChangeWorkImprovementType(AIUnit aiUnit,
                                                   TileImprovementType type) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
             new ChangeWorkImprovementTypeMessage(aiUnit.getUnit(), type));
+    }
+
+
+    /**
+     * Claims a tile for a colony.
+     *
+     * @param aiColony The <code>AIColony</code> claiming the tile.
+     * @param tile The <code>Tile</code> to claim.
+     * @param price The price to pay.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askClaimLand(AIColony aiColony, Tile tile,
+                                       int price) {
+        return sendMessage(aiColony.getConnection(),
+                           new ClaimLandMessage(tile, aiColony.getColony(),
+                                                price));
+    }
+
+
+    /**
+     * Clears the speciality of a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to clear.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askClearSpeciality(AIUnit aiUnit) {
+        return sendMessage(aiUnit.getConnection(),
+                           new ClearSpecialityMessage(aiUnit.getUnit()));
     }
 
 
@@ -166,10 +242,22 @@ public class AIMessage {
      */
     public static boolean askDeliverGift(AIUnit aiUnit, Settlement settlement,
                                          Goods goods) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new DeliverGiftMessage(aiUnit.getUnit(),
                                                   settlement, goods));
+    }
+
+
+    /**
+     * A unit in Europe emigrates.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     * @param slot The slot to emigrate from.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askEmigrate(Connection connection, int slot) {
+        return sendMessage(connection,
+                           new EmigrateUnitMessage(slot));
     }
 
 
@@ -183,8 +271,7 @@ public class AIMessage {
      */
     public static boolean askEquipUnit(AIUnit aiUnit, EquipmentType type,
                                        int amount) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new EquipUnitMessage(aiUnit.getUnit(), type,
                                                 amount));
     }
@@ -201,8 +288,7 @@ public class AIMessage {
     public static boolean askEstablishMission(AIUnit aiUnit,
                                               Direction direction,
                                               boolean denounce) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new MissionaryMessage(aiUnit.getUnit(), direction,
                                                  denounce));
     }
@@ -211,13 +297,13 @@ public class AIMessage {
     /**
      * Gives independence to a player.
      *
-     * @param aiPlayer The <code>AIPlayer</code> granting independence.
+     * @param connection The <code>Connection</code> to the server.
      * @param player The <code>Player</code> gaining independence.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askGiveIndependence(AIPlayer aiPlayer,
+    public static boolean askGiveIndependence(Connection connection,
                                               Player player) {
-        return sendMessage(aiPlayer.getConnection(),
+        return sendMessage(connection,
                            new GiveIndependenceMessage(player));
     }
 
@@ -233,7 +319,7 @@ public class AIMessage {
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           Goods goods, int gold) {
-        return sendMessage(aiUnit.getOwner().getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new IndianDemandMessage(aiUnit.getUnit(), colony,
                                                    goods, gold));
     }
@@ -247,22 +333,49 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMove(AIUnit aiUnit, Direction direction) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new MoveMessage(aiUnit.getUnit(), direction));
     }
 
 
-   /**
+    /**
      * An AIUnit is put outside a colony.
      *
      * @param aiUnit The <code>AIUnit</code> to put out.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askPutOutsideColony(AIUnit aiUnit) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new PutOutsideColonyMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
+     * Set the build queue in a colony.
+     *
+     * @param aiColony The <code>AIColony</code> that is building.
+     * @param queue The list of <code>BuildableType</code>s to build.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askSetBuildQueue(AIColony aiColony,
+                                           List<BuildableType> queue) {
+        return sendMessage(aiColony.getConnection(),
+                           new SetBuildQueueMessage(aiColony.getColony(),
+                                                    queue));
+    }
+
+
+    /**
+     * Train unit in Europe.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     * @param unitType The <code>UnitType</code> to train.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askTrainUnitInEurope(Connection connection,
+                                               UnitType type) {
+        return sendMessage(connection,
+                           new TrainUnitInEuropeMessage(type));
     }
 
 
@@ -274,8 +387,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askWork(AIUnit aiUnit, WorkLocation workLocation) {
-        AIPlayer owner = aiUnit.getOwner();
-        return sendMessage(owner.getConnection(),
+        return sendMessage(aiUnit.getConnection(),
                            new WorkMessage(aiUnit.getUnit(), workLocation));
     }
 

@@ -198,11 +198,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "AI player failed while working!", e);
                     }
-                    try {
-                        connection.send(Message.createNewRootElement("endTurn"));
-                    } catch (IOException e) {
-                        logger.log(Level.WARNING, "Could not send \"endTurn\"-message!", e);
-                    }
+                    AIMessage.sendTrivial(connection, "endTurn");
                 }
             };
             t.start();
@@ -234,11 +230,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         }
 
         FoundingFather foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
-        Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", foundingFather.getId());
-        serverPlayer.setCurrentFather(foundingFather);
-
-        return reply;
+        return AIMessage.makeTrivial("chosenFoundingFather",
+                                     "foundingFather", foundingFather.getId());
     }
 
     /**
@@ -251,32 +244,29 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      */
     private Element monarchAction(DummyConnection connection, Element element) {
         MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
-        Element reply = null;
         boolean accept = false;
         switch (action) {
         case RAISE_TAX:
             int tax = Integer.parseInt(element.getAttribute("amount"));
             accept = getAIPlayer().acceptTax(tax);
-            reply = Message.createNewRootElement("acceptTax");
-            reply.setAttribute("accepted", String.valueOf(accept));
+            element.setAttribute("accepted", String.valueOf(accept));
+            logger.finest("AI player monarch action " + action
+                          + " = " + accept);
             break;
             
-        case LOWER_TAX:
-            int newTax = Integer.parseInt(element.getAttribute("amount"));
-            getAIPlayer().getPlayer().setTax(newTax);
-            break;
-
         case OFFER_MERCENARIES:
-            reply = Message.createNewRootElement("hireMercenaries");
             accept = getAIPlayer().acceptMercenaryOffer();
-            reply.setAttribute("accepted", String.valueOf(accept));
+            element.setAttribute("accepted", String.valueOf(accept));
+            logger.finest("AI player monarch action " + action
+                          + " = " + accept);
             break;
 
         default:
-            logger.info("AI player ignoring monarch action " + action);
+            logger.finest("AI player ignoring monarch action " + action);
+            return null;
         }
 
-        return reply;
+        return element;
     }
 
     /**

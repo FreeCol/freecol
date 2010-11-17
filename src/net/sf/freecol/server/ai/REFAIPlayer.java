@@ -36,7 +36,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.networking.GiveIndependenceMessage;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -332,7 +332,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
 
         for (Player p : dominions) {
-            sendAndWaitSafely(new GiveIndependenceMessage(p).toXMLElement());
+            AIMessage.askGiveIndependence(getConnection(), p);
         }
     }
 

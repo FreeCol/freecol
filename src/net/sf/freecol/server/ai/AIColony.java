@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
-import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMessage;
@@ -135,6 +134,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     protected AIUnit getAIUnit(Unit unit) {
         return (AIUnit) getAIMain().getAIObject(unit);
+    }
+
+    protected AIPlayer getAIOwner() {
+        return (AIPlayer) getAIMain().getAIObject(colony.getOwner());
+    }
+
+    protected Connection getConnection() {
+        return getAIOwner().getConnection();
     }
 
     /**
@@ -773,34 +780,23 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * goods.  Steals land from other settlements only when it is
      * free.
      *
-     * @param connection The <code>Connection</code> to be used when
-     *            communicating with the server.
      * @param unit The <code>Unit</code> to work the tile.
      * @param goodsType The type of goods to produce.
      * @return The best choice of available vacant colony tiles, or
      *         null if nothing suitable.
      */
-    private ColonyTile getBestVacantTile(Connection connection,
-                                         Unit unit, GoodsType goodsType) {
+    private ColonyTile getBestVacantTile(Unit unit, GoodsType goodsType) {
         ColonyTile colonyTile = colony.getVacantColonyTileFor(unit, true, goodsType);
         if (colonyTile == null) return null;
 
         // Check if the tile needs to be claimed from another settlement.
         Tile tile = colonyTile.getWorkTile();
         if (tile.getOwningSettlement() != colony) {
-            ClaimLandMessage message = new ClaimLandMessage(tile, colony, 0);
-            try {
-                connection.sendAndWait(message.toXMLElement());
-            } catch (IOException e) {
-                logger.warning("Could not send \""
-                               + ClaimLandMessage.getXMLElementTagName()
-                               + "\"-message:" + e.getMessage());
-            }
-            if (tile.getOwningSettlement() != colony) {
+            if (!AIMessage.askClaimLand(this, tile, 0)
+                || tile.getOwningSettlement() != colony) {
                 return null; // Claim failed.
             }
         }
-
         return colonyTile;
     }
 
@@ -1007,14 +1003,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
                 GoodsType type = bestPick.getWorkType().getRawMaterial();
                 WorkLocation w = (type == null) ? null
-                    : getBestVacantTile(connection, bestPick, type);
+                    : getBestVacantTile(bestPick, type);
                 if (w == null) {
                     type = colony.getSpecification()
                         .getGoodsType("model.goods.bells");
                     w = colony.getBuildingForProducing(type);
                 }
                 if (w == null) {
-                    w = getBestVacantTile(connection, bestPick, foodType);
+                    w = getBestVacantTile(bestPick, foodType);
                     type = foodType;
                 }
                 if (w != null) {
@@ -1055,7 +1051,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         for (GoodsType goodsType2 : goodsList) {
                             if (!goodsType2.isFarmed())
                                 continue;
-                            ColonyTile bestTile = getBestVacantTile(connection, unit, goodsType2);
+                            ColonyTile bestTile = getBestVacantTile(unit, goodsType2);
                             int production2 = (bestTile == null ? 0 :
                                                bestTile.getProductionOf(unit, goodsType2));
                             if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
@@ -1446,17 +1442,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         BuildableType buildable = (bi.hasNext()) ? bi.next() : null;
         if (buildable != null && colony.canBuild(buildable)
             && buildable != colony.getCurrentlyBuilding()) {
-            Element element = Message.createNewRootElement("setBuildQueue");
-            element.setAttribute("colony", colony.getId());
-            element.setAttribute("size", "1");
-            element.setAttribute("x0", buildable.getId());
-            try {
-                connection.sendAndWait(element);
-            } catch (IOException e) {
-                logger.warning("Could not send \"setBuildQueue\"-message.");
-            }
-            logger.fine("Colony " + colony.getId()
-                        + " will build " + buildable.getId());
+            List<BuildableType> queue = new ArrayList<BuildableType>();
+            queue.add(buildable);
+            AIMessage.askSetBuildQueue(this, queue);
         }
     }
 
