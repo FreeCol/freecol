@@ -380,13 +380,6 @@ public final class Canvas extends JDesktopPane {
                 mc.addToComponent(this);
                 mapControls = mc;
             }
-            if (europePanel != null) {
-                JInternalFrame f = getInternalFrame(europePanel);
-                if (f != null) {
-                    f.setSize(getWidth(), getHeight());
-                    f.setLocation(0, 0);
-                }
-            }
             gui.setSize(getSize());
             gui.forceReposition();
             oldSize = getSize();
