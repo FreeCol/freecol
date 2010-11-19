@@ -241,11 +241,13 @@ public class Messages {
         return message(object.getId() + ".name");
     }
 
+    public static String getDescription(FreeColObject object) {
+        return message(object.getId() + ".description");
+    }
+
     public static String getShortDescription(FreeColObject object) {
         return message(object.getId() + ".shortDescription");
     }
-
-
 
 
     /**

@@ -44,6 +44,16 @@ public class MiniMapZoomInAction extends MapboardAction {
     }
     
     /**
+     * Creates a new <code>MiniMapZoomInAction</code>.
+     * @param freeColClient The main controller object for the client.
+     * @param secondary a <code>boolean</code> value
+     */
+    MiniMapZoomInAction(FreeColClient freeColClient, boolean secondary) {
+        super(freeColClient, id + ".secondary");
+        addImageIcons("zoom_in");
+    }
+    
+    /**
      * Checks if this action should be enabled.
      * 
      * @return <code>true</code> if the minimap can be zoomed in.
@@ -66,5 +76,6 @@ public class MiniMapZoomInAction extends MapboardAction {
         mca.getMapControls().zoomIn();
         update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id).update();
+        getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id + ".secondary").update();
     }
 }

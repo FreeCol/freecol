@@ -44,6 +44,15 @@ public class MiniMapZoomOutAction extends MapboardAction {
         addImageIcons("zoom_out");
     }
     
+    /**
+     * Creates a new <code>MiniMapZoomOutAction</code>.
+     * @param freeColClient The main controller object for the client.
+     * @param secondary a <code>boolean</code> value
+     */
+    MiniMapZoomOutAction(FreeColClient freeColClient, boolean secondary) {
+        super(freeColClient, id + ".secondary");
+        addImageIcons("zoom_out");
+    }
     
     /**
      * Checks if this action should be enabled.
@@ -68,5 +77,6 @@ public class MiniMapZoomOutAction extends MapboardAction {
         mca.getMapControls().zoomOut();
         update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomInAction.id).update();
+        getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomInAction.id + ".secondary").update();
     }
 }

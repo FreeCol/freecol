@@ -400,7 +400,9 @@ public final class Canvas extends JDesktopPane {
             addKeyBinding(am.getFreeColAction(MoveAction.id + d + ".secondary"));
         }
         addKeyBinding(am.getFreeColAction(MiniMapZoomInAction.id));
+        addKeyBinding(am.getFreeColAction(MiniMapZoomInAction.id + ".secondary"));
         addKeyBinding(am.getFreeColAction(MiniMapZoomOutAction.id));
+        addKeyBinding(am.getFreeColAction(MiniMapZoomOutAction.id + ".secondary"));
     }
 
     private void addKeyBinding(FreeColAction action) {
