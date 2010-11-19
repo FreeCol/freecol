@@ -93,20 +93,19 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      * Ask the server to train a unit in Europe on behalf of the AIPlayer
      */
     public AIUnit trainAIUnitInEurope(UnitType unitType) {
-
         if (unitType==null) {
             throw new IllegalArgumentException("Invalid UnitType.");
         }
 
-        AIUnit unit = null;
+        AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
         int n = europe.getUnitCount();
 
         if (AIMessage.askTrainUnitInEurope(getConnection(), unitType)
             && europe.getUnitCount() == n+1) {
-            unit = new AIUnit(getAIMain(), europe.getUnitList().get(n));
+            aiUnit = getAIUnit(europe.getUnitList().get(n));
         }
-        return unit;
+        return aiUnit;
     }
 
 
@@ -114,15 +113,15 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      * Ask the server to recruit a unit in Europe on behalf of the AIPlayer
      */
     public AIUnit recruitAIUnitInEurope(int slot) {
-        AIUnit unit = null;
+        AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
         int n = europe.getUnitCount();
 
         if (AIMessage.askEmigrate(getConnection(), slot)
             && europe.getUnitCount() == n+1) {
-            unit = new AIUnit(getAIMain(), europe.getUnitList().get(n));
+            aiUnit = getAIUnit(europe.getUnitList().get(n));
         }
-        return unit;
+        return aiUnit;
     }
 
     /**

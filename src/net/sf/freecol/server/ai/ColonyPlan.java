@@ -633,7 +633,7 @@ public class ColonyPlan {
         if (primaryRawMaterial != null) {
             GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
             Building b = colony.getBuildingForProducing(producedGoods);
-            if (b != null) {
+            if (producedGoods != null && b != null) {
                 WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, producedGoods);
                 workLocationPlans.add(wlp);
             }
@@ -743,7 +743,7 @@ public class ColonyPlan {
                 secondaryWorkers <= MAX_LEVEL) {
                 GoodsType producedGoods = secondaryRawMaterial.getProducedMaterial();
                 Building b = colony.getBuildingForProducing(producedGoods);
-                if (b != null) {
+                if (producedGoods != null && b != null) {
                     WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, producedGoods);
                     workLocationPlans.add(wlp);
                     colonistAdded = true;
@@ -761,7 +761,7 @@ public class ColonyPlan {
                 && primaryWorkers <= MAX_LEVEL) {
                 GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
                 Building b = colony.getBuildingForProducing(producedGoods);
-                if (b != null) {
+                if (producedGoods != null && b != null) {
                     WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, producedGoods);
                     workLocationPlans.add(wlp);
                     colonistAdded = true;
@@ -787,6 +787,7 @@ public class ColonyPlan {
 
             // Add builders
             if (getFoodProduction() >= getNextFoodConsumption()
+                && buildingReq != null
                 && buildingReqProducer != null
                 && buildingReqProducer.getProduction() * builders <= getProductionOf(buildingRawMat)
                 && buildingReqProducer.getMaxUnits() < builders) {
