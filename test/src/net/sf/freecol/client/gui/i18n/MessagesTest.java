@@ -36,11 +36,11 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testMessageString() {
 
-    	assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));	
+    	assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));
         assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
 
         // With parameters
-        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", 
+        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%",
                      Messages.message("menuBar.statusLine"));
 
         // Long String
@@ -53,7 +53,7 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testMessageStringVarargs() {
-        
+
         try {
             Messages.message(null);
             fail("We should never get here");
@@ -64,13 +64,13 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
 
         // With parameters for "Gold: %gold% | Tax: %tax%% | Year: %year%"
-        assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%", 
+        assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%",
                      Messages.message("menuBar.statusLine", "%score%", "1050", "%gold%", "silver", "%tax%", "13"));
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                     + "A new colonist is born whenever a colony has 200 units of food or more.", Messages.message(
-                                                                                                                   "model.goods.food.description"));
+                     + "A new colonist is born whenever a colony has 200 units of food or more.",
+                     Messages.message("model.goods.food.description"));
 
         try {
             Messages.message("menuBar.statusLine", "%tax%");
@@ -79,11 +79,11 @@ public class MessagesTest extends FreeColTestCase {
             // Expected
         }
 
-        
+
         // Message not found
         assertEquals(noSuchKey, Messages.message(noSuchKey));
-        
-        assertEquals(noSuchKey, Messages.message(noSuchKey, 
+
+        assertEquals(noSuchKey, Messages.message(noSuchKey,
                                                  "%gold%", "silver", "%tax%", "13"));
     }
 
@@ -96,14 +96,14 @@ public class MessagesTest extends FreeColTestCase {
 
         assertEquals("Handelsberater", Messages.message("reportTradeAction.name"));
     }
-    
+
     // Tests if messages with special chars (like $) are well processed
     public void testMessageWithSpecialChars(){
     	String errMsg = "Error setting up test.";
     	String expected = "You establish the colony of %colony%.";
         String message = Messages.message("model.history.FOUND_COLONY");
     	assertEquals(errMsg, expected, message);
-        
+
         String colNameWithSpecialChars="$specialColName\\";
         errMsg = "Wrong message";
         expected = "You establish the colony of $specialColName\\.";
