@@ -152,7 +152,7 @@ public class Messages {
             return messageId;
         }
 
-        if (data!=null && data.length > 0) {
+        if (data != null && data.length > 0) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {
                     throw new IllegalArgumentException("Programming error, no data should be <null>.");
@@ -160,7 +160,40 @@ public class Messages {
                 message = message.replace(data[i], data[i+1]);
             }
         }
+        message = replaceChoices(message);
         return message.trim();
+    }
+
+    public static String replaceChoices(String input) {
+        int openChoice = input.indexOf("{{");
+        int closeChoice = openChoice;
+        if (openChoice < 0) {
+            // nothing to do
+            return input;
+        }
+
+        int index = 0;
+        StringBuilder result = new StringBuilder();
+        while (openChoice >= 0) {
+            closeChoice = input.indexOf("}}", openChoice + 2);
+            result.append(input.substring(index, openChoice));
+            String[] choice = input.substring(openChoice + 2, closeChoice).split("\\|");
+            if (choice[0].startsWith("plural")
+                || choice[0].startsWith("PLURAL")) {
+                // found tag
+                int colonIndex = choice[0].indexOf(":");
+                int choiceIndex = (colonIndex > 0)
+                    ? choiceIndex = Integer.parseInt(choice[0].substring(colonIndex + 1)) + 1
+                    : choice.length - 1;
+                result.append(choice[Math.min(choiceIndex, choice.length - 1)]);
+            } else {
+                result.append(choice[choice.length - 1]);
+            }
+            index = closeChoice + 2;
+            openChoice = input.indexOf("{{", index);
+        }
+        result.append(input.substring(index));
+        return result.toString();
     }
 
     /**

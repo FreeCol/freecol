@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.i18n;
 
+import java.io.ByteArrayInputStream;
 import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -162,6 +163,29 @@ public class MessagesTest extends FreeColTestCase {
             .add("model.goods.food.name")
             .addName(")");
         assertEquals("(Food)", Messages.message(t4));
+
+    }
+
+    public void testReplaceChoices() {
+
+        assertEquals("abc   xyzdef567", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
+        assertEquals("abc1abc", Messages.replaceChoices("abc{{plural:0|1|12|123}}abc"));
+        assertEquals("abc123", Messages.replaceChoices("abc{{plural:34|1|12|123}}"));
+
+        String unit = "{{piece of artillery|pieces of artillery|artillery}}";
+        String mapping = "some.key="
+            + "This is {{plural:%number%|a test|one of several tests|not much of a test}}.\n"
+            + "unit.template=%number% {{plural:%number%|%unit%}}\n"
+            + "unit.key=" + unit;
+        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
+        Messages.loadResources(stream);
+
+        assertEquals("artillery", Messages.message("unit.key"));
+
+        assertEquals("This is a test.", Messages.message("some.key", "%number%", "0"));
+        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "1"));
+        assertEquals("This is not much of a test.", Messages.message("some.key", "%number%", "2"));
+        assertEquals("This is not much of a test.", Messages.message("some.key", "%number%", "123"));
 
     }
 
