@@ -125,6 +125,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
@@ -388,26 +389,14 @@ public final class Canvas extends JDesktopPane {
 
 
     /**
-     * Create key bindings for all actions that are not represented by
-     * a menu item.
+     * Create key bindings for all actions.
      */
     private void createKeyBindings() {
-        ActionManager am = freeColClient.getActionManager();
-        addKeyBinding(am.getFreeColAction(DebugAction.id));
-
-        for (Direction d : Direction.values()) {
-            addKeyBinding(am.getFreeColAction(MoveAction.id + d));
-            addKeyBinding(am.getFreeColAction(MoveAction.id + d + ".secondary"));
+        for (Option option : freeColClient.getActionManager().getOptions()) {
+            FreeColAction action = (FreeColAction) option;
+            getInputMap().put(action.getAccelerator(), action.getId());
+            getActionMap().put(action.getId(), action);
         }
-        addKeyBinding(am.getFreeColAction(MiniMapZoomInAction.id));
-        addKeyBinding(am.getFreeColAction(MiniMapZoomInAction.id + ".secondary"));
-        addKeyBinding(am.getFreeColAction(MiniMapZoomOutAction.id));
-        addKeyBinding(am.getFreeColAction(MiniMapZoomOutAction.id + ".secondary"));
-    }
-
-    private void addKeyBinding(FreeColAction action) {
-        getInputMap().put(action.getAccelerator(), action.getId());
-        getActionMap().put(action.getId(), action);
     }
 
     /**
