@@ -23,7 +23,10 @@
     <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
     <property name="freecol.metaserver.jar.file" value="${basedir}/FreeCol-metaserver.jar"/>
     <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
-	<property name="test" value="AllTests"/>
+    <property name="test" value="AllTests"/>
+    <property name="miglayout.jar" value="jars/miglayout-3.7.3.1-swing.jar"/>
+    <property name="cli.jar" value="jars/commons-cli-1.1.jar"/>
+    <property name="cortado.jar" value="jars/cortado-fc-1.0.jar"/>
 
     <path id="libraries.classpath">
         <!-- StAX xml parser -->
@@ -31,11 +34,11 @@
         <!-- Woodstox XML processor -->
         <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
         <!-- MigLayout manager -->
-        <pathelement location="${basedir}/jars/miglayout-3.7.3.1-swing.jar"/>
+        <pathelement location="${basedir}/${miglayout.jar}"/>
         <!-- Command line processor -->
-        <pathelement location="${basedir}/jars/commons-cli-1.1.jar"/>
+        <pathelement location="${basedir}/${cli.jar}"/>
         <!-- Cortado Video Applet -->
-        <pathelement location="${basedir}/jars/cortado-fc-1.0.jar"/>
+        <pathelement location="${basedir}/${cortado.jar}"/>
     </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />
@@ -134,7 +137,7 @@
       <manifest file="${basedir}/src/MANIFEST.MF">
         <attribute name="Created-By" value="FreeCol Team"/>
         <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
-        <attribute name="Class-Path" value="jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar jars/tritonus_share.jar jars/vorbisspi1.0.3.jar jars/miglayout-3.7.3.1-swing.jar jars/commons-cli-1.1.jar jars/cortado-fc-1.0.jar"/>
+        <attribute name="Class-Path" value="jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar jars/tritonus_share.jar jars/vorbisspi1.0.3.jar ${miglayout.jar} ${cli.jar} ${cortado.jar}"/>
         <attribute name="Revision" value="${svn.Revision}"/>
       </manifest>
     </target>
