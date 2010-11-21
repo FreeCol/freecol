@@ -221,17 +221,24 @@ public class Messages {
             }
         case TEMPLATE:
             if (containsKey(template.getId())) {
-                result = message(template.getId());
+                result = messageBundle.get(template.getId());
             } else if (template.getDefaultId() != null) {
-                result = message(template.getDefaultId());
+                result = messageBundle.get(template.getDefaultId());
             }
 	    for (int index = 0; index < template.getKeys().size(); index++) {
                 result = result.replace(template.getKeys().get(index),
                                         message(template.getReplacements().get(index)));
 	    }
-	    return result;
+	    return replaceChoices(result);
         case KEY:
-            return message(template.getId());
+            String key = messageBundle.get(template.getId());
+            if (key == null) {
+                return template.getId();
+            } else if (key.startsWith("{{") && key.endsWith("}}")) {
+                return key.substring(2, key.length() - 2);
+            } else {
+                return key;
+            }
         case NAME:
         default:
             return template.getId();

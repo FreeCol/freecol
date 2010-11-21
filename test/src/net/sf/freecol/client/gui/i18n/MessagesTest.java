@@ -187,6 +187,12 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("This is not much of a test.", Messages.message("some.key", "%number%", "2"));
         assertEquals("This is not much of a test.", Messages.message("some.key", "%number%", "123"));
 
+        StringTemplate template = StringTemplate.template("unit.template")
+            .addAmount("%number%", 1)
+            .add("%unit%", "unit.key");
+
+        assertEquals("1 pieces of artillery", Messages.message(template));
+
     }
 
 
