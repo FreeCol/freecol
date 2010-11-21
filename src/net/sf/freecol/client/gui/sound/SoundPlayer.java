@@ -461,8 +461,9 @@ public class SoundPlayer {
                             }
                         } catch (InterruptedException e) {}
                         read = din.read(data, 0, data.length);
-                        if (read <= 0) break;
-                        line.write(data, 0, read);
+                        if (read < 0) break; else if (read > 0) {
+                            line.write(data, 0, read);
+                        }
                     }
                 } finally {
                     if (pcl != null) volume.removePropertyChangeListener(pcl);
@@ -475,8 +476,9 @@ public class SoundPlayer {
                     while (!soundStopped
                            && System.currentTimeMillis() < fadeStop) {
                         read = din.read(data, 0, data.length);
-                        if (read <= 0) break;
-                        line.write(data, 0, read);
+                        if (read < 0) break; else if (read > 0) {
+                            line.write(data, 0, read);
+                        }
                         if (System.currentTimeMillis() > ms) {
                             // decrease the gain toward minimum (-80dB) by 1dB
                             float currentGain = control.getValue();
