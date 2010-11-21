@@ -65,6 +65,14 @@ public class Messages {
     private static Map<String, String> messageBundle =
         new HashMap<String, String>();
 
+    private static Number grammaticalNumber = NumberRules.OTHER_NUMBER_RULE;
+
+
+
+    public static void setGrammaticalNumber(Number number) {
+        grammaticalNumber = number;
+    }
+
     /**
      * Set the resource bundle for the given locale
      *
@@ -126,7 +134,6 @@ public class Messages {
         return new File(FreeCol.getDataDirectory(), STRINGS_DIRECTORY);
     }
 
-
     /**
      * Finds the message with a particular ID in the default locale and performs
      * string replacements.
@@ -178,16 +185,23 @@ public class Messages {
             closeChoice = input.indexOf("}}", openChoice + 2);
             result.append(input.substring(index, openChoice));
             String[] choice = input.substring(openChoice + 2, closeChoice).split("\\|");
+            int lastIndex = choice.length - 1;
             if (choice[0].startsWith("plural")
                 || choice[0].startsWith("PLURAL")) {
                 // found tag
-                int colonIndex = choice[0].indexOf(":");
-                int choiceIndex = (colonIndex > 0)
-                    ? choiceIndex = Integer.parseInt(choice[0].substring(colonIndex + 1)) + 1
-                    : choice.length - 1;
-                result.append(choice[Math.min(choiceIndex, choice.length - 1)]);
+                int colonIndex = choice[0].indexOf(":", 6);
+                int choiceIndex;
+                if (colonIndex > 0) {
+                    int number = Integer.parseInt(choice[0].substring(colonIndex + 1));
+                    number = grammaticalNumber.getIndex(number);
+                    // add one to offset the tag
+                    choiceIndex = Math.min(number + 1, lastIndex);
+                } else {
+                    choiceIndex = lastIndex;
+                }
+                result.append(choice[choiceIndex]);
             } else {
-                result.append(choice[choice.length - 1]);
+                result.append(choice[lastIndex]);
             }
             index = closeChoice + 2;
             openChoice = input.indexOf("{{", index);

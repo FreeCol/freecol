@@ -168,9 +168,18 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testReplaceChoices() {
 
+        // default Number is Other
         assertEquals("abc   xyzdef567", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
         assertEquals("abc1abc", Messages.replaceChoices("abc{{plural:0|1|12|123}}abc"));
-        assertEquals("abc123", Messages.replaceChoices("abc{{plural:34|1|12|123}}"));
+        assertEquals("abc1", Messages.replaceChoices("abc{{plural:34|1|12|123}}"));
+
+        // apply English rules
+        Messages.setGrammaticalNumber(NumberRules.PLURAL_NUMBER_RULE);
+        assertEquals("abc   xyzdef567", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
+        assertEquals("abc12abc", Messages.replaceChoices("abc{{plural:0|1|12|123}}abc"));
+        assertEquals("abc1abc", Messages.replaceChoices("abc{{plural:1|1|12|123}}abc"));
+        assertEquals("abc12abc", Messages.replaceChoices("abc{{plural:7|1|12|123}}abc"));
+        assertEquals("abc12", Messages.replaceChoices("abc{{plural:34|1|12|123}}"));
 
         String unit = "{{piece of artillery|pieces of artillery|artillery}}";
         String mapping = "some.key="
@@ -182,18 +191,17 @@ public class MessagesTest extends FreeColTestCase {
 
         assertEquals("artillery", Messages.message("unit.key"));
 
-        assertEquals("This is a test.", Messages.message("some.key", "%number%", "0"));
-        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "1"));
-        assertEquals("This is not much of a test.", Messages.message("some.key", "%number%", "2"));
-        assertEquals("This is not much of a test.", Messages.message("some.key", "%number%", "123"));
+        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "0"));
+        assertEquals("This is a test.", Messages.message("some.key", "%number%", "1"));
+        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "2"));
+        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "24"));
 
         StringTemplate template = StringTemplate.template("unit.template")
             .addAmount("%number%", 1)
             .add("%unit%", "unit.key");
 
-        assertEquals("1 pieces of artillery", Messages.message(template));
+        assertEquals("1 piece of artillery", Messages.message(template));
 
     }
-
 
 }
