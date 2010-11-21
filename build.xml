@@ -47,6 +47,12 @@
         <!-- Cortado Video Applet -->
         <pathelement location="${basedir}/${cortado.jar}"/>
     </path>
+    <path id="soundlibs.classpath">
+      <pathelement location="${basedir}/jars/jogg-0.0.7.jar"/>
+      <pathelement location="${basedir}/jars/jorbis-0.0.15.jar"/>
+      <pathelement location="${basedir}/jars/tritonus_share.jar"/>
+      <pathelement location="${basedir}/jars/vorbisspi1.0.3.jar"/>
+    </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />
     </path>
@@ -61,6 +67,7 @@
         <pathelement location="${freecol.build.dir}" />
         <path refid="junit.classpath"/>
         <path refid="libraries.classpath" />
+        <path refid="soundlibs.classpath" />
     </path>
 
     <condition property="isOsUnixLike">
@@ -577,11 +584,11 @@
             export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
             -->
         <junit printsummary="yes">
-	        <classpath refid="test.run.classpath"/>
-	       	<formatter type="brief" usefile="false" />
-        	<formatter type="plain" />
-        	<test todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
-                <sysproperty key="java.awt.headless" value="true" />
+          <classpath refid="test.run.classpath"/>
+          <formatter type="brief" usefile="false" />
+          <formatter type="plain" />
+          <test todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
+          <sysproperty key="java.awt.headless" value="true" />
         </junit>
     	<echo message="For more detailed information about this test run see:"/>
     	<echo message="${freecol.build.dir}/TEST-net.sf.freecol.${test}.txt"/>
