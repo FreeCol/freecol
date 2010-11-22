@@ -1396,6 +1396,7 @@
                   minimumGrowth="2" maximumGrowth="10">
         <plunder probability="100" minimum="2" maximum="4" factor="200" />
         <plunder probability="100" minimum="2" maximum="4" factor="200" />
+        <gifts probability="100" minimum="3" maximum="6" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
     </indian-nation-type>
@@ -1405,7 +1406,7 @@
                   minimumSize="6" maximumSize="8"
                   minimumGrowth="1" maximumGrowth="8">
         <plunder probability="50" minimum="3" maximum="8" factor="100" />
-        <gifts probability="100" minimum="3" maximum="8" factor="100" />
+        <gifts probability="100" minimum="3" maximum="6" factor="100" />
         <modifier id="model.modifier.defence" type="percentage" value="50" />
       </settlement>
       <settlement id="model.settlement.village.capital" capital="true"
@@ -1414,6 +1415,7 @@
                   minimumGrowth="2" maximumGrowth="10">
         <plunder probability="100" minimum="3" maximum="8" factor="200" />
         <plunder probability="100" minimum="3" maximum="8" factor="200" />
+        <gifts probability="100" minimum="4" maximum="8" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
     </indian-nation-type>
@@ -1486,7 +1488,7 @@
                   minimumSize="8" maximumSize="12"
                   minimumGrowth="3" maximumGrowth="12">
         <plunder probability="100" minimum="2" maximum="6" factor="2100" />
-        <gifts probability="100" minimum="2" maximum="6" factor="200" />
+        <gifts probability="100" minimum="3" maximum="6" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
       <settlement id="model.settlement.inca.capital" capital="true"
@@ -1494,7 +1496,7 @@
                   minimumSize="10" maximumSize="12"
                   minimumGrowth="4" maximumGrowth="14">
         <plunder probability="100" minimum="2" maximum="6" factor="3000" />
-        <gifts probability="100" minimum="2" maximum="6" factor="300" />
+        <gifts probability="100" minimum="4" maximum="8" factor="300" />
         <modifier id="model.modifier.defence" type="percentage" value="200" />
       </settlement>
     </indian-nation-type>
@@ -1509,7 +1511,7 @@
                   minimumSize="8" maximumSize="12"
                   minimumGrowth="3" maximumGrowth="12">
         <plunder probability="100" minimum="5" maximum="9" factor="1000" />
-        <gifts probability="100" minimum="5" maximum="9" factor="200" />
+        <gifts probability="100" minimum="4" maximum="8" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
       <settlement id="model.settlement.aztec.capital" capital="true"
@@ -1517,7 +1519,7 @@
                   minimumSize="10" maximumSize="12"
                   minimumGrowth="4" maximumGrowth="14">
         <plunder probability="100" minimum="7" maximum="12" factor="1000" />
-        <gifts probability="100" minimum="7" maximum="12" factor="300" />
+        <gifts probability="100" minimum="5" maximum="10" factor="300" />
         <modifier id="model.modifier.defence" type="percentage" value="200" />
       </settlement>
     </indian-nation-type>
