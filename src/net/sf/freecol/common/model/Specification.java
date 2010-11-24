@@ -806,13 +806,6 @@ public final class Specification {
         return getType(id, GoodsType.class);
     }
 
-    /**
-     * Deprecated: use getFoodGoodsTypeList() instead
-     */
-    public List<GoodsType> getGoodsFood() {
-        return foodGoodsTypeList;
-    }
-
     // -- Resources --
     public List<ResourceType> getResourceTypeList() {
         return resourceTypeList;

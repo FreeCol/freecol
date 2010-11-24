@@ -109,7 +109,7 @@ public class ColonyPlanTest extends FreeColTestCase {
 
         // get food production of central colony tile
         int expAmount = 0;
-        for (GoodsType foodType : spec().getGoodsFood()) {
+        for (GoodsType foodType : spec().getFoodGoodsTypeList()) {
             expAmount += colony.getTile().getMaximumPotential(foodType, null);
         }
 

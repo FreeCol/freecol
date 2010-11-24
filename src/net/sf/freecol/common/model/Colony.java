@@ -1221,7 +1221,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      */
     public int getFoodProduction() {
         int result = 0;
-        for (GoodsType foodType : getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             result += getProductionOf(foodType);
         }
         return result;
@@ -1297,7 +1297,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         ColonyTile bestTile = null;
         GoodsType bestType = null;
         int bestProduction = 0;
-        for (GoodsType foodType : getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             ColonyTile colonyTile = getVacantColonyTileFor(unit, false, foodType);
             if (colonyTile != null) {
                 int production = colonyTile.getProductionOf(unit, foodType);
@@ -1409,7 +1409,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     public int getProductionNetOf(GoodsType goodsType) {
         int count = getProductionNextTurn(goodsType);
         int used = getConsumptionOf(goodsType);
-
         Building bldg = getBuildingForConsuming(goodsType);
         if (bldg != null) {
             used += bldg.getGoodsInputNextTurn();

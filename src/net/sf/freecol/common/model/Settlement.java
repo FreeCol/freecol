@@ -619,7 +619,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     	int consumed = 0;
     	GoodsType corn = getSpecification().getGoodsType("model.goods.grain");
 
-    	for (GoodsType foodType : getSpecification().getGoodsFood()) {
+    	for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             if(foodType == corn){
                 // consumption of corn calculated last
                 continue;
@@ -641,7 +641,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     protected void removeFood(final int amount) {
         int rest = amount;
         List<AbstractGoods> backlog = new ArrayList<AbstractGoods>();
-        for (GoodsType foodType : getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             int available = getGoodsCount(foodType);
             if (available >= rest) {
                 removeGoods(foodType, rest);
@@ -666,7 +666,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     public int getFoodCount() {
         int result = 0;
-        for (GoodsType foodType : getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             result += getGoodsCount(foodType);
         }
         return result;

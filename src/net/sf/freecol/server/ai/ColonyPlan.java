@@ -852,7 +852,7 @@ public class ColonyPlan {
      */
     public int getFoodProduction() {
         int amount = 0;
-        for (GoodsType foodType : colony.getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : colony.getSpecification().getFoodGoodsTypeList()) {
             amount += getProductionOf(foodType);
         }
 
