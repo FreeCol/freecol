@@ -56,7 +56,7 @@ public class AIColonyTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.warehouse");
 
     private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammersType

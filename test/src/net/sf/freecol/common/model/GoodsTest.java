@@ -162,7 +162,7 @@ public class GoodsTest extends FreeColTestCase {
         GoodsType hammers = spec().getGoodsType("model.goods.hammers");
         GoodsType tools = spec().getGoodsType("model.goods.tools");
         GoodsType fish = spec().getGoodsType("model.goods.fish");
-        GoodsType food = spec().getGoodsType("model.goods.food");
+        GoodsType food = spec().getPrimaryFoodType();
         GoodsType ore = spec().getGoodsType("model.goods.ore");
         GoodsType lumber = spec().getGoodsType("model.goods.lumber");
         

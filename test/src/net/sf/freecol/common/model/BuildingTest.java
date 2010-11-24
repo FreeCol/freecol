@@ -359,7 +359,7 @@ public class BuildingTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        GoodsType foodType = spec().getPrimaryFoodType();
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
 

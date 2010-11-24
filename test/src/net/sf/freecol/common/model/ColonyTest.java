@@ -172,7 +172,7 @@ public class ColonyTest extends FreeColTestCase {
         GoodsType bells = spec().getGoodsType("model.goods.bells");
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-        GoodsType food = spec().getGoodsType("model.goods.food");
+        GoodsType food = spec().getPrimaryFoodType();
         BuildingType townHall = spec().getBuildingType("model.building.townHall");
         BuildingType weaversHouse = spec().getBuildingType("model.building.weaverHouse");
 

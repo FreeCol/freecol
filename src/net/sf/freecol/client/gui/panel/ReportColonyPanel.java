@@ -93,7 +93,7 @@ public final class ReportColonyPanel extends ReportPanel {
             }
 
             // Production
-            GoodsType food = getSpecification().getGoodsType("model.goods.food");
+            GoodsType food = getSpecification().getPrimaryFoodType();
             GoodsType horses = getSpecification().getGoodsType("model.goods.horses");
             int count = 0;
             int netFood = colony.getFoodProduction() - colony.getFoodConsumption();

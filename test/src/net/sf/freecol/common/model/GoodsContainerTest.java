@@ -24,7 +24,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class GoodsContainerTest extends FreeColTestCase {
 
     GoodsType sugar = spec().getGoodsType("model.goods.sugar");
-    GoodsType food = spec().getGoodsType("model.goods.food");
+    GoodsType food = spec().getPrimaryFoodType();
     GoodsType fish = spec().getGoodsType("model.goods.fish");
     GoodsType lumber = spec().getGoodsType("model.goods.lumber");
 

@@ -559,7 +559,7 @@ public class Building extends FreeColGameObject
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
-            if ("model.goods.food".equals(getGoodsInputType().getId())) {
+            if (getSpecification().getPrimaryFoodType() == getGoodsInputType()) {
                 return getGoodsInputAuto(colony.getFoodProduction());
             } else {
                 return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
@@ -582,11 +582,12 @@ public class Building extends FreeColGameObject
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
-            if ("model.goods.food".equals(getGoodsInputType().getId())) {
+            GoodsType foodType = getSpecification().getPrimaryFoodType();
+            if (foodType == getGoodsInputType()) {
                 int amount = 0;
-                for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-                    if (!"model.goods.food".equals(foodType.getId())) {
-                        amount += colony.getProductionNextTurn(foodType);
+                for (GoodsType type : getSpecification().getFoodGoodsTypeList()) {
+                    if (foodType != type) {
+                        amount += colony.getProductionNextTurn(type);
                     }
                 }
                 return getGoodsInputAuto(amount);

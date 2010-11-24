@@ -40,7 +40,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
     private static final TileType desertType
         = spec().getTileType("model.tile.desert");
     private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType horsesType
@@ -130,7 +130,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
         int foodProduced = camp1.getProductionOf(grainType);
         int foodConsumed = camp1.getFoodConsumption();
-        assertEquals(2, brave.getConsumptionOf(spec().getGoodsType("model.goods.food")));
+        assertEquals(2, brave.getConsumptionOf(foodType));
         assertEquals(2 * camp1.getUnitCount(), foodConsumed);
         assertTrue("Food Produced should be less the food consumed",foodProduced < foodConsumed);
 

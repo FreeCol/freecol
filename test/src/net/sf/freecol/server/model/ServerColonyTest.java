@@ -67,7 +67,7 @@ public class ServerColonyTest extends FreeColTestCase {
     private static final GoodsType lumberGoodsType
         = spec().getGoodsType("model.goods.lumber");
     private static final GoodsType foodGoodsType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
 
     private static final TileType plains
         = spec().getTileType("model.tile.plains");

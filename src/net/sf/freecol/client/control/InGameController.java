@@ -1347,7 +1347,7 @@ public final class InGameController implements NetworkConstants {
         if (food < 8) {
             messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                           "buildColony.noFood", unit,
-                                          getSpecification().getGoodsType("model.goods.food")));
+                                          getSpecification().getPrimaryFoodType()));
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {

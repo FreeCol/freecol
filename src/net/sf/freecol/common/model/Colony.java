@@ -1269,7 +1269,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      */
     private Occupation getOccupationFor(Unit unit) {
         if (getFoodProduction() > getFoodConsumption() +
-            unit.getType().getConsumptionOf(getSpecification().getGoodsType("model.goods.food"))) {
+            unit.getType().getConsumptionOf(getSpecification().getPrimaryFoodType())) {
             GoodsType expertProduction = unit.getType().getExpertProduction();
             if (expertProduction == null) {
                 if (unit.getExperience() > 0) {

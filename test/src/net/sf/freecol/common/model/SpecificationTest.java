@@ -223,7 +223,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
     public void testGoodsTypes() {
 
-        GoodsType food = spec().getGoodsType("model.goods.food");
+        GoodsType food = spec().getPrimaryFoodType();
         assertTrue(food.isFarmed());
         assertTrue(spec().getFarmedGoodsTypeList().contains(food));
         assertTrue(food.isFoodType());

@@ -199,7 +199,7 @@ public class IndianDemandMission extends Mission {
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
         int dx = getAIMain().getGame().getSpecification().getIntegerOption("model.option.nativeDemands")
             .getValue() + 1;
-        GoodsType food = getAIMain().getGame().getSpecification().getGoodsType("model.goods.food");
+        GoodsType food = getAIMain().getGame().getSpecification().getPrimaryFoodType();
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&

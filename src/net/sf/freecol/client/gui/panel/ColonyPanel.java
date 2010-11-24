@@ -447,7 +447,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             net += getColony().getProductionNetOf(goodsType);
         }
         if (net != 0) {
-            GoodsType goodsType = spec.getGoodsType("model.goods.food");
+            GoodsType goodsType = spec.getPrimaryFoodType();
             netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
 //            ratios = new ArrayList<AbstractGoods>();
 //            for (GoodsType goodsType : goodsTypes) {
@@ -563,7 +563,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
 /*
-        GoodsType grain = getSpecification().getGoodsType("model.goods.food");
+        GoodsType grain = getSpecification().getPrimaryFoodType();
         int food = 0;
 
         List<AbstractGoods> foodProduction = new ArrayList<AbstractGoods>();

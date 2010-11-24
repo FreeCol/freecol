@@ -153,7 +153,7 @@ public class ServerIndianSettlement extends IndianSettlement
 
         // Check for new resident.
         // Alcohol also contributes to create children.
-        GoodsType foodType = spec.getGoodsType("model.goods.food");
+        GoodsType foodType = spec.getPrimaryFoodType();
         GoodsType rumType = spec.getGoodsType("model.goods.rum");
         List<UnitType> unitTypes
             = spec.getUnitTypesWithAbility("model.ability.bornInIndianSettlement");

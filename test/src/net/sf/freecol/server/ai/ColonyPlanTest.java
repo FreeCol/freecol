@@ -48,7 +48,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     private static final GoodsType clothType
         = spec().getGoodsType("model.goods.cloth");
     private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType sugarType

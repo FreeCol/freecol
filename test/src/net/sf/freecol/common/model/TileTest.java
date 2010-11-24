@@ -37,7 +37,7 @@ public class TileTest extends FreeColTestCase {
     private static final GoodsType fish
         = spec().getGoodsType("model.goods.fish");
     private static final GoodsType food
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
     private static final GoodsType furs
         = spec().getGoodsType("model.goods.furs");
     private static final GoodsType grain

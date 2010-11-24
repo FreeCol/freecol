@@ -53,7 +53,7 @@ public class ServerPlayerTest extends FreeColTestCase {
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
     private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
     private static final GoodsType silverType

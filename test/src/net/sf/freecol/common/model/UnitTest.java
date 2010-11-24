@@ -46,7 +46,7 @@ public class UnitTest extends FreeColTestCase {
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
     private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
+        = spec().getPrimaryFoodType();
 
     private static final TileType ocean
         = spec().getTileType("model.tile.ocean");
