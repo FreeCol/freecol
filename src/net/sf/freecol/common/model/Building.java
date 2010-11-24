@@ -556,17 +556,27 @@ public class Building extends FreeColGameObject
      * @see #getProduction
      */
     public int getGoodsInput() {
-        if (getGoodsInputType() == null) {
+        GoodsType inputType = getGoodsInputType();
+        if (inputType == null) {
             return 0;
         } else if (canAutoProduce()) {
-            if (getSpecification().getPrimaryFoodType() == getGoodsInputType()) {
-                return getGoodsInputAuto(colony.getFoodProduction());
-            } else {
-                return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
-            }
+            return (inputType == getSpecification().getPrimaryFoodType())
+                ? getFoodInputAuto()
+                : getGoodsInputAuto(colony.getProductionOf(inputType));
         } else {
             return Math.min(getMaximumGoodsInput(), getStoredInput());
         }
+    }
+
+    private int getFoodInputAuto() {
+        GoodsType foodType = getSpecification().getPrimaryFoodType();
+        int amount = 0;
+        for (GoodsType type : getSpecification().getFoodGoodsTypeList()) {
+            if (foodType != type) {
+                amount += colony.getProductionNextTurn(type);
+            }
+        }
+        return getGoodsInputAuto(amount - colony.getFoodConsumption());
     }
 
     /**
@@ -579,24 +589,16 @@ public class Building extends FreeColGameObject
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        if (getGoodsInputType() == null) {
+        GoodsType inputType = getGoodsInputType();
+        if (inputType == null) {
             return 0;
         } else if (canAutoProduce()) {
-            GoodsType foodType = getSpecification().getPrimaryFoodType();
-            if (foodType == getGoodsInputType()) {
-                int amount = 0;
-                for (GoodsType type : getSpecification().getFoodGoodsTypeList()) {
-                    if (foodType != type) {
-                        amount += colony.getProductionNextTurn(type);
-                    }
-                }
-                return getGoodsInputAuto(amount);
-            } else {
-                return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
-            }
+            return (inputType == getSpecification().getPrimaryFoodType())
+                ? getFoodInputAuto()
+                : getGoodsInputAuto(colony.getProductionNextTurn(inputType));
         } else {
-            return Math.min(getMaximumGoodsInput(),
-                            getStoredInput() + colony.getProductionNextTurn(getGoodsInputType()));
+            return Math.min(getMaximumGoodsInput(), getStoredInput()
+                            + colony.getProductionNextTurn(inputType));
         }
     }
 

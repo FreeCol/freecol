@@ -165,9 +165,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         // Categorize buildings as {food, materials, other}-producers
-        // and update auto-producing buildings immediately.  To determine
-        // materials, examine the requirements for the current building
-        // if any.
+        // To determine materials, examine the requirements for the
+        // current building if any.
         List<GoodsType> forBuilding = new ArrayList<GoodsType>();
         BuildableType buildable = csGetBuildable(cs);
         if (buildable != null) {
@@ -180,21 +179,19 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<Building> forOther = new ArrayList<Building>();
         for (Building building : getBuildings()) {
             GoodsType outputType = building.getGoodsOutputType();
-            if (building.getType().hasAbility("model.ability.autoProduction")) {
-                ((ServerModelObject) building).csNewTurn(random, cs);
-            } else if (outputType != null && outputType.isFoodType()) {
+            if (outputType == null) {
+                forOther.add(building);
+            } else if (outputType.isFoodType()) {
                 forFood.add(building);
-            } else if (outputType != null && forBuilding.contains(outputType)) {
+            } else if (forBuilding.contains(outputType)) {
                 forMaterials.add(building);
             } else {
                 int index = -1;
-                if (outputType != null) {
-                    for (int i = 0; i < forOther.size(); i++) {
-                        GoodsType input = forOther.get(i).getGoodsInputType();
-                        if (outputType.equals(input)) {
-                            index = i;
-                            break;
-                        }
+                for (int i = 0; i < forOther.size(); i++) {
+                    GoodsType input = forOther.get(i).getGoodsInputType();
+                    if (outputType.equals(input)) {
+                        index = i;
+                        break;
                     }
                 }
                 if (index < 0) {
