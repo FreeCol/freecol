@@ -47,11 +47,13 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.LastSale;
+import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -242,17 +244,26 @@ public final class InGameInputHandler extends InputHandler {
             FreeColGameObject fcgo
                 = (idString == null || idString.isEmpty()) ? null
                 : game.getFreeColGameObject(idString);
-            if (fcgo != null) {
+            if (fcgo == null) {
+                logger.warning("Could not find FreeColGameObject with ID: "
+                               + idString);
+            } else {
                 if (divert != null) {
                     player.divertModelMessages(fcgo, divert);
                 }
-                fcgo.dispose();
-            } else {
-                logger.warning("Could not find FreeColGameObject with ID: "
-                               + element.getAttribute("ID"));
+                // Deselect the object if it is the current active unit.
+                GUI gui = getFreeColClient().getCanvas().getGUI();
+                if (fcgo instanceof Unit
+                    && (Unit)fcgo == gui.getActiveUnit()) {
+                    gui.setActiveUnit(null);
+                }
+
+                // Do just the low level dispose that removes
+                // reference to this object in the client.  The other
+                // updates should have done the rest.
+                fcgo.fundamentalDispose();
             }
         }
-
         new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
