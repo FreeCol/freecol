@@ -1040,8 +1040,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * The test for whether a tile can be claimed by a player
-     * settlement.  Note that this does not consider stealing.  The
-     * rule for the center tile is one step more exacting than this.
+     * settlement.  Note that this does not consider purchase or
+     * stealing.  The rule for the center tile is one step more
+     * exacting than this.
      *
      * The tile must be ownable by this player, not currently owned,
      * or owned by this player and not by a settlement, unless it is a
@@ -1070,8 +1071,25 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the tile can be claimed.
      */
     public boolean canClaimToFoundSettlement(Tile tile) {
-        return tile.isSettleable()
+        return canOwnTile(tile)
+            && tile.isSettleable()
             && (canClaimFreeCenterTile(tile) || canClaimForSettlement(tile));
+    }
+
+    /**
+     * Can a tile be acquired from its owners and used to found a settlement?
+     * Slightly weakens canClaimToFoundSettlement to allow for purchase
+     * and/or stealing.
+     *
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be acquired.
+     */
+    public boolean canAcquireToFoundSettlement(Tile tile) {
+        return canOwnTile(tile)
+            && tile.isSettleable()
+            && (canClaimToFoundSettlement(tile)
+                || (tile.getOwner() != null && tile.getOwner() != this
+                    && getLandPrice(tile) > 0));
     }
 
     /**

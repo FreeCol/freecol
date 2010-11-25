@@ -1224,8 +1224,15 @@ public final class InGameController implements NetworkConstants {
             askJoinColony(unit, tile.getColony());
             return;
         } else if (!player.canClaimToFoundSettlement(tile)) {
-            canvas.showInformationMessage("buildColony.badTile");
-            return;
+            if (player.canAcquireToFoundSettlement(tile)) {
+                if (!claimTile(player, tile, null,
+                               player.getLandPrice(tile), 0)) {
+                    return;
+                }
+            } else {
+                canvas.showInformationMessage("buildColony.badTile");
+                return;
+            }
         }
 
         if (freeColClient.getClientOptions()
@@ -3286,13 +3293,28 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        Player owner = tile.getOwner();
         int price = ((colony != null) ? player.canClaimForSettlement(tile)
                      : player.canClaimForImprovement(tile)) ? 0
             : player.getLandPrice(tile);
-        if (price < 0) { // not for sale
-            return false;
-        } else if (price > 0) { // for sale by natives
+        return claimTile(player, tile, colony, price, offer);
+    }
+
+    /**
+     * Claim a tile.
+     *
+     * @param player The <code>Player</code> that is claiming.
+     * @param tile The <code>Tile</code> to claim.
+     * @param colony An optional <code>Colony</code> to own the tile.
+     * @param price The price required.
+     * @param offer An offer to pay.
+     * @return True if the claim succeeded.
+     */
+    private boolean claimTile(Player player, Tile tile, Colony colony,
+                              int price, int offer) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player owner = tile.getOwner();
+        if (price < 0) return false; // not for sale
+        if (price > 0) { // for sale by natives
             if (offer >= price) { // offered more than enough
                 price = offer;
             } else if (offer < 0) { // plan to steal
