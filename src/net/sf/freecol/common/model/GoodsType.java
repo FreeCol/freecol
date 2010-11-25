@@ -59,7 +59,6 @@ public final class GoodsType extends FreeColGameObjectType {
 
     private GoodsType madeFrom;
     private GoodsType makes;
-    private GoodsType storedAs;
 
     private int initialAmount;
     private int initialPrice;
@@ -151,18 +150,6 @@ public final class GoodsType extends FreeColGameObjectType {
 
     public boolean isStorable() {
         return storable;
-    }
-
-    public boolean isStoredAs() {
-        return storedAs!=null;
-    }
-
-    public GoodsType getStoredAs() {
-        if (storedAs==null) {
-            return this;
-        } else {
-            return storedAs;
-        }
     }
 
     public int getInitialAmount() {
@@ -373,7 +360,6 @@ public final class GoodsType extends FreeColGameObjectType {
         }
 
         storable = getAttribute(in, "storable", true);
-        storedAs = getSpecification().getType(in, "stored-as", GoodsType.class, null);
     }
 
     public void readChild(XMLStreamReader in) throws XMLStreamException {
@@ -415,9 +401,6 @@ public final class GoodsType extends FreeColGameObjectType {
         }
         if (madeFrom != null) {
             out.writeAttribute("made-from", madeFrom.getId());
-        }
-        if (storedAs != null) {
-            out.writeAttribute("stored-as", storedAs.getId());
         }
     }
 

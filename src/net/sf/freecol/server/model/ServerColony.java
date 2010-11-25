@@ -164,6 +164,15 @@ public class ServerColony extends Colony implements ServerModelObject {
             ((ServerModelObject) colonyTile).csNewTurn(random, cs);
         }
 
+        // TODO: handle different types
+        GoodsType food = spec.getGoodsType("model.goods.food");
+        for (Goods goods : container.getCompactGoods()) {
+            if (goods.getType().isFoodType()) {
+                container.addGoods(food, goods.getAmount());
+                container.removeGoods(goods);
+            }
+        }
+
         // Categorize buildings as {food, materials, other}-producers
         // To determine materials, examine the requirements for the
         // current building if any.

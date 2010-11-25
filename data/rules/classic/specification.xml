@@ -80,13 +80,10 @@
     <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
-    <goods-type id="model.goods.grain" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
-    <goods-type id="model.goods.fish" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
+    <goods-type id="model.goods.grain" is-farmed="true" storable="false" is-food="true" />
+    <goods-type id="model.goods.fish" is-farmed="true" storable="false" is-food="true" />
     <!--
-    <goods-type id="model.goods.meat" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
+    <goods-type id="model.goods.meat" is-farmed="true" storable="false" is-food="true" />
     -->
     <goods-type id="model.goods.sugar" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>

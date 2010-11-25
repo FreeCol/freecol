@@ -650,7 +650,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @param amount an <code>int</code> value
      */
     public void addGoods(GoodsType type, int amount) {
-        goodsContainer.addGoods(type.getStoredAs(), amount);
+        goodsContainer.addGoods(type, amount);
         modifySpecialGoods(type, amount);
     }
 

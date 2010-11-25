@@ -543,7 +543,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @param amount an <code>int</code> value
      */
     public void addGoods(GoodsType type, int amount) {
-        goodsContainer.addGoods(type.getStoredAs(), amount);
+        goodsContainer.addGoods(type, amount);
     }
 
     public void addGoods(AbstractGoods goods) {
@@ -557,11 +557,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @return The amount of this type of Goods at this Location.
      */
     public int getGoodsCount(GoodsType type) {
-        if (type != null && !type.isStoredAs()) {
-            return goodsContainer.getGoodsCount(type);
-        } else {
-            return 0;
-        }
+        return goodsContainer.getGoodsCount(type);
     }
 
     /**
