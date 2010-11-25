@@ -648,6 +648,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 break;
             case BUILDQUEUE:
                 getCanvas().showSubPanel(new BuildQueuePanel(getColony(), getCanvas()));
+                constructionPanel.update();
                 break;
             case FILL:
                 fill();
@@ -1713,6 +1714,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateProductionPanel();
             updateWarehousePanel();
             buildingsPanel.update();
+            if (property.equals("model.goods.hammers")
+                || property.equals("model.goods.tools")) {
+                constructionPanel.update();
+            }
         } else if (Building.UNIT_CHANGE.equals(property)) {
             // already processed by BuildingPanel
         } else if (Tile.UNIT_CHANGE.equals(property)) {

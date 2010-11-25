@@ -126,6 +126,10 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
         repaint();
     }
 
+    public void update() {
+        initialize(colony.getCurrentlyBuilding());
+    }
+
     /**
      * Get the <code>DefaultLabel</code> value.
      *
