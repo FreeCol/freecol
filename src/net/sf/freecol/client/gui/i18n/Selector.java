@@ -19,25 +19,14 @@
 
 package net.sf.freecol.client.gui.i18n;
 
-/**
- * Number optimized for languages that distinguish place the numbers 0
- * and 1 in category one, and all others in category other.
- */
-public class ZeroOneNumberRule extends Number {
+public interface Selector {
 
-    public Category getCategory(double input) {
-	if (input == 0 || input == 1) {
-	    return Category.one;
-	} else {
-	    return Category.other;
-	}
-    }
+    /**
+     * Return the index of the rule this input matches.
+     *
+     * @param input a <code>String</code> value
+     * @return an <code>int</code> value
+     */
+    public int getIndex(String input);
 
-    public int getIndex(double input) {
-	if (input == 0 || input == 1) {
-	    return 0;
-	} else {
-	    return 1;
-	}
-    }
 }

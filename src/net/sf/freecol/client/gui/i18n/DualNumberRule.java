@@ -24,7 +24,7 @@ package net.sf.freecol.client.gui.i18n;
  * Number optimized for languages that distinguish the categories one,
  * two and other.
  */
-public class DualNumberRule implements Number {
+public class DualNumberRule extends Number {
 
     public Category getCategory(double input) {
 	if (input == 1) {

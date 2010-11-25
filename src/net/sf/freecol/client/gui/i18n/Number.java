@@ -25,7 +25,7 @@ package net.sf.freecol.client.gui.i18n;
  *
  * @See http://cldr.unicode.org/index/cldr-spec/plural-rules
  */
-public interface Number {
+public abstract class Number implements Selector {
 
     public enum Category { zero, one, two, few, many, other };
 
@@ -35,7 +35,12 @@ public interface Number {
      * @param input a <code>double</code> value
      * @return a <code>Category</code> value
      */
-    public Category getCategory(double input);
+    public abstract Category getCategory(double input);
+
+
+    public int getIndex(String input) {
+        return getIndex(Double.parseDouble(input));
+    }
 
     /**
      * Return the index of the rule this input matches. The index
@@ -47,5 +52,5 @@ public interface Number {
      * @param input a <code>double</code> value
      * @return an <code>int</code> value
      */
-    public int getIndex(double input);
+    public abstract int getIndex(double input);
 }

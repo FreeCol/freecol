@@ -23,7 +23,7 @@ package net.sf.freecol.client.gui.i18n;
  * Number optimized for languages that distinguish the categories one
  * and other.
  */
-public class PluralNumberRule implements Number {
+public class PluralNumberRule extends Number {
 
     public Category getCategory(double input) {
 	if (input == 1) {

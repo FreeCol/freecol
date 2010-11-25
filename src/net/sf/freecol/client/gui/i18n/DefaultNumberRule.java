@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * This class handles zero or one rule for each number category.
  */
-public class DefaultNumberRule implements Number {
+public class DefaultNumberRule extends Number {
 
     Map<Category, Rule> rules = new EnumMap<Category, Rule>(Category.class);
 
