@@ -205,7 +205,7 @@ public class BuildColonyMission extends Mission {
                 }
                 if (reply != null && reply.getTagName() != "error") {
                     colonyBuilt = true;
-                    Settlement settlement = unit.getTile().getSettlement();
+                    Settlement settlement = unit.getSettlement();
                     AIColony aiColony = (AIColony) getAIMain().getAIObject(settlement);
                     getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
                 } else {

@@ -1811,7 +1811,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return false;
         }
         
-        Settlement settlement = unitTile.getSettlement();
+        Settlement settlement = getSettlement();
         if(settlement != null && settlement.getOwner() != player){
             return false;
         }
@@ -1985,7 +1985,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * the {@link Tile} below.
      */
     public void putOutsideColony() {
-        if (getTile().getSettlement() == null) {
+        if (getSettlement() == null) {
             throw new IllegalStateException();
         }
 
@@ -2821,13 +2821,23 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
 
     /**
+     * Gets the Settlement this unit is in.
+     *
+     * @return The Settlement this unit is in, or null if none.
+     */
+    public Settlement getSettlement() {
+        Location location = getLocation();
+        return (location != null) ? location.getSettlement() : null;
+    }
+
+    /**
      * Gets the Colony this unit is in.
      * 
-     * @return The Colony it's in, or null if it is not in a Colony
+     * @return The Colony this unit is in, or null if none.
      */
     public Colony getColony() {
         Location location = getLocation();
-        return (location != null ? location.getColony() : null);
+        return (location != null) ? location.getColony() : null;
     }
 
     /** 

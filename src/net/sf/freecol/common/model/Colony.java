@@ -1938,6 +1938,15 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     /**
      * Returns just this Colony itself.
      *
+     * @return This colony.
+     */
+    public Settlement getSettlement() {
+        return this;
+    }
+
+    /**
+     * Returns just this Colony itself.
+     *
      * @return this colony.
      */
     public Colony getColony() {

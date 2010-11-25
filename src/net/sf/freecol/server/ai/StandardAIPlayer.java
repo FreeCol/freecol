@@ -1203,7 +1203,7 @@ public class StandardAIPlayer extends AIPlayer {
             throw new IllegalStateException("Units can only switch equipment in the same location");
         }
 
-        if(unit1.getTile().getSettlement() == null){
+        if(unit1.getSettlement() == null){
             throw new IllegalStateException("Units can only switch equipment in a settlement");
         }
 
@@ -1575,7 +1575,7 @@ public class StandardAIPlayer extends AIPlayer {
             }
 
             if (unit.getState() == UnitState.IN_COLONY
-                && unit.getTile().getSettlement().getUnitCount() <= 1) {
+                && unit.getSettlement().getUnitCount() <= 1) {
                 // The unit has its hand full keeping the colony alive.
                 continue;
             }

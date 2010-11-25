@@ -1148,9 +1148,18 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * An Indian settlement is no colony.
+     * Returns this settlement.
      *
-     * @return null
+     * @return This settlement.
+     */
+    public Settlement getSettlement() {
+        return this;
+    }
+
+    /**
+     * An Indian settlement is not a colony.
+     *
+     * @return Null.
      */
     public Colony getColony() {
         return null;

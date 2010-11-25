@@ -135,10 +135,18 @@ public interface Location {
     public GoodsContainer getGoodsContainer();
 
     /**
-     * Returns the <code>Colony</code> this <code>Location</code> is
-     * located in or null if this Location does not  belong to a colony.
+     * Returns the <code>Settlement</code> this <code>Location</code> is
+     * located in.
      *
-     * @return The <code>Colony</code> or null if not in a colony.
+     * @return The current <code>Settlement</code> or null if none.
      */
-     public Colony getColony();
+    public Settlement getSettlement();
+
+    /**
+     * Returns the <code>Colony</code> this <code>Location</code> is
+     * located in.
+     *
+     * @return The current <code>Colony</code> or null if none.
+     */
+    public Colony getColony();
 }

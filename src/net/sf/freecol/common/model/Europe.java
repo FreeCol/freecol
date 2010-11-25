@@ -211,10 +211,20 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         return null;
     }
 
+
+    /**
+     * Europe does not belong to a settlement.
+     *
+     * @return Null.
+     */
+    public Settlement getSettlement() {
+        return null;
+    }
+
     /**
      * Europe does not belong to a colony.
      *
-     * @return Always returns null.
+     * @return Null.
      */
     public Colony getColony() {
         return null;

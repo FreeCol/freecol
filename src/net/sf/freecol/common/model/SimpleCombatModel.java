@@ -243,7 +243,7 @@ public class SimpleCombatModel extends CombatModel {
                           .getModifierSet("model.modifier.bombardBonus"));
         } else if (defender != null && ((Unit) defender).getTile() != null) {
             Unit defenderUnit = (Unit) defender;
-            if (defenderUnit.getTile().getSettlement() != null) {
+            if (defenderUnit.getSettlement() != null) {
                 result.addAll(attackerUnit
                               .getModifierSet("model.modifier.bombardBonus"));
             } else {
@@ -260,7 +260,7 @@ public class SimpleCombatModel extends CombatModel {
                 }
                 // Artillery in the open penalty
                 if (attackerUnit.hasAbility("model.ability.bombard")
-                    && attackerUnit.getTile().getSettlement() == null) {
+                    && attackerUnit.getSettlement() == null) {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
             }
@@ -670,7 +670,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     private boolean isBeached(Unit unit) {
         return unit.isNaval() && unit.getTile().isLand()
-            && unit.getTile().getSettlement() == null;
+            && unit.getSettlement() == null;
     }
 
 }

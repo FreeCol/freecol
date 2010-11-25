@@ -100,7 +100,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     public SelectDestinationDialog(Canvas parent, Unit unit) {
         super(parent);
 
-        final Settlement inSettlement = (unit.getTile() != null) ? unit.getTile().getSettlement() : null;
+        final Settlement inSettlement = unit.getSettlement();
 
         // Collect the goods the unit is carrying.
         List<GoodsType> goodsTypeList = new ArrayList<GoodsType>();

@@ -319,7 +319,7 @@ public abstract class Mission extends AIObject {
         
         Unit carrier = (Unit) getUnit().getLocation();
         
-        if (carrier.getTile().getSettlement() != null) {
+        if (carrier.getSettlement() != null) {
             return carrier.getTile();
         }        
         // Find the closest friendly Settlement:

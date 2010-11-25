@@ -200,6 +200,16 @@ public class Building extends FreeColGameObject
         return getColony().canBuild(buildingType.getUpgradesTo());
     }
 
+
+    /**
+     * Gets a pointer to the settlement containing this building.
+     *
+     * @return This colony.
+     */
+    public Settlement getSettlement() {
+        return colony;
+    }
+
     /**
      * Gets a pointer to the colony containing this building.
      *

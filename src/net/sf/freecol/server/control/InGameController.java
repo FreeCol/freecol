@@ -2895,7 +2895,7 @@ public final class InGameController extends Controller {
      */
     private int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
-        Settlement settlement = loser.getTile().getSettlement();
+        Settlement settlement = loser.getSettlement();
         if (settlement != null) {
             if (settlement instanceof IndianSettlement) {
                 return (((IndianSettlement) settlement).isCapital())
@@ -3629,7 +3629,7 @@ public final class InGameController extends Controller {
     private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defenderPlayer.getNationName();
-        Settlement settlement = defender.getTile().getSettlement();
+        Settlement settlement = defender.getSettlement();
         StringTemplate defenderLocation = defender.getLocation().getLocationNameFor(defenderPlayer);
         EquipmentType equip = defender
             .getBestCombatEquipmentType(defender.getAutomaticEquipment());
@@ -4709,18 +4709,21 @@ public final class InGameController extends Controller {
 
         goods.adjustAmount();
         moveGoods(goods, unit);
+        boolean moved = false;
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
+            moved = true;
         }
 
         // Only have to update the carrier location, as that *must*
         // include the original location of the goods, but if it is in
         // a colony it is better still just to update the goods
         // containers.
-        Colony colony = unit.getColony();
-        if (colony != null) {
-            cs.add(See.only(serverPlayer), colony.getGoodsContainer());
+        Settlement settlement = unit.getSettlement();
+        if (settlement != null) {
+            cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
             cs.add(See.only(serverPlayer), unit.getGoodsContainer());
+            if (moved) cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         } else {
             cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation());
         }
@@ -4748,7 +4751,7 @@ public final class InGameController extends Controller {
             loc = null;
         } else if (unit.getTile() == null) {
             return Message.clientError("Unit not on the map.");
-        } else if (unit.getTile().getSettlement() instanceof Colony) {
+        } else if (unit.getSettlement() != null) {
             settlement = unit.getTile().getSettlement();
             loc = settlement;
         } else { // Dump of goods onto a tile
@@ -4756,15 +4759,19 @@ public final class InGameController extends Controller {
         }
         goods.adjustAmount();
         moveGoods(goods, loc);
+        boolean moved = false;
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
+            moved = true;
         }
 
         if (settlement != null) {
             cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
+            cs.add(See.only(serverPlayer), unit.getGoodsContainer());
+            if (moved) cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+        } else {
+            cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation());
         }
-        // Always update unit, to show goods are gone.
-        cs.add(See.perhaps(), unit);
 
         // Others might see a capacity change.
         sendToOthers(serverPlayer, cs);
@@ -5468,7 +5475,7 @@ public final class InGameController extends Controller {
     public Element equipUnit(ServerPlayer serverPlayer, Unit unit,
                              EquipmentType type, int amount) {
         Settlement settlement = (unit.getTile() == null) ? null
-            : unit.getTile().getSettlement();
+            : unit.getSettlement();
         GoodsContainer container = null;
         boolean tileDirty = false;
         if (unit.isInEurope()) {

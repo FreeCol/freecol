@@ -731,7 +731,7 @@ public class TransportMission extends Mission {
 		}
 		
 		//Already at a settlement
-		if(unit.getTile().getSettlement() != null){
+		if(unit.getSettlement() != null){
 			return new Destination();
 		}
 		
@@ -1213,8 +1213,8 @@ public class TransportMission extends Mission {
                 
                 // Sanitation, to force game to reset
                 if(mission == null || au.getTransportDestination() == null){
-                	if(carrier.getLocation() instanceof Europe ||
-                	    carrier.getTile().getSettlement() != null){
+                	if(carrier.getLocation() instanceof Europe
+                     || carrier.getSettlement() != null) {
                 		logger.warning("Unloading unit without mission or destination");
                 		unitLeavesShip(connection, u);
                 		continue;

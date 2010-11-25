@@ -206,6 +206,16 @@ public class ColonyTile extends FreeColGameObject
         return null;
     }
 
+
+    /**
+     * Gets a pointer to the settlement containing this tile.
+     *
+     * @return This settlement.
+     */
+    public Settlement getSettlement() {
+        return colony;
+    }
+
     /**
      * Gets a pointer to the colony containing this tile.
      *

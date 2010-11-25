@@ -100,7 +100,7 @@ public class EquipUnitMessage extends Message {
             ; // Always OK
         } else if (unit.getTile() == null) {
             return Message.clientError("Unit is not on the map: " + unitId);
-        } else if (unit.getTile().getSettlement() == null) {
+        } else if (unit.getSettlement() == null) {
             return Message.clientError("Unit is not in a settlement: " + unitId);
         }
         EquipmentType type = game.getSpecification().getEquipmentType(typeId);
