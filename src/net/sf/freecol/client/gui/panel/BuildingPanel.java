@@ -31,6 +31,7 @@ import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,6 +50,8 @@ import net.miginfocom.swing.MigLayout;
  * This panel represents a single building in a Colony.
  */
 public class BuildingPanel extends JPanel implements PropertyChangeListener {
+
+    private static Logger logger = Logger.getLogger(BuildingPanel.class.getName());
 
     private final Canvas parent;
 
@@ -147,43 +150,17 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     public void addPropertyChangeListeners() {
         building.addPropertyChangeListener(this);
-        Colony colony = building.getColony();
-        GoodsType type = building.getGoodsInputType();
-        if (type != null) {
-            colony.addPropertyChangeListener(type.getId(), this);
-        }
-        type = building.getGoodsOutputType();
-        if (type != null) {
-            colony.addPropertyChangeListener(type.getId(), this);
-        }
     }
 
     public void removePropertyChangeListeners() {
         building.removePropertyChangeListener(this);
-        Colony colony = building.getColony();
-        GoodsType type = building.getGoodsInputType();
-        if (type != null) {
-            colony.removePropertyChangeListener(type.getId(), this);
-        }
-        type = building.getGoodsOutputType();
-        if (type != null) {
-            colony.removePropertyChangeListener(type.getId(), this);
-        }
     }
 
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getPropertyName();
-        if (Building.UNIT_CHANGE.toString().equals(property)) {
-            Colony colony = building.getColony();
-            GoodsType type = building.getGoodsInputType();
-            if (type != null) {
-                colony.firePropertyChange(type.getId(), 0, 1);
-            }
-            type = building.getGoodsOutputType();
-            if (type != null) {
-                colony.firePropertyChange(type.getId(), 0, 1);
-            }
-        }
+        logger.finest(building.getId() + " change " + property
+                      + ": " + event.getOldValue()
+                      + " -> " + event.getNewValue());
         initialize();
     }
 

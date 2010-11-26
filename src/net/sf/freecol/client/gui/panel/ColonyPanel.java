@@ -420,6 +420,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         warehousePanel.update();
     }
 
+    public void updateOutsideColonyPanel() {
+        outsideColonyPanel.initialize();
+    }
+
     public void updateTilePanel() {
         tilePanel.initialize();
     }
@@ -993,7 +997,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         Unit unit = ((UnitLabel) comp).getUnit();
 
                         if (getBuilding().canAdd(unit)) {
-                            oldParent.remove(comp);
+                            //oldParent.remove(comp);
                             getController().work(unit, getBuilding());
                         } else {
                             return null;
@@ -1174,6 +1178,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void propertyChange(PropertyChangeEvent event) {
+            String property = event.getPropertyName();
+            logger.finest("Outside " + colony.getId() + " change " + property
+                          + ": " + event.getOldValue()
+                          + " -> " + event.getNewValue());
             initialize();
         }
 
@@ -1543,16 +1551,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         Tile tile = colonyTile.getWorkTile();
                         Player player = unit.getOwner();
 
-                        logger.info("Colony " + getColony().getName()
-                                    + " claims tile " + tile.toString()
-                                    + " with unit " + unit.getId());
-                        if ((tile.getOwner() != player
-                             || tile.getOwningSettlement() != getColony())
-                            && !getController().claimLand(tile, getColony(), 0)) {
-                            logger.warning("Colony " + getColony().getName()
-                                           + " could not claim tile " + tile.toString()
-                                           + " with unit " + unit.getId());
-                            return null;
+                        if (tile.getOwner() != player
+                            || tile.getOwningSettlement() != getColony()) {
+                            if (getController().claimLand(tile, getColony(), 0)) {
+                                logger.info("Colony " + getColony().getName()
+                                            + " claims tile " + tile.toString()
+                                            + " with unit " + unit.getId());
+                            } else {
+                                logger.warning("Colony " + getColony().getName()
+                                               + " could not claim tile " + tile.toString()
+                                               + " with unit " + unit.getId());
+                                return null;
+                            }
                         }
 
                         if (colonyTile.canAdd(unit)) {
@@ -1627,41 +1637,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             public void addPropertyChangeListeners() {
                 colonyTile.addPropertyChangeListener(this);
-                Colony colony = colonyTile.getColony();
-                List<AbstractGoods> production
-                    = colonyTile.getTile().getType().getProduction(null);
-                for (AbstractGoods ag : production) {
-                    colony.addPropertyChangeListener(ag.getType().getId(),
-                                                     this);
-                }
             }
 
             public void removePropertyChangeListeners() {
                 colonyTile.removePropertyChangeListener(this);
-                Colony colony = colonyTile.getColony();
-                List<AbstractGoods> production
-                    = colonyTile.getTile().getType().getProduction(null);
-                for (AbstractGoods ag : production) {
-                    colony.removePropertyChangeListener(ag.getType().getId(),
-                                                        this);
-                }
             }
 
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
-                    Colony colony = colonyTile.getColony();
-                    // Have to use abstract production as if the unit was
-                    // removed we can not tell what it was producing.
-                    List<AbstractGoods> production
-                        = colonyTile.getTile().getType().getProduction(null);
-                    for (AbstractGoods ag : production) {
-                        colony.firePropertyChange(ag.getType().getId(), 0, 1);
-                        // However, we only really need fire one change
-                        // event as that is enough to provoke a redisplay.
-                        break;
-                    }
-                }
+                logger.finest(colonyTile.getId() + " change " + property
+                              + ": " + event.getOldValue()
+                              + " -> " + event.getNewValue());
                 initialize();
             }
 
@@ -1680,11 +1666,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
     }
 
-    public void propertyChange(PropertyChangeEvent e) {
+    public void propertyChange(PropertyChangeEvent event) {
         if (!isShowing() || getColony() == null) {
             return;
         }
-        String property = e.getPropertyName();
+        String property = event.getPropertyName();
+        logger.finest(getColony().getName() + " change " + property
+                      + ": " + event.getOldValue()
+                      + " -> " + event.getNewValue());
 
         if (Unit.CARGO_CHANGE.equals(property)) {
             updateInPortPanel();
@@ -1697,20 +1686,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
             populationPanel.update();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
-            FreeColGameObject object = (FreeColGameObject) e.getSource();
-            String oldType = (String) e.getOldValue();
-            String newType = (String) e.getNewValue();
+            FreeColGameObject object = (FreeColGameObject) event.getSource();
+            String oldType = (String) event.getOldValue();
+            String newType = (String) event.getNewValue();
             getCanvas().showInformationMessage(object,
                                                "model.colony.unitChange",
                                                "%oldType%", oldType,
                                                "%newType%", newType);
             updateTilePanel();
         } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
+            // Note: ColonyTile.UNIT_CHANGE.equals(Building.UNIT_CHANGE)
             updateTilePanel();
             updateProductionPanel();
         } else if (property.startsWith("model.goods.")) {
-            // changes to warehouse goods count may affect building production
-            //which requires a view update
+            // Changes to warehouse goods count may affect building production
+            // which requires a view update.
             updateProductionPanel();
             updateWarehousePanel();
             buildingsPanel.update();
@@ -1718,12 +1708,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 || property.equals("model.goods.tools")) {
                 constructionPanel.update();
             }
-        } else if (Building.UNIT_CHANGE.equals(property)) {
-            // already processed by BuildingPanel
         } else if (Tile.UNIT_CHANGE.equals(property)) {
-            outsideColonyPanel.initialize();
+            updateOutsideColonyPanel();
         } else {
-            logger.warning("Unknown property change event: " + e.getPropertyName());
+            logger.warning("Unknown property change event: "
+                           + event.getPropertyName());
         }
     }
 

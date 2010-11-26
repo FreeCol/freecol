@@ -375,6 +375,89 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 
+    // Simple helper container to remember a colony state prior to some
+    // change.
+    private class ColonyWas {
+        private Colony colony;
+        private int population;
+
+        public ColonyWas(Colony colony) {
+            this.colony = colony;
+            this.population = colony.getUnitCount();
+        }
+
+        /**
+         * Fire any property changes resulting from actions within a
+         * colony.
+         */
+        public void fireChanges() {
+            int newPopulation = colony.getUnitCount();
+            if (newPopulation != population) {
+                colony.updatePopulation(newPopulation - population);
+            }
+            colony.getGoodsContainer().fireChanges();
+        }
+    }
+
+    // Simple helper container to remember a unit state prior to some change.
+    private class UnitWas {
+        private Unit unit;
+        private Location loc;
+        private GoodsType work;
+        private int amount;
+        private Colony colony;
+
+        public UnitWas(Unit unit) {
+            this.unit = unit;
+            this.loc = unit.getLocation();
+            this.work = unit.getWorkType();
+            this.amount = getAmount(loc, work);
+            this.colony = unit.getColony();
+        }
+
+        // TODO: fix this non-OO nastiness
+        private int getAmount(Location location, GoodsType goodsType) {
+            return (location == null || goodsType == null) ? 0
+                : (location instanceof Building)
+                ? ((Building)location).getProductionNextTurn()
+                : (location instanceof ColonyTile)
+                ? ((ColonyTile)location).getProductionOf(goodsType)
+                : 0;
+        }
+
+        /**
+         * Fire any property changes resulting from actions of a unit.
+         */
+        public void fireChanges() {
+            Location newLoc = unit.getLocation();
+            if (loc != newLoc) {
+                // Note: exploiting the accident that Building.UNIT_CHANGE
+                // == ColonyTile.UNIT_CHANGE
+                FreeColGameObject oldFcgo = (FreeColGameObject) loc;
+                oldFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
+                FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
+                newFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+            }
+            if (colony != null) {
+                GoodsType newWork = unit.getWorkType();
+                int newAmount = getAmount(newLoc, newWork);
+                if (work == newWork) {
+                    if (work != null && amount != newAmount) {
+                        colony.firePropertyChange(work.getId(),
+                                                  amount, newAmount);
+                    }
+                } else {
+                    if (work != null) {
+                        colony.firePropertyChange(work.getId(), amount, 0);
+                    }
+                    if (newWork != null) {
+                        colony.firePropertyChange(newWork.getId(), 0, newAmount);
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Set a player to be the new current player.
@@ -609,6 +692,7 @@ public final class InGameController implements NetworkConstants {
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
         int newAmount;
+        ColonyWas colonyWas = new ColonyWas(colony);
         if (askLoadCargo(goods, carrier)
             && (newAmount = container.getGoodsCount(type)) != oldAmount) {
             if (newAmount != oldAmount + amount) {
@@ -619,7 +703,7 @@ public final class InGameController implements NetworkConstants {
                                + " result " + Integer.toString(newAmount));
             }
             carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
-            fireColonyChanges(colony, -1, null, null);
+            colonyWas.fireChanges();
             return true;
         }
         return false;
@@ -750,6 +834,7 @@ public final class InGameController implements NetworkConstants {
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
         int newAmount;
+        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         if (askUnloadCargo(goods)
             && (newAmount = container.getGoodsCount(type)) != oldAmount) {
             if (newAmount != oldAmount - amount) {
@@ -759,9 +844,7 @@ public final class InGameController implements NetworkConstants {
                                + " leaving " + Integer.toString(newAmount));
             }
             carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
-            if (colony != null) {
-                fireColonyChanges(colony, -1, null, null);
-            }
+            if (colonyWas != null) colonyWas.fireChanges();
             return true;
         }
         return false;
@@ -1014,37 +1097,6 @@ public final class InGameController implements NetworkConstants {
                      tile.getSettlement().getOwner() != freeColClient.getMyPlayer()));
         } else {
             return false;
-        }
-    }
-
-    /**
-     * Fire any property changes resulting from actions within a
-     * colony.
-     *
-     * @param colony The <code>Colony</code> that may have changed.
-     * @param oldPop The old population (or negative if unchanged).
-     * @param unit A <code>Unit</code> that may have moved.
-     * @param oldLoc The old <code>Location</code> of the unit.
-     */
-    private void fireColonyChanges(Colony colony, int oldPop, Unit unit,
-                                   Location oldLoc) {
-        if (oldPop >= 0) {
-            int newPop = colony.getUnitCount();
-            if (oldPop != newPop) {
-                colony.updatePopulation(newPop - oldPop);
-            }
-        }
-        colony.getGoodsContainer().fireChanges();
-        if (unit != null) {
-            Location newLoc = unit.getLocation();
-            if (oldLoc != newLoc) {
-                // Note: exploiting the accident that Building.UNIT_CHANGE
-                // == ColonyTile.UNIT_CHANGE
-                FreeColGameObject oldFcgo = (FreeColGameObject) oldLoc;
-                oldFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
-                FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
-                newFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
-            }
         }
     }
 
@@ -1519,9 +1571,9 @@ public final class InGameController implements NetworkConstants {
         Europe europe = player.getEurope();
         int count = europe.getUnitCount();
         if (askEmigrate(slot) && europe.getUnitCount() > count) {
-            freeColClient.getCanvas().updateGoldLabel();
             europe.firePropertyChange(Europe.UNIT_CHANGE, count,
                                       europe.getUnitCount());
+            freeColClient.getCanvas().updateGoldLabel();
         }
     }
 
@@ -3734,11 +3786,11 @@ public final class InGameController implements NetworkConstants {
         if (askBuyGoods(carrier, type, toBuy)
             && (newAmount = carrier.getGoodsContainer().getGoodsCount(type)) > oldAmount) {
             freeColClient.playSound("sound.event.loadCargo");
-            canvas.updateGoldLabel();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
             for (TransactionListener listener : market.getTransactionListener()) {
                 listener.logPurchase(type, toBuy, price);
             }
+            canvas.updateGoldLabel();
             return true;
         }
 
@@ -3880,7 +3932,12 @@ public final class InGameController implements NetworkConstants {
 
         // Try to clear.
         if (askClearSpeciality(unit) && unit.getType() == newType) {
-            ;//unit.firePropertyChange(Unit.UNIT_TYPE_CHANGE, oldType, newType);
+            // Would expect to need to do:
+            //    unit.firePropertyChange(Unit.UNIT_TYPE_CHANGE,
+            //                            oldType, newType);
+            // but this routine is only called out of UnitLabel, where the
+            // unit icon is always updated anyway.
+            ;
         }
         nextActiveUnit();
     }
@@ -4009,17 +4066,16 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        int oldPop = (colony == null) ? -1 : colony.getUnitCount();
-        Location oldLoc = unit.getLocation();
         int oldAmount = unit.getEquipmentCount(type);
         int newAmount;
+        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(unit);
         if (askEquipUnit(unit, type, amount)
             && (newAmount = unit.getEquipmentCount(type)) != oldAmount) {
             unit.firePropertyChange(Unit.EQUIPMENT_CHANGE,
                                     oldAmount, newAmount);
-            if (colony != null) {
-                fireColonyChanges(colony, oldPop, unit, oldLoc);
-            }
+            if (colonyWas != null) colonyWas.fireChanges();
+            unitWas.fireChanges();
             canvas.updateGoldLabel();
         }
     }
@@ -4072,11 +4128,12 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Try to change the work location.
-        Location oldLoc = unit.getLocation();
-        int oldPop = colony.getUnitCount();
+        ColonyWas colonyWas = new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(unit);
         if (askWork(unit, workLocation)
             && unit.getLocation() == workLocation) {
-            fireColonyChanges(colony, oldPop, unit, oldLoc);
+            colonyWas.fireChanges();
+            unitWas.fireChanges();
         }
     }
 
@@ -4120,10 +4177,11 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        int oldPop = colony.getUnitCount();
-        Location oldLoc = unit.getLocation();
+        ColonyWas colonyWas = new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(unit);
         if (askPutOutsideColony(unit)) {
-            fireColonyChanges(colony, oldPop, unit, oldLoc);
+            colonyWas.fireChanges();
+            unitWas.fireChanges();
             return true;
         }
         return false;
@@ -4160,17 +4218,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        GoodsType oldWorkType = unit.getWorkType();
+        UnitWas unitWas = new UnitWas(unit);
         if (askChangeWorkType(unit, workType)) {
-            if (unit.getLocation() instanceof ColonyTile) {
-                ColonyTile colonyTile = (ColonyTile) unit.getLocation();
-                if (oldWorkType != null) {
-                    colonyTile.firePropertyChange(oldWorkType.getId(),
-                        colonyTile.getProductionOf(unit, oldWorkType), null);
-                }
-                colonyTile.firePropertyChange(workType.getId(),
-                    null, colonyTile.getProductionOf(unit, workType));
-            }
+            unitWas.fireChanges();
         }
     }
 
@@ -4508,11 +4558,12 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
+        ColonyWas colonyWas = new ColonyWas(colony);
         if (askPayForBuilding(colony) && colony.getPriceForBuilding() == 0) {
             String pc = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
             List<BuildableType> queue = colony.getBuildQueue();
             colony.firePropertyChange(pc, null, queue);
-            fireColonyChanges(colony, -1, null, null);
+            colonyWas.fireChanges();
         }
     }
 
