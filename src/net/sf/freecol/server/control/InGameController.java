@@ -3031,7 +3031,7 @@ public final class InGameController extends Controller {
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.
         for (Tile t : colony.getOwnedTiles()) {
-            cs.add(See.only(colonyPlayer), t);
+            cs.add(See.perhaps().always(colonyPlayer), t);
         }
         if (colony.getLineOfSight() > attacker.getLineOfSight()) {
             for (Tile t : tile.getSurroundingTiles(attacker.getLineOfSight(),
