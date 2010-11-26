@@ -1997,6 +1997,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        Settlement oldSettlement = settlement;
+        Player oldSettlementOwner = (settlement == null) ? null
+            : settlement.getOwner();
+
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
@@ -2031,7 +2035,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owningSettlement = null;
         }
 
-        Settlement oldSettlement = settlement;
         settlement = null;
         units.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -2075,13 +2078,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         // Player settlement list is not passed in player updates
         // so do it here.  TODO: something better.
+        Player settlementOwner = (settlement == null) ? null
+            : settlement.getOwner();
         if (settlement == null && oldSettlement != null) {
-            Player owner = oldSettlement.getOwner();
+            // Settlement disappeared
             oldSettlement.setOwner(null);
-            owner.removeSettlement(oldSettlement);
+            oldSettlementOwner.removeSettlement(oldSettlement);
         } else if (settlement != null && oldSettlement == null) {
-            Player owner = settlement.getOwner();
-            owner.addSettlement(settlement);
+            // Settlement appeared
+            settlementOwner.addSettlement(settlement);
+        } else if (settlementOwner != oldSettlementOwner) {
+            // Settlement changed owner
+            oldSettlement.setOwner(null);
+            oldSettlementOwner.removeSettlement(oldSettlement);
+            settlement.setOwner(settlementOwner);
+            settlementOwner.addSettlement(settlement);
         }
 
         // 0.9.x compatibility code
