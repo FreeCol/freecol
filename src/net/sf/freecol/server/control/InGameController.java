@@ -3630,10 +3630,13 @@ public final class InGameController extends Controller {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defenderPlayer.getNationName();
         Settlement settlement = defender.getSettlement();
-        StringTemplate defenderLocation = defender.getLocation().getLocationNameFor(defenderPlayer);
+        StringTemplate defenderLocation = defender.getLocation()
+            .getLocationNameFor(defenderPlayer);
         EquipmentType equip = defender
             .getBestCombatEquipmentType(defender.getAutomaticEquipment());
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
+        StringTemplate attackerLocation = attacker.getLocation()
+            .getLocationNameFor(attackerPlayer);
         StringTemplate attackerNation = attackerPlayer.getNationName();
 
         // Autoequipment is not actually with the unit, it is stored
@@ -3642,7 +3645,17 @@ public final class InGameController extends Controller {
             settlement.removeGoods(goods);
         }
 
-        cs.addMessage(See.only((ServerPlayer) defender.getOwner()),
+        cs.addMessage(See.only(attackerPlayer),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                             "model.unit.unitWinColony",
+                             attacker)
+                .addStringTemplate("%location%", attackerLocation)
+                .addStringTemplate("%nation%", attackerNation)
+                .addStringTemplate("%unit%", attacker.getLabel())
+                .addName("%settlement%", settlement.getNameFor(attackerPlayer))
+                .addStringTemplate("%enemyNation%", defenderNation)
+                .addStringTemplate("%enemyUnit%", defender.getLabel()));
+        cs.addMessage(See.only(defenderPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              "model.unit.unitLoseAutoEquip",
                              defender)
