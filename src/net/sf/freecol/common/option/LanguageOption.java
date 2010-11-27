@@ -82,7 +82,7 @@ public class LanguageOption extends AbstractOption {
 
 
     private Language value;
-    
+
     /**
      * Creates a new  <code>IntegerOption</code>.
      * @param in The <code>XMLStreamReader</code> containing the data.
@@ -94,7 +94,7 @@ public class LanguageOption extends AbstractOption {
              prepareLanguages();
          }
          readFromXML(in);
-     }   
+     }
 
     private void prepareLanguages() {
         for (String[] pair : languageNamesHelper) {
@@ -145,17 +145,23 @@ public class LanguageOption extends AbstractOption {
         File i18nDirectory = new File(FreeCol.getDataDirectory(), Messages.STRINGS_DIRECTORY);
         File[] files = i18nDirectory.listFiles();
         if (files == null) {
-            throw new RuntimeException("No language files could be found in the <" + i18nDirectory + 
+            throw new RuntimeException("No language files could be found in the <" + i18nDirectory +
                                        "> folder. Make sure you ran the ant correctly.");
         }
+        String prefix = Messages.FILE_PREFIX + "_";
+        int prefixLength = prefix.length();
         for (File file : files) {
             if (file.getName() == null) {
                 continue;
             }
-            if (file.getName().startsWith(Messages.FILE_PREFIX + "_")) {
+            if (file.getName().startsWith(prefix)) {
                 try {
-                    final String languageID = file.getName().substring(16, file.getName().indexOf("."));
-                    languages.put(languageID, new Language(languageID, getLocale(languageID)));
+                    final String languageID =
+                        file.getName().substring(prefixLength, file.getName().indexOf("."));
+                    // qqq contains explanations only
+                    if (!"qqq".equals(languageID)) {
+                        languages.put(languageID, new Language(languageID, getLocale(languageID)));
+                    }
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Exception in findLanguages()", e);
                     continue;
@@ -166,8 +172,8 @@ public class LanguageOption extends AbstractOption {
 
 
     /**
-     * Returns the <code>Locale</code> decided by the given name. 
-     * 
+     * Returns the <code>Locale</code> decided by the given name.
+     *
      * @param languageID A String using the same format as
      *         {@link #getValue()}.
      * @return The Locale.
@@ -176,7 +182,7 @@ public class LanguageOption extends AbstractOption {
         if (languageID == null || AUTO.equals(languageID)) {
             return Locale.getDefault();
         }
-         
+
         try {
             String language, country = "", variant = "";
             StringTokenizer st = new StringTokenizer(languageID, "_", true);
@@ -211,7 +217,7 @@ public class LanguageOption extends AbstractOption {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -225,7 +231,7 @@ public class LanguageOption extends AbstractOption {
 
         out.writeEndElement();
      }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
@@ -235,7 +241,7 @@ public class LanguageOption extends AbstractOption {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         findLanguages();
-        
+
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         } else if(getId() == NO_ID) {
