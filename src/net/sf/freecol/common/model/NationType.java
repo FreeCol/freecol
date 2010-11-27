@@ -70,7 +70,20 @@ public abstract class NationType extends FreeColGameObjectType {
                 return settlementType;
             }
         }
-        return null;
+        // TODO: remove 0.9.x compatibility code and throw exception instead
+        String id = "model.settlement." + getId().substring(getId().lastIndexOf(".") + 1)
+            + (isCapital ? ".capital" : "");
+        SettlementType type = new SettlementType(id, getSpecification());
+        if (isCapital) {
+            type.setCapital(true);
+            type.setPlunder(new RandomRange(100, 2, 6, 1500));
+            type.setGifts(new RandomRange(100, 2, 6, 200));
+        } else {
+            type.setPlunder(new RandomRange(50, 2, 6, 1000));
+            type.setGifts(new RandomRange(50, 2, 6, 100));
+        }
+        return type;
+        // end compatibility code
     }
 
     public SettlementType getSettlementType(String id) {
