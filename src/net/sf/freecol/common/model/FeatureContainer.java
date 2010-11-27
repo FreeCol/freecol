@@ -530,4 +530,20 @@ public class FeatureContainer {
         }
     }
 
+    /**
+     * Debug helper.
+     */
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("[FeatureContainer [abilities");
+        for (Ability ability : getAbilities()) {
+            result.append(" " + ability.toString());
+        }
+        result.append("][modifiers");
+        for (Modifier modifier : getModifiers()) {
+            result.append(" " + modifier.toString());
+        }
+        result.append("]]");
+        return result.toString();
+    }
 }

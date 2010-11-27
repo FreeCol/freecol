@@ -45,6 +45,12 @@
     <modifier id="model.modifier.artilleryAgainstRaid"
               source="model.source.artilleryAgainstRaid"
               value="100" type="percentage" />
+    <!-- Modifiers with an increment are really templates to be instantiated
+         with the specific start/end years they apply to. -->
+    <modifier id="model.modifier.colonyGoodsParty"
+              source="model.source.colonyGoodsParty"
+              value="50" type="percentage"
+              increment="-2" incrementType="additive" />
   </modifiers>
 
   <events>

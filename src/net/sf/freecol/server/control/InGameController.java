@@ -1101,18 +1101,40 @@ public final class InGameController extends Controller {
                                  serverPlayer)
                     .addName("%replace%", String.valueOf(tax + extraTax)));
         } else { // Tea party
-            Turn turn = getGame().getTurn();
+            Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
             colony.removeGoods(goods);
-            colony.getFeatureContainer()
-                .addModifier(Modifier.createTeaPartyModifier(turn));
-            Specification spec = getGame().getSpecification();
+
             Market market = serverPlayer.getMarket();
             market.setArrears(goodsType, market.getPaidForSale(goodsType)
                 * spec.getIntegerOption("model.option.arrearsFactor")
                               .getValue());
-            cs.add(See.only(serverPlayer), colony.getGoodsContainer(),
-                   market.getMarketData(goodsType));
+
+            Turn turn = getGame().getTurn();
+            List<Modifier> modifiers
+                = spec.getModifiers("model.modifier.colonyGoodsParty");
+            Modifier template;
+            if (modifiers != null && !modifiers.isEmpty()) {
+                template = modifiers.get(0);
+            } else {
+                // TODO: remove this backward compatibility hack for
+                // the < 0.10.x format.
+                template = new Modifier("model.modifier.colonyGoodsParty",
+                                        Specification.COLONY_GOODS_PARTY_SOURCE,
+                                        50, Modifier.Type.PERCENTAGE);
+                template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
+            }
+            colony.getFeatureContainer()
+                .addModifier(Modifier.makeTimedModifier("model.goods.bells",
+                                                        template, turn));
+
+            // Have to update the colony to pick up the feature container.
+            // Otherwise we could get away with just sending the goods
+            // container.  TODO: make the feature container updateable?
+            cs.add(See.only(serverPlayer), colony);
+            // cs.add(See.only(serverPlayer), colony.getGoodsContainer(),
+            //       market.getMarketData(goodsType));
+
             String messageId = goodsType.getId() + ".destroyed";
             if (!Messages.containsKey(messageId)) {
                 messageId = (colony.isLandLocked())

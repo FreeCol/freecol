@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.53
+<!-- XSD for specification version 0.55
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -30,6 +30,7 @@
      0.52: add upkeep attribute to building-type
      0.53: add exposeResourcePercent attribute to tileimprovement-type
      0.54: add settlement type
+     0.55: add increment and incrementType to modifier
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -771,6 +772,16 @@
         </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="value" type="xs:float"/>
+      <xs:attribute name="increment" use="optional" type="xs:float"/>
+      <xs:attribute name="incrementType" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="additive"/>
+            <xs:enumeration value="multiplicative"/>
+            <xs:enumeration value="percentage"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="delete" type="xs:boolean"/>
       <xs:attribute name="source" type="xs:string"/>
       <xs:attribute name="index" type="xs:nonNegativeInteger"/>

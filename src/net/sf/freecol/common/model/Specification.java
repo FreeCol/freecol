@@ -80,10 +80,8 @@ public final class Specification {
         new FreeColGameObjectType("model.source.cargoPenalty");
     public static final FreeColGameObjectType AMBUSH_BONUS_SOURCE =
         new FreeColGameObjectType("model.source.ambushBonus");
-
-    // Workaround.  Not really in the specification.
-    public static final FreeColGameObjectType COLONY_GOODS_PARTY =
-        new FreeColGameObjectType("model.monarch.colonyGoodsParty");
+    public static final FreeColGameObjectType COLONY_GOODS_PARTY_SOURCE =
+        new FreeColGameObjectType("model.source.colonyGoodsParty");
 
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
@@ -180,7 +178,7 @@ public final class Specification {
                 BASE_DEFENCE_SOURCE,
                 CARGO_PENALTY_SOURCE,
                 AMBUSH_BONUS_SOURCE,
-                COLONY_GOODS_PARTY
+                COLONY_GOODS_PARTY_SOURCE
             }) {
             allTypes.put(source.getId(), source);
         }

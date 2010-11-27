@@ -135,30 +135,35 @@ public class ColonyTest extends FreeColTestCase {
 
     }
 
+    private Modifier createTeaPartyModifier(Turn turn) {
+        Modifier template = spec().getModifiers("model.modifier.colonyGoodsParty").get(0);
+        return Modifier.makeTimedModifier("model.goods.bells", template, turn);
+    }
+
     public void testTeaParty() {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
         spec();
 
-        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
-        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
-        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
+        colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
+        colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
+        colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
 
         int modifierCount = 0;
         for (Modifier existingModifier : colony.getFeatureContainer().getModifierSet("model.goods.bells")) {
-            if (Specification.COLONY_GOODS_PARTY.equals(existingModifier.getSource())) {
+            if (Specification.COLONY_GOODS_PARTY_SOURCE.equals(existingModifier.getSource())) {
                 modifierCount++;
             }
         }
         assertEquals(1, modifierCount);
 
         Turn newTurn = new Turn(game.getTurn().getNumber() + 1);
-        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(newTurn));
+        colony.getFeatureContainer().addModifier(createTeaPartyModifier(newTurn));
 
         modifierCount = 0;
         for (Modifier existingModifier : colony.getFeatureContainer().getModifierSet("model.goods.bells")) {
-            if (Specification.COLONY_GOODS_PARTY.equals(existingModifier.getSource())) {
+            if (Specification.COLONY_GOODS_PARTY_SOURCE.equals(existingModifier.getSource())) {
                 modifierCount++;
             }
         }

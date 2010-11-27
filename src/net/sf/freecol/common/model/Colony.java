@@ -2111,11 +2111,12 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
-            // Don't write other features, they will be added from
-            // buildings in readFromXMLImpl().
-            for (Modifier modifier : getFeatureContainer().getModifierSet("model.goods.bells",
-                                                                     null, getGame().getTurn())) {
-                if (Specification.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
+            // Only write the features that need specific instantiation,
+            // which is currently only those with increments.
+            // Fixed features will be added from their origins (usually
+            // buildings).
+            for (Modifier modifier : getFeatureContainer().getModifiers()) {
+                if (modifier.hasIncrement()) {
                     modifier.toXML(out);
                 }
             }

@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Turn;
 
 import org.w3c.dom.Element;
 
@@ -147,6 +148,29 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      */
     public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
         readFromXMLImpl(in, specification);
+    }
+
+    /**
+     * Makes a timed modifier (one with start/end turn and increment)
+     * with the specified id from a template modifier (containing the increment
+     * and value) and given start turn.
+     * Currently the only suitable template is model.modifier.colonyGoodsParty.
+     *
+     * @param id The id for the new modifier.
+     * @param template A template <code>Modifier</code> with increment.
+     * @param start The starting <code>Turn</code>.
+     * @return A new timed modifier.
+     */
+    public static Modifier makeTimedModifier(String id, Modifier template,
+                                             Turn start) {
+        Modifier modifier = new Modifier(id, template.getSource(),
+                                         template.getValue(),
+                                         template.getType());
+        float inc = template.getIncrement();
+        modifier.setIncrement(inc, template.getIncrementType(), start,
+                              new Turn(start.getNumber()
+                                       + (int)(template.getValue()/-inc)));
+        return modifier;
     }
 
     /**
@@ -341,16 +365,6 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     }
 
 
-    // -- Factory methods --
-
-    public static Modifier createTeaPartyModifier(Turn turn) {
-        Modifier bellsBonus = new Modifier("model.goods.bells", Specification.COLONY_GOODS_PARTY,
-                                           50, Type.PERCENTAGE);
-        bellsBonus.setIncrement(-2, Type.ADDITIVE, turn, new Turn(turn.getNumber() + 25));
-        return bellsBonus;
-    }
-
-
     // -- Serialization --
 
 
@@ -378,22 +392,24 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         super.readAttributes(in, specification);
-        setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase(Locale.US)));
+        String typeString = in.getAttributeValue(null, "type");
+        setType(Enum.valueOf(Type.class, typeString.toUpperCase(Locale.US)));
         value = Float.parseFloat(in.getAttributeValue(null, VALUE_TAG));
         String incrementString = in.getAttributeValue(null, "incrementType");
         if (incrementString != null) {
-            setType(Enum.valueOf(Type.class, incrementString.toUpperCase(Locale.US)));
+            setIncrementType(Enum.valueOf(Type.class,
+                    incrementString.toUpperCase(Locale.US)));
             increment = Float.parseFloat(in.getAttributeValue(null, "increment"));
         }
         index = getAttribute(in, "index", -1);
     }
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-	super.writeAttributes(out);
-	out.writeAttribute(VALUE_TAG, String.valueOf(value));
-	out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
+        super.writeAttributes(out);
+        out.writeAttribute(VALUE_TAG, String.valueOf(value));
+        out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
         if (incrementType != null) {
-            out.writeAttribute("incrementType", incrementType.toString());
+            out.writeAttribute("incrementType", incrementType.toString().toLowerCase(Locale.US));
             out.writeAttribute("increment", String.valueOf(increment));
         }
         if (index >= 0) {
@@ -402,8 +418,8 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     public String toString() {
-        return getId() + (getSource() == null ? " " : " (" + getSource().getId() + ") ") +
-            type + " " + value;
+        return getId() + ((getSource() == null) ? " "
+                          : " (" + getSource().getId() + ") ")
+            + type + " " + value;
     }
-
 }
