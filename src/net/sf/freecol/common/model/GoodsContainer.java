@@ -179,7 +179,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         int newAmount = oldAmount + amount;
 
         if (newAmount < 0) {
-            throw new IllegalStateException("Operation would leave " + (newAmount) + " goods of type " 
+            throw new IllegalStateException("Operation would leave " + (newAmount) + " goods of type "
                                             + type.getNameKey() + " in Location " + parent);
         } else if (newAmount == 0) {
             storedGoods.remove(type);
@@ -188,7 +188,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         }
         firePropertyChange(type.getId(), oldAmount, newAmount);
     }
-    
+
     /**
      * Removes Goods from this containter.
      * @param g The Goods to remove from this container.
@@ -226,12 +226,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Removes all goods above given amount, provided that the goods
      * are storable and do not ignore warehouse limits.
-     * 
+     *
      * @param newAmount The treshold.
      */
     public void removeAbove(int newAmount) {
         for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.isStorable() && !goodsType.limitIgnored() && 
+            if (goodsType.isStorable() && !goodsType.limitIgnored() &&
                 storedGoods.get(goodsType) > newAmount) {
                 setAmount(goodsType, newAmount);
             }
@@ -246,29 +246,29 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             storedGoods.put(goodsType, newAmount);
         }
         firePropertyChange(goodsType.getId(), oldAmount, newAmount);
-    }        
+    }
 
     /**
      * Removes all goods.
-     * 
+     *
      */
     public void removeAll() {
         storedGoods.clear();
     }
 
-    
+
     /**
      * Checks if any storable type of goods has reached the given
      * amount.
-     * 
+     *
      * @param amount The amount.
-     * @return <code>true</code> if any type of goods, 
-     * except for <code>Goods.FOOD</code>, has reached 
+     * @return <code>true</code> if any type of goods,
+     * except for <code>Goods.FOOD</code>, has reached
      * the given amount.
      */
     public boolean hasReachedCapacity(int amount) {
         for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.isStorable() && !goodsType.limitIgnored() && 
+            if (goodsType.isStorable() && !goodsType.limitIgnored() &&
                 storedGoods.get(goodsType) > amount) {
                 return true;
             }
@@ -302,7 +302,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Returns the amount of one type of Goods at the beginning of the turn.
      * @param type The type of Goods being looked for in this container.
-     * @return The amount of this type of Goods in this container. at the beginning of the turn 
+     * @return The amount of this type of Goods in this container. at the beginning of the turn
      */
     public int getOldGoodsCount(GoodsType type) {
         if (oldStoredGoods.containsKey(type)) {
@@ -368,7 +368,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         return totalGoods;
     }
 
-    
+
     /**
      * Gets an <code>Iterator</code> of every <code>Goods</code> in this
      * <code>GoodsContainer</code>. There is only one <code>Goods</code>
@@ -450,18 +450,18 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
@@ -554,7 +554,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     /**
      * Creates a <code>String</code> representation of this
-     * <code>GoodsContainer</code>.    
+     * <code>GoodsContainer</code>.
      */
     public String toString() {
         StringBuffer sb = new StringBuffer(200);
