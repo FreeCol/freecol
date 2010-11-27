@@ -36,9 +36,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class SoundTest extends FreeColTestCase {
-    
+
     SoundPlayer soundPlayer = null;
-    
+
     private void playSound(String id) {
         File file = ResourceManager.getAudio(id);
         if (file == null) {
@@ -57,7 +57,7 @@ public class SoundTest extends FreeColTestCase {
             }
         }
     }
-    
+
     public void testSound() {
         File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
@@ -74,5 +74,40 @@ public class SoundTest extends FreeColTestCase {
         playSound("sound.intro.general");
         playSound("sound.event.illegalMove");
         // other sounds require loading a rule set
-   }
+    }
+
+    public void testClassic() {
+        File baseDirectory = new File(FreeCol.getDataDirectory(), "rules/classic");
+        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        ResourceManager.preload(new Dimension(1,1));
+
+        ClientOptions clientOptions = new ClientOptions();
+        final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
+        final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
+        po.setValue(10); // 10% volume
+        soundPlayer = new SoundPlayer(amo, po);
+
+        playSound("sound.intro.model.nation.english");
+        playSound("sound.intro.model.nation.dutch");
+        playSound("sound.intro.model.nation.french");
+        playSound("sound.intro.model.nation.spanish");
+        playSound("sound.anthem.model.nation.dutch");
+        playSound("sound.anthem.model.nation.english");
+        playSound("sound.anthem.model.nation.french");
+        playSound("sound.anthem.model.nation.spanish");
+        playSound("sound.attack.artillery");
+        playSound("sound.attack.mounted");
+        playSound("sound.attack.naval");
+        playSound("sound.event.meet.model.nation.aztec");
+        playSound("sound.event.buildingComplete");
+        playSound("sound.event.captureColony");
+        playSound("sound.event.fountainOfYouth");
+        playSound("sound.event.loadCargo");
+        playSound("sound.event.missionEstablished");
+        playSound("sound.event.sellCargo");
+        playSound("sound.event.shipSunk");
+
+    }
+
 }
