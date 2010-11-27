@@ -164,15 +164,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             ((ServerModelObject) colonyTile).csNewTurn(random, cs);
         }
 
-        // TODO: handle different types
-        GoodsType food = spec.getGoodsType("model.goods.food");
-        for (Goods goods : container.getCompactGoods()) {
-            if (goods.getType().isFoodType()) {
-                container.addGoods(food, goods.getAmount());
-                container.removeGoods(goods);
-            }
-        }
-
         // Categorize buildings as {food, materials, other}-producers
         // To determine materials, examine the requirements for the
         // current building if any.
@@ -185,13 +176,17 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
         List<Building> forFood = new ArrayList<Building>();
         List<Building> forMaterials = new ArrayList<Building>();
+        List<Building> foodConsumers = new ArrayList<Building>();
         List<Building> forOther = new ArrayList<Building>();
         for (Building building : getBuildings()) {
             GoodsType outputType = building.getGoodsOutputType();
+            GoodsType inputType = building.getGoodsInputType();
             if (outputType == null) {
                 forOther.add(building);
             } else if (outputType.isFoodType()) {
                 forFood.add(building);
+            } else if (inputType != null && inputType.isFoodType()) {
+                foodConsumers.add(building);
             } else if (forBuilding.contains(outputType)) {
                 forMaterials.add(building);
             } else {
@@ -216,9 +211,43 @@ public class ServerColony extends Colony implements ServerModelObject {
             ((ServerModelObject) building).csNewTurn(random, cs);
         }
 
+        // check for surplus available to produce goods from food
+        // types (e.g. horses)
+        int surplus = 0;
+        for (Goods goods : container.getCompactGoods()) {
+            if (goods.getType().isFoodType()) {
+                surplus += (goods.getAmount() - container.getOldGoodsCount(goods.getType()));
+            }
+        }
+
+        int foodRequired = getFoodConsumption();
+        surplus -= foodRequired;
+
+        if (surplus > 0) {
+            for (Building building : foodConsumers) {
+                int goodsCount = container.getGoodsCount(building.getGoodsInputType());
+                ((ServerBuilding) building).csNewTurn(random, cs, surplus);
+                goodsCount -= container.getGoodsCount(building.getGoodsInputType());
+                surplus -= goodsCount;
+                if (surplus < 0) {
+                    logger.warning("Building " + building.getId() + " consumed more than allowed!");
+                } else if (surplus == 0) {
+                    break;
+                }
+            }
+        }
+
+        // convert all food types to food
+        GoodsType food = spec.getPrimaryFoodType();
+        for (Goods goods : container.getCompactGoods()) {
+            if (goods.getType().isFoodType()) {
+                container.addGoods(food, goods.getAmount());
+                container.removeGoods(goods);
+            }
+        }
+
         // All food should be produced, so now check for starvation,
         // and hence whether the colony will survive.
-        int foodRequired = getFoodConsumption();
         int foodAvailable = getFoodCount();
         if (foodRequired > foodAvailable) { // Someone starves.
             removeFood(foodAvailable);

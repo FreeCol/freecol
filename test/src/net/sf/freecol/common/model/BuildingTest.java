@@ -360,11 +360,12 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(1);
         GoodsType foodType = spec().getPrimaryFoodType();
+        GoodsType grainType = spec().getGoodsType("model.goods.grain");
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
 
         Building pasture = colony.getBuilding(spec().getBuildingType("model.building.country"));
-        assertEquals(foodType, pasture.getGoodsInputType());
+        assertEquals(grainType, pasture.getGoodsInputType());
         assertEquals(horsesType, pasture.getGoodsOutputType());
 
         // no horses yet
