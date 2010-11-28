@@ -584,15 +584,50 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return Math.max(0, result);
     }
 
+    public int getConsumptionOf(List<GoodsType> goodsTypes) {
+        int result = 0;
+        if (goodsTypes != null) {
+            for (GoodsType goodsType : goodsTypes) {
+                result += getConsumptionOf(goodsType);
+            }
+        }
+        return result;
+    }
+
+
     /**
      * Gives the food needed to keep all units alive in this Settlement.
      *
      * @return The amount of food eaten in this colony each this turn.
      */
     public int getFoodConsumption() {
+        return getConsumptionOf(getSpecification().getFoodGoodsTypeList());
+    }
+
+    public int getSurplusProduction(GoodsType goodsType) {
+        int result = getProductionOf(goodsType) - getConsumptionOf(goodsType);
+        if (result > 0) {
+            Set<Modifier> storeSurplus = featureContainer.getModifierSet("model.modifier.storeSurplus", goodsType);
+            if (!storeSurplus.isEmpty()) {
+                result -= (int) featureContainer.applyModifierSet(result, getGame().getTurn(), storeSurplus);
+                result = Math.max(0, result);
+            }
+        }
+        return result;
+    }
+
+    public int getSurplusFoodProduction() {
         int result = 0;
         for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            result += getConsumptionOf(foodType);
+            result += getSurplusProduction(foodType);
+        }
+        if (result > 0) {
+            GoodsType food = getSpecification().getPrimaryFoodType();
+            Set<Modifier> storeSurplus = featureContainer.getModifierSet("model.modifier.storeSurplus", food);
+            if (!storeSurplus.isEmpty()) {
+                result -= (int) featureContainer.applyModifierSet(result, getGame().getTurn(), storeSurplus);
+                result = Math.max(0, result);
+            }
         }
         return result;
     }

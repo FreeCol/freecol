@@ -237,11 +237,11 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
 
-        // convert all food types to food
-        GoodsType food = spec.getPrimaryFoodType();
+        // convert all food types to food (or whatever)
         for (Goods goods : container.getCompactGoods()) {
-            if (goods.getType().isFoodType()) {
-                container.addGoods(food, goods.getAmount());
+            GoodsType goodsType = goods.getType();
+            if (goodsType.isFoodType() && goodsType.isStoredAs()) {
+                container.addGoods(goodsType.getStoredAs(), goods.getAmount());
                 container.removeGoods(goods);
             }
         }

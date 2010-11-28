@@ -345,16 +345,13 @@ public final class CompactLabourReport extends ReportPanel {
             production.setBorder(TOPCELLBORDER);
 
             headerRow.add(production, "cell " + PRODUCTION_SYMBOL_COLUMN + " " + row + " "
-                          //+ (!goods.isStoredAs() ? 4 : 3) + " 1");
-                          + " 3 1");
+                          + (!goods.isStoredAs() ? 4 : 3) + " 1");
 
-            /*
             if (showNetProduction && goods.isStoredAs()) {
                 JLabel netProduction = new JLabel(getLibrary().getGoodsImageIcon(goods.getStoredAs()));
                 netProduction.setBorder(TOPCELLBORDER);
                 headerRow.add(netProduction, "cell " + NETPRODUCTION_SUMMARY_COLUMN + " 1");
             }
-            */
         }
 
         if (!isSummary()) {

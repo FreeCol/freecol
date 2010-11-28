@@ -450,6 +450,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             gross += getColony().getProductionOf(goodsType);
             net += getColony().getProductionNetOf(goodsType);
         }
+        System.out.println("gross: " + gross + ", net: " + net);
         if (net != 0) {
             GoodsType goodsType = spec.getPrimaryFoodType();
             netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));

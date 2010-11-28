@@ -112,14 +112,9 @@ public class ServerIndianSettlement extends IndianSettlement
         Specification spec = getSpecification();
 
         // Produce goods.
-        GoodsType food = spec.getGoodsType("model.goods.food");
         List<GoodsType> goodsList = spec.getGoodsTypeList();
         for (GoodsType g : goodsList) {
-            if (g.isFoodType()) {
-                addGoods(food, getProductionOf(g));
-            } else {
-                addGoods(g, getProductionOf(g));
-            }
+            addGoods(g.getStoredAs(), getProductionOf(g));
         }
 
         // Use tools (if available) to produce manufactured goods.

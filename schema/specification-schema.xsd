@@ -80,6 +80,7 @@
       <xs:attribute name="is-food" type="xs:boolean"/>
       <xs:attribute name="made-from" type="GoodsTypeId"/>
       <xs:attribute name="storable" type="xs:boolean"/>
+      <xs:attribute name="stored-as" type="GoodsTypeId"/>
       <xs:attribute name="new-world-goods" type="xs:boolean"/>
       <xs:attribute name="trade-goods" type="xs:boolean"/>
       <xs:attribute name="breeding-number" type="xs:nonNegativeInteger"/>

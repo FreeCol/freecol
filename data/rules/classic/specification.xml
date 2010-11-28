@@ -86,10 +86,13 @@
     <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
-    <goods-type id="model.goods.grain" is-farmed="true" storable="false" is-food="true" />
-    <goods-type id="model.goods.fish" is-farmed="true" storable="false" is-food="true" />
+    <goods-type id="model.goods.grain" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
+    <goods-type id="model.goods.fish" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
     <!--
-    <goods-type id="model.goods.meat" is-farmed="true" storable="false" is-food="true" />
+    <goods-type id="model.goods.meat" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
     -->
     <goods-type id="model.goods.sugar" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
@@ -1338,19 +1341,20 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <ability id="model.ability.canRecruitUnit" />
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
       <settlement id="model.settlement.colony" capital="false" claimableRadius="1"
-                  visibleRadius="2"/>
+                  visibleRadius="2">
+        <modifier id="model.modifier.defence" type="percentage" value="50" />
+      </settlement>
     </european-nation-type>
     <!-- default REF nation -->
     <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
       <ability id="model.ability.royalExpeditionaryForce" value="true"/>
-      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
-                type="percentage" value="50" />
-      <settlement id="model.settlement.colony" capital="false" claimableRadius="1" />
+      <settlement id="model.settlement.colony" capital="false" claimableRadius="1"
+                  visibleRadius="2">
+        <modifier id="model.modifier.defence" type="percentage" value="50" />
+      </settlement>
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade" extends="model.nationType.default">
