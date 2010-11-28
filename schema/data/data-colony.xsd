@@ -51,6 +51,7 @@
       <xs:attribute name="liberty" type="xs:int" use="optional" default="0" />
       <xs:attribute name="immigration" type="xs:int" use="optional" default="0" />
       <xs:attribute name="established" type="xs:int" use="optional" default="1" />
+      <xs:attribute name="settlementType" type="xs:string" />
 
       <xs:attribute name="sonsOfLiberty" type="xs:int" use="optional"
 		    default="0">
