@@ -4564,6 +4564,7 @@ public final class InGameController implements NetworkConstants {
             List<BuildableType> queue = colony.getBuildQueue();
             colony.firePropertyChange(pc, null, queue);
             colonyWas.fireChanges();
+            canvas.updateGoldLabel();
         }
     }
 

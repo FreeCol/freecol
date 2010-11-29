@@ -942,29 +942,19 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @return The type of building currently being built.
      */
     public BuildableType getCurrentlyBuilding() {
-        if (buildQueue.isEmpty()) {
-            return null;
-        } else {
-            return buildQueue.get(0);
-        }
+        return (buildQueue.isEmpty()) ? null : buildQueue.get(0);
     }
 
     /**
-     * Sets the type of building to be built.
+     * Sets the current type of buildable to be built and if it is a building
+     * insist that there is only one in the queue.
      *
-     * @param buildable The type of building to be built.
+     * @param buildable The <code>BuildableType</code> to build.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
-        List<BuildableType> oldBuildQueue = new ArrayList<BuildableType>(buildQueue);
-        // There should not be more than one entry of a building type
-        if (buildable instanceof BuildingType) {
-            if (buildQueue.contains(buildable)){
-                buildQueue.remove(buildable);
-            }
-        }
+        if (buildable instanceof BuildingType
+            && buildQueue.contains(buildable)) buildQueue.remove(buildable);
         buildQueue.add(0, buildable);
-        firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
-                           oldBuildQueue, buildQueue);
     }
 
     /**
