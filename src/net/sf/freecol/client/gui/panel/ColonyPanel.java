@@ -139,7 +139,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private Colony colony;
 
-    private UnitLabel selectedUnit;
+    private UnitLabel selectedUnitLabel;
 
     private JButton exitButton = new JButton(Messages.message("close"));
 
@@ -272,7 +272,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         enterPressesWhenFocused(buildQueueButton);
         buildQueueButton.addActionListener(this);
 
-        selectedUnit = null;
+        selectedUnitLabel = null;
 
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.
@@ -379,7 +379,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         // update all the subpanels
         cargoPanel.setCarrier(null);
 
-        inPortPanel.initialize(preSelectedUnit);
+        inPortPanel.initialize();
+        if (preSelectedUnit != null) setSelectedUnit(preSelectedUnit);
         warehousePanel.initialize();
         buildingsPanel.initialize();
         tilePanel.initialize();
@@ -391,29 +392,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         outsideColonyPanel.setColony(colony);
     }
 
-    /**
-     * Enables the unload and fill buttons if the currently selected unit is a
-     * carrier with some cargo.
-     */
-    private void updateCarrierButtons() {
-        unloadButton.setEnabled(false);
-        fillButton.setEnabled(false);
-        if (isEditable() && selectedUnit != null) {
-            Unit unit = selectedUnit.getUnit();
-            if (unit != null && unit.isCarrier() && unit.getSpaceLeft() < unit.getType().getSpace()) {
-                unloadButton.setEnabled(true);
-                for (Goods goods : unit.getGoodsList()) {
-                    if (getColony().getGoodsCount(goods.getType()) > 0) {
-                        fillButton.setEnabled(true);
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
     public void updateInPortPanel() {
-        inPortPanel.initialize(null);
+        inPortPanel.initialize();
     }
 
     public void updateWarehousePanel() {
@@ -610,27 +590,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     /**
-     * Returns the currently select unit.
-     *
-     * @return The currently select unit.
-     */
-    public Unit getSelectedUnit() {
-        if (selectedUnit == null)
-            return null;
-        else
-            return selectedUnit.getUnit();
-    }
-
-    /**
-     * Returns the currently select unit.
-     *
-     * @return The currently select unit.
-     */
-    public UnitLabel getSelectedUnitLabel() {
-        return selectedUnit;
-    }
-
-    /**
      * Analyzes an event and calls the right external methods to take care of
      * the user's request.
      *
@@ -758,34 +717,82 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
     }
 
+
     /**
-     * Selects a unit that is located somewhere on this panel.
-     *
-     * @param unit The unit that is being selected.
+     * Enables the unload and fill buttons if the currently selected unit is a
+     * carrier with some cargo.
      */
-    public void setSelectedUnit(Unit unit) {
-        Component[] components = inPortPanel.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            if (components[i] instanceof UnitLabel && ((UnitLabel) components[i]).getUnit() == unit) {
-                setSelectedUnitLabel((UnitLabel) components[i]);
-                break;
+    private void updateCarrierButtons() {
+        unloadButton.setEnabled(false);
+        fillButton.setEnabled(false);
+        if (isEditable() && selectedUnitLabel != null) {
+            Unit unit = selectedUnitLabel.getUnit();
+            if (unit != null && unit.isCarrier() && unit.getSpaceLeft() < unit.getType().getSpace()) {
+                unloadButton.setEnabled(true);
+                for (Goods goods : unit.getGoodsList()) {
+                    if (getColony().getGoodsCount(goods.getType()) > 0) {
+                        fillButton.setEnabled(true);
+                        return;
+                    }
+                }
             }
         }
-        updateCarrierButtons();
+    }
+
+    /**
+     * Returns the currently select unit.
+     *
+     * @return The currently select unit.
+     */
+    public Unit getSelectedUnit() {
+        return (selectedUnitLabel == null) ? null
+            : selectedUnitLabel.getUnit();
+    }
+
+    /**
+     * Selects a unit that is potentially located somewhere in port.
+     *
+     * @param unit The <code>Unit</code> to select.
+     */
+    public void setSelectedUnit(Unit unit) {
+        UnitLabel unitLabel = null;
+
+        if (unit != null) {
+            Component[] components = inPortPanel.getComponents();
+            for (int i = 0; i < components.length; i++) {
+                if (components[i] instanceof UnitLabel
+                    && ((UnitLabel) components[i]).getUnit() == unit) {
+                    unitLabel = (UnitLabel) components[i];
+                    break;
+                }
+            }
+        }
+
+        setSelectedUnitLabel(unitLabel);
+    }
+
+    /**
+     * Returns the currently select unit label.
+     *
+     * @return The currently select unit label.
+     */
+    public UnitLabel getSelectedUnitLabel() {
+        return selectedUnitLabel;
     }
 
     /**
      * Selects a unit that is located somewhere on this panel.
      *
-     * @param unitLabel The unit that is being selected.
+     * @param unitLabel The <code>UnitLabel</code> for the unit that
+     *     is being selected.
      */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
-        if (selectedUnit != unitLabel) {
-            if (selectedUnit != null) {
-                selectedUnit.setSelected(false);
-                selectedUnit.getUnit().removePropertyChangeListener(this);
+        if (selectedUnitLabel != unitLabel) {
+            if (selectedUnitLabel != null) {
+                selectedUnitLabel.setSelected(false);
+                selectedUnitLabel.getUnit().removePropertyChangeListener(this);
             }
-            selectedUnit = unitLabel;
+            selectedUnitLabel = unitLabel;
             if (unitLabel == null) {
                 cargoPanel.setCarrier(null);
             } else {
@@ -794,7 +801,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 unitLabel.getUnit().addPropertyChangeListener(this);
             }
         }
+        updateCarrierButtons();
+        inPortPanel.revalidate();
+        inPortPanel.repaint();
     }
+
 
     /**
      * Returns a pointer to the <code>CargoPanel</code>-object in use.
@@ -1205,29 +1216,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             return "InPortPanelUI";
         }
 
-        public void initialize(Unit selectedUnit) {
-            // This is required
-            UnitLabel oldSelectedUnitLabel = ColonyPanel.this.getSelectedUnitLabel();
-            if(oldSelectedUnitLabel != null){
-                if(selectedUnit == null){
-                    selectedUnit = oldSelectedUnitLabel.getUnit();
-                }
-                ColonyPanel.this.setSelectedUnit(null);
-            }
-
+        public void initialize() {
             removeAll();
-            if (colony == null) {
-                return;
-            }
+            if (colony == null) return;
 
-            Tile colonyTile = colony.getTile();
-            Unit lastCarrier = null;
-            for (Unit unit : colonyTile.getUnitList()) {
-                if(!unit.isCarrier()){
-                    continue;
-                }
+            UnitLabel lastCarrier = null;
+            UnitLabel prevCarrier = null;
+            for (Unit unit : colony.getTile().getUnitList()) {
+                if (!unit.isCarrier()) continue;
 
-                lastCarrier = unit;
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
@@ -1239,18 +1236,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     unitLabel.addMouseListener(pressListener);
                 }
                 add(unitLabel);
-            }
-            revalidate();
-            repaint();
 
-            // last carrier is selected by default, if no other should be
-            if(selectedUnit == null && lastCarrier != null){
-                selectedUnit = lastCarrier;
+                lastCarrier = unitLabel;
+                if (getSelectedUnit() == unit) prevCarrier = unitLabel;
             }
-            // select the unit
-            if(selectedUnit != null){
-                ColonyPanel.this.setSelectedUnit(selectedUnit);
-            }
+
+            // Keep the previous selected unit if possible, otherwise default
+            // on the last carrier.
+            setSelectedUnitLabel((prevCarrier != null) ? prevCarrier
+                                 : (lastCarrier != null) ? lastCarrier
+                                 : null);
+            // No revalidate+repaint as this is done in setSelectedUnitLabel
         }
     }
 

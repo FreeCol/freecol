@@ -98,7 +98,7 @@ public final class EuropePanel extends FreeColPanel {
 
     private Europe europe;
 
-    private UnitLabel selectedUnit;
+    private UnitLabel selectedUnitLabel;
 
     private JButton exitButton;
 
@@ -127,6 +127,7 @@ public final class EuropePanel extends FreeColPanel {
         inPortPanel = new InPortPanel();
         cargoPanel = new EuropeCargoPanel(parent);
         cargoPanel.setParentPanel(this);
+
         docksPanel = new DocksPanel(this);
         marketPanel = new MarketPanel(this);
 
@@ -222,7 +223,7 @@ public final class EuropePanel extends FreeColPanel {
         add(sailButton);
         add(exitButton, "tag ok");
 
-        selectedUnit = null;
+        selectedUnitLabel = null;
 
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.
@@ -286,10 +287,10 @@ public final class EuropePanel extends FreeColPanel {
             // Naval units can either be in the port, going to europe or
             // going to america.
             switch (unit.getState()) {
-            	case TO_EUROPE:
+            case TO_EUROPE:
             		toEuropePanel.add(unitLabel, false);
             		break;
-            	case TO_AMERICA:
+            case TO_AMERICA:
             		toAmericaPanel.add(unitLabel, false);
             		break;
             }
@@ -311,70 +312,69 @@ public final class EuropePanel extends FreeColPanel {
     }
 
     /**
-     * Selects a unit that is located somewhere on this panel.
-     *
-     * @param unit The unit that is being selected.
-     */
-    public void setSelectedUnit(Unit unit) {
-    	// null param should be forward
-    	if(unit == null){
-    		setSelectedUnitLabel(null);
-    		return;
-    	}
-        Component[] components = inPortPanel.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            if (components[i] instanceof UnitLabel && ((UnitLabel) components[i]).getUnit() == unit) {
-                setSelectedUnitLabel((UnitLabel) components[i]);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Selects a unit that is located somewhere on this panel.
-     *
-     * @param unitLabel The unit that is being selected.
-     */
-    public void setSelectedUnitLabel(UnitLabel unitLabel) {
-        if (selectedUnit == unitLabel) {
-            return;
-        }
-        if (selectedUnit != null) {
-            selectedUnit.setSelected(false);
-        }
-        selectedUnit = unitLabel;
-        if (unitLabel == null) {
-            cargoPanel.setCarrier(null);
-        } else {
-            cargoPanel.setCarrier(unitLabel.getUnit());
-            unitLabel.setSelected(true);
-        }
-
-        inPortPanel.revalidate();
-        inPortPanel.repaint();
-    }
-
-    /**
      * Returns the currently select unit.
      *
      * @return The currently select unit.
      */
     public Unit getSelectedUnit() {
-        if (selectedUnit == null) {
-            return null;
-        } else {
-            return selectedUnit.getUnit();
-        }
+        return (selectedUnitLabel == null) ? null
+            : selectedUnitLabel.getUnit();
     }
 
     /**
-     * Returns the currently select unit.
+     * Selects a unit that is potentially located somewhere in port.
      *
-     * @return The currently select unit.
+     * @param unit The <code>Unit</code> to select.
+     */
+    public void setSelectedUnit(Unit unit) {
+        UnitLabel unitLabel = null;
+
+        if (unit != null) {
+            Component[] components = inPortPanel.getComponents();
+            for (int i = 0; i < components.length; i++) {
+                if (components[i] instanceof UnitLabel
+                    && ((UnitLabel) components[i]).getUnit() == unit) {
+                    unitLabel = (UnitLabel) components[i];
+                    break;
+                }
+            }
+        }
+
+        setSelectedUnitLabel(unitLabel);
+    }
+
+    /**
+     * Returns the currently select unit label.
+     *
+     * @return The currently select unit label.
      */
     public UnitLabel getSelectedUnitLabel() {
-        return selectedUnit;
+        return selectedUnitLabel;
     }
+
+    /**
+     * Selects a unit that is located somewhere on this panel.
+     *
+     * @param unitLabel The <code>UnitLabel</code> for the unit that
+     *     is being selected.
+     */
+    public void setSelectedUnitLabel(UnitLabel unitLabel) {
+        if (selectedUnitLabel != unitLabel) {
+            if (selectedUnitLabel != null) {
+                selectedUnitLabel.setSelected(false);
+            }
+            selectedUnitLabel = unitLabel;
+            if (unitLabel == null) {
+                cargoPanel.setCarrier(null);
+            } else {
+                cargoPanel.setCarrier(unitLabel.getUnit());
+                unitLabel.setSelected(true);
+            }
+        }
+        inPortPanel.revalidate();
+        inPortPanel.repaint();
+    }
+
 
     /**
      * Unload the contents of the currently selected carrier.
@@ -583,10 +583,11 @@ public final class EuropePanel extends FreeColPanel {
     }
 
     /**
-     * A panel that holds UnitsLabels that represent naval Units that are
+     * A panel that holds UnitLabels that represent naval Units that are
      * waiting in Europe.
      */
-    public final class InPortPanel extends JPanel implements PropertyChangeListener {
+    public final class InPortPanel extends JPanel
+        implements PropertyChangeListener {
 
         public void initialize() {
             europe.addPropertyChangeListener(this);
@@ -596,39 +597,29 @@ public final class EuropePanel extends FreeColPanel {
         public void update() {
             removeAll();
 
-            List<Unit> units = europe.getUnitList();
             UnitLabel lastCarrier = null;
-            for (Unit unit : units) {
-            	if(!unit.isNaval()){
-            		continue;
-            	}
-                if ((unit.getState() == UnitState.ACTIVE || unit.getState() == UnitState.SENTRY)) {
+            UnitLabel prevCarrier = null;
+            for (Unit unit : europe.getUnitList()) {
+                if (!unit.isNaval()) continue;
+
+                if (unit.getState() == UnitState.ACTIVE
+                    || unit.getState() == UnitState.SENTRY) {
                     UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                     add(unitLabel);
-                    lastCarrier = unitLabel;
 
-                    // we are redoing the labels, so we need to update the reference
-                    //of the selected unit
-                    if(selectedUnit != null && selectedUnit.getUnit() == unit){
-                    	selectedUnit = unitLabel;
-                    	selectedUnit.setSelected(true);
-                    }
+                    lastCarrier = unitLabel;
+                    if (getSelectedUnit() == unit) prevCarrier = unitLabel;
                 }
             }
-            // Default on the last carrier
-            if (selectedUnit == null && lastCarrier != null) {
-                setSelectedUnitLabel(lastCarrier);
-            }
-            // unselect units bound to America
-            boolean isSelectedUnitBoundToAmerica = selectedUnit != null
-    				&& selectedUnit.getUnit().getState() == UnitState.TO_AMERICA;
-            if(isSelectedUnitBoundToAmerica){
-            	setSelectedUnitLabel(lastCarrier);
-            }
-            revalidate();
-            repaint();
+
+            // Keep the previous selected unit if possible, otherwise default
+            // on the last carrier.
+            setSelectedUnitLabel((prevCarrier != null) ? prevCarrier
+                                 : (lastCarrier != null) ? lastCarrier
+                                 : null);
+            // No revalidate+repaint as this is done in setSelectedUnitLabel
         }
 
         public void propertyChange(PropertyChangeEvent event) {

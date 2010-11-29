@@ -72,6 +72,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
     public CargoPanel(Canvas parent, boolean withTitle) {
         super(parent);
 
+        carrier = null;
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
 
