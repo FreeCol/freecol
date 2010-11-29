@@ -226,7 +226,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         if (surplus > 0) {
             for (Building building : foodConsumers) {
                 int goodsCount = container.getGoodsCount(building.getGoodsInputType());
-                ((ServerBuilding) building).csNewTurn(random, cs, surplus);
+                ((ServerBuilding) building).csNewTurn(random, cs, Math.min(goodsCount, surplus));
                 goodsCount -= container.getGoodsCount(building.getGoodsInputType());
                 surplus -= goodsCount;
                 if (surplus < 0) {
