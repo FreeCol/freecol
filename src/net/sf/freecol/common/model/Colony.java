@@ -2126,7 +2126,9 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 getStockade().toXML(out, player, showAll, toSavedGame);
             }
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            out.writeAttribute("owner", pet.getOwner().getId());
+            if (pet.getOwner() != null) {
+                out.writeAttribute("owner", pet.getOwner().getId());
+            }
             out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
             // TODO: should be pet version of stockade
             if (getStockade() != null) {
