@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -719,7 +720,7 @@ public class Building extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean canAutoProduce() {
-        return buildingType.hasAbility("model.ability.autoProduction");
+        return !buildingType.getModifierSet("model.modifier.autoProduction").isEmpty();
     }
 
     /**
@@ -855,7 +856,15 @@ public class Building extends FreeColGameObject
             // we need at least two horses/animals to breed
             return 0;
         }
-        return Math.max(1, available / 10);
+        Set<Modifier> autoProduction = getType().getModifierSet("model.modifier.autoProduction");
+        if (autoProduction.isEmpty()) {
+            // this should never be the case
+            return 0;
+        } else {
+            int result = (int) FeatureContainer.applyModifierSet(available, getGame().getTurn(),
+                                                                 autoProduction);
+            return Math.max(1, result);
+        }
     }
 
     /**

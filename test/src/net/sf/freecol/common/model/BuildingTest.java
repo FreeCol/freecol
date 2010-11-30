@@ -363,10 +363,15 @@ public class BuildingTest extends FreeColTestCase {
         GoodsType grainType = spec().getGoodsType("model.goods.grain");
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
-
-        Building pasture = colony.getBuilding(spec().getBuildingType("model.building.country"));
+        BuildingType country = spec().getBuildingType("model.building.country");
+        Building pasture = colony.getBuilding(country);
         assertEquals(grainType, pasture.getGoodsInputType());
         assertEquals(horsesType, pasture.getGoodsOutputType());
+
+        Set<Modifier> autoProduction = country.getModifierSet("model.modifier.autoProduction");
+        assertEquals(1, autoProduction.size());
+        Modifier modifier = autoProduction.iterator().next();
+        assertEquals(1, (int) modifier.applyTo(20));
 
         // no horses yet
         assertEquals(10, colony.getFoodProduction());
@@ -379,12 +384,18 @@ public class BuildingTest extends FreeColTestCase {
 
         colony.addGoods(horsesType, 20);
         assertEquals(1, pasture.getProductionOf(horsesType));
-        assertEquals(2, pasture.getMaximumProduction());
+        assertEquals(1, pasture.getMaximumProduction());
         assertEquals(1, colony.getProductionNetOf(horsesType));
         colony.addGoods(horsesType, 20);
         assertEquals(2, pasture.getProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProduction());
+        assertEquals(2, pasture.getMaximumProduction());
         assertEquals(2, colony.getProductionNetOf(horsesType));
+
+        pasture.upgrade();
+
+        assertEquals(4, pasture.getProductionOf(horsesType));
+        assertEquals(4, pasture.getMaximumProduction());
+        assertEquals(4, colony.getProductionNetOf(horsesType));
 
     }
 

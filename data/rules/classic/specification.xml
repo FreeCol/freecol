@@ -1134,15 +1134,14 @@
     </building-type>
     <building-type id="model.building.country" workplaces="0" consumes="model.goods.grain"
                    produces="model.goods.horses" sequence="14">
-      <modifier id="model.goods.horses" type="percentage" value="-50"/>
-      <ability id="model.ability.autoProduction" value="true" />
+      <modifier id="model.modifier.autoProduction" type="multiplicative" value="0.05" />
       <ability id="model.ability.build">
         <scope type="model.equipment.horses"/>
       </ability>
     </building-type>
     <building-type id="model.building.stables" extends="model.building.country"
                    upgradesFrom="model.building.country" upkeep="5">
-      <modifier id="model.goods.horses" type="percentage" value="50"/>
+      <modifier id="model.modifier.autoProduction" type="multiplicative" value="2" />
       <required-goods id="model.goods.hammers" value="64"/>
     </building-type>
     <building-type id="model.building.docks" workplaces="0" sequence="15" upkeep="5">
