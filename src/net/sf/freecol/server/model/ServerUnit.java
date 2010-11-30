@@ -811,7 +811,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // dies, including the animation.  However dead units
         // make no discoveries.  Always update the new tile.
         if (oldLocation instanceof Europe) {
-            ; // TODO: add message?
+            cs.add(See.only(serverPlayer), (Europe) oldLocation);
         } else {
             cs.addMove(See.perhaps().always(serverPlayer), this,
                        oldLocation, newTile);
