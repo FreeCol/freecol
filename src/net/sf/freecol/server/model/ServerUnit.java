@@ -773,7 +773,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
-        List<FreeColGameObject> newTiles = new ArrayList<FreeColGameObject>();
+        List<Tile> newTiles = new ArrayList<Tile>();
         int los = getLineOfSight();
         for (Tile tile : newTile.getSurroundingTiles(los)) {
             if (!serverPlayer.canSee(tile)) newTiles.add(tile);
@@ -799,7 +799,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             setMovesLeft(getMovesLeft() - getMoveCost(newTile));
         }
 
-
         // Do the move and explore a rumour if needed.
         setLocation(newTile);
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
@@ -820,7 +819,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
         cs.add(See.perhaps().always(serverPlayer), newTile);
         if (isDisposed()) return;
-        cs.add(See.only(serverPlayer), newTiles);
+        for (Tile t : newTiles) {
+            t.updatePlayerExploredTile(serverPlayer);
+            cs.add(See.only(serverPlayer), t);
+        }
 
         if (newTile.isLand()) {
             // Claim land for tribe?
