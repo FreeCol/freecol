@@ -1515,7 +1515,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         pet.getTileItemInfo(tileItemContainer);
-
         pet.setConnected(connected);
         pet.setOwner(owner);
 
@@ -2087,12 +2086,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else if (settlement != null && oldSettlement == null) {
             // Settlement appeared
             settlementOwner.addSettlement(settlement);
+            owner = settlementOwner;
         } else if (settlementOwner != oldSettlementOwner) {
             // Settlement changed owner
             oldSettlement.setOwner(null);
             oldSettlementOwner.removeSettlement(oldSettlement);
             settlement.setOwner(settlementOwner);
             settlementOwner.addSettlement(settlement);
+            owner = settlementOwner;
         }
 
         // 0.9.x compatibility code
