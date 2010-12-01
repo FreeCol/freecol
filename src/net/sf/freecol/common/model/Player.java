@@ -1089,7 +1089,7 @@ public class Player extends FreeColGameObject implements Nameable {
             && tile.isSettleable()
             && (canClaimToFoundSettlement(tile)
                 || (tile.getOwner() != null && tile.getOwner() != this
-                    && getLandPrice(tile) > 0));
+                    && getLandPrice(tile) >= 0));
     }
 
     /**
@@ -1317,8 +1317,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         price *= getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
         price += 100;
-        return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier",
-                                                    null, getGame().getTurn());
+        return (int) featureContainer
+            .applyModifier(price, "model.modifier.landPaymentModifier",
+                           null, getGame().getTurn());
     }
 
     /**

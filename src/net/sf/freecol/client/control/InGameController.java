@@ -1275,21 +1275,18 @@ public final class InGameController implements NetworkConstants {
         if (tile.getColony() != null) {
             askJoinColony(unit, tile.getColony());
             return;
-        } else if (!player.canClaimToFoundSettlement(tile)) {
-            if (player.canAcquireToFoundSettlement(tile)) {
-                if (!claimTile(player, tile, null,
-                               player.getLandPrice(tile), 0)) {
-                    return;
-                }
-            } else {
-                canvas.showInformationMessage("buildColony.badTile");
-                return;
-            }
+        } else if (!player.canAcquireToFoundSettlement(tile)) {
+            canvas.showInformationMessage("buildColony.badTile");
+            return;
         }
 
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
             && !showColonyWarnings(tile, unit)) {
+            return;
+        }
+        if (tile.getOwner() != player
+            && !claimTile(player, tile, null, player.getLandPrice(tile), 0)) {
             return;
         }
 
