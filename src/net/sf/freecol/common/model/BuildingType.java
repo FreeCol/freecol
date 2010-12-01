@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -170,6 +171,28 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
             }
         }
     }
+
+    // TODO: remove 0.9.x compatibility code
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in);
+        }
+        try {
+            if (hasAbility("model.ability.autoProduction")) {
+                // old-style auto-production
+                getFeatureContainer().removeModifiers("model.goods.horses");
+                float value = ("model.building.country".equals(getId()))
+                    ? 0.05f : 0.1f;
+                Modifier modifier = new Modifier("model.modifier.autoProduction", this,
+                                                 value, Modifier.Type.MULTIPLICATIVE);
+                addModifier(modifier);
+                getSpecification().addModifier(modifier);
+            }
+        } catch(Exception e) {
+            // no such ability, we don't care
+        }
+    }
+    // end compatibility code
 
     /**
      * Makes an XML-representation of this object.

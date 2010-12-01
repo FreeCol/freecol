@@ -505,17 +505,6 @@ public final class Specification {
         } else if (allTypes.containsKey(mangle(Id))) {
             // TODO: remove 0.9.x compatibility code
             return type.cast(allTypes.get(mangle(Id)));
-        } else if ("model.modifier.autoProduction".equals(Id)) {
-            // TODO: remove 0.9.x compatibility code
-            try {
-                Constructor<T> c = type.getConstructor(String.class, Specification.class);
-                T result = c.newInstance(Id, this);
-                allTypes.put(Id, result);
-                return result;
-            } catch(Exception e) {
-                logger.warning(e.toString());
-                return null;
-            }
         } else if (initialized) {
             throw new IllegalArgumentException("Undefined FreeColGameObjectType" + " with ID '" + Id + "'.");
         } else {
