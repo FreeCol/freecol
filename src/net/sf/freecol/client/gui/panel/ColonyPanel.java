@@ -937,8 +937,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             for (Component component : getComponents()) {
                 if (component instanceof ASingleBuildingPanel) {
                     ((ASingleBuildingPanel) component).removePropertyChangeListeners();
-                } else if (component instanceof BuildingSitePanel) {
-                    ((BuildingSitePanel) component).removePropertyChangeListeners();
                 }
             }
         }

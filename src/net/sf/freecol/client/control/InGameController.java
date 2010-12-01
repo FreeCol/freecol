@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -4461,7 +4462,12 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        askSetBuildQueue(colony, buildQueue);
+        List<BuildableType> queue
+            = new ArrayList<BuildableType>(colony.getBuildQueue());
+        if (askSetBuildQueue(colony, buildQueue)) {
+            colony.firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
+                                      queue, colony.getBuildQueue());
+        }
     }
 
     /**
@@ -4556,10 +4562,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         ColonyWas colonyWas = new ColonyWas(colony);
+        List<BuildableType> queue
+            = new ArrayList<BuildableType>(colony.getBuildQueue());
         if (askPayForBuilding(colony) && colony.getPriceForBuilding() == 0) {
-            String pc = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
-            List<BuildableType> queue = colony.getBuildQueue();
-            colony.firePropertyChange(pc, null, queue);
+            colony.firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
+                                      null, colony.getBuildQueue());
             colonyWas.fireChanges();
             canvas.updateGoldLabel();
         }

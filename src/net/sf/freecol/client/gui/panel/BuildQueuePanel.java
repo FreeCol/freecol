@@ -572,7 +572,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 // do nothing?
             } else if (BUY.equals(command)) {
                 getController().payForBuilding(colony);
-                getCanvas().updateGoldLabel();
             } else {
                 logger.warning("Unsupported command " + command);
             }

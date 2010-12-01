@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -69,9 +70,12 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     }
 
     public void setColony(Colony newColony) {
-        if(newColony != colony){
+        if (newColony != colony) {
             if (colony != null) {
                 colony.removePropertyChangeListener(EVENT, this);
+                for (MouseListener listener : getMouseListeners()) {
+                    removeMouseListener(listener);
+                }
             }
             this.colony = newColony;
 
@@ -80,8 +84,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             colony.addPropertyChangeListener(EVENT, this);
             addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);
-                        parent.showSubPanel(queuePanel);
+                        parent.showSubPanel(new BuildQueuePanel(colony,
+                                                                parent));
                     }
                 });
         }

@@ -1021,10 +1021,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @param newBuildQueue The new BuildQueue value.
      */
     public void setBuildQueue(final List<BuildableType> newBuildQueue) {
-        List<BuildableType> oldBuildQueue = buildQueue;
         buildQueue = newBuildQueue;
-        firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
-                           oldBuildQueue, newBuildQueue);
     }
 
     /**
