@@ -21,6 +21,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -31,11 +32,14 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -43,6 +47,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Region;
@@ -58,6 +63,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -968,6 +974,78 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
     }
+
+
+    /**
+     * Remove equipment from a unit.
+     *
+     * @param settlement The <code>Settlement</code> where the unit is
+     *     (may be null if the unit is in Europe).
+     * @param remove A collection of <code>EquipmentType</code> to remove.
+     * @param amount Override the amount of equipment to remove.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csRemoveEquipment(Settlement settlement,
+                                  Collection<EquipmentType> remove,
+                                  int amount, Random random, ChangeSet cs) {
+        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        for (EquipmentType e : remove) {
+            int a = (amount > 0) ? amount : getEquipmentCount(e);
+            for (AbstractGoods goods : e.getGoodsRequired()) {
+                GoodsType goodsType = goods.getType();
+                int n = goods.getAmount() * a;
+                if (isInEurope()) {
+                    if (serverPlayer.canTrade(goodsType,
+                                              Market.Access.EUROPE)) {
+                        serverPlayer.csSell(null, goodsType, n, random, cs);
+                    }
+                } else if (settlement != null) {
+                    settlement.addGoods(goodsType, n);
+                }
+            }
+            // Removals can not cause incompatible-equipment trouble
+            changeEquipment(e, -a);
+        }
+    }
+
+
+    /**
+     * Is there work for a unit to do at a stop?
+     *
+     * @param stop The <code>Stop</code> to test.
+     * @return True if the unit should load or unload cargo at the stop.
+     */
+    public boolean hasWorkAtStop(Stop stop) {
+        List<GoodsType> stopGoods = stop.getCargo();
+        int cargoSize = stopGoods.size();
+        for (Goods goods : getGoodsList()) {
+            GoodsType type = goods.getType();
+            if (stopGoods.contains(type)) {
+                if (getLoadableAmount(type) > 0) {
+                    // There is space on the unit to load some more
+                    // of this goods type, so return true if there is
+                    // some available at the stop.
+                    Location loc = stop.getLocation();
+                    if (loc instanceof Colony) {
+                        if (((Colony) loc).getExportAmount(type) > 0) {
+                            return true;
+                        }
+                    } else if (loc instanceof Europe) {
+                        return true;
+                    }
+                } else {
+                    cargoSize--; // No room for more of this type.
+                }
+            } else {
+                return true; // This type should be unloaded here.
+            }
+        }
+
+        // Return true if there is space left, and something to load.
+        return getSpaceLeft() > 0 && cargoSize > 0;
+    }
+
 
     /**
      * Returns the tag name of the root element representing this object.

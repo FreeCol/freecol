@@ -127,9 +127,8 @@ public class ChatMessage extends Message {
         /* Do not trust the client-supplied sender name */
         sender = serverPlayer.getId();
 
-        server.getInGameController().sendToOthers(serverPlayer,
-                                                  toXMLElement());
-        return null;
+        return server.getInGameController().chat(serverPlayer, message,
+                                                 privateChat);
     }
 
     /**

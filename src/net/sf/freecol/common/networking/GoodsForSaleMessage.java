@@ -114,13 +114,8 @@ public class GoodsForSaleMessage extends Message {
         }
 
         // Try to collect the goods for sale.
-        try {
-            sellGoods = server.getInGameController()
-                .getGoodsForSale(unit, settlement);
-        } catch (Exception e) {
-            return Message.clientError(e.getMessage());
-        }
-        return this.toXMLElement();
+        return server.getInGameController()
+            .getGoodsForSale(serverPlayer, unit, settlement);
     }
 
     /**

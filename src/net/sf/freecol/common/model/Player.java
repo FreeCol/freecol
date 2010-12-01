@@ -46,7 +46,6 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.util.RandomChoice;
 
 import org.w3c.dom.Element;
 
@@ -2028,25 +2027,6 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
-
-    /**
-     * Generate a weighted list of unit types recruitable by this player.
-     *
-     * @return A weighted list of recruitable unit types.
-     */
-    public List<RandomChoice<UnitType>> generateRecruitablesList() {
-        ArrayList<RandomChoice<UnitType>> recruitables
-            = new ArrayList<RandomChoice<UnitType>>();
-        FeatureContainer fc = getFeatureContainer();
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isRecruitable()
-                && fc.hasAbility("model.ability.canRecruitUnit", unitType)) {
-                recruitables.add(new RandomChoice<UnitType>(unitType,
-                        unitType.getRecruitProbability()));
-            }
-        }
-        return recruitables;
-    }
 
     /**
      * Get the <code>TradeRoutes</code> value.

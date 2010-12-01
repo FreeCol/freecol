@@ -23,7 +23,9 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -31,6 +33,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -187,6 +192,40 @@ public class IndianNationType extends NationType {
         }
     }
     */
+
+    /**
+     * Generates choices for skill that could be taught from a settlement on
+     * a given Tile.
+     *
+     * @param tile The <code>Tile</code> where the settlement will be located.
+     * @return A random choice set of skills.
+     */
+    public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {
+        List<RandomChoice<UnitType>> skills = getSkills();
+        Map<GoodsType, Integer> scale = new HashMap<GoodsType, Integer>();
+
+        for (RandomChoice<UnitType> skill : skills) {
+            scale.put(skill.getObject().getExpertProduction(), 1);
+        }
+
+        for (Tile t: tile.getSurroundingTiles(1)) {
+            for (GoodsType goodsType : scale.keySet()) {
+                scale.put(goodsType, scale.get(goodsType).intValue()
+                          + t.potential(goodsType, null));
+            }
+        }
+
+        List<RandomChoice<UnitType>> scaledSkills
+            = new ArrayList<RandomChoice<UnitType>>();
+        for (RandomChoice<UnitType> skill : skills) {
+            UnitType unitType = skill.getObject();
+            int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
+            scaledSkills.add(new RandomChoice<UnitType>(unitType,
+                    skill.getProbability() * scaleValue));
+        }
+
+        return scaledSkills;
+    }
 
     /**
      * Returns a list of this Nation's skills.

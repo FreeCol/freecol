@@ -165,6 +165,51 @@ public class ServerGame extends Game implements ServerModelObject {
 
 
     /**
+     * Checks if anybody has won this game.
+     *
+     * @return The <code>Player</code> who has won the game or null if none.
+     */
+    public Player checkForWinner() {
+        Specification spec = getSpecification();
+        if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
+            for (Player player : getPlayers()) {
+                if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
+                    return player;
+                }
+            }
+        }
+        if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
+            Player winner = null;
+            for (Player player : getPlayers()) {
+                if (!player.isDead() && player.isEuropean()
+                    && !player.isREF()) {
+                    if (winner != null) { // A live European player
+                        winner = null;
+                        break;
+                    }
+                    winner = player;
+                }
+            }
+            if (winner != null) return winner;
+        }
+        if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
+            Player winner = null;
+            for (Player player : getPlayers()) {
+                if (!player.isDead() && !player.isAI()) {
+                    if (winner != null) { // A live human player
+                        winner = null;
+                        break;
+                    }
+                    winner = player;
+                }
+            }
+            if (winner != null) return winner;
+        }
+        return null;
+    }
+
+
+    /**
      * Is the next player in a new turn?
      */
     public boolean isNextPlayerInNewTurn() {
