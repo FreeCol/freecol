@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -346,6 +347,7 @@ public class SimpleMapGenerator implements MapGenerator {
      *       no settlements are added.
      */
     private void createIndianSettlements(final Map map, List<Player> players) {
+        Specification spec = map.getGame().getSpecification();
         float shares = 0f;
         List<IndianSettlement> settlements = new ArrayList<IndianSettlement>();
         List<Player> indians = new ArrayList<Player>();
@@ -422,8 +424,8 @@ public class SimpleMapGenerator implements MapGenerator {
         // order picking out as many as possible suitable tiles for
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
-        int minSettlementDistance = map.getGame().getSpecification()
-            .getRangeOption("model.option.settlementNumber").getValue();
+        int minSettlementDistance
+            = spec.getRangeOption("model.option.settlementNumber").getValue();
         List<Tile> settlementTiles = new ArrayList<Tile>();
         tiles: for (Tile tile : map.getAllTiles()) {
             if (!map.isPolar(tile) && tile.isSettleable()) {
@@ -531,6 +533,9 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // Grow some more tiles.
         // TODO: move the magic numbers below to the spec RSN
+        // Also collect the skills provided
+        HashMap<UnitType, List<IndianSettlement>> skills
+            = new HashMap<UnitType, List<IndianSettlement>>();
         Collections.shuffle(settlements, random);
         for (IndianSettlement is : settlements) {
             List<Tile> tiles = new ArrayList<Tile>();
@@ -555,7 +560,86 @@ public class SimpleMapGenerator implements MapGenerator {
                     tiles.add(tile);
                 }
             }
+
+            // Collect settlements by skill
+            UnitType skill = is.getLearnableSkill();
+            List<IndianSettlement> isList = skills.get(skill);
+            if (isList == null) {
+                isList = new ArrayList<IndianSettlement>();
+                isList.add(is);
+                skills.put(skill, isList);
+            } else {
+                isList.add(is);
+            }
         }
+
+        // Require that there be experts for all the new world goods types.
+        // Collect the list of needed experts
+        List<UnitType> expertsNeeded = new ArrayList<UnitType>();
+        for (GoodsType goodsType : spec.getNewWorldGoodsTypeList()) {
+            UnitType expert = spec.getExpertForProducing(goodsType);
+            if (!skills.containsKey(expert)) expertsNeeded.add(expert);
+        }
+        // Extract just the settlement lists.
+        List<List<IndianSettlement>> isList
+            = new ArrayList<List<IndianSettlement>>(skills.values());
+        Comparator<List<IndianSettlement>> listComparator
+            = new Comparator<List<IndianSettlement>>() {
+                public int compare(List<IndianSettlement> l1,
+                                   List<IndianSettlement> l2) {
+                    return l2.size() - l1.size();
+                }
+            };
+        // For each missing skill...
+        while (!expertsNeeded.isEmpty()) {
+            UnitType neededSkill = expertsNeeded.remove(0);
+            Collections.sort(isList, listComparator);
+            List<IndianSettlement> extras = isList.remove(0);
+            UnitType extraSkill = extras.get(0).getLearnableSkill();
+            List<RandomChoice<IndianSettlement>> choices
+                = new ArrayList<RandomChoice<IndianSettlement>>();
+            // ...look at the settlements with the most common skill
+            // with a bit of favoritism to capitals as the needed skill
+            // is so rare,...
+            for (IndianSettlement is : extras) {
+                IndianNationType nation
+                    = (IndianNationType) is.getOwner().getNationType();
+                int cm = (is.isCapital()) ? 2 : 1;
+                RandomChoice<IndianSettlement> rc = null;
+                for (RandomChoice<UnitType> c : nation.generateSkillsForTile(is.getTile())) {
+                    if (c.getObject() == neededSkill) {
+                        rc = new RandomChoice<IndianSettlement>(is, c.getProbability() * cm);
+                        break;
+                    }
+                }
+                choices.add((rc != null) ? rc
+                            : new RandomChoice<IndianSettlement>(is, 1));
+            }
+            if (!choices.isEmpty()) {
+                // ...and pick one that could do the missing job.
+                IndianSettlement chose
+                    = RandomChoice.getWeightedRandom(logger, "expert", random,
+                                                     choices);
+                logger.finest("At " + chose.getName()
+                              + " replaced " + extraSkill
+                              + " (one of " + extras.size() + ")"
+                              + " by missing " + neededSkill);
+                chose.setLearnableSkill(neededSkill);
+                extras.remove(chose);
+                isList.add(0, extras); // Try to stay well sorted
+                List<IndianSettlement> neededList
+                    = new ArrayList<IndianSettlement>();
+                neededList.add(chose);
+                isList.add(neededList);
+            } else { // `can not happen'
+                logger.finest("Game is missing skill: " + neededSkill);
+            }
+        }
+        String msg = "Settlement skills:";
+        for (List<IndianSettlement> iss : isList) {
+            msg += "  " + iss.size() + " x " + iss.get(0).getLearnableSkill();
+        }
+        logger.info(msg);
 
         logger.info("Created " + settlementsPlaced
                     + " Indian settlements of maximum " + settlementsToPlace);
