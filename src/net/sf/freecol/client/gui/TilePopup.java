@@ -497,7 +497,7 @@ public final class TilePopup extends JPopupMenu {
      * @return true if this popup has at least one menuitem, false otherwise.
      */
     public boolean hasItem() {
-        return hasAnItem;
+        return hasAnItem || FreeCol.isInDebugMode();
     }
 
     /**
