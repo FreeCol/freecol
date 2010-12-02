@@ -1426,7 +1426,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * Note the use of copies of the unit and settlement lists to
      * avoid nasty surprises due to asynchronous disappearance of
-     * members of either.
+     * members of either.  TODO: see if this can be relaxed.
      *
      * Use {@link #invalidateCanSeeTiles} whenever possible.
      * @return <code>true</code> if successful <code>false</code> otherwise
@@ -1445,13 +1445,15 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         } else {
             for (Unit unit : getUnits()) {
-                Tile tile = unit.getTile();
-                if (tile != null) {
-                    canSeeTiles[tile.getX()][tile.getY()] = true;
-                    for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
-                        if (t != null) {
-                            canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
-                        }
+                // Only consider units directly on the map, not those
+                // on a carrier or in Europe.
+                if (!(unit.getLocation() instanceof Tile)) continue;
+
+                Tile tile = (Tile) unit.getLocation();
+                canSeeTiles[tile.getX()][tile.getY()] = true;
+                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
+                    if (t != null) {
+                        canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
                     }
                 }
             }
