@@ -1289,7 +1289,7 @@ public final class InGameController extends Controller {
      */
     public Element closeTransaction(ServerPlayer serverPlayer, Unit unit,
                                     Settlement settlement) {
-        if (TransactionSession.lookup(unit, settlement) != null) {
+        if (TransactionSession.lookup(unit, settlement) == null) {
             return Message.clientError("No such transaction session.");
         }
 
