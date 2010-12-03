@@ -910,8 +910,8 @@ public final class InGameController extends Controller {
             // Otherwise we could get away with just sending the goods
             // container.  TODO: make the feature container updateable?
             cs.add(See.only(serverPlayer), colony);
-            // cs.add(See.only(serverPlayer), colony.getGoodsContainer(),
-            //       market.getMarketData(goodsType));
+            // cs.add(See.only(serverPlayer), colony.getGoodsContainer());
+            cs.add(See.only(serverPlayer), market.getMarketData(goodsType));
 
             String messageId = goodsType.getId() + ".destroyed";
             if (!Messages.containsKey(messageId)) {
