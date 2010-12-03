@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
@@ -281,17 +282,29 @@ public abstract class AIPlayer extends AIObject {
      *       
      * TODO: Move this to a specialized Handler class (AIEurope?)
      * TODO: Give protected access?
-     * 
+     *
+     * @param The index of the unit to recruit in the recruitables list.
      * @return the new AIUnit created by this action. May be null.          
      */
-    public AIUnit recruitAIUnitInEurope(int slot) {
+    public AIUnit recruitAIUnitInEurope(int index) {
         AIUnit aiUnit = null;
         Europe europe = player.getEurope();
         int n = europe.getUnitCount();
 
-        if (AIMessage.askEmigrate(getConnection(), slot)
+        // CHEAT: give the AI a selection ability
+        final String selectAbility = "model.ability.selectRecruit";
+        boolean canSelect = player.hasAbility(selectAbility);
+        Ability ability = null;
+        if (!canSelect) {
+            ability = new Ability(selectAbility);
+            player.getFeatureContainer().addAbility(ability);
+        }
+        if (AIMessage.askEmigrate(getConnection(), index+1)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));
+        }
+        if (ability != null) {
+            player.getFeatureContainer().removeAbility(ability);
         }
         return aiUnit;
     }

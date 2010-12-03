@@ -983,7 +983,7 @@ public class TransportMission extends Mission {
         // train
         if (player.getGold() >= player.getRecruitPrice()
             && price > player.getRecruitPrice()) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
                 // Note, used to be 1-3 but the method expects 0-2
                 if (europe.getRecruitable(i) == unitType) {
                     return aiPlayer.recruitAIUnitInEurope(i);
