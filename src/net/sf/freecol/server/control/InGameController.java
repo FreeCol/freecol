@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
@@ -155,13 +156,6 @@ public final class InGameController extends Controller {
     private int debugOnlyAITurns = 0;
     private MonarchAction debugMonarchAction = null;
     private ServerPlayer debugMonarchPlayer = null;
-
-
-    public static enum MigrationType {
-        NORMAL,     // Unit decided to migrate
-        RECRUIT,    // Player is paying
-        FOUNTAIN    // As a result of a Fountain of Youth discovery
-    }
 
 
     /**
@@ -1472,62 +1466,7 @@ public final class InGameController extends Controller {
     public Element emigrate(ServerPlayer serverPlayer, int slot,
                             MigrationType type) {
         ChangeSet cs = new ChangeSet();
-
-        // Valid slots are in [1,3], recruitable indices are in [0,2].
-        // An invalid slot is normal when the player has no control over
-        // recruit type.
-        boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
-        int index = (selected) ? slot-1
-            : Utils.randomInt(logger, "Choose emigrant", random,
-                              Europe.RECRUIT_COUNT);
-
-        // Create the recruit, move it to the docks.
-        Europe europe = serverPlayer.getEurope();
-        UnitType recruitType = europe.getRecruitable(index);
-        Game game = getGame();
-        Unit unit = new ServerUnit(game, europe, serverPlayer, recruitType,
-                                   UnitState.ACTIVE);
-        unit.setLocation(europe);
-
-        // Handle migration type specific changes.
-        switch (type) {
-        case FOUNTAIN:
-            serverPlayer.setRemainingEmigrants(serverPlayer.getRemainingEmigrants() - 1);
-            break;
-        case RECRUIT:
-            serverPlayer.modifyGold(-europe.getRecruitPrice());
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-            europe.increaseRecruitmentDifficulty();
-            // Fall through
-        case NORMAL:
-            serverPlayer.updateImmigrationRequired();
-            serverPlayer.reduceImmigration();
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                          "immigration", "immigrationRequired");
-            break;
-        default:
-            throw new IllegalArgumentException("Bogus migration type");
-        }
-
-        // Replace the recruit we used.
-        List<RandomChoice<UnitType>> recruits
-            = serverPlayer.generateRecruitablesList();
-        europe.setRecruitable(index,
-            RandomChoice.getWeightedRandom(logger,
-                "Replace recruit", random, recruits));
-        cs.add(See.only(serverPlayer), europe);
-
-        // Return an informative message only if this was an ordinary
-        // migration where we did not select the unit type.
-        // Other cases were selected.
-        if (!selected) {
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                 "model.europe.emigrate",
-                                 serverPlayer, unit)
-                    .add("%europe%", europe.getNameKey())
-                    .addStringTemplate("%unit%", unit.getLabel()));
-        }
+        serverPlayer.csEmigrate(slot, type, random, cs);
 
         // Do not update others, emigration is private.
         return cs.build(serverPlayer);

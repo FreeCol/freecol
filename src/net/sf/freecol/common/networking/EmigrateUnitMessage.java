@@ -20,11 +20,11 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.control.InGameController.MigrationType;
 
 import org.w3c.dom.Element;
 

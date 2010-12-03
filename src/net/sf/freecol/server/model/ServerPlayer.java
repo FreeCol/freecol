@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
@@ -975,7 +976,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         if (isEuropean()) { // Update liberty and immigration
-            cs.addPartial(See.only(this), this, "liberty", "immigration");
+            if (checkEmigrate()
+                && !hasAbility("model.ability.selectRecruit")) {
+                // Auto-emigrate if selection not allowed.
+                csEmigrate(0, MigrationType.NORMAL, random, cs);
+            } else {
+                cs.addPartial(See.only(this), this, "immigration");
+            }
+            cs.addPartial(See.only(this), this, "liberty");
         }
     }
 
@@ -1385,6 +1393,73 @@ public class ServerPlayer extends Player implements ServerModelObject {
             is.makeContactSettlement(this);
             cs.add(See.only(null).perhaps(this),
                    owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN, is));
+        }
+    }
+
+
+    /**
+     * A unit migrates from Europe.
+     *
+     * @param slot The slot within <code>Europe</code> to select the unit from.
+     * @param type The type of migration occurring.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csEmigrate(int slot, MigrationType type, Random random,
+                           ChangeSet cs) {
+        // Valid slots are in [1,3], recruitable indices are in [0,2].
+        // An invalid slot is normal when the player has no control over
+        // recruit type.
+        boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
+        int index = (selected) ? slot-1
+            : Utils.randomInt(logger, "Choose emigrant", random,
+                              Europe.RECRUIT_COUNT);
+
+        // Create the recruit, move it to the docks.
+        Europe europe = getEurope();
+        UnitType recruitType = europe.getRecruitable(index);
+        Game game = getGame();
+        Unit unit = new ServerUnit(game, europe, this, recruitType,
+                                   UnitState.ACTIVE);
+        unit.setLocation(europe);
+
+        // Handle migration type specific changes.
+        switch (type) {
+        case FOUNTAIN:
+            setRemainingEmigrants(getRemainingEmigrants() - 1);
+            break;
+        case RECRUIT:
+            modifyGold(-europe.getRecruitPrice());
+            cs.addPartial(See.only(this), this, "gold");
+            europe.increaseRecruitmentDifficulty();
+            // Fall through
+        case NORMAL:
+            updateImmigrationRequired();
+            reduceImmigration();
+            cs.addPartial(See.only(this), this,
+                          "immigration", "immigrationRequired");
+            break;
+        default:
+            throw new IllegalArgumentException("Bogus migration type");
+        }
+
+        // Replace the recruit we used.
+        List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
+        europe.setRecruitable(index,
+            RandomChoice.getWeightedRandom(logger,
+                "Replace recruit", random, recruits));
+        cs.add(See.only(this), europe);
+
+        // Add an informative message only if this was an ordinary
+        // migration where we did not select the unit type.
+        // Other cases were selected.
+        if (!selected) {
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                 "model.europe.emigrate",
+                                 this, unit)
+                    .add("%europe%", europe.getNameKey())
+                    .addStringTemplate("%unit%", unit.getLabel()));
         }
     }
 

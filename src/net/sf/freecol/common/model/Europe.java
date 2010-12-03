@@ -62,6 +62,13 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     private UnitType[] recruitables = { null, null, null };
     public static final int RECRUIT_COUNT = 3;
 
+    public static enum MigrationType {
+        NORMAL,     // Unit decided to migrate
+        RECRUIT,    // Player is paying
+        FOUNTAIN    // As a result of a Fountain of Youth discovery
+    }
+
+
     protected java.util.Map<UnitType, Integer> unitPrices
         = new HashMap<UnitType, Integer>();
 
