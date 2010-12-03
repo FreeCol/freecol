@@ -446,6 +446,7 @@ public class MarketData extends FreeColGameObject {
         incomeAfterTaxes = getAttribute(in, "incomeAfterTaxes", 0);
         traded = getAttribute(in, "traded", sales != 0);
         price();
+        oldPrice = costToBuy;
         in.nextTag();
     }
 

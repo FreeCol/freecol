@@ -1423,6 +1423,7 @@ public final class InGameController extends Controller {
         }
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
+        container.saveState();
         serverPlayer.csBuy(container, type, amount, random, cs);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), container);
