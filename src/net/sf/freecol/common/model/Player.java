@@ -329,7 +329,11 @@ public class Player extends FreeColGameObject implements Nameable {
     protected HashMap<String, LastSale> lastSales = null;
 
     // Temporary variables:
-    protected boolean[][] canSeeTiles = null;
+
+    // Tiles the player can see.
+    // No access to canSeeTiles without taking canSeeLock.
+    private boolean[][] canSeeTiles = null;
+    private final Object canSeeLock = new Object();
 
     // Contains the abilities and modifiers of this type.
     protected FeatureContainer featureContainer;
@@ -1394,17 +1398,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #hasExplored
      */
     public void setExplored(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null
-            || unit.getTile() == null || isIndian()) {
+        if (getGame() == null || getGame().getMap() == null || unit == null
+            || unit.getLocation() == null || unit.getTile() == null
+            || isIndian()) {
             return;
         }
-        if (canSeeTiles == null) {
-            resetCanSeeTiles();
-        }
-
-        for (Tile tile: unit.getTile().getSurroundingTiles(unit.getLineOfSight())) {
-            canSeeTiles[tile.getX()][tile.getY()] = true;
-        }
+        invalidateCanSeeTiles();
     }
 
     /**
@@ -1413,61 +1412,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@link #resetCanSeeTiles} will be called whenever it is needed.
      */
     public void invalidateCanSeeTiles() {
-        canSeeTiles = null;
-    }
-
-    /**
-     * Resets this player's "can see"-tiles. This is done by setting
-     * all the tiles within each {@link Unit} and {@link Settlement}s
-     * line of sight visible. The other tiles are made invisible.
-     *
-     * Note that tiles must be tested for null as they may be both
-     * valid tiles but yet null during a save game load.
-     *
-     * Note the use of copies of the unit and settlement lists to
-     * avoid nasty surprises due to asynchronous disappearance of
-     * members of either.  TODO: see if this can be relaxed.
-     *
-     * Use {@link #invalidateCanSeeTiles} whenever possible.
-     * @return <code>true</code> if successful <code>false</code> otherwise
-     */
-    public boolean resetCanSeeTiles() {
-        Map map = getGame().getMap();
-        if (map == null) {
-            return false;
+        synchronized (canSeeLock) {
+            canSeeTiles = null;
         }
-        canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
-        if (!getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
-            for (Tile t : getGame().getMap().getAllTiles()) {
-                if (t != null) {
-                    canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
-                }
-            }
-        } else {
-            for (Unit unit : getUnits()) {
-                // Only consider units directly on the map, not those
-                // on a carrier or in Europe.
-                if (!(unit.getLocation() instanceof Tile)) continue;
-
-                Tile tile = (Tile) unit.getLocation();
-                canSeeTiles[tile.getX()][tile.getY()] = true;
-                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
-                    if (t != null) {
-                        canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
-                    }
-                }
-            }
-            for (Settlement settlement : new ArrayList<Settlement>(getSettlements())) {
-                Tile tile = settlement.getTile();
-                canSeeTiles[tile.getX()][tile.getY()] = true;
-                for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
-                    if (t != null) {
-                        canSeeTiles[t.getX()][t.getY()] = hasExplored(t);
-                    }
-                }
-            }
-        }
-        return true;
     }
 
     /**
@@ -1480,13 +1427,84 @@ public class Player extends FreeColGameObject implements Nameable {
      *         <code>Tile</code> and <i>false</i> otherwise.
      */
     public boolean canSee(Tile tile) {
-        if (tile == null) {
-            return false;
+        if (tile == null) return false;
+
+        do {
+            synchronized (canSeeLock) {
+                if (canSeeTiles != null) {
+                    return canSeeTiles[tile.getX()][tile.getY()];
+                }
+            }
+        } while (resetCanSeeTiles());
+        return false;
+    }
+
+    /**
+     * Resets this player's "can see"-tiles. This is done by setting
+     * all the tiles within each {@link Unit} and {@link Settlement}s
+     * line of sight visible. The other tiles are made invisible.
+     *
+     * Use {@link #invalidateCanSeeTiles} whenever possible.
+     * @return <code>true</code> if successful <code>false</code> otherwise
+     */
+    private boolean resetCanSeeTiles() {
+        Map map = getGame().getMap();
+        if (map == null) return false;
+
+        boolean[][] cST = makeCanSeeTiles(map);
+        synchronized (canSeeLock) {
+            canSeeTiles = cST;
         }
-        if (canSeeTiles == null && !resetCanSeeTiles()) {
-            return false;
+        return true;
+    }
+
+    /**
+     * Builds a canSeeTiles array.
+     *
+     * Note that tiles must be tested for null as they may be both
+     * valid tiles but yet null during a save game load.
+     *
+     * Note the use of copies of the unit and settlement lists to
+     * avoid nasty surprises due to asynchronous disappearance of
+     * members of either.  TODO: see if this can be relaxed.
+     *
+     * @param map The <code>Map</code> to use.
+     * @return A canSeeTiles array.
+     */
+    private boolean[][] makeCanSeeTiles(Map map) {
+        boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
+
+        if (!getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+            for (Tile t : getGame().getMap().getAllTiles()) {
+                if (t != null) {
+                    cST[t.getX()][t.getY()] = hasExplored(t);
+                }
+            }
+        } else {
+            for (Unit unit : getUnits()) {
+                // Only consider units directly on the map, not those
+                // on a carrier or in Europe.
+                if (!(unit.getLocation() instanceof Tile)) continue;
+
+                Tile tile = (Tile) unit.getLocation();
+                cST[tile.getX()][tile.getY()] = true;
+                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
+                    if (t != null) {
+                        cST[t.getX()][t.getY()] = hasExplored(t);
+                    }
+                }
+            }
+            for (Settlement settlement : new ArrayList<Settlement>(getSettlements())) {
+                Tile tile = settlement.getTile();
+                cST[tile.getX()][tile.getY()] = true;
+                for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
+                    if (t != null) {
+                        cST[t.getX()][t.getY()] = hasExplored(t);
+                    }
+                }
+            }
         }
-        return canSeeTiles[tile.getX()][tile.getY()];
+        return cST;
     }
 
     /**
@@ -1612,7 +1630,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void endTurn() {
         removeModelMessages();
-        resetCanSeeTiles();
+        invalidateCanSeeTiles();
     }
 
     /**

@@ -497,17 +497,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
-            player.resetCanSeeTiles();
-            for (Tile t: game.getMap().getAllTiles()) {
-                if (t != null && !player.canSee(t)
-                    && t.getFirstUnit() != null) {
-                    if (t.getFirstUnit().getOwner() == player) {
-                        logger.warning("Could not see one of my own units!");
-                    }
-                    t.disposeAllUnits();
-                }
-            }
-            player.resetCanSeeTiles();
+            player.invalidateCanSeeTiles();
 
             // Check for emigration.
             if (player.checkEmigrate()) {

@@ -204,7 +204,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         connected = connection != null;
 
         resetExploredTiles(getGame().getMap());
-        resetCanSeeTiles();
+        invalidateCanSeeTiles();
     }
 
     /**
@@ -663,7 +663,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 int radius = (unit.getColony() != null)
                     ? unit.getColony().getLineOfSight()
                     : unit.getLineOfSight();
-                for (Tile t: tile.getSurroundingTiles(radius)) {
+                for (Tile t : tile.getSurroundingTiles(radius)) {
                     setExplored(t);
                 }
             }
@@ -708,22 +708,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return;
         }
 
-        if (canSeeTiles == null) {
-            resetCanSeeTiles();
-        }
-
         Tile tile = unit.getTile();
         setExplored(tile);
-        canSeeTiles[tile.getX()][tile.getY()] = true;
-
         for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
             setExplored(t);
-            if (canSeeTiles != null) {
-                canSeeTiles[t.getX()][t.getY()] = true;
-            } else {
-                invalidateCanSeeTiles();
-            }
         }
+        invalidateCanSeeTiles();
     }
 
     /**
@@ -759,8 +749,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Tile tile: getGame().getMap().getAllTiles()) {
             setExplored(tile);
         }
-        getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR).setValue(false);
-        resetCanSeeTiles();
+        getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR)
+            .setValue(false);
+        invalidateCanSeeTiles();
     }
 
     /**
