@@ -43,6 +43,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -1069,6 +1070,7 @@ public class StandardAIPlayer extends AIPlayer {
         
             Collections.sort(unarmedColonists, comp);
             Unit unit = unarmedColonists.get(0);
+            cheatEquipmentGoods(colony, musketsEqType, 1);
             AIMessage.askEquipUnit(getAIUnit(unit), musketsEqType, 1);
             if(!unit.isMounted()){
                 unmountedSoldiers.add(unit);
@@ -1094,10 +1096,28 @@ public class StandardAIPlayer extends AIPlayer {
         while(unmountedSoldiers.size() > 0 
                 && colony.canBuildEquipment(horsesEqType)){
             Unit soldier = unmountedSoldiers.remove(0);
+            cheatEquipmentGoods(colony, horsesEqType, 1);
             AIMessage.askEquipUnit(getAIUnit(soldier), horsesEqType, 1);
         }
     }
-    
+
+    /**
+     * CHEAT.  Add bogus goods to an AI Colony so that an attempt
+     * to equip a unit will succeed.
+     */
+    private void cheatEquipmentGoods(Colony colony, EquipmentType type,
+                                     int amount) {
+        for (AbstractGoods goods : type.getGoodsRequired()) {
+            GoodsType goodsType = goods.getType();
+            int n = amount * goods.getAmount()
+                - colony.getGoodsCount(goodsType);
+            if (n > 0) {
+                colony.addGoods(goodsType, n);
+            }
+        }
+    }
+
+
     void reOrganizeSoldiersOfColony(Colony colony){
         List<Unit>unarmedExpertSoldiers = new ArrayList<Unit>();
         List<Unit>armedNonExpertSoldiers = new ArrayList<Unit>();
