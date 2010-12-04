@@ -130,24 +130,14 @@ public class IndianNationType extends NationType {
     }
 
     /**
-     * Describe <code>getSettlementTypeAsString</code> method here.
+     * Get a message id for the general type of settlements of this nation.
      *
-     * @return a <code>String</code> value
+     * @param plural Choose the plural form or not.
+     * @return A suitable message id.
      */
-    /*
-    public final String getSettlementTypeKey() {
-        switch (getTypeOfSettlement()) {
-        case INCA_CITY:
-        case AZTEC_CITY:
-            return "settlementType.city";
-        case INDIAN_VILLAGE:
-            return "settlementType.village";
-        case INDIAN_CAMP:
-        default:
-            return "settlementType.camp";
-        }
+    public final String getSettlementTypeKey(boolean plural) {
+        return getSettlementType(false).getId() + ((plural) ? ".plural" : "");
     }
-    */
 
     /**
      * Returns the list of regions in which this tribe my settle.

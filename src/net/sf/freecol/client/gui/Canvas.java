@@ -2010,7 +2010,7 @@ public final class Canvas extends JDesktopPane {
                                      .addStringTemplate("%nation%", settlement.getOwner().getNationName())
                                      .addName("%settlement%", settlement.getName())
                                      .add("%number%", number)
-                                     .add("%settlementType%", settlement.getType().getId() + ".plural")));
+                                     .add("%settlementType%", ((IndianNationType) owner.getNationType()).getSettlementTypeKey(true))));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
             text.append(Messages.message(StringTemplate.template("scoutSettlement.skill")
