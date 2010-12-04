@@ -237,7 +237,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                     System.out.println("Food consumer is " + building.getType().getId());
                     int inputCount = getGoodsCount(inputType);
                     int outputCount = getGoodsCount(outputType);
-                    System.out.println("Goods input is " + inputCount + " " + inputType.getId());
+                    System.out.println("Goods input is " + Math.min(inputCount, surplus)
+                                       + " " + inputType.getId());
                     ((ServerBuilding) building).csNewTurn(random, cs, Math.min(inputCount, surplus));
                     surplus -= inputCount - getGoodsCount(inputType);
                     System.out.println("Produced " + (getGoodsCount(outputType) - outputCount)

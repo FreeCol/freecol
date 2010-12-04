@@ -571,9 +571,7 @@ public class Building extends FreeColGameObject
         if (inputType == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return (inputType == getSpecification().getPrimaryFoodType())
-                ? getFoodInputAuto()
-                : getGoodsInputAuto(colony.getProductionOf(inputType));
+            return getMaximumAutoProduction();
         } else {
             return Math.min(getMaximumGoodsInput(), getStoredInput());
         }

@@ -121,8 +121,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     }
 
     private void produceGoods(ChangeSet cs, ServerPlayer owner, int maxInput) {
-        //final int goodsInput = Math.min(getGoodsInput(), maxInput);
-        int goodsInput = maxInput;
+        final int goodsInput = Math.min(getGoodsInput(), maxInput);
         final int goodsOutput = canAutoProduce()
             ? getAutoProduction(goodsInput)
             : getProductionAdding(maxInput);
