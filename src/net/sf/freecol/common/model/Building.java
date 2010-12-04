@@ -618,14 +618,17 @@ public class Building extends FreeColGameObject
             return 0;
         } else {
             int outputGoods = colony.getGoodsCount(getGoodsOutputType());
-            if (outputGoods < getGoodsOutputType().getBreedingNumber() ||
-                outputGoods >= colony.getWarehouseCapacity()) {
+            if (outputGoods < getGoodsOutputType().getBreedingNumber()) {
+                // not enough animals to breed
+                return 0;
+            } else if (outputGoods >= colony.getWarehouseCapacity()) {
+                // warehouse is already full
                 return 0;
             } else {
                 int surplus = available;
                 // we need to take into consideration the residents consumption
                 if (getGoodsInputType().isFoodType()) {
-                    surplus -= colony.getFoodConsumptionByType(getGoodsInputType());
+                    surplus -= colony.getFoodConsumption();
                     if (surplus <= 0) {
                         return 0;
                     }

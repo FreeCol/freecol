@@ -211,30 +211,48 @@ public class ServerColony extends Colony implements ServerModelObject {
             ((ServerModelObject) building).csNewTurn(random, cs);
         }
 
-        // check for surplus available to produce goods from food
-        // types (e.g. horses)
-        int surplus = 0;
-        for (Goods goods : container.getCompactGoods()) {
-            if (goods.getType().isFoodType()) {
-                surplus += (goods.getAmount() - container.getOldGoodsCount(goods.getType()));
-            }
-        }
-
         int foodRequired = getFoodConsumption();
-        surplus -= foodRequired;
-
-        if (surplus > 0) {
-            for (Building building : foodConsumers) {
-                int goodsCount = container.getGoodsCount(building.getGoodsInputType());
-                ((ServerBuilding) building).csNewTurn(random, cs, Math.min(goodsCount, surplus));
-                goodsCount -= container.getGoodsCount(building.getGoodsInputType());
-                surplus -= goodsCount;
-                if (surplus < 0) {
-                    logger.warning("Building " + building.getId() + " consumed more than allowed!");
-                } else if (surplus == 0) {
-                    break;
+        if (!foodConsumers.isEmpty()) {
+            // check for surplus available to produce goods from food
+            // types (e.g. horses)
+            int surplus = 0;
+            for (Goods goods : container.getCompactGoods()) {
+                if (goods.getType().isFoodType()) {
+                    surplus += (goods.getAmount() - container.getOldGoodsCount(goods.getType()));
                 }
             }
+            surplus -= foodRequired;
+            System.out.println("Food surplus in " + getName() + " is " + surplus);
+
+            if (surplus > 0) {
+                // TODO: move surplus storage to specification
+                surplus /= 2;
+                System.out.println("Surplus after storage is " + surplus);
+            }
+
+            if (surplus > 0) {
+                for (Building building : foodConsumers) {
+                    GoodsType inputType = building.getGoodsInputType();
+                    GoodsType outputType = building.getGoodsOutputType();
+                    System.out.println("Food consumer is " + building.getType().getId());
+                    int inputCount = getGoodsCount(inputType);
+                    int outputCount = getGoodsCount(outputType);
+                    System.out.println("Goods input is " + inputCount + " " + inputType.getId());
+                    ((ServerBuilding) building).csNewTurn(random, cs, Math.min(inputCount, surplus));
+                    surplus -= inputCount - getGoodsCount(inputType);
+                    System.out.println("Produced " + (getGoodsCount(outputType) - outputCount)
+                                       + " " + outputType);
+                    System.out.println("Surplus is now " + surplus);
+                    if (surplus < 0) {
+                        logger.warning("Building " + building.getId() + " consumed more than allowed!");
+                        break;
+                    } else if (surplus == 0) {
+                        break;
+                    }
+                }
+            }
+            System.out.println("----------------------------------------");
+
         }
 
         // convert all food types to food (or whatever)
