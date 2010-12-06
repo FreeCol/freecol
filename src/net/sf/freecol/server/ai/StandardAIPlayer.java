@@ -1069,11 +1069,15 @@ public class StandardAIPlayer extends AIPlayer {
             }
         
             Collections.sort(unarmedColonists, comp);
-            Unit unit = unarmedColonists.get(0);
-            cheatEquipmentGoods(colony, musketsEqType, 1);
-            AIMessage.askEquipUnit(getAIUnit(unit), musketsEqType, 1);
-            if(!unit.isMounted()){
-                unmountedSoldiers.add(unit);
+            for (Unit unit : unarmedColonists) {
+                if (unit.canBeEquippedWith(musketsEqType)) {
+                    cheatEquipmentGoods(colony, musketsEqType, 1);
+                    AIMessage.askEquipUnit(getAIUnit(unit), musketsEqType, 1);
+                    if(!unit.isMounted()){
+                        unmountedSoldiers.add(unit);
+                    }
+                    break;
+                }
             }
         }
         
