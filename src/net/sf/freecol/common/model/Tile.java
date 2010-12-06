@@ -57,7 +57,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     private static final String UNITS_TAG_NAME = "units";
 
-    public static final String UNIT_CHANGE = "UNIT_CHANGE";
+    // This must be distinct from ColonyTile/Building.UNIT_CHANGE or
+    // the colony panel can get confused.
+    public static final String UNIT_CHANGE = "TILE_UNIT_CHANGE";
 
     private TileType type;
     

@@ -1017,6 +1017,7 @@ public final class InGameController extends Controller {
                 .addAmount("%cashInAmount%", cashInAmount));
 
         // Dispose of the unit.
+        cs.add(See.only(serverPlayer), (FreeColGameObject) unit.getLocation());
         cs.addDispose(serverPlayer, unit.getLocation(), unit);
 
         // Others can not see cash-ins which happen in colonies or Europe.
