@@ -20,7 +20,6 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
@@ -84,10 +83,14 @@ public class GetTransactionMessage extends Message {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
-        IndianSettlement settlement;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
-            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
+        Settlement settlement;
+        try {
+            settlement = server.getAdjacentSettlementSafely(settlementId, unit);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }

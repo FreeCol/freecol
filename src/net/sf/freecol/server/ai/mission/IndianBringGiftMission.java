@@ -169,10 +169,16 @@ public class IndianBringGiftMission extends Mission {
             if (r != null && 
                 getUnit().getTile().getNeighbourOrNull(r) == target.getTile()) {
                 // We have arrived.
-                AIMessage.askDeliverGift(getAIUnit(), target,
-                                         getUnit().getGoodsIterator().next());
-                logger.info("IndianBringGift for " + getUnit().getId()
-                            + " delivered at " + target.getName());
+                if (AIMessage.askGetTransaction(getAIUnit(), target)
+                    && AIMessage.askDeliverGift(getAIUnit(), target,
+                                                getUnit().getGoodsIterator().next())
+                    && AIMessage.askCloseTransaction(getAIUnit(), target)) {
+                    logger.info("IndianBringGift for " + getUnit().getId()
+                                + " delivered at " + target.getName());
+                } else {
+                    logger.warning("IndianBringGift for " + getUnit().getId()
+                                   + " failed at " + target.getName());
+                }
                 completed = true;
             }
         }

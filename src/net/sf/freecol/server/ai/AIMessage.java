@@ -47,9 +47,11 @@ import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
+import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
+import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.Message;
@@ -233,6 +235,21 @@ public class AIMessage {
 
 
     /**
+     * An AIUnit closes a transaction.
+     *
+     * @param aiUnit The <code>AIUnit</code> that closes the transaction.
+     * @param settlement The target <code>Settlement</code>.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askCloseTransaction(AIUnit aiUnit,
+                                              Settlement settlement) {
+        return sendMessage(aiUnit.getConnection(),
+                           new CloseTransactionMessage(aiUnit.getUnit(),
+                                                       settlement));
+    }
+
+
+    /**
      * An AIUnit delivers a gift.
      *
      * @param aiUnit The <code>AIUnit</code> delivering the gift.
@@ -291,6 +308,21 @@ public class AIMessage {
         return sendMessage(aiUnit.getConnection(),
                            new MissionaryMessage(aiUnit.getUnit(), direction,
                                                  denounce));
+    }
+
+
+    /**
+     * An AIUnit gets a transaction.
+     *
+     * @param aiUnit The <code>AIUnit</code> that gets a transaction.
+     * @param settlement The target <code>Settlement</code>.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askGetTransaction(AIUnit aiUnit,
+                                            Settlement settlement) {
+        return sendMessage(aiUnit.getConnection(),
+                           new GetTransactionMessage(aiUnit.getUnit(),
+                                                     settlement));
     }
 
 
