@@ -408,7 +408,8 @@ public class SoundPlayer {
                     in.close();
                 }
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not play audio.", e);
+                logger.log(Level.WARNING, "Could not play audio: "
+                           + file.getName(), e);
             }
         }
 
