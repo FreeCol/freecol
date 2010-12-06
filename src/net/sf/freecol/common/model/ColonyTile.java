@@ -285,7 +285,9 @@ public class ColonyTile extends FreeColGameObject
         if (tile.getSettlement() != null
             || tile.getOccupyingUnit() != null
             || (tile.getOwningSettlement() != colony
-                && !player.canClaimForSettlement(tile))) {
+                && !player.canClaimForSettlement(tile))
+            || (!tile.isLand()
+                && !colony.hasAbility("model.ability.produceInWater"))) {
             return false;
         }
 
