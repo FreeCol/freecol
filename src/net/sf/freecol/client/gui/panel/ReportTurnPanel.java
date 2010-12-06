@@ -252,7 +252,8 @@ public final class ReportTurnPanel extends ReportPanel {
             button.setActionCommand(europe.getId());
             headline = button;
         } else if (source instanceof Market) {
-            JButton button = new JButton(Messages.message("clientOptions.messages.guiShowMarketPrices.name"));
+            Market market = (Market) source;
+            JButton button = new JButton(Messages.message(market.getOwner().getMarketName()));
             button.addActionListener(this);
             button.setActionCommand(getMyPlayer().getEurope().getId());
             headline = button;
