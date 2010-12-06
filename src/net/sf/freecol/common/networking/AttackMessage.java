@@ -105,7 +105,11 @@ public class AttackMessage extends Message {
                                        + " from unit: " + unitId);
         }
         MoveType moveType = unit.getMoveType(direction);
-        if (moveType != MoveType.ATTACK) {
+        if ((moveType == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
+             && unit.getRole() == Unit.Role.SCOUT)
+            || moveType == MoveType.ATTACK) {
+            ; // OK
+        } else {
             return Message.clientError("Illegal attack move for: " + unitId
                                        + " type: " + moveType
                                        + " from: " + unit.getLocation().getId()
