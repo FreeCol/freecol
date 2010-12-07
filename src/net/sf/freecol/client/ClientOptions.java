@@ -448,12 +448,7 @@ public class ClientOptions extends OptionGroup {
     private Comparator<ModelMessage> messageTypeComparator = new Comparator<ModelMessage>() {
         // sort according to message type
         public int compare(ModelMessage message1, ModelMessage message2) {
-            int dtype = message1.getMessageType().ordinal() - message2.getMessageType().ordinal();
-            if (dtype == 0 && message1.getSourceId() != message2.getSourceId()) {
-                return messageSourceComparator.compare(message1, message2);
-            } else {
-                return dtype;
-            }
+            return message1.getMessageType().ordinal() - message2.getMessageType().ordinal();
         }
     };
 
