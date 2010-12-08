@@ -260,7 +260,14 @@ public final class FreeColClient {
         }
         ResourceManager.setModMappings(modMappings);
         ResourceManager.preload(size);
-        
+
+        //If modMappings change any UI resources related to actions,
+        //these would not become visible without a 2nd call to initializeActions()
+        //potential TODO: find a better way to untangle this.
+        if (!headless) {
+            actionManager.initializeActions();
+        }
+
         // Control:
         connectController = new ConnectController(this);
         preGameController = new PreGameController(this);
