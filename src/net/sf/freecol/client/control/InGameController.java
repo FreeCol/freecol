@@ -3441,6 +3441,7 @@ public final class InGameController implements NetworkConstants {
         FreeColGameObject oldLocation = (FreeColGameObject) unit.getLocation();
         if (cash && askCashInTreasureTrain(unit) && unit.isDisposed()) {
             oldLocation.firePropertyChange(Tile.UNIT_CHANGE, unit, null);
+            freeColClient.playSound("sound.event.cashInTreasureTrain");
             canvas.updateGoldLabel();
             nextActiveUnit(tile);
             return true;
