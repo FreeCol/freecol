@@ -733,6 +733,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                       "lostCityRumour.FountainOfYouth",
                                       serverPlayer, this));
             }
+            cs.addAttribute(See.only(serverPlayer),
+                            "sound", "sound.event.fountainOfYouth");
             break;
         case NO_SUCH_RUMOUR: case MOUNDS:
         default:

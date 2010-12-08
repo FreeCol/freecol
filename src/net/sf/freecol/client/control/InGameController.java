@@ -1863,7 +1863,6 @@ public final class InGameController implements NetworkConstants {
             // Without Brewster, the migrants have already been selected
             // and were updated to the European docks by the server.
             final int migrants = Integer.parseInt(reply.getAttribute("fountainOfYouth"));
-            freeColClient.playSound("sound.event.fountainOfYouth");
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < migrants; i++) {
