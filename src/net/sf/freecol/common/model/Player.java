@@ -341,9 +341,11 @@ public class Player extends FreeColGameObject implements Nameable {
     // Maximum food consumption of unit types available to this player.
     private int maximumFoodConsumption = -1;
 
-    protected final Iterator<Unit> nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
+    private final UnitIterator nextActiveUnitIterator
+        = new UnitIterator(this, new ActivePredicate());
 
-    protected final Iterator<Unit> nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
+    private final UnitIterator nextGoingToUnitIterator
+        = new UnitIterator(this, new GoingToPredicate());
 
     /**
      * A cache of settlement names, a capital for natives, and a fallback
@@ -3039,17 +3041,29 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public class UnitIterator implements Iterator<Unit> {
 
-        private Iterator<Unit> unitIterator = null;
-
         private Player owner;
-
-        private Unit nextUnit = null;
 
         private UnitPredicate predicate;
 
+        private ArrayList<Unit> units = null;
 
         /**
-         * Creates a new <code>NextActiveUnitIterator</code>.
+         * A comparator to compare units by position, top to bottom,
+         * left to right.
+         */
+        private final Comparator<Unit> xyComparator = new Comparator<Unit>() {
+            public int compare(Unit unit1, Unit unit2) {
+                Tile tile1 = unit1.getTile();
+                Tile tile2 = unit2.getTile();
+                int cmp = ((tile1 == null) ? 0 : tile1.getY())
+                    - ((tile2 == null) ? 0 : tile2.getY());
+                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
+                    : (tile1.getX() - tile2.getX());
+            }
+        };
+
+        /**
+         * Creates a new <code>UnitIterator</code>.
          *
          * @param owner The <code>Player</code> that needs an iterator of it's
          *            units.
@@ -3059,39 +3073,49 @@ public class Player extends FreeColGameObject implements Nameable {
         public UnitIterator(Player owner, UnitPredicate predicate) {
             this.owner = owner;
             this.predicate = predicate;
+            reset();
         }
 
+        /**
+         * Reset the internal units list, initially only with units that
+         * satisfy the predicate.
+         */
+        public void reset() {
+            units = new ArrayList<Unit>();
+            for (Unit u : owner.getUnits()) {
+                if (predicate.obtains(u)) units.add(u);
+            }
+            Collections.sort(units, xyComparator);
+        }
+
+        /**
+         * Check if there is any more valid units.
+         * If there are, it will be at the head of the internal units list.
+         *
+         * @return True if there are any valid units left.
+         */
         public boolean hasNext() {
-            if (nextUnit != null && predicate.obtains(nextUnit)) {
-                return true;
-            }
-            if (unitIterator == null) {
-                unitIterator = createUnitIterator();
-            }
-            while (unitIterator.hasNext()) {
-                nextUnit = unitIterator.next();
-                if (predicate.obtains(nextUnit)) {
-                    return true;
+            // Try to find a unit that still satisfies the predicate.
+            while (!units.isEmpty()) {
+                if (predicate.obtains(units.get(0))) {
+                    return true; // Still valid
                 }
+                units.remove(0);
             }
-            unitIterator = createUnitIterator();
-            while (unitIterator.hasNext()) {
-                nextUnit = unitIterator.next();
-                if (predicate.obtains(nextUnit)) {
-                    return true;
-                }
-            }
-            nextUnit = null;
-            return false;
+            // Nothing left, so refill the units list.  If it is still
+            // empty then there is definitely nothing left.
+            reset();
+            return !units.isEmpty();
         }
 
+        /**
+         * Get the next valid unit.
+         * Always call hasNext to enforce validity.
+         *
+         * @return The next valid unit, or null if none.
+         */
         public Unit next() {
-            if (nextUnit == null || !predicate.obtains(nextUnit)) {
-                hasNext();
-            }
-            Unit temp = nextUnit;
-            nextUnit = null;
-            return temp;
+            return (hasNext()) ? units.remove(0) : null;
         }
 
         /**
@@ -3102,33 +3126,6 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         public void remove() {
             throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Returns an <code>Iterator</code> for the units of this player that
-         * can be active.
-         */
-        private Iterator<Unit> createUnitIterator() {
-            ArrayList<Unit> units = new ArrayList<Unit>();
-            for (Tile t: getGame().getMap().getAllTiles()) {
-                if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(owner)) {
-                    Iterator<Unit> unitIterator = t.getUnitIterator();
-                    while (unitIterator.hasNext()) {
-                        Unit u = unitIterator.next();
-                        Iterator<Unit> childUnitIterator = u.getUnitIterator();
-                        while (childUnitIterator.hasNext()) {
-                            Unit childUnit = childUnitIterator.next();
-                            if (predicate.obtains(childUnit)) {
-                                units.add(childUnit);
-                            }
-                        }
-                        if (predicate.obtains(u)) {
-                            units.add(u);
-                        }
-                    }
-                }
-            }
-            return units.iterator();
         }
     }
 
