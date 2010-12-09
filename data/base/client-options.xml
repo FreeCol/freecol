@@ -33,8 +33,6 @@
       <booleanOption id="model.option.alwaysCenter" defaultValue="false"/>
       <!-- If this option is enabled, the display will recenter in order to display the active unit -->
       <booleanOption id="model.option.jumpToActiveUnit" defaultValue="true"/>
-      <!-- Option for setting wether or not the fog of war should be displayed. -->
-      <booleanOption id="model.option.displayFogOfWar" defaultValue="false"/>
       <!-- Option for activating autoscroll when dragging units on the mapboard. -->
       <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
       <!-- Option for autoscrolling when hitting the boundaries of the mapboard -->

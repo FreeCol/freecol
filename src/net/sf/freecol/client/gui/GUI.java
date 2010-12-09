@@ -2557,7 +2557,6 @@ public final class GUI {
     private void displayFogOfWar(Graphics2D g, Map map, Tile tile) {
         if (tile.isExplored()
             && freeColClient.getGame().getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
-            && freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR)
             && freeColClient.getMyPlayer() != null
             && !freeColClient.getMyPlayer().canSee(tile)) {
             g.setColor(Color.BLACK);

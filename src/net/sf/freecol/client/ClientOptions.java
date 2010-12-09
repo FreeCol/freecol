@@ -249,11 +249,6 @@ public class ClientOptions extends OptionGroup {
     public static final String AUTOSAVE_DELETE = "model.option.autosaveDelete";
 
     /**
-     * Option for setting wether or not the fog of war should be displayed.
-     */
-    public static final String DISPLAY_FOG_OF_WAR = "model.option.displayFogOfWar";
-
-    /**
      * Option for activating autoscroll when dragging units on the mapboard.
      */
     public static final String MAP_SCROLL_ON_DRAG = "model.option.mapScrollOnDrag";
