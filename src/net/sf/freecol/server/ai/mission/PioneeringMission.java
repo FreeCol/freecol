@@ -41,9 +41,9 @@ import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -334,14 +334,7 @@ public class PioneeringMission extends Mission {
             if (price > 0 && player.getGold() < price) {
                 price = ClaimLandMessage.STEAL_LAND;
             }
-            ClaimLandMessage message = new ClaimLandMessage(target, null, price);
-            try {
-                connection.sendAndWait(message.toXMLElement());
-            } catch (IOException e) {
-                logger.warning("Could not send \""
-                               + ClaimLandMessage.getXMLElementTagName()
-                               + "\"-message:" + e.getMessage());
-            }
+            AIMessage.askClaimLand(connection, target, null, price);
         }
         if (target.getOwner() != player) {
             // Failed to take ownership

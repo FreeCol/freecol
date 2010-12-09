@@ -132,7 +132,7 @@ public class PrivateerMission extends Mission {
         Unit unit = getUnit();
 
         if(unit.getLocation() instanceof Europe){
-        	moveUnitToAmerica(connection, unit);
+            moveUnitToAmerica();
             unit.setMovesLeft(0);
             return;
         }
@@ -219,7 +219,7 @@ public class PrivateerMission extends Mission {
         }
         
         if (moveToEurope && unit.getMoveType(direction) == MoveType.MOVE_HIGH_SEAS) {
-        	moveUnitToEurope(connection, unit);
+        	moveUnitToEurope();
         	unit.setMovesLeft(0);
         	return;
         }
@@ -311,19 +311,19 @@ public class PrivateerMission extends Mission {
         for(Goods goods : goodsLst){
             if(inEurope){
             	logger.finest("Before dumping: money=" + unit.getOwner().getGold());
-                sellCargoInEurope(connection, unit, goods);
+                sellCargoInEurope(goods);
             	logger.finest("After dumping: money=" + unit.getOwner().getGold());
             } else{
             	Colony colony = unit.getTile().getColony();
             	logger.finest("Before dumping: " +  colony.getGoodsCount(goods.getType()) + " " + goods.getType());
-                unloadCargoInColony(connection, unit, goods);
+                unloadCargoInColony(goods);
             	logger.finest("After dumping: " +  colony.getGoodsCount(goods.getType()) + " " + goods.getType());
             }
         }
         
         List<Unit> unitLst = new ArrayList<Unit>(unit.getUnitList());
         for(Unit u : unitLst){
-            unitLeavesShip(connection, u);
+            unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
         }
     }
     

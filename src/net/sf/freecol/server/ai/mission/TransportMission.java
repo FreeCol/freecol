@@ -631,7 +631,7 @@ public class TransportMission extends Mission {
 
             //Already on a tile which gives direct access to Europe, just make the move
             if(canMoveToEurope){
-            	moveUnitToEurope(connection, carrier);
+            	moveUnitToEurope();
             	return;
             }
 
@@ -643,7 +643,7 @@ public class TransportMission extends Mission {
             	// Tile target = getGame().getMap().getNeighbourOrNull(r,
             	// carrier.getTile());
             	if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
-            		moveUnitToEurope(connection, carrier);
+            		moveUnitToEurope();
             	} else {
                   AIMessage.askMove(getAIUnit(), r);
             	}
@@ -922,7 +922,7 @@ public class TransportMission extends Mission {
         Market market = player.getMarket();
 
         if (player.getGold() >= market.getBidPrice(type, amount)) {
-            boolean success = buyGoods(connection, getUnit(), type, amount);
+            boolean success = AIMessage.askBuyGoods(getAIUnit(), type, amount);
             if(!success){
                 return null;
             }
@@ -1216,7 +1216,7 @@ public class TransportMission extends Mission {
                 	if(carrier.getLocation() instanceof Europe
                      || carrier.getSettlement() != null) {
                 		logger.warning("Unloading unit without mission or destination");
-                		unitLeavesShip(connection, u);
+                		unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
                 		continue;
                 	}
                 }
@@ -1227,7 +1227,7 @@ public class TransportMission extends Mission {
                     	logger.finest(carrier + "(" 
                         		+ carrier.getId() + ") unloading " + u + " at " + locStr);
                     	if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
-                            unitLeavesShip(connection, u);
+                          unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
                         }
                         mission.doMission(connection);
                         if (u.getLocation() != getUnit()) {
@@ -1289,14 +1289,14 @@ public class TransportMission extends Mission {
                     logger.finest(carrier + "(" 
                     		+ carrier.getId() + ") unloading " + ag + " at " + locStr);
                     if (carrier.getLocation() instanceof Europe) {
-                        boolean success = sellCargoInEurope(connection, carrier, ag.getGoods());
+                        boolean success = sellCargoInEurope(ag.getGoods());
                         if(success){
                             removeFromTransportList(ag);
                             ag.dispose();
                             transportListChanged = true;
                         }
                     } else {
-                        boolean success = unloadCargoInColony(connection, carrier, ag.getGoods());
+                        boolean success = unloadCargoInColony(ag.getGoods());
                         if(success){
                             removeFromTransportList(ag);
                             ag.dispose();
@@ -1336,13 +1336,9 @@ public class TransportMission extends Mission {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
                 if (u.getTile() == carrier.getTile() && !carrier.isBetweenEuropeAndNewWorld()) {
-                    EmbarkMessage embark = new EmbarkMessage(u, carrier, null);
-                    try {
-                        connection.sendAndWait(embark.toXMLElement());
+                    if (AIMessage.askEmbark(getAIUnit(), u)) {
                         tli.remove();
                         transportListChanged = true;
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"boardShipElement\"-message!");
                     }
                 }
             } else if (t instanceof AIGoods) {
@@ -1351,20 +1347,16 @@ public class TransportMission extends Mission {
                     if (carrier.getLocation() instanceof Europe) {
                         GoodsType goodsType = ag.getGoods().getType();
                         int goodsAmount = ag.getGoods().getAmount();
-                        boolean success = buyGoods(connection, carrier, goodsType, goodsAmount);
+                        boolean success = AIMessage.askBuyGoods(getAIUnit(), goodsType, goodsAmount);
                         if(success){
                             tli.remove();
                             transportListChanged = true;
                             ag.setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
                         }
                     } else {
-                        LoadCargoMessage message = new LoadCargoMessage(ag.getGoods(), carrier);
-                        try {
-                            connection.sendAndWait(message.toXMLElement());
+                        if (AIMessage.askLoadCargo(getAIUnit(), ag.getGoods())) {
                             tli.remove();
                             transportListChanged = true;
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"loadCargo\"-message!");
                         }
                     }
                 }
@@ -1462,7 +1454,7 @@ public class TransportMission extends Mission {
         // Move back to America:
         Unit carrier = getUnit();
         if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
-            moveUnitToAmerica(connection, carrier);
+            moveUnitToAmerica();
         }        
     }
     

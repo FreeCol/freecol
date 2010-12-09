@@ -202,7 +202,6 @@ public class ScoutingMission extends Mission {
             }
         }
 
-        exploreLostCityRumour(connection);
         if (getUnit().isDisposed()) {
             return;
         }

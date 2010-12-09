@@ -152,15 +152,7 @@ public class IndianBringGiftMission extends Mission {
                     completed = true;
                 } else {
                     Goods goods = goodsList.get(getAIRandom().nextInt(goodsList.size()));
-                    LoadCargoMessage message = new LoadCargoMessage(goods, getUnit());
-                    try {
-                        connection.sendAndWait(message.toXMLElement());
-                        logger.info("IndianBringGift for " + getUnit().getId()
-                                    + " loaded at " + is.getName());
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"loadCargo\"-message!");
-                        completed = true;
-                    }
+                    AIMessage.askLoadCargo(getAIUnit(), goods);
                 }
             }
         } else {

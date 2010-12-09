@@ -36,12 +36,8 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.SellGoodsMessage;
-import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
@@ -170,24 +166,12 @@ public abstract class Mission extends AIObject {
     }
 
 
-    protected void moveUnitToAmerica(Connection connection, Unit unit) {
-        Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
-        moveToAmericaElement.setAttribute("unit", unit.getId());
-        try {
-            connection.sendAndWait(moveToAmericaElement);
-        } catch (IOException e) {
-            logger.warning("Could not send \"moveToAmericaElement\"-message!");
-        }
+    protected void moveUnitToAmerica() {
+        AIMessage.askMoveToAmerica(aiUnit);
     }
     
-    protected void moveUnitToEurope(Connection connection, Unit unit) {
-        Element moveToAmericaElement = Message.createNewRootElement("moveToEurope");
-        moveToAmericaElement.setAttribute("unit", unit.getId());
-        try {
-            connection.sendAndWait(moveToAmericaElement);
-        } catch (IOException e) {
-            logger.warning("Could not send \"moveToAmericaElement\"-message!");
-        }
+    protected void moveUnitToEurope() {
+        AIMessage.askMoveToEurope(aiUnit);
     }
     
     
@@ -195,24 +179,6 @@ public abstract class Mission extends AIObject {
         if (direction != null) {
             if (getUnit().getMoveType(direction).isProgress()) {
                 AIMessage.askMove(aiUnit, direction);
-            }
-        }
-    }
-    
-    /**
-     * Makes the unit explore the lost city rumour located on it's current
-     * <code>Tile</code> (if any).
-     *  
-     * @param connection The <code>Connection</code> to make the request on.
-     */
-    protected void exploreLostCityRumour(Connection connection) {
-        if (getUnit().getTile().hasLostCityRumour()) {           
-            Element exploreElement = Message.createNewRootElement("explore");
-            exploreElement.setAttribute("unit", getUnit().getId());       
-            try {
-                connection.ask(exploreElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"explore\"-message!");
             }
         }
     }
@@ -369,35 +335,18 @@ public abstract class Mission extends AIObject {
         }
     }
     
-    protected boolean unloadCargoInColony(Connection connection, Unit carrier, Goods goods) {
-        UnloadCargoMessage message = new UnloadCargoMessage(goods);
-        try {
-            connection.sendAndWait(message.toXMLElement());
-        } catch (IOException e) {
-            logger.warning("Could not send \"" + UnloadCargoMessage.getXMLElementTagName()
-                           + "\"-message!");
-            return false;
-        }
-        return true;
+    protected boolean unloadCargoInColony(Goods goods) {
+        return AIMessage.askUnloadCargo(aiUnit, goods);
     }
 
-    protected boolean sellCargoInEurope(Connection connection, Unit carrier, Goods goods) {
-        // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
-        Player p = carrier.getOwner();
+    protected boolean sellCargoInEurope(Goods goods) {
+        // CHEAT: Remove when the AI is good enough
+        Player p = getUnit().getOwner();
         if (p.isAI() && getAIMain().getFreeColServer().isSingleplayer()) {
             // Double the income by adding this bonus:
             p.modifyGold(p.getMarket().getSalePrice(goods));
         }
-        // END: TODO-AI-CHEATING.
-        SellGoodsMessage message = new SellGoodsMessage(goods, carrier);
-        try {
-            connection.sendAndWait(message.toXMLElement());
-        } catch (IOException e) {
-            logger.warning("Could not send \"" + SellGoodsMessage.getXMLElementTagName()
-                           + "\"-message!");
-            return false;
-        }
-        return true;
+        return AIMessage.askSellGoods(aiUnit, goods);
     }
     
     /**
@@ -475,30 +424,13 @@ public abstract class Mission extends AIObject {
     }
 
 
-    protected boolean unitLeavesShip(Connection connection, Unit unit) {
-        DisembarkMessage message = new DisembarkMessage(unit);
-        try {
-            connection.sendAndWait(message.toXMLElement());
-        } catch (IOException e) {
-            logger.warning("Could not send \"" + DisembarkMessage.getXMLElementTagName()
-                           + "\"-message to the server!");
-            return false;
-        }
-        return true;
+    protected boolean unitLeavesShip(AIUnit aiUnit) {
+        return AIMessage.askDisembark(aiUnit);
     }
     
     public boolean buyGoods(Connection connection, Unit carrier,
                             GoodsType goodsType, int amount) {
-        BuyGoodsMessage message = new BuyGoodsMessage(carrier, goodsType,
-                                                      amount);
-        try {
-            connection.sendAndWait(message.toXMLElement());
-        } catch (IOException e) {
-            logger.warning("Could not send \"" + BuyGoodsMessage.getXMLElementTagName()
-                           + "\"-message to the server.");
-            return false;
-        }
-        return true;
+        return AIMessage.askBuyGoods(aiUnit, goodsType, amount);
     }
     
     public PathNode findNearestColony(Unit unit){

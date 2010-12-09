@@ -38,6 +38,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.GoodsWish;
@@ -48,10 +49,11 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for realizing a <code>Wish</code>.
-* @see Wish
-*/
+ * Mission for realizing a <code>Wish</code>.
+ * @see Wish
+ */
 public class WishRealizationMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
 
@@ -136,16 +138,13 @@ public class WishRealizationMission extends Mission {
                 if (wish.getDestination() instanceof Colony) {
                     Colony colony = (Colony) wish.getDestination();
 
-                    Element workElement = Message.createNewRootElement("work");
-                    workElement.setAttribute("unit", unit.getId());
-                    workElement.setAttribute("workLocation", colony.getVacantWorkLocationFor(getUnit()).getId());
-                    try {
-                        connection.sendAndWait(workElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"work\"-message.");
+                    if (AIMessage.askWork(getAIUnit(), colony.getVacantWorkLocationFor(getUnit()))) {
+                        //getUnit().setLocation(colony);
+                        getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), (AIColony) getAIMain().getAIObject(colony)));
+                    } else {
+                        logger.warning("AIunit " + getAIUnit().getId()
+                                       + " could not work in " + colony.getId());
                     }
-                    //getUnit().setLocation(colony);
-                    getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), (AIColony) getAIMain().getAIObject(colony)));
                 } else {
                     logger.warning("Unknown type of destination for: " + wish);
                 }

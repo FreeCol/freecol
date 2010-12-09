@@ -42,6 +42,8 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.AttackMessage;
+import net.sf.freecol.common.networking.BuyGoodsMessage;
+import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
@@ -49,17 +51,24 @@ import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
+import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
+import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
+import net.sf.freecol.common.networking.MoveToAmericaMessage;
+import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
+import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
+import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -167,6 +176,34 @@ public class AIMessage {
 
 
     /**
+     * An AIUnit buys goods.
+     *
+     * @param aiUnit The <code>AIUnit</code> buys goods.
+     * @param type The <code>GoodsType</code> to buy.
+     * @param amount The amount of goods to buy.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askBuyGoods(AIUnit aiUnit, GoodsType type,
+                                      int amount) {
+        return sendMessage(aiUnit.getConnection(),
+                           new BuyGoodsMessage(aiUnit.getUnit(), type,
+                                               amount));
+    }
+
+
+    /**
+     * An AIUnit cashes in.
+     *
+     * @param aiUnit The <code>AIUnit</code> cashing in.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askCashInTreasureTrain(AIUnit aiUnit) {
+        return sendMessage(aiUnit.getConnection(),
+                           new CashInTreasureTrainMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
      * An AIUnit changes state.
      *
      * @param aiUnit The <code>AIUnit</code> to change the state of.
@@ -209,16 +246,16 @@ public class AIMessage {
     /**
      * Claims a tile for a colony.
      *
-     * @param aiColony The <code>AIColony</code> claiming the tile.
+     * @param connection The <code>Connection</code> to send on.
      * @param tile The <code>Tile</code> to claim.
+     * @param colony The <code>Colony</code> claiming the tile.
      * @param price The price to pay.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askClaimLand(AIColony aiColony, Tile tile,
-                                       int price) {
-        return sendMessage(aiColony.getConnection(),
-                           new ClaimLandMessage(tile, aiColony.getColony(),
-                                                price));
+    public static boolean askClaimLand(Connection conn, Tile tile,
+                                       Colony colony, int price) {
+        return sendMessage(conn,
+                           new ClaimLandMessage(tile, colony, price));
     }
 
 
@@ -262,6 +299,31 @@ public class AIMessage {
         return sendMessage(aiUnit.getConnection(),
                            new DeliverGiftMessage(aiUnit.getUnit(),
                                                   settlement, goods));
+    }
+
+
+    /**
+     * An AIUnit disembarks.
+     *
+     * @param aiUnit The <code>AIUnit</code> delivering the gift.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askDisembark(AIUnit aiUnit) {
+        return sendMessage(aiUnit.getConnection(),
+                           new DisembarkMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
+     * An AIUnit embarks.
+     *
+     * @param aiUnit The <code>AIUnit</code> carrier.
+     * @param unit The <code>Unit</code> that is embarking.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askEmbark(AIUnit aiUnit, Unit unit) {
+        return sendMessage(aiUnit.getConnection(),
+                           new EmbarkMessage(unit, aiUnit.getUnit(), null));
     }
 
 
@@ -358,6 +420,19 @@ public class AIMessage {
 
 
     /**
+     * An AI unit loads some cargo.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is loading.
+     * @param goods The <code>Goods</code> to load.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askLoadCargo(AIUnit aiUnit, Goods goods) {
+        return sendMessage(aiUnit.getConnection(),
+                           new LoadCargoMessage(goods, aiUnit.getUnit()));
+    }
+
+
+    /**
      * Moves an AIUnit in the given direction.
      *
      * @param aiUnit The <code>AIUnit</code> to move.
@@ -371,6 +446,30 @@ public class AIMessage {
 
 
     /**
+     * Moves an AIUnit to America.
+     *
+     * @param aiUnit The <code>AIUnit</code> to move.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askMoveToAmerica(AIUnit aiUnit) {
+        return sendMessage(aiUnit.getConnection(),
+                           new MoveToAmericaMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
+     * Moves an AIUnit to Europe.
+     *
+     * @param aiUnit The <code>AIUnit</code> to move.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askMoveToEurope(AIUnit aiUnit) {
+        return sendMessage(aiUnit.getConnection(),
+                           new MoveToEuropeMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
      * An AIUnit is put outside a colony.
      *
      * @param aiUnit The <code>AIUnit</code> to put out.
@@ -379,6 +478,19 @@ public class AIMessage {
     public static boolean askPutOutsideColony(AIUnit aiUnit) {
         return sendMessage(aiUnit.getConnection(),
                            new PutOutsideColonyMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
+     * An AI unit sells some cargo.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is selling.
+     * @param goods The <code>Goods</code> to sell.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askSellGoods(AIUnit aiUnit, Goods goods) {
+        return sendMessage(aiUnit.getConnection(),
+                           new SellGoodsMessage(goods, aiUnit.getUnit()));
     }
 
 
@@ -408,6 +520,19 @@ public class AIMessage {
                                                UnitType type) {
         return sendMessage(connection,
                            new TrainUnitInEuropeMessage(type));
+    }
+
+
+    /**
+     * An AI unit unloads some cargo.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is unloading.
+     * @param goods The <code>Goods</code> to unload.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askUnloadCargo(AIUnit aiUnit, Goods goods) {
+        return sendMessage(aiUnit.getConnection(),
+                           new UnloadCargoMessage(goods));
     }
 
 

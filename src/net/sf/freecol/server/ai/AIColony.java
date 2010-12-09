@@ -792,7 +792,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Check if the tile needs to be claimed from another settlement.
         Tile tile = colonyTile.getWorkTile();
         if (tile.getOwningSettlement() != colony) {
-            if (!AIMessage.askClaimLand(this, tile, 0)
+            if (!AIMessage.askClaimLand(getConnection(), tile, colony, 0)
                 || tile.getOwningSettlement() != colony) {
                 return null; // Claim failed.
             }

@@ -34,10 +34,10 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -144,12 +144,7 @@ public class CashInTreasureTrainMission extends Mission {
         }
         
         if (unit.canCashInTreasureTrain()) {
-        	Message message = new CashInTreasureTrainMessage(unit);
-            try {
-                connection.sendAndWait(message.toXMLElement());
-            } catch (IOException e) {
-                logger.warning("Could not send message: \"cashInTreasureTrain\".");
-            }
+            AIMessage.askCashInTreasureTrain(getAIUnit());
         }
     }
 

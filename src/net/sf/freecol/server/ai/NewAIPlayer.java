@@ -204,27 +204,6 @@ public abstract class NewAIPlayer extends AIObject {
     }
 
     /**
-     * Send an element and ignore IO exceptions. This was used all over the
-     * place, no better use a single method.
-     *
-     * @param element The element.
-     */
-    protected void sendAndWaitSafely(Element element) {
-        logger.finest("Entering method sendAndWaitSafely");
-        try {
-            if (logger.isLoggable(Level.FINER)) {
-                logger.finer("AI player (" + this + ") sending " + element.getTagName() + "...");
-            }
-            getConnection().sendAndWait(element);
-            if (logger.isLoggable(Level.FINER)) {
-                logger.finer("Sent and waited, returning.");
-            }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Couldn't send AI element " + element.getTagName() + "!", e);
-        }
-    }
-
-    /**
      * Send some tiles to update to all players which can see them
      *
      * @param tiles The tiles to update.
