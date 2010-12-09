@@ -4253,7 +4253,8 @@ public final class InGameController implements NetworkConstants {
 
         Tile tile = unit.getTile();
         if (player != tile.getOwner()) {
-            if (!claimLand(tile, null, 0)) return;
+            if (!claimTile(player, tile, null, player.getLandPrice(tile), 0)
+                || player != tile.getOwner()) return;
         }
 
         if (askChangeWorkImprovementType(unit, improvementType)) {
