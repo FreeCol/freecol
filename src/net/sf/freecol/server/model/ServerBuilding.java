@@ -129,10 +129,10 @@ public class ServerBuilding extends Building implements ServerModelObject {
         final GoodsType goodsOutputType = getGoodsOutputType();
 
         String message = (goodsInput + " " +
-                          (goodsInputType == null ? "null" : goodsInputType.getId())
-                          + " ---> "
+                          (goodsInputType == null ? "NULL" : goodsInputType.getId())
+                          + " converts to "
                           + goodsOutput + " " +
-                          (goodsOutputType == null ? "null" : goodsOutputType.getId()));
+                          (goodsOutputType == null ? "NULL" : goodsOutputType.getId()));
         logger.finest(message);
         if (canAutoProduce()) {
             System.out.println(message);

@@ -853,17 +853,22 @@ public class Building extends FreeColGameObject
      */
     private int getMaximumAutoProduction() {
         int available = colony.getGoodsCount(getGoodsOutputType());
+        System.out.println(available + " " + getGoodsOutputType() + " available");
         if (available < getGoodsOutputType().getBreedingNumber()) {
             // we need at least two horses/animals to breed
+            System.out.println("Too few animals to breed");
             return 0;
         }
         Set<Modifier> autoProduction = getType().getModifierSet("model.modifier.autoProduction");
         if (autoProduction.isEmpty()) {
             // this should never be the case
+            logger.warning("Autoprodution modifier set was empty for " + getType().getId());
             return 0;
         } else {
             int result = (int) FeatureContainer.applyModifierSet(available, getGame().getTurn(),
                                                                  autoProduction);
+            System.out.println("Autoproduction is MAX(1,(int) " + FeatureContainer.applyModifierSet(available, getGame().getTurn(),
+                                                                 autoProduction) + ") == " + Math.max(1, result));
             return Math.max(1, result);
         }
     }
