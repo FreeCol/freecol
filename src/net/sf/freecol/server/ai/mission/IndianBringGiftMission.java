@@ -119,6 +119,10 @@ public class IndianBringGiftMission extends Mission {
         readFromXML(in);
     }
 
+    private boolean OK(String ok) {
+        System.err.println(ok);
+        return true;
+    }
     /**
      * Performs the mission.
      * 
@@ -163,8 +167,8 @@ public class IndianBringGiftMission extends Mission {
                 // We have arrived.
                 if (AIMessage.askGetTransaction(getAIUnit(), target)
                     && AIMessage.askDeliverGift(getAIUnit(), target,
-                                                getUnit().getGoodsIterator().next())
-                    && AIMessage.askCloseTransaction(getAIUnit(), target)) {
+                                                getUnit().getGoodsIterator().next())) {
+                    AIMessage.askCloseTransaction(getAIUnit(), target);
                     logger.info("IndianBringGift for " + getUnit().getId()
                                 + " delivered at " + target.getName());
                 } else {

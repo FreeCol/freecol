@@ -1285,13 +1285,13 @@ public final class InGameController extends Controller {
      */
     public Element closeTransaction(ServerPlayer serverPlayer, Unit unit,
                                     Settlement settlement) {
-        if (TransactionSession.lookup(unit, settlement) == null) {
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
+        if (session == null) {
             return Message.clientError("No such transaction session.");
         }
 
         ChangeSet cs = new ChangeSet();
-        TransactionSession session = getTransactionSession(unit, settlement);
-
         // Restore unit movement if no action taken.
         Boolean actionTaken = (Boolean) session.get("actionTaken");
         if (!actionTaken) {

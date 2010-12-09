@@ -129,13 +129,18 @@ public class DeliverGiftMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
-        Settlement settlement;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
+        Settlement settlement;
+        try {
             settlement = server.getAdjacentSettlementSafely(settlementId, unit);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
+
         // Make sure we are trying to deliver something that is there
         if (goods.getLocation() != unit) {
             return Message.createError("server.trade.noGoods", "deliverGift of non-existent goods");
