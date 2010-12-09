@@ -396,11 +396,6 @@ public final class InGameController extends Controller {
             // this session.
             session.put("canSell", unit.getSpaceTaken() != 0);
         }
-
-        // Only keep track of human player sessions.
-        if (!unit.getOwner().isAI()) {
-            TransactionSession.remember(unit, settlement, session);
-        }
         return session;
     }
 
@@ -2353,8 +2348,7 @@ public final class InGameController extends Controller {
 
         // Inform the receiver of the gift.
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
-        if (!receiver.isAI() && receiver.isConnected()
-            && settlement instanceof Colony) {
+        if (receiver.isConnected() && settlement instanceof Colony) {
             cs.add(See.only(receiver), unit);
             cs.add(See.only(receiver), settlement);
             cs.addMessage(See.only(receiver),
