@@ -24,6 +24,4 @@ install/freecol::
 	install -m 644 FreeCol.jar debian/$(cdbs_curpkg)/usr/share/java/$(SOFTWARE)-$(VERSION).jar
 	ln -s $(SOFTWARE)-$(VERSION).jar debian/$(cdbs_curpkg)/usr/share/java/$(SOFTWARE).jar
 	install debian/$(SOFTWARE).sh debian/$(cdbs_curpkg)/usr/bin/$(SOFTWARE)
-	install -m 644 jars/higlayout.jar debian/$(cdbs_curpkg)/usr/share/java/higlayout-1.0.jar
-	ln -s higlayout-1.0.jar debian/$(cdbs_curpkg)/usr/share/java/higlayout.jar
 	cp -r data/ debian/$(cdbs_curpkg)/usr/share/freecol/

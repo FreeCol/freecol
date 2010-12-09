@@ -8,7 +8,6 @@
 #   - the jar file
 #     (prepare with: ant -Dnodata=true -Dnosound=true -Dnojars=true)
 #   - the data files (images, music & sounds)
-#   - the higlayout.jar file
 #   - all files from the freecol/packaging/common directory
 #           (these files will be put in the archive under the freecol directory to make them easily
 #           accessible by the user)
@@ -57,8 +56,7 @@ cp $copyFiles freecol
 #
 filesToArchive=`\
     find freecol/data ! -path '*CVS*' -type f -printf '%p ';\
-    find freecol/FreeCol.jar -type f -printf '%p ';\
-    find freecol/jars/higlayout.jar`
+    find freecol/FreeCol.jar -type f -printf '%p '`
 for i in $commonFiles; do
     filesToArchive="$filesToArchive freecol/$i"
 done

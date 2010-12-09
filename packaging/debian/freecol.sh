@@ -27,9 +27,9 @@ if [ "$JAVA_HOME" ] ; then
   done
 
   if [ "$FOUND" == "true" ]; then
-      $JAVACMD -cp /usr/share/java/freecol.jar:/usr/share/java/higlayout.jar net.sf.freecol.FreeCol "$@"
+      $JAVACMD -cp /usr/share/java/freecol.jar net.sf.freecol.FreeCol "$@"
   else
-      $JAVACMD -cp /usr/share/java/freecol.jar:/usr/share/java/higlayout.jar net.sf.freecol.FreeCol "$@" --freecol-data /usr/share/freecol/data
+      $JAVACMD -cp /usr/share/java/freecol.jar net.sf.freecol.FreeCol "$@" --freecol-data /usr/share/freecol/data
   fi
 
 else

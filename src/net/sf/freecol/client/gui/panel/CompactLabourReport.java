@@ -195,7 +195,6 @@ public final class CompactLabourReport extends ReportPanel {
 
             JButton unitButton = createUnitNameButton(unitData.getUnitName(), unitData);
             int rows = unitData.getUnitSummaryRowCount();
-            //ensureHeight(higLayout, unitButton.getPreferredSize().height, row, rows, minHeight);
             reportPanel.add(unitButton, "cell " + COLONY_COLUMN + " " + row + " " + 1 + " " + rows);
 
             if (unitData.hasDetails()) {
@@ -211,24 +210,6 @@ public final class CompactLabourReport extends ReportPanel {
             }
         }
     }
-
-    /**
-     * ensures that {@code rows} rows, starting from {@code startRow}, are at least {@code height} heigh
-     *
-     * @param higLayout
-     * @param height    the height we need
-     * @param startRow  from this row on
-     * @param rows      number of rows where the height has to be met
-     * @param minHeight minimum height for each row
-     */
-    /*
-    private void ensureHeight(HIGLayout higLayout, int height, int startRow, int rows, int minHeight) {
-        for (int delta : distribute(height, rows)) {
-            higLayout.setRowHeight(startRow, Math.max(delta, minHeight));
-            startRow++;
-        }
-    }
-    */
 
     /**
      * distributes {@code value}, amount the number of {@code pocketCount}
