@@ -26,7 +26,7 @@
     <property name="test" value="AllTests"/>
     <property name="miglayout.jar" value="jars/miglayout-3.7.3.1-swing.jar"/>
     <property name="cli.jar" value="jars/commons-cli-1.1.jar"/>
-    <property name="cortado.jar" value="jars/cortado-fc-1.0.jar"/>
+    <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 <!--
     <property name="stax.jar" value="jars/stax2-api-3.0.3.jar"/>
     <property name="woodstox.jar" value="jars/woodstox-core-lgpl-4.0.9.jar"/>

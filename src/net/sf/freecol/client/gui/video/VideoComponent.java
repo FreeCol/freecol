@@ -31,7 +31,8 @@ import javax.swing.border.Border;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 
 import com.fluendo.player.Cortado;
-import com.fluendo.player.StopListener;
+// Disable the feature that seems to be missing from the stock Cortado
+// import com.fluendo.player.StopListener;
 
 /**
  * A component for playing video.
@@ -71,17 +72,18 @@ public class VideoComponent extends JPanel {
         applet.setParam ("showStatus", "hide");
         applet.init();
 
-        applet.setStopListener(new StopListener() {
-            public void stopped() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        for (VideoListener sl : videoListeners) {
-                            sl.stopped();
-                        }
-                    }
-                });
-            }
-        });
+        // Disable the feature that seems to be missing from the stock Cortado
+        //applet.setStopListener(new StopListener() {
+        //    public void stopped() {
+        //        SwingUtilities.invokeLater(new Runnable() {
+        //            public void run() {
+        //                for (VideoListener sl : videoListeners) {
+        //                    sl.stopped();
+        //                }
+        //            }
+        //        });
+        //    }
+        //});
         
         setLayout(null);
         add(applet);
