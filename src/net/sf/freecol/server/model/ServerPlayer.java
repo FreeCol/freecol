@@ -2622,8 +2622,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         } else {
             for (Goods g : capture) g.setLocation(null);
-            TransactionSession ts = TransactionSession.create(winner, loser);
-            ts.put("lootCargo", capture);
+            TransactionSession.establishLootSession(winner, loser, capture);
             cs.addAttribute(See.only(winnerPlayer), "loot", "true");
         }
         loser.getGoodsContainer().removeAll();

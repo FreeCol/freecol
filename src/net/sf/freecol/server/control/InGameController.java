@@ -367,37 +367,6 @@ public final class InGameController extends Controller {
         return refPlayer;
     }
 
-    /**
-     * Gets a transaction session for a unit trading with a settlement.
-     * Either the current one if it exists or create a fresh one.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return A session describing the transaction.
-     */
-    private TransactionSession getTransactionSession(Unit unit,
-                                                     Settlement settlement) {
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
-        if (session != null) return session;
-
-        // Session does not exist, create, store, and return it.
-        session = TransactionSession.create(unit, settlement);
-        // Default values
-        session.put("actionTaken", false);
-        session.put("unitMoves", unit.getMovesLeft());
-        session.put("canGift", true);
-        if (settlement.getOwner().atWarWith(unit.getOwner())) {
-            session.put("canSell", false);
-            session.put("canBuy", false);
-        } else {
-            session.put("canBuy", true);
-            // The unit took nothing to sell, so nothing should be in
-            // this session.
-            session.put("canSell", unit.getSpaceTaken() != 0);
-        }
-        return session;
-    }
 
     // Client-server communication utilities
 
@@ -1246,15 +1215,15 @@ public final class InGameController extends Controller {
     public Element getTransaction(ServerPlayer serverPlayer, Unit unit,
                                   Settlement settlement) {
         ChangeSet cs = new ChangeSet();
-        TransactionSession session;
-
-        session = TransactionSession.lookup(unit, settlement);
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
         if (session == null) {
             if (unit.getMovesLeft() <= 0) {
                 return Message.clientError("Unit " + unit.getId()
                                            + " has no moves left.");
             }
-            session = getTransactionSession(unit, settlement);
+            session = TransactionSession.establishTradeSession(unit,
+                                                               settlement);
             // Sets unit moves to zero to avoid cheating.  If no
             // action is taken, the moves will be restored when
             // closing the session
@@ -1349,15 +1318,14 @@ public final class InGameController extends Controller {
     public Element buyProposition(ServerPlayer serverPlayer,
                                   Unit unit, Settlement settlement,
                                   Goods goods, int price) {
-        if (TransactionSession.lookup(unit, settlement) == null) {
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
+        if (session == null) {
             return Message.clientError("Proposing to buy without opening a transaction session?!");
         }
-        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canBuy")) {
             return Message.clientError("Proposing to buy in a session where buying is not allowed.");
         }
-
-        ChangeSet cs = new ChangeSet();
 
         // AI considers the proposition, return with a gold value
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain()
@@ -1365,7 +1333,9 @@ public final class InGameController extends Controller {
         int gold = ai.buyProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
-        cs.addAttribute(See.only(serverPlayer), "gold", Integer.toString(gold));
+        ChangeSet cs = new ChangeSet();
+        cs.addAttribute(See.only(serverPlayer),
+                        "gold", Integer.toString(gold));
         return cs.build(serverPlayer);
     }
 
@@ -1382,15 +1352,14 @@ public final class InGameController extends Controller {
     public Element sellProposition(ServerPlayer serverPlayer,
                                    Unit unit, Settlement settlement,
                                    Goods goods, int price) {
-        if (TransactionSession.lookup(unit, settlement) == null) {
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
+        if (session == null) {
             return Message.clientError("Proposing to sell without opening a transaction session");
         }
-        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canSell")) {
             return Message.clientError("Proposing to sell in a session where selling is not allowed.");
         }
-
-        ChangeSet cs = new ChangeSet();
 
         // AI considers the proposition, return with a gold value
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain()
@@ -1398,8 +1367,9 @@ public final class InGameController extends Controller {
         int gold = ai.sellProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
-        cs.addAttribute(See.only(serverPlayer), "gold", Integer.toString(gold));
-
+        ChangeSet cs = new ChangeSet();
+        cs.addAttribute(See.only(serverPlayer),
+                        "gold", Integer.toString(gold));
         return cs.build(serverPlayer);
     }
 
@@ -2205,31 +2175,30 @@ public final class InGameController extends Controller {
     public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
-        if (TransactionSession.lookup(unit, settlement) == null) {
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
+        if (session == null) {
             return Message.clientError("Trying to buy without opening a transaction session");
         }
-        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canBuy")) {
             return Message.clientError("Trying to buy in a session where buying is not allowed.");
         }
         if (unit.getSpaceLeft() <= 0) {
             return Message.clientError("Unit is full, unable to buy.");
         }
-        settlement.makeContactSettlement(serverPlayer);
 
         // Check that this is the agreement that was made
+        settlement.makeContactSettlement(serverPlayer);
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
         int returnGold = ai.buyProposition(unit, settlement, goods, amount);
         if (returnGold != amount) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
         }
-        // Check this is funded.
-        if (serverPlayer.getGold() < amount) {
+        if (serverPlayer.getGold() < amount) { // Check this is funded.
             return Message.clientError("Insufficient gold to buy.");
         }
 
         ChangeSet cs = new ChangeSet();
-
         // Valid, make the trade.
         moveGoods(goods, unit);
         cs.add(See.perhaps(), unit);
@@ -2266,15 +2235,16 @@ public final class InGameController extends Controller {
     public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement,
                                     Goods goods, int amount) {
-        if (TransactionSession.lookup(unit, settlement) == null) {
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
+        if (session == null) {
             return Message.clientError("Trying to sell without opening a transaction session");
         }
-        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canSell")) {
             return Message.clientError("Trying to sell in a session where selling is not allowed.");
         }
-        settlement.makeContactSettlement(serverPlayer);
 
+        settlement.makeContactSettlement(serverPlayer);
         // Check that the gold is the agreed amount
         AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
         int returnGold = ai.sellProposition(unit, settlement, goods, amount);
@@ -2283,7 +2253,6 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-
         // Valid, make the trade.
         moveGoods(goods, settlement);
         cs.add(See.perhaps(), unit);
@@ -2320,10 +2289,11 @@ public final class InGameController extends Controller {
     public Element deliverGiftToSettlement(ServerPlayer serverPlayer,
                                            Unit unit, Settlement settlement,
                                            Goods goods) {
-        if (TransactionSession.lookup(unit, settlement) == null) {
+        TransactionSession session
+            = TransactionSession.lookup(unit, settlement);
+        if (session == null) {
             return Message.clientError("Trying to deliverGift without opening a transaction session");
         }
-        TransactionSession session = getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canGift")) {
             return Message.clientError("Trying to deliver gift in a session where gift giving is not allowed.");
         }
@@ -2774,9 +2744,9 @@ public final class InGameController extends Controller {
     private Element rejectTrade(ServerPlayer serverPlayer, ServerPlayer other,
                                 Unit unit, Settlement settlement,
                                 DiplomaticTrade agreement) {
-        ChangeSet cs = new ChangeSet();
-
         TransactionSession.forget(unit, settlement);
+
+        ChangeSet cs = new ChangeSet();
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                new DiplomacyMessage(unit, settlement, agreement));
@@ -2831,7 +2801,11 @@ public final class InGameController extends Controller {
 
         case PROPOSE_TRADE:
             current = agreement;
-            session = TransactionSession.find(unit, settlement);
+            session = TransactionSession.lookup(unit, settlement);
+            if (session == null) {
+                session = TransactionSession
+                    .establishDiplomacySession(unit, settlement);
+            }
             session.put("agreement", agreement);
 
             // If the unit is on a carrier we need to update the
@@ -2961,6 +2935,9 @@ public final class InGameController extends Controller {
     /**
      * Loot cargo.
      *
+     * Note loser is passed by id, as by the time we get here the unit
+     * may have been sunk.
+     *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the winner.
      * @param winner The <code>Unit</code> that looting.
      * @param loserId The id of the <code>Unit</code> that is looted.
@@ -2989,11 +2966,13 @@ public final class InGameController extends Controller {
             TransactionSession.forget(winner.getId(), loserId);
             for (Goods g : loot) {
                 if (!available.contains(g)) {
-                    return Message.clientError("Invalid loot: " + g.toString());
+                    return Message.clientError("Invalid loot: "
+                                               + g.toString());
                 }
                 available.remove(g);
                 if (!winner.canAdd(g)) {
-                    return Message.clientError("Loot failed: " + g.toString());
+                    return Message.clientError("Loot failed: "
+                                               + g.toString());
                 }
                 winner.add(g);
             }

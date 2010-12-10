@@ -51,6 +51,7 @@ import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.TransactionSession;
 
 
 /**
@@ -226,6 +227,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
+        TransactionSession.clearAll();
         setTurn(getTurn().next());
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));

@@ -21,24 +21,26 @@
 package net.sf.freecol.server.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
  * Convenience wrapper class for the map that underlies
  * transaction sessions.
- * TODO: This is leaky, fix.
- * TODO: Relax server restriction on AI transactions?
  */
 public class TransactionSession {
 
     private static final Logger logger = Logger.getLogger(TransactionSession.class.getName());
 
-    private static Map<String, Map<String, TransactionSession>> allSessions
+    private static final Map<String, Map<String, TransactionSession>> allSessions
         = new HashMap<String, Map<String, TransactionSession>>();
 
     private Map<String, Object> session;
@@ -48,25 +50,81 @@ public class TransactionSession {
         session = new HashMap<String, Object>();
     }
 
-    public Object get(String id) {
-        return session.get(id);
-    }
-
-    public void put(String id, Object val) {
-        session.put(id, val);
-    }
-
     /**
-     * Looks up the TransactionSession unique to the specified fcgos in
-     * allSessions.
+     * Create and remember a new TransactionSession unique to the
+     * specified ids.
      *
      * @param o1 First <code>FreeColGameObject</code>.
      * @param o2 Second <code>FreeColGameObject</code>.
-     * @return The transaction session, or null if not found.
+     * @return The transaction session.
      */
-    public static TransactionSession lookup(FreeColGameObject o1,
-                                            FreeColGameObject o2) {
-        return TransactionSession.lookup(o1.getId(), o2.getId());
+    private static TransactionSession create(FreeColGameObject o1,
+                                             FreeColGameObject o2) {
+        Map<String, TransactionSession> base = allSessions.get(o1.getId());
+        if (base == null) {
+            base = new HashMap<String, TransactionSession>();
+            allSessions.put(o1.getId(), base);
+        } else {
+            if (base.containsKey(o2.getId())) base.remove(o2.getId());
+        }
+        TransactionSession session = new TransactionSession();
+        base.put(o2.getId(), session);
+        return session;
+    }
+
+
+    // Public interface
+    /**
+     * Clear all transactions.  Useful at the start of turn.
+     */
+    public static void clearAll() {
+        for (Map<String, TransactionSession> s : allSessions.values()) {
+            s.clear();
+        }
+        allSessions.clear();
+    }
+
+    /**
+     * Establish a "diplomacy" session.
+     *
+     * @param unit The <code>Unit</code> that is visiting a settlement.
+     * @param settlement The <code>Settlement</code> to be visited.
+     */
+    public static TransactionSession establishDiplomacySession(Unit unit, Settlement settlement) {
+        TransactionSession ts = TransactionSession.create(unit, settlement);
+        return ts;
+    }
+
+    /**
+     * Establish a "loot" session.
+     *
+     * @param winner The <code>Unit</code> that is looting.
+     * @param loser The <code>Unit</code> to be looted.
+     * @param capture The <code>Goods</code> to choose from.
+     */
+    public static TransactionSession establishLootSession(Unit winner,
+                                                          Unit loser,
+                                                          List<Goods> capture) {
+        TransactionSession ts = TransactionSession.create(winner, loser);
+        ts.put("lootCargo", capture);
+        return ts;
+    }
+
+    /**
+     * Establish a "trade" session.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> to trade with.
+     */
+    public static TransactionSession establishTradeSession(Unit unit, Settlement settlement) {
+        TransactionSession ts = TransactionSession.create(unit, settlement);
+        ts.put("actionTaken", false);
+        ts.put("unitMoves", unit.getMovesLeft());
+        boolean atWar = settlement.getOwner().atWarWith(unit.getOwner());
+        ts.put("canBuy", !atWar);
+        ts.put("canSell", !atWar && unit.getSpaceTaken() > 0);
+        ts.put("canGift", true);
+        return ts;
     }
 
     /**
@@ -83,80 +141,19 @@ public class TransactionSession {
     }
 
     /**
-     * Create and remember a new TransactionSession unique to the
-     * specified ids.
+     * Looks up the TransactionSession unique to the specified game objects.
      *
      * @param o1 First <code>FreeColGameObject</code>.
      * @param o2 Second <code>FreeColGameObject</code>.
-     * @return The transaction session.
+     * @return The transaction session, or null if not found.
      */
-    public static TransactionSession create(FreeColGameObject o1,
+    public static TransactionSession lookup(FreeColGameObject o1,
                                             FreeColGameObject o2) {
-        Map<String, TransactionSession> base = allSessions.get(o1.getId());
-        if (base == null) {
-            base = new HashMap<String, TransactionSession>();
-            allSessions.put(o1.getId(), base);
-        } else {
-            if (base.containsKey(o2.getId())) base.remove(o2.getId());
-        }
-        TransactionSession session = new TransactionSession();
-        base.put(o2.getId(), session);
-        return session;
+        return TransactionSession.lookup(o1.getId(), o2.getId());
     }
 
     /**
-     * Find a TransactionSession unique to the specified ids, or
-     * create and remember a new one.
-     *
-     * @param o1 First <code>FreeColGameObject</code>.
-     * @param o2 Second <code>FreeColGameObject</code>.
-     * @return The transaction session.
-     */
-    public static TransactionSession find(FreeColGameObject o1,
-                                          FreeColGameObject o2) {
-        Map<String, TransactionSession> base = allSessions.get(o1.getId());
-        if (base == null) {
-            base = new HashMap<String, TransactionSession>();
-            allSessions.put(o1.getId(), base);
-        }
-        TransactionSession session = base.get(o2.getId());
-        if (session == null) {
-            session = new TransactionSession();
-            base.put(o2.getId(), session);
-        }
-        return session;
-    }
-
-    /**
-     * Remember a TransactionSession (save to allSessions).
-     *
-     * @param o1 First <code>FreeColGameObject</code>.
-     * @param o2 Second <code>FreeColGameObject</code>.
-     * @param session The <code>TransactionSession</code> to save.
-     */
-    public static void remember(FreeColGameObject o1,
-                                FreeColGameObject o2,
-                                TransactionSession session) {
-        Map<String, TransactionSession> base = allSessions.get(o1.getId());
-        if (base == null) {
-            base = new HashMap<String, TransactionSession>();
-            allSessions.put(o1.getId(), base);
-        }
-        base.put(o2.getId(), session);
-    }
-
-    /**
-     * Forget a TransactionSession (remove from allSessions).
-     *
-     * @param o1 First <code>FreeColGameObject</code>.
-     * @param o2 Second <code>FreeColGameObject</code>.
-     */
-    public static void forget(FreeColGameObject o1, FreeColGameObject o2) {
-        TransactionSession.forget(o1.getId(), o2.getId());
-    }
-
-    /**
-     * Forget a TransactionSession (remove from allSessions).
+     * Forget a TransactionSession.
      *
      * @param id1 The first id.
      * @param id2 The second id.
@@ -168,4 +165,35 @@ public class TransactionSession {
             if (base.isEmpty()) allSessions.remove(id1);
         }
     }
+
+    /**
+     * Forget a TransactionSession.
+     *
+     * @param o1 First <code>FreeColGameObject</code>.
+     * @param o2 Second <code>FreeColGameObject</code>.
+     */
+    public static void forget(FreeColGameObject o1, FreeColGameObject o2) {
+        TransactionSession.forget(o1.getId(), o2.getId());
+    }
+
+    /**
+     * Gets a property from a TransactionSession.
+     *
+     * @param id The property id to query.
+     * @return The requested property.
+     */
+    public Object get(String id) {
+        return session.get(id);
+    }
+
+    /**
+     * Puts a property into a TransactionSession.
+     *
+     * @param id The property id to set.
+     * @param val The property to set.
+     */
+    public void put(String id, Object val) {
+        session.put(id, val);
+    }
+
 }
