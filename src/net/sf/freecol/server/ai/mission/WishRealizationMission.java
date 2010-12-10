@@ -202,6 +202,7 @@ public class WishRealizationMission extends Mission {
     *         and <code>false</code> otherwise.
     */
     public boolean isValid() {
+        if (wish == null) return false;
         Location l = wish.getDestination();
         if (l == null) {
             return false;
