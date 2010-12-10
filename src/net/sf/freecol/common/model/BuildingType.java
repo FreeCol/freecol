@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -191,6 +193,23 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         } catch(Exception e) {
             // no such ability, we don't care
         }
+        try {
+            if (!getModifierSet("model.modifier.warehouseStorage").isEmpty()) {
+                if (getModifierSet("model.modifier.storeSurplus").isEmpty()) {
+                    Modifier modifier = new Modifier("model.modifier.storeSurplus", 0.5f,
+                                                     Modifier.Type.MULTIPLICATIVE);
+                    Scope scope = new Scope();
+                    scope.setType("model.goods.food");
+                    List<Scope> scopes = new ArrayList<Scope>();
+                    scopes.add(scope);
+                    modifier.setScopes(scopes);
+                    addModifier(modifier);
+                }
+            }
+        } catch(Exception e) {
+            // no such modifier, we don't care
+        }
+
     }
     // end compatibility code
 

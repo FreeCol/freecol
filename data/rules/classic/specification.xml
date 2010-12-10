@@ -1120,6 +1120,9 @@
     </building-type>
     <building-type id="model.building.depot" workplaces="0" sequence="13">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
+      <modifier id="model.modifier.storeSurplus" type="multiplicative" value="0.5">
+        <scope type="model.goods.food"/>
+      </modifier>
     </building-type>
     <building-type id="model.building.warehouse" extends="model.building.depot"
                    upgradesFrom="model.building.depot" upkeep="5">

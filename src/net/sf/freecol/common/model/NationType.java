@@ -95,6 +95,7 @@ public abstract class NationType extends FreeColGameObjectType {
         }
         return null;
     }
+
     /**
      * Whether this is a EuropeanNation, i.e. a player or a REF.
      *

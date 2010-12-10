@@ -598,16 +598,28 @@ public class Building extends FreeColGameObject
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
+        int available = getStoredInput() + colony.getProductionNextTurn(getGoodsInputType());
+        return getGoodsInputNextTurn(available);
+    }
+
+    /**
+     * Returns the amount of goods being used to get the current
+     * {@link #getProduction production} at the next turn.
+     *
+     * @param available the amount of input goods available
+     * @return The actual amount of goods that will be used to support the
+     *         production at the next turn.
+     * @see #getMaximumGoodsInput
+     * @see #getProduction
+     */
+    public int getGoodsInputNextTurn(int available) {
         GoodsType inputType = getGoodsInputType();
         if (inputType == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return (inputType == getSpecification().getPrimaryFoodType())
-                ? getFoodInputAuto()
-                : getGoodsInputAuto(colony.getProductionNextTurn(inputType));
+            return getGoodsInputAuto(available);
         } else {
-            return Math.min(getMaximumGoodsInput(), getStoredInput()
-                            + colony.getProductionNextTurn(inputType));
+            return Math.min(getMaximumGoodsInput(), available);
         }
     }
 
@@ -706,7 +718,7 @@ public class Building extends FreeColGameObject
      */
     public int getProductionNextTurn() {
         if (canAutoProduce()) {
-            return getAutoProduction(getGoodsInputNextTurn());
+            return getAutoProduction(colony.getProductionNextTurn(getGoodsInputType()));
         } else if (getGoodsInputType() == null) {
             return getProductionAdding(0);
         } else {
@@ -849,7 +861,10 @@ public class Building extends FreeColGameObject
     }
 
     /**
-     * Returns the maximum production of a building with 0 workplaces
+     * Returns the maximum production of a building that breeds
+     * animals.
+     *
+     * TODO: make this more generic
      */
     private int getMaximumAutoProduction() {
         int available = colony.getGoodsCount(getGoodsOutputType());
@@ -859,18 +874,11 @@ public class Building extends FreeColGameObject
             System.out.println("Too few animals to breed");
             return 0;
         }
-        Set<Modifier> autoProduction = getType().getModifierSet("model.modifier.autoProduction");
-        if (autoProduction.isEmpty()) {
-            // this should never be the case
-            logger.warning("Autoprodution modifier set was empty for " + getType().getId());
-            return 0;
-        } else {
-            int result = (int) FeatureContainer.applyModifierSet(available, getGame().getTurn(),
-                                                                 autoProduction);
-            System.out.println("Autoproduction is MAX(1,(int) " + FeatureContainer.applyModifierSet(available, getGame().getTurn(),
-                                                                 autoProduction) + ") == " + Math.max(1, result));
-            return Math.max(1, result);
-        }
+
+        int result = (int) getType().getFeatureContainer()
+            .applyModifier(available, "model.modifier.autoProduction");
+        System.out.println("Maximum autoproduction is " + Math.max(1, result));
+        return Math.max(1, result);
     }
 
     /**
