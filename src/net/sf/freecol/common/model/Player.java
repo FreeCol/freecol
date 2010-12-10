@@ -2288,7 +2288,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getOutpostValue(Tile t) {
         Market market = getMarket();
-        if (t.getType().canSettle() && t.getSettlement() == null) {
+        if (canClaimToFoundSettlement(t)) {
             boolean nearbyTileIsOcean = false;
             float advantages = 1f;
             int value = 0;
@@ -2392,7 +2392,7 @@ public class Player extends FreeColGameObject implements Nameable {
         //----- END MAGIC NUMBERS
 
         //return 0 if a colony can't be built on tile t
-        if (!t.getType().canSettle() || t.getSettlement() != null) {
+        if (!canClaimToFoundSettlement(t)) {
             return 0;
         }
 
