@@ -426,18 +426,24 @@ public final class InGameController implements NetworkConstants {
                 : 0;
         }
 
+        // TODO: fix this non-OO nastiness
+        private String change(FreeColGameObject fcgo) {
+            return (fcgo instanceof Tile) ? Tile.UNIT_CHANGE
+                : (fcgo instanceof ColonyTile) ? ColonyTile.UNIT_CHANGE
+                : (fcgo instanceof Building) ? Building.UNIT_CHANGE
+                : null;
+        }
+
         /**
          * Fire any property changes resulting from actions of a unit.
          */
         public void fireChanges() {
             Location newLoc = unit.getLocation();
             if (loc != newLoc) {
-                // Note: exploiting the accident that Building.UNIT_CHANGE
-                // == ColonyTile.UNIT_CHANGE
                 FreeColGameObject oldFcgo = (FreeColGameObject) loc;
-                oldFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
+                oldFcgo.firePropertyChange(change(oldFcgo), unit, null);
                 FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
-                newFcgo.firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+                newFcgo.firePropertyChange(change(newFcgo), null, unit);
             }
             if (colony != null) {
                 GoodsType newWork = unit.getWorkType();
