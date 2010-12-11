@@ -70,6 +70,7 @@ public class VideoComponent extends JPanel {
         applet.setParam ("kateIndex", "0");
         applet.setParam ("bufferSize", "200");
         applet.setParam ("showStatus", "hide");
+        applet.setParam ("debug", "0");
         applet.init();
 
         // Disable the feature that seems to be missing from the stock Cortado
