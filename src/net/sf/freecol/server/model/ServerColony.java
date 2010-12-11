@@ -222,6 +222,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 }
             }
             surplus -= foodRequired;
+            System.out.println("----------------------------------------");
             System.out.println("Food surplus in " + getName() + " is " + surplus);
 
             if (surplus > 0) {
@@ -252,8 +253,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
             }
-            System.out.println("----------------------------------------");
-
         }
 
         // convert all food types to food (or whatever)
