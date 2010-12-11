@@ -302,7 +302,8 @@ public abstract class Feature extends FreeColObject {
         String sourceId = in.getAttributeValue(null, "source");
         if (sourceId == null) {
             setSource(null);
-        } else if (sourceId.equals("model.monarch.colonyGoodsParty")) {
+        } else if (sourceId.equals("model.colony.colonyGoodsParty")
+                   || sourceId.equals("model.monarch.colonyGoodsParty")) {
             // TODO: remove this backward compatibility for < 0.10.x games.
             setSource(specification.getType("model.source.colonyGoodsParty"));
         } else if (specification != null) {
