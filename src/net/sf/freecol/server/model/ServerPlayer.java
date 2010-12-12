@@ -801,6 +801,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csBuy(GoodsContainer container, GoodsType type, int amount,
                       Random random, ChangeSet cs)
         throws IllegalStateException {
+        logger.finest(getName() + "buys " + amount + " " + type);
         Market market = getMarket();
         int price = market.getBidPrice(type, amount);
         if (price > getGold()) {
@@ -846,6 +847,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csSell(GoodsContainer container, GoodsType type, int amount,
                        Random random, ChangeSet cs) {
+        logger.finest(getName() + "sells " + amount + " " + type);
         Market market = getMarket();
         int tax = getTax();
         int incomeBeforeTaxes = market.getSalePrice(type, amount);
@@ -1190,6 +1192,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
                 if (amount > 0) {
                     market.addGoodsToMarket(type, -amount);
+                    logger.finest(getName() + " removal of " + amount
+                                  + " " + type
+                                  + ", total: " + market.getAmountInMarket(type));
                 }
             }
             if (market.hasPriceChanged(type)) {

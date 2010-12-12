@@ -2216,6 +2216,8 @@ public final class InGameController extends Controller {
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
         session.put("canBuy", false);
+        logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
+                      + " at " + settlement.getName() + " for " + amount);
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, cs);
@@ -2272,6 +2274,8 @@ public final class InGameController extends Controller {
         session.put("canSell", false);
         cs.addSale(serverPlayer, settlement, goods.getType(),
                    (int) Math.round((float) amount / goods.getAmount()));
+        logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
+                      + " at " + settlement.getName() + " for " + amount);
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, cs);
