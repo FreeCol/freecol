@@ -577,17 +577,6 @@ public class Building extends FreeColGameObject
         }
     }
 
-    private int getFoodInputAuto() {
-        GoodsType foodType = getSpecification().getPrimaryFoodType();
-        int amount = 0;
-        for (GoodsType type : getSpecification().getFoodGoodsTypeList()) {
-            if (foodType != type) {
-                amount += colony.getProductionNextTurn(type);
-            }
-        }
-        return getGoodsInputAuto(amount - colony.getFoodConsumption());
-    }
-
     /**
      * Returns the amount of goods being used to get the current
      * {@link #getProduction production} at the next turn.
@@ -598,7 +587,10 @@ public class Building extends FreeColGameObject
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        int available = getStoredInput() + colony.getProductionNextTurn(getGoodsInputType());
+        int available = colony.getProductionNextTurn(getGoodsInputType());
+        if (!canAutoProduce()) {
+            available += getStoredInput();
+        }
         return getGoodsInputNextTurn(available);
     }
 
@@ -635,17 +627,7 @@ public class Building extends FreeColGameObject
                 // warehouse is already full
                 return 0;
             } else {
-                int surplus = available;
-                // we need to take into consideration the residents consumption
-                if (getGoodsInputType().isFoodType()) {
-                    surplus -= colony.getFoodConsumption();
-                    if (surplus <= 0) {
-                        return 0;
-                    }
-                    // half of the surplus food, rounded down, is stored
-                    surplus = (int) Math.ceil(surplus / 2.0);
-                }
-               return surplus;
+                return available;
             }
         }
     }
@@ -718,7 +700,12 @@ public class Building extends FreeColGameObject
      */
     public int getProductionNextTurn() {
         if (canAutoProduce()) {
-            return getAutoProduction(colony.getProductionNextTurn(getGoodsInputType()));
+            int rawInput = colony.getSurplusFoodProduction(getGoodsInputType());
+            int input = getGoodsInputAuto(rawInput);
+            int output = getAutoProduction(input);
+            System.out.println("Raw input: " + rawInput + ", input: " + input
+                               + " --> " + output);
+            return output;
         } else if (getGoodsInputType() == null) {
             return getProductionAdding(0);
         } else {

@@ -226,8 +226,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             System.out.println("Food surplus in " + getName() + " is " + surplus);
 
             if (surplus > 0) {
-                // TODO: move surplus storage to specification
-                surplus /= 2;
+                // TODO: make more generic
+                surplus = Math.max(0, surplus - storedSurplus(spec.getPrimaryFoodType(), surplus));
                 System.out.println("Surplus after storage is " + surplus);
             }
 

@@ -1398,7 +1398,12 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         int used = getConsumptionOf(goodsType);
         Building bldg = getBuildingForConsuming(goodsType);
         if (bldg != null) {
-            used += bldg.getGoodsInputNextTurn();
+            if (goodsType.isBreedable()) {
+                // TODO: make this more generic
+                used += bldg.getGoodsInputNextTurn(getSurplusFoodProduction(goodsType));
+            } else {
+                used += bldg.getGoodsInputNextTurn();
+            }
         }
 
         if (goodsType.isStorable()) {

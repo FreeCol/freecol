@@ -426,20 +426,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         // food
         List<AbstractGoods> ratios;
         List<GoodsType> goodsTypes = spec.getFoodGoodsTypeList();
-        for (GoodsType goodsType : goodsTypes) {
-            gross += getColony().getProductionOf(goodsType);
-            net += getColony().getProductionNetOf(goodsType);
-        }
-        System.out.println("gross: " + gross + ", net: " + net);
+        // TODO: make this generic
+        net = colony.getFoodProduction() - colony.getFoodConsumption();
+        net -= colony.getProductionNetOf(spec.getGoodsType("model.goods.horses"));
         if (net != 0) {
             GoodsType goodsType = spec.getPrimaryFoodType();
             netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-//            ratios = new ArrayList<AbstractGoods>();
-//            for (GoodsType goodsType : goodsTypes) {
-//                // get food production proportions so we can represent surplus in the same ratios
-//                ratios.add(new AbstractGoods(goodsType, colony.getProductionOf(goodsType) * net / gross));
-//            }
-//            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
         }
 
         // liberty
@@ -452,11 +444,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (net != 0) {
             GoodsType goodsType = spec.getGoodsType("model.goods.bells");
             netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-//            ratios = new ArrayList<AbstractGoods>();
-//            for (GoodsType goodsType : goodsTypes) {
-//                ratios.add(new AbstractGoods(goodsType, colony.getProductionOf(goodsType) * net / gross));
-//            }
-//            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
         }
 
 
@@ -470,11 +457,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (net != 0) {
             GoodsType goodsType = spec.getGoodsType("model.goods.crosses");
             netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-//            ratios = new ArrayList<AbstractGoods>();
-//            for (GoodsType goodsType : goodsTypes) {
-//                ratios.add(new AbstractGoods(goodsType, colony.getProductionOf(goodsType) * net / gross));
-//            }
-//            netProductionPanel.add(new ProductionMultiplesLabel(ratios, getCanvas()));
         }
 
 
@@ -547,45 +529,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
         }
 
-/*
-        GoodsType grain = getSpecification().getPrimaryFoodType();
-        int food = 0;
-
-        List<AbstractGoods> foodProduction = new ArrayList<AbstractGoods>();
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            int production = colony.getProductionOf(goodsType);
-            if (production != 0) {
-                if (goodsType.isFoodType()) {
-                    foodProduction.add(new AbstractGoods(goodsType, production));
-                    food += production;
-                } else if (goodsType.isBreedable()) {
-                    ProductionLabel horseLabel = new ProductionLabel(goodsType, production, getCanvas());
-                    horseLabel.setMaxGoodsIcons(1);
-                    netProductionPanel.add(horseLabel);
-                } else if (goodsType.isImmigrationType() || goodsType.isLibertyType()) {
-                    int consumption = colony.getConsumption(goodsType);
-                    ProductionLabel bellsLabel = new ProductionLabel(goodsType, production, getCanvas());
-                    bellsLabel.setToolTipPrefix(Messages.message("totalProduction"));
-                    if (consumption != 0) {
-                        int surplus = production - consumption;
-                        ProductionLabel surplusLabel = new ProductionLabel(goodsType, surplus, getCanvas());
-                        surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
-                        netProductionPanel.add(surplusLabel, 0);
-                    }
-                    netProductionPanel.add(bellsLabel, 0);
-                } else {
-                    production = colony.getProductionNetOf(goodsType);
-                    netProductionPanel.add(new ProductionLabel(goodsType, production, getCanvas()));
-                }
-            }
-        }
-
-        netProductionPanel.add(new ProductionLabel(grain, food - colony.getFoodConsumption(), getCanvas()), 0);
-
-        ProductionMultiplesLabel label = new ProductionMultiplesLabel(foodProduction, getCanvas());
-        label.setToolTipPrefix(Messages.message("totalProduction"));
-        netProductionPanel.add(label, 0);
-*/
         netProductionPanel.revalidate();
     }
 

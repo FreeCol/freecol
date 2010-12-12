@@ -604,32 +604,45 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return getConsumptionOf(getSpecification().getFoodGoodsTypeList());
     }
 
+    public int storedSurplus(GoodsType goodsType, int surplus) {
+        Set<Modifier> storeSurplus = featureContainer.getModifierSet("model.modifier.storeSurplus", goodsType);
+        int result = 0;
+        if (!storeSurplus.isEmpty()) {
+            result = (int) featureContainer.applyModifierSet(surplus, getGame().getTurn(), storeSurplus);
+        }
+        System.out.println("stored surplus is " + result + " " + goodsType);
+        return result;
+    }
+
     public int getSurplusProduction(GoodsType goodsType) {
         int result = getProductionOf(goodsType) - getConsumptionOf(goodsType);
         if (result > 0) {
-            Set<Modifier> storeSurplus = featureContainer.getModifierSet("model.modifier.storeSurplus", goodsType);
-            if (!storeSurplus.isEmpty()) {
-                result -= (int) featureContainer.applyModifierSet(result, getGame().getTurn(), storeSurplus);
-                result = Math.max(0, result);
-            }
+            return Math.min(0, result - storedSurplus(goodsType, result));
         }
         return result;
     }
 
-    public int getSurplusFoodProduction() {
+    public int getSurplusFoodProduction(GoodsType goodsType) {
         int result = 0;
+        int total = 0;
         for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            result += getSurplusProduction(foodType);
-        }
-        if (result > 0) {
-            GoodsType food = getSpecification().getPrimaryFoodType();
-            Set<Modifier> storeSurplus = featureContainer.getModifierSet("model.modifier.storeSurplus", food);
-            if (!storeSurplus.isEmpty()) {
-                result -= (int) featureContainer.applyModifierSet(result, getGame().getTurn(), storeSurplus);
-                result = Math.max(0, result);
+            int surplus = getProductionOf(foodType);
+            total += surplus;
+            if (foodType == goodsType) {
+                result = surplus;
             }
         }
-        return result;
+        total -= getFoodConsumption();
+        if (total > 0) {
+            // TODO: make this more generic
+            GoodsType food = getSpecification().getPrimaryFoodType();
+            total = Math.max(0, total - storedSurplus(food, total));
+        }
+        if (goodsType == null) {
+            return total;
+        } else {
+            return Math.min(result, total);
+        }
     }
 
     /**
