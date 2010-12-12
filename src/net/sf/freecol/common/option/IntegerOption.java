@@ -29,7 +29,8 @@ import javax.xml.stream.XMLStreamWriter;
 /**
 * Represents an option where the valid choice is an integer.
 */
-public class IntegerOption extends AbstractOption {
+public class IntegerOption extends AbstractOption<Integer> {
+
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
@@ -39,7 +40,7 @@ public class IntegerOption extends AbstractOption {
 
     /**
      * Creates a new <code>IntegerOption</code>.
-     * 
+     *
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
      */
@@ -57,7 +58,7 @@ public class IntegerOption extends AbstractOption {
         readFromXML(in);
     }
 
-    
+
     /**
     * Returns the minimum allowed value.
     * @return The minimum value allowed by this option.
@@ -65,7 +66,7 @@ public class IntegerOption extends AbstractOption {
     public int getMinimumValue() {
         return minimumValue;
     }
-    
+
     /**
      * Sets the minimum allowed value.
      * @param minimumValue The minimum value to set
@@ -95,19 +96,19 @@ public class IntegerOption extends AbstractOption {
     * Gets the current value of this <code>IntegerOption</code>.
     * @return The value.
     */
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 
-    
+
     /**
     * Sets the value of this <code>IntegerOption</code>.
     * @param value The value to be set.
     */
-    public void setValue(int value) {
+    public void setValue(Integer value) {
         final int oldValue = this.value;
         this.value = value;
-        
+
         if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue), Integer.valueOf(value));
         }
@@ -117,10 +118,10 @@ public class IntegerOption extends AbstractOption {
 
     /**
      * Gets a <code>String</code> representation of the current value.
-     * 
+     *
      * This method can be overwritten by subclasses to allow a custom save
      * value, since this method is used by {@link #toXML(XMLStreamWriter)}.
-     * 
+     *
      * @return The String value of the Integer.
      * @see #setValue(String)
      */
@@ -131,13 +132,13 @@ public class IntegerOption extends AbstractOption {
     /**
      * Converts the given <code>String</code> to an Integer and calls
      * {@link #setValue(int)}.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * This method can be overwritten by subclasses to allow a custom save
      * value, since this method is used by {@link #readFromXML(XMLStreamReader)}.
-     * 
+     *
      * @param value The String value of the Integer.
      * @see #getStringValue()
      */
@@ -148,7 +149,7 @@ public class IntegerOption extends AbstractOption {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -173,14 +174,14 @@ public class IntegerOption extends AbstractOption {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String value = in.getAttributeValue(null, VALUE_TAG);
-        
+
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
         if (defaultValue == null && value == null) {
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
         }
- 
+
         if(getId() == NO_ID) {
             setId(id);
         }

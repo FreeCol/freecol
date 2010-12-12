@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
  * Represents an option that can be either <i>true</i>
  * or <i>false</i>.
  */
-public class BooleanOption extends AbstractOption {
+public class BooleanOption extends AbstractOption<Boolean> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(BooleanOption.class.getName());
@@ -52,19 +52,19 @@ public class BooleanOption extends AbstractOption {
      * Gets the current value of this <code>BooleanOption</code>.
      * @return The value.
      */
-    public boolean getValue() {
+    public Boolean getValue() {
         return value;
     }
-    
-    
+
+
     /**
      * Sets the current value of this <code>BooleanOption</code>.
      * @param value The value.
      */
-    public void setValue(boolean value) {
+    public void setValue(Boolean value) {
         final boolean oldValue = this.value;
         this.value = value;
-        
+
         if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, Boolean.valueOf(oldValue), Boolean.valueOf(value));
         }
@@ -75,7 +75,7 @@ public class BooleanOption extends AbstractOption {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.

@@ -36,7 +36,7 @@ public class PercentageOption extends IntegerOption {
 
     /**
      * Creates a new <code>RangeOption</code>.
-     * 
+     *
      * @param in The <code>XMSStreamReader</code> to read the data from
      * @exception XMLStreamException if an error occurs
      */
@@ -49,7 +49,7 @@ public class PercentageOption extends IntegerOption {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -66,7 +66,7 @@ public class PercentageOption extends IntegerOption {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -104,7 +104,7 @@ public class PercentageOption extends IntegerOption {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "percentageOption".
      */
     public static String getXMLElementTagName() {

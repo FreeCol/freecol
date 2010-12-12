@@ -30,9 +30,7 @@ import net.sf.freecol.common.model.FreeColObject;
  * unless the option group is null, followed by the id of the option object,
  * followed by a ".", followed by "name" or "shortDescription".
  */
-abstract public class AbstractOption extends FreeColObject implements Option {
-
-    public static final String NO_ID = "NO_ID";
+abstract public class AbstractOption<T> extends FreeColObject implements Option {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
@@ -46,10 +44,10 @@ abstract public class AbstractOption extends FreeColObject implements Option {
 
     protected boolean previewEnabled = false;
 
-    
+
     /**
      * Creates a new <code>AbstractOption</code>.
-     * 
+     *
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
      */
@@ -60,7 +58,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     /**
      * Should this option be updated directly so that
      * changes may be previewes?
-     * 
+     *
      * @return <code>true</code> if changes to this
      *      option should be made directly (and reset
      *      back later if the changes are not stored).
@@ -68,11 +66,11 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     public boolean isPreviewEnabled() {
         return previewEnabled;
     }
-    
+
     /**
      * Sets if this option should be updated directly.
-     * 
-     * @param previewEnabled <code>true</code> if changes 
+     *
+     * @param previewEnabled <code>true</code> if changes
      *      to this option should be made directly (and
      *      reset back later if the changes are not stored).
      */
@@ -83,7 +81,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     /**
      * Returns the string prefix that identifies the group of this
      * <code>Option</code>.
-     * 
+     *
      * @return The string prefix provided by the OptionGroup.
      */
     public String getGroup() {
@@ -92,9 +90,9 @@ abstract public class AbstractOption extends FreeColObject implements Option {
 
     /**
      * Set the option group
-     * 
+     *
      * @param group <code>OptionGroup</code> to set
-     * 
+     *
      */
     public void setGroup(String group) {
         if (group == null) {
@@ -103,4 +101,9 @@ abstract public class AbstractOption extends FreeColObject implements Option {
             optionGroup = group;
         }
     }
+
+    public abstract T getValue();
+
+    public abstract void setValue(T value);
+
 }

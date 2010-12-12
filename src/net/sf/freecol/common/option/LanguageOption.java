@@ -42,7 +42,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * Option for selecting a language. The possible choices are determined
  * using the available language files in "data/strings".
  */
-public class LanguageOption extends AbstractOption {
+public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     private static Logger logger = Logger.getLogger(LanguageOption.class.getName());
 

@@ -54,6 +54,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
     private static final String RESET = "RESET";
+    private static final String EDIT = "EDIT";
 
     private OptionGroupUI ui;
     private OptionGroup level;
@@ -144,13 +145,19 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
         if (levels.size() == 1) {
             add(okButton, "newline 20, tag ok");
         } else {
-            add(okButton, "newline 20, split 3, tag ok");
+            add(okButton, "newline 20, split 4, tag ok");
 
             JButton reset = new JButton(Messages.message("reset"));
             reset.setActionCommand(RESET);
             reset.addActionListener(this);
             reset.setMnemonic('R');
             add(reset);
+
+            JButton edit = new JButton(Messages.message("edit"));
+            edit.setActionCommand(EDIT);
+            edit.addActionListener(this);
+            edit.setMnemonic('E');
+            add(edit);
 
             add(cancelButton, "tag cancel");
         }
@@ -192,6 +199,10 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
             setResponse(specification.getOptionGroup(DEFAULT_LEVEL));
         } else if (RESET.equals(command)) {
             ui.reset();
+        } else if (EDIT.equals(command)) {
+            OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
+            custom.setValue(level);
+            difficultyBox.setSelectedItem(CUSTOM_LEVEL);
         } else {
             logger.warning("Invalid ActionCommand: " + command);
         }
@@ -199,8 +210,7 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
 
     public void itemStateChanged(ItemEvent event) {
         String id = (String) difficultyBox.getSelectedItem();
-        Specification spec = specification;
-        level = spec.getOptionGroup(id);
+        level = specification.getOptionGroup(id);
         ui = new OptionGroupUI(level, (CUSTOM_LEVEL.equals(id)));
         optionPanel.removeAll();
         optionPanel.add(ui);

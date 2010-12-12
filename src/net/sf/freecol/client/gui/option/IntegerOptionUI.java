@@ -70,7 +70,7 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
 
         if (editable) {
             int stepSize = Math.min((option.getMaximumValue() - option.getMinimumValue()) / 10, 1000);
-            setModel(new SpinnerNumberModel(option.getValue(), option.getMinimumValue(),
+            setModel(new SpinnerNumberModel((int) option.getValue(), option.getMinimumValue(),
                                             option.getMaximumValue(), Math.max(1, stepSize)));
             addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent e) {

@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 /**
  * Represents an option for specifying a <code>File</code>.
  */
-public class FileOption extends AbstractOption {
+public class FileOption extends AbstractOption<File> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(FileOption.class.getName());
@@ -39,7 +39,7 @@ public class FileOption extends AbstractOption {
 
     /**
      * Creates a new <code>IntegerOption</code>.
-     * 
+     *
      * @param in The <code>XMLStreamReader</code> containing the data.
      * @exception XMLStreamException if an error occurs
      */
@@ -50,7 +50,7 @@ public class FileOption extends AbstractOption {
 
     /**
      * Gets the current value of this <code>FileOption</code>.
-     * 
+     *
      * @return The value using <code>null</code> for marking no value.
      */
     public File getValue() {
@@ -59,7 +59,7 @@ public class FileOption extends AbstractOption {
 
     /**
      * Sets the value of this <code>FileOption</code>.
-     * 
+     *
      * @param value The value to be set.
      */
     public void setValue(File value) {
@@ -75,7 +75,7 @@ public class FileOption extends AbstractOption {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -94,7 +94,7 @@ public class FileOption extends AbstractOption {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -115,7 +115,7 @@ public class FileOption extends AbstractOption {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "booleanOption".
      */
     public static String getXMLElementTagName() {

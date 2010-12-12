@@ -51,7 +51,7 @@ public class SelectOption extends IntegerOption {
 
     /**
      * Creates a new <code>SelectOption</code>.
-     * 
+     *
      * @param in The <code>XMSStreamReader</code> to read the data from
      * @exception XMLStreamException if an error occurs
      */
@@ -62,7 +62,7 @@ public class SelectOption extends IntegerOption {
 
     /**
      * Gets the range values of this <code>RangeOption</code>.
-     * 
+     *
      * @return The value.
      */
     public Map<Integer, String> getItemValues() {
@@ -84,7 +84,7 @@ public class SelectOption extends IntegerOption {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -113,7 +113,7 @@ public class SelectOption extends IntegerOption {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -155,17 +155,17 @@ public class SelectOption extends IntegerOption {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "selectOption".
      */
     public static String getXMLElementTagName() {
         return "selectOption";
     }
-    
+
     /**
      * Gets the tag name of the item element
      * This method is not static to ensure proper overriding in <code>readFromXMLImpl</code>.
-     * 
+     *
      * @return "selectValue".
      */
     public String getXMLItemElementTagName() {

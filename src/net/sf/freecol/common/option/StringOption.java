@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.UnitType;
  * Represents an option that can be either <i>true</i>
  * or <i>false</i>.
  */
-public class StringOption extends AbstractOption {
+public class StringOption extends AbstractOption<String> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(StringOption.class.getName());

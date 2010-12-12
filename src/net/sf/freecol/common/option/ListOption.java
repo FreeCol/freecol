@@ -14,7 +14,7 @@ import javax.xml.stream.XMLStreamWriter;
  * An option for a list of something.
  * @param <T> The type of objects to store in the list.
  */
-public class ListOption<T> extends AbstractOption {
+public class ListOption<T> extends AbstractOption<List<T>> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ListOption.class.getName());
@@ -27,7 +27,7 @@ public class ListOption<T> extends AbstractOption {
     /**
      * Creates a new <code>ListOption</code>.
      * @param selector a ListOptionSelector
-     * @param in The <code>XMLStreamReader</code> containing the data. 
+     * @param in The <code>XMLStreamReader</code> containing the data.
      * @exception XMLStreamException if an error occurs
      */
     public ListOption(ListOptionSelector<T> selector, XMLStreamReader in)
@@ -74,7 +74,7 @@ public class ListOption<T> extends AbstractOption {
     /**
      * Gets the delegate responsible for getting a list of
      * objects that can be selected by this option.
-     * 
+     *
      * @return The <code>ListOptionSelector</code> for this
      *      option.
      */
@@ -89,8 +89,8 @@ public class ListOption<T> extends AbstractOption {
     public List<T> getValue() {
         return new ArrayList<T>(value);
     }
-    
-    
+
+
     /**
      * Sets the current value of this <code>Option</code>.
      * @param value The value.
@@ -98,7 +98,7 @@ public class ListOption<T> extends AbstractOption {
     public void setValue(List<T> value) {
         final List<T> oldValue = this.value;
         this.value = value;
-        
+
         if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
@@ -112,7 +112,7 @@ public class ListOption<T> extends AbstractOption {
         }
         return ids;
     }
-    
+
     private void setValueIds(final List<String> ids) {
         final List<T> value = new ArrayList<T>(ids.size());
         for (String id : ids) {
@@ -120,11 +120,11 @@ public class ListOption<T> extends AbstractOption {
         }
         setValue(value);
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -167,7 +167,7 @@ public class ListOption<T> extends AbstractOption {
             }
         }
         setValue(value);
-        
+
     }
 
 

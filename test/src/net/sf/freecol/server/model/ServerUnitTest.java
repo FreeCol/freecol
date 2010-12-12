@@ -177,8 +177,8 @@ public class ServerUnitTest extends FreeColTestCase {
 
         //assertEquals(2, dutch.getDifficulty().getIndex());
         //assertEquals("model.difficulty.medium", dutch.getDifficulty().getId());
-        assertEquals(6, spec().getIntegerOption("model.option.badGovernmentLimit").getValue());
-        assertEquals(10, spec().getIntegerOption("model.option.veryBadGovernmentLimit").getValue());
+        assertEquals(6, spec().getInteger("model.option.badGovernmentLimit"));
+        assertEquals(10, spec().getInteger("model.option.veryBadGovernmentLimit"));
 
         // Found colony on 6,8
         ServerUnit soldier = new ServerUnit(game, map.getTile(6, 8), dutch,

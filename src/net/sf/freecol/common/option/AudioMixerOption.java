@@ -38,7 +38,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Option for selecting an audio mixer.
  */
-public class AudioMixerOption extends AbstractOption {
+public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapper> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AudioMixerOption.class.getName());
@@ -61,7 +61,7 @@ public class AudioMixerOption extends AbstractOption {
         return mixer;
     }
 
-    
+
     private static Comparator<MixerWrapper> audioMixerComparator = new Comparator<MixerWrapper>() {
         public int compare(MixerWrapper m1, MixerWrapper m2) {
             if (m1.equals(DEFAULT)) {
@@ -91,7 +91,7 @@ public class AudioMixerOption extends AbstractOption {
         readFromXML(in);
     }
 
-   
+
     /**
      * Get the <code>Value</code> value.
      *
@@ -138,11 +138,11 @@ public class AudioMixerOption extends AbstractOption {
             audioMixers.put(mi.getName(), new MixerWrapper(mi.getName(), mi));
         }
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -155,7 +155,7 @@ public class AudioMixerOption extends AbstractOption {
 
         out.writeEndElement();
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
@@ -191,30 +191,30 @@ public class AudioMixerOption extends AbstractOption {
     public static String getXMLElementTagName() {
         return "audioMixerOption";
     }
-    
+
     public static class MixerWrapper {
         private String name;
         private Mixer.Info mixerInfo;
-        
+
         MixerWrapper(String name, Mixer.Info mixerInfo) {
             this.name = name;
             this.mixerInfo = mixerInfo;
         }
-        
+
         public String getKey() {
             return name;
         }
-        
+
         public Mixer.Info getMixerInfo() {
             return mixerInfo;
-        
+
         }
-        
+
         @Override
         public String toString() {
             return name;
         }
-        
+
         @Override
         public boolean equals(Object o) {
             if (o instanceof MixerWrapper) {

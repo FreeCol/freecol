@@ -37,7 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
 * Used for grouping objects of {@link Option}s.
 */
-public class OptionGroup extends AbstractOption {
+public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
@@ -54,7 +54,7 @@ public class OptionGroup extends AbstractOption {
     public OptionGroup(String id) {
         super(id);
     }
-    
+
     /**
      * Creates a new  <code>OptionGroup</code>.
      * @param in The <code>XMLStreamReader</code> containing the data.
@@ -141,7 +141,7 @@ public class OptionGroup extends AbstractOption {
             throw new IllegalArgumentException("No boolean value associated with the specified option.");
         }
     }
-    
+
     /**
      * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
      */
@@ -162,7 +162,7 @@ public class OptionGroup extends AbstractOption {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -239,24 +239,49 @@ public class OptionGroup extends AbstractOption {
     public static String getXMLElementTagName() {
         return "optionGroup";
     }
-    
+
     /**
      * Returns the name of this <code>Option</code>.
-     * 
+     *
      * @return The name as provided in the constructor.
      */
     public String getName() {
         return Messages.message(getId() + ".name");
     }
-    
+
     /**
      * Gives a short description of this <code>Option</code>. Can for
      * instance be used as a tooltip text.
-     * 
+     *
      * @return A short description of this <code>Option</code>.
      */
     public String getShortDescription() {
         return Messages.message(getId() + ".shortDescription");
+    }
+
+    /**
+     * Returns the OptionGroup itself.
+     *
+     * @return an <code>Object</code> value
+     */
+    public OptionGroup getValue() {
+        return this;
+    }
+
+    /**
+     * This method does nothing at all. It is only needed to extend
+     * AbstractOption.
+     *
+     * @param value an <code>Object</code> value
+     */
+    @SuppressWarnings("unchecked")
+    public void setValue(OptionGroup value) {
+        for (Option other : value.getOptions()) {
+            if (other instanceof AbstractOption) {
+                AbstractOption mine = (AbstractOption) getOption(other.getId());
+                mine.setValue(((AbstractOption) other).getValue());
+            }
+        }
     }
 
 }

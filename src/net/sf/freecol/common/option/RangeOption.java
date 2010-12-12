@@ -33,10 +33,10 @@ import javax.xml.stream.XMLStreamWriter;
  * represented by strings. In general, these strings are localized by looking up
  * the key of the choice, which consists of the id of the AbstractObject
  * followed by a "." followed by the value of the option string.
- * 
+ *
  * RangeOption differs from SelectOption, as the value being selected represents
  * a numeric measurement, defined by a bounded range of comparable values.
- * As the graphical component rendering a range option only works with a 
+ * As the graphical component rendering a range option only works with a
  * conventional index, this implies to manage a fixed rank for each possible values.
  */
 public class RangeOption extends SelectOption {
@@ -47,7 +47,7 @@ public class RangeOption extends SelectOption {
 
     /**
      * Creates a new <code>RangeOption</code>.
-     * 
+     *
      * @param in The <code>XMSStreamReader</code> to read the data from
      * @exception XMLStreamException if an error occurs
      */
@@ -58,7 +58,7 @@ public class RangeOption extends SelectOption {
     /**
      * Gets the rank of the current selected value in the list of values of this
      * <code>RangeOption</code>.
-     * 
+     *
      * @return The value.
      */
     public int getValueRank() {
@@ -73,7 +73,7 @@ public class RangeOption extends SelectOption {
     /**
      * Sets the value through the rank in the list of values of this
      * <code>RangeOption</code>.
-     * 
+     *
      * @param rank The rank of the value to be set.
      */
     public void setValueRank(int rank) {
@@ -91,7 +91,7 @@ public class RangeOption extends SelectOption {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -102,7 +102,7 @@ public class RangeOption extends SelectOption {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "rangeOption".
      */
     public static String getXMLElementTagName() {
@@ -111,7 +111,7 @@ public class RangeOption extends SelectOption {
 
     /**
      * Gets the tag name of the item element
-     * 
+     *
      * @return "rangeValue".
      */
     public String getXMLItemElementTagName() {

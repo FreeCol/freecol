@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 
 /**
  * An option describes something which can be customized by the user.
- * 
+ *
  * @see net.sf.freecol.common.model.GameOptions
  */
 public interface Option {
@@ -41,7 +41,7 @@ public interface Option {
 
     public static final String NO_ID = "NO_ID";
 
-    
+
 
     /**
     * Returns a textual representation of this object.
@@ -61,28 +61,28 @@ public interface Option {
     /**
      * Should this option be updated directly so that
      * changes may be previewes?
-     * 
+     *
      * @return <code>true</code> if changes to this
      *      option should be made directly (and reset
      *      back later if the changes are not stored).
      */
     public boolean isPreviewEnabled();
-    
+
     /**
      * Adds a new <code>PropertyChangeListener</code> for monitoring state
      * changes. Events are generated when variables are changed.
-     * 
+     *
      * @param pcl The <code>PropertyChangeListener</code> to be added.
      */
     public void addPropertyChangeListener(PropertyChangeListener pcl);
-    
+
     /**
      * Remove the given <code>PropertyChangeListener</code>.
-     * 
+     *
      * @param pcl The <code>PropertyChangeListener</code> to be removed.
      */
     public void removePropertyChangeListener(PropertyChangeListener pcl);
-    
+
     /**
     * Makes an XML-representation of this object.
     *
@@ -97,7 +97,7 @@ public interface Option {
     * @param element The DOM-element ("Document Object Model") made to represent this "Option".
     */
     public void readFromXMLElement(Element element);
-    
+
     /**
      * Initializes this object from an XML-representation of this object.
      * @param in The input stream with the XML.
@@ -105,7 +105,7 @@ public interface Option {
      *      to the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException;
-    
+
     /**
      * Makes an XML-representation of this object.
      *
@@ -113,5 +113,5 @@ public interface Option {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException;     
+    public void toXML(XMLStreamWriter out) throws XMLStreamException;
 }
