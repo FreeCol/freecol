@@ -63,6 +63,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
     protected static final String CANCEL = "CANCEL";
+    protected static final String RESET = "RESET";
 
     // Stores the response from the user:
     private T response = null;
@@ -159,14 +160,14 @@ public class FreeColDialog<T> extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     * @see ChoiceItem
     */
-    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(String text, String cancelText, 
+    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(String text, String cancelText,
                                                                       List<ChoiceItem<T>> choices) {
 
         if (choices.isEmpty()) {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
         }
 
-        
+
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
 
         final FreeColDialog<ChoiceItem<T>> choiceDialog =
@@ -190,12 +191,12 @@ public class FreeColDialog<T> extends FreeColPanel {
              if ((choices.size() % 4) == 0 && choices.size() > 12) columns = 4;
         else if ((choices.size() % 3) == 0 && choices.size() > 6)  columns = 3;
         else if ((choices.size() % 2) == 0 && choices.size() > 4)  columns = 2;
-        
+
         else if (choices.size() > 21) columns = 4;
         else if (choices.size() > 10) columns = 2;
-        
+
         JPanel choicesPanel = new JPanel(new GridLayout(0, columns, 10, 10));
-        choicesPanel.setBorder(new CompoundBorder(choicesPanel.getBorder(), 
+        choicesPanel.setBorder(new CompoundBorder(choicesPanel.getBorder(),
                                                   new EmptyBorder(10, 20, 10, 20)));
 
         /*
@@ -314,7 +315,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                                                           String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
-        
+
         final FreeColDialog<String> inputDialog =
             new FreeColDialog<String>(FreeCol.getFreeColClient().getCanvas())  {
             public void requestFocus() {
@@ -336,7 +337,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                 inputDialog.setResponse(input.getText());
             }
         });
-        
+
         input.selectAll();
 
         inputDialog.add(getDefaultTextArea(text));
@@ -362,10 +363,10 @@ public class FreeColDialog<T> extends FreeColPanel {
         final int defaultHeight = 100;
         final int defaultWidth = 40;
         final int COLUMNS = 5;
-        
+
         final String widthText = Messages.message("width");
         final String heightText = Messages.message("height");
-        
+
         final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
@@ -389,7 +390,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             });
 
-        
+
         JLabel widthLabel = new JLabel(widthText);
         widthLabel.setLabelFor(inputWidth);
         JLabel heightLabel = new JLabel(heightText);
@@ -514,7 +515,7 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         return new FreeColFileFilter( ".fsg", "filter.savedGames" );
     }
-    
+
 
     /**
     * Returns a filter accepting "*.fgo".
@@ -524,13 +525,13 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         return new FreeColFileFilter( ".fgo", "filter.gameOptions" );
     }
-    
-    
+
+
     /**
     * Returns a filter accepting all files containing a
     * {@link net.sf.freecol.common.model.GameOptions}.
     * That is; both "*.fgo" and "*.fsg".
-    * 
+    *
     * @return The filter.
     */
     public static FileFilter getGameOptionsFileFilter() {
@@ -581,7 +582,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
