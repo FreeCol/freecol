@@ -30,9 +30,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.Class;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,21 +68,21 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -99,12 +96,7 @@ import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
 import net.sf.freecol.server.generator.TerrainGenerator;
-import net.sf.freecol.server.model.ServerBuilding;
-import net.sf.freecol.server.model.ServerColony;
-import net.sf.freecol.server.model.ServerColonyTile;
-import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -140,26 +132,15 @@ public final class FreeColServer {
      * The oldest save game format that can still be loaded.
      */
     public static final int MINIMUM_SAVEGAME_VERSION = 1;
+    private final FreeColServerControllers freeColServerControllers;
 
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
 
-    /** Stores the current state of the game. */
-    private GameState gameState = GameState.STARTING_GAME;
-
     // Networking:
     private Server server;
 
-    // Control:
-    private final UserConnectionHandler userConnectionHandler;
-
-    private final PreGameController preGameController;
-
-    private final PreGameInputHandler preGameInputHandler;
-
     private final InGameInputHandler inGameInputHandler;
-
-    private final InGameController inGameController;
 
     private ServerGame game;
 
@@ -168,9 +149,6 @@ public final class FreeColServer {
     private MapGenerator mapGenerator;
 
     private boolean singleplayer;
-
-    // The username of the player owning this server.
-    private String owner;
 
     private boolean publicServer = false;
 
@@ -232,11 +210,12 @@ public final class FreeColServer {
         this.name = name;
         this.random = new Random(new SecureRandom().nextLong());
 
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
+        freeColServerControllers = new FreeColServerControllers(
+        		new UserConnectionHandler(this),
+        		new PreGameController(this),
+        		new PreGameInputHandler(this),
+        		new InGameController(this, random));
         inGameInputHandler = new InGameInputHandler(this);
-        inGameController = new InGameController(this, random);
 
         game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification, advantages));
@@ -277,9 +256,11 @@ public final class FreeColServer {
         this.name = name;
         //this.nationOptions = nationOptions;
         mapGenerator = null;
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
+        freeColServerControllers = new FreeColServerControllers(
+        		new UserConnectionHandler(this),
+        		new PreGameController(this),
+        		new PreGameInputHandler(this),
+        		new InGameController(this, random));
         inGameInputHandler = new InGameInputHandler(this);
 
         try {
@@ -290,7 +271,7 @@ public final class FreeColServer {
             throw e;
         }
         try {
-            owner = loadGame(savegame);
+            freeColServerControllers.setOwner(loadGame(savegame));
         } catch (FreeColException e) {
             server.shutdown();
             throw e;
@@ -303,7 +284,6 @@ public final class FreeColServer {
         if (random == null) {
             this.random = new Random(new SecureRandom().nextLong());
         }
-        inGameController = new InGameController(this, random);
         mapGenerator = new SimpleMapGenerator(random, getSpecification());
 
         updateMetaServer(true);
@@ -461,9 +441,9 @@ public final class FreeColServer {
             element.setAttribute("port", Integer.toString(port));
             element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
             element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
-            element.setAttribute("isGameStarted", Boolean.toString(gameState != GameState.STARTING_GAME));
+            element.setAttribute("isGameStarted", Boolean.toString(freeColServerControllers.getGameState() != GameState.STARTING_GAME));
             element.setAttribute("version", FreeCol.getVersion());
-            element.setAttribute("gameState", Integer.toString(getGameState().ordinal()));
+            element.setAttribute("gameState", Integer.toString(freeColServerControllers.getGameState().ordinal()));
             Element reply = mc.ask(element);
             if (reply != null && reply.getTagName().equals("noRouteToServer")) {
                 throw new NoRouteToServerException();
@@ -561,7 +541,7 @@ public final class FreeColServer {
      * @see #loadGame
      */
     public String getOwner() {
-        return owner;
+        return freeColServerControllers.getOwner();
     }
 
     /**
@@ -750,7 +730,7 @@ public final class FreeColServer {
                         game.getSpecification().applyDifficultyLevel(level);
                     }
                     game.setCurrentPlayer(null);
-                    gameState = GameState.IN_GAME;
+                    freeColServerControllers.setGameState(GameState.IN_GAME);
                     integrity = game.checkIntegrity();
                 } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
                     if (doNotLoadAI) {
@@ -1002,7 +982,7 @@ public final class FreeColServer {
      *         new client connect.
      */
     public UserConnectionHandler getUserConnectionHandler() {
-        return userConnectionHandler;
+        return freeColServerControllers.getUserConnectionHandler();
     }
 
     /**
@@ -1011,11 +991,7 @@ public final class FreeColServer {
      * @return The <code>Controller</code>.
      */
     public Controller getController() {
-        if (getGameState() == GameState.IN_GAME) {
-            return inGameController;
-        } else {
-            return preGameController;
-        }
+        return freeColServerControllers.getController();
     }
 
     /**
@@ -1024,7 +1000,7 @@ public final class FreeColServer {
      * @return The <code>PreGameInputHandler</code>.
      */
     public PreGameInputHandler getPreGameInputHandler() {
-        return preGameInputHandler;
+        return freeColServerControllers.getPreGameInputHandler();
     }
 
     /**
@@ -1042,7 +1018,7 @@ public final class FreeColServer {
      * @return The controller from making a new turn etc.
      */
     public InGameController getInGameController() {
-        return inGameController;
+        return freeColServerControllers.getInGameController();
     }
 
     /**
@@ -1082,7 +1058,7 @@ public final class FreeColServer {
      *         {@link GameState#ENDING_GAME}.
      */
     public GameState getGameState() {
-        return gameState;
+        return freeColServerControllers.getGameState();
     }
 
     /**
@@ -1092,7 +1068,7 @@ public final class FreeColServer {
      *            {@link GameState#IN_GAME} and {@link GameState#ENDING_GAME}.
      */
     public void setGameState(GameState state) {
-        gameState = state;
+        freeColServerControllers.setGameState(state);
     }
 
     /**
@@ -1137,26 +1113,8 @@ public final class FreeColServer {
      */
     public Unit getUnitSafely(String unitId, ServerPlayer serverPlayer)
         throws IllegalStateException {
-        Game game = serverPlayer.getGame();
-        FreeColGameObject obj;
-        Unit unit;
 
-        if (unitId == null || unitId.length() == 0) {
-            throw new IllegalStateException("ID must not be empty.");
-        }
-        obj = game.getFreeColGameObjectSafely(unitId);
-        if (obj == null) {
-            throw new IllegalStateException("Not an object: " + unitId);
-        } else if (!(obj instanceof Unit)) {
-            throw new IllegalStateException("Unit expected, "
-                                            + " got " + obj.getClass()
-                                            + ": " + unitId);
-        }
-        unit = (Unit) obj;
-        if (unit.getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not the owner of unit: " + unitId);
-        }
-        return unit;
+        return freeColServerControllers.getUnitSafely(unitId, serverPlayer);
     }
 
     /**
@@ -1174,34 +1132,8 @@ public final class FreeColServer {
      */
     public Settlement getAdjacentSettlementSafely(String settlementId, Unit unit)
         throws IllegalStateException {
-        Game game = unit.getOwner().getGame();
-        Settlement settlement;
 
-        if (settlementId == null || settlementId.length() == 0) {
-            throw new IllegalStateException("ID must not be empty.");
-        } else if (!(game.getFreeColGameObject(settlementId) instanceof Settlement)) {
-            throw new IllegalStateException("Not a settlement ID: " + settlementId);
-        }
-        settlement = (Settlement) game.getFreeColGameObject(settlementId);
-        if (settlement.getTile() == null) {
-            throw new IllegalStateException("Settlement is not on the map: "
-                                            + settlementId);
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalStateException("Unit is not on the map: "
-                                            + unit.getId());
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Unit " + unit.getId()
-                                            + " is not adjacent to settlement: " + settlementId);
-        }
-        if (unit.getOwner() == settlement.getOwner()) {
-            throw new IllegalStateException("Unit: " + unit.getId()
-                                            + " and settlement: " + settlementId
-                                            + " are both owned by player: "
-                                            + unit.getOwner().getId());
-        }
-        return settlement;
+        return freeColServerControllers.getAdjacentSettlementSafely(settlementId, unit);
     }
 
     /**
@@ -1220,15 +1152,7 @@ public final class FreeColServer {
      */
     public IndianSettlement getAdjacentIndianSettlementSafely(String settlementId, Unit unit)
         throws IllegalStateException {
-        Settlement settlement = getAdjacentSettlementSafely(settlementId, unit);
-        if (!(settlement instanceof IndianSettlement)) {
-            throw new IllegalStateException("Not an indianSettlement: " + settlementId);
-        }
-        if (!unit.getOwner().hasContacted(settlement.getOwner())) {
-            throw new IllegalStateException("Player has not established contact with the "
-                                            + settlement.getOwner().getNation());
-        }
-        return (IndianSettlement) settlement;
+        return freeColServerControllers.getAdjacentIndianSettlementSafely(settlementId, unit);
     }
 
 
