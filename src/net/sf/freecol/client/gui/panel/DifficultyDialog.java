@@ -53,7 +53,6 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
-    private static final String RESET = "RESET";
     private static final String EDIT = "EDIT";
 
     private OptionGroupUI ui;

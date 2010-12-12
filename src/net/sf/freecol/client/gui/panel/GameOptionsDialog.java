@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
@@ -48,11 +47,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
 
     private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());
 
-    private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3, RESET = 4;
-
-    private JButton ok, load, save, cancel, reset;
-
-    private JLabel header;
+    private JButton load, save, reset;
 
     private OptionGroupUI ui;
 
@@ -66,52 +61,37 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         super(parent);
         setLayout(new MigLayout("wrap 1, fill"));
 
-        ok = new JButton(Messages.message("ok"));
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        ok.setMnemonic('O');
-
         load = new JButton(Messages.message("load"));
-        load.setActionCommand(String.valueOf(LOAD));
+        load.setActionCommand(LOAD);
         load.addActionListener(this);
-        load.setMnemonic('L');
 
         save = new JButton(Messages.message("save"));
-        save.setActionCommand(String.valueOf(SAVE));
+        save.setActionCommand(SAVE);
         save.addActionListener(this);
-        save.setMnemonic('S');
 
         reset = new JButton(Messages.message("reset"));
-        reset.setActionCommand(String.valueOf(RESET));
+        reset.setActionCommand(RESET);
         reset.addActionListener(this);
-        reset.setMnemonic('R');
 
-        cancel = new JButton(Messages.message("cancel"));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        cancel.addActionListener(this);
-        cancel.setMnemonic('C');
-
-        FreeColPanel.enterPressesWhenFocused(ok);
-        setCancelComponent(cancel);
+        FreeColPanel.enterPressesWhenFocused(okButton);
+        setCancelComponent(cancelButton);
 
         // Header:
-        header = getDefaultHeader(Messages.message("gameOptions"));
-        add(header, "center");
+        add(getDefaultHeader(Messages.message("gameOptions")), "center");
 
         // Options:
         ui = new OptionGroupUI(getSpecification().getOptionGroup("gameOptions"), editable);
-        //ui.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(ui, "newline 20, grow");
 
         // Buttons:
         if (editable) {
-            add(ok, "newline 20, split 5, tag ok");
-            add(cancel, "tag cancel");
+            add(okButton, "newline 20, split 5, tag ok");
+            add(cancelButton, "tag cancel");
             add(load);
             add(save);
             add(reset);
         } else {
-            add(ok, "newline 20, tag ok");
+            add(okButton, "newline 20, tag ok");
         }
 
         // Set special cases
@@ -138,14 +118,6 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         return getMinimumSize();
     }
 
-    public void requestFocus() {
-        if (ok.isEnabled()) {
-            ok.requestFocus();
-        } else {
-            cancel.requestFocus();
-        }
-    }
-
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
@@ -154,56 +126,46 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                ui.unregister();
+        if (OK.equals(command)) {
+            ui.unregister();
+            ui.updateOption();
+            getClient().getPreGameController().sendGameOptions();
+            getCanvas().remove(this);
+            setResponse(Boolean.TRUE);
+        } else if (CANCEL.equals(command)) {
+            ui.rollback();
+            ui.unregister();
+            getCanvas().remove(this);
+            setResponse(Boolean.FALSE);
+        } else if (SAVE.equals(command)) {
+            FileFilter[] filters = new FileFilter[] { FreeColDialog.getFGOFileFilter(),
+                                                      FreeColDialog.getFSGFileFilter(),
+                                                      FreeColDialog.getGameOptionsFileFilter() };
+            File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
+            if (saveFile != null) {
                 ui.updateOption();
-                getClient().getPreGameController().sendGameOptions();
-                getCanvas().remove(this);
-                setResponse(Boolean.TRUE);
-                break;
-            case CANCEL:
-                ui.rollback();
-                ui.unregister();
-                getCanvas().remove(this);
-                setResponse(Boolean.FALSE);
-                break;
-            case SAVE:
-                FileFilter[] filters = new FileFilter[] { FreeColDialog.getFGOFileFilter(),
-                                                          FreeColDialog.getFSGFileFilter(),
-                                                          FreeColDialog.getGameOptionsFileFilter() };
-                File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
-                if (saveFile != null) {
-                    ui.updateOption();
-                    getGame().getSpecification().getOptionGroup("gameOptions").save(saveFile);
-                }
-                break;
-            case LOAD:
-                File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(),
-                                                           new FileFilter[] {
-                                                               FreeColDialog.getFGOFileFilter(),
-                                                               FreeColDialog.getFSGFileFilter(),
-                                                               FreeColDialog.getGameOptionsFileFilter()
-                                                           });
-                if (loadFile != null) {
-                    try {
-                        FileInputStream in = new FileInputStream(loadFile);
-                        getGame().getSpecification().loadFragment(in);
-                        in.close();
-                    } catch(Exception e) {
-                        logger.warning("Failed to load game options from " + loadFile.getName());
-                    }
-                }
-                break;
-            case RESET:
-                ui.reset();
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
+                getGame().getSpecification().getOptionGroup("gameOptions").save(saveFile);
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+        } else if (LOAD.equals(command)) {
+            File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(),
+                                                       new FileFilter[] {
+                                                           FreeColDialog.getFGOFileFilter(),
+                                                           FreeColDialog.getFSGFileFilter(),
+                                                           FreeColDialog.getGameOptionsFileFilter()
+                                                       });
+            if (loadFile != null) {
+                try {
+                    FileInputStream in = new FileInputStream(loadFile);
+                    getGame().getSpecification().loadFragment(in);
+                    in.close();
+                } catch(Exception e) {
+                    logger.warning("Failed to load game options from " + loadFile.getName());
+                }
+            }
+        } else if (RESET.equals(command)) {
+            ui.reset();
+        } else {
+            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 }

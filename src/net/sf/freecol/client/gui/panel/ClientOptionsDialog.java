@@ -58,12 +58,12 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
 
         setCancelComponent(cancelButton);
 
-        setSize(780, 540);
+        setSize(850, 600);
     }
 
     @Override
     public Dimension getMinimumSize() {
-        return new Dimension(780, 540);
+        return new Dimension(850, 600);
     }
 
     @Override
@@ -82,7 +82,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
         add(ui);
 
         // Buttons:
-        add(okButton, "split 3, tag ok");
+        add(okButton, "newline 20, split 3, tag ok");
         add(cancelButton);
         add(reset);
     }

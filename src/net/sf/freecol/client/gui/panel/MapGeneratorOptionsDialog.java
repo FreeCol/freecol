@@ -68,9 +68,8 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
         ui = new OptionGroupUI(mgo, editable);
 
         JButton reset = new JButton(Messages.message("reset"));
-        reset.setActionCommand("RESET");
+        reset.setActionCommand(RESET);
         reset.addActionListener(this);
-        reset.setMnemonic('R');
 
         setCancelComponent(cancelButton);
 
@@ -196,10 +195,10 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
             ui.unregister();
             getCanvas().remove(this);
             setResponse(new Boolean(false));
-        } else if ("RESET".equals(command)) {
+        } else if (RESET.equals(command)) {
             ui.reset();
         } else {
-            logger.warning("Invalid ActionCommand: invalid number.");
+            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 }
