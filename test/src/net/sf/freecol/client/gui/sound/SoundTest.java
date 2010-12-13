@@ -37,7 +37,18 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class SoundTest extends FreeColTestCase {
 
-    SoundPlayer soundPlayer = null;
+    private SoundPlayer soundPlayer = null;
+
+    private SoundPlayer getSoundPlayer() {
+        if (soundPlayer == null) {
+            ClientOptions clientOptions = new ClientOptions();
+            final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
+            final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
+            po.setValue(10); // 10% volume
+            soundPlayer = new SoundPlayer(amo, po);
+        }
+        return soundPlayer;
+    }
 
     private void playSound(String id) {
         File file = ResourceManager.getAudio(id);
@@ -49,7 +60,7 @@ public class SoundTest extends FreeColTestCase {
             assertTrue("Resource " + id + " should be present",
                        ResourceManager.hasResource(id));
         } else {
-            soundPlayer.playOnce(file);
+            getSoundPlayer().playOnce(file);
             try {
                 // just play the beginning of the sound, just to check it works
                 Thread.sleep(300);
@@ -64,12 +75,6 @@ public class SoundTest extends FreeColTestCase {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
         ResourceManager.preload(new Dimension(1,1));
 
-        ClientOptions clientOptions = new ClientOptions();
-        final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
-        final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
-        po.setValue(10); // 10% volume
-        soundPlayer = new SoundPlayer(amo, po);
-
         // these sounds are base resources, and should be enough for a test
         playSound("sound.intro.general");
         playSound("sound.event.illegalMove");
@@ -81,12 +86,6 @@ public class SoundTest extends FreeColTestCase {
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
         ResourceManager.preload(new Dimension(1,1));
-
-        ClientOptions clientOptions = new ClientOptions();
-        final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
-        final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
-        po.setValue(10); // 10% volume
-        soundPlayer = new SoundPlayer(amo, po);
 
         playSound("sound.intro.model.nation.english");
         playSound("sound.intro.model.nation.dutch");
@@ -107,7 +106,6 @@ public class SoundTest extends FreeColTestCase {
         playSound("sound.event.missionEstablished");
         playSound("sound.event.sellCargo");
         playSound("sound.event.shipSunk");
-
     }
 
 }
