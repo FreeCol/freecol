@@ -979,7 +979,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         private final JLabel royalistMemberLabel = new JLabel();
 
         public PopulationPanel() {
-            setOpaque(true);
+            setOpaque(false);
             setToolTipText(" ");
             setLayout(new MigLayout("wrap 5, fill, insets 0",
                                     "[][]:push[center]:push[right][]"));
