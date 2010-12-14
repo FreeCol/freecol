@@ -1518,7 +1518,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                             if (getClient().getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
                                 ColonyTile bestTile = getColony().getVacantColonyTileFor(unit, false, workType);
-                                if (colonyTile != bestTile
+                                if (bestTile != null && colonyTile != bestTile
                                     && (colonyTile.getProductionOf(unit, workType)
                                         < bestTile.getProductionOf(unit, workType))) {
                                     StringTemplate template = StringTemplate.template("colonyPanel.notBestTile")
