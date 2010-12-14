@@ -3107,7 +3107,6 @@ public final class InGameController extends Controller {
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
         }
-        unit.setMovesLeft(0);
         if (unit.isInEurope()) {
             cs.add(See.only(serverPlayer), unit);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
