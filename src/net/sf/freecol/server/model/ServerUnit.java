@@ -942,7 +942,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
             if (welcomer != null) {
                 cs.addAttribute(See.only(serverPlayer), "welcome",
-                                welcomer.getId());
+                    welcomer.getId());
+                cs.addAttribute(See.only(serverPlayer), "camps",
+                    Integer.toString(welcomer.getNumberOfSettlements()));
             }
         }
 
