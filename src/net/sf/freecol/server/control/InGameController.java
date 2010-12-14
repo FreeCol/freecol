@@ -3104,6 +3104,9 @@ public final class InGameController extends Controller {
         // as csSell will have added sales changes.  In a settlement,
         // the goods container will always be dirty, but the whole tile
         // will only need to be updated if the unit moved into it.
+        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
+            unit.setMovesLeft(0);
+        }
         unit.setMovesLeft(0);
         if (unit.isInEurope()) {
             cs.add(See.only(serverPlayer), unit);
