@@ -742,6 +742,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         }
         tile.removeLostCityRumour();
+        tile.updatePlayerExploredTiles();
     }
 
     /**
