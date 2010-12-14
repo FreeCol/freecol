@@ -1090,11 +1090,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the tile can be acquired.
      */
     public boolean canAcquireToFoundSettlement(Tile tile) {
-        return canOwnTile(tile)
-            && tile.isSettleable()
-            && (canClaimToFoundSettlement(tile)
-                || (tile.getOwner() != null && tile.getOwner() != this
-                    && getLandPrice(tile) >= 0));
+        return canClaimToFoundSettlement(tile)
+            || (canOwnTile(tile)
+                && tile.isSettleable()
+                && tile.getOwner() != null
+                && tile.getOwner() != this
+                && getLandPrice(tile) >= 0);
     }
 
     /**

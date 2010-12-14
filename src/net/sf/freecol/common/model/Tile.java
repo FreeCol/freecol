@@ -1002,12 +1002,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public boolean isSettleable() {
         if (settlement != null || !getType().canSettle()) return false;
-
-        for (Tile tile : getSurroundingTiles(1)) {
-            if (tile.getSettlement() != null
-                && tile.getOwner().isEuropean()) return false;
-        }
-
         return true;
     }
 
