@@ -622,10 +622,12 @@ public final class InGameController extends Controller {
             }
             sendToOthers(serverPlayer, cs);
 
-            // Keep ending turn for non-AI players that are either not
+            // Keep ending turn for dead or non-AI players that are either not
             // connected or skipping turns in debug mode.
-            if (player != null && !player.isAI()
-                && (!player.isConnected() || debugOnlyAITurns > 0)) {
+            if (player != null
+                && (player.isDead()
+                    || (!player.isAI()
+                        && (!player.isConnected() || debugOnlyAITurns > 0)))) {
                 sendElement(serverPlayer, cs);
                 continue;
             }
