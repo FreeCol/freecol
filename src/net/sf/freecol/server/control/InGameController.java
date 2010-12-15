@@ -1392,7 +1392,8 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
         container.saveState();
-        serverPlayer.csBuy(container, type, amount, random, cs);
+        serverPlayer.buy(container, type, amount, random);
+        serverPlayer.csFlushMarket(type, cs);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), container);
         // Action occurs in Europe, nothing is visible to other players.
@@ -1416,7 +1417,8 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
         container.saveState();
-        serverPlayer.csSell(container, type, amount, random, cs);
+        serverPlayer.sell(container, type, amount, random);
+        serverPlayer.csFlushMarket(type, cs);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), container);
         // Action occurs in Europe, nothing is visible to other players.
@@ -3070,7 +3072,8 @@ public final class InGameController extends Controller {
                 int n = amount * goods.getAmount();
                 if (unit.isInEurope()) {
                     try {
-                        serverPlayer.csBuy(container, goodsType, n, random, cs);
+                        serverPlayer.buy(container, goodsType, n, random);
+                        serverPlayer.csFlushMarket(goodsType, cs);
                     } catch (IllegalStateException e) {
                         return Message.clientError(e.getMessage());
                     }
@@ -3101,7 +3104,7 @@ public final class InGameController extends Controller {
         // Nothing for others to see except if the settlement population
         // changes.
         // If in Europe, we can get away with just updating the unit
-        // as csSell will have added sales changes.  In a settlement,
+        // as sell() will have added sales changes.  In a settlement,
         // the goods container will always be dirty, but the whole tile
         // will only need to be updated if the unit moved into it.
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
@@ -3148,7 +3151,8 @@ public final class InGameController extends Controller {
             int amount = required.get(type);
             if (type.isStorable()) {
                 // TODO: should also check canTrade(type, Access.?)
-                serverPlayer.csBuy(container, type, amount, random, cs);
+                serverPlayer.buy(container, type, amount, random);
+                serverPlayer.csFlushMarket(type, cs);
             } else {
                 container.addGoods(type, amount);
             }

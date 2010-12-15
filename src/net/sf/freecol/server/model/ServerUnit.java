@@ -1003,7 +1003,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 if (isInEurope()) {
                     if (serverPlayer.canTrade(goodsType,
                                               Market.Access.EUROPE)) {
-                        serverPlayer.csSell(null, goodsType, n, random, cs);
+                        serverPlayer.sell(null, goodsType, n, random);
+                        serverPlayer.csFlushMarket(goodsType, cs);
                     }
                 } else if (settlement != null) {
                     settlement.addGoods(goodsType, n);

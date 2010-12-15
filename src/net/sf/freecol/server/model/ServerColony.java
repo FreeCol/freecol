@@ -432,7 +432,9 @@ public class ServerColony extends Colony implements ServerModelObject {
             tileDirty = true;
         }
 
-        // Export goods if custom house is built
+        // Export goods if custom house is built.
+        // Do not flush price changes yet, as any price change may change
+        // yet again in csYearlyGoodsRemoval.
         if (hasAbility("model.ability.export")) {
             boolean gold = false;
             for (Goods goods : container.getCompactGoods()) {
@@ -442,7 +444,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     && (owner.canTrade(goods, Market.Access.CUSTOM_HOUSE))) {
                     int amount = goods.getAmount() - data.getExportLevel();
                     if (amount > 0) {
-                        owner.csSell(container, type, amount, random, cs);
+                        owner.sell(container, type, amount, random);
                         gold = true;
                     }
                 }

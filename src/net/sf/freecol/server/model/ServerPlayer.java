@@ -785,6 +785,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Flush any market price changes for a specified goods type.
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csFlushMarket(GoodsType type, ChangeSet cs) {
+        Market market = getMarket();
+        if (market.hasPriceChanged(type)) {
+            // This type of goods has changed price, so we will update
+            // the market and send a message as well.
+            cs.addMessage(See.only(this),
+                          market.makePriceChangeMessage(type));
+            market.flushPriceChange(type);
+            cs.add(See.only(this), market.getMarketData(type));
+        }
+    }
+
+    /**
      * Buy goods in Europe.
      * Do not update the container or player in the ChangeSet, this
      * routine is called from higher level routines where other updates
@@ -794,14 +812,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param type The <code>GoodsType</code> to buy.
      * @param amount The amount of goods to buy.
      * @param random A <code>Random</code> number source.
-     * @param cs A <code>ChangeSet</code> to update.
      * @throws IllegalStateException If the <code>player</code> cannot afford
      *                               to buy the goods.
      */
-    public void csBuy(GoodsContainer container, GoodsType type, int amount,
-                      Random random, ChangeSet cs)
+    public void buy(GoodsContainer container, GoodsType type, int amount,
+                    Random random)
         throws IllegalStateException {
-        logger.finest(getName() + "buys " + amount + " " + type);
+        logger.finest(getName() + " buys " + amount + " " + type);
         Market market = getMarket();
         int price = market.getBidPrice(type, amount);
         if (price > getGold()) {
@@ -822,14 +839,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         propagateToEuropeanMarkets(type, marketAmount, random);
 
         container.addGoods(type, amount);
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so we will update
-            // the market and send a message as well.
-            cs.addMessage(See.only(this),
-                          market.makePriceChangeMessage(type));
-            market.flushPriceChange(type);
-            cs.add(See.only(this), market.getMarketData(type));
-        }
     }
 
     /**
@@ -843,11 +852,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param type The <code>GoodsType</code> to sell.
      * @param amount The amount of goods to sell.
      * @param random A <code>Random</code> number source.
-     * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csSell(GoodsContainer container, GoodsType type, int amount,
-                       Random random, ChangeSet cs) {
-        logger.finest(getName() + "sells " + amount + " " + type);
+    public void sell(GoodsContainer container, GoodsType type, int amount,
+                     Random random) {
+        logger.finest(getName() + " sells " + amount + " " + type);
         Market market = getMarket();
         int tax = getTax();
         int incomeBeforeTaxes = market.getSalePrice(type, amount);
@@ -863,14 +871,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         propagateToEuropeanMarkets(type, amount, random);
 
         if (container != null) container.addGoods(type, -amount);
-        if (market.hasPriceChanged(type)) {
-            // This type of goods has changed price, so update the
-            // market and send a message as well.
-            cs.addMessage(See.only(this),
-                          market.makePriceChangeMessage(type));
-            market.flushPriceChange(type);
-            cs.add(See.only(this), market.getMarketData(type));
-        }
     }
 
     /**
@@ -1197,12 +1197,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                   + ", total: " + market.getAmountInMarket(type));
                 }
             }
-            if (market.hasPriceChanged(type)) {
-                cs.add(See.only(this), market.getMarketData(type));
-                cs.addMessage(See.only(this),
-                              market.makePriceChangeMessage(type));
-                market.flushPriceChange(type);
-            }
+            csFlushMarket(type, cs);
         }
     }
 

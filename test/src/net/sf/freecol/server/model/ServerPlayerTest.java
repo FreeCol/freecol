@@ -98,11 +98,11 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // Sell lightly in the English market to check that the good
         // is now considered "traded".
-        english.csSell(null, silverType, 1, new Random(), new ChangeSet());
+        english.sell(null, silverType, 1, new Random());
         assertTrue(englishMarket.hasBeenTraded(silverType));
 
         // Sell heavily in the French market, price should drop.
-        french.csSell(null, silverType, 200, new Random(), new ChangeSet());
+        french.sell(null, silverType, 200, new Random());
         assertEquals(frenchGold + silverPrice * 200, french.getGold());
         assertTrue(frenchMarket.hasBeenTraded(silverType));
         assertTrue(frenchMarket.getSalePrice(silverType, 1) < silverPrice);
@@ -421,7 +421,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         int previousGold = p.getGold();
         int price = silverType.getInitialSellPrice();
 
-        p.csSell(null, silverType, 1000, new Random(), new ChangeSet());
+        p.sell(null, silverType, 1000, new Random());
 
         assertEquals(previousGold + price * 1000, p.getGold());
         assertTrue(dm.getSalePrice(silverType, 1) < price);
@@ -434,8 +434,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Market dm = player.getMarket();
         player.modifyGold(1000000);
         int price = foodType.getInitialBuyPrice();
-        player.csBuy(new GoodsContainer(game, player.getEurope()), foodType,
-                     10000, new Random(), new ChangeSet());
+        player.buy(new GoodsContainer(game, player.getEurope()), foodType,
+                   10000, new Random());
 
         assertEquals(1000000 - 10000 * price, player.getGold());
         assertTrue(dm.getBidPrice(foodType, 1) > price);
@@ -459,7 +459,7 @@ public class ServerPlayerTest extends FreeColTestCase {
             throw new IllegalArgumentException("Price is already 0 for selling " + type);
 
         while (price == market.getSalePrice(type, 1)){
-            player.csSell(null, type, 10, random, cs);
+            player.sell(null, type, 10, random);
             result++;
         }
         return result;
@@ -486,7 +486,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         GoodsContainer container = new GoodsContainer(game, player.getEurope());
         while (price == market.getBidPrice(type, 1)) {
-            player.csBuy(container, type, 10, random, cs);
+            player.buy(container, type, 10, random);
             result++;
         }
         return result;
