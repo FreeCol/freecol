@@ -701,11 +701,15 @@ public class Building extends FreeColGameObject
     public int getProductionNextTurn() {
         if (canAutoProduce()) {
             int rawInput = colony.getSurplusFoodProduction(getGoodsInputType());
-            int input = getGoodsInputAuto(rawInput);
-            int output = getAutoProduction(input);
-            System.out.println("Raw input: " + rawInput + ", input: " + input
-                               + " --> " + output);
-            return output;
+            if (rawInput > 0) {
+                int input = getGoodsInputAuto(rawInput);
+                int output = getAutoProduction(input);
+                System.out.println("Raw input: " + rawInput + ", input: " + input
+                                   + " --> " + output);
+                return output;
+            } else {
+                return 0;
+            }
         } else if (getGoodsInputType() == null) {
             return getProductionAdding(0);
         } else {
