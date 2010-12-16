@@ -161,7 +161,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
                  && !colony.canBuild())) {
             // Actually produce the goods:
             if (goodsInputType != null) {
-                colony.removeGoods(goodsInputType, getGoodsInput());
+                colony.removeGoods(goodsInputType, goodsInput);
             }
             colony.addGoods(goodsOutputType, goodsOutput);
 
