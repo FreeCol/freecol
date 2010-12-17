@@ -93,7 +93,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertTrue("Food Produced should be more the food consumed",
                    foodProduced > foodConsumed);
 
-        int expectedHorseProd = Math.min(IndianSettlement.MAX_HORSES_PER_TURN,
+        int expectedHorseProd = Math.min(ServerIndianSettlement.MAX_HORSES_PER_TURN,
                                          foodAvail);
         assertTrue("Horses should breed", expectedHorseProd > 0);
 

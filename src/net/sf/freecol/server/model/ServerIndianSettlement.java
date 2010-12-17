@@ -60,6 +60,8 @@ public class ServerIndianSettlement extends IndianSettlement
 
     private static final Logger logger = Logger.getLogger(ServerIndianSettlement.class.getName());
 
+    public static final int MAX_HORSES_PER_TURN = 2;
+
 
     /**
      * Trivial constructor for all ServerModelObjects.
@@ -178,6 +180,7 @@ public class ServerIndianSettlement extends IndianSettlement
         }
 
         // Try to breed horses
+        // TODO: Make this generic.
         GoodsType horsesType = spec.getGoodsType("model.goods.horses");
         // TODO: remove this
         GoodsType grainType = spec.getGoodsType("model.goods.grain");
@@ -185,8 +188,7 @@ public class ServerIndianSettlement extends IndianSettlement
         int foodProdAvail = getProductionOf(grainType) - getFoodConsumption();
         if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
             && foodProdAvail > 0) {
-            int nHorses = Math.min(IndianSettlement.MAX_HORSES_PER_TURN,
-                                   foodProdAvail);
+            int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);
             addGoods(horsesType, nHorses);
             logger.finest("Settlement " + getName() + " bred " + nHorses);
         }
