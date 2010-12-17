@@ -856,8 +856,8 @@ public class IndianSettlement extends Settlement {
     public int getProductionOf(GoodsType type) {
         int potential = 0;
         for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
-            if ((workTile.getOwningSettlement() == null ||
-                 workTile.getOwningSettlement() == this) && !workTile.isOccupied()) {
+            if (workTile.getOwningSettlement() == this
+                && !workTile.isOccupied()) {
                 // TODO: make unitType brave
                 potential += workTile.potential(type, null);
             }
