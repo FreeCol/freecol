@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.OptionGroup;
 
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
@@ -174,8 +175,8 @@ public final class MapEditorController {
         final Game game = freeColClient.getGame();
         final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
 
-        boolean ok = canvas.showMapGeneratorOptionsDialog(mapGenerator.getMapGeneratorOptions(), true);
-        if (!ok) {
+        OptionGroup group = canvas.showMapGeneratorOptionsDialog(mapGenerator.getMapGeneratorOptions(), true);
+        if (group == null) {
             return;
         }
 

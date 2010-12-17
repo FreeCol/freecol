@@ -335,4 +335,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             optionUpdater.reset();
         }
     }
+
+    @Override
+    public String getUIClassID() {
+        return "ReportPanelUI";
+    }
 }

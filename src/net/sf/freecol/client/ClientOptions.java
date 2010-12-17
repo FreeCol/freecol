@@ -580,35 +580,22 @@ public class ClientOptions extends OptionGroup {
             if (in.getLocalName().equals(OptionGroup.getXMLElementTagName())) {
                 updateFromXML(in);
             } else {
-                final String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                if (idStr != null) {
-                    // old protocols:
-                    Option o = getOption(idStr);
+                String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                if (idStr == null) {
+                    idStr = in.getLocalName();
+                }
+                Option o = getOption(idStr);
 
-                    if (o != null) {
-                        o.readFromXML(in);
-                    } else {
-                        // Normal only if this option is from an old save game:
-                        logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
-
-                        // Ignore the option:
-                        final String ignoredTag = in.getLocalName();
-                        while (in.nextTag() != XMLStreamConstants.END_ELEMENT
-                                || !in.getLocalName().equals(ignoredTag));
-                    }
+                if (o != null) {
+                    o.readFromXML(in);
                 } else {
-                    Option o = getOption(in.getLocalName());
-                    if (o != null) {
-                        o.readFromXML(in);
-                    } else {
-                        // Normal only if this option is from an old save game:
-                        logger.info("Option \"" + in.getLocalName() + " not found.");
+                    // Normal only if this option is from an old save game:
+                    logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
 
-                        // Ignore the option:
-                        final String ignoredTag = in.getLocalName();
-                        while (in.nextTag() != XMLStreamConstants.END_ELEMENT
-                                || !in.getLocalName().equals(ignoredTag));
-                    }
+                    // Ignore the option:
+                    final String ignoredTag = in.getLocalName();
+                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT
+                           || !in.getLocalName().equals(ignoredTag));
                 }
             }
         }

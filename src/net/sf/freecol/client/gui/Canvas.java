@@ -1752,13 +1752,13 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the client options have been modified, and
      *         <code>false</code> otherwise.
      */
-    public boolean showClientOptionsDialog() {
+    public OptionGroup showClientOptionsDialog() {
         clientOptionsDialog.initialize();
         clientOptionsDialogShowing = true;
-        boolean r = showFreeColDialog(clientOptionsDialog);
+        OptionGroup group = showFreeColDialog(clientOptionsDialog);
         clientOptionsDialogShowing = false;
         freeColClient.getActionManager().update();
-        return r;
+        return group;
     }
 
     /**
@@ -1769,7 +1769,7 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the options have been modified, and
      *         <code>false</code> otherwise.
      */
-    public boolean showMapGeneratorOptionsDialog(boolean editable) {
+    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
         final OptionGroup mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
         return showMapGeneratorOptionsDialog(mgo, editable);
     }
@@ -1783,7 +1783,7 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the options have been modified, and
      *         <code>false</code> otherwise.
      */
-    public boolean showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable) {
+    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable) {
         MapGeneratorOptionsDialog mapGeneratorOptionsDialog =
             new MapGeneratorOptionsDialog(this, mgo, editable);
         return showFreeColDialog(mapGeneratorOptionsDialog);

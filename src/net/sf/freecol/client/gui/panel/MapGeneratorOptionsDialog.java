@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -50,39 +50,24 @@ import net.miginfocom.swing.MigLayout;
  * Dialog for changing the
  * {@link net.sf.freecol.server.generator.OptionGroup}.
  */
-public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class MapGeneratorOptionsDialog extends OptionsDialog implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
-
-    private final OptionGroupUI ui;
 
     /**
      * The constructor that will add the items to this panel.
      *
      * @param parent The parent of this panel.
+     * @param mgo the map generator options
+     * @param editable whether the options may be edited
      */
     public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable) {
-        super(parent);
-        setLayout(new MigLayout("wrap 1"));
+        super(parent, editable);
 
-        ui = new OptionGroupUI(mgo, editable);
-
-        JButton reset = new JButton(Messages.message("reset"));
-        reset.setActionCommand(RESET);
-        reset.addActionListener(this);
-
-        setCancelComponent(cancelButton);
-
-        setSize(750, 500);
-
-        // Header:
-        add(getDefaultHeader(mgo.getName()), "align center");
-
-        JScrollPane scrollPane;
+        JScrollPane scrollPane = null;
 
         if (editable) {
             JPanel mapPanel = new JPanel();
-            mapPanel.setLayout(new MigLayout("", "", "[nogrid][]"));
             /*
              * TODO: The update should be solved by PropertyEvent.
              */
@@ -116,61 +101,37 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
                     mapButton.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                ui.reset();
-                                FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-                                fou.setValue(file);
-
-                                ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
-                                ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
-                                ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+                                setFile(file);
                             }
                         });
                     mapPanel.add(mapButton);
                 }
             }
 
-            // Options:
-            mapPanel.add(ui, "newline 20");
-
-            scrollPane = new JScrollPane(mapPanel,
-                                         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        } else {
-            scrollPane = new JScrollPane(ui,
-                                         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            if (mapPanel.getComponentCount() > 0) {
+                scrollPane = new JScrollPane(mapPanel,
+                                             JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+                scrollPane.getViewport().setOpaque(false);
+                // TODO: find out how to do this properly
+                scrollPane.setMinimumSize(new Dimension(400, 110));
+            }
         }
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.getViewport().setOpaque(false);
-        add(scrollPane, "height 100%, width 100%");
 
-        // Buttons:
-        if (editable) {
-            add(okButton, "newline 20, split 3, tag ok");
-            add(reset);
-            add(cancelButton, "tag cancel");
-        } else {
-            add(okButton, "newline 20, tag ok");
-        }
+        initialize(mgo, mgo.getName(), scrollPane);
 
     }
 
-    public void requestFocus() {
-        if (okButton.isEnabled()) {
-            okButton.requestFocus();
-        } else {
-            cancelButton.requestFocus();
-        }
-    }
+    private void setFile(File file) {
+        OptionGroupUI ui = getOptionUI();
+        ui.reset();
+        FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
+        fou.setValue(file);
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 500);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
+        ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
+        ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
+        ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
     }
 
     /**
@@ -180,25 +141,13 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            ui.unregister();
-            ui.updateOption();
-            getCanvas().remove(this);
             if (!getClient().isMapEditor()) {
                 getClient().getPreGameController().sendMapGeneratorOptions();
                 getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
             }
-            setResponse(new Boolean(true));
-        } else if (CANCEL.equals(command)) {
-            ui.rollback();
-            ui.unregister();
-            getCanvas().remove(this);
-            setResponse(new Boolean(false));
-        } else if (RESET.equals(command)) {
-            ui.reset();
-        } else {
-            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 }

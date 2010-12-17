@@ -49,15 +49,15 @@ import net.miginfocom.swing.MigLayout;
 /**
 * Dialog for changing the {@link net.sf.freecol.common.model.DifficultyLevel}.
 */
-public final class DifficultyDialog extends FreeColDialog<OptionGroup> implements ItemListener {
+public final class DifficultyDialog extends OptionsDialog implements ItemListener {
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
     private static final String EDIT = "EDIT";
 
-    private OptionGroupUI ui;
-    private OptionGroup level;
     private JPanel optionPanel;
+
+    private JButton edit = new JButton(Messages.message("edit"));
 
     private String DEFAULT_LEVEL = "model.difficulty.medium";
     private String CUSTOM_LEVEL = "model.difficulty.custom";
@@ -79,9 +79,8 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
 
 
     public DifficultyDialog(Canvas parent, OptionGroup level) {
-        super(parent);
+        super(parent, false);
         specification = getSpecification();
-        difficultyBox.setRenderer(new BoxRenderer());
         List<OptionGroup> levels = new ArrayList<OptionGroup>(1);
         levels.add(level);
         initialize(levels);
@@ -92,39 +91,44 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
     * @param parent The parent of this panel.
     */
     public DifficultyDialog(Canvas parent, Specification specification) {
-        super(parent);
+        super(parent, false);
         this.specification = specification;
-        difficultyBox.setRenderer(new BoxRenderer());
         initialize(specification.getDifficultyLevels());
+
     }
 
     private void initialize(List<OptionGroup> levels) {
-        setLayout(new MigLayout("wrap 1, fill"));
+
+        setLayout(new MigLayout("wrap 1, fill", "[center]"));
+
+        difficultyBox.setRenderer(new BoxRenderer());
+
+        edit.setActionCommand(EDIT);
+        edit.addActionListener(this);
 
         // Header:
-        JLabel header = localizedLabel("difficulty");
-        header.setFont(ResourceManager.getFont("HeaderFont", 48f));
-        add(header, "center, wrap 20");
+        add(getDefaultHeader(Messages.message("difficulty")), "wrap 20");
 
         for (OptionGroup dLevel : levels) {
             String id = dLevel.getId();
             difficultyBox.addItem(id);
             if (DEFAULT_LEVEL.equals(id)) {
-                level = dLevel;
+                group = dLevel;
                 difficultyBox.setSelectedIndex(difficultyBox.getItemCount() - 1);
             }
         }
 
         if (levels.size() == 1) {
             difficultyBox.setEnabled(false);
-            level = levels.get(0);
+            group = levels.get(0);
         } else {
             difficultyBox.addItemListener(this);
         }
         add(difficultyBox);
 
         // Options:
-        ui = new OptionGroupUI(level, false);
+        OptionGroupUI ui = new OptionGroupUI(group, false);
+        setOptionUI(ui);
         ui.setOpaque(false);
         optionPanel = new JPanel() {
             @Override
@@ -144,21 +148,12 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
         if (levels.size() == 1) {
             add(okButton, "newline 20, tag ok");
         } else {
-            add(okButton, "newline 20, split 4, tag ok");
-
-            JButton reset = new JButton(Messages.message("reset"));
-            reset.setActionCommand(RESET);
-            reset.addActionListener(this);
-            reset.setMnemonic('R');
-            add(reset);
-
-            JButton edit = new JButton(Messages.message("edit"));
-            edit.setActionCommand(EDIT);
-            edit.addActionListener(this);
-            edit.setMnemonic('E');
-            add(edit);
-
+            add(okButton, "newline 20, split 6, tag ok");
             add(cancelButton, "tag cancel");
+            add(reset);
+            add(load);
+            add(save);
+            add(edit);
         }
 
         setSize(780, 540);
@@ -186,31 +181,20 @@ public final class DifficultyDialog extends FreeColDialog<OptionGroup> implement
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            ui.unregister();
-            ui.updateOption();
-            getCanvas().remove(this);
-            setResponse(level);
-        } else if (CANCEL.equals(command)) {
-            ui.rollback();
-            ui.unregister();
-            getCanvas().remove(this);
-            setResponse(specification.getOptionGroup(DEFAULT_LEVEL));
-        } else if (RESET.equals(command)) {
-            ui.reset();
-        } else if (EDIT.equals(command)) {
+        if (EDIT.equals(command)) {
             OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
-            custom.setValue(level);
+            custom.setValue(group);
             difficultyBox.setSelectedItem(CUSTOM_LEVEL);
         } else {
-            logger.warning("Invalid ActionCommand: " + command);
+            super.actionPerformed(event);
         }
     }
 
     public void itemStateChanged(ItemEvent event) {
         String id = (String) difficultyBox.getSelectedItem();
-        level = specification.getOptionGroup(id);
-        ui = new OptionGroupUI(level, (CUSTOM_LEVEL.equals(id)));
+        group = specification.getOptionGroup(id);
+        OptionGroupUI ui = new OptionGroupUI(group, (CUSTOM_LEVEL.equals(id)));
+        setOptionUI(ui);
         optionPanel.removeAll();
         optionPanel.add(ui);
         revalidate();

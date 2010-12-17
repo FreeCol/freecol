@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,53 +38,17 @@ import net.miginfocom.swing.MigLayout;
 /**
  * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
  */
-public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
+public final class ClientOptionsDialog extends OptionsDialog  {
 
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
-
-    private OptionGroupUI ui;
-    private JButton reset = new JButton(Messages.message("reset"));
 
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ClientOptionsDialog(Canvas parent) {
-        super(parent);
-        setLayout(new MigLayout("wrap 1", "[center]"));
-
-        reset.setActionCommand(RESET);
-        reset.addActionListener(this);
-
-        setCancelComponent(cancelButton);
-
-        setSize(850, 600);
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(850, 600);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
-
-    public void initialize() {
-        removeAll();
-
-        // Header:
-        add(getDefaultHeader(getClient().getClientOptions().getName()));
-
-        // Options:
-        ui = new OptionGroupUI(getClient().getClientOptions());
-        add(ui);
-
-        // Buttons:
-        add(okButton, "newline 20, split 3, tag ok");
-        add(cancelButton);
-        add(reset);
+        super(parent, true);
+        initialize(getClient().getClientOptions(), getClient().getClientOptions().getName(), null);
     }
 
     /**
@@ -93,18 +57,15 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            ui.unregister();
-            ui.updateOption();
-            getCanvas().remove(this);
             getClient().saveClientOptions();
             getClient().getActionManager().update();
             JMenuBar menuBar = getClient().getFrame().getJMenuBar();
             if (menuBar != null) {
                 ((FreeColMenuBar) menuBar).reset();
             }
-            setResponse(Boolean.TRUE);
 
             // Immediately redraw the minimap if that was updated.
             MapControlsAction mca = (MapControlsAction) getClient()
@@ -112,15 +73,6 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
             if (mca.getMapControls() != null) {
                 mca.getMapControls().update();
             }
-        } else if (CANCEL.equals(command)) {
-            ui.rollback();
-            ui.unregister();
-            getCanvas().remove(this);
-            setResponse(Boolean.FALSE);
-        } else if (RESET.equals(command)) {
-            ui.reset();
-        } else {
-            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 }
