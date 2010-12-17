@@ -197,8 +197,7 @@ public class ServerIndianSettlement extends IndianSettlement
     }
 
     /**
-     * Convenience function to remove an amount of goods but increase
-     * the gold by a corresponding amount (CHEAT).
+     * Convenience function to remove an amount of goods.
      *
      * @param type The <code>GoodsType</code> to remove.
      * @param amount The amount of goods to remove.
@@ -206,8 +205,11 @@ public class ServerIndianSettlement extends IndianSettlement
     private void consumeGoods(GoodsType type, int amount) {
         if (getGoodsCount(type) > 0) {
             amount = Math.min(amount, getGoodsCount(type));
-            getOwner().modifyGold(amount);
             removeGoods(type, amount);
+            // CHEAT: increase the gold by a corresponding amount
+            if (type.isNewWorldLuxuryType()) {
+                getOwner().modifyGold(amount);
+            }
         }
     }
 
