@@ -2131,15 +2131,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
                               .addStringTemplate("%nation%", winnerNation)
                               .add("%equipment%", equip.getNameKey()));
 
-                // TODO: Immediately transferring the captured goods
+                // CHEAT: Immediately transferring the captured goods
                 // back to a potentially remote settlement is pretty
-                // dubious.  Apparently Col1 did it, but its a CHEAT
-                // nonetheless.  Better would be to give the capturing
-                // unit a return-home- -with-plunder mission.
+                // dubious.  Apparently Col1 did it.  Better would be
+                // to give the capturing unit a go-home-with-plunder mission.
                 IndianSettlement settlement = winner.getIndianSettlement();
                 if (settlement != null) {
                     for (AbstractGoods goods : equip.getGoodsRequired()) {
                         settlement.addGoods(goods);
+                        logger.finest("CHEAT teleporting " + goods.toString()
+                                      + " back to " + settlement.getName());
                     }
                     cs.add(See.only(winnerPlayer), settlement);
                 }
