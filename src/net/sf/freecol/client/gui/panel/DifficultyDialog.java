@@ -20,30 +20,22 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
 
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -115,7 +107,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         edit.setActionCommand(EDIT);
         edit.addActionListener(this);
         edit.setEnabled(!CUSTOM_LEVEL.equals(group.getId()));
-        addButton(edit);
+        getButtons().add(edit);
 
         difficultyBox.addItemListener(this);
 
@@ -149,4 +141,9 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         edit.setEnabled(!CUSTOM_LEVEL.equals(id));
         updateUI(specification.getOptionGroup(id));
     }
+
+    public String getDefaultFileName() {
+        return "custom.xml";
+    }
+
 }

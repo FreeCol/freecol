@@ -36,7 +36,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
@@ -44,7 +43,6 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
-import net.miginfocom.swing.MigLayout;
 
 /**
  * Dialog for changing the
@@ -121,6 +119,10 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
 
         initialize(mgo, mgo.getName(), scrollPane);
 
+    }
+
+    public String getDefaultFileName() {
+        return "map_generator_options.xml";
     }
 
     private void setFile(File file) {

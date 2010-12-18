@@ -20,8 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
-
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -35,8 +33,6 @@ import net.sf.freecol.common.model.GameOptions;
  */
 public final class GameOptionsDialog extends OptionsDialog implements ActionListener {
 
-    private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());
-
     /**
      * The constructor that will add the items to this panel.
      *
@@ -44,10 +40,10 @@ public final class GameOptionsDialog extends OptionsDialog implements ActionList
      */
     public GameOptionsDialog(Canvas parent, boolean editable) {
         super(parent, editable);
-        super.initialize(getSpecification().getOptionGroup("gameOptions"),
-                         Messages.message("gameOptions"), null);
-        // Set special cases
+        initialize(getSpecification().getOptionGroup("gameOptions"),
+                   Messages.message("gameOptions"), null);
 
+        // Set special cases
         // Disable victory option "All humans defeated"
         //when playing single player
         if (editable && getClient().isSingleplayer()) {
@@ -56,6 +52,10 @@ public final class GameOptionsDialog extends OptionsDialog implements ActionList
             comp.setValue(false);
             comp.setEnabled(false);
         }
+    }
+
+    public String getDefaultFileName() {
+        return "game_options.xml";
     }
 
 }

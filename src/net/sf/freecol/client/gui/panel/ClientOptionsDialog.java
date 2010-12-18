@@ -20,20 +20,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JMenuBar;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.option.OptionGroupUI;
 
-import net.miginfocom.swing.MigLayout;
 
 /**
  * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
@@ -48,6 +43,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      */
     public ClientOptionsDialog(Canvas parent) {
         super(parent, true);
+        getButtons().clear();
         initialize(getClient().getClientOptions(), getClient().getClientOptions().getName(), null);
     }
 

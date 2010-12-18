@@ -49,9 +49,9 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
-    protected static final String RESET = "RESET";
-    protected static final String SAVE = "SAVE";
-    protected static final String LOAD = "LOAD";
+    private static final String RESET = "RESET";
+    private static final String SAVE = "SAVE";
+    private static final String LOAD = "LOAD";
 
     private OptionGroupUI ui;
     private OptionGroup group;
@@ -62,6 +62,17 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private List<JButton> buttons = new ArrayList<JButton>();
     private boolean editable = true;
+
+    private static final FileFilter[] filters = new FileFilter[] {
+        new FileFilter() {
+            public boolean accept(File pathname) {
+                return pathname.getName().endsWith(".xml");
+            }
+            public String getDescription() {
+                return Messages.message("filter.xml");
+            }
+        }
+    };
 
     /**
      * The constructor that will add the items to this panel.
@@ -152,8 +163,8 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         return editable;
     }
 
-    protected void addButton(JButton button) {
-        buttons.add(button);
+    protected List<JButton> getButtons() {
+        return buttons;
     }
 
     protected void updateUI(OptionGroup group) {
@@ -166,6 +177,10 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     protected OptionGroup getGroup() {
         return group;
+    }
+
+    public String getDefaultFileName() {
+        return "options.xml";
     }
 
     /**
@@ -188,24 +203,14 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         } else if (RESET.equals(command)) {
             ui.reset();
         } else if (SAVE.equals(command)) {
-            FileFilter[] filters = new FileFilter[] {
-                FreeColDialog.getFGOFileFilter(),
-                FreeColDialog.getFSGFileFilter(),
-                FreeColDialog.getGameOptionsFileFilter()
-            };
-            File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
+            File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".xml", filters,
+                                                       getDefaultFileName());
             if (saveFile != null) {
                 ui.updateOption();
                 group.save(saveFile);
             }
         } else if (LOAD.equals(command)) {
-            File loadFile = getCanvas()
-                .showLoadDialog(FreeCol.getSaveDirectory(),
-                                new FileFilter[] {
-                                    FreeColDialog.getFGOFileFilter(),
-                                    FreeColDialog.getFSGFileFilter(),
-                                    FreeColDialog.getGameOptionsFileFilter()
-                                });
+            File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), filters);
             if (loadFile != null) {
                 try {
                     FileInputStream in = new FileInputStream(loadFile);
