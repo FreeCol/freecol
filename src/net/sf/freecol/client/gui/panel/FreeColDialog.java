@@ -63,9 +63,6 @@ public class FreeColDialog<T> extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
     protected static final String CANCEL = "CANCEL";
-    protected static final String RESET = "RESET";
-    protected static final String SAVE = "SAVE";
-    protected static final String LOAD = "LOAD";
 
     // Stores the response from the user:
     private T response = null;

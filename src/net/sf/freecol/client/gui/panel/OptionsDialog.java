@@ -25,9 +25,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
@@ -45,11 +49,18 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
+    protected static final String RESET = "RESET";
+    protected static final String SAVE = "SAVE";
+    protected static final String LOAD = "LOAD";
+
     private OptionGroupUI ui;
-    protected OptionGroup group;
-    protected JButton reset = new JButton(Messages.message("reset"));
-    protected JButton load = new JButton(Messages.message("load"));
-    protected JButton save = new JButton(Messages.message("save"));
+    private OptionGroup group;
+    private JButton reset = new JButton(Messages.message("reset"));
+    private JButton load = new JButton(Messages.message("load"));
+    private JButton save = new JButton(Messages.message("save"));
+    private JPanel optionPanel;
+
+    private List<JButton> buttons = new ArrayList<JButton>();
     private boolean editable = true;
 
     /**
@@ -59,7 +70,7 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
     public OptionsDialog(Canvas parent, boolean editable) {
         super(parent);
         this.editable = editable;
-        setLayout(new MigLayout("wrap 1, fill", "[center]"));
+        setLayout(new MigLayout("wrap 1, fill"));
 
         reset.setActionCommand(RESET);
         reset.addActionListener(this);
@@ -69,6 +80,10 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
         save.setActionCommand(SAVE);
         save.addActionListener(this);
+
+        buttons.add(reset);
+        buttons.add(load);
+        buttons.add(save);
 
         setCancelComponent(cancelButton);
 
@@ -83,7 +98,7 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         removeAll();
 
         // Header:
-        add(getDefaultHeader(header));
+        add(getDefaultHeader(header), "center");
 
         // Additional component, if any
         if (component != null) {
@@ -91,16 +106,29 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
 
         // Options:
-        ui = new OptionGroupUI(group, editable);
-        add(ui, "grow");
+        ui = new OptionGroupUI(group, isGroupEditable());
+        optionPanel = new JPanel() {
+            @Override
+            public String getUIClassID() {
+                return "ReportPanelUI";
+            }
+        };
+        optionPanel.setOpaque(true);
+        optionPanel.add(ui);
+        JScrollPane scrollPane = new JScrollPane(optionPanel,
+                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
+        add(scrollPane, "height 100%, width 100%");
 
         // Buttons:
         if (editable) {
-            add(okButton, "newline 20, split 5, tag ok");
-            add(cancelButton);
-            add(reset);
-            add(load);
-            add(save);
+            int cells = buttons.size() + 2;
+            add(okButton, "newline 20, tag ok, split " + cells);
+            add(cancelButton, "tag cancel");
+            for (JButton button : buttons) {
+                add(button);
+            }
         } else {
             add(okButton, "newline 20, tag ok");
         }
@@ -120,14 +148,25 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         return ui;
     }
 
-    protected void setOptionUI(OptionGroupUI ui) {
-        this.ui = ui;
+    protected boolean isGroupEditable() {
+        return editable;
     }
 
-    protected void setEditable(boolean value) {
-        editable = value;
+    protected void addButton(JButton button) {
+        buttons.add(button);
     }
 
+    protected void updateUI(OptionGroup group) {
+        this.group = group;
+        optionPanel.removeAll();
+        optionPanel.add(new OptionGroupUI(group, isGroupEditable()));
+        revalidate();
+        repaint();
+    }
+
+    protected OptionGroup getGroup() {
+        return group;
+    }
 
     /**
      * This function analyses an event and calls the right methods to take

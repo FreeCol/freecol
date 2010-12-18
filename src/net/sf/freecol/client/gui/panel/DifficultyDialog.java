@@ -77,13 +77,16 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         }
     }
 
-
     public DifficultyDialog(Canvas parent, OptionGroup level) {
         super(parent, false);
+        difficultyBox.setRenderer(new BoxRenderer());
         specification = getSpecification();
-        List<OptionGroup> levels = new ArrayList<OptionGroup>(1);
-        levels.add(level);
-        initialize(levels);
+
+        difficultyBox.addItem(level.getId());
+        difficultyBox.setEnabled(false);
+
+        initialize(level, Messages.message("difficulty"), difficultyBox);
+
     }
 
     /**
@@ -91,87 +94,38 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     * @param parent The parent of this panel.
     */
     public DifficultyDialog(Canvas parent, Specification specification) {
-        super(parent, false);
-        this.specification = specification;
-        initialize(specification.getDifficultyLevels());
-
-    }
-
-    private void initialize(List<OptionGroup> levels) {
-
-        setLayout(new MigLayout("wrap 1, fill", "[center]"));
-
+        super(parent, true);
         difficultyBox.setRenderer(new BoxRenderer());
+        this.specification = specification;
 
-        edit.setActionCommand(EDIT);
-        edit.addActionListener(this);
-
-        // Header:
-        add(getDefaultHeader(Messages.message("difficulty")), "wrap 20");
-
-        for (OptionGroup dLevel : levels) {
-            String id = dLevel.getId();
+        OptionGroup group = null;
+        for (OptionGroup level : specification.getDifficultyLevels()) {
+            String id = level.getId();
             difficultyBox.addItem(id);
             if (DEFAULT_LEVEL.equals(id)) {
-                group = dLevel;
+                group = level;
                 difficultyBox.setSelectedIndex(difficultyBox.getItemCount() - 1);
             }
         }
 
-        if (levels.size() == 1) {
-            difficultyBox.setEnabled(false);
-            group = levels.get(0);
-        } else {
-            difficultyBox.addItemListener(this);
-        }
-        add(difficultyBox);
-
-        // Options:
-        OptionGroupUI ui = new OptionGroupUI(group, false);
-        setOptionUI(ui);
-        ui.setOpaque(false);
-        optionPanel = new JPanel() {
-            @Override
-            public String getUIClassID() {
-                return "ReportPanelUI";
-            }
-        };
-        optionPanel.setOpaque(true);
-        optionPanel.add(ui);
-        JScrollPane scrollPane = new JScrollPane(optionPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
-        add(scrollPane, "height 100%, width 100%");
-
-        // Buttons:
-        if (levels.size() == 1) {
-            add(okButton, "newline 20, tag ok");
-        } else {
-            add(okButton, "newline 20, split 6, tag ok");
-            add(cancelButton, "tag cancel");
-            add(reset);
-            add(load);
-            add(save);
-            add(edit);
+        if (group == null) {
+            group = specification.getDifficultyLevels().get(0);
         }
 
-        setSize(780, 540);
+        edit.setActionCommand(EDIT);
+        edit.addActionListener(this);
+        edit.setEnabled(!CUSTOM_LEVEL.equals(group.getId()));
+        addButton(edit);
+
+        difficultyBox.addItemListener(this);
+
+        initialize(group, Messages.message("difficulty"), difficultyBox);
+
     }
 
     @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(780, 540);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
-
-    public void initialize() {
-        removeAll();
-
+    protected boolean isGroupEditable() {
+        return CUSTOM_LEVEL.equals(getGroup().getId());
     }
 
     /**
@@ -183,7 +137,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         String command = event.getActionCommand();
         if (EDIT.equals(command)) {
             OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
-            custom.setValue(group);
+            custom.setValue(getGroup());
             difficultyBox.setSelectedItem(CUSTOM_LEVEL);
         } else {
             super.actionPerformed(event);
@@ -192,12 +146,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
 
     public void itemStateChanged(ItemEvent event) {
         String id = (String) difficultyBox.getSelectedItem();
-        group = specification.getOptionGroup(id);
-        OptionGroupUI ui = new OptionGroupUI(group, (CUSTOM_LEVEL.equals(id)));
-        setOptionUI(ui);
-        optionPanel.removeAll();
-        optionPanel.add(ui);
-        revalidate();
-        repaint();
+        edit.setEnabled(!CUSTOM_LEVEL.equals(id));
+        updateUI(specification.getOptionGroup(id));
     }
 }
