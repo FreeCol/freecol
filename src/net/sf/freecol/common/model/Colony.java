@@ -23,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,7 +52,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public class Colony extends Settlement implements Nameable, PropertyChangeListener {
+public class Colony extends Settlement implements Consumer, Nameable, PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -2055,6 +2056,87 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     public void dispose() {
         disposeList();
     }
+
+
+    public List<Consumer> getConsumersOf(GoodsType goodsType) {
+        List<Consumer> result = new ArrayList<Consumer>();
+        for (Unit unit : getUnitList()) {
+            if (unit.consumes(goodsType)) {
+                result.add(unit);
+            }
+        }
+        for (Building building : buildingMap.values()) {
+            if (building.getGoodsInputType() == goodsType
+                || (!building.getType().getFeatureContainer()
+                    .getModifierSet("model.modifier.storeSurplus", goodsType)
+                    .isEmpty())) {
+                result.add(building);
+            }
+        }
+        if (consumes(goodsType)) {
+            result.add(this);
+        }
+        Collections.sort(result, Consumer.COMPARATOR);
+        return result;
+    }
+
+
+    // Interface Consumer
+
+    /**
+     * Returns the number of units of the given GoodsType this
+     * UnitType consumes per turn (when in a settlement).
+     *
+     * @return units consumed
+     */
+    public int getConsumedAmount(GoodsType goodsType) {
+        BuildableType current = getCurrentlyBuilding();
+        if (current == null) {
+            return 0;
+        } else {
+            return current.getAmountRequiredOf(goodsType);
+        }
+    }
+
+
+    /**
+     * Returns true if this Consumer consumes the given GoodsType.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean consumes(GoodsType goodsType) {
+        return getConsumedAmount(goodsType) > 0;
+    }
+
+    /**
+     * Returns a list of GoodsTypes this Consumer consumes.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<AbstractGoods> getConsumedGoods() {
+        BuildableType current = getCurrentlyBuilding();
+        if (current == null) {
+            return new ArrayList<AbstractGoods>();
+        } else {
+            return current.getGoodsRequired();
+        }
+    }
+
+    /**
+     * The priority of this Consumer. The higher the priority, the
+     * earlier will the Consumer be allowed to consume the goods it
+     * requires.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPriority() {
+        return COLONY_PRIORITY;
+    }
+
+
+    //Serialization
+
 
     /**
      * This method writes an XML-representation of this object to the given

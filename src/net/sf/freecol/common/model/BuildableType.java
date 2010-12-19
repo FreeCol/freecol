@@ -51,6 +51,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * A list of AbstractGoods required to build this type.
      */
     private List<AbstractGoods> goodsRequired = new ArrayList<AbstractGoods>();
+
     /**
      * Stores the abilities required by this Type.
      */

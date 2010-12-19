@@ -40,8 +40,8 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private int basicProduction = 3;
     private int minSkill = UNDEFINED;
     private int maxSkill = INFINITY;
-    private int sequence = 0;
     private int upkeep = 0;
+    private int priority = Consumer.BUILDING_PRIORITY;
 
     private GoodsType consumes, produces;
     private Modifier productionModifier = null;
@@ -91,13 +91,21 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         return level;
     }
 
-    public int getSequence() {
-        return sequence;
-    }
-
     public int getUpkeep() {
         return upkeep;
     }
+
+    /**
+     * The consumption priority of a Building of this type. The higher
+     * the priority, the earlier will the Consumer be allowed to
+     * consume the goods it requires.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPriority() {
+        return priority;
+    }
+
 
     public FreeColGameObjectType getType() {
         return this;
@@ -163,7 +171,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         minSkill = getAttribute(in, "minSkill", parent.minSkill);
         maxSkill = getAttribute(in, "maxSkill", parent.maxSkill);
 
-        sequence = getAttribute(in, "sequence", parent.sequence);
+        priority = getAttribute(in, "priority", parent.priority);
         upkeep = getAttribute(in, "upkeep", parent.upkeep);
 
         if (parent != this) {
@@ -237,9 +245,11 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         if (maxSkill < INFINITY) {
             out.writeAttribute("maxSkill", Integer.toString(maxSkill));
         }
-        out.writeAttribute("sequence", Integer.toString(sequence));
         if (upkeep > 0) {
             out.writeAttribute("upkeep", Integer.toString(upkeep));
+        }
+        if (priority != Consumer.BUILDING_PRIORITY) {
+            out.writeAttribute("priority", Integer.toString(priority));
         }
         if (consumes != null) {
             out.writeAttribute("consumes", consumes.getId());

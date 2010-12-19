@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
-public final class UnitType extends BuildableType implements Comparable<UnitType> {
+public final class UnitType extends BuildableType implements Comparable<UnitType>, Consumer {
 
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
@@ -454,20 +454,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     }
 
     /**
-     * Returns the number of units of the given GoodsType this
-     * UnitType consumes per turn (when in a settlement).
-     *
-     * @return units consumed
-     */
-    public int getConsumptionOf(GoodsType goodsType) {
-        return consumption.getCount(goodsType);
-    }
-
-    public int compareTo(UnitType other) {
-        return getIndex() - other.getIndex();
-    }
-
-    /**
      * Returns true if the UnitType is available to the given
      * Player.
      *
@@ -767,6 +753,71 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         return Math.max(base, 1);
     }
 
+     /**
+     * Returns the number of units of the given GoodsType this
+     * UnitType consumes per turn (when in a settlement).
+     *
+     * @return units consumed
+     */
+    public int getConsumptionOf(GoodsType goodsType) {
+        return consumption.getCount(goodsType);
+    }
+
+    // Interface Comparable
+
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(UnitType other) {
+        return getIndex() - other.getIndex();
+    }
+
+    // Interface Consumer
+
+    /**
+     * Returns the number of units of the given GoodsType this
+     * UnitType consumes per turn (when in a settlement).
+     *
+     * @return units consumed
+     */
+    public int getConsumedAmount(GoodsType goodsType) {
+        return consumption.getCount(goodsType);
+    }
+
+    /**
+     * Returns true if this Consumer consumes the given GoodsType.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean consumes(GoodsType goodsType) {
+        return getConsumedAmount(goodsType) > 0;
+    }
+
+    /**
+     * Returns a list of GoodsTypes this Consumer consumes.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<AbstractGoods> getConsumedGoods() {
+        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        for (GoodsType goodsType : consumption.keySet()) {
+            result.add(new AbstractGoods(goodsType, consumption.getCount(goodsType)));
+        }
+        return result;
+    }
+
+    /**
+     * The priority of this Consumer. The higher the priority, the
+     * earlier will the Consumer be allowed to consume the goods it
+     * requires.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPriority() {
+        // TODO: make this configurable
+        return UNIT_PRIORITY;
+    }
 
 
 }

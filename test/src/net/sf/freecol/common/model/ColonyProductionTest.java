@@ -19,8 +19,11 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -213,4 +216,71 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals("Wrong maximum horse production", 5, pasture.getMaximumProduction());
         assertEquals("Wrong net horse production",0, colony.getProductionNetOf(horsesType));
     }
+
+    public void testConsumers() {
+
+        Game game = getGame();
+        game.setMap(getTestMap());
+
+        Colony colony = getStandardColony(3);
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+
+        List<Consumer> consumers = colony.getConsumersOf(foodType);
+        assertEquals(4, consumers.size());
+        assertTrue(consumers.get(0) instanceof Unit);
+        assertTrue(consumers.get(1) instanceof Unit);
+        assertTrue(consumers.get(2) instanceof Unit);
+        assertTrue(consumers.get(3) instanceof Building);
+        assertEquals("model.building.depot",
+                     ((Building) consumers.get(3)).getType().getId());
+
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+
+        consumers = colony.getConsumersOf(bellsType);
+        assertEquals(3, consumers.size());
+        assertTrue(consumers.get(0) instanceof Unit);
+        assertTrue(consumers.get(1) instanceof Unit);
+        assertTrue(consumers.get(2) instanceof Unit);
+
+        GoodsType sugarType = spec().getGoodsType("model.goods.sugar");
+
+        consumers = colony.getConsumersOf(sugarType);
+        assertEquals(1, consumers.size());
+        assertTrue(consumers.get(0) instanceof Building);
+        assertEquals("model.building.distillerHouse",
+                     ((Building) consumers.get(0)).getType().getId());
+
+
+        GoodsType grainType = spec().getGoodsType("model.goods.grain");
+
+        consumers = colony.getConsumersOf(grainType);
+        assertEquals(1, consumers.size());
+        assertTrue(consumers.get(0) instanceof Building);
+        assertEquals("model.building.country",
+                     ((Building) consumers.get(0)).getType().getId());
+
+
+        GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+
+        consumers = colony.getConsumersOf(toolsType);
+        assertEquals(0, consumers.size());
+
+        colony.setCurrentlyBuilding(spec().getBuildingType("model.building.rumDistillery"));
+        consumers = colony.getConsumersOf(toolsType);
+        assertEquals(1, consumers.size());
+        assertEquals(consumers.get(0), colony);
+
+        BuildingType armoryType = spec().getBuildingType("model.building.armory");
+        Building armory = new ServerBuilding(getGame(), colony, armoryType);
+        colony.addBuilding(armory);
+        consumers = colony.getConsumersOf(toolsType);
+        assertEquals(2, consumers.size());
+        assertEquals(consumers.get(0), colony);
+        assertTrue(consumers.get(1) instanceof Building);
+        assertEquals("model.building.armory",
+                     ((Building) consumers.get(1)).getType().getId());
+
+
+    }
+
 }

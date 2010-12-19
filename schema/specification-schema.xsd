@@ -366,7 +366,7 @@
       <xs:attribute name="produces" type="GoodsTypeId"/>
       <xs:attribute name="consumes" type="GoodsTypeId"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="sequence" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
       <xs:attribute name="minSkill" type="xs:int"/>
       <xs:attribute name="maxSkill" type="xs:int"/>
       <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>

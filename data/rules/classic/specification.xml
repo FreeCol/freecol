@@ -945,11 +945,11 @@
 
   <building-types>
     <building-type id="model.building.townHall" basicProduction="3"
-                   produces="model.goods.bells" sequence="1">
+                   produces="model.goods.bells">
       <modifier id="model.goods.bells" type="additive" value="1"/>
     </building-type>
     <building-type id="model.building.carpenterHouse" basicProduction="3"
-                   consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
+                   consumes="model.goods.lumber" produces="model.goods.hammers">
       <ability id="model.ability.build">
         <scope type="model.unit.wagonTrain"/>
       </ability>
@@ -960,7 +960,7 @@
       <required-goods id="model.goods.hammers" value="52"/>
     </building-type>
     <building-type id="model.building.blacksmithHouse" basicProduction="3"
-                   consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
+                   consumes="model.goods.ore" produces="model.goods.tools">
       <ability id="model.ability.build">
         <scope type="model.equipment.tools"/>
         <scope type="model.equipment.muskets"/>
@@ -980,7 +980,7 @@
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.tobacconistHouse" basicProduction="3"
-                   consumes="model.goods.tobacco" produces="model.goods.cigars" sequence="4">
+                   consumes="model.goods.tobacco" produces="model.goods.cigars">
     </building-type>
     <building-type id="model.building.tobacconistShop" extends="model.building.tobacconistHouse"
                    basicProduction="6" upgradesFrom="model.building.tobacconistHouse" upkeep="5">
@@ -996,7 +996,7 @@
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.weaverHouse" basicProduction="3"
-                   consumes="model.goods.cotton" produces="model.goods.cloth" sequence="5">
+                   consumes="model.goods.cotton" produces="model.goods.cloth">
     </building-type>
     <building-type id="model.building.weaverShop" extends="model.building.weaverHouse"
                    basicProduction="6" upgradesFrom="model.building.weaverHouse" upkeep="5">
@@ -1012,7 +1012,7 @@
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.distillerHouse" basicProduction="3"
-                   consumes="model.goods.sugar" produces="model.goods.rum" sequence="6">
+                   consumes="model.goods.sugar" produces="model.goods.rum">
     </building-type>
     <building-type id="model.building.rumDistillery" extends="model.building.distillerHouse"
                    basicProduction="6" upgradesFrom="model.building.distillerHouse" upkeep="5">
@@ -1028,7 +1028,7 @@
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.furTraderHouse" basicProduction="3"
-                   consumes="model.goods.furs" produces="model.goods.coats" sequence="7">
+                   consumes="model.goods.furs" produces="model.goods.coats">
     </building-type>
     <building-type id="model.building.furTradingPost" extends="model.building.furTraderHouse"
                    basicProduction="6" upgradesFrom="model.building.furTraderHouse" upkeep="5">
@@ -1044,7 +1044,7 @@
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.schoolhouse" workplaces="1" minSkill="1" maxSkill="1"
-                   required-population="4" sequence="8" upkeep="5">
+                   required-population="4" upkeep="5">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
@@ -1061,7 +1061,7 @@
       <required-goods id="model.goods.tools" value="100"/>
     </building-type>
     <building-type id="model.building.armory" basicProduction="3" upkeep="5"
-                   consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
+                   consumes="model.goods.tools" produces="model.goods.muskets">
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.build">
         <scope type="model.unit.artillery"/>
@@ -1080,7 +1080,7 @@
       <modifier id="model.goods.muskets" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.chapel" workplaces="0" produces="model.goods.crosses" sequence="10">
+    <building-type id="model.building.chapel" workplaces="0" produces="model.goods.crosses">
       <modifier id="model.goods.crosses" type="additive" value="1"/>
     </building-type>
     <building-type id="model.building.church" extends="model.building.chapel"
@@ -1097,7 +1097,7 @@
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.goods.crosses" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.stockade" workplaces="0" required-population="3" sequence="11">
+    <building-type id="model.building.stockade" workplaces="0" required-population="3">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
@@ -1118,7 +1118,7 @@
       <modifier id="model.modifier.defence" delete="true" />
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
     </building-type>
-    <building-type id="model.building.depot" workplaces="0" sequence="13">
+    <building-type id="model.building.depot" workplaces="0" priority="750">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
       <modifier id="model.modifier.storeSurplus" type="multiplicative" value="0.5">
         <scope type="model.goods.food"/>
@@ -1136,7 +1136,7 @@
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
     <building-type id="model.building.country" workplaces="0" consumes="model.goods.grain"
-                   produces="model.goods.horses" sequence="14">
+                   produces="model.goods.horses">
       <modifier id="model.modifier.autoProduction" type="multiplicative" value="0.05" />
       <ability id="model.ability.build">
         <scope type="model.equipment.horses"/>
@@ -1147,7 +1147,7 @@
       <modifier id="model.modifier.autoProduction" type="multiplicative" value="2" />
       <required-goods id="model.goods.hammers" value="64"/>
     </building-type>
-    <building-type id="model.building.docks" workplaces="0" sequence="15" upkeep="5">
+    <building-type id="model.building.docks" workplaces="0" upkeep="5">
       <required-ability id="model.ability.hasPort" value="true" />
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
@@ -1168,7 +1168,7 @@
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.printingPress" workplaces="0" sequence="16" upkeep="5">
+    <building-type id="model.building.printingPress" workplaces="0" upkeep="5">
       <required-goods id="model.goods.hammers" value="52"/>
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.goods.bells" type="percentage" value="50"/>
@@ -1180,7 +1180,7 @@
       <modifier id="model.goods.bells" delete="true" />
       <modifier id="model.goods.bells" type="percentage" value="100"/>
     </building-type>
-    <building-type id="model.building.customHouse" workplaces="0" sequence="17" upkeep="15">
+    <building-type id="model.building.customHouse" workplaces="0" upkeep="15">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
       <required-ability id="model.ability.buildCustomHouse"/>

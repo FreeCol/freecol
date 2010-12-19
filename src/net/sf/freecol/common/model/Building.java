@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  * Represents a building in a colony.
  */
 public class Building extends FreeColGameObject
-    implements WorkLocation, Ownable, Named, Comparable<Building> {
+    implements WorkLocation, Ownable, Named, Comparable<Building>, Consumer {
 
     private static Logger logger = Logger.getLogger(Building.class.getName());
 
@@ -936,6 +936,61 @@ public class Building extends FreeColGameObject
     public void dispose() {
         disposeList();
     }
+
+
+    // Interface Consumer
+
+    /**
+     * Returns the number of units of the given GoodsType this
+     * Building consumes per turn.
+     *
+     * @return units consumed
+     */
+    public int getConsumedAmount(GoodsType goodsType) {
+        if (consumes(goodsType)) {
+            return getGoodsInput();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Returns true if this Consumer consumes the given GoodsType.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean consumes(GoodsType goodsType) {
+        return goodsType == getGoodsInputType();
+    }
+
+    /**
+     * Returns a list of GoodsTypes this Consumer consumes.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<AbstractGoods> getConsumedGoods() {
+        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        GoodsType inputType = getGoodsInputType();
+        if (inputType != null) {
+            result.add(new AbstractGoods(inputType, getConsumedAmount(inputType)));
+        }
+        return result;
+    }
+
+    /**
+     * The priority of this Consumer. The higher the priority, the
+     * earlier will the Consumer be allowed to consume the goods it
+     * requires.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPriority() {
+        return buildingType.getPriority();
+    }
+
+
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given
