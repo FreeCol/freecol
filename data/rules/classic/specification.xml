@@ -821,8 +821,8 @@
       <ability id="model.ability.foundColony" value="true"/>
       <required-ability id="model.ability.native"/>
       <consumes id="model.goods.food" value="2" />
-      <consumes id="model.goods.rum" value="2" />
-      <consumes id="model.goods.tradeGoods" value="2" />
+      <consumes id="model.goods.rum" value="1" />
+      <consumes id="model.goods.tradeGoods" value="1" />
       <consumes id="model.goods.ore" value="1" />
       <consumes id="model.goods.silver" value="1" />
       <consumes id="model.goods.cigars" value="1" />
