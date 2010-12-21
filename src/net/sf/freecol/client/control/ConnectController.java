@@ -272,6 +272,7 @@ public final class ConnectController {
                 freeColClient.setMyPlayer(thisPlayer);
 
                 freeColClient.getActionManager().addSpecificationActions(game.getSpecification());
+                freeColClient.setActiveUnit();
                 
                 c.endTransmission(in);
                 
@@ -442,7 +443,7 @@ public final class ConnectController {
                             login(username, "127.0.0.1", FreeCol.getDefaultPort());
                             canvas.closeStatusPanel();
                         }
-                    } );                    
+                    } );
                 } catch (NoRouteToServerException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

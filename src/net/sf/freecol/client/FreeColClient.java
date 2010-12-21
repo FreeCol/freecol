@@ -67,6 +67,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -873,5 +874,21 @@ public final class FreeColClient {
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
     }
-}
 
+    /**
+     * Set the current active unit in the game if one can be found from
+     * a saved game.
+     *
+     * @param active The <code>Unit</code> to set as active.
+     */
+    public void setActiveUnit() {
+        if (getFreeColServer() != null) {
+            Unit active = getFreeColServer().getActiveUnit();
+            if (active != null && getGame() != null) {
+                // Convert to client side
+                active = (Unit) getGame().getFreeColGameObject(active.getId());
+                active.getOwner().setNextActiveUnit(active);
+            }
+        }
+    }
+}

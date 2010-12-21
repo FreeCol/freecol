@@ -248,7 +248,10 @@ public final class InGameController implements NetworkConstants {
         boolean result = false;
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         try {
-            freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getName());
+            freeColClient.getFreeColServer()
+                .setActiveUnit(freeColClient.getGUI().getActiveUnit());
+            freeColClient.getFreeColServer()
+                .saveGame(file, freeColClient.getMyPlayer().getName());
             canvas.closeStatusPanel();
             result = true;
         } catch (IOException e) {

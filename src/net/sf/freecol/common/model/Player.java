@@ -1814,6 +1814,16 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Sets a new active unit.
+     *
+     * @param unit A <code>Unit</code> to make the next one to be active.
+     * @return True if the operation succeeded.
+     */
+    public boolean setNextActiveUnit(Unit unit) {
+        return nextActiveUnitIterator.setNext(unit);
+    }
+
+    /**
      * Gets a new going_to unit.
      *
      * @return A <code>Unit</code> that can be made active.
@@ -3046,7 +3056,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         private UnitPredicate predicate;
 
-        private ArrayList<Unit> units = null;
+        private List<Unit> units = null;
 
         /**
          * A comparator to compare units by position, top to bottom,
@@ -3117,6 +3127,28 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         public Unit next() {
             return (hasNext()) ? units.remove(0) : null;
+        }
+
+        /**
+         * Set the next valid unit.
+         *
+         * @param unit The <code>Unit</code> to put at the front of the list.
+         * @return True if the operation succeeds.
+         */
+        public boolean setNext(Unit unit) {
+            if (predicate.obtains(unit)) { // Of course, it has to be valid...
+                Unit first = (units.isEmpty()) ? null : units.get(0);
+                while (!units.isEmpty()) {
+                    if (units.get(0) == unit) return true;
+                    units.remove(0);
+                }
+                reset();
+                while (!units.isEmpty() && units.get(0) != first) {
+                    if (units.get(0) == unit) return true;
+                    units.remove(0);
+                }
+            }
+            return false;
         }
 
         /**

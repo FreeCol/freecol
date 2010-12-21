@@ -185,6 +185,9 @@ public final class FreeColServer {
     /** Did the integrity check succeed */
     private boolean integrity = false;
 
+    /** An active unit specified in a saved game. */
+    private Unit activeUnit = null;
+
     /**
      * The high scores on this server.
      */
@@ -585,7 +588,8 @@ public final class FreeColServer {
      * @exception IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
-    public void saveGame(File file, String username, BufferedImage image) throws IOException {
+    public void saveGame(File file, String username, BufferedImage image)
+        throws IOException {
         final Game game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         JarOutputStream fos = null;
@@ -617,6 +621,9 @@ public final class FreeColServer {
             xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
             xsw.writeAttribute("randomState", getRandomState(random));
+            if (getActiveUnit() != null) {
+                xsw.writeAttribute("activeUnit", getActiveUnit().getId());
+            }
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
             Iterator<FreeColGameObject> fcgoIterator
@@ -709,6 +716,8 @@ public final class FreeColServer {
                 }
             }
             final String owner = xsr.getAttributeValue(null, "owner");
+            final String active = xsr.getAttributeValue(null, "activeUnit");
+
             ArrayList<String> serverStrings = null;
             aiMain = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -807,6 +816,10 @@ public final class FreeColServer {
                 addStringOption("model.option.buildOnNativeLand",
                                 "model.option.buildOnNativeLand.never");
             }
+
+            // Now units are all present, set active unit.
+            setActiveUnit((active == null || game == null) ? null
+                          : (Unit) game.getFreeColGameObjectSafely(active));
 
             // Later, we might want to modify loaded savegames:
             return owner;
@@ -1400,6 +1413,24 @@ public final class FreeColServer {
         }
     }
 
+
+    /**
+     * Gets the active unit specified in a saved game, if any.
+     *
+     * @return The active unit.
+     */
+    public Unit getActiveUnit() {
+        return activeUnit;
+    }
+
+    /**
+     * Gets the active unit specified in a saved game, if any.
+     *
+     * @param unit The active unit to save.
+     */
+    public void setActiveUnit(Unit unit) {
+        activeUnit = unit;
+    }
 
     /** Hex constant digits for get/restoreRandomState. */
     private static final String HEX_DIGITS = "0123456789ABCDEF";

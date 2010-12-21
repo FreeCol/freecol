@@ -240,15 +240,6 @@ public final class PreGameController {
             freeColClient.getFrame().setJMenuBar(new InGameMenuBar(freeColClient));
         }
 
-        Unit activeUnit = myPlayer.getNextActiveUnit();
-        //freeColClient.getMyPlayer().updateCrossesRequired();
-        gui.setActiveUnit(activeUnit);
-        if (activeUnit != null) {
-            gui.setFocus(activeUnit.getTile().getPosition());
-        } else {
-            gui.setFocus(((Tile) myPlayer.getEntryLocation()).getPosition());
-        }
-
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
         
