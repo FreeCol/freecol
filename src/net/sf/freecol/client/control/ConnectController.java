@@ -282,7 +282,8 @@ public final class ConnectController {
                     freeColClient.getPreGameController().startGame();
 
                     if (isCurrentPlayer) {
-                        freeColClient.getInGameController().setCurrentPlayer(thisPlayer);
+                        freeColClient.getInGameController()
+                            .setCurrentPlayer(thisPlayer, false);
                     }
                 }
             } else if (in.getLocalName().equals("error")) {

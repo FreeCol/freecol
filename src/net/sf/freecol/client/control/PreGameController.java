@@ -226,28 +226,30 @@ public final class PreGameController {
             canvas.closeMainPanel();
             canvas.closeMenus();
             canvas.closeStatusPanel();
-            
             freeColClient.playSound("sound.intro." + myPlayer.getNationID());
         }
-
-        InGameController inGameController = freeColClient.getInGameController();
-        InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();
-
-        freeColClient.getClient().setMessageHandler(inGameInputHandler);
+        freeColClient.getClient()
+            .setMessageHandler(freeColClient.getInGameInputHandler());
 
         if (!freeColClient.isHeadless()) {
             gui.setInGame(true);
-            freeColClient.getFrame().setJMenuBar(new InGameMenuBar(freeColClient));
+            freeColClient.getFrame()
+                .setJMenuBar(new InGameMenuBar(freeColClient));
         }
 
+        InGameController igc = freeColClient.getInGameController();
+        igc.nextActiveUnit((Tile) myPlayer.getEntryLocation());
+
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
-        canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
+        canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,
+                 freeColClient.getGame().getMap()));
         
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             myPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                                    "tutorial.startGame", myPlayer));
+                                                      "tutorial.startGame",
+                                                      myPlayer));
             // force view of tutorial message
-            inGameController.nextModelMessage();
+            igc.nextModelMessage();
         }
     }
 }

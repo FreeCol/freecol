@@ -438,7 +438,7 @@ public final class InGameInputHandler extends InputHandler {
                     if (popDown) {
                         getFreeColClient().getCanvas().closeMenus();
                     }
-                    getFreeColClient().getInGameController().setCurrentPlayer(currentPlayer);
+                    getFreeColClient().getInGameController().setCurrentPlayer(currentPlayer, true);
                     getFreeColClient().getActionManager().update();
                 }
             });

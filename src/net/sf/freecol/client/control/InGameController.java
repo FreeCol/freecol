@@ -473,8 +473,9 @@ public final class InGameController implements NetworkConstants {
      * Set a player to be the new current player.
      *
      * @param player The <code>Player</code> to be the new current player.
+     * @param active If true, set the active unit.
      */
-    public void setCurrentPlayer(Player player) {
+    public void setCurrentPlayer(Player player, boolean active) {
         logger.finest("Entering client setCurrentPlayer: " + player.getName());
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
@@ -538,7 +539,7 @@ public final class InGameController implements NetworkConstants {
                 freeColClient.playSound("sound.anthem." + player.getNationID());
             }
             displayModelMessages(true);
-            nextActiveUnit();
+            if (active) nextActiveUnit();
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
     }
