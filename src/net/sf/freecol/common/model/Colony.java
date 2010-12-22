@@ -1987,6 +1987,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     public void updateStockadeLevel() {
         Building stockade = getStockade();
         stockadeLevel = (stockade == null) ? 0 : stockade.getLevel();
+        getTile().updatePlayerExploredTiles();
     }
 
 
