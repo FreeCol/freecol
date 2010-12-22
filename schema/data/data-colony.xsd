@@ -109,6 +109,14 @@
 	  </xs:documentation>
 	</xs:annotation>
       </xs:attribute>
+      <xs:attribute name="stockadeLevel" type="xs:int" use="optional"
+                    default="0">
+        <xs:annotation>
+          <xs:documentation>
+            Level of the stockade-type building in the colony
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="unitCount" type="xs:int" use="optional"
 		    default="-1">
 	<xs:annotation>

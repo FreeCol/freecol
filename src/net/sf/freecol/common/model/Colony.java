@@ -141,6 +141,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
 
     // Will only be used on enemy colonies:
     protected int unitCount = -1;
+    protected int stockadeLevel = 0;
 
     /** The turn in which this colony was established. */
     protected Turn established = new Turn(0);
@@ -1971,6 +1972,25 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     }
 
     /**
+     * Returns the visible stockade level, often updated from pet.
+     *
+     * @return The visible stockade level.
+     */
+    public int getStockadeLevel() {
+        return stockadeLevel;
+    }
+
+    /**
+     * Update the visible stockade level with the actual level of the
+     * building.
+     */
+    public void updateStockadeLevel() {
+        Building stockade = getStockade();
+        stockadeLevel = (stockade == null) ? 0 : stockade.getLevel();
+    }
+
+
+    /**
      * Get the <code>Modifier</code> value.
      *
      * @param id a <code>String</code> value
@@ -2182,6 +2202,8 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
+            out.writeAttribute("stockadeLevel",
+                               Integer.toString(getStockadeLevel()));
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
@@ -2206,15 +2228,19 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
         } else if (player.canSee(getTile())) {
             out.writeAttribute("owner", owner.getId());
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
-            if (getStockade() != null) {
-                getStockade().toXML(out, player, showAll, toSavedGame);
-            }
+            out.writeAttribute("stockadeLevel",
+                               Integer.toString(getStockadeLevel()));
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            out.writeAttribute("owner", pet.getOwner().getId());
-            out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
-            // TODO: should be pet version of stockade
-            if (getStockade() != null) {
-                getStockade().toXML(out, player, showAll, toSavedGame);
+            if (pet.getOwner() != null) {
+                out.writeAttribute("owner", pet.getOwner().getId());
+            }
+            if (pet.getColonyUnitCount() > 0) {
+                out.writeAttribute("unitCount",
+                                   Integer.toString(pet.getColonyUnitCount()));
+            }
+            if (pet.getColonyStockadeLevel() >= 0) {
+                out.writeAttribute("stockadeLevel",
+                                   Integer.toString(pet.getColonyStockadeLevel()));
             }
         }
         goodsContainer.toXML(out, player, showAll, toSavedGame);
@@ -2244,6 +2270,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             getFeatureContainer().addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
+        stockadeLevel = getAttribute(in, "stockadeLevel", 0);
 
         // Clear containers
         colonyTiles.clear();

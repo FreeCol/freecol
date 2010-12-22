@@ -1516,15 +1516,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         if (getColony() != null) {
             pet.setColonyUnitCount(getSettlement().getUnitCount());
-            
-            // TODO stockade may now be null, but is 0 the right way to set this?
-            // This might as well be a mistake in the spec.
-            Building stockade = getColony().getStockade();
-            if (stockade != null){
-            	pet.setColonyStockadeLevel(stockade.getType().getIndex());
-            } else {
-            	pet.setColonyStockadeLevel(0);
-            }
+            pet.setColonyStockadeLevel(getColony().getStockadeLevel());
         } else if (getSettlement() != null) {
             IndianSettlement settlement = (IndianSettlement) getSettlement();
             pet.setMissionary(settlement.getMissionary());

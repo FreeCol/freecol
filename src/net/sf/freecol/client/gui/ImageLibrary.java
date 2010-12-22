@@ -74,7 +74,7 @@ public final class ImageLibrary {
 
 
     private static final String[] stockadeKey = new String[] {
-        null, ".stockade", ".fort", ".fortress"
+        "", ".stockade", ".fort", ".fortress"
     };
 
 
@@ -611,10 +611,7 @@ public final class ImageLibrary {
                     key = "large";
                 }
 
-                if (colony.getStockade() != null) {
-                    key += stockadeKey[colony.getStockade().getLevel()];
-                }
-
+                key += stockadeKey[colony.getStockadeLevel()];
             }
             key = "model.settlement." + key + ".image";
         } else { // IndianSettlement
