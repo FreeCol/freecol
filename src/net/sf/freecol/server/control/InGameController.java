@@ -84,7 +84,6 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.RandomRange;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
@@ -1708,11 +1707,9 @@ public final class InGameController extends Controller {
                                  IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        Tile tile = settlement.getTile();
-        PlayerExploredTile pet = tile.getPlayerExploredTile(serverPlayer);
         settlement.makeContactSettlement(serverPlayer);
-        pet.setVisited();
-        pet.setSkill(settlement.getLearnableSkill());
+        Tile tile = settlement.getTile();
+        tile.updateIndianSettlementInformation(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
