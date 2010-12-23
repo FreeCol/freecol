@@ -500,8 +500,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Unit unit = s.getMissionary();
                     s.setMissionary(null);
                     cs.addDispose(this, s.getTile(), unit);
-                    cs.add(See.perhaps(), s.getTile());
                     s.getTile().updatePlayerExploredTiles();
+                    cs.add(See.perhaps(), s.getTile());
                 }
             }
         }
@@ -511,6 +511,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         while (!settlements.isEmpty()) {
             Settlement settlement = settlements.remove(0);
             for (Tile tile : settlement.getOwnedTiles()) {
+                tile.updatePlayerExploredTiles();
                 cs.add(See.perhaps(), tile);
             }
             cs.addDispose(this, settlement.getTile(), settlement);
@@ -518,7 +519,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Clean up remaining tile ownerships
         for (Tile tile : getGame().getMap().getAllTiles()) {
-            if (tile.getOwner() == this) tile.setOwner(null);
+            if (tile.getOwner() == this) {
+                tile.setOwner(null);
+                tile.setOwningSettlement(null);
+                tile.updatePlayerExploredTiles();
+            }
         }
 
         // Remove units
@@ -686,8 +691,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Sets the given tile to be explored by this player and updates
      * the player's information about the tile.
-     *
-     * @see Tile#updatePlayerExploredTile(Player)
      */
     public void setExplored(Tile tile) {
         tile.setExploredBy(this, true);
@@ -804,9 +807,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Buy goods in Europe.
-     * Do not update the container or player in the ChangeSet, this
-     * routine is called from higher level routines where other updates
-     * happen.
      *
      * @param container The <code>GoodsContainer</code> to carry the goods.
      * @param type The <code>GoodsType</code> to buy.
@@ -843,9 +843,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Sell goods in Europe.
-     * Do not update the container or player in the ChangeSet, this
-     * routine is called from higher level routines where other updates
-     * happen.
      *
      * @param container An optional <code>GoodsContainer</code>
      *     carrying the goods.
@@ -1301,7 +1298,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             t.updatePlayerExploredTile(this);
                             cs.add(See.only(this), t);
                         }
-                        for (Tile x : t.getSurroundingTiles(1)) {
+                        for (Tile x : colony.getOwnedTiles()) {
                             if (!x.isExploredBy(this)) {
                                 x.setExploredBy(this, true);
                                 x.updatePlayerExploredTile(this);
@@ -1368,8 +1365,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             ChangeSet cs) {
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
-        tile.setOwningSettlement(settlement);
         tile.setOwner(this);
+        tile.setOwningSettlement(settlement);
         tile.updatePlayerExploredTiles();
 
         // Update the tile for all, and privately any now-angrier
@@ -2040,8 +2037,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.
         for (Tile t : colony.getOwnedTiles()) {
-            cs.add(See.perhaps().always(colonyPlayer), t);
             t.updatePlayerExploredTiles();
+            cs.add(See.perhaps().always(colonyPlayer), t);
         }
         if (colony.getLineOfSight() > attacker.getLineOfSight()) {
             for (Tile t : tile.getSurroundingTiles(attacker.getLineOfSight(),
@@ -2501,7 +2498,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     // Add this to the tiles to process if its not
                     // there already.
                     if (!owned.contains(t)) owned.add(t);
-                } else if (s.getOwner().canOwnTile(t)) {
+                } else if (s.getOwner().canOwnTile(t)
+                           && (s.getOwner().isIndian()
+                               || s.getTile().getDistanceTo(t) <= s.getRadius())) {
                     // Weight claimant settlements:
                     //   settlements owned by the same player
                     //     > settlements owned by same type of player
