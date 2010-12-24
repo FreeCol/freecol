@@ -1138,6 +1138,7 @@
     <building-type id="model.building.country" workplaces="0" consumes="model.goods.grain"
                    produces="model.goods.horses">
       <modifier id="model.modifier.autoProduction" type="multiplicative" value="0.05" />
+      <ability id="model.ability.consumeOnlySurplusProduction"/>
       <ability id="model.ability.build">
         <scope type="model.equipment.horses"/>
       </ability>
@@ -1346,6 +1347,7 @@
       <settlement id="model.settlement.colony" capital="false" claimableRadius="1"
                   visibleRadius="2">
         <modifier id="model.modifier.defence" type="percentage" value="50" />
+        <ability id="model.ability.consumeAllOrNothing"/>
       </settlement>
     </european-nation-type>
     <!-- default REF nation -->

@@ -780,8 +780,8 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      *
      * @return units consumed
      */
-    public int getConsumedAmount(GoodsType goodsType) {
-        return consumption.getCount(goodsType);
+    public int getConsumedAmount(GoodsType goodsType, int available) {
+        return Math.min(available, consumption.getCount(goodsType));
     }
 
     /**
@@ -791,7 +791,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * @return a <code>boolean</code> value
      */
     public boolean consumes(GoodsType goodsType) {
-        return getConsumedAmount(goodsType) > 0;
+        return getConsumedAmount(goodsType, Integer.MAX_VALUE) > 0;
     }
 
     /**

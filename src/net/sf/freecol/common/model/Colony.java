@@ -2079,6 +2079,43 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     }
 
 
+    public int getInputAvailable(GoodsType goodsType, Consumer consumer) {
+        int production = getProductionOf(goodsType);
+        int stored = getGoodsCount(goodsType);
+        for (Consumer other : getConsumersOf(goodsType)) {
+            if (other.getPriority() < consumer.getPriority()) {
+                if (other.hasAbility("model.ability.consumeOnlySurplusProduction")) {
+                    production -= other.getConsumedAmount(goodsType, production);
+                    if (production <= 0) {
+                        return 0;
+                    }
+                } else {
+                    stored -= other.getConsumedAmount(goodsType, production + stored);
+                    if (stored < 0) {
+                        production += stored;
+                        stored = 0;
+                    }
+                    if (production <= 0 && stored <= 0) {
+                        return 0;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        if (consumer.hasAbility("model.ability.consumeOnlySurplusProduction")) {
+            return production;
+        } else {
+            return production + stored;
+        }
+    }
+
+    /**
+     * Returns a list of Consumers requiring the given type of goods.
+     *
+     * @param goodsType the type of goods
+     * @return a list of consumers
+     */
     public List<Consumer> getConsumersOf(GoodsType goodsType) {
         List<Consumer> result = new ArrayList<Consumer>();
         for (Unit unit : getUnitList()) {
@@ -2087,10 +2124,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             }
         }
         for (Building building : buildingMap.values()) {
-            if (building.getGoodsInputType() == goodsType
-                || (!building.getType().getFeatureContainer()
-                    .getModifierSet("model.modifier.storeSurplus", goodsType)
-                    .isEmpty())) {
+            if (building.consumes(goodsType)) {
                 result.add(building);
             }
         }
@@ -2105,18 +2139,32 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     // Interface Consumer
 
     /**
-     * Returns the number of units of the given GoodsType this
-     * UnitType consumes per turn (when in a settlement).
+     * Returns the number of units of the given GoodsType this Colony
+     * consumes this turn. Colonies consume goods only in order to
+     * build units or buildings.
      *
+     * @param goodsType a <code>GoodsType</code> value
+     * @param available an <code>int</code> value
      * @return units consumed
      */
-    public int getConsumedAmount(GoodsType goodsType) {
+    public int getConsumedAmount(GoodsType goodsType, int available) {
+        int amount = 0;
         BuildableType current = getCurrentlyBuilding();
-        if (current == null) {
-            return 0;
-        } else {
-            return current.getAmountRequiredOf(goodsType);
+        if (current != null) {
+            // ATTENTION: this code presupposes that we will consume
+            // all required goods at once
+            for (AbstractGoods required : current.getGoodsRequired()) {
+                if (required.getType() == goodsType) {
+                    amount = required.getAmount();
+                    if (amount < available) {
+                        return 0;
+                    }
+                } else if (getInputAvailable(goodsType, this) < required.getAmount()) {
+                    return 0;
+                }
+            }
         }
+        return amount;
     }
 
 
@@ -2127,7 +2175,8 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
      * @return a <code>boolean</code> value
      */
     public boolean consumes(GoodsType goodsType) {
-        return getConsumedAmount(goodsType) > 0;
+        return getCurrentlyBuilding() != null
+            && getCurrentlyBuilding().getAmountRequiredOf(goodsType) > 0;
     }
 
     /**
@@ -2156,7 +2205,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     }
 
 
-    //Serialization
+    // Serialization
 
 
     /**

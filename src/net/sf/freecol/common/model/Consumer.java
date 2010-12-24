@@ -57,12 +57,17 @@ public interface Consumer {
     public static final int UNIT_PRIORITY = 1000;
 
     /**
-     * Returns the number of units of the given GoodsType this
-     * UnitType consumes per turn (when in a settlement).
+     * Returns the number of units of the given GoodsType consumed
+     * this turn. Since some consumers consume a certain percentage of
+     * the goods available rather than a fixed amount, the amount of
+     * available goods must be passed as a parameter. This method may
+     * return 0 even if the method consumes returns true.
      *
+     * @param goodsType a <code>GoodsType</code> value
+     * @param available an <code>int</code> value
      * @return units consumed
      */
-    public int getConsumedAmount(GoodsType goodsType);
+    public int getConsumedAmount(GoodsType goodsType, int available);
 
     /**
      * Returns true if this Consumer consumes the given GoodsType.
@@ -87,5 +92,20 @@ public interface Consumer {
      * @return an <code>int</code> value
      */
     public int getPriority();
+
+
+    /**
+     * Returns whether the consumer has the ability with the given
+     * id. The two abilities most relevant to consumers are
+     * "consumeAllOrNothing", which implies that the consumer will not
+     * consume any goods if its requirements can not be met (used by
+     * the Colony when building), as well as
+     * "consumeOnlySurplusProduction", which implies that the consumer
+     * does not consume stored goods (used by the country and stables).
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id);
 
 }

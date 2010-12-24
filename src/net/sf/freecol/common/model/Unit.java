@@ -3082,10 +3082,12 @@ public class Unit extends FreeColGameObject
      * Returns the number of units of the given GoodsType this
      * Unit consumes per turn (when in a settlement).
      *
+     * @param goodsType a <code>GoodsType</code> value
+     * @param available an <code>int</code> value
      * @return units consumed
      */
-    public int getConsumedAmount(GoodsType goodsType) {
-        return unitType.getConsumptionOf(goodsType);
+    public int getConsumedAmount(GoodsType goodsType, int available) {
+        return unitType.getConsumedAmount(goodsType, available);
     }
 
     /**

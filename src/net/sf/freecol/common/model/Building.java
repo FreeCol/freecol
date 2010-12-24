@@ -944,11 +944,13 @@ public class Building extends FreeColGameObject
      * Returns the number of units of the given GoodsType this
      * Building consumes per turn.
      *
+     * @param goodsType a <code>GoodsType</code> value
+     * @param available an <code>int</code> value
      * @return units consumed
      */
-    public int getConsumedAmount(GoodsType goodsType) {
+    public int getConsumedAmount(GoodsType goodsType, int available) {
         if (consumes(goodsType)) {
-            return getGoodsInput();
+            return getGoodsInputNextTurn(available);
         } else {
             return 0;
         }
@@ -961,7 +963,10 @@ public class Building extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean consumes(GoodsType goodsType) {
-        return goodsType == getGoodsInputType();
+        return goodsType == getGoodsInputType()
+            || !(buildingType.getFeatureContainer()
+                 .getModifierSet("model.modifier.storeSurplus", goodsType)
+                 .isEmpty());
     }
 
     /**
@@ -973,7 +978,7 @@ public class Building extends FreeColGameObject
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
         GoodsType inputType = getGoodsInputType();
         if (inputType != null) {
-            result.add(new AbstractGoods(inputType, getConsumedAmount(inputType)));
+            result.add(new AbstractGoods(inputType, getConsumedAmount(inputType, Integer.MAX_VALUE)));
         }
         return result;
     }
