@@ -2536,7 +2536,7 @@ public final class GUI {
                     // Draw the alarm chip if needed.
                     Player player = freeColClient.getMyPlayer();
                     if (player != null && indianSettlement.hasContactedSettlement(player)) {
-                        final boolean visited = indianSettlement.hasBeenVisited(player);
+                        final boolean visited = indianSettlement.hasSpokenToChief(player);
                         chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
                         g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                     }

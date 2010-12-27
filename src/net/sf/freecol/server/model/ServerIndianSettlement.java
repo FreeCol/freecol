@@ -80,7 +80,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by
      *     Europeans at this settlement.
-     * @param isVisited Indicates if any European scout has asked to
+     * @param spokenTo Indicates if any European scout has asked to
      *     speak with the chief.
      * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given
@@ -88,13 +88,13 @@ public class ServerIndianSettlement extends IndianSettlement
     public ServerIndianSettlement(Game game, Player owner, String name,
                                   Tile tile, boolean isCapital,
                                   UnitType learnableSkill,
-                                  Set<Player> isVisited, Unit missionary) {
+                                  Set<Player> spokenTo, Unit missionary) {
         super(game, owner, name, tile);
 
         goodsContainer = new GoodsContainer(game, this);
         this.learnableSkill = learnableSkill;
         setCapital(isCapital);
-        this.visitedBy = isVisited;
+        this.spokenTo = spokenTo;
         this.missionary = missionary;
 
         convertProgress = 0;

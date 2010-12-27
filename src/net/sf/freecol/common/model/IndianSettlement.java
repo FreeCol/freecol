@@ -81,12 +81,12 @@ public class IndianSettlement extends Settlement {
     protected GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
 
     /**
-     * A map that tells if a player has visited the settlement.
+     * A map that tells if a player has spoken to the chief of this settlement.
      *
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
-    protected Set<Player> visitedBy = new HashSet<Player>();
+    protected Set<Player> spokenTo = new HashSet<Player>();
 
     /** Units present at this settlement. */
     protected List<Unit> units = Collections.emptyList();
@@ -372,13 +372,13 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Returns true if a European player has visited this settlement
-     * to speak with the chief.
+     * Returns true if a European player has spoken with the chief of
+     * this settlement.
      *
-     * @return True if a European player has visited this settlement.
+     * @return True if a European player has spoken with the chief.
      */
-    public boolean hasBeenVisited() {
-        Iterator<Player> playerIterator = visitedBy.iterator();
+    public boolean hasSpokenToChief() {
+        Iterator<Player> playerIterator = spokenTo.iterator();
         while (playerIterator.hasNext()) {
             if (playerIterator.next().isEuropean()) {
                 return true;
@@ -388,27 +388,27 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Returns true if a the given player has visited this settlement
-     * to speak with the chief.
+     * Returns true if a the given player has spoken with the chief of
+     * this settlement.
      *
      * @param player The <code>Player</code> to check.
      * @return True if the player has visited this settlement to speak
      *     with the chief.
      */
-    public boolean hasBeenVisited(Player player) {
-        return visitedBy.contains(player);
+    public boolean hasSpokenToChief(Player player) {
+        return spokenTo.contains(player);
     }
 
     /**
-     * Sets the visited status of this settlement to true, indicating
+     * Sets the spoken-to status of this settlement to true, indicating
      * that a European player has had a chat with the chief.
      *
      * @param player The visiting <code>Player</code>.
      */
-    public void setVisited(Player player) {
-        if (!hasBeenVisited(player)) {
+    public void setSpokenToChief(Player player) {
+        if (!hasSpokenToChief(player)) {
             makeContactSettlement(player); // Just to be sure
-            visitedBy.add(player);
+            spokenTo.add(player);
         }
     }
 
@@ -423,7 +423,7 @@ public class IndianSettlement extends Settlement {
      * @return True if the settlement accepts such contact.
      */
     public boolean allowContact(Unit unit) {
-        return hasBeenVisited(unit.getOwner())
+        return unit.getOwner().hasContacted(owner)
             || !unit.isNaval()
             || unit.getGoodsCount() > 0;
     }
@@ -1011,7 +1011,7 @@ public class IndianSettlement extends Settlement {
         goodsContainer.toXML(out, player, showAll, toSavedGame);
 
         if (full) {
-            Iterator<Player> playerIterator = visitedBy.iterator();
+            Iterator<Player> playerIterator = spokenTo.iterator();
             while (playerIterator.hasNext()) {
                 out.writeStartElement(IS_VISITED_TAG_NAME);
                 out.writeAttribute("player", playerIterator.next().getId());
@@ -1041,7 +1041,7 @@ public class IndianSettlement extends Settlement {
                 out.writeEndElement();
             }
         } else if (pet != null) {
-            if (hasBeenVisited(player)) {
+            if (hasSpokenToChief(player)) {
                 out.writeStartElement(IS_VISITED_TAG_NAME);
                 out.writeAttribute("player", player.getId());
                 out.writeEndElement();
@@ -1087,7 +1087,7 @@ public class IndianSettlement extends Settlement {
         lastTribute = getAttribute(in, "lastTribute", 0);
         learnableSkill = getSpecification().getType(in, "learnableSkill", UnitType.class, null);
 
-        visitedBy.clear();
+        spokenTo.clear();
         alarm = new HashMap<Player, Tension>();
         missionary = null;
         units.clear();
@@ -1095,7 +1095,7 @@ public class IndianSettlement extends Settlement {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                visitedBy.add(player);
+                spokenTo.add(player);
                 in.nextTag(); // close tag is always generated.
             } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));

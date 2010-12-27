@@ -1861,7 +1861,7 @@ public final class InGameController extends Controller {
             Tile tile = settlement.getTile();
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
-            if (settlement.hasBeenVisited()) {
+            if (settlement.hasSpokenToChief()) {
                 // Pre-visited settlements are a noop.
                 result = "nothing";
             } else if (skill != null
@@ -1899,7 +1899,7 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            settlement.setVisited(serverPlayer);
+            settlement.setSpokenToChief(serverPlayer);
             tile.updatePlayerExploredTile(serverPlayer);
             tile.updateIndianSettlementInformation(serverPlayer);
             cs.add(See.only(serverPlayer), tile);

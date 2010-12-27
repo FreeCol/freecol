@@ -54,7 +54,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         JLabel settlementLabel = new JLabel(canvas.getImageIcon(settlement, false));
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
-        boolean visited = settlement.hasBeenVisited(player);
+        boolean visited = player.hasVisited(settlement);
         String text = Messages.message(settlement.getNameFor(player)) + ", "
             + Messages.message(StringTemplate.template(settlement.isCapital()
                                                        ? "indianCapital"
@@ -89,7 +89,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         String sale;
         add(localizedLabel("indianSettlement.highlyWanted"), "newline");
-        if (!visited || wantedGoods.length == 0 || wantedGoods[0] == null) {
+        if (!visited) {
             add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
         } else {
             sale = player.getLastSaleString(settlement, wantedGoods[0]);
@@ -100,7 +100,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         }
 
         add(localizedLabel("indianSettlement.otherWanted"), "newline");
-        if (!visited || wantedGoods.length <= 1 || wantedGoods[1] == null) {
+        if (!visited) {
             add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
         } else {
             int i, n = 1;

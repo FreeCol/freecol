@@ -1690,7 +1690,7 @@ public class InGameControllerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.player(inca).build();
-        camp.setVisited(dutch);
+        camp.makeContactSettlement(dutch);
 
         assertEquals("Inca should be at peace with dutch",
                      Stance.PEACE, inca.getStance(dutch));
