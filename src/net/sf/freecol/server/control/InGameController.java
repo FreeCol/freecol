@@ -1709,7 +1709,7 @@ public final class InGameController extends Controller {
 
         settlement.makeContactSettlement(serverPlayer);
         Tile tile = settlement.getTile();
-        tile.updateIndianSettlementInformation(serverPlayer);
+        tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -1760,8 +1760,7 @@ public final class InGameController extends Controller {
             unit.setType(skill);
             if (!settlement.isCapital()) settlement.setLearnableSkill(null);
             Tile tile = settlement.getTile();
-            tile.updatePlayerExploredTile(serverPlayer);
-            tile.updateIndianSettlementInformation(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.only(serverPlayer), unit, tile);
             break;
         }
@@ -1900,8 +1899,7 @@ public final class InGameController extends Controller {
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
             settlement.setSpokenToChief(serverPlayer);
-            tile.updatePlayerExploredTile(serverPlayer);
-            tile.updateIndianSettlementInformation(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.only(serverPlayer), tile);
             for (Tile t : tile.getSurroundingTiles(radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isCoast())) {
@@ -2002,7 +2000,7 @@ public final class InGameController extends Controller {
             enemy = (ServerPlayer) missionary.getOwner();
             settlement.setMissionary(null);
             tile.updatePlayerExploredTiles();
-            tile.updateIndianSettlementInformation(enemy);
+            tile.updatePlayerExploredTile(enemy, true);
 
             // Inform the enemy of loss of mission
             cs.add(See.only(enemy), settlement);
@@ -2031,7 +2029,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer),
                    settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY));
             tile.updatePlayerExploredTiles();
-            tile.updateIndianSettlementInformation(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.perhaps().always(serverPlayer), tile);
             break;
         }
@@ -2207,8 +2205,7 @@ public final class InGameController extends Controller {
         Player settlementPlayer = settlement.getOwner();
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        tile.updatePlayerExploredTile(serverPlayer);
-        tile.updateIndianSettlementInformation(serverPlayer);
+        tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer),
             settlement.modifyAlarm(serverPlayer, -amount / 50));
         settlementPlayer.modifyGold(amount);
@@ -2267,8 +2264,7 @@ public final class InGameController extends Controller {
         serverPlayer.modifyGold(amount);
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        tile.updatePlayerExploredTile(serverPlayer);
-        tile.updateIndianSettlementInformation(serverPlayer);
+        tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), settlement);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
@@ -2314,8 +2310,7 @@ public final class InGameController extends Controller {
                    indianSettlement.modifyAlarm(serverPlayer,
                    -indianSettlement.getPrice(goods) / 50));
             indianSettlement.updateWantedGoods();
-            tile.updatePlayerExploredTile(serverPlayer);
-            tile.updateIndianSettlementInformation(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.only(serverPlayer), settlement);
         }
         session.put("actionTaken", true);

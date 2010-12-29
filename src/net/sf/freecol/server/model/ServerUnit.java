@@ -829,7 +829,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         cs.add(See.perhaps().always(serverPlayer), newTile);
         if (isDisposed()) return;
         for (Tile t : newTiles) {
-            t.updatePlayerExploredTile(serverPlayer);
+            t.updatePlayerExploredTile(serverPlayer, false);
             cs.add(See.only(serverPlayer), t);
         }
 

@@ -1296,13 +1296,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         if (!t.isExploredBy(this)) {
                             t.setExploredBy(this, true);
                         }
-                        t.updatePlayerExploredTile(this);
+                        t.updatePlayerExploredTile(this, false);
                         cs.add(See.only(this), t);
                         for (Tile x : colony.getOwnedTiles()) {
                             if (!x.isExploredBy(this)) {
                                 x.setExploredBy(this, true);
                             }
-                            x.updatePlayerExploredTile(this);
+                            x.updatePlayerExploredTile(this, false);
                             cs.add(See.only(this), x);
                         }
                     }

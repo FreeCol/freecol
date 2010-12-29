@@ -1466,7 +1466,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         for (Player player : getGame().getPlayers()) {
             if (playerExploredTiles.get(player) != null
                 || (player.isEuropean() && player.canSee(this))) {
-                updatePlayerExploredTile(player);
+                updatePlayerExploredTile(player, false);
             }
         }
     }
@@ -1488,8 +1488,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * <code>Player</code>.
      * 
      * @param player The <code>Player</code>.
+     * @param full If true, also update any hidden information specific to a
+     *    settlement present on the tile.
      */
-    public void updatePlayerExploredTile(Player player) {
+    public void updatePlayerExploredTile(Player player, boolean full) {
         if (playerExploredTiles == null || getGame().getViewOwner() != null
             || !player.isEuropean()) {
             return;
@@ -1499,18 +1501,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             pet = new PlayerExploredTile(getGame(), player, this);
             playerExploredTiles.put(player, pet);
         }
-        pet.update();
-    }
-
-    /**
-     * Updates the hidden information about the native settlement on this tile.
-     *
-     * @param player The <code>Player</code> which should get the updated
-     *            information.
-     */
-    public void updateIndianSettlementInformation(Player player) {
-        if (!player.isEuropean()) return;
-        getPlayerExploredTile(player).updateIndianSettlement();
+        pet.update(full);
     }
 
     /**
@@ -1540,7 +1531,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public void setExploredBy(Player player, boolean explored) {
         if (!player.isEuropean()) return;
         if (explored) {
-            updatePlayerExploredTile(player);
+            updatePlayerExploredTile(player, false);
         } else {
             if (playerExploredTiles != null) {
                 playerExploredTiles.remove(player);

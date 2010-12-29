@@ -94,8 +94,10 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     /**
      * Update this PlayerExploredTile with the current state of its tile.
+     *
+     * @param full If true, update information hidden by settlements.
      */
-    public void update() {
+    public void update(boolean full) {
         owner = tile.getOwner();
         owningSettlement = tile.getOwningSettlement();
 
@@ -122,21 +124,12 @@ public class PlayerExploredTile extends FreeColGameObject {
             colonyUnitCount = 0;
             colonyStockadeLevel = 0;
             missionary = is.getMissionary();
-            // Do not update attributes that need close contact:
-            //   skill, wantedGoods
+            if (full) {
+                skill = is.getLearnableSkill();
+                wantedGoods = is.getWantedGoods();
+            }
         } else if (settlement != null) {
             throw new IllegalStateException("Bogus settlement");
-        }
-    }
-
-    /**
-     * Update the "hidden" IndianSettlement attributes.
-     */
-    public void updateIndianSettlement() {
-        if (tile.getSettlement() instanceof IndianSettlement) {
-            IndianSettlement is = (IndianSettlement) tile.getSettlement();
-            skill = is.getLearnableSkill();
-            wantedGoods = is.getWantedGoods();
         }
     }
 
