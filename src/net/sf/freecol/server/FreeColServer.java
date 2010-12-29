@@ -1486,4 +1486,8 @@ public final class FreeColServer {
         }
     }
 
+    public void shutdown() {
+        server.shutdown();
+    }
+
 }
