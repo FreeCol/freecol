@@ -997,7 +997,6 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("owner", owner.getId());
-        out.writeAttribute("settlementType", getType().getId());
 
         if (full) {
             out.writeAttribute("lastTribute", Integer.toString(lastTribute));
