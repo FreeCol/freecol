@@ -1758,9 +1758,11 @@ public final class InGameController extends Controller {
             // Teach the unit, and expend the skill if necessary.
             // Do a full information update as the unit is in the settlement.
             unit.setType(skill);
-            if (!settlement.isCapital()) settlement.setLearnableSkill(null);
             Tile tile = settlement.getTile();
-            tile.updatePlayerExploredTile(serverPlayer, true);
+            if (!settlement.isCapital()) {
+                settlement.setLearnableSkill(null);
+                tile.updatePlayerExploredTile(serverPlayer, true);
+            }
             cs.add(See.only(serverPlayer), unit, tile);
             break;
         }
@@ -1998,9 +2000,7 @@ public final class InGameController extends Controller {
         ServerPlayer enemy = null;
         if (missionary != null) {
             enemy = (ServerPlayer) missionary.getOwner();
-            settlement.setMissionary(null);
-            tile.updatePlayerExploredTiles();
-            tile.updatePlayerExploredTile(enemy, true);
+            settlement.changeMissionary(null);
 
             // Inform the enemy of loss of mission
             cs.add(See.only(enemy), settlement);
@@ -2024,12 +2024,10 @@ public final class InGameController extends Controller {
         case HAPPY: case CONTENT: case DISPLEASED:
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
             unit.setLocation(null);
-            settlement.setMissionary(unit);
+            settlement.changeMissionary(unit);
             settlement.setConvertProgress(0);
             cs.add(See.only(serverPlayer),
                    settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY));
-            tile.updatePlayerExploredTiles();
-            tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.perhaps().always(serverPlayer), tile);
             break;
         }

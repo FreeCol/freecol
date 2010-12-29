@@ -257,7 +257,7 @@ public class TerrainGenerator {
             if (generateBonus
                 && random.nextInt(100) < getMapGeneratorOptions().getInteger("model.option.bonusNumber")) {
                 // Create random Bonus Resource
-                t.setResource(createResource(t));
+                t.addResource(createResource(t));
             }
         } else {
             int adjacentLand = 0;
@@ -288,12 +288,12 @@ public class TerrainGenerator {
 
             if (t.getType().isConnected()) {
                 if (generateBonus && adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
-                    t.setResource(createResource(t));
+                    t.addResource(createResource(t));
                 }
             } else {
                 if (random.nextInt(100) < getMapGeneratorOptions().getInteger("model.option.bonusNumber")) {
                     // Create random Bonus Resource
-                    t.setResource(createResource(t));
+                    t.addResource(createResource(t));
                 }
             }
         }

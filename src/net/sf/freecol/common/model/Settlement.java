@@ -347,7 +347,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             u.setOwner(newOwner);
         }
 
-        for (Tile t : getOwnedTiles()) t.setOwner(newOwner);
+        for (Tile t : getOwnedTiles()) {
+            t.changeOwnership(newOwner, this);
+        }
         oldOwner.invalidateCanSeeTiles();
         newOwner.invalidateCanSeeTiles();
 
@@ -419,9 +421,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             Tile settlementTile = getTile();
             List<Tile> lostTiles = getOwnedTiles();
             for (Tile tile : lostTiles) {
-                tile.setOwningSettlement(null);
-                tile.setOwner(null);
-                tile.updatePlayerExploredTiles();
+                tile.changeOwnership(null, null);
             }
             settlementTile.setSettlement(null);
 

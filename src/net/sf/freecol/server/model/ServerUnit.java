@@ -377,8 +377,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         : Utils.randomInt(logger, "Resource quantity",
                                           random,
                                           maxValue - minValue + 1));
-                tile.setResource(new Resource(getGame(), tile, resType,
-                                              value));
+                tile.addResource(new Resource(getGame(), tile, resType, value));
             }
         }
 
@@ -742,7 +741,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         }
         tile.removeLostCityRumour();
-        tile.updatePlayerExploredTiles();
     }
 
     /**

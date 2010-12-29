@@ -223,7 +223,7 @@ public class TileTest extends FreeColTestCase {
         Tile tile = new Tile(game, mountains, 0, 0);
         assertEquals(0,tile.potential(food, null));
         assertEquals(1,tile.potential(silver, null));
-        tile.setResource(new Resource(game, tile, silverResource));
+        tile.addResource(new Resource(game, tile, silverResource));
         assertEquals(0,tile.potential(food, null));
         assertEquals(3,tile.potential(silver, null));
     }
@@ -236,7 +236,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(0, tile1.getMaximumPotential(food, null));
         assertEquals(1, tile1.potential(silver, null));
         assertEquals(2, tile1.getMaximumPotential(silver, null));
-        tile1.setResource(new Resource(game, tile1, silverResource));
+        tile1.addResource(new Resource(game, tile1, silverResource));
         assertEquals(0, tile1.potential(food, null));
         assertEquals(3, tile1.potential(silver, null));
         assertEquals(4, tile1.getMaximumPotential(silver, null));
@@ -244,7 +244,7 @@ public class TileTest extends FreeColTestCase {
         Tile tile2 = new Tile(game, plains, 0, 1);
         assertEquals(5, tile2.potential(grain, null));
         assertEquals(6, tile2.getMaximumPotential(grain, null));
-        tile2.setResource(new Resource(game, tile2, grainResource));
+        tile2.addResource(new Resource(game, tile2, grainResource));
         // potential assumes expert
         assertEquals(9, tile2.potential(grain, null));
         assertEquals(10, tile2.getMaximumPotential(grain, null));
@@ -385,7 +385,7 @@ public class TileTest extends FreeColTestCase {
         assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar, null), road2.getType()));
         assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
 
-        tile1.setResource(new Resource(game, tile1, sugarResource));
+        tile1.addResource(new Resource(game, tile1, sugarResource));
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), savannah));
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));
@@ -551,7 +551,7 @@ public class TileTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         ColonyTile colonyTile = colony.getColonyTile(tile);
-        tile.setResource(new Resource(game, tile, mineralsResource));
+        tile.addResource(new Resource(game, tile, mineralsResource));
         if (colonyTile.getUnit() != null) {
             colonyTile.getUnit().setLocation(colony.getBuilding(townHallType));
         }

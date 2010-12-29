@@ -517,7 +517,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         for (Unit unit : new ArrayList<Unit>(units)) {
             unit.dispose();
         }
-        updatePlayerExploredTiles();
     }
     
     public void dispose() {
@@ -754,27 +753,115 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Returns the river on this <code>Tile</code> if any
-     * @return River <code>TileImprovement</code>
+     * Puts a <code>Settlement</code> on this <code>Tile</code>. A
+     * <code>Tile</code> can only have one <code>Settlement</code> located
+     * on it. The <code>Settlement</code> will also become the owner of this
+     * <code>Tile</code>.
+     *
+     * @param s The <code>Settlement</code> that shall be located on this
+     *            <code>Tile</code>.
+     * @see #getSettlement
      */
-    public TileImprovement getRiver() {
-        if (tileItemContainer == null) {
-            return null;
-        } else {
-            return tileItemContainer.getRiver();
-        }
+    public void setSettlement(Settlement s) {
+        settlement = s;
+        owningSettlement = s;
     }
 
     /**
-     * Returns the lost city rumour on this <code>Tile</code> if any
-     * @return a <code>LostCityRumour</code> value
+     * Gets the <code>Settlement</code> located on this <code>Tile</code>.
+     *
+     * @return The <code>Settlement</code> that is located on this
+     *         <code>Tile</code> or <i>null</i> if no <code>Settlement</code>
+     *         apply.
+     * @see #setSettlement
+     */
+    public Settlement getSettlement() {
+        return settlement;
+    }
+
+    /**
+     * Gets the <code>Colony</code> located on this <code>Tile</code>. Only
+     * a convenience method for {@link #getSettlement} that makes sure that
+     * the settlement is a colony.
+     *
+     * @return The <code>Colony</code> that is located on this
+     *         <code>Tile</code> or <i>null</i> if no <code>Colony</code>
+     *         apply.
+     * @see #getSettlement
+     */
+    public Colony getColony() {
+
+        if (settlement != null && settlement instanceof Colony) {
+            return ((Colony) settlement);
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets the owner of this tile. A <code>Settlement</code> become an owner
+     * of a <code>Tile</code> when having workers placed on it.
+     *
+     * @param owner The Settlement that owns this tile.
+     * @see #getOwner
+     */
+    public void setOwningSettlement(Settlement owner) {
+        this.owningSettlement = owner;
+    }
+
+    /**
+     * Gets the owner of this tile.
+     *
+     * @return The Settlement that owns this tile.
+     * @see #setOwner
+     */
+    public Settlement getOwningSettlement() {
+        return owningSettlement;
+    }
+
+    /**
+     * Change the tile ownership.  Also change the owning settlement
+     * as the two are commonly related.
+     *
+     * @param player The <code>Player</code> to own the tile.
+     * @param settlement The <code>Settlement</code> to own the tile.
+     */
+    public void changeOwnership(Player player, Settlement settlement) {
+        setOwner(player);
+        setOwningSettlement(settlement);
+        updatePlayerExploredTiles();
+    }
+
+    /**
+     * Adds a tile item to this tile.
+     *
+     * @param item The <code>TileItem</code> to add.
+     */
+    private void addTileItem(TileItem item) {
+        if (tileItemContainer == null) {
+            tileItemContainer = new TileItemContainer(getGame(), this);
+        }
+        tileItemContainer.addTileItem(item);
+        updatePlayerExploredTiles();
+    }
+
+    /**
+     * Gets the lost city rumour on this <code>Tile</code> if any.
+     *
+     * @return The <code>LostCityRumour</code> on this tile, or null if none.
      */
     public LostCityRumour getLostCityRumour() {
-        if (tileItemContainer == null) {
-            return null;
-        } else {
-            return tileItemContainer.getLostCityRumour();
-        }
+        return (tileItemContainer == null) ? null
+            : tileItemContainer.getLostCityRumour();
+    }
+
+    /**
+     * Adds a lost city rumour to this tile.
+     *
+     * @param rumour The <code>LostCityRumour</code> to add.
+     */
+    public void addLostCityRumour(LostCityRumour rumour) {
+        addTileItem(rumour);
     }
 
     /**
@@ -784,6 +871,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public void removeLostCityRumour() {
         if (tileItemContainer != null) {
             tileItemContainer.removeAll(LostCityRumour.class);
+            updatePlayerExploredTiles();
+        }
+    }
+
+    /**
+     * Returns the river on this <code>Tile</code> if any
+     * @return River <code>TileImprovement</code>
+     */
+    public TileImprovement getRiver() {
+        if (tileItemContainer == null) {
+            return null;
+        } else {
+            return tileItemContainer.getRiver();
         }
     }
 
@@ -815,14 +915,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The neighbouring Tile of the given Tile in the given direction.
      */
     public Tile getNeighbourOrNull(Direction direction) {
-
         Position position = getPosition();
         if (getMap().isValid(position)) {
             Position neighbourPosition = position.getAdjacent(direction);
             return getMap().getTile(neighbourPosition);
         } else {
             return null;
-    }
+        }
     }
 
     /**
@@ -856,88 +955,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Puts a <code>Settlement</code> on this <code>Tile</code>. A
-     * <code>Tile</code> can only have one <code>Settlement</code> located
-     * on it. The <code>Settlement</code> will also become the owner of this
-     * <code>Tile</code>.
-     * 
-     * @param s The <code>Settlement</code> that shall be located on this
-     *            <code>Tile</code>.
-     * @see #getSettlement
+     * Adds a <code>Resource</code> to this <code>Tile</code>.
+     *
+     * @param resource The <code>Resource</code> to add.
      */
-    public void setSettlement(Settlement s) {
-        settlement = s;
-        owningSettlement = s;
+    public void addResource(Resource resource) {
+        if (resource == null) return;
+        addTileItem(resource);
     }
 
-    /**
-     * Gets the <code>Settlement</code> located on this <code>Tile</code>.
-     * 
-     * @return The <code>Settlement</code> that is located on this
-     *         <code>Tile</code> or <i>null</i> if no <code>Settlement</code>
-     *         apply.
-     * @see #setSettlement
-     */
-    public Settlement getSettlement() {
-        return settlement;
-    }
-
-    /**
-     * Gets the <code>Colony</code> located on this <code>Tile</code>. Only
-     * a convenience method for {@link #getSettlement} that makes sure that 
-     * the settlement is a colony.
-     * 
-     * @return The <code>Colony</code> that is located on this
-     *         <code>Tile</code> or <i>null</i> if no <code>Colony</code>
-     *         apply.
-     * @see #getSettlement
-     */
-    public Colony getColony() {
-
-        if (settlement != null && settlement instanceof Colony) {
-            return ((Colony) settlement);
-        }
-
-        return null;
-    }
-
-    /**
-     * Sets the owner of this tile. A <code>Settlement</code> become an owner
-     * of a <code>Tile</code> when having workers placed on it.
-     * 
-     * @param owner The Settlement that owns this tile.
-     * @see #getOwner
-     */
-    public void setOwningSettlement(Settlement owner) {
-        this.owningSettlement = owner;
-    }
-
-    /**
-     * Gets the owner of this tile.
-     * 
-     * @return The Settlement that owns this tile.
-     * @see #setOwner
-     */
-    public Settlement getOwningSettlement() {
-        return owningSettlement;
-    }
-
-    /**
-     * Sets the <code>Resource</code> for this <code>Tile</code>
-     */
-    public void setResource(Resource resource) {
-        if (resource == null) {
-            return;
-        }
-        if (tileItemContainer == null) {
-            tileItemContainer = new TileItemContainer(getGame(), this);
-        }
-
-        tileItemContainer.addTileItem(resource);
-        
-        updatePlayerExploredTiles();
-    }
-    
     /**
      * Sets the type for this Tile.
      * 
@@ -1080,14 +1106,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 firePropertyChange(UNIT_CHANGE, null, locatable);
             }
         } else if (locatable instanceof TileItem) {
-            if (tileItemContainer == null) {
-                tileItemContainer = new TileItemContainer(getGame(), this);
-            }
-            tileItemContainer.addTileItem((TileItem) locatable);
+            addTileItem((TileItem) locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a tile.");
         }
-        updatePlayerExploredTiles();
     }
 
     /**
@@ -1108,21 +1130,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         } else if (locatable instanceof TileItem) {
             tileItemContainer.addTileItem((TileItem) locatable);
+            updatePlayerExploredTiles();
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
         }
-        updatePlayerExploredTiles();
     }
     
     /**
-     * Removes the unit from the tile. It does not updatePlayerExploredTiles.
+     * Removes the unit from the tile.
+     *
      * @param unit The unit to be removed
      */
     public void removeUnitNoUpdate(Unit unit) {
         units.remove(unit);
     }
+
     /**
-     * Adds the unit to the tile. It does not updatePlayerExploredTiles.
+     * Adds the unit to the tile.
+     *
      * @param unit The unit to be added
      */
     public void addUnitNoUpdate(Unit unit) {
@@ -1448,6 +1473,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
             if (resource.useQuantity(goodsType, unitType, potential) == 0) {
                 tileItemContainer.removeTileItem(resource);
+                updatePlayerExploredTiles();
                 return resource;
             }
         }

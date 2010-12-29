@@ -324,7 +324,7 @@ public class SimpleMapGenerator implements MapGenerator {
                             && t.getOwningSettlement() != null) {
                             r.setType(LostCityRumour.RumourType.MOUNDS);
                         }
-                        t.add(r);
+                        t.addLostCityRumour(r);
                         counter++;
                         break;
                     }

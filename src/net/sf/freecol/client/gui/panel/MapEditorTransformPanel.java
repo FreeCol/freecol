@@ -352,7 +352,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 case 1:
                     ResourceType resourceType = resList.get(0);
                     // TODO: create GUI for setting the quantity
-                    t.setResource(new Resource(t.getGame(), t, resourceType, resourceType.getMaxValue()));
+                    t.addResource(new Resource(t.getGame(), t, resourceType, resourceType.getMaxValue()));
                     return;
                 default:
                     List<ChoiceItem<ResourceType>> choices = new ArrayList<ChoiceItem<ResourceType>>();
@@ -365,7 +365,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                                                        Messages.message("cancel"),
                                                                        choices);
                     if (choice != null) {
-                        t.setResource(new Resource(t.getGame(), t, choice, choice.getMaxValue()));
+                        t.addResource(new Resource(t.getGame(), t, choice, choice.getMaxValue()));
                     }
                 }
             }
@@ -377,7 +377,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (t.isLand()) {
                 LostCityRumour rumour = t.getLostCityRumour();
                 if (rumour == null) {
-                    t.add(new LostCityRumour(t.getGame(), t));
+                    t.addLostCityRumour(new LostCityRumour(t.getGame(), t));
                 } else {
                     t.removeLostCityRumour();
                 }

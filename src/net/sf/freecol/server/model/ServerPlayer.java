@@ -498,9 +498,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (Player other : getGame().getPlayers()) {
                 for (IndianSettlement s : other.getIndianSettlementsWithMission(this)) {
                     Unit unit = s.getMissionary();
-                    s.setMissionary(null);
+                    s.changeMissionary(null);
                     cs.addDispose(this, s.getTile(), unit);
-                    s.getTile().updatePlayerExploredTiles();
                     cs.add(See.perhaps(), s.getTile());
                 }
             }
@@ -510,20 +509,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Settlement> settlements = getSettlements();
         while (!settlements.isEmpty()) {
             Settlement settlement = settlements.remove(0);
-            for (Tile tile : settlement.getOwnedTiles()) {
-                tile.updatePlayerExploredTiles();
-                cs.add(See.perhaps(), tile);
-            }
             cs.addDispose(this, settlement.getTile(), settlement);
         }
 
         // Clean up remaining tile ownerships
         for (Tile tile : getGame().getMap().getAllTiles()) {
-            if (tile.getOwner() == this) {
-                tile.setOwner(null);
-                tile.setOwningSettlement(null);
-                tile.updatePlayerExploredTiles();
-            }
+            if (tile.getOwner() == this) tile.changeOwnership(null, null);
         }
 
         // Remove units
@@ -1365,9 +1356,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             ChangeSet cs) {
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
-        tile.setOwner(this);
-        tile.setOwningSettlement(settlement);
-        tile.updatePlayerExploredTiles();
+        tile.changeOwnership(this, settlement);
 
         // Update the tile for all, and privately any now-angrier
         // owners, or the player gold if a price was paid.
@@ -1961,10 +1950,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
             Unit missionary = s.getMissionary(attackerPlayer);
             if (missionary != null) {
-                s.setMissionary(null);
-                Tile tile = s.getTile();
-                tile.updatePlayerExploredTiles();
-                if (s != settlement) cs.add(See.perhaps(), tile);
+                s.changeMissionary(null);
+                if (s != settlement) cs.add(See.perhaps(), s.getTile());
             }
         }
     }
@@ -2037,7 +2024,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.
         for (Tile t : colony.getOwnedTiles()) {
-            t.updatePlayerExploredTiles();
             cs.add(See.perhaps().always(colonyPlayer), t);
         }
         if (colony.getLineOfSight() > attacker.getLineOfSight()) {
@@ -2521,13 +2507,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
             if (bestClaimant == null) {
-                tile.setOwner(null);
-                tile.setOwningSettlement(null);
+                tile.changeOwnership(null, null);
             } else {
-                tile.setOwner(bestClaimant.getOwner());
-                tile.setOwningSettlement(bestClaimant);
+                tile.changeOwnership(bestClaimant.getOwner(), bestClaimant);
             }
-            tile.updatePlayerExploredTiles();
             if (tile != settlement.getTile()) {
                 cs.add(See.perhaps().always(owner), tile);
             }
