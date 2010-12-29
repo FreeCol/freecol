@@ -34,6 +34,8 @@
 
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	<xs:element ref="serverPlayer" />
+        <xs:element ref="serverUnit" />
+        <xs:element ref="serverIndianSettlement" />
       </xs:choice>
     </xs:complexType>
   </xs:element>
@@ -41,6 +43,18 @@
   <xs:element name="serverPlayer">
     <xs:complexType>
       <xs:attribute name="ID" type="PlayerId" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverUnit">
+    <xs:complexType>
+      <xs:attribute name="ID" type="UnitId" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverIndianSettlement">
+    <xs:complexType>
+      <xs:attribute name="ID" type="IndianSettlementId" use="required" />
     </xs:complexType>
   </xs:element>
 
