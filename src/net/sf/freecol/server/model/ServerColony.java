@@ -372,7 +372,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
                 if (success) {
-                    updateStockadeLevel();
+                    tile.updatePlayerExploredTiles();
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
                                          "model.colony.buildingReady",

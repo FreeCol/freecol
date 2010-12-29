@@ -141,7 +141,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
 
     // Will only be used on enemy colonies:
     protected int unitCount = -1;
-    protected int stockadeLevel = 0;
+    protected int stockadeLevel = -1;
 
     /** The turn in which this colony was established. */
     protected Turn established = new Turn(0);
@@ -1972,24 +1972,17 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     }
 
     /**
-     * Returns the visible stockade level, often updated from pet.
+     * Gets the stockade level.
+     * Uses the "stockadeLevel" variable if it is non-negative, which should
+     * only be true for other player colonies.  Otherwise, get the real value.
      *
-     * @return The visible stockade level.
+     * @return The stockade level.
      */
     public int getStockadeLevel() {
-        return stockadeLevel;
-    }
-
-    /**
-     * Update the visible stockade level with the actual level of the
-     * building.
-     */
-    public void updateStockadeLevel() {
+        if (stockadeLevel >= 0) return stockadeLevel;
         Building stockade = getStockade();
-        stockadeLevel = (stockade == null) ? 0 : stockade.getLevel();
-        getTile().updatePlayerExploredTiles();
+        return (stockade == null) ? 0 : stockade.getLevel();
     }
-
 
     /**
      * Get the <code>Modifier</code> value.
@@ -2252,8 +2245,6 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
-            out.writeAttribute("stockadeLevel",
-                               Integer.toString(getStockadeLevel()));
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
@@ -2275,11 +2266,6 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
                 out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
                 out.writeEndElement();
             }
-        } else if (player.canSee(getTile())) {
-            out.writeAttribute("owner", owner.getId());
-            out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
-            out.writeAttribute("stockadeLevel",
-                               Integer.toString(getStockadeLevel()));
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             if (pet.getOwner() != null) {
                 out.writeAttribute("owner", pet.getOwner().getId());
@@ -2320,7 +2306,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             getFeatureContainer().addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
-        stockadeLevel = getAttribute(in, "stockadeLevel", 0);
+        stockadeLevel = getAttribute(in, "stockadeLevel", -1);
 
         // Clear containers
         colonyTiles.clear();
