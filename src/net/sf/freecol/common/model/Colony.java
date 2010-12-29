@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2010  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -2104,25 +2104,27 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     }
 
     /**
-     * Returns a list of Consumers requiring the given type of goods.
+     * Returns a list of Consumers requiring the given types of goods.
      *
-     * @param goodsType the type of goods
+     * @param goodsTypes the types of goods
      * @return a list of consumers
      */
-    public List<Consumer> getConsumersOf(GoodsType goodsType) {
+    public List<Consumer> getConsumersOf(GoodsType... goodsTypes) {
         List<Consumer> result = new ArrayList<Consumer>();
-        for (Unit unit : getUnitList()) {
-            if (unit.consumes(goodsType)) {
-                result.add(unit);
+        for (GoodsType goodsType : goodsTypes) {
+            for (Unit unit : getUnitList()) {
+                if (unit.consumes(goodsType)) {
+                    result.add(unit);
+                }
             }
-        }
-        for (Building building : buildingMap.values()) {
-            if (building.consumes(goodsType)) {
-                result.add(building);
+            for (Building building : buildingMap.values()) {
+                if (building.consumes(goodsType)) {
+                    result.add(building);
+                }
             }
-        }
-        if (consumes(goodsType)) {
-            result.add(this);
+            if (consumes(goodsType)) {
+                result.add(this);
+            }
         }
         Collections.sort(result, Consumer.COMPARATOR);
         return result;
