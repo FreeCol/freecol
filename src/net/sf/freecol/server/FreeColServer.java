@@ -276,6 +276,31 @@ public final class FreeColServer {
      */
     public FreeColServer(final FreeColSavegameFile savegame, int port, String name)
         throws IOException, FreeColException, NoRouteToServerException {
+        this(savegame, port, name, null);
+    }
+
+    /**
+     * Starts a new server in a specified mode and with a specified port and
+     * loads the game from the given file.
+     *
+     * @param savegame The file where the game data is located.
+     *
+     * @param port The TCP port to use for the public socket. That is the port
+     *            the clients will connect to.
+     *
+     * @param name The name of the server, or <code>null</code> if the default
+     *            name should be used.
+     *
+     * @param specification a <code>Specification</code> value
+     * @exception IOException if the public socket cannot be created (the exception
+     *             will be logged by this class).
+     *
+     * @exception FreeColException if the savegame could not be loaded.
+     * @exception NoRouteToServerException if an error occurs
+     */
+    public FreeColServer(final FreeColSavegameFile savegame, int port, String name,
+                         Specification specification)
+        throws IOException, FreeColException, NoRouteToServerException {
         this.port = port;
         this.name = name;
         //this.nationOptions = nationOptions;
@@ -293,7 +318,7 @@ public final class FreeColServer {
             throw e;
         }
         try {
-            owner = loadGame(savegame);
+            owner = loadGame(savegame, specification);
         } catch (FreeColException e) {
             server.shutdown();
             throw e;
@@ -695,6 +720,21 @@ public final class FreeColServer {
      * @exception FreeColException if the savegame contains incompatible data.
      */
     public String loadGame(final FreeColSavegameFile fis) throws IOException, FreeColException {
+        return loadGame(fis, null);
+    }
+
+    /**
+     * Loads a game.
+     *
+     * @param fis The file where the game data is located.
+     * @param specification a <code>Specification</code> value
+     * @return The username of the player saving the game.
+     * @exception IOException If a problem was encountered while trying to open,
+     *             read or close the file.
+     * @exception FreeColException if the savegame contains incompatible data.
+     */
+    public String loadGame(final FreeColSavegameFile fis, Specification specification)
+        throws IOException, FreeColException {
         boolean doNotLoadAI = false;
         XMLStream xs = null;
         try {
@@ -735,13 +775,11 @@ public final class FreeColServer {
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
-                    Specification specification = null;
-                    if (savegameVersion < 9) {
+                    if (savegameVersion < 9 && specification == null) {
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
-                    game = new ServerGame(null, xsr, serverStrings,
-                                          specification);
+                    game = new ServerGame(null, xsr, serverStrings, specification);
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level

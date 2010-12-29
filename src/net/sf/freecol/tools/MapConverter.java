@@ -34,6 +34,8 @@ import javax.xml.validation.Validator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 
 import org.xml.sax.SAXParseException;
@@ -42,6 +44,8 @@ import org.xml.sax.SAXParseException;
 public class MapConverter {
 
     public static void main(String[] args) throws Exception {
+
+        Specification specification = new FreeColTcFile("freecol").getSpecification();
 
         for (String filename : args) {
             File out = new File(filename);
@@ -54,7 +58,8 @@ public class MapConverter {
                     FreeColSavegameFile savegame = new FreeColSavegameFile(in);
                     BufferedImage thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
                     System.out.println("Loaded thumbnail.");
-                    FreeColServer server = new FreeColServer(savegame, FreeCol.DEFAULT_PORT, "mapTransformer");
+                    FreeColServer server = new FreeColServer(savegame, FreeCol.DEFAULT_PORT,
+                                                             "mapTransformer", specification);
                     System.out.println("Started server.");
                     server.saveGame(out, server.getOwner(), thumbnail);
                     System.out.println("Saved updated savegame.");

@@ -1066,9 +1066,12 @@ public class Game extends FreeColGameObject {
                 // TODO: remove 0.9.x compatibility code
                 mapGeneratorOptions = new OptionGroup(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
-                specification = new Specification();
-                specification.readFromXMLImpl(in);
-                specification.clean();
+                Specification spec = new Specification();
+                spec.readFromXMLImpl(in);
+                if (specification == null) {
+                    specification = spec;
+                    specification.clean();
+                }
             } else {
                 logger.warning("Unknown tag: " + tagName + " loading game");
                 in.nextTag();
