@@ -280,44 +280,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     /**
-     * Claim ownership of a tile for this settlement.
-     *
-     * @param tile The <code>Tile</code> to claim.
-     * @return True if some aspect of the tile changed.
-     */
-    public boolean claimTile(Tile tile) {
-        boolean change = false;
-        if (tile.getOwningSettlement() != this) {
-            tile.setOwningSettlement(this);
-            change = true;
-        }
-        if (tile.getOwner() != owner) {
-            tile.setOwner(owner);
-            change = true;
-        }
-        if (change) {
-            tile.updatePlayerExploredTiles();
-        }
-        return change;
-    }
-
-    /**
-     * Disclaim ownership of a tile for this settlement.
-     *
-     * @param tile The <code>Tile</code> to disclaim.
-     * @return True if some aspect of the tile changed.
-     */
-    public boolean disclaimTile(Tile tile) {
-        if (tile.getOwningSettlement() == this) {
-            tile.setOwner(null);
-            tile.setOwningSettlement(null);
-            tile.updatePlayerExploredTiles();
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Put a prepared settlement onto the map.
      */
     public void placeSettlement() {

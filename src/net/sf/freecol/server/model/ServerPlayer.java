@@ -1295,15 +1295,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         && (ServerPlayer) colony.getOwner() != this) {
                         if (!t.isExploredBy(this)) {
                             t.setExploredBy(this, true);
-                            t.updatePlayerExploredTile(this);
-                            cs.add(See.only(this), t);
                         }
+                        t.updatePlayerExploredTile(this);
+                        cs.add(See.only(this), t);
                         for (Tile x : colony.getOwnedTiles()) {
                             if (!x.isExploredBy(this)) {
                                 x.setExploredBy(this, true);
-                                x.updatePlayerExploredTile(this);
-                                cs.add(See.only(this), x);
                             }
+                            x.updatePlayerExploredTile(this);
+                            cs.add(See.only(this), x);
                         }
                     }
                 }
@@ -2521,9 +2521,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
             if (bestClaimant == null) {
-                settlement.disclaimTile(tile);
+                tile.setOwner(null);
+                tile.setOwningSettlement(null);
             } else {
-                bestClaimant.claimTile(tile);
+                tile.setOwner(bestClaimant.getOwner());
+                tile.setOwningSettlement(bestClaimant);
             }
             tile.updatePlayerExploredTiles();
             if (tile != settlement.getTile()) {

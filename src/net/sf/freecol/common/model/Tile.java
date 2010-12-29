@@ -248,10 +248,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
                 PlayerExploredTile pet = playerExploredTiles.get(player);
-                if (pet != null && pet.isExplored()) {
-                    return getType().getNameKey();
-                }
-                return "unexplored";
+                return (pet != null) ? getType().getNameKey() : "unexplored";
             } else {
                 logger.warning("player == null");
                 return "";
@@ -1457,79 +1454,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return null;
     }
 
-
-    /**
-     * Gets the <code>PlayerExploredTile</code> for the given
-     * <code>Player</code>.
-     * 
-     * @param player The <code>Player</code>.
-     * @see PlayerExploredTile
-     */
-    public PlayerExploredTile getPlayerExploredTile(Player player) {
-        if (playerExploredTiles == null) {
-            return null;
-        }
-        return playerExploredTiles.get(player);
-    }
-
-    /**
-     * Creates a <code>PlayerExploredTile</code> for the given
-     * <code>Player</code>.
-     * 
-     * @param player The <code>Player</code>.
-     * @see PlayerExploredTile
-     */
-    private void createPlayerExploredTile(Player player) {
-        playerExploredTiles.put(player, new PlayerExploredTile(getGame(), player, this));
-    }
-
-    /**
-     * Updates the information about this <code>Tile</code> for the given
-     * <code>Player</code>.
-     * 
-     * @param player The <code>Player</code>.
-     */
-    public void updatePlayerExploredTile(Player player) {
-
-        if (playerExploredTiles == null || getGame().getViewOwner() != null) {
-            return;
-        }
-        PlayerExploredTile pet = playerExploredTiles.get(player);
-        if (pet == null) {
-
-            if (player.isEuropean()) {
-                String message = "'playerExploredTiles' for " + player.getPlayerType() + 
-                                 " player '" + player.getName() + "' is 'null'. " + 
-                                 player.canSee(this) + ", " + isExploredBy(player) + " ::: " + getPosition();
-                logger.warning(message);
-                //throw new IllegalStateException(message);
-                pet = new PlayerExploredTile(getGame(), player, this);
-                playerExploredTiles.put(player, pet);
-            } else {
-                return;
-            }
-        }
-
-        pet.getTileItemInfo(tileItemContainer);
-        pet.setConnected(connected);
-        pet.setOwner(owner);
-
-        if (getColony() != null) {
-            pet.setColonyUnitCount(getSettlement().getUnitCount());
-            pet.setColonyStockadeLevel(getColony().getStockadeLevel());
-        } else if (getSettlement() != null) {
-            IndianSettlement settlement = (IndianSettlement) getSettlement();
-            pet.setMissionary(settlement.getMissionary());
-            pet.setVisited();
-            /*
-             * These attributes should not be updated by this method: skill,
-             * highlyWantedGoods, wantedGoods1 and wantedGoods2
-             */
-        } else {
-            pet.setColonyUnitCount(0);
-        }
-    }
-
     /**
      * Updates the <code>PlayerExploredTile</code> for each player. This
      * update will only be performed if the player
@@ -1540,11 +1464,53 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return;
         }
         for (Player player : getGame().getPlayers()) {
-            if (playerExploredTiles.get(player) != null ||
-                (player.isEuropean() && player.canSee(this))) {
+            if (playerExploredTiles.get(player) != null
+                || (player.isEuropean() && player.canSee(this))) {
                 updatePlayerExploredTile(player);
             }
         }
+    }
+
+    /**
+     * Gets the <code>PlayerExploredTile</code> for the given
+     * <code>Player</code>.
+     * 
+     * @param player The <code>Player</code>.
+     * @see PlayerExploredTile
+     */
+    public PlayerExploredTile getPlayerExploredTile(Player player) {
+        return (playerExploredTiles == null) ? null
+            : playerExploredTiles.get(player);
+    }
+
+    /**
+     * Updates the information about this <code>Tile</code> for the given
+     * <code>Player</code>.
+     * 
+     * @param player The <code>Player</code>.
+     */
+    public void updatePlayerExploredTile(Player player) {
+        if (playerExploredTiles == null || getGame().getViewOwner() != null
+            || !player.isEuropean()) {
+            return;
+        }
+        PlayerExploredTile pet = playerExploredTiles.get(player);
+        if (pet == null) {
+            pet = new PlayerExploredTile(getGame(), player, this);
+            playerExploredTiles.put(player, pet);
+        }
+        pet.update();
+    }
+
+    /**
+     * Updates the hidden information about the native settlement on this tile.
+     *
+     * @param player The <code>Player</code> which should get the updated
+     *            information.
+     */
+    public void updateIndianSettlementInformation(Player player) {
+        if (!player.isEuropean()) return;
+        getPlayerExploredTile(player).updateIndianSettlement();
     }
 
     /**
@@ -1557,14 +1523,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         otherwise.
      */
     public boolean isExploredBy(Player player) {
-        if (player.isIndian()) {
-            return true;
-        }
-        if (playerExploredTiles == null || playerExploredTiles.get(player) == null || !isExplored()) {
-            return false;
-        }
-
-        return getPlayerExploredTile(player).isExplored();
+        if (!player.isEuropean()) return true;
+        if (!isExplored()) return false;
+        return getPlayerExploredTile(player) != null;
     }
 
     /**
@@ -1577,39 +1538,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *            <code>false</code> otherwise.
      */
     public void setExploredBy(Player player, boolean explored) {
-        if (player.isIndian()) {
-            return;
+        if (!player.isEuropean()) return;
+        if (explored) {
+            updatePlayerExploredTile(player);
+        } else {
+            if (playerExploredTiles != null) {
+                playerExploredTiles.remove(player);
+            }
         }
-        if (playerExploredTiles.get(player) == null) {
-            createPlayerExploredTile(player);
-        }
-        getPlayerExploredTile(player).setExplored(explored);
-        updatePlayerExploredTile(player);
-    }
-
-    /**
-     * Updates the information about the <code>IndianSettlement</code> located
-     * on this <code>Tile</code>.
-     * <p>
-     * 
-     * @param player The <code>Player</code> which should get the updated
-     *            information.
-     * @exception NullPointerException If there is no settlement on this
-     *                <code>Tile</code>.
-     * @exception ClassCastException If the <code>Settlement</code> on this
-     *                <code>Tile</code> is not an
-     *                <code>IndianSettlement</code>.
-     * @see IndianSettlement
-     */
-    public void updateIndianSettlementInformation(Player player) {
-        if (player.isIndian()) {
-            return;
-        }
-        PlayerExploredTile playerExploredTile = getPlayerExploredTile(player);
-        IndianSettlement is = (IndianSettlement) getSettlement();
-        playerExploredTile.setSkill(is.getLearnableSkill());
-        playerExploredTile.setWantedGoods(is.getWantedGoods());
-        playerExploredTile.setVisited();
     }
 
 
@@ -1901,23 +1837,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        if (toSavedGame && !showAll) {
-            logger.warning("toSavedGame is true, but showAll is false");
-        }
-
-        PlayerExploredTile pet = null;
-        if (!(showAll)) {
-            // We're sending the Tile from the server to the client and showAll
-            // is false.
-            if (player != null) {
-                pet = playerExploredTiles.get(player);
-            } else {
-                logger.warning("player == null");
+        if (!showAll) {
+            if (toSavedGame) {
+                logger.warning("toSavedGame is true, but showAll is false");
+            }
+            if (player == null) {
+                logger.warning("player is null, but showAll is false");
             }
         }
+        PlayerExploredTile pet = (showAll) ? null
+            : getPlayerExploredTile(player);
+
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("x", Integer.toString(x));
@@ -1938,9 +1870,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 writeAttribute(out, "owner", pet.getOwner());
             }
         }
-
-        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owningSettlement != null)) {
-            out.writeAttribute("owningSettlement", owningSettlement.getId());
+        if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
+            if (owningSettlement != null) {
+                out.writeAttribute("owningSettlement",
+                                   owningSettlement.getId());
+            }
+        } else if (pet != null) {
+            if (pet.getOwningSettlement() != null) {
+                out.writeAttribute("owningSettlement",
+                                   pet.getOwningSettlement().getId());
+            }
         }
 
         if (settlement != null) {
@@ -1958,20 +1897,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
                 out.writeEndElement();
             }
-            if (tileItemContainer != null) {
-                tileItemContainer.toXML(out, player, showAll, toSavedGame);
-            }
-        } else {
-            if (tileItemContainer != null) {
-                tileItemContainer.toXML(out, player, showAll, toSavedGame, pet);
-            }
+        }
+        if (tileItemContainer != null) {
+            tileItemContainer.toXML(out, player, showAll, toSavedGame);
         }
 
         if (toSavedGame) {
             for (Entry<Player, PlayerExploredTile> entry : playerExploredTiles.entrySet()) {
-                if (entry.getValue().isExplored()) {
-                    entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
-                }
+                entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
             }
         }
 
@@ -2048,11 +1981,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             } else if (in.getLocalName().equals("playerExploredTile")) {
                 // Only from a savegame:
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                if (playerExploredTiles.get(player) == null) {
-                    PlayerExploredTile pet = new PlayerExploredTile(getGame(), in);
+                PlayerExploredTile pet = playerExploredTiles.get(player);
+                if (pet == null) {
+                    pet = new PlayerExploredTile(getGame(), in);
                     playerExploredTiles.put(player, pet);
                 } else {
-                    playerExploredTiles.get(player).readFromXML(in);
+                    pet.readFromXML(in);
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " [" +
