@@ -141,7 +141,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
 
     // Will only be used on enemy colonies:
     protected int unitCount = -1;
-    protected int stockadeLevel = -1;
+    protected String stockadeKey = null;
 
     /** The turn in which this colony was established. */
     protected Turn established = new Turn(0);
@@ -212,6 +212,23 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     public String getNameFor(Player player) {
         // Europeans can always work out the colony name.
         return getName();
+    }
+
+    /**
+     * Gets the image key for this colony.
+     *
+     * @return The image key.
+     */
+    public String getImageKey() {
+        if (isUndead()) return "undead";
+
+        int unitCount = getUnitCount();
+        String key = (unitCount <= 3) ? "small"
+            : (unitCount <= 7) ? "medium"
+            : "large";
+        String stockade = getStockadeKey();
+        if (stockade != null) key += stockade;
+        return "model.settlement." + key + ".image";
     }
 
     /**
@@ -1972,16 +1989,26 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     }
 
     /**
-     * Gets the stockade level.
-     * Uses the "stockadeLevel" variable if it is non-negative, which should
+     * Gets the stockade key.
+     * Uses the "stockadeKey" variable if it is non-null, which should
      * only be true for other player colonies.  Otherwise, get the real value.
      *
-     * @return The stockade level.
+     * @return The stockade key.
      */
-    public int getStockadeLevel() {
-        if (stockadeLevel >= 0) return stockadeLevel;
+    public String getStockadeKey() {
+        return (stockadeKey != null) ? stockadeKey : getTrueStockadeKey();
+    }
+
+    /**
+     * Gets the true stockade key, as should be visible to the owner
+     * or a player that can see this colony.
+     *
+     * @return The true stockade key.
+     */
+    public String getTrueStockadeKey() {
         Building stockade = getStockade();
-        return (stockade == null) ? 0 : stockade.getLevel();
+        return (stockade == null) ? null
+            : stockade.getType().getId().substring("model.building".length());
     }
 
     /**
@@ -2276,9 +2303,9 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
                 out.writeAttribute("unitCount",
                                    Integer.toString(pet.getColonyUnitCount()));
             }
-            if (pet.getColonyStockadeLevel() >= 0) {
-                out.writeAttribute("stockadeLevel",
-                                   Integer.toString(pet.getColonyStockadeLevel()));
+            if (pet.getColonyStockadeKey() != null) {
+                out.writeAttribute("stockadeKey",
+                                   pet.getColonyStockadeKey());
             }
         }
         goodsContainer.toXML(out, player, showAll, toSavedGame);
@@ -2308,7 +2335,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             getFeatureContainer().addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
-        stockadeLevel = getAttribute(in, "stockadeLevel", -1);
+        stockadeKey = in.getAttributeValue(null, "stockadeKey");
 
         // Clear containers
         colonyTiles.clear();

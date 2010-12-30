@@ -48,8 +48,7 @@
 
       <xs:attribute name="colonyUnitCount" type="xs:int" use="optional"
 		    default="0" />
-      <xs:attribute name="colonyStockadeLevel" type="xs:int"
-		    use="optional" default="0" />
+      <xs:attribute name="colonyStockadeKey" type="xs:string" use="optional" />
 
       <xs:attribute name="learnableSkill" type="xs:string"
 		    use="optional" />

@@ -206,6 +206,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.name = newName;
     }
 
+    /**
+     * Gets an image key for this settlement.
+     */
+    abstract public String getImageKey();
+
      /**
      * Returns <code>true</code> if this is the Nation's capital.
      *

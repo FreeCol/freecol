@@ -203,6 +203,18 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the image key for this native settlement.
+     *
+     * @return The image key.
+     */
+    public String getImageKey() {
+        return getOwner().getNationID()
+            + (isCapital() ? ".capital" : ".settlement")
+            + ((getMissionary() == null) ? "" : ".mission")
+            + ".image";
+    }
+
+    /**
      * Returns a suitable (non-unique) name.
      * @return The name of this settlement.
      */

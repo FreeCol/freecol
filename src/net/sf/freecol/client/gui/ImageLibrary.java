@@ -73,11 +73,6 @@ public final class ImageLibrary {
                                DARKNESS = "halo.dark.image";
 
 
-    private static final String[] stockadeKey = new String[] {
-        "", ".stockade", ".fort", ".fortress"
-    };
-
-
     /**
      * The scaling factor used when creating this
      * <code>ImageLibrary</code>. The value
@@ -593,34 +588,7 @@ public final class ImageLibrary {
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(Settlement settlement, double scale) {
-        String key = "";
-
-        if (settlement instanceof Colony) {
-            Colony colony = (Colony) settlement;
-
-            // TODO: Put it in specification
-            if (colony.isUndead()) {
-                key = "undead";
-            } else {
-                int unitCount = colony.getUnitCount();
-                if (unitCount <= 3) {
-                    key = "small";
-                } else if (unitCount <= 7) {
-                    key = "medium";
-                } else {
-                    key = "large";
-                }
-
-                key += stockadeKey[colony.getStockadeLevel()];
-            }
-            key = "model.settlement." + key + ".image";
-        } else { // IndianSettlement
-            key = settlement.getOwner().getNationID()
-                + (settlement.isCapital() ? ".capital" : ".settlement")
-                + ((((IndianSettlement) settlement).getMissionary() == null) ? "" : ".mission")
-                + ".image";
-        }
-        return ResourceManager.getImage(key, scale);
+        return ResourceManager.getImage(settlement.getImageKey(), scale);
     }
 
     /**

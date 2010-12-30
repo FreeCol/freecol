@@ -61,7 +61,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     // Colony data.
     private int colonyUnitCount = 0;
-    private int colonyStockadeLevel = 0;
+    private String colonyStockadeKey = null;
 
     // IndianSettlement data.
     private UnitType skill = null;
@@ -117,12 +117,12 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
             colonyUnitCount = colony.getUnitCount();
-            colonyStockadeLevel = colony.getStockadeLevel();
+            colonyStockadeKey = colony.getTrueStockadeKey();
             missionary = null;
         } else if (settlement instanceof IndianSettlement) {
             IndianSettlement is = (IndianSettlement) settlement;
             colonyUnitCount = 0;
-            colonyStockadeLevel = 0;
+            colonyStockadeKey = null;
             missionary = is.getMissionary();
             if (full) {
                 skill = is.getLearnableSkill();
@@ -151,8 +151,8 @@ public class PlayerExploredTile extends FreeColGameObject {
         return colonyUnitCount;
     }
 
-    public int getColonyStockadeLevel() {
-        return colonyStockadeLevel;
+    public String getColonyStockadeKey() {
+        return colonyStockadeKey;
     }
 
     public Unit getMissionary() {
@@ -216,7 +216,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         Settlement settlement = tile.getSettlement();
         if (settlement instanceof Colony) {
             out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
-            out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
+            if (colonyStockadeKey != null) {
+                out.writeAttribute("colonyStockadeKey", colonyStockadeKey);
+            }
         } else if (settlement instanceof IndianSettlement) {
             writeAttribute(out, "learnableSkill", skill);
             writeAttribute(out, "wantedGoods0", wantedGoods[0]);
@@ -257,7 +259,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         owningSettlement = getFreeColGameObject(in, "owningSettlement",
                                                 Settlement.class, null);
         colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
-        colonyStockadeLevel = getAttribute(in, "colonyStockadeLevel", 0);
+        colonyStockadeKey = in.getAttributeValue(null, "colonyStockadeKey");
         skill = spec.getType(in, "learnableSkill", UnitType.class, null);
         wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class,
                                       null);
