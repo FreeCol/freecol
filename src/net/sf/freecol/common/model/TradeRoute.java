@@ -21,26 +21,32 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
+
 
 /**
  * A TradeRoute holds all information for a unit to follow along a trade route.
  */
 public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
+    private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
 
     private static final String CARGO_TAG = "cargo";
 
     public static final TradeRoute NO_TRADE_ROUTE = new TradeRoute();
-
-    // private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
-
+    
     /**
      * The name of this trade route.
      */
@@ -277,6 +283,15 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
     }
 
+    public static boolean isStopValid(Unit unit, Stop stop) {
+        return TradeRoute.isStopValid(unit.getOwner(), stop);
+    }
+    
+    public static boolean isStopValid(Player player, Stop stop) {
+        return (stop == null) ? false
+            : stop.isValid();
+    }
+
     public class Stop {
 
         private Location location;
@@ -288,7 +303,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * client and can be ignored for XML serialization.
          */
         private boolean modified = false;
-
 
         public Stop(Location location) {
             this.location = location;
@@ -304,24 +318,14 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             this.cargo = new ArrayList<GoodsType>(other.cargo);
         }
 
-        private Stop(XMLStreamReader in) throws XMLStreamException {
-            String locationId = in.getAttributeValue(null, "location");
-            location = (Location) getGame().getFreeColGameObject(locationId);
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(CARGO_TAG)) {
-                    String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                    if (id == null) {
-                        // TODO: remove support for old format
-                        List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
-                        for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
-                            addCargo(goodsList.get(cargoIndex));
-                        }
-                    } else {
-                        addCargo(getSpecification().getGoodsType(id));
-                        in.nextTag();
-                    }
-                }
-            }
+        /**
+         * Is this stop valid?
+         *
+         * @return True if the stop is valid.
+         */
+        public boolean isValid() {
+            return location != null
+                && !((FreeColGameObject) location).isDisposed();
         }
 
         /**
@@ -375,21 +379,10 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
 
         public String toString() {
-            return (getLocation() == null) ? "invalid stop" : getLocation().toString();
-        }
-
-        public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-            out.writeStartElement(getStopXMLElementTagName());
-            out.writeAttribute("location", this.location.getId());
-            for (GoodsType cargoType : cargo) {
-                out.writeStartElement(CARGO_TAG);
-                out.writeAttribute(ID_ATTRIBUTE_TAG, cargoType.getId());
-                out.writeEndElement();
-            }
-            out.writeEndElement();
+            return (isValid()) ? getLocation().toString()
+                : "invalid stop";
         }
     }
-
 
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
@@ -400,10 +393,36 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         out.writeAttribute("name", getName());
         out.writeAttribute("owner", getOwner().getId());
         for (Stop stop : stops) {
-            stop.toXMLImpl(out);
+            out.writeStartElement(getStopXMLElementTagName());
+            out.writeAttribute("location", stop.getLocation().getId());
+            for (GoodsType cargoType : stop.getCargo()) {
+                out.writeStartElement(CARGO_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, cargoType.getId());
+                out.writeEndElement();
+            }
+            out.writeEndElement();
         }
 
         out.writeEndElement();
+    }
+
+    /**
+     * Nasty hack to find the stop location.  Trade routes tend to precede
+     * the map so colonies are not yet defined when trade routes are read.
+     */
+    private Location findLocation(Game game, String id) {
+        FreeColGameObject fcgo = game.getFreeColGameObject(id);
+        if (fcgo == null) {
+            if (id.startsWith(Colony.getXMLElementTagName())) {
+                return new Colony(game, id);
+            } else if (id.startsWith(Europe.getXMLElementTagName())) {
+                return new Europe(game, id);
+            } else {
+                try { throw new IllegalStateException("STOP = " + id + " => null"); } catch (Exception e) { e.printStackTrace(); }
+                return null;
+            }
+        }
+        return (Location) fcgo;
     }
 
     /**
@@ -423,33 +442,33 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         stops.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (getStopXMLElementTagName().equals(in.getLocalName())) {
-                stops.add(new Stop(in));
+                String locationId = in.getAttributeValue(null, "location");
+                Stop stop = new Stop(findLocation(game, locationId));
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals(CARGO_TAG)) {
+                        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                        if (id == null) {
+                            // TODO: remove support for old format
+                            List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
+                            for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
+                                stop.addCargo(goodsList.get(cargoIndex));
+                            }
+                        } else {
+                            stop.addCargo(getSpecification().getGoodsType(id));
+                            in.nextTag();
+                        }
+                    }
+                }
+                if (stop.isValid()) {
+                    stops.add(stop);
+                } else {
+                    logger.warning("Invalid stop for " + getId()
+                                   + " at " + locationId);
+                }
             }
         }
     }
     
-    public static boolean isStopValid(Unit unit, Stop stop){
-        return TradeRoute.isStopValid(unit.getOwner(), stop);
-    }
-    
-    public static boolean isStopValid(Player player, Stop stop){
-        if(stop == null){
-            return false;
-        }
-        
-        Location location = stop.getLocation();
-        
-        if(location == null){
-            return false;
-        }
-        
-        if (((FreeColGameObject) location).isDisposed()) {
-            return false;
-        }
-           
-        return true;
-    }
-
     /**
      * Returns the tag name of the root element representing this object.
      * 

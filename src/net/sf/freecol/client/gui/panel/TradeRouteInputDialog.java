@@ -617,10 +617,12 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 Image image = getLibrary().getCoatOfArmsImage(europe.getOwner().getNation(), 0.5);
                 icon = new JLabel(new ImageIcon(image));
                 name = localizedLabel(europe.getNameKey());
-            } else {
+            } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(getLibrary().getSettlementImage(colony, 0.5)));
                 name = new JLabel(colony.getName());
+            } else {
+                throw new IllegalStateException("Bogus location: " + location);
             }
             panel.add(icon, "spany");
             panel.add(name, "span, wrap");
