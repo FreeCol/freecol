@@ -2403,9 +2403,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate nativeNation = nativePlayer.getNationName();
         String settlementName = settlement.getName();
 
-        // Destroy the settlement, update settlement tiles.
-        csDisposeSettlement(settlement, cs);
-
         // Calculate the treasure amount.  Larger if Hernan Cortes is
         // present in the congress, from cities, and capitals.
         SettlementType settlementType = settlement.getType();
@@ -2417,6 +2414,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .getModifierSet("model.modifier.nativeTreasureModifier");
         treasure = (int) FeatureContainer
             .applyModifierSet(treasure, game.getTurn(), modifierSet);
+
+        // Destroy the settlement, update settlement tiles.
+        csDisposeSettlement(settlement, cs);
 
         // Make the treasure train.
         List<UnitType> unitTypes = game.getSpecification()
