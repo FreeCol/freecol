@@ -1328,6 +1328,7 @@ public class TransportMission extends Mission {
 
         Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
+            if (carrier.getSpaceLeft() == 0) break;
             Transportable t = tli.next();
             if (isCarrying(t)) {
                 continue;
