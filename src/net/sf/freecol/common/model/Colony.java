@@ -57,6 +57,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String BUILD_QUEUE_TAG = "buildQueueItem";
+    public static final String POPULATION_QUEUE_TAG = "populationQueueItem";
     public static final String REARRANGE_WORKERS = "rearrangeWorkers";
     public static final int LIBERTY_PER_REBEL = 200;
 
@@ -147,8 +148,12 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     protected Turn established = new Turn(0);
 
     /** A list of Buildable items. */
-    protected BuildQueue buildQueue = new BuildQueue(this, Consumer.COLONY_PRIORITY);
+    protected BuildQueue<BuildableType> buildQueue =
+        new BuildQueue<BuildableType>(this, Consumer.COLONY_PRIORITY);
 
+    /** The colonists that may be born. */
+    protected BuildQueue<UnitType> populationQueue =
+        new BuildQueue<UnitType>(this, Consumer.POPULATION_PRIORITY);
 
     protected Colony() {
         // empty constructor
@@ -2223,6 +2228,11 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
                 out.writeEndElement();
             }
+            for (BuildableType item : populationQueue.getValues()) {
+                out.writeStartElement(POPULATION_QUEUE_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
+                out.writeEndElement();
+            }
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             if (pet.getOwner() != null) {
                 out.writeAttribute("owner", pet.getOwner().getId());
@@ -2298,7 +2308,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 Modifier modifier = new Modifier(in, getSpecification());
                 getFeatureContainer().addModifier(modifier);
             } else if ("buildQueue".equals(in.getLocalName())) {
-                // TODO: remove support for old format
+                // TODO: remove support for old format, move serialization to BuildQueue
                 int size = getAttribute(in, ARRAY_SIZE, 0);
                 if (size > 0) {
                     for (int x = 0; x < size; x++) {
@@ -2311,11 +2321,26 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 buildQueue.add(getSpecification().getType(id, BuildableType.class));
                 in.nextTag();
+            } else if (POPULATION_QUEUE_TAG.equals(in.getLocalName())) {
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                populationQueue.add(getSpecification().getType(id, UnitType.class));
+                in.nextTag();
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + getName());
                 in.nextTag();
             }
         }
+        // TODO: remove 0.9.x compatibility code
+        if (populationQueue.isEmpty()) {
+            for (UnitType unitType : getSpecification().getUnitTypesWithAbility("model.ability.bornInColony")) {
+                List<AbstractGoods> required = unitType.getGoodsRequired();
+                required.add(new AbstractGoods(getSpecification().getGoodsType("model.goods.food"),
+                                               FOOD_PER_COLONIST));
+                unitType.setGoodsRequired(required);
+                populationQueue.add(unitType);
+            }
+        }
+        // end TODO
     }
 
     /**

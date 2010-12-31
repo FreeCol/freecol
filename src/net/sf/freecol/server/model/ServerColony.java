@@ -20,6 +20,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -119,12 +120,19 @@ public class ServerColony extends Colony implements ServerModelObject {
                 landLocked = false;
             }
         }
+        // set up default production queues
         if (landLocked) {
             buildQueue.add(spec.getBuildingType("model.building.warehouse"));
         } else {
             buildQueue.add(spec.getBuildingType("model.building.docks"));
             getFeatureContainer().addAbility(HAS_PORT);
         }
+        for (UnitType unitType : spec.getUnitTypesWithAbility("model.ability.bornInColony")) {
+            if (!unitType.getGoodsRequired().isEmpty()) {
+                populationQueue.add(unitType);
+            }
+        }
+
         Building building;
         List<BuildingType> buildingTypes = spec.getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
@@ -415,22 +423,33 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Now that other production which might consume food (e.g. horses)
         // has been done, check for new colonists.
-        List<UnitType> colonyTypes
-            = spec.getUnitTypesWithAbility("model.ability.bornInColony");
-        if (getFoodCount() >= FOOD_PER_COLONIST && !colonyTypes.isEmpty()) {
-            UnitType type = Utils.getRandomMember(logger, "Choose birth",
-                                                  colonyTypes, random);
-            Unit unit = new ServerUnit(getGame(), getTile(), owner, type,
-                                       UnitState.ACTIVE);
-            removeFood(FOOD_PER_COLONIST);
-            cs.addMessage(See.only(owner),
-                new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                 "model.colony.newColonist",
-                                 this, unit)
-                          .addName("%colony%", getName()));
-            logger.info("New colonist created in " + getName()
-                        + " with ID=" + unit.getId());
-            tileDirty = true;
+        if (!populationQueue.isEmpty()) {
+            UnitType type = populationQueue.getCurrentlyBuilding();
+            boolean canBuild = true;
+            for (AbstractGoods goods : type.getGoodsRequired()) {
+                if (getGoodsCount(goods.getType()) < goods.getAmount()) {
+                    canBuild = false;
+                    break;
+                }
+            }
+            if (canBuild) {
+                Unit unit = new ServerUnit(getGame(), getTile(), owner, type,
+                                           UnitState.ACTIVE);
+                for (AbstractGoods goods : type.getGoodsRequired()) {
+                    removeGoods(goods);
+                }
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                               "model.colony.newColonist",
+                                               this, unit)
+                              .addName("%colony%", getName()));
+                logger.info("New colonist created in " + getName()
+                            + " with ID=" + unit.getId());
+                if (populationQueue.size() > 1) {
+                    Collections.shuffle(populationQueue.getValues(), random);
+                }
+                tileDirty = true;
+            }
         }
 
         // Export goods if custom house is built.

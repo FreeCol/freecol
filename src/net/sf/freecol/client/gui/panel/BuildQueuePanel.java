@@ -125,7 +125,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         featureContainer = new FeatureContainer(getSpecification());
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (!unitType.getGoodsRequired().isEmpty()) {
+            if (!(unitType.getGoodsRequired().isEmpty()
+                  || unitType.hasAbility("model.ability.bornInColony"))) {
                 // can be built
                 buildableUnits.add(unitType);
             }

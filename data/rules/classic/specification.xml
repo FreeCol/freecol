@@ -606,6 +606,7 @@
                recruitProbability="20">
       <ability id="model.ability.bornInColony" value="true"/>
       <ability id="model.ability.foundInLostCity" value="true"/>
+      <required-goods id="model.goods.food" value="200"/>
       <downgrade unit="model.unit.freeColonist" delete="true" />
       <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
       <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>

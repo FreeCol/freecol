@@ -38,6 +38,12 @@ public interface Consumer {
     };
 
     /**
+     * Default consumption priority for the Colony when producing new
+     * colonists (from food).
+     */
+    public static final int POPULATION_PRIORITY = 300;
+
+    /**
      * Default consumption priority for buildings. Individual building
      * types may have different priorities.
      */

@@ -113,7 +113,7 @@ public class GoodsTest extends FreeColTestCase {
     public void testGetRawMaterial() {
     	GoodsType cotton = spec().getGoodsType("model.goods.cotton");
     	GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-    	
+
         assertEquals(null, cotton.getRawMaterial());
         assertEquals(cotton, cloth.getRawMaterial());
     }
@@ -121,7 +121,7 @@ public class GoodsTest extends FreeColTestCase {
     public void testGetManufactoredGoods() {
     	GoodsType cotton = spec().getGoodsType("model.goods.cotton");
     	GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-    	
+
         assertEquals(null, cloth.getProducedMaterial());
         assertEquals(cloth, cotton.getProducedMaterial());
     }
@@ -130,12 +130,12 @@ public class GoodsTest extends FreeColTestCase {
     	GoodsType bells = spec().getGoodsType("model.goods.bells");
     	GoodsType cloth = spec().getGoodsType("model.goods.cloth");
     	GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-    	
+
         assertFalse(bells.isFarmed());
         assertTrue(cotton.isFarmed());
         assertFalse(cloth.isFarmed());
     }
-    
+
     public void testMilitaryGoods() {
         GoodsType bells = spec().getGoodsType("model.goods.bells");
         GoodsType crosses = spec().getGoodsType("model.goods.crosses");
@@ -143,7 +143,7 @@ public class GoodsTest extends FreeColTestCase {
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         GoodsType muskets = spec().getGoodsType("model.goods.muskets");
         GoodsType horses = spec().getGoodsType("model.goods.horses");
-        
+
         assertFalse(bells.isMilitaryGoods());
         assertFalse(crosses.isMilitaryGoods());
         assertFalse(cloth.isMilitaryGoods());
@@ -165,7 +165,7 @@ public class GoodsTest extends FreeColTestCase {
         GoodsType food = spec().getPrimaryFoodType();
         GoodsType ore = spec().getGoodsType("model.goods.ore");
         GoodsType lumber = spec().getGoodsType("model.goods.lumber");
-        
+
         // for EquipmentType horses
         assertTrue(horses.isBuildingMaterial());
         // for EquipmentType muskets
@@ -173,17 +173,17 @@ public class GoodsTest extends FreeColTestCase {
         // for buildings and units
         assertTrue(hammers.isBuildingMaterial());
         assertTrue(tools.isBuildingMaterial());
-        
+
         // other goods not involved in construction, or not directly involved
         assertFalse(bells.isBuildingMaterial());
         assertFalse(crosses.isBuildingMaterial());
         assertFalse(cloth.isBuildingMaterial());
         assertFalse(cotton.isBuildingMaterial());
         assertFalse(fish.isBuildingMaterial());
-        assertFalse(food.isBuildingMaterial());
+        //assertFalse(food.isBuildingMaterial());
         assertFalse(ore.isBuildingMaterial());
         assertFalse(lumber.isBuildingMaterial());
-        
+
         // checking raw materials
         assertTrue(ore.isRawBuildingMaterial());
         assertTrue(lumber.isRawBuildingMaterial());
@@ -229,9 +229,9 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(100000, cotton.getAmount());
 
     }
-    
+
     public Player dutch(){
-    	return getGame().getPlayer("model.nation.dutch");    	
+    	return getGame().getPlayer("model.nation.dutch");
     }
 
     public void testAdjustAmount() {
@@ -291,7 +291,7 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(ore, chain.get(0));
         assertEquals(tools, chain.get(1));
         assertEquals(muskets, chain.get(2));
-        
+
     }
 
 }

@@ -30,19 +30,19 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 
-public class BuildQueue implements Consumer {
+public class BuildQueue<T extends BuildableType> implements Consumer {
 
     /** A list of Buildable items. */
-    private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
+    private List<T> buildQueue = new ArrayList<T>();
 
     private int priority = COLONY_PRIORITY;
 
     private Colony colony;
 
-    public BuildQueue(Colony colony, int priority, BuildableType... items) {
+    public BuildQueue(Colony colony, int priority, T... items) {
         this.colony = colony;
         this.priority = priority;
-        for (BuildableType type : items) {
+        for (T type : items) {
             buildQueue.add(type);
         }
     }
@@ -52,7 +52,7 @@ public class BuildQueue implements Consumer {
      *
      * @return The type of building currently being built.
      */
-    public BuildableType getCurrentlyBuilding() {
+    public T getCurrentlyBuilding() {
         return (buildQueue.isEmpty()) ? null : buildQueue.get(0);
     }
 
@@ -60,9 +60,9 @@ public class BuildQueue implements Consumer {
      * Sets the current type of buildable to be built and if it is a building
      * insist that there is only one in the queue.
      *
-     * @param buildable The <code>BuildableType</code> to build.
+     * @param buildable The <code>T</code> to build.
      */
-    public void setCurrentlyBuilding(BuildableType buildable) {
+    public void setCurrentlyBuilding(T buildable) {
         if (buildable instanceof BuildingType && buildQueue.contains(buildable)) {
             buildQueue.remove(buildable);
         }
@@ -74,15 +74,15 @@ public class BuildQueue implements Consumer {
         buildQueue.clear();
     }
 
-    public void add(BuildableType buildable) {
+    public void add(T buildable) {
         buildQueue.add(buildable);
     }
 
-    public List<BuildableType> getValues() {
+    public List<T> getValues() {
         return buildQueue;
     }
 
-    public void setValues(List<BuildableType> values) {
+    public void setValues(List<T> values) {
         buildQueue = values;
     }
 
@@ -112,7 +112,7 @@ public class BuildQueue implements Consumer {
      */
     public int getConsumedAmount(GoodsType goodsType, int available) {
         int amount = 0;
-        BuildableType current = getCurrentlyBuilding();
+        T current = getCurrentlyBuilding();
         if (current != null) {
             // ATTENTION: this code presupposes that we will consume
             // all required goods at once
@@ -148,7 +148,7 @@ public class BuildQueue implements Consumer {
      * @return a <code>List</code> value
      */
     public List<AbstractGoods> getConsumedGoods() {
-        BuildableType current = getCurrentlyBuilding();
+        T current = getCurrentlyBuilding();
         if (current == null) {
             return new ArrayList<AbstractGoods>();
         } else {
