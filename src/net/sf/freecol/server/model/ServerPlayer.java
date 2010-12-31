@@ -1996,12 +1996,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addHistory(attackerPlayer,
                       new HistoryEvent(game.getTurn(),
                                        HistoryEvent.EventType.CONQUER_COLONY)
-                      .addStringTemplate("%nation%", attackerNation)
+                      .addStringTemplate("%nation%", colonyNation)
                       .addName("%colony%", colony.getName()));
         cs.addHistory(colonyPlayer,
                       new HistoryEvent(game.getTurn(),
                                        HistoryEvent.EventType.COLONY_CONQUERED)
-                      .addStringTemplate("%nation%", colonyNation)
+                      .addStringTemplate("%nation%", attackerNation)
                       .addName("%colony%", colony.getName()));
         cs.addMessage(See.only(attackerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
