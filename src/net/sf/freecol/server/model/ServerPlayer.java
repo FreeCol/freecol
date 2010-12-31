@@ -1138,7 +1138,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Colony colony : getColonies()) {
             if (colony.canBombardEnemyShip()) {
                 for (Tile tile : colony.getTile().getSurroundingTiles(1)) {
-                    if (!tile.isLand() && tile.getFirstUnit() != null) {
+                    if (!tile.isLand() && tile.getFirstUnit() != null
+                        && tile.getFirstUnit().getOwner() != this) {
                         for (Unit unit : new ArrayList<Unit>(tile.getUnitList())) {
                             if (atWarWith(unit.getOwner())
                                 || unit.hasAbility("model.ability.piracy")) {
