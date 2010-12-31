@@ -2473,6 +2473,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Try to reassign the tiles
         List<Tile> owned = settlement.getOwnedTiles();
+        Tile centerTile = settlement.getTile();
+        Settlement centerClaimant = null;
         while (!owned.isEmpty()) {
             Tile tile = owned.remove(0);
             votes.clear();
@@ -2489,9 +2491,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     // Add this to the tiles to process if its not
                     // there already.
                     if (!owned.contains(t)) owned.add(t);
-                } else if (s.getOwner().canOwnTile(t)
+                } else if (s.getOwner().canOwnTile(tile)
                            && (s.getOwner().isIndian()
-                               || s.getTile().getDistanceTo(t) <= s.getRadius())) {
+                               || s.getTile().getDistanceTo(tile) <= s.getRadius())) {
                     // Weight claimant settlements:
                     //   settlements owned by the same player
                     //     > settlements owned by same type of player
@@ -2511,18 +2513,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     bestClaim = vote.getValue().intValue();
                 }
             }
-            if (bestClaimant == null) {
-                tile.changeOwnership(null, null);
+            if (tile == centerTile) {
+                centerClaimant = bestClaimant; // Defer until settlement gone
             } else {
-                tile.changeOwnership(bestClaimant.getOwner(), bestClaimant);
-            }
-            if (tile != settlement.getTile()) {
+                if (bestClaimant == null) {
+                    tile.changeOwnership(null, null);
+                } else {
+                    tile.changeOwnership(bestClaimant.getOwner(), bestClaimant);
+                }
                 cs.add(See.perhaps().always(owner), tile);
             }
         }
 
         // Settlement goes away
-        cs.addDispose(owner, settlement.getTile(), settlement);
+        cs.addDispose(owner, centerTile, settlement);
+        if (centerClaimant != null) {
+            centerTile.changeOwnership(centerClaimant.getOwner(),
+                                       centerClaimant);
+        }
     }
 
     /**
