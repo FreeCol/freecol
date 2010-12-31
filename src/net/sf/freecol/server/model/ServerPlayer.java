@@ -2407,10 +2407,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
         StringTemplate nativeNation = nativePlayer.getNationName();
         String settlementName = settlement.getName();
+        boolean capital = settlement.isCapital();
+        SettlementType settlementType = settlement.getType();
 
         // Calculate the treasure amount.  Larger if Hernan Cortes is
         // present in the congress, from cities, and capitals.
-        SettlementType settlementType = settlement.getType();
         RandomRange plunder = settlementType.getPlunder();
         int randomLimit = Utils.randomInt(logger, "Base treasure factor", random,
                                           plunder.getRandomLimit());
@@ -2435,7 +2436,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // This is an atrocity.
         int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
         if (settlementType.getClaimableRadius() > 1) atrocities *= 2;
-        if (settlement.isCapital()) atrocities = (atrocities * 3) / 2;
+        if (capital) atrocities = (atrocities * 3) / 2;
         attackerPlayer.modifyScore(atrocities);
         cs.addPartial(See.only(attackerPlayer), attackerPlayer, "score");
 
@@ -2451,6 +2452,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                        HistoryEvent.EventType.DESTROY_SETTLEMENT)
                       .addStringTemplate("%nation%", nativeNation)
                       .addName("%settlement%", settlementName));
+        if (capital) {
+            cs.addMessage(See.only(this),
+                          new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                           "indianSettlement.capitalBurned",
+                                           attacker)
+                          .addName("%name%", settlementName)
+                          .addStringTemplate("%nation%", nativeNation));
+        }
         if (nativePlayer.checkForDeath()) {
             cs.addHistory(attackerPlayer,
                           new HistoryEvent(game.getTurn(),
