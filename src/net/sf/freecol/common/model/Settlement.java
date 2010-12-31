@@ -722,4 +722,12 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     }
 
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute("name", getName());
+        out.writeAttribute("tile", tile.getId());
+        out.writeAttribute("settlementType", getType().getId());
+        // Not owner, it is subject to PlayerExploredTile handling.
+    }
 }

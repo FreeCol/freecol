@@ -2259,10 +2259,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         // Add attributes:
-        out.writeAttribute("ID", getId());
-        out.writeAttribute("name", getName());
-        out.writeAttribute("tile", tile.getId());
-        out.writeAttribute("settlementType", getType().getId());
+        super.writeAttributes(out);
         out.writeAttribute("established", Integer.toString(established.getNumber()));
         if (full) {
             out.writeAttribute("owner", owner.getId());

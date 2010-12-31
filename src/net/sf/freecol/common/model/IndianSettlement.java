@@ -1004,12 +1004,9 @@ public class IndianSettlement extends Settlement {
 
         // Start element:
         out.writeStartElement(getXMLElementTagName());
+        super.writeAttributes(out);
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("tile", tile.getId());
-        out.writeAttribute("name", getName());
         out.writeAttribute("owner", owner.getId());
-
         if (full) {
             out.writeAttribute("lastTribute", Integer.toString(lastTribute));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
