@@ -268,14 +268,14 @@ public class ColonyProductionTest extends FreeColTestCase {
         colony.setCurrentlyBuilding(spec().getBuildingType("model.building.rumDistillery"));
         consumers = colony.getConsumersOf(toolsType);
         assertEquals(1, consumers.size());
-        assertEquals(consumers.get(0), colony);
+        assertTrue(consumers.get(0) instanceof BuildQueue);
 
         BuildingType armoryType = spec().getBuildingType("model.building.armory");
         Building armory = new ServerBuilding(getGame(), colony, armoryType);
         colony.addBuilding(armory);
         consumers = colony.getConsumersOf(toolsType);
         assertEquals(2, consumers.size());
-        assertEquals(consumers.get(0), colony);
+        assertTrue(consumers.get(0) instanceof BuildQueue);
         assertTrue(consumers.get(1) instanceof Building);
         assertEquals("model.building.armory",
                      ((Building) consumers.get(1)).getType().getId());

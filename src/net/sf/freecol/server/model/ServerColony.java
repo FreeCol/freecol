@@ -571,7 +571,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         Specification spec = getSpecification();
 
         while (!buildQueue.isEmpty()) {
-            BuildableType buildable = buildQueue.get(0);
+            BuildableType buildable = buildQueue.getCurrentlyBuilding();
             switch (getNoBuildReason(buildable)) {
             case NONE:
                 return buildable;

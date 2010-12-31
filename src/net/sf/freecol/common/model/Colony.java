@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public class Colony extends Settlement implements Consumer, Nameable, PropertyChangeListener {
+public class Colony extends Settlement implements Nameable, PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -147,7 +147,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
     protected Turn established = new Turn(0);
 
     /** A list of Buildable items. */
-    protected List<BuildableType> buildQueue = new ArrayList<BuildableType>();
+    protected BuildQueue buildQueue = new BuildQueue(this, Consumer.COLONY_PRIORITY);
 
 
     protected Colony() {
@@ -961,7 +961,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
      * @return The type of building currently being built.
      */
     public BuildableType getCurrentlyBuilding() {
-        return (buildQueue.isEmpty()) ? null : buildQueue.get(0);
+        return buildQueue.getCurrentlyBuilding();
     }
 
     /**
@@ -971,9 +971,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
      * @param buildable The <code>BuildableType</code> to build.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
-        if (buildable instanceof BuildingType
-            && buildQueue.contains(buildable)) buildQueue.remove(buildable);
-        buildQueue.add(0, buildable);
+        buildQueue.setCurrentlyBuilding(buildable);
     }
 
     /**
@@ -1031,7 +1029,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
      * @return a <code>List<Buildable></code> value
      */
     public List<BuildableType> getBuildQueue() {
-        return buildQueue;
+        return buildQueue.getValues();
     }
 
     /**
@@ -1040,7 +1038,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
      * @param newBuildQueue The new BuildQueue value.
      */
     public void setBuildQueue(final List<BuildableType> newBuildQueue) {
-        buildQueue = newBuildQueue;
+        buildQueue.setValues(newBuildQueue);
     }
 
     /**
@@ -2149,81 +2147,14 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
                     result.add(building);
                 }
             }
-            if (consumes(goodsType)) {
-                result.add(this);
+            // Add build queues;
+            if (buildQueue.consumes(goodsType)) {
+                result.add(buildQueue);
             }
+
         }
         Collections.sort(result, Consumer.COMPARATOR);
         return result;
-    }
-
-
-    // Interface Consumer
-
-    /**
-     * Returns the number of units of the given GoodsType this Colony
-     * consumes this turn. Colonies consume goods only in order to
-     * build units or buildings.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param available an <code>int</code> value
-     * @return units consumed
-     */
-    public int getConsumedAmount(GoodsType goodsType, int available) {
-        int amount = 0;
-        BuildableType current = getCurrentlyBuilding();
-        if (current != null) {
-            // ATTENTION: this code presupposes that we will consume
-            // all required goods at once
-            for (AbstractGoods required : current.getGoodsRequired()) {
-                if (required.getType() == goodsType) {
-                    amount = required.getAmount();
-                    if (amount < available) {
-                        return 0;
-                    }
-                } else if (getInputAvailable(goodsType, this) < required.getAmount()) {
-                    return 0;
-                }
-            }
-        }
-        return amount;
-    }
-
-
-    /**
-     * Returns true if this Consumer consumes the given GoodsType.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean consumes(GoodsType goodsType) {
-        return getCurrentlyBuilding() != null
-            && getCurrentlyBuilding().getAmountRequiredOf(goodsType) > 0;
-    }
-
-    /**
-     * Returns a list of GoodsTypes this Consumer consumes.
-     *
-     * @return a <code>List</code> value
-     */
-    public List<AbstractGoods> getConsumedGoods() {
-        BuildableType current = getCurrentlyBuilding();
-        if (current == null) {
-            return new ArrayList<AbstractGoods>();
-        } else {
-            return current.getGoodsRequired();
-        }
-    }
-
-    /**
-     * The priority of this Consumer. The higher the priority, the
-     * earlier will the Consumer be allowed to consume the goods it
-     * requires.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getPriority() {
-        return COLONY_PRIORITY;
     }
 
 
@@ -2287,7 +2218,7 @@ public class Colony extends Settlement implements Consumer, Nameable, PropertyCh
             for (WorkLocation workLocation : getWorkLocations()) {
                 ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
             }
-            for (BuildableType item : buildQueue) {
+            for (BuildableType item : buildQueue.getValues()) {
                 out.writeStartElement(BUILD_QUEUE_TAG);
                 out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
                 out.writeEndElement();
