@@ -1490,8 +1490,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return;
         }
         for (Player player : getGame().getPlayers()) {
-            if (playerExploredTiles.get(player) != null
-                || (player.isEuropean() && player.canSee(this))) {
+            if (player.isEuropean() && player.canSee(this)) {
                 updatePlayerExploredTile(player, false);
             }
         }
@@ -1880,14 +1879,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             out.writeAttribute("connected", Boolean.toString(true));
         }
 
-        if (owner != null) {
-            if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
+        if (getGame().isClientTrusted() || showAll) {
+            if (owner != null) {
                 out.writeAttribute("owner", owner.getId());
-            } else if (pet != null) {
+            }
+        } else if (pet != null) {
+            if (pet.getOwner() != null) {
                 writeAttribute(out, "owner", pet.getOwner());
             }
         }
-        if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
+
+        if (getGame().isClientTrusted() || showAll) {
             if (owningSettlement != null) {
                 out.writeAttribute("owningSettlement",
                                    owningSettlement.getId());
@@ -1904,9 +1906,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         // Check if the player can see the tile:
-        // Do not show enemy units or any tileitems on a tile out-of-sight.
+        // Do not show enemy units on a tile out-of-sight.
+        // But show enemy units if:
+        // 1) the tile is visible,
+        // 2) there is no settlement there owned by another player.
         if (getGame().isClientTrusted() || showAll
-            || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))) {
+            || (player.canSee(this)
+                && (settlement == null || settlement.getOwner() == player))) {
             if (!units.isEmpty()) {
                 out.writeStartElement(UNITS_TAG_NAME);
                 for (Unit unit : units) {
