@@ -273,18 +273,27 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Determine the total bonus for a GoodsType. Checks Resource and all Improvements.
+     * Determine the total bonus for a GoodsType. Checks Resource and
+     * all Improvements, unless onlyNatural is <code>true</code>, in
+     * which case only natural Improvements will be considered. This
+     * is necessary in order to calculate secondary production, which
+     * does not profit from artificial Improvements, such as plowing.
+     *
      * @param g a <code>GoodsType</code> value
      * @param unitType an <code>UnitType</code> value
      * @param tilePotential an <code>int</code> value
+     * @param onlyNatural a <code>boolean</code> value
      * @return The total bonus
      */
-    public int getTotalBonusPotential(GoodsType g, UnitType unitType, int tilePotential) {
+    public int getTotalBonusPotential(GoodsType g, UnitType unitType, int tilePotential, boolean onlyNatural) {
         int potential = tilePotential;
         int improvementBonus = 0;
         for (TileItem item : tileItems) {
             if (item instanceof TileImprovement) {
-                improvementBonus += ((TileImprovement) item).getBonus(g);
+                TileImprovement improvement = (TileImprovement) item;
+                if (improvement.getType().isNatural() || !onlyNatural) {
+                    improvementBonus += improvement.getBonus(g);
+                }
             } else if (item instanceof Resource) {
                 potential = ((Resource) item).getBonus(g, unitType, potential);
             }

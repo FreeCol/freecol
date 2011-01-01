@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a single tile on the <code>Map</code>.
- * 
+ *
  * @see Map
  */
 public final class Tile extends FreeColGameObject implements Location, Named, Ownable {
@@ -62,7 +62,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public static final String UNIT_CHANGE = "TILE_UNIT_CHANGE";
 
     private TileType type;
-    
+
     private int x, y;
 
     /** The player that consider this tile to be their land. */
@@ -120,7 +120,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * A constructor to use.
-     * 
+     *
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
      * @param type The type.
      * @param locX The x-position of this tile on the map.
@@ -144,7 +144,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param game The <code>Game</code> this <code>Tile</code> should be
      *            created in.
      * @param in The input stream containing the XML.
@@ -162,7 +162,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param game The <code>Game</code> this <code>Tile</code> should be
      *            created in.
      * @param e An XML-element that will be used to initialize this object.
@@ -182,7 +182,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -234,7 +234,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Gets the name of this tile, or shows "unexplored" if not explored by player.
-     * 
+     *
      * @return The name as a <code>String</code>.
      */
     public String getNameKey() {
@@ -270,10 +270,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 .addStringTemplate(tileItemContainer.getLabel());
         }
     }
-    
+
     /**
      * Returns the name of this location.
-     * 
+     *
      * @return The name of this location.
      */
     public StringTemplate getLocationName() {
@@ -333,7 +333,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Gets the distance in tiles between this <code>Tile</code> and the
      * specified one.
-     * 
+     *
      * @param tile The <code>Tile</code> to check the distance to.
      * @return Distance
      */
@@ -422,11 +422,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Tile</code>.
-     * <p>If this tile has a settlement, the units inside the settlement 
+     * <p>If this tile has a settlement, the units inside the settlement
      * are also considered as potential defenders.
      * <p>As this method is quite expensive, it should not be used to test
      * for the presence of enemy units.
-     * 
+     *
      * @param attacker The target that would be attacking this tile.
      * @return The <code>Unit</code> that has been chosen to defend this
      *         tile.
@@ -486,13 +486,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns the cost of moving onto this tile from a given <code>Tile</code>.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * This method does not take special unit behavior into account. Use
      * {@link Unit#getMoveCost} whenever it is possible.
-     * 
+     *
      * @param fromTile The <code>Tile</code> the moving {@link Unit} comes
      *            from.
      * @return The cost of moving the unit.
@@ -518,7 +518,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             unit.dispose();
         }
     }
-    
+
     public void dispose() {
         if (settlement != null) {
             settlement.dispose();
@@ -526,13 +526,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (tileItemContainer != null) {
             tileItemContainer.dispose();
         }
-        
+
         super.dispose();
     }
 
     /**
      * Gets the first <code>Unit</code> on this tile.
-     * 
+     *
      * @return The first <code>Unit</code> on this tile.
      */
     public Unit getFirstUnit() {
@@ -545,7 +545,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Gets the last <code>Unit</code> on this tile.
-     * 
+     *
      * @return The last <code>Unit</code> on this tile.
      */
     public Unit getLastUnit() {
@@ -559,7 +559,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Returns the total amount of Units at this Location. This also includes
      * units in a carrier
-     * 
+     *
      * @return The total amount of Units at this Location.
      */
     public int getTotalUnitCount() {
@@ -574,7 +574,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Checks if this <code>Tile</code> contains the specified
      * <code>Locatable</code>.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to test the presence of.
      * @return
      *            <ul>
@@ -597,7 +597,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Gets the <code>Map</code> in which this <code>Tile</code> belongs.
-     * 
+     *
      * @return The <code>Map</code>.
      */
     public Map getMap() {
@@ -648,7 +648,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Check if the tile has been explored.
-     * 
+     *
      * @return true if tile is known.
      */
     public boolean isExplored() {
@@ -657,7 +657,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns <code>true</code> if this Tile is a land Tile, 'false' otherwise.
-     * 
+     *
      * @return <code>true</code> if this Tile is a land Tile, 'false' otherwise.
      */
     public boolean isLand() {
@@ -666,7 +666,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns <code>true</code> if this Tile is forested.
-     * 
+     *
      * @return <code>true</code> if this Tile is forested.
      */
     public boolean isForested() {
@@ -675,7 +675,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns <code>true</code> if this Tile has a River.
-     * 
+     *
      * @return <code>true</code> if this Tile has a River.
      */
     public boolean hasRiver() {
@@ -684,7 +684,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns <code>true</code> if this Tile has a resource on it.
-     * 
+     *
      * @return <code>true</code> if this Tile has a resource on it.
      */
     public boolean hasResource() {
@@ -693,7 +693,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns <code>true</code> if this Tile has a lostCityRumour on it.
-     * 
+     *
      * @return <code>true</code> if this Tile has a lostCityRumour on it.
      */
     public boolean hasLostCityRumour() {
@@ -702,7 +702,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns <code>true</code> if this Tile has a road.
-     * 
+     *
      * @return <code>true</code> if this Tile has a road.
      */
     public boolean hasRoad() {
@@ -726,7 +726,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Returns the type of this Tile. Returns UNKNOWN if the type of this Tile
      * is unknown.
-     * 
+     *
      * @return The type of this Tile.
      */
     public TileType getType() {
@@ -735,7 +735,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * The nation that consider this tile to be their property.
-     * 
+     *
      * @return The player owning this tile.
      */
     public Player getOwner() {
@@ -744,7 +744,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Sets the nation that should consider this tile to be their property.
-     * 
+     *
      * @param owner The player, new owner of this tile.
      * @see #getOwner
      */
@@ -889,7 +889,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns the style of a river <code>TileImprovement</code> on this <code>Tile</code>.
-     * 
+     *
      * @return an <code>int</code> value
      */
     public int getRiverStyle() {
@@ -926,7 +926,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Determine whether this tile has adjacent tiles that are unexplored.
-     * 
+     *
      * @return true if at least one neighbouring tiles is unexplored, otherwise false
      */
     public boolean hasUnexploredAdjacent() {
@@ -966,7 +966,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Sets the type for this Tile.
-     * 
+     *
      * @param t The new TileType for this Tile.
      */
     public void setType(TileType t) {
@@ -980,13 +980,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (!isLand()) {
             settlement = null;
         }
-        
+
         updatePlayerExploredTiles();
     }
 
      /**
      * Returns the x-coordinate of this Tile.
-     * 
+     *
      * @return The x-coordinate of this Tile.
      */
     public int getX() {
@@ -995,7 +995,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns the y-coordinate of this Tile.
-     * 
+     *
      * @return The y-coordinate of this Tile.
      */
     public int getY() {
@@ -1004,7 +1004,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Gets the <code>Position</code> of this <code>Tile</code>.
-     * 
+     *
      * @return The <code>Position</code> of this <code>Tile</code>.
      */
     public Position getPosition() {
@@ -1020,7 +1020,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Check to see if this tile can be used to construct a new settlement.
-     * 
+     *
      * @return True if tile is suitable for colonization, false otherwise
      */
     public boolean isSettleable() {
@@ -1031,7 +1031,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Gets a <code>Unit</code> that can become active. This is preferably a
      * <code>Unit</code> not currently performing any work.
-     * 
+     *
      * @return A <code>Unit</code> with <code>movesLeft > 0</code> or
      *         <i>null</i> if no such <code>Unit</code> is located on this
      *         <code>Tile</code>.
@@ -1083,7 +1083,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Gets the <code>Tile</code> where this <code>Location</code> is
      * located or null if no <code>Tile</code> applies.
-     * 
+     *
      * @return This <code>Tile</code>.
      */
     public Tile getTile() {
@@ -1092,7 +1092,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Adds a <code>Locatable</code> to this Location.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public void add(Locatable locatable) {
@@ -1100,7 +1100,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             if (!units.contains(locatable)) {
                 if (units.equals(Collections.emptyList())) {
                     units = new ArrayList<Unit>();
-                } 
+                }
                 units.add((Unit) locatable);
                 ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
                 firePropertyChange(UNIT_CHANGE, null, locatable);
@@ -1114,7 +1114,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Removes a <code>Locatable</code> from this Location.
-     * 
+     *
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
@@ -1135,7 +1135,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
         }
     }
-    
+
     /**
      * Removes the unit from the tile.
      *
@@ -1159,7 +1159,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns the amount of units at this <code>Location</code>.
-     * 
+     *
      * @return The amount of units at this <code>Location</code>.
      */
     public int getUnitCount() {
@@ -1177,13 +1177,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public List<Unit> getUnitList() {
         return units;
     }
-    
+
     /**
      * Gets an <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Tile</code>. This does not include
      * <code>Unit</code>s located in a <code>Settlement</code> or on
      * another <code>Unit</code> on this <code>Tile</code>.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
@@ -1210,7 +1210,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * The potential of this tile to produce a certain type of goods.
-     * 
+     *
      * @param goodsType The type of goods to check the potential for.
      * @param unitType an <code>UnitType</code> value
      * @return The normal potential of this tile to produce that amount of
@@ -1224,7 +1224,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Gets the maximum potential for producing the given type of goods. The
      * maximum potential is the potential of a tile after the tile has been
      * plowed/built road on.
-     * 
+     *
      * @param goodsType The type of goods.
      * @param unitType an <code>UnitType</code> value
      * @return The maximum potential.
@@ -1294,7 +1294,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Checks whether this <code>Tile</code> can have a road or not. This
      * method will return <code>false</code> if a road has already been built.
-     * 
+     *
      * @return The result.
      */
     public boolean canGetRoad() {
@@ -1311,14 +1311,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return tileItemContainer.findTileImprovementType(type);
         }
     }
-    
+
     /**
      * Will check whether this tile has a completed improvement of the given
      * type.
-     * 
+     *
      * Useful for checking whether the tile for instance has a road or is
      * plowed.
-     * 
+     *
      * @param type
      *            The type to check for.
      * @return Whether the tile has the improvement and the improvement is
@@ -1332,10 +1332,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         return false;
     }
-    
+
     /**
      * Calculates the potential of a certain <code>GoodsType</code>.
-     * 
+     *
      * @param tileType
      *            The <code>TileType</code>.
      * @param goodsType
@@ -1347,7 +1347,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *            The Bonus Fish to be considered if valid
      * @return The amount of goods.
      */
-    public static int getTileTypePotential(TileType tileType, GoodsType goodsType, 
+    public static int getTileTypePotential(TileType tileType, GoodsType goodsType,
                                            TileItemContainer tiContainer, UnitType unitType) {
         if (tileType == null || goodsType == null || !goodsType.isFarmed()) {
             return 0;
@@ -1355,11 +1355,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         // Get tile potential + bonus if any
         int potential = tileType.getProductionOf(goodsType, unitType);
         if (tiContainer != null) {
-            potential = tiContainer.getTotalBonusPotential(goodsType, unitType, potential);
+            potential = tiContainer.getTotalBonusPotential(goodsType, unitType, potential, false);
         }
         return potential;
     }
 
+    /**
+     * Returns the primary production of a colony center tile. In the
+     * standard rule sets, this is always some kind of food and all
+     * tile improvements contribute to the production.
+     *
+     * @return an <code>int</code> value
+     */
     public int getPrimaryProduction() {
         AbstractGoods primaryProduction = type.getPrimaryGoods();
         if (primaryProduction == null) {
@@ -1367,12 +1374,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else {
             int potential = primaryProduction.getAmount();
             if (tileItemContainer != null) {
-                potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null, potential);
+                potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null,
+                                                                     potential, false);
             }
             return potential;
         }
-    }        
+    }
 
+    /**
+     * Returns the secondary production of a colony center tile. Only
+     * natural tile improvements, such as rivers, contribute to the
+     * production. Artificial tile improvements, such as plowing, are
+     * ignored.
+     *
+     * @return an <code>int</code> value
+     */
     public int getSecondaryProduction() {
         AbstractGoods secondaryProduction = type.getSecondaryGoods();
         if (secondaryProduction == null) {
@@ -1380,11 +1396,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else {
             int potential = secondaryProduction.getAmount();
             if (tileItemContainer != null) {
-                potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null, potential);
+                potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null,
+                                                                     potential, true);
             }
             return potential;
         }
-    }        
+    }
 
     /**
      * Sorts GoodsTypes according to potential based on TileType,
@@ -1499,7 +1516,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Gets the <code>PlayerExploredTile</code> for the given
      * <code>Player</code>.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @see PlayerExploredTile
      */
@@ -1511,7 +1528,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Updates the information about this <code>Tile</code> for the given
      * <code>Player</code>.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @param full If true, also update any hidden information specific to a
      *    settlement present on the tile.
@@ -1532,7 +1549,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Checks if this <code>Tile</code> has been explored by the given
      * <code>Player</code>.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @return <code>true</code> if this <code>Tile</code> has been explored
      *         by the given <code>Player</code> and <code>false</code>
@@ -1547,7 +1564,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Sets this <code>Tile</code> to be explored by the given
      * <code>Player</code>.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @param explored <code>true</code> if this <code>Tile</code> should be
      *            explored by the given <code>Player</code> and
@@ -1569,9 +1586,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Returns the number of turns it takes for a non-expert pioneer to perform
      * the given <code>TileImprovementType</code>. It will check if it is valid
      * for this <code>TileType</code>.
-     * 
+     *
      * @param workType The <code>TileImprovementType</code>
-     * 
+     *
      * @return The number of turns it should take a non-expert pioneer to finish
      *         the work.
      */
@@ -1616,10 +1633,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public boolean isOccupied() {
         return getOccupyingUnit() != null;
     }
-    
+
     /**
      * Determines whether this tile is adjacent to the specified tile.
-     * 
+     *
      * @param tile A potentially adjacent <code>Tile</code>.
      * @return <code>true</code> if the tile is adjacent to this tile
      */
@@ -1629,7 +1646,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     	}
     	return (this.getDistanceTo(tile) == 1);
     }
-    
+
     /**
      * Gets the position adjacent Tile to a given Tile, in a given
      * direction.
@@ -1728,7 +1745,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Checks if the given <code>Tile</code> is adjacent to the
      * east or west edge of the map.
-     * 
+     *
      * @return <code>true</code> if the given tile is at the edge of the map.
      */
     public boolean isAdjacentToVerticalMapEdge() {
@@ -1831,14 +1848,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -1936,7 +1953,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -2058,7 +2075,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns a String representation of this Tile.
-     * 
+     *
      * @return A String representation of this Tile.
      */
     public String toString() {
@@ -2067,7 +2084,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "tile".
      */
     public static String getXMLElementTagName() {
