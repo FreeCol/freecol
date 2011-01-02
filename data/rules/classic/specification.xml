@@ -944,6 +944,13 @@
     </unit-type>
   </unit-types>
 
+  <!--
+      The priority value determines the order in which consumers are
+      granted access to goods. Units have a priority of 1000, the
+      colony's build queue has a priority of 500, and the colony's
+      population queue has a priority of 300. Consumers with a higher
+      priority are served first.
+  -->
   <building-types>
     <building-type id="model.building.townHall" basicProduction="3"
                    produces="model.goods.bells">
@@ -1061,8 +1068,9 @@
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>
     </building-type>
-    <building-type id="model.building.armory" basicProduction="3" upkeep="5"
+    <building-type id="model.building.armory" basicProduction="3" upkeep="5" priority="400"
                    consumes="model.goods.tools" produces="model.goods.muskets">
+      <!-- priority should be less than the colony's build queue -->
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.build">
         <scope type="model.unit.artillery"/>

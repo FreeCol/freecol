@@ -184,4 +184,13 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return "model.ability.consumeAllOrNothing".equals(id);
     }
 
+    public String toString() {
+        String result = "BuildQueue:";
+        for (BuildableType item : buildQueue) {
+            result += " " + item.getId();
+        }
+        return result;
+
+    }
+
 }

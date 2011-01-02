@@ -44,16 +44,15 @@ public interface Consumer {
     public static final int POPULATION_PRIORITY = 300;
 
     /**
+     * The consumption priority of the colony build queue.
+     */
+    public static final int COLONY_PRIORITY = 500;
+
+    /**
      * Default consumption priority for buildings. Individual building
      * types may have different priorities.
      */
-    public static final int BUILDING_PRIORITY = 500;
-
-    /**
-     * The consumption priority of a Colony building a Unit or
-     * Building.
-     */
-    public static final int COLONY_PRIORITY = 800;
+    public static final int BUILDING_PRIORITY = 800;
 
     /**
      * Default consumption priority for units. Individual unit types

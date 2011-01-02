@@ -2162,6 +2162,30 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         return result;
     }
 
+    public List<Consumer> getConsumers() {
+        List<Consumer> result = new ArrayList<Consumer>();
+        for (Unit unit : getUnitList()) {
+            if (!unit.getConsumedGoods().isEmpty()) {
+                result.add(unit);
+            }
+        }
+        for (Building building : buildingMap.values()) {
+            if (!building.getConsumedGoods().isEmpty()) {
+                result.add(building);
+            }
+        }
+        // Add build queues;
+        if (!buildQueue.getConsumedGoods().isEmpty()) {
+            result.add(buildQueue);
+        }
+        if (!populationQueue.getConsumedGoods().isEmpty()) {
+            result.add(populationQueue);
+        }
+
+        Collections.sort(result, Consumer.COMPARATOR);
+        return result;
+    }
+
 
     // Serialization
 
