@@ -19,7 +19,7 @@
 
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\User Guide for Version v0.9.0}
+\title{FreeCol Documentation\\User Guide for Version v0.10.0}
 \maketitle{}
 
 \tableofcontents
@@ -110,6 +110,29 @@ survive an attack of the King's forces}. Before declaring your
 independence \textbf{you need to have the majority of the people
 behind you}. This can be done by \textbf{promoting free speech} and by
 providing a strong governmental system.
+
+
+\hypertarget{About this manual}{\section{About this manual}}
+
+FreeCol is turning into a game engine that allows the implementation
+of many different games based on similar concepts. It is already
+possible to define different rule sets and to select one of them when
+starting a new game. At the moment, FreeCol ships with two rule sets
+accessible to the user: ``Classic'', which attempts to emulate the
+rules of the original game as far as possible, and ``FreeCol'', which
+mainly conforms to the rules of the original game, but differs in a
+few points. The ``FreeCol'' rule set introduces four additional
+European powers with new national advantages, for example.
+
+In this manual, we always talk about the ``Classic'' rule set unless
+we explicitly mention another rule set. Please note that most of the
+features of terrain types, unit types, building types, founding
+fathers and so on could be changed by another rule set. If the manual
+states that a Lumberjack has a movement allowance of three, or that
+the Prairie produces three units of Cotton, then this applies to the
+``Classic'' rule set and the ``FreeCol'' rule set. Another rule set
+might change these values, or might not even include a Lumberjack, the
+Prairie terrain, or Cotton.
 
 
 \hypertarget{Liberty and Immigration}{\section{Liberty and Immigration}}
@@ -1539,6 +1562,18 @@ place. There are several aspects to consider:
 
 \hypertarget{The colony tile}{\subsection{The colony tile}}
 
+The tile your colony is built on is special in several ways. It is the
+only tile that produces more than one type of goods at the same time
+and neither requires nor allows the presence of a colonist to do
+so. On the other hand, you can not choose which types of goods to
+produce. The colony tile will always produce some kind of food as its
+primary product, and some raw material other than lumber or silver as
+its secondary product. The production of food can be increased by
+plowing the colony tile, but the secondary production will not benefit
+from artificial tile improvements such as fields and roads. It will,
+however, benefit from natural tile improvements such as rivers and
+resources.
+
 Some terrain types are more suitable for establishing a colony than
 others. Colonies can not be built on Arctic tiles, nor on Mountains,
 because these terrain types produce no Grain. Hills and Deserts are
@@ -1559,16 +1594,26 @@ can not support colonies.
 
 The New World is also irrigated by minor and major rivers. The
 production of most types of \hyperlink{Goods}{Goods} is increased by
-the presence of rivers and roads, which your
+the presence of rivers as well as roads, which your
 \hyperlink{Pioneer}{Pioneers} can build. All terrain types which
-produce Grain (except the Hills) can also be cleared or plowed by your
-Pioneers. In the case of open land, plowing increases the production
-of Grain and most other types of goods. In the case of forests,
-clearing removes the forest and transforms the tile into open land:
-Boreal Forest is transformed into Tundra, Mixed Forest into Plains,
-Conifer Forest into Grassland, Tropical Forest into Savannah, Wetland
-Forest into Marsh, Rain Forest into Swamp, Scrub Forest into Desert,
-and Broadleaf Forest into Prairie.
+produce Grain (except the Hills) can also be plowed by your Pioneers
+in order increase grain production. If the tile is forested, you must
+first clear the forest and transform the tile into open land:
+
+\vskip5mm
+\begin{tabular}{l @{\hskip5mm$\rightarrow$\hskip5mm} l}
+Forested&Cleared\\
+\hline
+Boreal Forest & Tundra\\
+Mixed Forest & Plains\\
+Conifer Forest & Grassland\\
+Tropical Forest & Savannah\\
+Wetland Forest & Marsh\\
+Rain Forest & Swamp\\
+Scrub Forest & Desert\\
+Broadleaf Forest & Prairie\\
+\end{tabular}
+\vskip5mm
 
 
 \hypertarget{The adjacent tiles}{\subsection{The adjacent tiles}}
@@ -1790,9 +1835,7 @@ Some buildings have an immediate effect. The
 \hyperlink{Stockade}{Stockade}, for example, provides protection for
 your colony, and the \hyperlink{Dock}{Docks} enable your colonists to
 go fishing. The effects of these buildings can not be increased by
-workers. In the building box at the top right of the \hyperlink{colony
-panel}{colony panel}, these buildings are shown in parentheses, like
-this: ``(Stockade)''.
+workers.
 
 Most buildings do nothing if they are unoccupied, but provide workers
 with a place to produce manufactured goods. The
