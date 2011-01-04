@@ -981,12 +981,22 @@ public final class InGameController extends Controller {
             new ModelMessage(messageId, serverPlayer, unit)
                 .addAmount("%amount%", fullAmount)
                 .addAmount("%cashInAmount%", cashInAmount));
+        messageId = (serverPlayer.getPlayerType() == PlayerType.REBEL
+                     || serverPlayer.getPlayerType() == PlayerType.INDEPENDENT)
+            ? "model.unit.cashInTreasureTrain.other.independent"
+            : "model.unit.cashInTreasureTrain.other.colonial";
+        cs.addMessage(See.all().except(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             messageId, serverPlayer)
+                .addAmount("%amount%", fullAmount)
+                .addStringTemplate("%nation%", serverPlayer.getNationName()));
 
         // Dispose of the unit.
         cs.add(See.only(serverPlayer), (FreeColGameObject) unit.getLocation());
         cs.addDispose(serverPlayer, unit.getLocation(), unit);
 
-        // Others can not see cash-ins which happen in colonies or Europe.
+        // Others can see the cash in message.
+        sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
