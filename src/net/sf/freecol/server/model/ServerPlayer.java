@@ -856,7 +856,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .applyModifier(amount, "model.modifier.tradeBonus",
                            type, getGame().getTurn());
         market.addGoodsToMarket(type, marketAmount);
-        propagateToEuropeanMarkets(type, amount, random);
+        propagateToEuropeanMarkets(type, marketAmount, random);
 
         if (container != null) container.addGoods(type, -amount);
     }
