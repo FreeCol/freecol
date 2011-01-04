@@ -168,11 +168,6 @@ public class MarketData extends FreeColGameObject {
         int newSalePrice = Math.round(goodsType.getInitialAmount()
                                       * initialPrice
                                       / (float) amountInMarket);
-        System.err.println("Pricing " + goodsType
-                           + " A_0=" + goodsType.getInitialAmount()
-                           + " P_0=" + initialPrice
-                           + " A_n=" + amountInMarket
-                           + " P_n=" + newSalePrice);
         int newPrice = newSalePrice + goodsType.getPriceDifference();
 
         // dirty work-around to limit prices of new world goods

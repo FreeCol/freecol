@@ -135,10 +135,10 @@
       <market initial-amount="3000"  initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.tools" is-farmed="false" made-from="model.goods.ore">
-      <market initial-amount="500"   initial-price="1"  price-difference="2"/>
+      <market initial-amount="1500"   initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.muskets" is-farmed="false" made-from="model.goods.tools">
-      <market initial-amount="500"   initial-price="1"  price-difference="2"/>
+      <market initial-amount="1500"   initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.bells" is-farmed="false" ignore-limit="true" storable="false">
       <modifier id="model.modifier.liberty" type="multiplicative" value="1"/>
