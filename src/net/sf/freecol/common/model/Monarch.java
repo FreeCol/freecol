@@ -49,35 +49,36 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
+    /** The minimum price for mercenaries. */
+    public static final int MINIMUM_PRICE = 300;
+
+    /**
+     * The minimum tax rate (given in percentage) from where it
+     * can be lowered.
+     */
+    public static final int MINIMUM_TAX_RATE = 20;
+
     /** The name key of this monarch. */
     private String name;
 
     /** The player of this monarch. */
     private Player player;
 
-    /** The space required to transport all land units. */
-    int spaceRequired;
-
-    /** The current naval transport capacity. */
-    int capacity;
-
     /** The number of land units in the REF. */
-    private List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
+    private final List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
 
     /** The number of naval units in the REF. */
-    private List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
+    private final List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
 
-    /** The minimum price for mercenaries. */
-    public static final int MINIMUM_PRICE = 300;
-
-    /**
-     * The minimum tax rate (given in percentage) from where it
-     * can be lowered 
-     */
-    public static final int MINIMUM_TAX_RATE = 20;
-    
     /** Whether a frigate has been provided. */
     private boolean supportSea = false;
+
+    // Internal variables that do not need serialization.
+    /** The space required to transport all land units. */
+    private int spaceRequired;
+
+    /** The current naval transport capacity. */
+    private int capacity;
 
 
     /** Constants describing monarch actions. */
@@ -121,21 +122,16 @@ public final class Monarch extends FreeColGameObject implements Named {
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility("model.ability.navalUnit")) {
                     navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
-                    if (unitType.canCarryUnits()) {
-                        capacity += unitType.getSpace() * number;
-                    }
                 } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
                     landUnits.add(new AbstractUnit(unitType, Role.SOLDIER, number));
                     landUnits.add(new AbstractUnit(unitType, Role.DRAGOON, number));
-                    spaceRequired += unitType.getSpaceTaken() * 2 * number;
                 } else {
                     landUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
-                    spaceRequired += unitType.getSpaceTaken() * number;
                 }
             }
         }
+        updateSpaceAndCapacity();
     }
-
 
     /**
      * Initiates a new <code>Monarch</code> from an <code>Element</code>
@@ -176,6 +172,23 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public Monarch(Game game, String id) {
         super(game, id);
+    }
+
+    /**
+     * Update the space and capacity variables.
+     */
+    private void updateSpaceAndCapacity() {
+        Specification spec = getSpecification();
+        capacity = 0;
+        for (AbstractUnit nu : navalUnits) {
+            if (nu.getUnitType(spec).canCarryUnits()) {
+                capacity += nu.getUnitType(spec).getSpace() * nu.getNumber();
+            }
+        }
+        spaceRequired = 0;
+        for (AbstractUnit lu : landUnits) {
+            spaceRequired += lu.getUnitType(spec).getSpaceTaken() * lu.getNumber();
+        }
     }
 
     /**
@@ -314,38 +327,38 @@ public final class Monarch extends FreeColGameObject implements Named {
             // The more time has passed, the less likely the monarch
             // will do nothing.
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.NO_ACTION,
-                    Math.max(200 - turn, 100)));
+                                                        Math.max(200 - turn, 100)));
         }
 
         if (actionIsValid(MonarchAction.RAISE_TAX)) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.RAISE_TAX,
-                    10 + dx));
+                                                        10 + dx));
         }
 
         if (actionIsValid(MonarchAction.LOWER_TAX)) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.LOWER_TAX,
-                    10 - dx));
+                                                        10 - dx));
         }
 
         if (actionIsValid(MonarchAction.ADD_TO_REF)) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.ADD_TO_REF,
-                    10 + dx));
+                                                        10 + dx));
         }
 
         if (actionIsValid(MonarchAction.DECLARE_WAR)) {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.DECLARE_WAR,
-                    5 + dx));
+                                                        5 + dx));
         }
 
         if (actionIsValid(MonarchAction.SUPPORT_LAND)) {
             if (player.getGold() < MINIMUM_PRICE) {
                 if (dx < 3) {
                     choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_LAND,
-                            3 - dx));
+                                                                3 - dx));
                 }
             } else {
                 choices.add(new RandomChoice<MonarchAction>(MonarchAction.OFFER_MERCENARIES,
-                            6 - dx));
+                                                            6 - dx));
             }
         }
 
@@ -396,10 +409,15 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @param random The <code>Random</code> number source to use.
      * @return An addition to the Royal Expeditionary Force.
      */
-    public List<AbstractUnit> addToREF(Random random) {
+    public List<AbstractUnit> chooseForREF(Random random) {
         ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
+        logger.info("Add to REF: capacity=" + capacity
+                    + " spaceRequired=" + spaceRequired + " => "
+                    + ((capacity < spaceRequired + 15) ? "naval" : "land")
+                    + " unit");
+        // TODO: magic number 2.5 * Manowar-capacity = 15
         if (capacity < spaceRequired + 15) {
             AbstractUnit unit = Utils.getRandomMember(logger, "Choose naval",
                                                       navalUnits, random);
@@ -420,27 +438,32 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @param units The addition to the Royal Expeditionary Force.
      */
     public void addToREF(List<AbstractUnit> units) {
+        Specification spec = getSpecification();
         for (AbstractUnit unitToAdd : units) {
-            UnitType unitType = getSpecification().getUnitType(unitToAdd.getId());
+            UnitType unitType = spec.getUnitType(unitToAdd.getId());
+            int n = unitToAdd.getNumber();
             if (unitType.hasAbility("model.ability.navalUnit")) {
                 for (AbstractUnit refUnit : navalUnits) {
                     if (refUnit.getId().equals(unitToAdd.getId())) {
-                        refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
+                        refUnit.setNumber(refUnit.getNumber() + n);
                         if (unitType.canCarryUnits()) {
-                            capacity += unitType.getSpace() * unitToAdd.getNumber();
+                            capacity += unitType.getSpace() * n;
                         }
+                        break;
                     }
                 }
             } else {
                 for (AbstractUnit refUnit : landUnits) {
-                    if (refUnit.getId().equals(unitToAdd.getId()) &&
-                        refUnit.getRole().equals(unitToAdd.getRole())) {
-                        refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
-                        spaceRequired += unitType.getSpaceTaken() * unitToAdd.getNumber();
+                    if (refUnit.getId().equals(unitToAdd.getId())
+                        && refUnit.getRole().equals(unitToAdd.getRole())) {
+                        refUnit.setNumber(refUnit.getNumber() + n);
+                        spaceRequired += unitType.getSpaceTaken() * n;
+                        break;
                     }
                 }
             }
         }
+        updateSpaceAndCapacity();
     }
 
     /**
@@ -642,6 +665,7 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -654,6 +678,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         name = getAttribute(in, "name", player.getNation().getRulerNameKey());
         supportSea = Boolean.valueOf(in.getAttributeValue(null, "supportSea")).booleanValue();
 
+        navalUnits.clear();
+        landUnits.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("navalUnits".equals(childName)) {
@@ -668,11 +694,13 @@ public final class Monarch extends FreeColGameObject implements Named {
                 }
             }
         }
-        
+        updateSpaceAndCapacity();
+
         // sanity check: we should be on the closing tag
         if (!in.getLocalName().equals(Monarch.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </" + Monarch.getXMLElementTagName() + "> "+
-                           "found instead: " +in.getLocalName());
+            logger.warning("Error parsing xml: expecting closing tag </"
+                           + Monarch.getXMLElementTagName()
+                           + "> found instead: " + in.getLocalName());
         }
     }
 

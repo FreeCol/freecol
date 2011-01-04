@@ -719,7 +719,8 @@ public final class InGameController extends Controller {
                 };
             break;
         case ADD_TO_REF:
-            final List<AbstractUnit> refAdditions = monarch.addToREF(random);
+            final List<AbstractUnit> refAdditions
+                = monarch.chooseForREF(random);
             if (refAdditions.isEmpty()) break;
             t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
                     public void run() {
