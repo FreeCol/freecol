@@ -2362,6 +2362,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationName();
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
+        StringTemplate colonyNation = colonyPlayer.getNationName();
         int plunder = colony.getPlunder();
         Tile tile = colony.getTile();
 
@@ -2379,6 +2380,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addAmount("%amount%", plunder)
                       .addStringTemplate("%nation%", attackerNation)
                       .addStringTemplate("%unit%", attacker.getLabel()));
+        cs.addMessage(See.all().except(colonyPlayer),
+                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                       "model.unit.colonyBurning.other",
+                                       attackerPlayer)
+                      .addName("%colony%", colony.getName())
+                      .addStringTemplate("%nation%", colonyNation)
+                      .addStringTemplate("%attackerNation%", attackerNation));
 
         // Allocate some plunder.
         attackerPlayer.modifyGold(plunder);
