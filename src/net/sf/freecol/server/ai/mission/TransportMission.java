@@ -660,55 +660,55 @@ public class TransportMission extends Mission {
         }
     }
 
-	Destination getNextStop() {
-		Unit unit = getUnit();
-		if(transportList.size() == 0 && !hasCargo()){
-			logger.info(unit + "(" + unit.getId() + ") has nothing to transport, moving to default destination");
-			return getDefaultDestination();
-		}
+    public Destination getNextStop() {
+        Unit unit = getUnit();
+        if(transportList.size() == 0 && !hasCargo()){
+            logger.info(unit + "(" + unit.getId() + ") has nothing to transport, moving to default destination");
+            return getDefaultDestination();
+        }
 
-		// Cash unavailable destinations to avoid find path duplication
-		List<Location> unavailLoc = new ArrayList<Location>();
-		for(Transportable transportable : transportList){
-			Location destLoc = null;
-			PathNode path = null;
-			if(isCarrying(transportable)){
-				destLoc = transportable.getTransportDestination();
-			}
-			else{
-				destLoc = transportable.getTransportLocatable().getLocation();
-			}
-			
-			//check if we already found this destination to be unaccessible
-			if(destLoc == null || unavailLoc.contains(destLoc)){
-				continue;
-			}
-			
-			// unit already at location
-			if(destLoc == unit.getLocation()){
-				return new Destination();
-			}
-			
-			// find path for destination location
-			if(destLoc instanceof Europe){
-				path = findPathToEurope(unit.getTile());
-			}
-			else{
-				path = getPath(transportable);
-			}
-			// add unavailable location to tabu list
-			if(path == null){
-				unavailLoc.add(destLoc);
-				continue;
-			}
-			logger.finest("Transporting " + transportable + " to " + destLoc);
-			boolean moveToEurope = destLoc instanceof Europe;
-			return new Destination(moveToEurope,path);
-		}
-	
-		logger.warning("No destination available, stay put");
-		return null;
-	}
+        // Cash unavailable destinations to avoid find path duplication
+        List<Location> unavailLoc = new ArrayList<Location>();
+        for(Transportable transportable : transportList){
+            Location destLoc = null;
+            PathNode path = null;
+            if(isCarrying(transportable)){
+                destLoc = transportable.getTransportDestination();
+            }
+            else{
+                destLoc = transportable.getTransportLocatable().getLocation();
+            }
+
+            //check if we already found this destination to be unaccessible
+            if(destLoc == null || unavailLoc.contains(destLoc)){
+                continue;
+            }
+
+            // unit already at location
+            if(destLoc == unit.getLocation()){
+                return new Destination();
+            }
+
+            // find path for destination location
+            if(destLoc instanceof Europe){
+                path = findPathToEurope(unit.getTile());
+            }
+            else{
+                path = getPath(transportable);
+            }
+            // add unavailable location to tabu list
+            if(path == null){
+                unavailLoc.add(destLoc);
+                continue;
+            }
+            logger.finest("Transporting " + transportable + " to " + destLoc);
+            boolean moveToEurope = destLoc instanceof Europe;
+            return new Destination(moveToEurope,path);
+        }
+
+        logger.warning("No destination available, stay put");
+        return null;
+    }
 
     /**
      * Gets the default destination for the unit of this mission
@@ -1111,7 +1111,15 @@ public class TransportMission extends Mission {
                 path.getTransportDropNode().previous.next = null;
             }
         } else {
-            path = getGame().getMap().findPath(carrier, start.getTile(), destination.getTile());
+            try {
+                path = getGame().getMap().findPath(carrier, start.getTile(), destination.getTile());
+            } catch (IllegalArgumentException e) {
+                logger.warning("findPath(" + carrier
+                               + ", " + start.getTile()
+                               + ", " + destination.getTile()
+                               + ") failed: " + e.getMessage());
+                path = null;
+            }
         }
 
         return path;
