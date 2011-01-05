@@ -1613,7 +1613,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
 
-        if (Unit.CARGO_CHANGE.equals(property)) {
+        if (property == null) {
+            logger.warning("Null property change");
+        } else if (Unit.CARGO_CHANGE.equals(property)) {
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
             populationPanel.update();
