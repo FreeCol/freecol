@@ -70,6 +70,7 @@ public class SetTradeRoutesMessage extends Message {
         for (int i = 0; i < nodes.getLength(); i++) {
             TradeRoute route = tradeRouteFromElement(game,
                                                      (Element) nodes.item(i));
+            if (route != null) newRoutes.add(route);
         }
         this.tradeRoutes = newRoutes;
     }
@@ -92,6 +93,7 @@ public class SetTradeRoutesMessage extends Message {
         try {
             return new TradeRoute(game, element);
         } catch (Exception e) {
+            logger.warning("Could not build trade route: " + id);
             return null;
         }
     }
@@ -136,8 +138,10 @@ public class SetTradeRoutesMessage extends Message {
             realRoute.updateFrom(tradeRoute);
             newRoutes.add(realRoute);
         }
-        serverPlayer.setTradeRoutes(newRoutes);
-        return null;
+
+        // Proceed to set trade routes
+        return server.getInGameController()
+            .setTradeRoutes(serverPlayer, newRoutes);
     }
 
     /**

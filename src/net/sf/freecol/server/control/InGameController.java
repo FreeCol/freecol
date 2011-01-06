@@ -3434,6 +3434,21 @@ public final class InGameController extends Controller {
             .build(serverPlayer);
     }
 
+    /**
+     * Set trade routes for a player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to set trade
+     *    routes for.
+     * @param routes The new list of <code>TradeRoute</code>s.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element setTradeRoutes(ServerPlayer serverPlayer,
+                                  List<TradeRoute> routes) {
+        serverPlayer.setTradeRoutes(routes);
+        // Have to update the whole player alas.
+        return new ChangeSet().add(See.only(serverPlayer), serverPlayer)
+            .build(serverPlayer);
+    }
 
     /**
      * Get a new trade route for a player.
@@ -3443,8 +3458,12 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element getNewTradeRoute(ServerPlayer serverPlayer) {
-        return new ChangeSet().addTradeRoute(serverPlayer,
-                new TradeRoute(getGame(), "", serverPlayer))
+        List<TradeRoute> routes
+            = new ArrayList<TradeRoute>(serverPlayer.getTradeRoutes());
+        TradeRoute route = new TradeRoute(getGame(), "", serverPlayer);
+        routes.add(route);
+        serverPlayer.setTradeRoutes(routes);
+        return new ChangeSet().addTradeRoute(serverPlayer, route)
             .build(serverPlayer);
     }
 

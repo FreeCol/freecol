@@ -4879,15 +4879,13 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean askSetTradeRoutes(List<TradeRoute> routes) {
         Client client = freeColClient.getClient();
-        Element request = Message.createNewRootElement("setTradeRoutes");
-        Document doc = request.getOwnerDocument();
-        for (TradeRoute route : routes) {
-            Element element = doc.createElement(TradeRoute.getXMLElementTagName());
-            element.setAttribute("id", route.getId());
-            request.appendChild(element);
-        }
-        Element reply = askExpecting(client, request, null);
-        return reply == null;
+        SetTradeRoutesMessage message = new SetTradeRoutesMessage(routes);
+        Element reply = askExpecting(client, message.toXMLElement(), null);
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**

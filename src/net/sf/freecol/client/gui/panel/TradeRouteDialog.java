@@ -211,6 +211,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
             for (int index = 0; index < listModel.getSize(); index++) {
                 routes.add((TradeRoute) listModel.getElementAt(index));
             }
+            getController().setTradeRoutes(routes);
             setResponse((TradeRoute) tradeRoutes.getSelectedValue());
             break;
         case CANCEL:

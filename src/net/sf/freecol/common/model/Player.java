@@ -3270,7 +3270,7 @@ public class Player extends FreeColGameObject implements Nameable {
             event.toXML(out, this);
         }
 
-        for (TradeRoute route : getTradeRoutes()) {
+        for (TradeRoute route : tradeRoutes) {
             route.toXML(out, this);
         }
 
