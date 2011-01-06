@@ -435,11 +435,15 @@ public final class InGameInputHandler extends InputHandler {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
+                    FreeColClient fcc = getFreeColClient();
                     if (popDown) {
-                        getFreeColClient().getCanvas().closeMenus();
+                        fcc.getCanvas().closeMenus();
                     }
-                    getFreeColClient().getInGameController().setCurrentPlayer(currentPlayer, true);
-                    getFreeColClient().getActionManager().update();
+                    fcc.getInGameController().setCurrentPlayer(currentPlayer);
+                    if (fcc.getMyPlayer().equals(currentPlayer)) {
+                        fcc.getInGameController().nextActiveUnit();
+                    }
+                    fcc.getActionManager().update();
                 }
             });
         } catch (InterruptedException e) {

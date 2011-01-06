@@ -876,8 +876,7 @@ public final class FreeColClient {
     }
 
     /**
-     * Set the current active unit in the game if one can be found from
-     * a saved game.
+     * Set the game-wide next active unit if one can be found.
      *
      * @param active The <code>Unit</code> to set as active.
      */

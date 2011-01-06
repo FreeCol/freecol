@@ -283,8 +283,10 @@ public final class ConnectController {
 
                     if (isCurrentPlayer) {
                         freeColClient.getInGameController()
-                            .setCurrentPlayer(thisPlayer, false);
+                            .setCurrentPlayer(thisPlayer);
                     }
+                    freeColClient.getGUI().setSelectedTile(thisPlayer
+                        .getEntryLocation().getTile().getPosition(), false);
                 }
             } else if (in.getLocalName().equals("error")) {
                 canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
