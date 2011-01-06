@@ -123,7 +123,13 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         Player player = getMyPlayer();
 
         List<TradeRoute> theRoutes = new ArrayList<TradeRoute>(player.getTradeRoutes());
-        player.resetTradeRouteCounts();
+        for (TradeRoute tradeRoute : theRoutes) tradeRoute.setCount(0);
+        for (Unit u : player.getUnits()) {
+            TradeRoute tradeRoute = u.getTradeRoute();
+            if (tradeRoute != null) {
+                tradeRoute.setCount(1 + tradeRoute.getCount());
+            }
+        }
         Collections.sort(theRoutes, tradeRouteComparator);
         for (TradeRoute route : theRoutes) {
             listModel.addElement(route);

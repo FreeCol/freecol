@@ -2091,26 +2091,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
         tradeRoutes.clear();
-        for (TradeRoute tr : newTradeRoutes) {
-            tradeRoutes.add(tr);
-        }
-    }
-
-    /**
-     * Reset the <code>TradeRoute</code> counts associated with the
-     * player's trade routes.
-     */
-    public final void resetTradeRouteCounts() {
-        Iterator<Unit> unitIterator = getUnitIterator();
-
-        for (TradeRoute tradeRoute : tradeRoutes) tradeRoute.setCount(0);
-        while (unitIterator.hasNext()) {
-            TradeRoute tradeRoute = unitIterator.next().getTradeRoute();
-
-            if (tradeRoute != null) {
-                tradeRoute.setCount(1 + tradeRoute.getCount());
-            }
-        }
+        tradeRoutes.addAll(newTradeRoutes);
     }
 
     /**
