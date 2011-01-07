@@ -2380,22 +2380,24 @@ public final class InGameController implements NetworkConstants {
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
-        ArrayList<Unit> choices = new ArrayList<Unit>();
-        for (Unit nextUnit : destinationTile.getUnitList()) {
-            if (nextUnit.getSpaceLeft() >= unit.getType().getSpaceTaken()) {
-                choices.add(nextUnit);
+        List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
+        for (Unit u : destinationTile.getUnitList()) {
+            if (u.getSpaceLeft() >= unit.getType().getSpaceTaken()) {
+                String m = Messages.message(Messages.getLabel(u));
+                choices.add(new ChoiceItem<Unit>(m, u));
+                carrier = u; // Save a default
             }
         }
         if (choices.size() == 0) {
             throw new RuntimeException("Unit " + unit.getId()
                                        + " found no carrier to embark upon.");
         } else if (choices.size() == 1) {
-            carrier = choices.get(0);
+            ; // Use the default
         } else {
-            carrier = canvas.showSimpleChoiceDialog(unit.getTile(),
-                                                    "embark.text",
-                                                    "embark.cancel",
-                                                    choices);
+            carrier = canvas.showChoiceDialog(unit.getTile(),
+                                              Messages.message("embark.text"),
+                                              Messages.message("embark.cancel"),
+                                              choices);
             if (carrier == null) return; // User cancelled
         }
 
