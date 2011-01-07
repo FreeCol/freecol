@@ -2428,7 +2428,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Disembark selected units able to move.
-        ArrayList<Unit> disembarkable = new ArrayList<Unit>();
+        List<Unit> disembarkable = new ArrayList<Unit>();
         unit.setStateToAllChildren(UnitState.ACTIVE);
         for (Unit u : unit.getUnitList()) {
             if (u.getMoveType(tile).isProgress()) {
@@ -2447,6 +2447,7 @@ public final class InGameController implements NetworkConstants {
             for (Unit dUnit : disembarkable) {
                 choices.add(new ChoiceItem<Unit>(Messages.message(Messages.getLabel(dUnit)), dUnit));
             }
+            choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
             Unit u = canvas.showChoiceDialog(unit.getTile(),
                                              Messages.message("disembark.text"),
                                              Messages.message("disembark.cancel"),
@@ -2455,8 +2456,13 @@ public final class InGameController implements NetworkConstants {
             // Call move() as while the destination tile is known to
             // be clear of settlements or other player units, it *may*
             // have a rumour.
-            move(u, direction);
-            disembarkable.remove(u);
+            if (u == unit) {
+                for (Unit dUnit : disembarkable) move(dUnit, direction);
+                disembarkable.clear();
+            } else {
+                move(u, direction);
+                disembarkable.remove(u);
+            }
         }
         return true;
     }
