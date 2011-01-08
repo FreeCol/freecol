@@ -811,7 +811,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         public ColonyCargoPanel(Canvas canvas) {
             super(canvas, true);
-            setLayout(new MigLayout("wrap 4, fill"));
+            //setLayout(new MigLayout("wrap 4, fill"));
         }
 
         @Override
@@ -1036,7 +1036,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         private Colony colony;
 
         public OutsideColonyPanel() {
-            super(new MigLayout("wrap 5, fill"));
+            super(new MigLayout("wrap 4, fill"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("outsideColony")));
         }
