@@ -144,9 +144,6 @@ public class Map extends FreeColGameObject {
     /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
     public static final int COST_INFINITY = Integer.MIN_VALUE;
 
-    /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)}. */
-    public static enum PathType { BOTH_LAND_AND_SEA, ONLY_LAND, ONLY_SEA }
-
     private Tile[][] tiles;
 
     private final java.util.Map<String, Region> regions = new HashMap<String, Region>();
@@ -283,48 +280,6 @@ public class Map extends FreeColGameObject {
 
     /**
      * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against the
-     * <code>options</code>.
-     *
-     * <br>
-     * <br>
-     *
-     * <i>Important: This method will not include colonies in a possible path,
-     * and {@link PathNode#getTurns}, {@link PathNode#getTotalTurns} and
-     * {@link PathNode#getMovesLeft} will all return <code>-1</code> for the
-     * generated {@link PathNode}s.
-     *
-     * <br>
-     * <br>
-     *
-     * Use {@link #findPath(Unit, Tile, Tile)} whenever possible.</i>
-     *
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @param type
-     *            One of: {@link PathType#BOTH_LAND_AND_SEA},
-     *            {@link PathType#BOTH_LAND_AND_SEA}, {@link PathType#ONLY_LAND} and
-     *            {@link PathType#ONLY_SEA}.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @see #findPath(Unit, Tile, Tile)
-     * @see Unit#findPath(Tile)
-     * @exception IllegalArgumentException
-     *                if either <code>start</code> or <code>end</code> are
-     *                <code>null</code>.
-     */
-    public PathNode findPath(Tile start, Tile end, PathType type) {
-        return findPath(null, start, end, type);
-    }
-
-    /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
      * the <code>end</code> will not be checked against the <code>unit</code>'s
      * legal moves.
      *
@@ -351,77 +306,7 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         }
-        return findPath(unit, start, end, null, null, CostDeciders.defaultFor(unit));
-    }
-
-    /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against the <code>unit</code>'s
-     * legal moves.
-     *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal.
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @param costDecider
-     *            The object responsible for determining the cost.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @see #findPath(Tile, Tile, PathType)
-     * @see Unit#findPath(Tile)
-     * @exception IllegalArgumentException
-     *                if either <code>unit</code>, <code>start</code> or
-     *                <code>end</code> are <code>null</code>.
-     */
-    public PathNode findPath(Unit unit, Tile start, Tile end, CostDecider costDecider) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        }
-        return findPath(unit, start, end, null, null, costDecider);
-    }
-
-    /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against the <code>unit</code>'s
-     * legal moves.
-     *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal.
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @param carrier
-     *            A carrier that currently holds the <code>unit</code>, or
-     *            <code>null</code> if the <code>unit</code> is not
-     *            presently on a carrier.
-     * @param costDecider
-     *            The object responsible for determining the cost.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @see #findPath(Tile, Tile, PathType)
-     * @see Unit#findPath(Tile)
-     * @exception IllegalArgumentException
-     *                if either <code>unit</code>, <code>start</code> or
-     *                <code>end</code> are <code>null</code>.
-     */
-    public PathNode findPath(Unit unit, Tile start, Tile end, Unit carrier, CostDecider costDecider) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        }
-        return findPath(unit, start, end, null, carrier, costDecider);
+        return findPath(unit, start, end, null, CostDeciders.defaultFor(unit));
     }
 
     /**
@@ -456,41 +341,8 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         }
-        return findPath(unit, start, end, null, carrier, CostDeciders.defaultFor(unit));
-    }
-
-    /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against validity (neither the
-     * <code>options</code> nor allowed movement by the <code>unit</code>.
-     *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal. The <code>options</code> are
-     *            used instead if <code>unit == null</code>.
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @param type
-     *            One of: {@link PathType#BOTH_LAND_AND_SEA},
-     *            {@link PathType#BOTH_LAND_AND_SEA}, {@link PathType#ONLY_LAND} and
-     *            {@link PathType#ONLY_SEA}. This argument if ignored if
-     *            <code>unit != null</code>.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @exception IllegalArgumentException
-     *                if either <code>start</code> or <code>end</code> are
-     *                <code>null</code>.
-     * @exception IllegalArgumentException
-     *                if <code>start == end</code>.
-     */
-    private PathNode findPath(Unit unit, Tile start, Tile end, PathType type) {
-        return findPath(unit, start, end, type, null, CostDeciders.defaultFor(unit));
+        return findPath(unit, start, end, carrier,
+                        CostDeciders.defaultFor(unit));
     }
 
     /**
@@ -503,11 +355,6 @@ public class Map extends FreeColGameObject {
      *            The <code>Tile</code> in which the path starts from.
      * @param end
      *            The end of the path.
-     * @param type
-     *            One of: {@link PathType#BOTH_LAND_AND_SEA},
-     *            {@link PathType#BOTH_LAND_AND_SEA}, {@link PathType#ONLY_LAND} and
-     *            {@link PathType#ONLY_SEA}. This argument if ignored if
-     *            <code>unit != null</code>.
      * @param carrier
      *            A carrier that currently holds the <code>unit</code>, or
      *            <code>null</code> if the <code>unit</code> is not
@@ -527,8 +374,9 @@ public class Map extends FreeColGameObject {
      *                if either <code>start</code> or <code>end</code> are
      *                <code>null</code>.
      */
-    private PathNode findPath(final Unit unit, final Tile start, final Tile end,
-            final PathType type, final Unit carrier, final CostDecider costDecider) {
+    public PathNode findPath(final Unit unit, final Tile start, final Tile end,
+                             final Unit carrier,
+                             final CostDecider costDecider) {
         /*
          * Using A* with the Manhatten distance as the heuristics.
          *
@@ -549,7 +397,7 @@ public class Map extends FreeColGameObject {
         if (start.equals(end)) {
             throw new IllegalArgumentException("start == end");
         }
-        if (carrier != null && unit == null) {
+        if (unit == null) {
             throw new IllegalArgumentException("Argument 'unit' must not be 'null'.");
         }
 
@@ -563,11 +411,14 @@ public class Map extends FreeColGameObject {
                                      Direction.N, currentUnit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
-            firstNode = new PathNode(start, 0, start.getDistanceTo(end), Direction.N, -1, -1);
+            firstNode = new PathNode(start, 0, start.getDistanceTo(end),
+                                     Direction.N, -1, -1);
         }
 
-        final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
-        final HashMap<String, PathNode> closedList = new HashMap<String, PathNode>();
+        final HashMap<String, PathNode> openList
+            = new HashMap<String, PathNode>();
+        final HashMap<String, PathNode> closedList
+            = new HashMap<String, PathNode>();
         final PriorityQueue<PathNode> openListQueue
             = new PriorityQueue<PathNode>(1024,
                 new Comparator<PathNode>() {
@@ -601,8 +452,7 @@ public class Map extends FreeColGameObject {
             // Only check further along a path (i.e. ignore initial
             // node) if it is possible to transit *through* it
             // (isProgress()).
-            if (currentUnit != null
-                && currentNode.previous != null) {
+            if (currentNode.previous != null) {
                 Tile previousTile = currentNode.previous.getTile();
                 if (!currentUnit.getSimpleMoveType(previousTile, currentTile,
                                                    false).isProgress()) {
@@ -613,9 +463,7 @@ public class Map extends FreeColGameObject {
             // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
                 final Tile newTile = currentTile.getNeighbourOrNull(direction);
-                if (newTile == null) {
-                    continue;
-                }
+                if (newTile == null) continue;
 
                 // If the new tile is the tile we just visited, skip
                 // it. We can use == because PathNode.getTile() and
@@ -650,36 +498,25 @@ public class Map extends FreeColGameObject {
                 }
 
                 // Update parameters for the new tile.
-                if (moveUnit == null) {
-                    if ((!newTile.isExplored()
-                         || (type == PathType.ONLY_SEA && newTile.isLand())
-                         || (type == PathType.ONLY_LAND && !newTile.isLand()))
-                        && newTile != end) {
+                int extraCost = costDecider.getCost(moveUnit,
+                                                    currentTile, newTile,
+                                                    movesLeft, turns);
+                if (extraCost == CostDecider.ILLEGAL_MOVE) {
+                    // Do not let the CostDecider (which may be
+                    // conservative) block the final destination if it
+                    // is still a legal move.
+                    if (newTile == end
+                        && moveUnit.getSimpleMoveType(currentTile, newTile,
+                                                      false).isLegal()) {
+                        cost += moveUnit.getInitialMovesLeft();
+                        movesLeft = 0;
+                    } else {
                         continue;
                     }
-                    cost += newTile.getMoveCost(currentTile);
                 } else {
-                    int extraCost = costDecider.getCost(moveUnit,
-                            currentTile, newTile, movesLeft, turns);
-                    if (extraCost == CostDecider.ILLEGAL_MOVE) {
-                        // Do not let the CostDecider (which may be
-                        // conservative) block the final destination
-                        // if it is still a legal move.
-                        if (newTile == end
-                            && moveUnit.getSimpleMoveType(currentTile, newTile,
-                                                          false).isLegal()) {
-                            cost += moveUnit.getInitialMovesLeft();
-                            movesLeft = 0;
-                        } else {
-                            continue;
-                        }
-                    } else {
-                        cost += extraCost;
-                        movesLeft = costDecider.getMovesLeft();
-                        if (costDecider.isNewTurn()) {
-                            turns++;
-                        }
-                    }
+                    cost += extraCost;
+                    movesLeft = costDecider.getMovesLeft();
+                    if (costDecider.isNewTurn()) turns++;
                 }
 
                 // Is this an improvement?  If not, ignore.
@@ -695,7 +532,7 @@ public class Map extends FreeColGameObject {
 
                 // Queue new node with updated parameters.
                 successor = new PathNode(newTile, cost, f, direction,
-                        movesLeft, turns);
+                                         movesLeft, turns);
                 successor.previous = currentNode;
                 successor.setOnCarrier(carrier != null && moveUnit == carrier);
                 openList.put(newTile.getId(), successor);

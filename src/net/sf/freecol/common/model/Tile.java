@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.PathType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
