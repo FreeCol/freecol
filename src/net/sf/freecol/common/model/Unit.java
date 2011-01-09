@@ -1126,8 +1126,8 @@ public class Unit extends FreeColGameObject
                 // TODO: Use a standard carrier with four move points
                 // as a the unit's carrier:
                 Tile start = getOwner().getEntryLocation().getTile();
-                p = getGame().getMap().findPath(start, destination.getTile(),
-                                                Map.PathType.BOTH_LAND_AND_SEA);
+                p = getGame().getMap().findPath(this, start,
+                                                destination.getTile());
             }
             if (p != null) {
                 return p.getTotalTurns();
