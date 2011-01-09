@@ -62,6 +62,7 @@ class BaseCostDecider implements CostDecider {
         
         // Disallow illegal moves.
         // Special moves and moving off a carrier consume a whole turn.
+        boolean consumeMove = false;
         switch (unit.getSimpleMoveType(oldTile, newTile, true)) {
         case MOVE_HIGH_SEAS:
             break;
@@ -76,9 +77,8 @@ class BaseCostDecider implements CostDecider {
         case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
         case ENTER_FOREIGN_COLONY_WITH_SCOUT:
         case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            movesLeft = 0;
-            newTurn = false;
-            return movesLeftBefore;
+            consumeMove = true;
+            break;
         default:
             return ILLEGAL_MOVE;
         }
@@ -95,7 +95,11 @@ class BaseCostDecider implements CostDecider {
             movesLeft = initialMoves - moveCostNextTurn;
             newTurn = true;
         }
-        
+        if (consumeMove) {
+            moveCost += movesLeft;
+            movesLeft = 0;
+        }
+
         return moveCost;
     }
     
