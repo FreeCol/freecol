@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -280,40 +281,40 @@ public class BuildColonyMission extends Mission {
      *         <code>Unit</code>.
      */
     public static Tile findColonyLocation(Unit unit) {
-        
         Game game = unit.getGame();
-        
+        Map map = game.getMap();
+
         Tile startTile = null;
+        Unit carrier = null;
         if (unit.isOnCarrier()) {
-            Unit carrier = (Unit) unit.getLocation();
+            carrier = (Unit) unit.getLocation();
             startTile = carrier.getTile();
         } else if (unit.getLocation() instanceof Europe) {
             startTile = unit.getFullEntryLocation();
         } else {
             startTile = unit.getTile();
         }
-            
         if (startTile == null) {
             return null;
         }
 
+        // If called during the first few turns of the game, and our
+        // unit may be the starting unit (==isOnCarrier()) make sure
+        // to find _some_ starting position
+        boolean gameStart = game.getTurn().getNumber() < 10 && carrier != null;
         Tile bestTile = null;
         int highestColonyValue = 0;
         int maxNumberofTiles = 500;
         int tileCounter = 0;
-
-        //if called during the first few turns of the game,
-        //and our unit may be the starting unit (==isOnCarrier())
-        //make sure to find _some_ starting position        
-        boolean gameStart = false;
-        if (unit.getGame().getTurn().getNumber() < 10 && unit.isOnCarrier()) {
-            gameStart = true;
-        }
         
         Iterator<Position> it = game.getMap().getFloodFillIterator(startTile.getPosition());
         
         while (it.hasNext()) {
-            Tile tile = game.getMap().getTile(it.next());
+            Tile tile = map.getTile(it.next());
+
+            // No initial polar colonies
+            if (gameStart && map.isPolar(tile)) continue;
+
             if (tile.getOwner() != null) continue;
             int newColonyValue = -1;
             int tileColonyValue = unit.getOwner().getColonyValue(tile);
@@ -322,20 +323,12 @@ public class BuildColonyMission extends Mission {
             	&& (tileColonyValue + 10000) > highestColonyValue) {
             	// tileColonyValue + 10000 is the highest possible ColonyValue for this  tile
                 if (tile != startTile) {
-                    PathNode path;
-
-                    if (unit.isOnCarrier()) {
-                        Unit carrier = (Unit) unit.getLocation();
-                        path = game.getMap().findPath(unit, startTile, tile, carrier);
-                    } else {
-                        path = game.getMap().findPath(unit, startTile, tile);
-                    }
+                    PathNode path = (carrier != null)
+                        ? map.findPath(unit, startTile, tile, carrier)
+                        : map.findPath(unit, startTile, tile);
                     if (path != null) {
-                        newColonyValue = 10000
-                            + tileColonyValue
-                            - path.getTotalTurns()
-                            * ((unit.getGame().getTurn().getNumber() < 10
-                                && unit.isOnCarrier()) ? 25 : 4);
+                        newColonyValue = 10000 + tileColonyValue
+                            - path.getTotalTurns() * ((gameStart) ? 25 : 4);
                     }
                 } else {
                     newColonyValue = 10000 + tileColonyValue;
