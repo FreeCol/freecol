@@ -464,8 +464,7 @@ public class SimpleCombatModel extends CombatModel {
 
                 // Sink the defender on great wins or lack of repair
                 // location, otherwise just damage.
-                if (great || defenderUnit.getTile()
-                    .getRepairLocation(defenderUnit.getOwner()) == null) {
+                if (great || defenderUnit.getRepairLocation() == null) {
                     crs.add(CombatResult.SINK_SHIP_BOMBARD);
                 } else {
                     crs.add(CombatResult.DAMAGE_SHIP_BOMBARD);
@@ -521,7 +520,7 @@ public class SimpleCombatModel extends CombatModel {
                 && !loser.getGoodsList().isEmpty()) {
                 crs.add(CombatResult.LOOT_SHIP);
             }
-            if (great || tile.getRepairLocation(loserPlayer) == null
+            if (great || loser.getRepairLocation() == null
                 || isBeached(loser)) {
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
@@ -555,7 +554,7 @@ public class SimpleCombatModel extends CombatModel {
                 Colony colony = (Colony) settlement;
                 CombatResult shipResult
                     = (colony.getShipList().isEmpty()) ? null
-                    : (tile.getRepairLocation(loserPlayer) == null)
+                    : (colony.getShipList().get(0).getRepairLocation() == null)
                     ? CombatResult.SINK_COLONY_SHIPS
                     : CombatResult.DAMAGE_COLONY_SHIPS;
                 if (winnerPlayer.isEuropean()) {

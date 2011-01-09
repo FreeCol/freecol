@@ -2004,26 +2004,6 @@ public class Player extends FreeColGameObject implements Nameable {
         this.ready = ready;
     }
 
-    /**
-     * Returns the closest <code>Location</code> in which the given ship can
-     * get repaired. This is the closest {@link Colony} with a drydock, or
-     * {@link Europe} if this player has no colonies with a drydock.
-     *
-     * @param unit The ship that needs a location to be repaired.
-     * @return The closest <code>Location</code> in which the ship can be
-     *         repaired.
-     * @exception IllegalArgumentException if the <code>unit</code> is not a
-     *                ship.
-     */
-    public Location getRepairLocation(Unit unit) {
-        if (!unit.isNaval()) {
-            throw new IllegalArgumentException("Repair for non-naval unit!?!");
-        } else if (unit.getTile() == null) {
-            throw new IllegalArgumentException("Repair for unit not on the map!?!");
-        }
-        return unit.getTile().getRepairLocation(unit.getOwner());
-    }
-
     public void incrementLiberty(int amount) {
         liberty += amount;
     }

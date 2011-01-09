@@ -1632,6 +1632,46 @@ public class Unit extends FreeColGameObject
             setMovesLeft(0);
     }
 
+
+    /**
+     * Finds the closest <code>Location</code> to this tile where
+     * this ship can be repaired.
+     *
+     * @return The closest <code>Location</code> where a ship can be repaired.
+     */
+    public Location getRepairLocation() {
+        Location closestLocation = null;
+        int shortestDistance = INFINITY;
+        Map map = getGame().getMap();
+        Player player = getOwner();
+        Tile tile = getTile();
+        for (Colony colony : player.getColonies()) {
+            if (colony == null || colony.getTile() == tile) {
+                // Disallow a colony on the start tile, as this routine
+                // can be called as part of colony capture, and thus this
+                // colony will no longer be suitable.
+                continue;
+            }
+            int distance;
+            if (colony.hasAbility("model.ability.repairUnits")) {
+                // Tile.getDistanceTo(Tile) doesn't care about
+                // connectivity, so we need to check for an available
+                // path to target colony instead
+                PathNode pn = findPath(colony.getTile());
+                if (pn != null
+                    && (distance = pn.getTotalTurns()) < shortestDistance) {
+                    closestLocation = colony;
+                    shortestDistance = distance;
+                }
+            }
+        }
+        boolean connected = tile.isConnected()
+            || (tile.getColony() != null && tile.getColony().isConnected());
+        return (closestLocation != null) ? closestLocation
+            : (connected) ? player.getEurope()
+            : null;
+    }
+
     /**
      * Adds a locatable to this <code>Unit</code>.
      *

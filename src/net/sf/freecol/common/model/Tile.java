@@ -1771,46 +1771,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return false;
     }
 
-    /**
-     * Finds the closest <code>Location</code> to this tile where
-     * a ship can be repaired.
-     *
-     * @param player The <code>Player</code> whose repair locations
-     *     are searched.
-     * @return The closest <code>Location</code> where a ship can be repaired.
-     */
-    public Location getRepairLocation(Player player) {
-        Location closestLocation = null;
-        int shortestDistance = INFINITY;
-        Map map = getGame().getMap();
-        for (Colony colony : player.getColonies()) {
-            if (colony == null || colony.getTile() == this) {
-                // Disallow a colony on the start tile, as this routine
-                // can be called as part of colony capture, and thus this
-                // colony will no longer be suitable.
-                continue;
-            }
-            int distance;
-            if (colony.hasAbility("model.ability.repairUnits")) {
-                // Tile.getDistanceTo(Tile) doesn't care about
-                // connectivity, so we need to check for an available
-                // path to target colony instead
-                PathNode pn = map.findPath(this, colony.getTile(),
-                                           PathType.ONLY_SEA);
-                if (pn != null
-                    && (distance = pn.getTotalTurns()) < shortestDistance) {
-                    closestLocation = colony;
-                    shortestDistance = distance;
-                }
-            }
-        }
-        boolean connected = isConnected()
-            || (getColony() != null && getColony().isConnected());
-        return (closestLocation != null) ? closestLocation
-            : (connected) ? player.getEurope()
-            : null;
-    }
-
 
     public void toXMLMinimal(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());

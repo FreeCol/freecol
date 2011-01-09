@@ -2215,7 +2215,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        Location repair = ship.getTile().getRepairLocation(shipPlayer);
+        Location repair = ship.getRepairLocation();
         StringTemplate repairLocationName = repair.getLocationNameFor(shipPlayer);
         Location oldLocation = ship.getLocation();
         StringTemplate shipNation = ship.getApparentOwnerName();
@@ -2250,7 +2250,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                      ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        Location repair = ship.getTile().getRepairLocation(shipPlayer);
+        Location repair = ship.getRepairLocation();
         StringTemplate repairLocationName = repair.getLocationNameFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
@@ -2787,7 +2787,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             colony.damageBuilding(building);
         } else if (pillage < buildingList.size() + shipList.size()) {
             Unit ship = shipList.get(pillage - buildingList.size());
-            if (colony.getTile().getRepairLocation(colonyPlayer) == null) {
+            if (ship.getRepairLocation() == null) {
                 csSinkShipAttack(attacker, ship, cs);
             } else {
                 csDamageShipAttack(attacker, ship, cs);
