@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -168,48 +169,61 @@ public class BuildColonyMission extends Mission {
      */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
+        Player player = unit.getOwner();
 
         if (!isValid()) {
             return;
         }
 
-        if (getUnit().getTile() == null) {
+        if (unit.getTile() == null) {
             return;
         }
 
-        if (target == null || doNotGiveUp
-            && (colonyValue != getUnit().getOwner().getColonyValue(target) || target.getSettlement() != null)) {
+        if (target == null
+            || (doNotGiveUp && (target.getSettlement() != null
+                                || colonyValue != player.getColonyValue(target)))) {
             target = findColonyLocation(getUnit());
             if (target == null) {
                 doNotGiveUp = false;
                 return;
-            } else {
-                colonyValue = getUnit().getOwner().getColonyValue(target);
             }
+            colonyValue = player.getColonyValue(target);
         }
 
         // Move towards the target.
-        if (getUnit().getTile() != null) {
-            if (target != getUnit().getTile()) {
+        if (unit.getTile() != null) {
+            if (target != unit.getTile()) {
                 Direction r = moveTowards(connection, target);
                 moveButDontAttack(connection, r);
             }
-            if (getUnit().canBuildColony() && target == getUnit().getTile()
-                && getUnit().getMovesLeft() > 0) {
-                Element reply = null;
-
-                try {
-                    reply = connection.ask(new BuildColonyMessage(Player.ASSIGN_SETTLEMENT_NAME, unit).toXMLElement());
-                } catch (IOException e) {
-                    logger.warning("Could not send BuildColony message.");
+            if (unit.canBuildColony()
+                && target == unit.getTile()
+                && unit.getMovesLeft() > 0) {
+                if (target.getOwner() == null) {
+                    ; // All is well
+                } else if (target.getOwner() == player) {
+                    // Already ours, clear users
+                    Colony colony = (Colony) target.getOwningSettlement();
+                    if (colony != null
+                        && colony.getColonyTile(target) != null) {
+                        colony.getColonyTile(target).relocateWorkers();
+                    }
+                } else { // Not our tile, claim it first
+                    if (!AIMessage.askClaimLand(connection, target, null, 0)
+                        || target.getOwner() != player) {
+                        target = null; // Try a different one
+                        return;
+                    }
                 }
-                if (reply != null && reply.getTagName() != "error") {
+                if (AIMessage.askBuildColony(getAIUnit(), Player.ASSIGN_SETTLEMENT_NAME)
+                    && target.getSettlement() != null) {
                     colonyBuilt = true;
-                    Settlement settlement = unit.getSettlement();
-                    AIColony aiColony = (AIColony) getAIMain().getAIObject(settlement);
+                    AIColony aiColony = (AIColony) getAIMain()
+                        .getAIObject(target.getSettlement());
                     getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
                 } else {
-                    logger.warning("Could not build an AI colony on tile "+getUnit().getTile().getPosition().toString());
+                    logger.warning("Could not build an AI colony on tile "
+                                   + target.getPosition().toString());
                 }
             }
         }

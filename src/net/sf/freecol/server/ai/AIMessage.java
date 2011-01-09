@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.AttackMessage;
+import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChangeStateMessage;
@@ -172,6 +173,19 @@ public class AIMessage {
     public static boolean askAttack(AIUnit aiUnit, Direction direction) {
         return sendMessage(aiUnit.getConnection(),
                            new AttackMessage(aiUnit.getUnit(), direction));
+    }
+
+
+    /**
+     * An AIUnit builds a colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to build the colony.
+     * @param name The name of the colony.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askBuildColony(AIUnit aiUnit, String name) {
+        return sendMessage(aiUnit.getConnection(),
+                           new BuildColonyMessage(name, aiUnit.getUnit()));
     }
 
 
