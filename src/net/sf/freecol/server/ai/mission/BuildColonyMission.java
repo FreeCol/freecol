@@ -312,7 +312,7 @@ public class BuildColonyMission extends Mission {
             // No initial polar colonies
             if (gameStart && map.isPolar(tile)) continue;
 
-            if (tile.getOwner() != null) continue;
+            if (!player.canAcquireToFoundSettlement(tile)) continue;
 
             float tileColonyValue = unit.getOwner().getColonyValue(tile);
             if (tileColonyValue > highestColonyValue) {
