@@ -283,6 +283,7 @@ public class BuildColonyMission extends Mission {
     public static Tile findColonyLocation(Unit unit) {
         Game game = unit.getGame();
         Map map = game.getMap();
+        Player player = unit.getOwner();
 
         Tile startTile = null;
         Unit carrier = null;
@@ -294,21 +295,17 @@ public class BuildColonyMission extends Mission {
         } else {
             startTile = unit.getTile();
         }
-        if (startTile == null) {
-            return null;
-        }
+        if (startTile == null) return null;
 
         // If called during the first few turns of the game, and our
         // unit may be the starting unit (==isOnCarrier()) make sure
         // to find _some_ starting position
         boolean gameStart = game.getTurn().getNumber() < 10 && carrier != null;
-        Tile bestTile = null;
-        int highestColonyValue = 0;
         int maxNumberofTiles = 500;
         int tileCounter = 0;
-        
-        Iterator<Position> it = game.getMap().getFloodFillIterator(startTile.getPosition());
-        
+        Tile bestTile = null;
+        float highestColonyValue = 0.0f;
+        Iterator<Position> it = map.getFloodFillIterator(startTile.getPosition());
         while (it.hasNext()) {
             Tile tile = map.getTile(it.next());
 
@@ -316,36 +313,33 @@ public class BuildColonyMission extends Mission {
             if (gameStart && map.isPolar(tile)) continue;
 
             if (tile.getOwner() != null) continue;
-            int newColonyValue = -1;
-            int tileColonyValue = unit.getOwner().getColonyValue(tile);
-            
-            if (tileColonyValue > 0
-            	&& (tileColonyValue + 10000) > highestColonyValue) {
-            	// tileColonyValue + 10000 is the highest possible ColonyValue for this  tile
+
+            float tileColonyValue = unit.getOwner().getColonyValue(tile);
+            if (tileColonyValue > highestColonyValue) {
+                float newColonyValue;
                 if (tile != startTile) {
                     PathNode path = (carrier != null)
                         ? map.findPath(unit, startTile, tile, carrier)
                         : map.findPath(unit, startTile, tile);
-                    if (path != null) {
-                        newColonyValue = 10000 + tileColonyValue
-                            - path.getTotalTurns() * ((gameStart) ? 25 : 4);
-                    }
+                    newColonyValue = (path == null) ? -1.0f
+                        : tileColonyValue / (path.getTotalTurns() + 1.0f);
                 } else {
-                    newColonyValue = 10000 + tileColonyValue;
+                    newColonyValue = tileColonyValue;
                 }
                 if (newColonyValue > highestColonyValue) {
                     highestColonyValue = newColonyValue;
                     bestTile = tile;
                 }
             }
-            //break after checking a fixed number of tiles
-            //unless this may be the first colony,
-            //in which case we'll continue until we found _some_ location.
-            if ((++tileCounter >= maxNumberofTiles)
-                && (!gameStart || bestTile!= null)) break;
+            // Break after checking a fixed number of tiles unless
+            // this may be the first colony, in which case we'll
+            // continue until we found _some_ location.
+            if (++tileCounter >= maxNumberofTiles
+                && (!gameStart || bestTile != null)) break;
         }
         if (bestTile == null) {
-            logger.info("Unit " + unit.getId() + " unsuccessfully searched for colony spot");
+            logger.info("Unit " + unit.getId()
+                        + " unsuccessfully searched for colony spot");
         }
         return bestTile;
     }
