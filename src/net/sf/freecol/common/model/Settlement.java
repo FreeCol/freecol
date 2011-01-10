@@ -95,18 +95,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         featureContainer = new FeatureContainer(game.getSpecification());
         setType(owner.getNationType().getSettlementType(false));
 
-        // Relocate any worker already on the Tile (from another Settlement):
-        if (tile.getOwningSettlement() != null) {
-            if (tile.getOwningSettlement() instanceof Colony) {
-                Colony oc = (Colony) tile.getOwningSettlement();
-                ColonyTile ct = oc.getColonyTile(tile);
-                ct.relocateWorkers();
-            } else if (tile.getOwningSettlement() instanceof IndianSettlement) {
-                logger.warning("An indian settlement is already owning the tile.");
-            } else {
-                logger.warning("An unknown type of settlement is already owning the tile.");
-            }
-        }
         owner.addSettlement(this);
     }
 
@@ -290,9 +278,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public void placeSettlement() {
         List<Tile> tiles = getGame().getMap().getClaimableTiles(owner, tile,
                                                                 getRadius());
-        if (!tiles.contains(tile)) {
-            throw new IllegalStateException("Can not claim center tile");
-        }
         tile.setSettlement(this);
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);
