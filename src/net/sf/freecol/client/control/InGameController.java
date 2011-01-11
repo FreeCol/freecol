@@ -1797,8 +1797,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Ask the server
+        UnitWas unitWas = new UnitWas(unit);
         Element reply = askMove(unit, direction);
         if (reply == null) return;
+        unitWas.fireChanges();
 
         // Handle special cases
         Game game = freeColClient.getGame();

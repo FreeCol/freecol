@@ -1650,6 +1650,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
         } else if (Tile.UNIT_CHANGE.equals(property)) {
             updateOutsideColonyPanel();
+            updateInPortPanel();
         } else {
             logger.warning("Unknown property change event: "
                            + event.getPropertyName());
