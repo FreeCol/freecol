@@ -333,7 +333,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      *
      * @param colony The <code>Colony</code> to be displayed.
      */
-    public void initialize(Colony colony) {
+    private void initialize(Colony colony) {
         initialize(colony, null);
     }
 
@@ -345,7 +345,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      *            not <code>null</code> and it is a carrier located in the
      *            given <code>Colony</code>.
      */
-    public void initialize(final Colony colony, Unit preSelectedUnit) {
+    private void initialize(final Colony colony, Unit preSelectedUnit) {
         setColony(colony);
 
         // Set listeners and transfer handlers
