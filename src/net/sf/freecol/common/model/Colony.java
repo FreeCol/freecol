@@ -301,11 +301,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             updateSoL();
             updateProductionBonus();
         }
-        if (difference != 0) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
-            firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
-                               population - difference, population);
-        }
     }
 
     /**
@@ -1900,10 +1895,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
 
         int oldBonus = productionBonus;
         productionBonus = newBonus;
-        if (oldBonus != newBonus) {
-            firePropertyChange(ColonyChangeEvent.BONUS_CHANGE.toString(),
-                               oldBonus, newBonus);
-        }
     }
 
     /**

@@ -380,14 +380,16 @@ public final class InGameController implements NetworkConstants {
     }
 
     // Simple helper container to remember a colony state prior to some
-    // change.
+    // change, and fire off any consequent property changes.
     private class ColonyWas {
         private Colony colony;
         private int population;
+        private int productionBonus;
 
         public ColonyWas(Colony colony) {
             this.colony = colony;
             this.population = colony.getUnitCount();
+            this.productionBonus = colony.getProductionBonus();
         }
 
         /**
@@ -395,15 +397,23 @@ public final class InGameController implements NetworkConstants {
          * colony.
          */
         public void fireChanges() {
+            logger.finest("Firing changes for " + colony.getId());
             int newPopulation = colony.getUnitCount();
             if (newPopulation != population) {
-                colony.updatePopulation(newPopulation - population);
+                String pc = ColonyChangeEvent.POPULATION_CHANGE.toString();
+                colony.firePropertyChange(pc, population, newPopulation);
+            }
+            int newProductionBonus = colony.getProductionBonus();
+            if (newProductionBonus != productionBonus) {
+                String pc = ColonyChangeEvent.BONUS_CHANGE.toString();
+                colony.firePropertyChange(pc, productionBonus, newProductionBonus);
             }
             colony.getGoodsContainer().fireChanges();
         }
     }
 
-    // Simple helper container to remember a unit state prior to some change.
+    // Simple helper container to remember a unit state prior to some
+    // change, and fire off any consequent property changes.
     private class UnitWas {
         private Unit unit;
         private Location loc;
@@ -442,6 +452,7 @@ public final class InGameController implements NetworkConstants {
          * Fire any property changes resulting from actions of a unit.
          */
         public void fireChanges() {
+            logger.finest("Firing changes for " + unit.getId());
             Location newLoc = unit.getLocation();
             if (loc != newLoc) {
                 FreeColGameObject oldFcgo = (FreeColGameObject) loc;
