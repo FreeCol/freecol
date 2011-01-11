@@ -33,7 +33,6 @@ import java.io.StringWriter;
 import java.lang.Class;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -194,12 +193,12 @@ public final class FreeColServer {
     private List<HighScore> highScores = null;
 
 
-    public static final Comparator<HighScore> highScoreComparator = new Comparator<HighScore>() {
+    public static final Comparator<HighScore> highScoreComparator
+        = new Comparator<HighScore>() {
         public int compare(HighScore score1, HighScore score2) {
             return score2.getScore() - score1.getScore();
         }
     };
-
 
     /**
      * Starts a new server in a specified mode and with a specified port.
@@ -220,20 +219,23 @@ public final class FreeColServer {
      *             will be logged by this class).
      *
      */
-    public FreeColServer(Specification specification, boolean publicServer, boolean singleplayer, int port, String name)
+    public FreeColServer(Specification specification, boolean publicServer,
+                         boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(specification, publicServer, singleplayer, port, name, Advantages.SELECTABLE);
+        this(specification, publicServer, singleplayer, port, name,
+             Advantages.SELECTABLE);
     }
 
-    public FreeColServer(Specification specification, boolean publicServer, boolean singleplayer,
-                         int port, String name, Advantages advantages)
+    public FreeColServer(Specification specification, boolean publicServer,
+                         boolean singleplayer, int port, String name,
+                         Advantages advantages)
         throws IOException, NoRouteToServerException {
 
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
-        this.random = new Random(new SecureRandom().nextLong());
+        this.random = new Random(FreeCol.getFreeColSeed());
 
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -329,7 +331,7 @@ public final class FreeColServer {
             throw fe;
         }
         if (random == null) {
-            this.random = new Random(new SecureRandom().nextLong());
+            this.random = new Random(FreeCol.getFreeColSeed());
         }
         inGameController = new InGameController(this, random);
         mapGenerator = new SimpleMapGenerator(random, getSpecification());

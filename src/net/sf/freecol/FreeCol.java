@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -67,6 +68,8 @@ import org.apache.commons.cli.PosixParser;
  */
 public final class FreeCol {
 
+    private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
+
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
     public static final int     DEFAULT_PORT = 3541;
@@ -75,8 +78,6 @@ public final class FreeCol {
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
     public static final String DEFAULT_TC = "freecol";
-
-    private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     private static final String FREECOL_VERSION = "0.10.0";
     private static String FREECOL_REVISION;
@@ -142,6 +143,8 @@ public final class FreeCol {
     private static boolean displaySplash = false;
     private static Dimension windowSize;
 
+    private static long freeColSeed = 0L;
+
 
     private FreeCol() {
         // Hide constructor
@@ -169,6 +172,9 @@ public final class FreeCol {
         
         createAndSetDirectories();
         initLogging();
+
+        if (freeColSeed == 0L) freeColSeed = new SecureRandom().nextLong();
+        logger.info("Using seed: " + freeColSeed);
 
         Locale locale = getLocale();
         Locale.setDefault(locale);
@@ -604,6 +610,11 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.font"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("seed")
+                          .withDescription(Messages.message("cli.seed"))
+                          .withArgName(Messages.message("cli.arg.seed"))
+                          .hasArg()
+                          .create());
 
         try {
             // parse the command line arguments
@@ -748,8 +759,16 @@ public final class FreeCol {
             if (line.hasOption("font")) {
                 fontName = line.getOptionValue("font");
             }
-        } catch(ParseException e) {
-            System.out.println("\n" + e.getMessage() + "\n");
+            if (line.hasOption("seed")) {
+                String seedStr = line.getOptionValue("seed");
+                try {
+                    freeColSeed = Long.parseLong(seedStr);
+                } catch (NumberFormatException e) {
+                    System.err.println("Ignoring bad seed: " + seedStr);
+                }
+            }
+        } catch (ParseException e) {
+            System.err.println("\n" + e.getMessage() + "\n");
             printUsage();
             System.exit(1);
         }
@@ -818,6 +837,15 @@ public final class FreeCol {
      */
     public static boolean usesExperimentalAI() {
         return usesExperimentalAI;
+    }
+
+    /**
+     * Gets the seed for the PRNG.
+     *
+     * @return The seed.
+     */
+    public static long getFreeColSeed() {
+        return freeColSeed;
     }
 
     private static void startServer() {
