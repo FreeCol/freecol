@@ -152,8 +152,18 @@ public final class LastSale extends FreeColObject {
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        when = new Turn(Integer.parseInt(in.getAttributeValue(null, "when")));
-        price = Integer.parseInt(in.getAttributeValue(null, "price"));
+        int w;
+        try {
+            w = Integer.parseInt(in.getAttributeValue(null, "when"));
+        } catch (NumberFormatException e) {
+            w = 0;
+        }
+        when = new Turn(w);
+        try {
+            price = Integer.parseInt(in.getAttributeValue(null, "price"));
+        } catch (NumberFormatException e) {
+            price = 0;
+        }
 
         super.readChildren(in);
     }
