@@ -26,6 +26,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
@@ -37,11 +38,15 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * A panel that holds units and goods that represent Units and cargo
  * that are on board the currently selected ship.
  */
-public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
+public class CargoPanel extends FreeColPanel
+    implements PropertyChangeListener {
+
+    private static Logger logger = Logger.getLogger(CargoPanel.class.getName());
 
     /**
      * The carrier that contains cargo.
@@ -54,15 +59,10 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
 
     private final TitledBorder border;
 
-    /**
-     * Describe editable here.
-     */
     private boolean editable = true;
 
-    /**
-     * Describe parentPanel here.
-     */
     private JPanel parentPanel;
+
 
     /**
      * Creates this CargoPanel.
@@ -87,11 +87,6 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         initialize();
     }
 
-    @Override
-    public String getUIClassID() {
-        return "CargoPanelUI";
-    }
-
     /**
      * Get the <code>ParentPanel</code> value.
      *
@@ -111,6 +106,13 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
     }
 
     /**
+     * Is this panel active?
+     */
+    public boolean isActive() {
+        return carrier != null;
+    }
+
+    /**
      * Get the <code>Carrier</code> value.
      *
      * @return an <code>Unit</code> value
@@ -125,14 +127,10 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
      * @param newCarrier The new Carrier value.
      */
     public void setCarrier(final Unit newCarrier) {
-        if (carrier != null) {
-            carrier.removePropertyChangeListener(Unit.CARGO_CHANGE, this);
-        }
+        removePropertyChangeListeners();
         this.carrier = newCarrier;
-        if (carrier != null) {
-            carrier.addPropertyChangeListener(Unit.CARGO_CHANGE, this);
-        }
-        initialize();
+        addPropertyChangeListeners();
+        update();
     }
 
     /**
@@ -153,7 +151,24 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         this.editable = newEditable;
     }
 
+    /**
+     * Initialize this CargoPanel.
+     */
     public void initialize() {
+        update();
+    }
+
+    /**
+     * Clean up this CargoPanel.
+     */
+    public void cleanup() {
+        removePropertyChangeListeners();
+    }
+
+    /**
+     * Update this CargoPanel.
+     */
+    public void update() {
         removeAll();
 
         if (carrier != null) {
@@ -189,6 +204,9 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         repaint();
     }
 
+    /**
+     * Update the title of this CargoPanel.
+     */
     private void updateTitle() {
         // sanitation
         if (border == null) {
@@ -203,10 +221,6 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                                              "%name%", Messages.message(Messages.getLabel(carrier)),
                                              "%space%", String.valueOf(spaceLeft)));
         }
-    }
-
-    public boolean isActive() {
-        return (carrier != null);
     }
 
     /**
@@ -235,7 +249,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                     if (getController().boardShip(unit, carrier)) {
                         ((UnitLabel) comp).setSmall(false);
                         oldParent.remove(comp);
-                        initialize();
+                        update();
                         return comp;
                     }
                 }
@@ -252,7 +266,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                                              goods.getType(), loadableAmount);
                 goods.setAmount(goods.getAmount() - loadableAmount);
                 getController().loadCargo(goodsToAdd, carrier);
-                initialize();
+                update();
                 return comp;
             } else if (comp instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel) comp;
@@ -260,7 +274,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                 if (player.canTrade(label.getType())) {
                     getController().buyGoods(label.getType(), label.getAmount(), carrier);
                     getController().nextModelMessage();
-                    initialize();
+                    update();
                     return comp;
                 } else {
                     getController().payArrears(label.getType());
@@ -282,19 +296,37 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel) comp).getUnit();
             getController().leaveShip(unit);
-            initialize();
+            update();
         } else if (comp instanceof GoodsLabel) {
             Goods g = ((GoodsLabel) comp).getGoods();
             getController().unloadCargo(g, false);
-            initialize();
+            update();
+        }
+    }
+
+    public void addPropertyChangeListeners() {
+        if (carrier != null) {
+            carrier.addPropertyChangeListener(Unit.CARGO_CHANGE, this);
+            carrier.getGoodsContainer().addPropertyChangeListener(this);
+        }
+    }
+
+    public void removePropertyChangeListeners() {
+        if (carrier != null) {
+            carrier.removePropertyChangeListener(Unit.CARGO_CHANGE, this);
+            carrier.getGoodsContainer().removePropertyChangeListener(this);
         }
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        initialize();
+        logger.finest("CargoPanel change " + event.getPropertyName()
+                      + ": " + event.getOldValue()
+                      + " -> " + event.getNewValue());
+        update();
     }
 
-
-
+    @Override
+    public String getUIClassID() {
+        return "CargoPanelUI";
+    }
 }
-

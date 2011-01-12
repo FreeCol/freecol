@@ -98,9 +98,13 @@ public final class DragListener extends MouseAdapter {
                     menu = getUnitMenu((UnitLabel) comp);
                 } else if (comp instanceof GoodsLabel) {
                     menu = getGoodsMenu((GoodsLabel) comp);
-                } else if (comp instanceof MarketLabel &&
-                           parentPanel instanceof EuropePanel) {
-                    ((EuropePanel) parentPanel).payArrears(((MarketLabel) comp).getType());
+                } else if (comp instanceof MarketLabel
+                           && parentPanel instanceof EuropePanel) {
+                    GoodsType goodsType = ((MarketLabel) comp).getType();
+                    if (canvas.getClient().getInGameController().payArrears(goodsType)) {
+                        ((EuropePanel) parentPanel).revalidate();
+                        ((EuropePanel) parentPanel).refresh();
+                    }
                 }
                 if (menu != null) {
                     int elements = menu.getSubElements().length;
