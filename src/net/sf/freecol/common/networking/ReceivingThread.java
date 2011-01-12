@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -37,12 +38,13 @@ import net.sf.freecol.common.FreeColException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+
 /**
  * The thread that checks for incoming messages.
  */
 final class ReceivingThread extends Thread {
-    private static final Logger logger =
-            Logger.getLogger(ReceivingThread.class.getName());
+
+    private static final Logger logger = Logger.getLogger(ReceivingThread.class.getName());
 
     /** Maximum number og retries before closing the connection. */
     private static final int MAXIMUM_RETRIES = 5;
@@ -162,6 +164,18 @@ final class ReceivingThread extends Thread {
     }
 
     /**
+     * Logger.getLevel() returns null if inheriting from a parent logger,
+     * so we have to traverse the parent tree to find the actual level.
+     *
+     * @param logger The <code>Logger</code> to query.
+     * @return The real level the Logger is running at.
+     */
+    private static Level getRealLevel(Logger logger) {
+        while (logger.getLevel() == null) logger = logger.getParent();
+        return logger.getLevel();
+    }
+
+    /**
      * Listens to the inputstream and calls the messagehandler for each message
      * received.
      * 
@@ -179,17 +193,18 @@ final class ReceivingThread extends Thread {
             }
         }
 
-        final int LOOK_AHEAD = (FreeCol.isInDebugMode()) ? 50000 : 500;
+        final boolean dumpTraffic = FreeCol.isInDebugMode()
+            || getRealLevel(logger) == Level.FINEST;
+        final int LOOK_AHEAD = (dumpTraffic) ? 50000 : 500;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD*2);
         in.enable();
         bis.mark(LOOK_AHEAD);
-
         if (!shouldRun()) {
             return;
         }
 
         // START DEBUG-LINES:
-        if (FreeCol.isInDebugMode()) {
+        if (dumpTraffic) {
             byte[] buf = new byte[LOOK_AHEAD];
             int r = bis.read(buf, 0, LOOK_AHEAD);
             if (r > 0) {
@@ -203,7 +218,7 @@ final class ReceivingThread extends Thread {
             }
             bis.reset();
         }
-        // END DEBUB
+        // END DEBUG
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
         xmlIn = xif.createXMLStreamReader(bis);
