@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -99,9 +100,7 @@ public class Message {
     private Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
-
-        boolean dumpMsgOnError = FreeCol.isInDebugMode();
-        dumpMsgOnError = true;
+        boolean dumpMsgOnError = true; // FreeCol.isInDebugMode();
         if (dumpMsgOnError) {
             /*
              * inputSource.setByteStream( new
@@ -118,9 +117,7 @@ public class Message {
             tempDocument = builder.parse(inputSource);
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built
-            StringWriter sw = new StringWriter();
-            pce.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+            logger.log(Level.WARNING, "Parser error", pce);
         } catch (SAXException se) {
             throw se;
         } catch (IOException ie) {
@@ -250,6 +247,13 @@ public class Message {
      * @return The root <code>Element</code> of the error message.
      */
     public static Element clientError(String message) {
+        if (FreeCol.isInDebugMode()) {
+            try {
+                throw new IllegalStateException(message);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Client error", e);
+            }
+        }
         Element errorElement = createNewRootElement("error");
         errorElement.setAttribute("messageID", "server.reject");
         errorElement.setAttribute("message", message);
