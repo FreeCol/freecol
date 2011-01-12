@@ -2926,6 +2926,12 @@ public final class InGameController extends Controller {
             containerDirty = true;
         }
 
+        // Check for upgrade.
+        UnitType type
+            = unit.getType().getUnitTypeChange(ChangeType.ENTER_COLONY,
+                                               unit.getOwner());
+        if (type != null) unit.setType(type);
+
         // Change the location.
         // We could avoid updating the whole tile if we knew that this
         // was definitely a move between locations and no student/teacher

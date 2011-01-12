@@ -59,7 +59,9 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
@@ -155,6 +157,8 @@ public class InGameControllerTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.brave");
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType farmerType
+        = spec().getUnitType("model.unit.expertFarmer");
     private static final UnitType colonialType
         = spec().getUnitType("model.unit.colonialRegular");
     private static final UnitType veteranType
@@ -2072,4 +2076,40 @@ public class InGameControllerTest extends FreeColTestCase {
         }
     }
 
+    /**
+     * Check upgrades on entering a colony.
+     */
+    public void testUnitTypeChangeOnEnterColony() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        InGameController igc = ServerTestHelper.getInGameController();
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Colony colony = getStandardColony();
+
+        UnitType gardenerType = new UnitType("gardener", spec());
+        gardenerType.setSkill(0);
+
+        ChangeType enterColony = ChangeType.ENTER_COLONY;
+        UnitTypeChange change = new UnitTypeChange();
+        change.setNewUnitType(farmerType);
+        change.getChangeTypes().add(enterColony);
+        gardenerType.getTypeChanges().add(change);
+
+        assertTrue(gardenerType.canBeUpgraded(farmerType, enterColony));
+        assertTrue(change.appliesTo(dutch));
+        assertEquals(farmerType,
+                     gardenerType.getUnitTypeChange(enterColony, dutch));
+
+        Unit gardener = new ServerUnit(game, null, dutch, gardenerType,
+                                       UnitState.ACTIVE);
+        assertEquals(gardenerType, gardener.getType());
+        assertEquals(farmerType,
+            gardener.getType().getUnitTypeChange(enterColony, dutch));
+        WorkLocation loc = colony.getVacantWorkLocationFor(gardener);
+        assertNotNull(loc);
+        gardener.setLocation(colony.getTile());
+
+        igc.work(dutch, gardener, loc);
+        assertEquals(farmerType, gardener.getType());
+    }
 }

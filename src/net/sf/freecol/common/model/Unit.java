@@ -1923,7 +1923,6 @@ public class Unit extends FreeColGameObject
      * @param newLocation The new Location of the Unit.
      */
     public void setLocation(Location newLocation) {
-
         Location oldLocation = location;
         Colony oldColony = this.getColony();
         Colony newColony = null;
@@ -1942,6 +1941,7 @@ public class Unit extends FreeColGameObject
         // if there was one.
         if (oldLocation instanceof WorkLocation
             && !(newLocation instanceof WorkLocation)) {
+            // Leaving colony.
             getOwner().modifyScore(-getType().getScoreValue());
             oldColony.updatePopulation(-1);
 
@@ -1949,23 +1949,12 @@ public class Unit extends FreeColGameObject
                 teacher.setStudent(null);
                 teacher = null;
             }
-        }
-        if (newLocation instanceof WorkLocation
-            && !(oldLocation instanceof WorkLocation)) {
-            // entering colony
-            UnitType newType = unitType.getUnitTypeChange(ChangeType.ENTER_COLONY, owner);
-            if (newType == null) {
-                getOwner().modifyScore(getType().getScoreValue());
-            } else {
-                String oldName = unitType.getId() + ".name";
-                getOwner().modifyScore(-getType().getScoreValue());
-                setType(newType);
-                getOwner().modifyScore(getType().getScoreValue() * 2);
-                String newName = newType.getId() + ".name";
-                newColony.firePropertyChange(ColonyChangeEvent.UNIT_TYPE_CHANGE.toString(),
-                                             oldName, newName);
-            }
+        } else if (newLocation instanceof WorkLocation
+                   && !(oldLocation instanceof WorkLocation)) {
+            // Entering colony.
+            getOwner().modifyScore(getType().getScoreValue());
             newColony.updatePopulation(1);
+
             if (getState() != UnitState.IN_COLONY) {
                 logger.warning("Adding unit " + getId() + " with state==" + getState()
                                + " (should be IN_COLONY) to WorkLocation in "

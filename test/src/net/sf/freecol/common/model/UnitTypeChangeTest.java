@@ -98,38 +98,4 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         assertEquals(farmer, gardenerUnit.getType());
 
     }
-
-    public void testEnterColony() {
-
-        Game game = getStandardGame();
-    	game.setMap(getTestMap(true));
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Colony colony = getStandardColony();
-
-        UnitType gardener = new UnitType("gardener", spec());
-        gardener.setSkill(0);
-        UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
-
-        UnitTypeChange.ChangeType enterColony = UnitTypeChange.ChangeType.ENTER_COLONY;
-        UnitTypeChange change = new UnitTypeChange();
-        change.setNewUnitType(farmer);
-        change.getChangeTypes().add(enterColony);
-
-        gardener.getTypeChanges().add(change);
-
-        assertTrue(gardener.canBeUpgraded(farmer, enterColony));
-        assertTrue(change.appliesTo(dutch));
-        assertEquals(farmer, gardener.getUnitTypeChange(enterColony, dutch));
-
-        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardener,
-                                           UnitState.ACTIVE);
-        assertEquals(gardener, gardenerUnit.getType());
-        assertEquals(farmer, gardenerUnit.getType().getUnitTypeChange(enterColony, dutch));
-        assertNotNull(colony.getVacantWorkLocationFor(gardenerUnit));
-
-        gardenerUnit.setLocation(colony.getVacantWorkLocationFor(gardenerUnit));
-        assertEquals(farmer, gardenerUnit.getType());
-
-    }
-
 }

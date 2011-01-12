@@ -448,12 +448,14 @@ public final class InGameController implements NetworkConstants {
     private class UnitWas {
         private Unit unit;
         private Location loc;
+        private UnitType type;
         private GoodsType work;
         private int amount;
         private Colony colony;
 
         public UnitWas(Unit unit) {
             this.unit = unit;
+            this.type = unit.getType();
             this.loc = unit.getLocation();
             this.work = unit.getWorkType();
             this.amount = getAmount(loc, work);
@@ -485,11 +487,13 @@ public final class InGameController implements NetworkConstants {
          */
         public void fireChanges() {
             Location newLoc = null;
+            UnitType newType = null;
             GoodsType newWork = null;
             int newAmount = 0;
             if (!unit.isDisposed()) {
                 newLoc = unit.getLocation();
                 if (colony != null) {
+                    newType = unit.getType();
                     newWork = unit.getWorkType();
                     newAmount = (newWork == null) ? 0
                         : getAmount(newLoc, newWork);
@@ -505,6 +509,10 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             if (colony != null) {
+                if (type != newType && newType != null) {
+                    String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
+                    colony.firePropertyChange(pc, type, newType);
+                }
                 if (work == newWork) {
                     if (work != null && amount != newAmount) {
                         colony.firePropertyChange(work.getId(),
