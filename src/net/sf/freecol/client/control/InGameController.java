@@ -385,11 +385,14 @@ public final class InGameController implements NetworkConstants {
         private Colony colony;
         private int population;
         private int productionBonus;
+        private List<BuildableType> buildQueue;
 
         public ColonyWas(Colony colony) {
             this.colony = colony;
             this.population = colony.getUnitCount();
             this.productionBonus = colony.getProductionBonus();
+            this.buildQueue
+                = new ArrayList<BuildableType>(colony.getBuildQueue());
         }
 
         /**
@@ -397,7 +400,6 @@ public final class InGameController implements NetworkConstants {
          * colony.
          */
         public void fireChanges() {
-            logger.finest("Firing changes for " + colony.getId());
             int newPopulation = colony.getUnitCount();
             if (newPopulation != population) {
                 String pc = ColonyChangeEvent.POPULATION_CHANGE.toString();
@@ -408,7 +410,36 @@ public final class InGameController implements NetworkConstants {
                 String pc = ColonyChangeEvent.BONUS_CHANGE.toString();
                 colony.firePropertyChange(pc, productionBonus, newProductionBonus);
             }
+            List<BuildableType> newBuildQueue = colony.getBuildQueue();
+            if (!newBuildQueue.equals(buildQueue)) {
+                String pc = ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
+                colony.firePropertyChange(pc, buildQueue, newBuildQueue);
+            }
             colony.getGoodsContainer().fireChanges();
+        }
+    }
+
+    // Simple helper container to remember the Europe state prior to
+    // some change, and fire off any consequent property changes.
+    private class EuropeWas {
+        private Europe europe;
+        private int unitCount;
+
+        public EuropeWas(Europe europe) {
+            this.europe = europe;
+            this.unitCount = europe.getUnitCount();
+        }
+
+        /**
+         * Fire any property changes resulting from actions in Europe.
+         */
+        public void fireChanges() {
+            int newUnitCount = europe.getUnitCount();
+
+            if (newUnitCount != unitCount) {
+                String pc = Europe.UNIT_CHANGE.toString();
+                europe.firePropertyChange(pc, unitCount, newUnitCount);
+            }
         }
     }
 
@@ -442,6 +473,7 @@ public final class InGameController implements NetworkConstants {
         // TODO: fix this non-OO nastiness
         private String change(FreeColGameObject fcgo) {
             return (fcgo instanceof Tile) ? Tile.UNIT_CHANGE
+                : (fcgo instanceof Europe) ? Europe.UNIT_CHANGE
                 : (fcgo instanceof ColonyTile) ? ColonyTile.UNIT_CHANGE
                 : (fcgo instanceof Building) ? Building.UNIT_CHANGE
                 : (fcgo instanceof Unit) ? Unit.CARGO_CHANGE
@@ -452,17 +484,27 @@ public final class InGameController implements NetworkConstants {
          * Fire any property changes resulting from actions of a unit.
          */
         public void fireChanges() {
-            logger.finest("Firing changes for " + unit.getId());
-            Location newLoc = unit.getLocation();
+            Location newLoc = null;
+            GoodsType newWork = null;
+            int newAmount = 0;
+            if (!unit.isDisposed()) {
+                newLoc = unit.getLocation();
+                if (colony != null) {
+                    newWork = unit.getWorkType();
+                    newAmount = (newWork == null) ? 0
+                        : getAmount(newLoc, newWork);
+                }
+            }
+
             if (loc != newLoc) {
                 FreeColGameObject oldFcgo = (FreeColGameObject) loc;
                 oldFcgo.firePropertyChange(change(oldFcgo), unit, null);
-                FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
-                newFcgo.firePropertyChange(change(newFcgo), null, unit);
+                if (newLoc != null) {
+                    FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
+                    newFcgo.firePropertyChange(change(newFcgo), null, unit);
+                }
             }
             if (colony != null) {
-                GoodsType newWork = unit.getWorkType();
-                int newAmount = getAmount(newLoc, newWork);
                 if (work == newWork) {
                     if (work != null && amount != newAmount) {
                         colony.firePropertyChange(work.getId(),
@@ -476,6 +518,9 @@ public final class InGameController implements NetworkConstants {
                         colony.firePropertyChange(newWork.getId(), 0, newAmount);
                     }
                 }
+            }
+            if (unit.getGoodsContainer() != null) {
+                unit.getGoodsContainer().fireChanges();
             }
         }
     }
@@ -702,19 +747,12 @@ public final class InGameController implements NetworkConstants {
         int amount = goods.getAmount();
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
-        int newAmount;
+        UnitWas unitWas = new UnitWas(carrier);
         ColonyWas colonyWas = new ColonyWas(colony);
         if (askLoadCargo(goods, carrier)
-            && (newAmount = container.getGoodsCount(type)) != oldAmount) {
-            if (newAmount != oldAmount + amount) {
-                logger.warning("Bogus load of " + goods.toString()
-                               + " from " + colony.getId()
-                               + " to " + carrier.toString()
-                               + " with initial count " + Integer.toString(oldAmount)
-                               + " result " + Integer.toString(newAmount));
-            }
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
+            && container.getGoodsCount(type) != oldAmount) {
             colonyWas.fireChanges();
+            unitWas.fireChanges();
             return true;
         }
         return false;
@@ -844,18 +882,12 @@ public final class InGameController implements NetworkConstants {
         int amount = goods.getAmount();
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
-        int newAmount;
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(carrier);
         if (askUnloadCargo(goods)
-            && (newAmount = container.getGoodsCount(type)) != oldAmount) {
-            if (newAmount != oldAmount - amount) {
-                logger.warning("Bogus unload of " + goods.toString()
-                               + " from " + carrier.toString()
-                               + " with initial count " + Integer.toString(oldAmount)
-                               + " leaving " + Integer.toString(newAmount));
-            }
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
+            && container.getGoodsCount(type) != oldAmount) {
             if (colonyWas != null) colonyWas.fireChanges();
+            unitWas.fireChanges();
             return true;
         }
         return false;
@@ -1577,10 +1609,9 @@ public final class InGameController implements NetworkConstants {
      */
     private void emigrate(Player player, int slot) {
         Europe europe = player.getEurope();
-        int count = europe.getUnitCount();
-        if (askEmigrate(slot) && europe.getUnitCount() > count) {
-            europe.firePropertyChange(Europe.UNIT_CHANGE, count,
-                                      europe.getUnitCount());
+        EuropeWas europeWas = new EuropeWas(europe);
+        if (askEmigrate(slot)) {
+            europeWas.fireChanges();
             freeColClient.getCanvas().updateGoldLabel();
         }
     }
@@ -3468,10 +3499,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Update if cash in succeeds.
-        FreeColGameObject oldLocation = (FreeColGameObject) unit.getLocation();
+        UnitWas unitWas = new UnitWas(unit);
         if (cash && askCashInTreasureTrain(unit) && unit.isDisposed()) {
-            oldLocation.firePropertyChange(Tile.UNIT_CHANGE, unit, null);
             freeColClient.playSound("sound.event.cashInTreasureTrain");
+            unitWas.fireChanges();
             canvas.updateGoldLabel();
             nextActiveUnit(tile);
             return true;
@@ -3534,15 +3565,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Proceed to board
-        Location oldLocation = unit.getLocation();
+        UnitWas unitWas = new UnitWas(unit);
         if (askEmbark(unit, carrier, null) && unit.getLocation() == carrier) {
             freeColClient.playSound("sound.event.loadCargo");
-            if (oldLocation instanceof Tile) {
-                ((Tile) oldLocation).firePropertyChange(Tile.UNIT_CHANGE, unit, null);
-            } else if (oldLocation instanceof Europe) {
-                ((Europe) oldLocation).firePropertyChange(Europe.UNIT_CHANGE, unit, null);
-            }
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
+            unitWas.fireChanges();
             nextActiveUnit();
             return true;
         }
@@ -3591,16 +3617,10 @@ public final class InGameController implements NetworkConstants {
         Unit carrier = (Unit) unit.getLocation();
 
         // Ask the server
+        UnitWas unitWas = new UnitWas(unit);
         if (askDisembark(unit) && unit.getLocation() != carrier) {
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, unit, null);
-            if (!checkCashInTreasureTrain(unit)) {
-                Location newLocation = unit.getLocation();
-                if (newLocation instanceof Tile) {
-                    ((Tile) newLocation).firePropertyChange(Tile.UNIT_CHANGE, null, unit);
-                } else if (newLocation instanceof Europe) {
-                    ((Europe) newLocation).firePropertyChange(Europe.UNIT_CHANGE, null, unit);
-                }
-            }
+            checkCashInTreasureTrain(unit);
+            unitWas.fireChanges();
             nextActiveUnit();
             return true;
         }
@@ -3799,12 +3819,12 @@ public final class InGameController implements NetworkConstants {
 
         // Try to purchase.
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        int newAmount;
         int price = market.getCostToBuy(type);
+        UnitWas unitWas = new UnitWas(carrier);
         if (askBuyGoods(carrier, type, toBuy)
-            && (newAmount = carrier.getGoodsContainer().getGoodsCount(type)) > oldAmount) {
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             freeColClient.playSound("sound.event.loadCargo");
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
+            unitWas.fireChanges();
             for (TransactionListener listener : market.getTransactionListener()) {
                 listener.logPurchase(type, toBuy, price);
             }
@@ -3873,22 +3893,16 @@ public final class InGameController implements NetworkConstants {
         int amount = goods.getAmount();
         int price = market.getPaidForSale(type);
         int tax = player.getTax();
-        int carrierAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        if (askSellGoods(goods, carrier)) {
-            int newAmount = carrier.getGoodsContainer().getGoodsCount(type);
-            if (newAmount != carrierAmount - amount) {
-                logger.warning("Bogus sale of " + goods.toString()
-                               + " from " + carrier.toString()
-                               + " with initial count " + Integer.toString(carrierAmount)
-                               + " leaving " + Integer.toString(newAmount));
-                return false;
-            }
+        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
+        UnitWas unitWas = new UnitWas(carrier);
+        if (askSellGoods(goods, carrier)
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             freeColClient.playSound("sound.event.sellCargo");
-            canvas.updateGoldLabel();
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
+            unitWas.fireChanges();
             for (TransactionListener listener : market.getTransactionListener()) {
                 listener.logSale(type, amount, price, tax);
             }
+            canvas.updateGoldLabel();
             return true;
         }
 
@@ -4483,11 +4497,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        List<BuildableType> queue
-            = new ArrayList<BuildableType>(colony.getBuildQueue());
+        ColonyWas colonyWas = new ColonyWas(colony);
         if (askSetBuildQueue(colony, buildQueue)) {
-            colony.firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
-                                      queue, colony.getBuildQueue());
+            colonyWas.fireChanges();
         }
     }
 
@@ -4532,11 +4544,10 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        int count = europe.getUnitCount();
-        if (askTrainUnitInEurope(unitType) && europe.getUnitCount() > count) {
+        EuropeWas europeWas = new EuropeWas(europe);
+        if (askTrainUnitInEurope(unitType)) {
             canvas.updateGoldLabel();
-            europe.firePropertyChange(Europe.UNIT_CHANGE, count,
-                                      europe.getUnitCount());
+            europeWas.fireChanges();
         }
     }
 
@@ -4583,11 +4594,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         ColonyWas colonyWas = new ColonyWas(colony);
-        List<BuildableType> queue
-            = new ArrayList<BuildableType>(colony.getBuildQueue());
         if (askPayForBuilding(colony) && colony.getPriceForBuilding() == 0) {
-            colony.firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
-                                      null, colony.getBuildQueue());
             colonyWas.fireChanges();
             canvas.updateGoldLabel();
         }
