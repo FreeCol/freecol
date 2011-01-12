@@ -671,9 +671,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                      serverPlayer, newUnit)
                         .add("%city%", cityName)
                         .addAmount("%money%", treasureAmount));
-                cs.addHistory(serverPlayer,
+                cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
                                      HistoryEvent.EventType.CITY_OF_GOLD)
+                        .addStringTemplate("%nation%", serverPlayer.getNationName())
                         .add("%city%", cityName)
                         .addAmount("%treasure%", treasureAmount));
                 break;
@@ -960,7 +961,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (region.isPacific()) {
                 cs.addAttribute(See.only(serverPlayer),
                                 "discoverPacific", "true");
-                cs.addRegion(serverPlayer, region, "model.region.pacific");
+                cs.addRegion(serverPlayer, region,
+                             Messages.message("model.region.pacific"));
             } else {
                 String regionName = Messages.getDefaultRegionName(serverPlayer,
                                                                   region.getType());

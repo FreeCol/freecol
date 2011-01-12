@@ -317,15 +317,11 @@ public class ServerGame extends Game implements ServerModelObject {
                                                strongestAIPlayer)
                               .addStringTemplate("%loserNation%", loser)
                               .addStringTemplate("%nation%", winner));
-                for (Player p : getEuropeanPlayers()) {
-                    if (p != weakestAIPlayer) {
-                        cs.addHistory((ServerPlayer) p,
-                                      new HistoryEvent(getTurn(),
-                                                       HistoryEvent.EventType.SPANISH_SUCCESSION)
-                                      .addStringTemplate("%loserNation%", loser)
-                                      .addStringTemplate("%nation%", winner));
-                    }
-                }
+                cs.addGlobalHistory(getGame(),
+                    new HistoryEvent(getTurn(),
+                                     HistoryEvent.EventType.SPANISH_SUCCESSION)
+                              .addStringTemplate("%loserNation%", loser)
+                              .addStringTemplate("%nation%", winner));
                 weakestAIPlayer.setDead(true);
                 cs.addDead((ServerPlayer) weakestAIPlayer);
                 setSpanishSuccession(true);

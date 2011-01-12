@@ -1031,11 +1031,26 @@ public class ChangeSet {
     }
 
     /**
+     * Helper function to add a global history event to a ChangeSet.
+     * Also adds the history to all the European players.
+     *
+     * @param game The <code>Game</code> to find players in.
+     * @param history The <code>HistoryEvent</code> to add.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addGlobalHistory(Game game, HistoryEvent history) {
+        changes.add(new OwnedChange(See.all(), history));
+        for (Player p : game.getEuropeanPlayers()) {
+            p.addHistory(history);
+        }
+        return this;
+    }
+
+    /**
      * Helper function to add a history event to a ChangeSet.
      * Also adds the history to the owner.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making history
-     *     or null if all players should see this event.
+     * @param serverPlayer The <code>ServerPlayer</code> making history.
      * @param history The <code>HistoryEvent</code> to add.
      * @return The updated <code>ChangeSet</code>.
      */
@@ -1101,10 +1116,7 @@ public class ChangeSet {
         Game game = serverPlayer.getGame();
         HistoryEvent h = region.discover(serverPlayer, game.getTurn(), name);
         changes.add(new ObjectChange(See.all(), region));
-        changes.add(new OwnedChange(See.all(), h));
-        for (Player p : game.getPlayers()) {
-            if (p.isEuropean()) p.addHistory(h);
-        }
+        addGlobalHistory(game, h);
         return this;
     }
 
