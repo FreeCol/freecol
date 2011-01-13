@@ -1077,26 +1077,19 @@ public class Unit extends FreeColGameObject
      *         or <code>INFINITY</code> if no path can be found.
      */
     public int getTurnsToReach(Tile start, Tile end) {
+        if (start == end) return 0;
 
-        if (start == end) {
-            return 0;
-        }
-
+        PathNode p;
         if (isOnCarrier()) {
             Location dest = getDestination();
             setDestination(end);
-            PathNode p = getGame().getMap().findPath(this, start, end, (Unit) getLocation());
+            final Unit carrier = (Unit) getLocation();
+            p = getGame().getMap().findPath(this, start, end, carrier);
             setDestination(dest);
-            if (p != null) {
-                return p.getTotalTurns();
-            }
+        } else {
+            p = findPath(start, end);
         }
-        PathNode p = findPath(start, end);
-        if (p != null) {
-            return p.getTotalTurns();
-        }
-
-        return INFINITY;
+        return (p != null) ? p.getTotalTurns() : INFINITY;
     }
 
     /**
@@ -1112,33 +1105,39 @@ public class Unit extends FreeColGameObject
             logger.log(Level.WARNING, "destination == null", new Throwable());
         }
 
-        if (getTile() == null) {
-            if (destination.getTile() == null) {
+        Map map = getGame().getMap();
+        int sailTurns = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
+        boolean toEurope = destination instanceof Europe;
+        PathNode p;
+        if (isInEurope()) {
+            if (toEurope) {
                 return 0;
-            }
-            final PathNode p;
-            if (isOnCarrier()) {
-                final Unit carrier = (Unit) getLocation();
-                Tile start = carrier.getFullEntryLocation();
-                p = getGame().getMap().findPath(this, start,
-                                                destination.getTile(), carrier);
+            } else if (isNaval()) {
+                p = map.findPath(this, getFullEntryLocation(),
+                                 destination.getTile());
             } else {
-                // TODO: Use a standard carrier with four move points
-                // as a the unit's carrier:
-                Tile start = getOwner().getEntryLocation().getTile();
-                p = getGame().getMap().findPath(this, start,
-                                                destination.getTile());
+                Unit carrier = null;
+                if (isOnCarrier()) {
+                    carrier = (Unit) getLocation();
+                } else { // Pick a carrier.  If none, the unit is stuck!
+                    for (Unit u : getOwner().getUnits()) {
+                        if (u.isNaval()) {
+                            carrier = u;
+                            break;
+                        }
+                    }
+                }
+                p = (carrier == null) ? null
+                    : map.findPath(this, carrier.getFullEntryLocation(),
+                                   destination.getTile(), carrier);
             }
-            if (p != null) {
-                return p.getTotalTurns();
-            } else {
-                return INFINITY;
-            }
+            return (p == null) ? INFINITY : p.getTotalTurns() + sailTurns;
         }
 
-        if (destination.getTile() == null) {
-            // TODO: Find a path (and determine distance) to Europe:
-            return 10;
+        if (toEurope) {
+            Unit carrier = (isOnCarrier()) ? (Unit) getLocation() : this;
+            p = map.findPathToEurope(carrier, carrier.getTile());
+            return (p == null) ? INFINITY : p.getTotalTurns() + sailTurns;
         }
 
         return getTurnsToReach(destination.getTile());
