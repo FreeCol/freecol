@@ -264,7 +264,6 @@ public class ColonialAIPlayer extends AIPlayer {
      * @return <code>true</code> if the AI should build more colonies.
      */
     public boolean hasFewColonies() {        
-        logger.finest("Entering method hasFewColonies");
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
@@ -275,9 +274,11 @@ public class ColonialAIPlayer extends AIPlayer {
             numberOfWorkers += colony.getUnitCount();
         }
         
-        logger.finest("Leaving method hasFewColonies");
-        return numberOfColonies <= 2 || numberOfColonies >= 3
-                && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
+        boolean result = numberOfColonies <= 2
+            || (numberOfColonies >= 3
+                && numberOfWorkers / numberOfColonies > numberOfColonies - 2);
+        logger.finest("hasFewColonies = " + result);
+        return result;
     }
 
     /**

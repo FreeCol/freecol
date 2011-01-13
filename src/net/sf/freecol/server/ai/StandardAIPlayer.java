@@ -277,7 +277,6 @@ public class StandardAIPlayer extends AIPlayer {
      * @return <code>true</code> if the AI should build more colonies.
      */
     public boolean hasFewColonies() {
-        logger.finest("Entering method hasFewColonies");
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
@@ -288,9 +287,11 @@ public class StandardAIPlayer extends AIPlayer {
             numberOfWorkers += settlment.getUnitCount();
         }
         
-        logger.finest("Leaving method hasFewColonies");
-        return numberOfColonies <= 2 || numberOfColonies >= 3
-                && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
+        boolean result = numberOfColonies <= 2
+            || (numberOfColonies >= 3
+                && numberOfWorkers / numberOfColonies > numberOfColonies - 2);
+        logger.finest("hasFewColonies = " + result);
+        return result;
     }
 
     /**
