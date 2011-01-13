@@ -1647,7 +1647,7 @@ public class StandardAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (unit.isColonist() & unit.getOwner().isEuropean()) {
+            if (unit.isColonist() && unit.getOwner().isEuropean()) {
                 /*
                  * Motivated by (speed) performance: This map stores the
                  * distance between the unit and the destination of a Wish:
