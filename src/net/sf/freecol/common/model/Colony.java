@@ -301,6 +301,10 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             updateSoL();
             updateProductionBonus();
         }
+        // TODO: Clean this up, but beware it is vital for the AI ATM.
+        if (difference != 0) {
+            firePropertyChange(REARRANGE_WORKERS, true, false);
+        }
     }
 
     /**
