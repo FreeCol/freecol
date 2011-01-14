@@ -195,7 +195,7 @@ final class ReceivingThread extends Thread {
 
         final boolean dumpTraffic = FreeCol.isInDebugMode()
             || getRealLevel(logger) == Level.FINEST;
-        final int LOOK_AHEAD = (dumpTraffic) ? 50000 : 500;
+        final int LOOK_AHEAD = (dumpTraffic) ? 500000 : 500;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD*2);
         in.enable();
         bis.mark(LOOK_AHEAD);
