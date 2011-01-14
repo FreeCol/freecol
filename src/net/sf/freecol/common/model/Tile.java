@@ -246,7 +246,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
-                PlayerExploredTile pet = playerExploredTiles.get(player);
+                PlayerExploredTile pet = getPlayerExploredTile(player);
                 return (pet != null) ? getType().getNameKey() : "unexplored";
             } else {
                 logger.warning("player == null");
@@ -1901,7 +1901,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             tileItemContainer.toXML(out, player, showAll, toSavedGame);
         }
 
-        if (toSavedGame) {
+        if (toSavedGame && playerExploredTiles != null) {
             for (Entry<Player, PlayerExploredTile> entry : playerExploredTiles.entrySet()) {
                 entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
             }
@@ -1980,7 +1980,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             } else if (in.getLocalName().equals("playerExploredTile")) {
                 // Only from a savegame:
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                PlayerExploredTile pet = playerExploredTiles.get(player);
+                PlayerExploredTile pet = getPlayerExploredTile(player);
                 if (pet == null) {
                     pet = new PlayerExploredTile(getGame(), in);
                     playerExploredTiles.put(player, pet);
@@ -2022,7 +2022,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (settlement instanceof IndianSettlement) {
             Unit missionary = ((IndianSettlement) settlement).getMissionary();
             if (missionary != null) {
-                PlayerExploredTile pet = playerExploredTiles.get(missionary.getOwner());
+                PlayerExploredTile pet = getPlayerExploredTile(missionary.getOwner());
                 if (pet != null) {
                     pet.setMissionary(missionary);
                 }
