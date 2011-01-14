@@ -1057,19 +1057,6 @@ public class Unit extends FreeColGameObject
      * Returns the number of turns this <code>Unit</code> will have to use in
      * order to reach the given <code>Tile</code>.
      *
-     * @param end The <code>Tile</code> to be reached by this
-     *            <code>Unit</code>.
-     * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>INFINITY</code> if no path can be found.
-     */
-    public int getTurnsToReach(Tile end) {
-        return getTurnsToReach(getTile(), end);
-    }
-
-    /**
-     * Returns the number of turns this <code>Unit</code> will have to use in
-     * order to reach the given <code>Tile</code>.
-     *
      * @param start The <code>Tile</code> to start the search from.
      * @param end The <code>Tile</code> to be reached by this
      *            <code>Unit</code>.
@@ -1093,11 +1080,11 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns the number of turns this <code>Unit</code> will have to use in
-     * order to reach the given <code>Location</code>.
+     * Returns the number of turns this <code>Unit</code> will have to
+     * use in order to reach the given <code>Location</code>.
      *
      * @param destination The destination for this unit.
-     * @return The number of turns it will take to reach the <code>destination</code>,
+     * @return The number of turns it will take to reach the destination,
      *         or <code>INFINITY</code> if no path can be found.
      */
     public int getTurnsToReach(Location destination) {
@@ -1106,41 +1093,50 @@ public class Unit extends FreeColGameObject
         }
 
         Map map = getGame().getMap();
-        int sailTurns = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
+        int sailTurns = getSpecification()
+            .getIntegerOption("model.option.turnsToSail").getValue();
         boolean toEurope = destination instanceof Europe;
+        Unit carrier = (isOnCarrier()) ? (Unit) getLocation() : null;
         PathNode p;
-        if (isInEurope()) {
-            if (toEurope) {
+
+        // Handle the special cases of travelling to and from Europe
+        if (toEurope) {
+            if (isInEurope()) {
                 return 0;
             } else if (isNaval()) {
+                p = map.findPathToEurope(this, getTile());
+            } else if (carrier != null) {
+                p = map.findPathToEurope(carrier, carrier.getTile());
+            } else {
+                return INFINITY;
+            }
+            return (p == null) ? INFINITY : p.getTotalTurns();
+        }
+        if (isInEurope()) {
+            if (isNaval()) {
                 p = map.findPath(this, getFullEntryLocation(),
                                  destination.getTile());
             } else {
-                Unit carrier = null;
-                if (isOnCarrier()) {
-                    carrier = (Unit) getLocation();
-                } else { // Pick a carrier.  If none, the unit is stuck!
+                if (carrier == null) {
+                    // Pick a carrier.  If none found the unit is stuck!
                     for (Unit u : getOwner().getUnits()) {
                         if (u.isNaval()) {
                             carrier = u;
                             break;
                         }
                     }
+                    if (carrier == null) return INFINITY;
                 }
-                p = (carrier == null) ? null
-                    : map.findPath(this, carrier.getFullEntryLocation(),
-                                   destination.getTile(), carrier);
+                p = map.findPath(this, carrier.getFullEntryLocation(),
+                                 destination.getTile(), carrier);
             }
             return (p == null) ? INFINITY : p.getTotalTurns() + sailTurns;
         }
 
-        if (toEurope) {
-            Unit carrier = (isOnCarrier()) ? (Unit) getLocation() : this;
-            p = map.findPathToEurope(carrier, carrier.getTile());
-            return (p == null) ? INFINITY : p.getTotalTurns() + sailTurns;
-        }
-
-        return getTurnsToReach(destination.getTile());
+        // Not in Europe or going to Europe, so there must be a well
+        // defined start and end tile.
+        Tile start = (carrier == null) ? getTile() : carrier.getTile();
+        return getTurnsToReach(start, destination.getTile());
     }
 
     /**
