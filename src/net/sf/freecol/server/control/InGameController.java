@@ -2035,6 +2035,7 @@ public final class InGameController extends Controller {
         case HAPPY: case CONTENT: case DISPLEASED:
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
             unit.setLocation(null);
+            unit.setMovesLeft(0);
             settlement.changeMissionary(unit);
             settlement.setConvertProgress(0);
             cs.add(See.only(serverPlayer),
