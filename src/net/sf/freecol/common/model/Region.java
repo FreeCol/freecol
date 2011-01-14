@@ -37,7 +37,25 @@ public class Region extends FreeColGameObject implements Nameable {
     public static final String PACIFIC_NAME_KEY = "model.region.pacific";
     public static final String CHILD_TAG = "child";
 
-    public static enum RegionType { OCEAN, COAST, LAKE, RIVER, LAND, MOUNTAIN, DESERT }
+    public static enum RegionType {
+        OCEAN,
+        COAST,
+        LAKE,
+        RIVER,
+        LAND,
+        MOUNTAIN,
+        DESERT;
+
+
+        /**
+         * Gets a name index key for this region type.
+         *
+         * @return A name index key.
+         */
+        public String getNameIndexKey() {
+            return "index." + toString().toLowerCase(Locale.US);
+        }
+    }
 
     /**
      * The name of this Region.

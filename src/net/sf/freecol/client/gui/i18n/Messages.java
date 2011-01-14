@@ -424,8 +424,11 @@ public class Messages {
      * @return a <code>String</code> value
      */
     public static String getDefaultRegionName(Player player, RegionType regionType) {
-        int index = 1;
-        String prefix = player.getNationID() + ".region." + regionType.toString().toLowerCase() + ".";
+        net.sf.freecol.common.model.Map map = player.getGame().getMap();
+        int index = player.getNameIndex(regionType.getNameIndexKey());
+        if (index < 1) index = 1;
+        String prefix = player.getNationID() + ".region."
+            + regionType.toString().toLowerCase(Locale.US) + ".";
         String name;
         do {
             name = null;
@@ -433,7 +436,8 @@ public class Messages {
                 name = Messages.message(prefix + Integer.toString(index));
                 index++;
             }
-        } while (name != null && player.getGame().getMap().getRegionByName(name) != null);
+        } while (name != null && map.getRegionByName(name) != null);
+        player.setNameIndex(regionType.getNameIndexKey(), index);
         if (name == null) {
             do {
                 name = message(StringTemplate.template("model.region.default")
@@ -441,7 +445,7 @@ public class Messages {
                                .add("%type%", "model.region." + regionType.toString().toLowerCase() + ".name")
                                .addAmount("%index%", index));
                 index++;
-            } while (player.getGame().getMap().getRegionByName(name) != null);
+            } while (map.getRegionByName(name) != null);
         }
         return name;
     }

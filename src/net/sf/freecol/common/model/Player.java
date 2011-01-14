@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 
@@ -327,6 +328,10 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** The last-sale data. */
     protected HashMap<String, LastSale> lastSales = null;
+
+    /** Indices of largest used region name by type. */
+    protected final HashMap<String, Integer> nameIndex
+        = new HashMap<String, Integer>();
 
     // Temporary variables:
 
@@ -2954,6 +2959,25 @@ public class Player extends FreeColGameObject implements Nameable {
 
 
     /**
+     * Gets the name index for a given key.
+     *
+     * @param key The key to use.
+     */
+    public int getNameIndex(String key) {
+        Integer val = nameIndex.get(key);
+        return (val == null) ? 0 : val;
+    }
+
+    /**
+     * Gets the name index for a given key.
+     *
+     * @param key The key to use.
+     */
+    public void setNameIndex(String key, int value) {
+        nameIndex.put(key, new Integer(value));
+    }
+
+    /**
      * A predicate that can be applied to a unit.
      */
     public abstract class UnitPredicate {
@@ -3211,6 +3235,11 @@ public class Player extends FreeColGameObject implements Nameable {
         if (entryLocation != null) {
             out.writeAttribute("entryLocation", entryLocation.getId());
         }
+        for (RegionType regionType : RegionType.values()) {
+            String key = regionType.getNameIndexKey();
+            int index = getNameIndex(key);
+            if (index > 0) out.writeAttribute(key, Integer.toString(index));
+        }
         // attributes end here
 
         for (Entry<Player, Tension> entry : tension.entrySet()) {
@@ -3305,6 +3334,11 @@ public class Player extends FreeColGameObject implements Nameable {
             if (entryLocation == null) {
                 entryLocation = new Tile(getGame(), entryLocationStr);
             }
+        }
+        for (RegionType regionType : RegionType.values()) {
+            String key = regionType.getNameIndexKey();
+            int index = getAttribute(in, key, -1);
+            if (index > 0) setNameIndex(key, index);
         }
 
         featureContainer = new FeatureContainer(getSpecification());
