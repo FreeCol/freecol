@@ -238,7 +238,10 @@ public final class PreGameController {
         }
 
         InGameController igc = freeColClient.getInGameController();
-        igc.nextActiveUnit((Tile) myPlayer.getEntryLocation());
+        gui.setSelectedTile((Tile) myPlayer.getEntryLocation());
+        if (freeColClient.getGame().getCurrentPlayer() == myPlayer) {
+            igc.nextActiveUnit();
+        }
 
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,
