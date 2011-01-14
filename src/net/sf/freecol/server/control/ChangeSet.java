@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -545,14 +546,28 @@ public class ChangeSet {
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return (fcgo instanceof Ownable
-                    && ((Ownable) fcgo).getOwner() == (Player) serverPlayer)
-                || (fcgo instanceof Unit
-                    && ((Unit) fcgo).isVisibleTo(serverPlayer))
-                || (fcgo instanceof Location
-                    && ((Location) fcgo).getTile() != null
-                    && serverPlayer.canSee(((Location) fcgo).getTile()))
-                ;
+            if (fcgo instanceof Unit) {
+                // Units have a precise test, use that rather than
+                // the more general interface-based tests.
+                return ((Unit) fcgo).isVisibleTo(serverPlayer);
+            }
+            // If we own it, we can see it.
+            if (fcgo instanceof Ownable
+                && ((Ownable) fcgo).getOwner() == (Player) serverPlayer) {
+                return true;
+            }
+            // We do not own it, so the only way we could see it is if
+            // it is on the map.  Would like to use getTile() to
+            // decide that, but this will include ColonyTiles, which
+            // report the colony center tile, yet should never be visible.
+            // So just brutally disallow WorkLocations which should always
+            // be invisible inside colonies.
+            if (fcgo instanceof WorkLocation) {
+                return false;
+            }
+            return fcgo instanceof Location
+                && ((Location) fcgo).getTile() != null
+                && serverPlayer.canSee(((Location) fcgo).getTile());
         }
 
         /**

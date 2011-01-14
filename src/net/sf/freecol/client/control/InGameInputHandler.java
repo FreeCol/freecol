@@ -214,10 +214,10 @@ public final class InGameInputHandler extends InputHandler {
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(element.getAttribute("ID"));
-
+            String id = element.getAttribute("ID");
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(id);
             if (fcgo == null) {
-                logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
+                logger.warning("Object in update not present in client: " + id);
             } else {
                 fcgo.readFromXMLElement(element);
             }
