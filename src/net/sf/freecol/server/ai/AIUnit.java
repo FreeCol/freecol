@@ -398,7 +398,7 @@ public class AIUnit extends AIObject implements Transportable {
                 out.writeAttribute("transport", transport.getUnit().getId());
             }
         }
-        if (mission != null) {
+        if (mission != null && mission.isValid()) {
             mission.toXML(out);
         }
 

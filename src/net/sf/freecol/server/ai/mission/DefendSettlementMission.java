@@ -77,11 +77,6 @@ public class DefendSettlementMission extends Mission {
         super(aiMain, aiUnit);
 
         this.settlement = settlement;
-        
-        if (settlement == null) {
-            logger.warning("settlement == null");
-            throw new NullPointerException("settlement == null");
-        }        
     }
 
     /**
@@ -188,7 +183,9 @@ public class DefendSettlementMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */    
      public Tile getTransportDestination() {
-         if (getUnit().isOnCarrier()) {
+         if (settlement == null) {
+             return null;
+         } else if (getUnit().isOnCarrier()) {
              return settlement.getTile();
          } else if (getUnit().getLocation().getTile() == settlement.getTile()) {
              return null;
@@ -230,9 +227,10 @@ public class DefendSettlementMission extends Mission {
      *         and <code>false</code> otherwise.
      */
     public boolean isValid() {
-        return !settlement.isDisposed()
-                && settlement.getOwner() == getUnit().getOwner()
-                && getUnit().isDefensiveUnit();
+        return settlement != null
+            && !settlement.isDisposed()
+            && settlement.getOwner() == getUnit().getOwner()
+            && getUnit().isDefensiveUnit();
     }
 
     /**
@@ -247,7 +245,9 @@ public class DefendSettlementMission extends Mission {
         out.writeStartElement(getXMLElementTagName());
         
         out.writeAttribute("unit", getUnit().getId());
-        out.writeAttribute("settlement", settlement.getId());
+        if (settlement != null) {
+            out.writeAttribute("settlement", settlement.getId());
+        }
 
         out.writeEndElement();
     }
@@ -259,12 +259,7 @@ public class DefendSettlementMission extends Mission {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));        
-        
         settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "settlement"));
-        if (settlement == null) {
-            logger.warning("settlement == null");
-            throw new NullPointerException("settlement == null");
-        }
         
         in.nextTag();
     }
