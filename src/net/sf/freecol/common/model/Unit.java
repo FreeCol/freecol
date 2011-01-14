@@ -1678,14 +1678,19 @@ public class Unit extends FreeColGameObject
      *            <code>Unit</code>.
      */
     public void add(Locatable locatable) {
-        if (locatable instanceof Unit && canCarryUnits()) {
+        if (locatable instanceof Unit) {
+            if (!canCarryUnits()) {
+                throw new IllegalStateException("Can not carry units: "
+                                                + this.toString());
+            }
             Unit unit = (Unit) locatable;
             if (getSpaceLeft() < unit.getSpaceTaken()) {
-                throw new IllegalStateException("Not enough space for " + unit.toString()
-                                                + " left on " + toString());
+                throw new IllegalStateException("Not enough space for "
+                                                + unit.toString()
+                                                + " on " + this.toString());
             }
             if (units.contains(locatable)) {
-                logger.warning("Tried to add a 'Locatable' already in the carrier.");
+                logger.warning("Already on carrier: " + unit.toString());
                 return;
             }
 
@@ -1696,17 +1701,23 @@ public class Unit extends FreeColGameObject
             unit.setState(UnitState.SENTRY);
             firePropertyChange(CARGO_CHANGE, null, locatable);
             spendAllMoves();
-        } else if (locatable instanceof Goods && canCarryGoods()) {
+        } else if (locatable instanceof Goods) {
+            if (!canCarryGoods()) {
+                throw new IllegalStateException("Can not carry goods: "
+                                                + this.toString());
+            }
             Goods goods = (Goods) locatable;
             if (getLoadableAmount(goods.getType()) < goods.getAmount()){
-                throw new IllegalStateException("Not enough space for " + goods.toString()
-                                                + " left on " + toString());
+                throw new IllegalStateException("Not enough space for "
+                                                + goods.toString()
+                                                + " on " + this.toString());
             }
             goodsContainer.addGoods(goods);
             firePropertyChange(CARGO_CHANGE, null, locatable);
             spendAllMoves();
         } else {
-            throw new IllegalStateException("Tried to add a 'Locatable' to a non-carrier unit.");
+            throw new IllegalStateException("Can not be added to unit: "
+                + ((FreeColGameObject) locatable).toString());
         }
     }
 

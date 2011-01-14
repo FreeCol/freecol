@@ -1819,7 +1819,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveMove(Unit unit, Direction direction) {
         // If we are in a colony, or Europe, load sentries.
-        if (unit.getSpaceLeft() > 0
+        if (unit.canCarryUnits() && unit.getSpaceLeft() > 0
             && (unit.getColony() != null || unit.isInEurope())) {
             for (Unit sentry : new ArrayList<Unit>(unit.getLocation().getUnitList())) {
                 if (sentry.getState() == UnitState.SENTRY) {
