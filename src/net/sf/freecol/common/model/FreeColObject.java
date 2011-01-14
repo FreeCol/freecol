@@ -706,8 +706,7 @@ public abstract class FreeColObject {
 
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (getId() == null) {
-            // TODO: get rid of this again: id should NEVER be null
-            System.out.println(toString());
+            logger.warning("FreeColObject with null id: " + toString());
         } else {
             out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         }
