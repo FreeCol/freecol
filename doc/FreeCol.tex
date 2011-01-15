@@ -190,11 +190,12 @@ which a Java Virtual Machine compatible with Sun Java 5 or higher is
 available. In practice, however, things are less clear cut.
 
 FreeCol is known to work with \href{http://java.sun.com/}{Sun's Java 5
-  and 6}. FreeCol also works with OpenJDK, although some problems and
-graphics glitches remain. FreeCol is known to run on recent versions
-of Windows, Linux, and Mac OS X. If you are using Linux, using Java 6
-is recommended, as its font rendering is much better. If you are using
-FreeCol on a different platform, we would like to hear about it.
+  and 6}. FreeCol also works with OpenJDK, although some minor
+problems and graphics glitches may remain. FreeCol is known to run on
+recent versions of Windows, Linux, and Mac OS X. If you are using
+Linux, using Java 6 is recommended, as its font rendering is much
+better. If you are using FreeCol on a different platform, we would
+like to hear about it.
 
 FreeCol requires at least 256 MB memory and works best with a screen
 resolution of at least 1024x768 pixels. It should also be possible to
@@ -229,12 +230,8 @@ cases.
 In order to compile FreeCol you will need Java and
 \href{http://ant.apache.org/}{the Ant build system}. When these are
 installed, go to the root directory of FreeCol and type \verb$ant$ to
-build a JAR file containing the game. This process requires the
-\verb$native2ascii$\index{native2ascii} task, which is an optional ant
-task. Some Linux distributions place optional tasks in a different
-package, so make sure you have installed all necessary packages if you
-are a Linux user. The game is started using the command
-\verb$java -Xmx256M -jar FreeCol.jar$.
+build a JAR file containing the game. The game is started using the
+command \verb$java -Xmx256M -jar FreeCol.jar$.
 
 If something goes wrong, please open a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
@@ -269,7 +266,7 @@ Machine for details.
 
 There are many other Java options, but you probably won't need to
 change the default settings. FreeCol is developed in English, but it
-includes translations into several other languages, some of which are
+includes translations into many other languages, some of which are
 not very complete, however. Java will automatically select the
 translation for your locale, if available, and English otherwise. If
 you should wish to select a different language, or if language
@@ -321,6 +318,9 @@ interested in if you are a developer:
 
 \hypertarget{Game setup}{\subsection{Game setup}}
 
+
+\hypertarget{Main panel}{\subsubsection{Main panel}}
+
 If you start FreeCol without command line options, the game will first
 open a dialog that allows you to start a new game, to open a saved
 game, to open the map editor, to set various \hyperlink{Client
@@ -332,10 +332,39 @@ list of servers from \verb$meta.freecol.org$\index{meta.freecol.org},
 to join a \Concept{multi-player game}, or to start a new multi-player
 game.
 
-If you start a new game, you must also decide whether to use fixed or
-selectable national advantages, or no national advantages at all. In
-the original game, national advantages were always fixed. The Dutch,
-for example, always had a trading advantage.
+
+\hypertarget{New game}{\subsubsection{New game}}
+
+If you start a new single-player or multi-player game, you must also
+decide whether to use fixed or selectable national advantages, or no
+national advantages at all. In the original game, national advantages
+were always fixed. The Dutch, for example, always had a trading
+advantage. You must also decide which rule set to use. At the moment,
+FreeCol comes with two rule sets, namely ``FreeCol'' (the default) and
+``Classic''. In the future, we will probably distribute additional
+rule sets contributed by players. If you join another game, then you
+must accept the settings the game's owner selected.
+
+
+\hypertarget{Difficulty level}{\subsubsection{Difficulty level}}
+
+The next screen allows you to select an appropriate difficulty
+level. The game comes with five pre-defined difficulty levels: ``Very
+Easy'', ``Easy'', ``Normal'' (the default), ``Hard'' and ``Very
+Hard''. The level is defined by about two dozen different settings,
+such as the amount of gold you start the game with. If you select
+``Very Easy'', for example, you will start with 1000 gold, if you
+select ``Easy'', you will start with only 300 gold, and in higher
+levels you will start entirely penniless.
+
+You can also create your own custom difficulty level. Just select the
+difficulty level that is closest to what you want (i.e. select ``Very
+Hard'' if you want a difficulty level that is even harder) and press
+the ``edit'' button to change the settings. Please note that the range
+of all settings is limited.
+
+
+\hypertarget{Select nations}{\subsubsection{Select nations}}
 
 The next screen allows you to select which European and native nations
 will be present in the game, which colour will be used to represent
@@ -358,6 +387,12 @@ Colopedia. Also see the chapter on \hyperlink{Home Country}{your Home
   Country} for further information on the national advantages of
 various European nations.
 
+This screen also allows you to change various \hyperlink{Game
+  options}{game options}.
+
+
+\hypertarget{Joining a game}{\subsubsection{Joining a game}}
+
 If you choose to retrieve a list of running games from the metaserver,
 your computer will attempt to establish a connection to
 \verb$meta.freecol.org$, port $3540$\index{Port 3540}. You will be
@@ -371,6 +406,10 @@ well as the port it is running on. The default port is
 $3541$\index{Port 3541}. If you join a multi-player game, you can also
 choose a nation and colour, but another players might already have
 selected your preferred nation.
+
+
+\hypertarget{Setting up a multi-player game}{\subsubsection{Setting up
+    a multi-player game}}
 
 If you wish to start a multi-player game, then the IP address of the
 server will be that of your computer, but you must still select a port
@@ -423,16 +462,16 @@ tiles on the map, as well as the humidity and temperature of the
 map. The latter settings will influence the terrain.
 
 The game options proper allow you to select several parameters that
-influence game play, such as non-standard rules, victory conditions
-and the difficulty of the game. The initial values tab allows you to
-set the amount of gold available to the players at the start of the
-game. This is zero by default.
+influence game play, such as non-standard rules and victory
+conditions.
 
 The map tab allows you to select whether to use the \textit{Fog of
   War}, whether to hide enemy units in settlements and carriers, and
 whether to award exploration points for regions discovered by the
 players. By default, exploration points are only awarded for the
-discovery of the Pacific Ocean.
+discovery of the Pacific Ocean. You can also change the number of
+turns required to sail between Europe and the New World. By default,
+the journey takes three turns.
 
 The colony tab allows you to enable custom houses to
 \hypertarget{ignore boycotts}{ignore boycotts}\index{ignoring
@@ -446,21 +485,18 @@ You can also allow experts to ``have connections'', which means that
 experts working in factory-level buildings will be able to produce a
 small amount of goods even if the necessary raw materials are not
 generally available. This alleged feature of the original game is also
-disabled by default. Finally, you have the choice to save production
+disabled by default. You also have the choice to save production
 overflow, which means that new buildings, for example, will not use up
 all available hammers, but only the exact number required. The
-remaining hammers will remain available for the next building project.
+remaining hammers will remain available for the next building
+project. Finally, you may enable or disable manual student
+selection. The original game always selected a random student from
+those available.
 
 The victory conditions tab allows you to choose among three possible
 victory conditions. The game will be won by the first player to
 achieve independence, the player to eliminate all other European
 players, or the player to eliminate all other human players.
-
-Finally, the difficulty tab enables you to select a difficulty level
-between very easy and very hard. The difficulty level influences
-various prices and probabilites in the game, such as amount of gold
-required to buy Indian land, and the probability of converting
-natives.
 
 
 \hypertarget{Client options}{\section{Client options}}
