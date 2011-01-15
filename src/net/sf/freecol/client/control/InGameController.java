@@ -2501,7 +2501,9 @@ public final class InGameController implements NetworkConstants {
             for (Unit dUnit : disembarkable) {
                 choices.add(new ChoiceItem<Unit>(Messages.message(Messages.getLabel(dUnit)), dUnit));
             }
-            choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
+            if (disembarkable.size() > 1) {
+                choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
+            }
             Unit u = canvas.showChoiceDialog(unit.getTile(),
                                              Messages.message("disembark.text"),
                                              Messages.message("disembark.cancel"),
