@@ -1132,9 +1132,22 @@ public class Unit extends FreeColGameObject
             }
             return (p == null) ? INFINITY : p.getTotalTurns() + sailTurns;
         }
+        if (isBetweenEuropeAndNewWorld()) {
+            if (isNaval()) {
+                p = map.findPath(this, getFullEntryLocation(),
+                                 destination.getTile());
+                carrier = this;
+            } else {
+                if (carrier == null) return INFINITY;
+                p = map.findPath(this, carrier.getFullEntryLocation(),
+                                 destination.getTile(), carrier);
+            }
+            return (p == null) ? INFINITY : p.getTotalTurns()
+                + carrier.getWorkLeft();
+        }
 
-        // Not in Europe or going to Europe, so there must be a well
-        // defined start and end tile.
+        // Not in Europe, at sea, or going to Europe, so there must be
+        // a well defined start and end tile.
         Tile start = (carrier == null) ? getTile() : carrier.getTile();
         return getTurnsToReach(start, destination.getTile());
     }
