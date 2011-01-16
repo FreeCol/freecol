@@ -508,13 +508,13 @@ public class Unit extends FreeColGameObject
      * @return an <code>int</code> value
      */
     public int getTransportFee() {
-        if (canCashInTreasureTrain()) {
-            if (!isInEurope() && getOwner().getEurope() != null) {
-                return (int) getOwner().getFeatureContainer()
-                    .applyModifier(getTreasureAmount() / 2f,
-                                   "model.modifier.treasureTransportFee",
-                                   unitType, getGame().getTurn());
-            }
+        if (!isInEurope() && getOwner().getEurope() != null) {
+            float fee = (getSpecification().getInteger("model.option.treasureTransportFee")
+                         * getTreasureAmount()) / 100;
+            return (int) getOwner().getFeatureContainer()
+                .applyModifier(fee,
+                               "model.modifier.treasureTransportFee",
+                               unitType, getGame().getTurn());
         }
         return 0;
     }

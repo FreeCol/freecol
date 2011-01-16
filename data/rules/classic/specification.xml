@@ -1617,6 +1617,7 @@
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="4"/>
         <integerOption id="model.option.rumourDifficulty" value="0"/>
+        <integerOption id="model.option.treasureTransportFee" value="50"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="veryHigh" />
@@ -1654,6 +1655,7 @@
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="3"/>
         <integerOption id="model.option.rumourDifficulty" value="1"/>
+        <integerOption id="model.option.treasureTransportFee" value="55"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="high" />
@@ -1690,6 +1692,7 @@
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="2"/>
         <integerOption id="model.option.rumourDifficulty" value="2"/>
+        <integerOption id="model.option.treasureTransportFee" value="60"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="medium" />
@@ -1725,6 +1728,7 @@
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="1"/>
         <integerOption id="model.option.rumourDifficulty" value="3"/>
+        <integerOption id="model.option.treasureTransportFee" value="65"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="low" />
@@ -1759,6 +1763,7 @@
         <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
         <integerOption id="model.option.monarchSupport" value="0"/>
         <integerOption id="model.option.rumourDifficulty" value="4"/>
+        <integerOption id="model.option.treasureTransportFee" value="70"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <stringOption  id="model.option.tileProduction" value="veryLow" />
@@ -1793,6 +1798,7 @@
         <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
         <integerOption id="model.option.monarchSupport" value="0" minimumValue="0" maximumValue="4"/>
         <integerOption id="model.option.rumourDifficulty" value="4" minimumValue="0" maximumValue="4"/>
+        <integerOption id="model.option.treasureTransportFee" value="70" minimumValue="0" maximumValue="100"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="veryLow">

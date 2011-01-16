@@ -69,11 +69,11 @@ public class UnitTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.veteranSoldier");
     private static final UnitType wagonType
         = spec().getUnitType("model.unit.wagonTrain");
-    
+
 
     /**
      * Test unit for colonist status
-     * 
+     *
      */
     public void testIsColonist() {
         Game game = getStandardGame();
@@ -81,20 +81,20 @@ public class UnitTest extends FreeColTestCase {
         Player sioux = game.getPlayer("model.nation.sioux");
         Map map = getTestMap(plains, true);
         game.setMap(map);
-        
+
         Tile tile1 = map.getTile(6, 8);
         Tile tile2 = map.getTile(6, 9);
-      
+
         Unit merchantman = new ServerUnit(game, tile1, dutch, spec().getUnitType("model.unit.merchantman"),
                                     UnitState.ACTIVE);
-        
+
         assertFalse("Merchantman isnt a colonist",merchantman.isColonist());
-        
+
         Unit soldier = new ServerUnit(game, tile1, dutch, spec().getUnitType("model.unit.veteranSoldier"),
                                 UnitState.ACTIVE);
-        
+
         assertTrue("A soldier is a colonist",soldier.isColonist());
-        
+
         UnitType braveType = spec().getUnitType("model.unit.brave");
         Unit brave = new ServerUnit(game, tile2, sioux, braveType,
                                     UnitState.ACTIVE);
@@ -136,7 +136,7 @@ public class UnitTest extends FreeColTestCase {
         int wagonTrainOldSpace = wagonTrain.getType().getSpace();
         int wagonTrainOldSpaceTaken = wagonTrain.getType().getSpace();
         int caravelOldSpaceTaken = caravel.getType().getSpace();
-        
+
         // tests according to other possible rules
         wagonTrain.getType().setSpace(1);
         wagonTrain.getType().setSpaceTaken(2);
@@ -153,24 +153,24 @@ public class UnitTest extends FreeColTestCase {
         wagonTrain.getType().setSpaceTaken(wagonTrainOldSpaceTaken);
         caravel.getType().setSpaceTaken(caravelOldSpaceTaken);
     }
-    
+
     public void testFailedAddGoods(){
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-        
+
         Colony colony = this.getStandardColony();
         int foodInColony = 300;
         colony.addGoods(foodType, foodInColony);
         assertEquals("Setup error, colony does not have expected goods quantities",foodInColony,colony.getGoodsCount(foodType));
-        
+
         Player dutch = game.getPlayer("model.nation.dutch");
         Unit wagonTrain = new ServerUnit(game, colony.getTile(), dutch, spec().getUnitType("model.unit.wagonTrain"),
                                    UnitState.ACTIVE);
         int initialMoves = wagonTrain.getInitialMovesLeft();
         assertEquals("Setup error, unit has wrong initial moves", initialMoves, wagonTrain.getMovesLeft());
         assertTrue("Setup error, unit should not carry anything", wagonTrain.getGoodsCount() == 0);
-        
+
         Goods tooManyGoods = colony.goodsContainer.getGoods(foodType);
         try{
             wagonTrain.add(tooManyGoods);
@@ -181,7 +181,7 @@ public class UnitTest extends FreeColTestCase {
             assertEquals("Unit moves should not have been modified", initialMoves, wagonTrain.getMovesLeft());
         }
     }
-        
+
     public void testMissionary() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
@@ -190,7 +190,7 @@ public class UnitTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
         UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
-        
+
         Colony colony = getStandardColony(3);
         BuildingType churchType = spec().getBuildingType("model.building.chapel");
         Building church = colony.getBuilding(churchType);
@@ -207,7 +207,7 @@ public class UnitTest extends FreeColTestCase {
         // check mission creation
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement s = builder.player(sioux).settlementTile(tile).capital(true).isVisitedByPlayer(dutch, true).build();
-       
+
         // add the missionary
         s.setMissionary(jesuit);
         assertTrue("No missionary set",s.getMissionary() != null);
@@ -215,33 +215,33 @@ public class UnitTest extends FreeColTestCase {
         s.setMissionary(null);
         assertTrue("Missionary not removed",s.getMissionary() == null);
     }
-    
+
     public void testLineOfSight() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
         game.setMap(map);
         Player player = game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
-        
+
         UnitType frigateType = spec().getUnitType("model.unit.frigate");
         Unit frigate = new ServerUnit(game, tile, player, frigateType, UnitState.ACTIVE);
         assertEquals(2, frigate.getLineOfSight());
         assertTrue(frigate.hasAbility("model.ability.navalUnit"));
-        
+
         UnitType revengerType = spec().getUnitType("model.unit.revenger");
         Unit revenger = new ServerUnit(game, tile, player, revengerType, UnitState.ACTIVE);
         assertEquals(3, revenger.getLineOfSight());
-        
+
         Unit colonist = new ServerUnit(game, tile, player, colonistType, UnitState.ACTIVE);
         assertEquals(1, colonist.getLineOfSight());
         assertTrue(colonist.hasAbility("model.ability.canBeEquipped"));
-        
+
         EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
         assertTrue(colonist.canBeEquippedWith(horses));
         colonist.changeEquipment(horses, 1);
         assertEquals(2, colonist.getLineOfSight());
-        
-        // with Hernando De Soto, land units should see further 
+
+        // with Hernando De Soto, land units should see further
         FoundingFather father = spec().getFoundingFather("model.foundingFather.hernandoDeSoto");
         player.addFather(father);
 
@@ -249,25 +249,25 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(4, revenger.getLineOfSight()); // should get +1 bonus
         assertEquals(3, colonist.getLineOfSight()); // should get +1 bonus
     }
-    
+
     public void testDisposingUnits() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
         game.setMap(map);
         Player player = game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
-        
+
         UnitType frigateType = spec().getUnitType("model.unit.frigate");
         Unit frigate = new ServerUnit(game, tile, player, frigateType, UnitState.ACTIVE);
         Unit colonist = new ServerUnit(game, frigate, player, colonistType, UnitState.ACTIVE);
-        
+
         tile.disposeAllUnits();
         assertTrue(frigate.isDisposed());
         assertTrue(colonist.isDisposed());
         assertEquals(0, frigate.getUnitCount());
         assertEquals(0, tile.getUnitCount());
     }
-    
+
     public void testUnitCanBuildColony() {
 
         Game game = getStandardGame();
@@ -278,38 +278,38 @@ public class UnitTest extends FreeColTestCase {
         Map map = getTestMap(plains, true);
         game.setMap(map);
         Tile tile1 = map.getTile(10, 4);
-        
+
         UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
         Unit farmer = new ServerUnit(game, tile1, dutch, farmerType, UnitState.ACTIVE, farmerType.getDefaultEquipment());
         assertTrue(farmer.canBuildColony());
-        
+
         UnitType artyType = spec().getUnitType("model.unit.artillery");
         Unit arty = new ServerUnit(game, tile1, dutch, artyType, UnitState.ACTIVE, artyType.getDefaultEquipment());
         assertFalse(arty.canBuildColony());
-        
+
         UnitType shipType = spec().getUnitType("model.unit.galleon");
         Unit ship = new ServerUnit(game, tile1, dutch, shipType, UnitState.ACTIVE, shipType.getDefaultEquipment());
         assertFalse(ship.canBuildColony());
-        
+
         UnitType treasureType = spec().getUnitType("model.unit.treasureTrain");
         Unit treasure = new ServerUnit(game, tile1, dutch, treasureType,
                                        UnitState.ACTIVE,
                                        treasureType.getDefaultEquipment());
         assertFalse(treasure.canBuildColony());
-        
+
         UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
         Unit wagon = new ServerUnit(game, tile1, dutch, wagonType,
                                     UnitState.ACTIVE,
                                     wagonType.getDefaultEquipment());
         assertFalse(wagon.canBuildColony());
-        
+
         UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
         Unit indianConvert = new ServerUnit(game, tile1, dutch,
                                             indianConvertType,
                                             UnitState.ACTIVE,
                                             indianConvertType.getDefaultEquipment());
         assertFalse(indianConvert.canBuildColony());
-        
+
         UnitType braveType = spec().getUnitType("model.unit.brave");
         @SuppressWarnings("unused")
         Unit brave = new ServerUnit(game, tile1, sioux, braveType,
@@ -322,33 +322,33 @@ public class UnitTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-    	 
+
         Player indianPlayer = game.getPlayer("model.nation.sioux");
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
-         
+
         UnitType indianBraveType = spec().getUnitType("model.unit.brave");
         Unit brave = new ServerUnit(game, camp, indianPlayer, indianBraveType,
                                     UnitState.ACTIVE,
                                     indianBraveType.getDefaultEquipment());
         camp.addOwnedUnit(brave);
-         
+
         assertEquals("Brave wasnt added to camp",2, camp.getUnitCount());
         assertFalse("Brave wasnt added to player unit list",indianPlayer.getUnit(brave.getId()) == null);
-         
+
         // unit dies
         brave.dispose();
-        
+
         assertTrue("Brave wasnt disposed properly",brave.isDisposed());
         assertEquals("Brave wasnt removed from camp",1, camp.getUnitCount());
         assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
     }
-    
-    
+
+
     public void testUnitAvailability() {
         Game game = getStandardGame();
-        
+
         Player indian = game.getPlayer("model.nation.sioux");
         Player european = game.getPlayer("model.nation.dutch");
         Player king = game.getPlayer("model.nation.dutchREF");
@@ -394,7 +394,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(1, scout.getDefaultEquipment().length);
 
     }
-    
+
     public void testChangeEquipment() {
         Game game = getGame();
         game.setMap(getTestMap(true));
@@ -428,11 +428,11 @@ public class UnitTest extends FreeColTestCase {
         game.setMap(map);
 
         Tile colonyTile = map.getTile(6, 8);
-        
+
         UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
         Unit soldier = new ServerUnit(game, colonyTile, dutch, veteranType,
                                       UnitState.ACTIVE);
-        
+
         assertTrue("soldier location should be the colony tile",soldier.getLocation() == colonyTile);
         assertTrue("soldier tile should be the colony tile",soldier.getTile() == colonyTile);
         //Boolean found = false;
@@ -443,10 +443,10 @@ public class UnitTest extends FreeColTestCase {
             }
         }
         assertTrue("Unit not found in tile",found);
-        
+
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", colonyTile);
         nonServerBuildColony(soldier, colony);
-        
+
         assertFalse("soldier should be inside the colony",soldier.getLocation() == colonyTile);
         // There is some inconsistence with the results below
         // Unit.getTile() gives the location tile even though it isnt in the tile itself
@@ -457,7 +457,7 @@ public class UnitTest extends FreeColTestCase {
                 fail("Unit building colony still in tile");
             }
         }
-                
+
         found = false;
         for(WorkLocation loc : colony.getWorkLocations()){
             if(loc.getUnitList().contains(soldier)){
@@ -469,39 +469,39 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Soldier should be in a work tile in the colony",workTile != null);
         assertFalse("Soldier should not be working in central tile",workTile == colony.getColonyTile(colonyTile));
     }
-    
+
     public void testUnitLosesExperienceWithRoleChange() {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-                
+
         Player dutch = game.getPlayer("model.nation.dutch");
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch, colonistType,
                                        UnitState.ACTIVE);
-        
+
         colonist.modifyExperience(10);
         assertTrue("Colonist should some initial experience",colonist.getExperience() > 0);
 
         colonist.changeEquipment(musketsType, 1);
         assertTrue("Colonist should have lost all experience, different role",colonist.getExperience() == 0);
-        
+
         colonist.modifyExperience(10);
         colonist.changeEquipment(horsesType, 1);
         assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
     }
 
-    
+
     public void testOwnerChange(){
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-                
+
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
-        
+
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch, colonistType,
                                        UnitState.ACTIVE);
-        
+
         assertTrue("Colonist should be dutch",colonist.getOwner() == dutch);
         assertTrue("Dutch player should have 1 unit",dutch.getUnits().size() == 1);
         assertTrue("French player should have no units",french.getUnits().size() == 0);
@@ -511,15 +511,15 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Dutch player should have no units",dutch.getUnits().size() == 0);
         assertTrue("French player should have 1 unit",french.getUnits().size() == 1);
     }
-    
+
     public void testCarrierOwnerChange(){
         Game game = getStandardGame();
         Map map = getTestMap(ocean);
         game.setMap(map);
-                
+
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
-        
+
         Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch, galleonType,
                                       UnitState.ACTIVE);
         assertTrue("Galleon should be empty",galleon.getUnitCount() == 0);
@@ -528,12 +528,12 @@ public class UnitTest extends FreeColTestCase {
                                        UnitState.SENTRY);
         assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
         assertEquals("Wrong number of units th galleon is carrying",1,galleon.getUnitCount());
-        
+
         assertTrue("Colonist should be dutch",galleon.getOwner() == dutch);
         assertTrue("Colonist should be dutch",colonist.getOwner() == dutch);
         assertTrue("Dutch player should have 2 units",dutch.getUnits().size() == 2);
         assertTrue("French player should have no units",french.getUnits().size() == 0);
-        
+
         // change carrier owner
         galleon.setOwner(french);
         assertTrue("Galleon should be french",galleon.getOwner() == french);
@@ -548,7 +548,7 @@ public class UnitTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-        
+
         Colony colony = getStandardColony(1);
         Unit unit = colony.getUnitList().get(0);
         String initial = "/" + Integer.toString(unit.getInitialMovesLeft() / 3);
@@ -564,6 +564,41 @@ public class UnitTest extends FreeColTestCase {
             String actualString = unit.getMovesAsString();
             assertEquals(expectedString + " != " + actualString, expectedString, actualString );
         }
+    }
+
+    public void testTreasureTransportFee() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        Unit treasureTrain = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.treasureTrain"),
+                                            UnitState.ACTIVE);
+        treasureTrain.setTreasureAmount(6000);
+
+        spec().applyDifficultyLevel("model.difficulty.veryEasy");
+        assertEquals(50 * 60, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.easy");
+        assertEquals(55 * 60, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.medium");
+        assertEquals(60 * 60, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.hard");
+        assertEquals(65 * 60, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.veryHard");
+        assertEquals(70 * 60, treasureTrain.getTransportFee());
+
+        dutch.addFather(spec().getFoundingFather("model.foundingFather.hernanCortes"));
+
+        spec().applyDifficultyLevel("model.difficulty.veryEasy");
+        assertEquals(0, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.easy");
+        assertEquals(0, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.medium");
+        assertEquals(0, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.hard");
+        assertEquals(0, treasureTrain.getTransportFee());
+        spec().applyDifficultyLevel("model.difficulty.veryHard");
+        assertEquals(0, treasureTrain.getTransportFee());
+
     }
 
 }
