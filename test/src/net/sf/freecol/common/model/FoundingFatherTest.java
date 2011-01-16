@@ -95,14 +95,14 @@ public class FoundingFatherTest extends FreeColTestCase {
     public void testPeterStuyvesant() {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
-        
+
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
-        
+
         // The custom house is not buildable initially
         BuildableType customHouse = spec().getBuildingType("model.building.customHouse");
         assertFalse(colony.canBuild(customHouse));
-        
+
         // But it should become available after Peter Stuyvesant has joined continental congress
         FoundingFather father = spec().getFoundingFather("model.foundingFather.peterStuyvesant");
         player.addFather(father);
@@ -113,10 +113,10 @@ public class FoundingFatherTest extends FreeColTestCase {
         // check that all fathers can be added
     	Game game = getGame();
     	game.setMap(getTestMap(true));
-    	
+
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
-        
+
         for (FoundingFather father : spec().getFoundingFathers()) {
             player.addFather(father);
         }
@@ -125,7 +125,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     public void testMinuit() {
         Game game = getGame();
         game.setMap(getTestMap(true));
-    	
+
         Colony colony = getStandardColony();
         Unit unit = colony.getRandomUnit();
         Player player = colony.getOwner();
@@ -157,12 +157,12 @@ public class FoundingFatherTest extends FreeColTestCase {
     public void testPaine() {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
-    	
+
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         GoodsType bells = spec().getGoodsType("model.goods.bells");
         Building townHall = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
-        
+
         Unit statesman1 = colony.getUnitList().get(0);
         Unit statesman2 = colony.getUnitList().get(1);
         Unit statesman3 = colony.getUnitList().get(2);
@@ -187,7 +187,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
         assertTrue(player.hasAbility("model.ability.addTaxToBells"));
         assertFalse(player.getFeatureContainer().getModifierSet("model.goods.bells").isEmpty());
-                   
+
         player.setTax(30);
         // TODO: find out why the following changes anything
         colony.getModifierSet("model.goods.bells");
@@ -195,27 +195,27 @@ public class FoundingFatherTest extends FreeColTestCase {
         int expected = (int) (3 * 6 * 1.3f + 1);
         assertEquals(expected, townHall.getProductionOf(bells));
     }
-    
+
     public void testRevere() {
         Game game = getGame();
         game.setMap(getTestMap());
-        
+
         Colony colony = getStandardColony();
         Player player = colony.getOwner();
         Unit colonist = colony.getRandomUnit();
-           
+
         String errMsg = "Unit should not be able to automatically arm, Revere not in congress yet";
         assertTrue(errMsg, colonist.getAutomaticEquipment() == null);
-        
+
         // adding Revere to congress
         FoundingFather father = spec().getFoundingFather("model.foundingFather.paulRevere");
         player.addFather(father);
 
         errMsg = "Unit should not be able to automatically arm, no muskets available";
         assertTrue(errMsg, colonist.getAutomaticEquipment() == null);
-        
+
         colony.addGoods(musketsType, 100);
-        
+
         errMsg = "Unit be able to automatically arm, has muskets and Paul Revere";
         assertFalse(errMsg, colonist.getAutomaticEquipment() == null);
     }
