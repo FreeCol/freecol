@@ -774,6 +774,18 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Try to use a tile.  Steal it if necessary.
+     *
+     * @param tile The <code>Tile</code> to use.
+     * @return True if the tile can be used.
+     */
+    private boolean tryUseTile(Tile tile) {
+        if (tile.getOwningSettlement() == colony) return true;
+        return colony.getOwner().canClaimForSettlement(tile)
+            && AIMessage.askClaimLand(getConnection(), tile, colony, 0)
+            && tile.getOwningSettlement() == colony;
+    }
 
     /**
      * Find a colony's best tile to put a unit to produce a type of
@@ -791,13 +803,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Check if the tile needs to be claimed from another settlement.
         Tile tile = colonyTile.getWorkTile();
-        if (tile.getOwningSettlement() != colony) {
-            if (!AIMessage.askClaimLand(getConnection(), tile, colony, 0)
-                || tile.getOwningSettlement() != colony) {
-                return null; // Claim failed.
-            }
-        }
-        return colonyTile;
+        return (tryUseTile(tile)) ? colonyTile : null;
     }
 
     /**
@@ -1394,6 +1400,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 GoodsType locGoods = wlp.getGoodsType();
 
                 boolean isColonyTile = wl instanceof ColonyTile;
+
+                // Sanity check.  Make sure the tile is usable by this colony.
+                if (isColonyTile
+                    && !tryUseTile(((ColonyTile)wl).getTile())) continue;
+
                 boolean isLand = true;
                 if(isColonyTile){
                     isLand = ((ColonyTile) wl).getWorkTile().isLand();
