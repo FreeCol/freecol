@@ -217,12 +217,12 @@ public final class EuropePanel extends FreeColPanel {
         // at the moment, there is no room for the header
         // add(header, "span, center");
         add(toAmericaScroll);
+        add(docksScroll, "spany 4");
+        add(logScroll, "spany 4");
         add(toEuropeScroll);
         add(inPortScroll);
         add(cargoScroll);
-        add(docksScroll, "spany 4");
         add(marketScroll, "span");
-        add(logScroll, "spany 4");
 
         add(recruitButton, "span, split 6");
         add(purchaseButton);
