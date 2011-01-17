@@ -685,7 +685,9 @@ public class TransportMission extends Mission {
             }
 
             // unit already at location
-            if(destLoc == unit.getLocation()){
+            if (destLoc == unit.getLocation()
+                || (destLoc instanceof Colony
+                    && destLoc.getTile() == unit.getTile())) {
                 return new Destination();
             }
 
@@ -711,57 +713,49 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Gets the default destination for the unit of this mission
-     * First check the nearest colony
-     * if no colony is available, try Europe
-     * @return a <code>Destination</code> value
+     * Gets the current default destination for the unit of this mission.
+     *
+     * @return The default <code>Destination</code> for the unit.
      */
     Destination getDefaultDestination() {
-		Unit unit = getUnit();
-		PathNode path = null;
+        Unit unit = getUnit();
+        PathNode path = null;
 		
-		// If in Europe, stay in Europe
-		if(unit.getLocation() instanceof Europe){
-			return new Destination();
-		}
+        // If in Europe, stay in Europe
+        if (unit.getLocation() instanceof Europe) {
+            return new Destination();
+        }
 		
-		// sanitation
-		if(unit.getTile() == null){
-			throw new IllegalStateException("Cannot find unit " + unit.getId() + " location");
-		}
+        // Otherwise should be on the map
+        if (unit.getTile() == null) {
+            throw new IllegalStateException("Unit not on the map: "
+                                            + unit.getId());
+        }
 		
-		//Already at a settlement
-		if(unit.getSettlement() != null){
-			return new Destination();
-		}
+        // Already at a settlement
+        if (unit.getSettlement() != null) {
+            return new Destination();
+        }
 		
-		path = findNearestColony(unit);
-		if(path != null){
-			return new Destination(false,path);
-		}
+        // Try nearest colony
+        if ((path = findNearestColony(unit)) != null) {
+            return new Destination(false, path);
+        }
 		
-		// Should try Europe second
-		if(unit.isNaval() && unit.getOwner().getEurope() != null){
-			//Already at Europe
-			if(unit.getLocation() instanceof Europe){
-				return new Destination();
-			}
-			logger.finest("Trying to find move to Europe");
-			boolean canMoveToEurope = unit.canMoveToEurope();
-			if(!canMoveToEurope){
-				path = findPathToEurope(unit.getTile());
-				if(path != null){
-					canMoveToEurope = true;
-				}
-			}
-			if(canMoveToEurope){
-				return new Destination(true,path);
-			}
-		}
-		
-		logger.warning("Could not get default destination for " + unit);
-		return null;
-	}
+        // Try Europe
+        if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
+            if (unit.canMoveToEurope()) {
+                return new Destination(true, null);
+            }
+            if ((path = findPathToEurope(unit.getTile())) != null) {
+                return new Destination(true, path);
+            }
+        }
+
+        // Can fail intermittantly.  For example: up river and blocked in.
+        logger.warning("Could not get default destination for " + unit);
+        return null;
+    }
 
 	/**
      * Buys cargo (units and goods) when the carrier is in <code>Europe</code>.
@@ -1111,15 +1105,8 @@ public class TransportMission extends Mission {
                 path.getTransportDropNode().previous.next = null;
             }
         } else {
-            try {
-                path = getGame().getMap().findPath(carrier, start.getTile(), destination.getTile());
-            } catch (IllegalArgumentException e) {
-                logger.warning("findPath(" + carrier
-                               + ", " + start.getTile()
-                               + ", " + destination.getTile()
-                               + ") failed: " + e.getMessage());
-                path = null;
-            }
+            path = getGame().getMap().findPath(carrier, start.getTile(),
+                                               destination.getTile());
         }
 
         return path;
