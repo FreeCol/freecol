@@ -1403,7 +1403,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
                 // Sanity check.  Make sure the tile is usable by this colony.
                 if (isColonyTile
-                    && !tryUseTile(((ColonyTile)wl).getTile())) continue;
+                    && !tryUseTile(((ColonyTile)wl).getWorkTile())) continue;
 
                 boolean isLand = true;
                 if(isColonyTile){
