@@ -210,7 +210,8 @@ public class BuildColonyMission extends Mission {
                         colony.getColonyTile(target).relocateWorkers();
                     }
                 } else { // Not our tile, claim it first
-                    if (!AIMessage.askClaimLand(connection, target, null, 0)
+                    if (!player.canClaimToFoundSettlement(target)
+                        || !AIMessage.askClaimLand(connection, target, null, 0)
                         || target.getOwner() != player) {
                         target = null; // Try a different one
                         return;

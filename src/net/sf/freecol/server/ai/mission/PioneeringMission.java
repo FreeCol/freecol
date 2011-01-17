@@ -331,10 +331,14 @@ public class PioneeringMission extends Mission {
             // Decide whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
             int price = player.getLandPrice(target);
-            if (price > 0 && player.getGold() < price) {
-                price = ClaimLandMessage.STEAL_LAND;
+            if (price < 0) {
+                ; // fail
+            } else {
+                if (price > 0 && player.getGold() < price) {
+                    price = ClaimLandMessage.STEAL_LAND;
+                }
+                AIMessage.askClaimLand(connection, target, null, price);
             }
-            AIMessage.askClaimLand(connection, target, null, price);
         }
         if (target.getOwner() != player) {
             // Failed to take ownership
