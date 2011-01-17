@@ -672,13 +672,17 @@ public class ChangeSet {
 
         /**
          * Should a player perhaps be notified of this removal?
+         * They should if they can see the tile, and there is no
+         * other-player settlement present.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
          * @return True if the player should be notified.
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return tile != null && serverPlayer.canSee(tile);
+            return tile != null && serverPlayer.canSee(tile)
+                && (tile.getSettlement() == null
+                    || (ServerPlayer) tile.getSettlement().getOwner() == serverPlayer);
         }
 
         /**
