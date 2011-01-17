@@ -138,8 +138,8 @@ public class CashInTreasureTrainMission extends Mission {
                     CostDeciders.avoidSettlementsAndBlockingUnits(),
                     Integer.MAX_VALUE);
             if (bestPath != null) {
-                Direction direction = moveTowards(connection, bestPath);
-                moveButDontAttack(connection, direction);
+                Direction r = moveTowards(bestPath);
+                if (r == null || !moveButDontAttack(r)) return;
             }
         }
         

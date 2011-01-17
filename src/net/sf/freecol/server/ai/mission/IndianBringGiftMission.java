@@ -138,8 +138,8 @@ public class IndianBringGiftMission extends Mission {
         if (!hasGift()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
-                Direction r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
-                moveButDontAttack(connection, r);
+                Direction r = moveTowards(getUnit().getIndianSettlement().getTile());
+                if (r == null || !moveButDontAttack(r)) return;
             } else {
                 IndianSettlement is = getUnit().getIndianSettlement();
                 // Load the goods:
@@ -161,9 +161,9 @@ public class IndianBringGiftMission extends Mission {
             }
         } else {
             // Move to the target's colony and deliver
-            Direction r = moveTowards(connection, target.getTile());
-            if (r != null && 
-                getUnit().getTile().getNeighbourOrNull(r) == target.getTile()) {
+            Direction r = moveTowards(target.getTile());
+            if (r != null
+                && getUnit().getTile().getNeighbourOrNull(r) == target.getTile()) {
                 // We have arrived.
                 if (AIMessage.askGetTransaction(getAIUnit(), target)
                     && AIMessage.askDeliverGift(getAIUnit(), target,

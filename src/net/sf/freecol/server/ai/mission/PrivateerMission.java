@@ -152,14 +152,14 @@ public class PrivateerMission extends Mission {
             logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " found target at " + target);
             // We need to find an updated path to target
             pathToTarget = unit.findPath(target);
-            Direction direction = moveTowards(connection, pathToTarget);
-            if(direction == null){
-            	// some movement points may still remain
-            	//due to some block or just not enough points for next node
-            	// we need to make sure the unit has no points left, 
-            	//so the game can move to next unit
-            	logger.finest("Ending privateer (" + unit.getId() + ") turn, moves=" + unit.getMovesLeft());
-            	unit.setMovesLeft(0);
+            Direction direction = moveTowards(pathToTarget);
+            if (direction == null) {
+                // some movement points may still remain due to some
+                // block or just not enough points for next node we need
+                // to make sure the unit has no points left, so the game
+                // can move to next unit
+                logger.finest("Ending privateer (" + unit.getId() + ") turn, moves=" + unit.getMovesLeft());
+                unit.setMovesLeft(0);
                 return;
             }
             // catch up with the prey
@@ -206,16 +206,10 @@ public class PrivateerMission extends Mission {
         }
         
         boolean moveToEurope = nearestPort instanceof Europe;
-        
-        Direction direction = moveTowards(connection, path);        
-        
-        if(direction == null){
-            // some movement points may still remain
-        	//due to some block or just not enough points for next node
-        	// we need to make sure the unit has no points left, 
-        	//so the game can move to next unit
-        	unit.setMovesLeft(0);
-        	return;
+        Direction direction = moveTowards(path);
+        if (direction == null) {
+            unit.setMovesLeft(0);
+            return;
         }
         
         if (moveToEurope && unit.getMoveType(direction) == MoveType.MOVE_HIGH_SEAS) {

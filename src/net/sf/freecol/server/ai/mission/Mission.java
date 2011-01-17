@@ -86,79 +86,72 @@ public abstract class Mission extends AIObject {
         this.aiUnit = aiUnit;   
     }
 
-    
     /**
-    * Moves the unit owning this mission towards the given <code>Tile</code>.
-    * This is done in a loop until the tile is reached, there are no moves left,
-    * the path to the target cannot be found or that the next step is not a move.
-    *
-    * @param connection The <code>Connection</code> to use
-    *         when communicating with the server.
-    * @param tile The <code>Tile</code> the unit should move towards.
-    * @return The direction to take the final move (greater than or equal to zero),
-    *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left and
-    *         {@link #NO_PATH_TO_TARGET} if there is no path to follow.
-    *         If a direction is returned, it is guaranteed that moving in that direction
-    *         is not an illegal move, but a direction also gets returned
-    *         if the resulting move would be an {@link MoveType#ATTACK} etc. A direction
-    *         can also be returned during the path, if the path has been blocked.
-    */
-    protected Direction moveTowards(Connection connection, Tile tile) {
+     * Moves the unit owning this mission towards the given
+     * <code>Tile</code>.  This is done in a loop until the tile is
+     * reached, there are no moves left, the path to the target cannot
+     * be found or that the next step is not a move.
+     *
+     * @param tile The <code>Tile</code> the unit should move towards.
+     * @return The direction to take the final move or null if the
+     *     move can not be made.
+     */
+    protected Direction moveTowards(Tile tile) {
         PathNode pathNode = getUnit().findPath(tile);
-        
-        if (pathNode != null) {
-            return moveTowards(connection, pathNode);
-        } else {
-            return null;
-        }
+        return (pathNode == null) ? null : moveTowards(pathNode);
     }
 
-
     /**
-    * Moves the unit owning this mission using the given <code>pathNode</code>.
-    * This is done in a loop until the end of the path is reached, the next step is not a move
-    * or when there are no moves left.
-    *
-    * @param connection The <code>Connection</code> to use
-    *         when communicating with the server.
-    * @param pathNode The first node of the path.
-    * @return The direction to continue moving the path (greater than or equal to zero),
-    *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
-    *         If a direction is returned, it is guaranteed that moving in that direction
-    *         is not an illegal move. A directions gets returned when
-    *         moving in the given direction would not be a {@link MoveType#MOVE} or
-    *         {@link MoveType#MOVE_HIGH_SEAS}.
-    */
-    protected Direction moveTowards(Connection connection, PathNode pathNode) {
+     * Moves the unit owning this mission using the given path.  This
+     * is done in a loop until the end of the path is reached, the
+     * next step is not a move or when there are no moves left.
+     *
+     * @param pathNode The first node of the path.
+     * @return The direction to continue moving the path or null if the
+     *     move can not be made.
+     */
+    protected Direction moveTowards(PathNode pathNode) {
         if (getUnit().getMovesLeft() <= 0) {            
             return null;
         }
         
-        while (pathNode.next != null 
-               && pathNode.getTurns() == 0
-               && this.isValid() == true
-               && getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
-            AIMessage.askMove(aiUnit, pathNode.getDirection());
+        while (pathNode.next != null && pathNode.getTurns() == 0) {
+            if (!isValid()) {
+                return null;
+            }
+            if (!getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
+                break;
+            }
+            if (!AIMessage.askMove(aiUnit, pathNode.getDirection())) {
+                return null;
+            }
             pathNode = pathNode.next;
         }
-        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()).isLegal()) {
-            return pathNode.getDirection();
-        }
-        return null;
+        return (pathNode.getTurns() == 0
+                && getUnit().getMoveType(pathNode.getDirection()).isLegal())
+            ? pathNode.getDirection()
+            : null;
     }
 
+    /**
+     * Move a unit randomly.
+     *
+     * @param connection The <code>Connection</code> to use
+     *         when communicating with the server.
+     */
     protected void moveRandomly(Connection connection) {
         Unit unit = getUnit();
-        Direction[] randomDirections = Direction.getRandomDirectionArray(getAIRandom());
-        while (unit.getMovesLeft() > 0) {
+        Direction[] randomDirections
+            = Direction.getRandomDirectionArray(getAIRandom());
+
+        while (isValid() && unit.getMovesLeft() > 0) {
             Tile thisTile = getUnit().getTile();
-            int j;
-            for (j = 0; j < randomDirections.length; j++) {
+            for (int j = 0; j < randomDirections.length; j++) {
                 Direction direction = randomDirections[j];
                 if (thisTile.getNeighbourOrNull(direction) != null
-                    && unit.getMoveType(direction) == MoveType.MOVE) {
-                    AIMessage.askMove(aiUnit, direction);
-                    continue;
+                    && unit.getMoveType(direction) == MoveType.MOVE
+                    && AIMessage.askMove(aiUnit, direction)) {
+                    break;
                 }
             }
             unit.setMovesLeft(0);
@@ -175,12 +168,22 @@ public abstract class Mission extends AIObject {
     }
     
     
-    protected void moveButDontAttack(Connection connection, Direction direction) {
-        if (direction != null) {
-            if (getUnit().getMoveType(direction).isProgress()) {
-                AIMessage.askMove(aiUnit, direction);
-            }
+    /**
+     * Move in a specified direction, but do not attack.
+     * Always check the return from this in case the unit blundered into
+     * a lost city and died.
+     * The usual idiom is: "if (!moveButDontAttack(unit)) return;"
+     *
+     * @param direction The <code>Direction</code> to move.
+     * @return True if the unit doing this mission is still valid/alive.
+     */
+    protected boolean moveButDontAttack(Direction direction) {
+        if (direction != null
+            && getUnit() != null
+            && getUnit().getMoveType(direction).isProgress()) {
+            AIMessage.askMove(aiUnit, direction);
         }
+        return getUnit() != null && !getUnit().isDisposed();
     }
     
     /**
@@ -365,20 +368,17 @@ public abstract class Mission extends AIObject {
 
 
     /**
-    * Checks if this mission is still valid to perform.
-    *
-    * <BR><BR>
-    *
-    * A mission can be invalidated for a number of reasons. For example:
-    * a seek-and-destroy mission can be invalidated in case the
-    * relationship towards the targeted player improves.
-    * 
-    * @return The default value: <code>true</code>.
-    */
+     * Checks if this mission is still valid to perform.
+     *
+     * A mission can be invalidated for a number of reasons. For example:
+     * a seek-and-destroy mission can be invalidated in case the
+     * relationship towards the targeted player improves.
+     *
+     * @return True if the unit is still intact.
+     */
     public boolean isValid() {
         if (getUnit() != null && getUnit().isDisposed()) {
-            // an AI unit can move accidentally into a lost city ruin and get killed
-            // the mission is was associated with should become invalid 
+            // If the unit was killed then the mission becomes invalid.
             return false;
         }
         return true;

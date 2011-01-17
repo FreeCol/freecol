@@ -131,8 +131,8 @@ public class WishRealizationMission extends Mission {
         // Move towards the target.
         if (getUnit().getTile() != null) {
             if (wish.getDestination().getTile() != getUnit().getTile()) {
-                Direction r = moveTowards(connection, wish.getDestination().getTile());
-                moveButDontAttack(connection, r);
+                Direction r = moveTowards(wish.getDestination().getTile());
+                if (r == null || !moveButDontAttack(r)) return;
             }
             if (wish.getDestination().getTile() == getUnit().getTile()) {
                 if (wish.getDestination() instanceof Colony) {

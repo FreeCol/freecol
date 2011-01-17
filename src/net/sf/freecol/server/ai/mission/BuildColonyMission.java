@@ -194,8 +194,8 @@ public class BuildColonyMission extends Mission {
         // Move towards the target.
         if (unit.getTile() != null) {
             if (target != unit.getTile()) {
-                Direction r = moveTowards(connection, target);
-                moveButDontAttack(connection, r);
+                Direction r = moveTowards(target);
+                if (r == null || !moveButDontAttack(r)) return;
             }
             if (unit.canBuildColony()
                 && target == unit.getTile()

@@ -107,9 +107,9 @@ public class UnitWanderHostileMission extends Mission {
         }
         
         if (pathToTarget != null) {
-            Direction direction = moveTowards(connection, pathToTarget);
-            if (direction != null &&
-                unit.getMoveType(direction) == MoveType.ATTACK) {
+            Direction direction = moveTowards(pathToTarget);
+            if (direction != null
+                && unit.getMoveType(direction) == MoveType.ATTACK) {
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         } else {

@@ -173,7 +173,7 @@ public class ScoutingMission extends Mission {
 
             if (bestPath != null) {
                 transportDestination = null;
-                Direction direction = moveTowards(connection, bestPath);
+                Direction direction = moveTowards(bestPath);
                 if (direction != null) {
                     final MoveType mt = getUnit().getMoveType(direction);
                     if (mt == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {

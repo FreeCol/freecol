@@ -484,9 +484,9 @@ public class TransportMission extends Mission {
         }
         final PathNode pathToTarget = findNavalTarget(0);
         if (pathToTarget != null) {
-            final Direction direction = moveTowards(connection, pathToTarget);
-            if (direction != null &&
-                    carrier.getMoveType(direction) == MoveType.ATTACK) {
+            final Direction direction = moveTowards(pathToTarget);
+            if (direction != null
+                && carrier.getMoveType(direction) == MoveType.ATTACK) {
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         }
@@ -638,22 +638,20 @@ public class TransportMission extends Mission {
             // Move towards the next target:
             PathNode path = destination.getPath();
             boolean moveToEurope = destination.moveToEurope();
-            Direction r = moveTowards(connection, path);
+            Direction r = moveTowards(path);
             if (r != null && carrier.getMoveType(r).isProgress()) {
-            	// Tile target = getGame().getMap().getNeighbourOrNull(r,
-            	// carrier.getTile());
-            	if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
-            		moveUnitToEurope();
-            	} else {
-                  AIMessage.askMove(getAIUnit(), r);
-            	}
+                if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
+                    moveUnitToEurope();
+                } else {
+                    AIMessage.askMove(getAIUnit(), r);
+                }
 
-            	if (!(carrier.getLocation() instanceof Europe)) {
-            		moreWork = true;
-            	}
+                if (!(carrier.getLocation() instanceof Europe)) {
+                    moreWork = true;
+                }
             }
             if (r != null) {
-            	attackIfEnemyShipIsBlocking(connection, r);
+                attackIfEnemyShipIsBlocking(connection, r);
             }
             transportListChanged = restockCargoAtDestination(connection);
             attackEnemyShips(connection);

@@ -302,7 +302,7 @@ public class PioneeringMission extends Mission {
                 return; 
             }
 
-            Direction direction = moveTowards(connection, pathToTarget);
+            Direction direction = moveTowards(pathToTarget);
             if (direction != null
                 && unit.getMoveType(direction).isProgress()) {
                 AIMessage.askMove(getAIUnit(), direction);
@@ -388,8 +388,8 @@ public class PioneeringMission extends Mission {
                 return;
             }
 
-            Direction direction = moveTowards(connection, path);
-            moveButDontAttack(connection, direction);
+            Direction direction = moveTowards(path);
+            if (direction == null || !moveButDontAttack(direction)) return;
 
             // not there yet, remove any moves left 
             if(unit.getTile() != colonyWithTools.getTile()){

@@ -107,10 +107,8 @@ public class IdleAtColonyMission extends Mission {
             PathNode pathToTarget = findNearestColony(unit);
         
             if (pathToTarget != null) {
-                Direction dir = moveTowards(connection, pathToTarget);
-                if (dir != null) {
-                    moveButDontAttack(connection, dir);
-                }            
+                Direction r = moveTowards(pathToTarget);
+                if (r == null || !moveButDontAttack(r)) return;
             } else {
                 // Just make a random move if no target can be found.
                 moveRandomly(connection);

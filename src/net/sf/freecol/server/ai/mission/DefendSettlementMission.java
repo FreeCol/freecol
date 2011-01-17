@@ -162,8 +162,8 @@ public class DefendSettlementMission extends Mission {
             
         if (unit.getTile() != settlement.getTile()) {
             // Move towards the target.
-            Direction r = moveTowards(connection, settlement.getTile());
-            moveButDontAttack(connection, r);
+            Direction r = moveTowards(settlement.getTile());
+            if (r == null || !moveButDontAttack(r)) return;
         } else {
             if (unit.getState() != UnitState.FORTIFIED
                     && unit.getState() != UnitState.FORTIFYING

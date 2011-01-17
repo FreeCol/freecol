@@ -122,8 +122,8 @@ public class IndianDemandMission extends Mission {
         if (hasTribute()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
-                Direction r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
-                moveButDontAttack(connection, r);
+                Direction r = moveTowards(getUnit().getIndianSettlement().getTile());
+                if (r == null || !moveButDontAttack(r)) return;
             } else {
                 // Unload the goods
                 GoodsContainer container = getUnit().getGoodsContainer();
@@ -139,9 +139,9 @@ public class IndianDemandMission extends Mission {
         } else {
             // Move to the target's colony and demand
             Unit unit = getUnit();
-            Direction r = moveTowards(connection, target.getTile());
-            if (r != null &&
-                unit.getTile().getNeighbourOrNull(r) == target.getTile()
+            Direction r = moveTowards(target.getTile());
+            if (r != null
+                && unit.getTile().getNeighbourOrNull(r) == target.getTile()
                 && unit.getMovesLeft() > 0) {
                 // We have arrived.
                 Player enemy = target.getOwner();
