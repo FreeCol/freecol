@@ -315,18 +315,12 @@ public class ScoutingMission extends Mission {
 
     /**
      * Checks if this mission is still valid to perform.
+     * Unit must be mounted.
      * 
-     * @return <code>true</code> if this mission is still valid to perform and
-     *         <code>false</code> otherwise.
+     * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
-        Unit unit = getUnit();
-        // unit no longer has horses and not in a colony where it may get some
-        // cannot fulfill role of scout anymore
-        if (!unit.isMounted() && unit.getTile().getColony() == null) {
-            return false;
-        }
-        return valid && super.isValid();
+        return super.isValid() && getUnit().isMounted();
     }
 
     /**

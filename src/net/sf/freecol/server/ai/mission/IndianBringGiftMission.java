@@ -196,19 +196,19 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Checks if this mission is still valid to perform.
      * 
-     * <BR>
-     * <BR>
-     * 
      * This mission will be invalidated when the gift has been delivered. In
      * case of the stances {@link Stance#WAR WAR} or
      * {@link Stance#CEASE_FIRE CEASE_FIRE} towards the target player, the
      * mission would be invalidated as well.
      * 
-     * @return <code>true</code> if this mission is still valid.
+     * @return True if this mission is still valid.
      */
     public boolean isValid() {
-        return target != null && !target.isDisposed() && target.getTile().getColony() == target && !completed
-            && isValidMission(getUnit().getOwner(), target.getOwner()) && getUnit().getIndianSettlement() != null;
+        return super.isValid() && !completed
+            && target != null && !target.isDisposed()
+            && target.getTile().getColony() == target
+            && isValidMission(getUnit().getOwner(), target.getOwner())
+            && getUnit().getIndianSettlement() != null;
     }
 
     /**

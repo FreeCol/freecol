@@ -200,42 +200,25 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
     
     /**
-    * Check to see if this is a valid hostility with a valid target.
-    * @return <code>true</code> if this mission is valid.
+     * Check to see if this is a valid hostility with a valid target.
+     *
+     * @return True if this mission is valid.
     */
-    @Override
-	public boolean isValid() {
+    public boolean isValid() {
         Player owner = getUnit().getOwner();
         Player targetPlayer;
-        if (target == null) {
-            return false;
-        }     
-        if (((FreeColGameObject) target).isDisposed()) {
-            return false;
-        }
-        if (target.getTile() == null) {
-            return false;
-        }
-        if (!getUnit().isOffensiveUnit()) {
-            return false;
-        }
-        
-        // do not pursue units in colonies
-        if (target instanceof Unit && 
-            target.getTile().getSettlement() != null){
-        		return false;
-        }
 
-        targetPlayer = ((Ownable) target).getOwner();
-        if (targetPlayer == null) {
-            return false;
-        }
-        Stance stance = owner.getStance(targetPlayer);
-
-        return targetPlayer != owner &&
-            (stance == Stance.WAR 
-             || owner.isIndian() 
-             && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.CONTENT) >= 0);
+        return super.isValid()
+            && target != null && !((FreeColGameObject)target).isDisposed()
+            && target.getTile() != null
+            && getUnit().isOffensiveUnit()
+            && !(target instanceof Unit
+                 && target.getTile().getSettlement() != null)
+            && (targetPlayer = ((Ownable)target).getOwner()) != null
+            && targetPlayer != owner
+            && (owner.getStance(targetPlayer) == Stance.WAR
+                || (owner.isIndian()
+                    && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.CONTENT) >= 0));
     }
 
     

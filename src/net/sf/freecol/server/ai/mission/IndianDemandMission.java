@@ -304,10 +304,11 @@ public class IndianDemandMission extends Mission {
      * This mission will be invalidated when complete, if the home settlement
      * is gone, the target is gone, or tension reduces to happy.
      * 
-     * @return <code>true</code> if this mission is still valid.
+     * @return True if this mission is still valid.
      */
     public boolean isValid() {
-        return !completed && getUnit().getIndianSettlement() != null
+        return super.isValid() && !completed
+            && getUnit().getIndianSettlement() != null
             && (hasTribute()
                 || (target != null && !target.isDisposed()
                     && target.getTile().getColony() == target

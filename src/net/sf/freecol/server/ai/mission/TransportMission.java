@@ -1407,15 +1407,7 @@ public class TransportMission extends Mission {
      * @return <code>true</code>
      */
     public boolean isValid() {
-        if(!super.isValid()){
-            return false;
-        }
-        
-        AIUnit aiUnit = getAIUnit(); 
-        if(!isValid(aiUnit)){
-            return false;
-        }
-        return true;
+        return super.isValid() && isValid(getAIUnit());
     }
 
     /**

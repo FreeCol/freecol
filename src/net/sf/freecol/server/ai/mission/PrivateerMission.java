@@ -330,41 +330,22 @@ public class PrivateerMission extends Mission {
      */    
     public static boolean isValid(AIUnit aiUnit) {
         Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed() || !unit.hasAbility("model.ability.piracy" )){
-            return false;
-        }
-        
-        if(unit.isNaval() && unit.isUnderRepair()){
-        	return false;
-        }
-        
-        if(!(aiUnit.getMission() instanceof PrivateerMission) 
-        		&& (unit.getGoodsCount() > 0 || unit.getUnitCount() > 0)){
-        	return false;
-        }
-        
         AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(unit.getOwner().getId());
-        // we have no other naval transport, cannot do privateering
-        if(TransportMission.getPlayerNavalTransportMissionCount(aiPlayer, unit) == 0){
-        	logger.finest("Player has no other naval units than this one");
-            return false;
-        }
-        return true;
+        return unit != null
+            && unit.isNaval() && unit.hasAbility("model.ability.piracy")
+            && !unit.isUnderRepair()
+        		&& unit.getGoodsCount() == 0
+            && unit.getUnitCount() == 0
+            && TransportMission.getPlayerNavalTransportMissionCount(aiPlayer, unit) != 0;
     }
     
     /**
      * Checks if this mission is still valid to perform.
      * 
-     * @return <code>true</code>
+     * @return True if the mission is still valid.
      */
     public boolean isValid() {
-    	if(!isValid(getAIUnit())){
-    		return false;
-    	}
-    	if(invalidateMission){
-    		return false;
-    	}
-        return true;
+        return super.isValid() && !isValid(getAIUnit());
     }
 
     /**

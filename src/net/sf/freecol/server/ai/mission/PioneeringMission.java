@@ -491,28 +491,6 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Checks if this mission is still valid to perform.
-     *
-     * @return <code>true</code> if this mission is still valid to perform
-     *         and <code>false</code> otherwise.
-     */
-    public boolean isValid() {
-        if(getUnit().getTile() == null){
-            return false;
-        }
-        
-        switch(state){
-        case GET_TOOLS:
-            validateColonyWithTools();
-            break;
-        case IMPROVING:
-            updateTileImprovementPlan();
-            break;
-        }        
-        return !invalidateMission;
-    }
-
-    /**
      * Checks if this mission is valid for the given unit.
      *
      * @param aiUnit The unit.
@@ -633,6 +611,40 @@ public class PioneeringMission extends Mission {
             }
         }
         return list;
+    }
+
+    /**
+     * Checks if this mission is still valid to perform.
+     *
+     * @return True if this mission is still valid to perform.
+     */
+    public boolean isValid() {
+        if (!super.isValid()
+            || getUnit().getTile() == null
+            || invalidateMission) return false;
+
+        switch (state) {
+        case GET_TOOLS:
+            EquipmentType toolsType = getAIMain().getGame()
+                .getSpecification().getEquipmentType("model.equipment.tools");
+            if (colonyWithTools == null
+                || colonyWithTools.isDisposed()
+                || colonyWithTools.getOwner() != getUnit().getOwner()
+                || !colonyWithTools.canBuildEquipment(toolsType)) {
+                return findColonyWithTools(getAIUnit()) != null;
+            }
+            break;
+        case IMPROVING:
+            Tile target = (tileImprovementPlan == null) ? null
+                : tileImprovementPlan.getTarget();
+            if (tileImprovementPlan == null
+                || target == null
+                || target.hasImprovement(tileImprovementPlan.getType())) {
+                return false;
+            }
+            break;
+        }
+        return true;
     }
 
     /**

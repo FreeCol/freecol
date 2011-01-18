@@ -116,7 +116,14 @@ public class IdleAtColonyMission extends Mission {
         }
     }
     
-    
+    /**
+     * Checks if this mission is still valid to perform.
+     *
+     * @return True if this mission is still valid to perform.
+     */
+    public boolean isValid() {
+        return super.isValid();
+    }
     
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related 

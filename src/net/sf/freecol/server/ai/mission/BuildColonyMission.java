@@ -348,19 +348,17 @@ public class BuildColonyMission extends Mission {
     /**
      * Checks if this mission is still valid to perform.
      * 
-     * <BR>
-     * <BR>
+     * This mission will be invalidated when the colony has been built
+     * or if the <code>target.getColonyValue()</code> decreases.
      * 
-     * This mission will be invalidated when the colony has been built or if the
-     * <code>target.getColonyValue()</code> decreases.
-     * 
-     * @return <code>true</code> if this mission is still valid to perform and
-     *         <code>false</code> otherwise.
+     * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
-        return (!colonyBuilt && (doNotGiveUp || target != null
-                                 && target.getSettlement() == null
-                                 && colonyValue <= getUnit().getOwner().getColonyValue(target)));
+        return super.isValid() && !colonyBuilt
+            && (doNotGiveUp
+                || (target != null
+                    && target.getSettlement() == null
+                    && colonyValue <= getUnit().getOwner().getColonyValue(target)));
     }
 
     /**

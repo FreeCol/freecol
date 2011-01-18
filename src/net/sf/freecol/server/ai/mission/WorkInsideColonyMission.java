@@ -110,11 +110,13 @@ public class WorkInsideColonyMission extends Mission{
     /**
      * Checks if this mission is still valid to perform.
      *
-     * @return <code>true</code> if this mission is still valid to perform
-     *         and <code>false</code> otherwise.
+     * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
-        return !aiColony.getColony().isDisposed();
+        return super.isValid()
+            && aiColony != null
+            && aiColony.getColony() != null
+            && !aiColony.getColony().isDisposed();
     }
 
     /**

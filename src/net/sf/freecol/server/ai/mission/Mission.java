@@ -369,6 +369,7 @@ public abstract class Mission extends AIObject {
 
     /**
      * Checks if this mission is still valid to perform.
+     * At this level, if the unit was killed then the mission becomes invalid.
      *
      * A mission can be invalidated for a number of reasons. For example:
      * a seek-and-destroy mission can be invalidated in case the
@@ -377,11 +378,7 @@ public abstract class Mission extends AIObject {
      * @return True if the unit is still intact.
      */
     public boolean isValid() {
-        if (getUnit() != null && getUnit().isDisposed()) {
-            // If the unit was killed then the mission becomes invalid.
-            return false;
-        }
-        return true;
+        return getUnit() != null && !getUnit().isDisposed();
     }
 
 
