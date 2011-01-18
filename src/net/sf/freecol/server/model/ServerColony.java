@@ -486,41 +486,47 @@ public class ServerColony extends Colony implements ServerModelObject {
             int high = exportData.getHighLevel() * adjustment;
             int amount = goods.getAmount();
             int oldAmount = container.getOldGoodsCount(type);
-            String messageId = null;
-            int level = 0;
-            int waste = 0;
-            if (!type.limitIgnored()) {
-                if (amount > limit) { // limit has been exceeded
-                    waste = amount - limit;
-                    container.removeGoods(type, waste);
-                    messageId = "model.building.warehouseWaste";
-                } else if (amount == limit && oldAmount < limit) {
-                    // limit has been reached during this turn
-                    messageId = "model.building.warehouseOverfull";
-                } else if (amount > high && oldAmount <= high) {
-                    messageId = "model.building.warehouseFull";
-                    level = high;
-                }
-            }
+
             if (amount < low && oldAmount >= low) {
-                messageId = "model.building.warehouseEmpty";
-                level = low;
-            }
-            if (messageId != null) {
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                     messageId, this, type)
+                                     "model.building.warehouseEmpty",
+                                     this, type)
                               .add("%goods%", type.getNameKey())
-                              .addAmount("%waste%", waste)
-                              .addAmount("%level%", level)
+                              .addAmount("%level%", low)
                               .addName("%colony%", getName()));
                 continue;
             }
+            if (type.limitIgnored()) continue;
+
+            String messageId = null;
+            int waste = 0;
+            if (amount > limit) {
+                // limit has been exceeded
+                waste = amount - limit;
+                container.removeGoods(type, waste);
+                messageId = "model.building.warehouseWaste";
+            } else if (amount == limit && oldAmount < limit) {
+                // limit has been reached during this turn
+                messageId = "model.building.warehouseOverfull";
+            } else if (amount > high && oldAmount <= high) {
+                // high-water-mark has been reached this turn
+                messageId = "model.building.warehouseFull";
+            }
+            if (messageId != null) {
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                               messageId, this, type)
+                              .add("%goods%", type.getNameKey())
+                              .addAmount("%waste%", waste)
+                              .addAmount("%level%", high)
+                              .addName("%colony%", getName()));
+            }
 
             // No problem this turn, but what about the next?
-            if (!type.limitIgnored()
-                && !(exportData.isExported()
-                     && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
+            if (!(exportData.isExported()
+                  && hasAbility("model.ability.export")
+                  && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
                 && amount <= limit
                 && amount + getProductionNetOf(type) > limit) {
                 int lose = amount + getProductionNetOf(type) - limit;
