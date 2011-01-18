@@ -66,6 +66,7 @@ import net.sf.freecol.common.networking.MoveToAmericaMessage;
 import net.sf.freecol.common.networking.MoveToEuropeMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
+import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
@@ -492,6 +493,21 @@ public class AIMessage {
     public static boolean askPutOutsideColony(AIUnit aiUnit) {
         return sendMessage(aiUnit.getConnection(),
                            new PutOutsideColonyMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
+     * An AI unit scouts a native settlement.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is scouting.
+     * @param direction The <code>Direction</code> to move.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askScoutIndianSettlement(AIUnit aiUnit,
+                                                   Direction direction) {
+        return sendMessage(aiUnit.getConnection(),
+                           new ScoutIndianSettlementMessage(aiUnit.getUnit(),
+                                                            direction));
     }
 
 

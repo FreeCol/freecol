@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -177,17 +176,8 @@ public class ScoutingMission extends Mission {
                 if (direction != null) {
                     final MoveType mt = getUnit().getMoveType(direction);
                     if (mt == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-                        ScoutIndianSettlementMessage message = new ScoutIndianSettlementMessage(getUnit(), direction);
-                        try {
-                            connection.ask(message.toXMLElement());
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"" + ScoutIndianSettlementMessage.getXMLElementTagName()
-                                    + "\"-message!");
-                            return;
-                        }
-                        if (getUnit().isDisposed()) {
-                            return;
-                        }
+                        AIMessage.askScoutIndianSettlement(getAIUnit(),
+                                                           direction);
                     } else if (mt.isProgress()) {
                         AIMessage.askMove(getAIUnit(), direction);
                     }
