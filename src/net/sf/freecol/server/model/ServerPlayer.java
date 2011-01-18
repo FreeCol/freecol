@@ -2423,25 +2423,30 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Calculate the treasure amount.  Larger if Hernan Cortes is
         // present in the congress, from cities, and capitals.
         RandomRange plunder = settlementType.getPlunder();
-        int randomLimit = Utils.randomInt(logger, "Base treasure factor", random,
-                                          plunder.getRandomLimit());
-        int treasure = plunder.getAmount(randomLimit);
-        Set<Modifier> modifierSet = attackerPlayer.getFeatureContainer()
-            .getModifierSet("model.modifier.nativeTreasureModifier");
-        treasure = (int) FeatureContainer
-            .applyModifierSet(treasure, game.getTurn(), modifierSet);
+        int treasure = 0;
+        int r = plunder.getRandomLimit();
+        if (r > 0) {
+            r = Utils.randomInt(logger, "Base treasure factor", random, r);
+            r = plunder.getAmount(r);
+            Set<Modifier> modifierSet = attackerPlayer.getFeatureContainer()
+                .getModifierSet("model.modifier.nativeTreasureModifier");
+            treasure = (int) FeatureContainer
+                .applyModifierSet(r, game.getTurn(), modifierSet);
+        }
 
         // Destroy the settlement, update settlement tiles.
         csDisposeSettlement(settlement, cs);
 
-        // Make the treasure train.
-        List<UnitType> unitTypes = game.getSpecification()
-            .getUnitTypesWithAbility("model.ability.carryTreasure");
-        UnitType type = Utils.getRandomMember(logger, "Choose train",
-                                              unitTypes, random);
-        Unit train = new ServerUnit(game, tile, attackerPlayer, type,
-                                    UnitState.ACTIVE);
-        train.setTreasureAmount(treasure);
+        // Make the treasure train if there is treasure.
+        if (treasure > 0) {
+            List<UnitType> unitTypes = game.getSpecification()
+                .getUnitTypesWithAbility("model.ability.carryTreasure");
+            UnitType type = Utils.getRandomMember(logger, "Choose train",
+                                                  unitTypes, random);
+            Unit train = new ServerUnit(game, tile, attackerPlayer, type,
+                                        UnitState.ACTIVE);
+            train.setTreasureAmount(treasure);
+        }
 
         // This is an atrocity.
         int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
