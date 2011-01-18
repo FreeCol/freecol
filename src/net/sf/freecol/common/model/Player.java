@@ -3418,6 +3418,10 @@ public class Player extends FreeColGameObject implements Nameable {
         if (market == null) {
             market = new Market(getGame(), this);
         }
+
+        // Need to set the model.goods.bells bonuses
+        setTax(tax);
+
         invalidateCanSeeTiles();
     }
 
