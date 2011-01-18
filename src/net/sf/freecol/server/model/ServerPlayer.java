@@ -2639,7 +2639,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (!winner.canAdd(g)) break;
                 winner.add(g);
             }
-        } else {
+        } else if (winner.getSpaceLeft() > 0) {
             for (Goods g : capture) g.setLocation(null);
             TransactionSession.establishLootSession(winner, loser, capture);
             cs.addAttribute(See.only(winnerPlayer), "loot", "true");
