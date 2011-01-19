@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -306,6 +307,9 @@ public class ServerGame extends Game implements ServerModelObject {
                 }
                 for (Unit unit : weakestAIPlayer.getUnits()) {
                     unit.setOwner(strongestAIPlayer);
+                    if (unit.getLocation() instanceof Europe) {
+                        unit.setLocation(strongestAIPlayer.getEurope());
+                    }
                     cs.add(See.perhaps(), unit);
                 }
 
