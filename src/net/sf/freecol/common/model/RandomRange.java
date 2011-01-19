@@ -1,5 +1,9 @@
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -25,6 +29,11 @@ public class RandomRange {
      * Factor to multiply the value with.
      */
     private int factor = 1;
+
+    /**
+     * A list of Scopes limiting the applicability of this Feature.
+     */
+    private List<Scope> scopes = new ArrayList<Scope>();
 
 
     public RandomRange() {
@@ -128,14 +137,30 @@ public class RandomRange {
         this.factor = newFactor;
     }
 
+    /**
+     * Describe <code>getRange</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int getRange() {
         return maximum - minimum;
     }
 
+    /**
+     * Describe <code>getRandomLimit</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int getRandomLimit() {
         return getRange() * 100 / factor;
     }
 
+    /**
+     * Describe <code>getAmount</code> method here.
+     *
+     * @param random an <code>int</code> value
+     * @return an <code>int</code> value
+     */
     public int getAmount(int random) {
         int value = minimum + random;
         if (value <= maximum) {
@@ -143,6 +168,15 @@ public class RandomRange {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Return the scopes of this RandomRange.
+     *
+     * @return the scopes of this RandomRange
+     */
+    public List<Scope> getScopes() {
+        return scopes;
     }
 
     public RandomRange clone() {
@@ -155,7 +189,13 @@ public class RandomRange {
         minimum = Integer.parseInt(in.getAttributeValue(null, "minimum"));
         maximum = Integer.parseInt(in.getAttributeValue(null, "maximum"));
         factor = Integer.parseInt(in.getAttributeValue(null, "factor"));
-        in.nextTag();
+        scopes.clear();
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String nodeName = in.getLocalName();
+            if ("scope".equals(nodeName)) {
+                scopes.add(new Scope(in));
+            }
+        }
     }
 
     public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
@@ -164,6 +204,9 @@ public class RandomRange {
         out.writeAttribute("minimum", Integer.toString(minimum));
         out.writeAttribute("maximum", Integer.toString(maximum));
         out.writeAttribute("factor", Integer.toString(factor));
+        for (Scope scope : scopes) {
+            scope.toXML(out);
+        }
         out.writeEndElement();
     }
 

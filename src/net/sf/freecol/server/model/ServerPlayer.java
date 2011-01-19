@@ -2422,16 +2422,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Calculate the treasure amount.  Larger if Hernan Cortes is
         // present in the congress, from cities, and capitals.
-        RandomRange plunder = settlementType.getPlunder();
+        RandomRange plunder = settlementType.getPlunder(attacker);
         int treasure = 0;
         int r = plunder.getRandomLimit();
         if (r > 0) {
-            r = Utils.randomInt(logger, "Base treasure factor", random, r);
-            r = plunder.getAmount(r);
-            Set<Modifier> modifierSet = attackerPlayer.getFeatureContainer()
-                .getModifierSet("model.modifier.nativeTreasureModifier");
-            treasure = (int) FeatureContainer
-                .applyModifierSet(r, game.getTurn(), modifierSet);
+            r = Utils.randomInt(logger, "Plunder native settlement", random, r);
+            treasure = plunder.getAmount(r);
         }
 
         // Destroy the settlement, update settlement tiles.

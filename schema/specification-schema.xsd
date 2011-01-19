@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.55
+<!-- XSD for specification version 0.56
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -31,6 +31,7 @@
      0.53: add exposeResourcePercent attribute to tileimprovement-type
      0.54: add settlement type
      0.55: add increment and incrementType to modifier
+     0.56: add scope to plunder and gifts elements
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -887,6 +888,9 @@
   </xs:element>
 
   <xs:complexType name="RandomRange">
+    <xs:sequence minOccurs="0">
+      <xs:element name="scope" type="ScopeType"/>
+    </xs:sequence>
     <xs:attribute name="probability" use="required" type="xs:integer"/>
     <xs:attribute name="minimum" use="required" type="xs:integer"/>
     <xs:attribute name="maximum" use="required" type="xs:integer"/>

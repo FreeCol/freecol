@@ -759,6 +759,9 @@
   </xs:element>
 
   <xs:complexType name="RandomRange">
+    <xs:sequence minOccurs="0">
+      <xs:element name="scope" type="ScopeType"/>
+    </xs:sequence>
     <xs:attribute name="probability" use="required" type="xs:integer"/>
     <xs:attribute name="minimum" use="required" type="xs:integer"/>
     <xs:attribute name="maximum" use="required" type="xs:integer"/>

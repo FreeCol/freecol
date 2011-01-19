@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.54 -->
+<!-- specification version 0.56 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -1263,7 +1263,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
                      weight1="6" weight2="5" weight3="1">
-      <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="100"/>
+      <ability id="model.ability.plunderNatives"/>
       <modifier id="model.modifier.treasureTransportFee" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"
@@ -1406,7 +1406,12 @@
                   claimableRadius="1" extraClaimableRadius="2"
                   minimumSize="4" maximumSize="6"
                   minimumGrowth="1" maximumGrowth="8">
-        <plunder probability="20" minimum="2" maximum="3" factor="100" />
+        <plunder probability="20" minimum="2" maximum="3" factor="100">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="3" maximum="6" factor="100">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="2" maximum="3" factor="100" />
         <modifier id="model.modifier.defence" type="percentage" value="50" />
       </settlement>
@@ -1414,8 +1419,12 @@
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="6" maximumSize="8"
                   minimumGrowth="2" maximumGrowth="10">
-        <plunder probability="100" minimum="2" maximum="4" factor="200" />
-        <plunder probability="100" minimum="2" maximum="4" factor="200" />
+        <plunder probability="100" minimum="2" maximum="4" factor="200">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="2" maximum="4" factor="300">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="3" maximum="6" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
@@ -1425,7 +1434,12 @@
                   claimableRadius="1" extraClaimableRadius="2"
                   minimumSize="6" maximumSize="8"
                   minimumGrowth="1" maximumGrowth="8">
-        <plunder probability="50" minimum="3" maximum="8" factor="100" />
+        <plunder probability="50" minimum="3" maximum="8" factor="100">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="4" maximum="12" factor="100">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="3" maximum="6" factor="100" />
         <modifier id="model.modifier.defence" type="percentage" value="50" />
       </settlement>
@@ -1433,8 +1447,12 @@
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="8" maximumSize="10"
                   minimumGrowth="2" maximumGrowth="10">
-        <plunder probability="100" minimum="3" maximum="8" factor="200" />
-        <plunder probability="100" minimum="3" maximum="8" factor="200" />
+        <plunder probability="100" minimum="3" maximum="8" factor="200">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="3" maximum="8" factor="300">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="4" maximum="8" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
@@ -1507,7 +1525,12 @@
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="8" maximumSize="12"
                   minimumGrowth="3" maximumGrowth="12">
-        <plunder probability="100" minimum="2" maximum="6" factor="2100" />
+        <plunder probability="100" minimum="2" maximum="6" factor="2100">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="2" maximum="6" factor="3100">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="3" maximum="6" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
@@ -1515,7 +1538,12 @@
                   claimableRadius="3" extraClaimableRadius="3"
                   minimumSize="10" maximumSize="12"
                   minimumGrowth="4" maximumGrowth="14">
-        <plunder probability="100" minimum="2" maximum="6" factor="3000" />
+        <plunder probability="100" minimum="2" maximum="6" factor="3000">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="3" maximum="8" factor="4000">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="4" maximum="8" factor="300" />
         <modifier id="model.modifier.defence" type="percentage" value="200" />
       </settlement>
@@ -1530,7 +1558,12 @@
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="8" maximumSize="12"
                   minimumGrowth="3" maximumGrowth="12">
-        <plunder probability="100" minimum="5" maximum="9" factor="1000" />
+        <plunder probability="100" minimum="5" maximum="9" factor="1000">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="11" maximum="15" factor="1000">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="4" maximum="8" factor="200" />
         <modifier id="model.modifier.defence" type="percentage" value="100" />
       </settlement>
@@ -1538,7 +1571,12 @@
                   claimableRadius="3" extraClaimableRadius="3"
                   minimumSize="10" maximumSize="12"
                   minimumGrowth="4" maximumGrowth="14">
-        <plunder probability="100" minimum="7" maximum="12" factor="1000" />
+        <plunder probability="100" minimum="7" maximum="12" factor="1000">
+          <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
+        </plunder>
+        <plunder probability="100" minimum="16" maximum="19" factor="1000">
+          <scope ability-id="model.ability.plunderNatives" ability-value="true"/>
+        </plunder>
         <gifts probability="100" minimum="5" maximum="10" factor="300" />
         <modifier id="model.modifier.defence" type="percentage" value="200" />
       </settlement>

@@ -1,5 +1,8 @@
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,13 +38,13 @@ public class SettlementType extends FreeColGameObjectType {
     /**
      * The plunder this SettlementType generates when destroyed.
      */
-    private RandomRange plunder;
+    private List<RandomRange> plunder = new ArrayList<RandomRange>();
 
     /**
      * The gifts this SettlementType generates when visited by a
      * scout.
      */
-    private RandomRange gifts;
+    private List<RandomRange> gifts = new ArrayList<RandomRange>();
 
     /**
      * The minimum number of units for this SettlementType.
@@ -214,10 +217,23 @@ public class SettlementType extends FreeColGameObjectType {
     /**
      * Get the <code>Plunder</code> value.
      *
+     * @param unit an <code>Unit</code> value
      * @return a <code>RandomRange</code> value
      */
-    public final RandomRange getPlunder() {
-        return plunder;
+    public final RandomRange getPlunder(Unit unit) {
+        for (RandomRange range : plunder) {
+            List<Scope> scopes = range.getScopes();
+            if (scopes.isEmpty()) {
+                return range;
+            } else {
+                for (Scope scope : scopes) {
+                    if (scope.appliesTo(unit)) {
+                        return range;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -226,17 +242,32 @@ public class SettlementType extends FreeColGameObjectType {
      * @param newPlunder The new Plunder value.
      */
     public final void setPlunder(final RandomRange newPlunder) {
-        this.plunder = newPlunder;
+        plunder.add(newPlunder);
     }
+
 
     /**
      * Get the <code>Gifts</code> value.
      *
+     * @param unit an <code>Unit</code> value
      * @return a <code>RandomRange</code> value
      */
-    public final RandomRange getGifts() {
-        return gifts;
+    public final RandomRange getGifts(Unit unit) {
+        for (RandomRange range : gifts) {
+            List<Scope> scopes = range.getScopes();
+            if (scopes.isEmpty()) {
+                return range;
+            } else {
+                for (Scope scope : scopes) {
+                    if (scope.appliesTo(unit)) {
+                        return range;
+                    }
+                }
+            }
+        }
+        return null;
     }
+
 
     /**
      * Set the <code>Gifts</code> value.
@@ -244,10 +275,10 @@ public class SettlementType extends FreeColGameObjectType {
      * @param newGifts The new Gifts value.
      */
     public final void setGifts(final RandomRange newGifts) {
-        this.gifts = newGifts;
+        gifts.add(newGifts);
     }
 
-     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXMLImpl(out, getXMLElementTagName());
     }
 
@@ -267,11 +298,11 @@ public class SettlementType extends FreeColGameObjectType {
 
     public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
-        if (plunder != null) {
-            plunder.toXML(out, "plunder");
+        for (RandomRange range : plunder) {
+            range.toXML(out, "plunder");
         }
-        if (gifts != null) {
-            gifts.toXML(out, "gifts");
+        for (RandomRange range : gifts) {
+            range.toXML(out, "gifts");
         }
     }
 
@@ -291,11 +322,13 @@ public class SettlementType extends FreeColGameObjectType {
     @Override
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         if ("plunder".equals(in.getLocalName())) {
-            plunder = new RandomRange();
-            plunder.readFromXML(in);
+            RandomRange range = new RandomRange();
+            range.readFromXML(in);
+            plunder.add(range);
         } else if ("gifts".equals(in.getLocalName())) {
-            gifts = new RandomRange();
-            gifts.readFromXML(in);
+            RandomRange range = new RandomRange();
+            range.readFromXML(in);
+            gifts.add(range);
         } else {
             super.readChild(in);
         }

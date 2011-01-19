@@ -1894,7 +1894,7 @@ public final class InGameController extends Controller {
                 result = "tales";
             } else {
                 // ...and the rest are beads.
-                RandomRange gifts = settlement.getType().getGifts();
+                RandomRange gifts = settlement.getType().getGifts(unit);
                 int randomLimit = Utils.randomInt(logger, "Base beads amount",
                                                   random,
                                                   gifts.getRandomLimit());

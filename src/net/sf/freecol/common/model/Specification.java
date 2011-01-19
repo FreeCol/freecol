@@ -222,7 +222,7 @@ public final class Specification {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
-            throw new RuntimeException("Error parsing specification");
+            throw new RuntimeException("Error parsing specification: " + e.toString());
         }
     }
 
