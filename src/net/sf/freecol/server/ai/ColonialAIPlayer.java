@@ -173,7 +173,8 @@ public class ColonialAIPlayer extends AIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + getPlayer().toString());
+        logger.fine("Entering AI code for: " + getPlayer().toString()
+                    + ", year " + getGame().getTurn());
 
         //this AI assumes that player is _not_ REF, _not_ Indian, but European!
         if (getPlayer().isREF() ||

@@ -69,7 +69,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + getPlayer());
+        logger.fine("Entering AI code for: " + getPlayer()
+                    + ", year " + getGame().getTurn());
         sessionRegister.clear();
         clearAIUnits();
         checkForREFDefeat();

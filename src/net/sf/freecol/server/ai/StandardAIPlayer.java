@@ -181,24 +181,8 @@ public class StandardAIPlayer extends AIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + getPlayer() + ", year " + getGame().getTurn());
-
-        /** TODO: find some intelligent solution
-        switch (player.getNation()) {
-        case Player.DUTCH:
-            this.strategy = AIStrategy.TRADE;
-            break;
-        case Player.ENGLISH:
-            this.strategy = AIStrategy.IMMIGRATION;
-            break;
-        case Player.FRENCH:
-            this.strategy = AIStrategy.COOPERATION;
-            break;
-        case Player.SPANISH:
-            this.strategy = AIStrategy.CONQUEST;
-            break;
-        }
-        */
+        logger.fine("Entering AI code for: " + getPlayer()
+                    + ", year " + getGame().getTurn());
         this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
         clearAIUnits();
