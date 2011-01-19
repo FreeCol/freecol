@@ -181,6 +181,8 @@ public class Game extends FreeColGameObject {
         this.combatModel = new SimpleCombatModel();
         readFromXML(in);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
+        // setId() does not add Games to the freeColGameObjects
+        this.setFreeColGameObject(getId(), this);
     }
 
     /**
