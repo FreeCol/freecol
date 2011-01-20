@@ -236,6 +236,22 @@ public class FoundingFather extends FreeColGameObjectType {
 
     }
 
+    // TODO: remove 0.9.x compatibility code
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in);
+        }
+        try {
+            // Cortes has changed
+            if (!getModifierSet("model.modifier.nativeTreasureModifier").isEmpty()) {
+                addAbility(new Ability("model.ability.plunderNatives"));
+            }
+        } catch (Exception e) {
+            // we don't care
+        }
+    }
+    // end compatibility code
+
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if (Event.getXMLElementTagName().equals(childName)) {

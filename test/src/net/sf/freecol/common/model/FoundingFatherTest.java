@@ -92,6 +92,19 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
+    public void testAddAllFathers() {
+        // check that all fathers can be added
+    	Game game = getGame();
+    	game.setMap(getTestMap(true));
+
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+
+        for (FoundingFather father : spec().getFoundingFathers()) {
+            player.addFather(father);
+        }
+    }
+
     public void testPeterStuyvesant() {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
@@ -109,17 +122,26 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(colony.canBuild(customHouse));
     }
 
-    public void testAddAllFathers() {
-        // check that all fathers can be added
+    public void testHernanCortes() {
     	Game game = getGame();
     	game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
+        Unit unit = colony.getUnitList().get(0);
 
-        for (FoundingFather father : spec().getFoundingFathers()) {
-            player.addFather(father);
-        }
+        NationType inca = spec().getNationType("model.nationType.inca");
+        SettlementType incaCity = inca.getSettlementType("model.settlement.inca");
+
+        RandomRange range = incaCity.getPlunder(unit);
+        assertEquals(2100, range.getFactor());
+
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.hernanCortes");
+        player.addFather(father);
+
+        range = incaCity.getPlunder(unit);
+        assertEquals(3100, range.getFactor());
+
     }
 
     public void testMinuit() {
