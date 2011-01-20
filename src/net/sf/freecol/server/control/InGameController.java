@@ -887,7 +887,7 @@ public final class InGameController extends Controller {
             }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 messageId, serverPlayer.getMonarch())
+                                 messageId, serverPlayer)
                     .addName("%colony%", colony.getName())
                     .addName("%amount%", String.valueOf(goods.getAmount()))
                     .add("%goods%", goods.getNameKey()));
