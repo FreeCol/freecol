@@ -1499,12 +1499,12 @@ public class ColonialAIPlayer extends AIPlayer {
             while (unitsIterator.hasNext()) {
                 Unit theUnit = unitsIterator.next();
                 AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getId());
-                if (a != null && a.getGoal()==null) {
-                    //NOTE: Only adds units that currently don't have a goal.
-                    au.add(a);
+                if (a != null) {
+                    if (a.getGoal() == null) au.add(a);
                 } else {
-                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getId() + ") - "
-                            + (getGame().getFreeColGameObject(theUnit.getId()) != null));
+                    logger.warning("Could not find the AIUnit for: "
+                                   + theUnit + " (" + theUnit.getId() + ") - "
+                                   + (getGame().getFreeColGameObject(theUnit.getId()) != null));
                 }
             }
             myAIUnits = au;

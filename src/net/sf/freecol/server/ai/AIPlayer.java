@@ -82,7 +82,8 @@ public abstract class AIPlayer extends AIObject {
      * as necessary, using clearAIUnits(), so that getAIUnitIterator() will
      * create a new list.           
      */
-    private ArrayList<AIUnit> aiUnits = new ArrayList<AIUnit>();
+    private List<AIUnit> aiUnits = new ArrayList<AIUnit>();
+
 
     public AIPlayer(AIMain aiMain, String id) {
         super(aiMain, id);
@@ -106,11 +107,35 @@ public abstract class AIPlayer extends AIObject {
         player = p;
     }
 
+
+    protected AIUnit getAIUnit(Unit unit) {
+        return (AIUnit) getAIMain().getAIObject(unit);
+    }
+
     /**
      * Helper method to let implementing subclasses clear aiUnits.
      */         
     protected void clearAIUnits() {
         aiUnits.clear();    
+    }
+
+    /**
+     * Creates a list of AIUnits for the player.
+     *
+     * @return A list of AIUnits.
+     */
+    protected List<AIUnit> createAIUnits() {
+        ArrayList<AIUnit> au = new ArrayList<AIUnit>();
+        for (Unit u : getPlayer().getUnits()) {
+            AIUnit a = getAIUnit(u);
+            if (a != null) {
+                au.add(a);
+            } else {
+                logger.warning("Could not find the AIUnit for: "
+                               + u + " (" + u.getId() + ")");
+            }
+        }
+        return au;
     }
 
     /**
@@ -121,19 +146,7 @@ public abstract class AIPlayer extends AIObject {
      */
     protected Iterator<AIUnit> getAIUnitIterator() {
         if (aiUnits.size() == 0) {
-            ArrayList<AIUnit> au = new ArrayList<AIUnit>();
-            Iterator<Unit> unitsIterator = getPlayer().getUnitIterator();
-            while (unitsIterator.hasNext()) {
-                Unit theUnit = unitsIterator.next();
-                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getId());
-                if (a != null) {
-                    au.add(a);
-                } else {
-                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getId() + ") - "
-                            + (getGame().getFreeColGameObject(theUnit.getId()) != null));
-                }
-            }
-            aiUnits = au;
+            aiUnits = createAIUnits();
         }
         return aiUnits.iterator();
     }
@@ -169,10 +182,6 @@ public abstract class AIPlayer extends AIObject {
         } else {
             return ((DummyConnection) player.getConnection()).getOtherConnection();
         }
-    }
-
-    protected AIUnit getAIUnit(Unit unit) {
-        return (AIUnit) getAIMain().getAIObject(unit);
     }
 
     /**

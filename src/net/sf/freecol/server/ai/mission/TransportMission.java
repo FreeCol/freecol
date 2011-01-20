@@ -459,28 +459,39 @@ public class TransportMission extends Mission {
         final Unit carrier = getUnit();
         return (carrier.getGoodsCount() + carrier.getUnitCount()) > 0;
     }
-    
-    private void attackIfEnemyShipIsBlocking(Connection connection, Direction direction) {
+
+    /**
+     * Attack blocking ships.
+     *
+     * @return True if this ship is still capable of its mission.
+     */
+    private boolean attackIfEnemyShipIsBlocking(Connection connection,
+                                                Direction direction) {
         final Unit carrier = getUnit();
         if (canAttackEnemyShips()
                 && carrier.getMoveType(direction) == MoveType.ATTACK) {
             final Tile newTile = carrier.getTile().getNeighbourOrNull(direction);
             final Unit defender = newTile.getDefendingUnit(carrier);
-            if (!canAttackPlayer(defender.getOwner())) {
-                return;
+            if (canAttackPlayer(defender.getOwner())) {
+                AIMessage.askAttack(getAIUnit(), direction);
             }
-            AIMessage.askAttack(getAIUnit(), direction);
         }
+        return isValid();
     }
     
-    private void attackEnemyShips(Connection connection) {
+    /**
+     * Attack suitable enemy ships.
+     *
+     * @return True if this ship is still capable of its mission.
+     */
+    private boolean attackEnemyShips(Connection connection) {
         if (!canAttackEnemyShips()) {
-            return;
+            return true;
         }
         final Unit carrier = getUnit();
         if (hasCargo() && !carrier.getOwner().isREF()) {
             // Do not search for a target if we have cargo onboard.
-            return;
+            return true;
         }
         final PathNode pathToTarget = findNavalTarget(0);
         if (pathToTarget != null) {
@@ -490,6 +501,7 @@ public class TransportMission extends Mission {
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         }
+        return isValid();
     }
     
     private boolean canAttackPlayer(Player target) {
@@ -579,9 +591,9 @@ public class TransportMission extends Mission {
             
         }
 
-        attackEnemyShips(connection);
+        if (!attackEnemyShips(connection)) return;
         restockCargoAtDestination(connection);
-        attackEnemyShips(connection);
+        if (!attackEnemyShips(connection)) return;
 
         boolean transportListChanged = false;
         boolean moreWork = true;
@@ -651,10 +663,10 @@ public class TransportMission extends Mission {
                 }
             }
             if (r != null) {
-                attackIfEnemyShipIsBlocking(connection, r);
+                if (!attackIfEnemyShipIsBlocking(connection, r)) return;
             }
             transportListChanged = restockCargoAtDestination(connection);
-            attackEnemyShips(connection);
+            if (!attackEnemyShips(connection)) return;
         }
     }
 

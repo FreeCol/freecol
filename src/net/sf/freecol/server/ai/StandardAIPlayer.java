@@ -186,14 +186,8 @@ public class StandardAIPlayer extends AIPlayer {
         this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
         clearAIUnits();
-        if (getPlayer().isREF()) {
-            if(checkForREFDefeat()){
-                return;
-            }
-            if (!isWorkForREF()) {
-                return;
-            }
-        }
+        if (getPlayer().isREF()
+            && (checkForREFDefeat() || !isWorkForREF())) return;
         cheat();
         determineStances();
         rearrangeWorkersInColonies();

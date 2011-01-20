@@ -391,7 +391,8 @@ public abstract class NewAIPlayer extends AIObject {
                 if (a != null) {
                     au.add(a);
                 } else {
-                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getId() + ") - "
+                    logger.warning("Could not find the AIUnit for: "
+                                   + theUnit + " (" + theUnit.getId() + ") - "
                                    + (getGame().getFreeColGameObject(theUnit.getId()) != null));
                 }
             }
