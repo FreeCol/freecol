@@ -103,6 +103,12 @@ public abstract class NationType extends FreeColGameObjectType {
     public abstract boolean isEuropean();
 
     /**
+     * Whether this is a IndianNation.
+     *
+     */
+    public abstract boolean isIndian();
+
+    /**
      * Whether this is a EuropeanREFNation.
      *
      */

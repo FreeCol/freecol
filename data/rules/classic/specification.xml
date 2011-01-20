@@ -1386,6 +1386,9 @@
     <!-- this was the Spanish player -->
     <european-nation-type id="model.nationType.conquest" extends="model.nationType.default">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
+      <modifier id="model.modifier.offenceAgainst" type="percentage" value="50">
+        <scope method-name="isIndian" method-value="true"/>
+      </modifier>
       <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" mounted="true"/>
     </european-nation-type>
   </european-nation-types>

@@ -136,7 +136,7 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> hillsModifierSet = hills.getDefenceBonus();
         assertFalse(soldier.hasAbility("model.ability.ambushBonus"));
-        assertFalse(colonist.hasAbility("model.ability.ambushPenalty"));                     
+        assertFalse(colonist.hasAbility("model.ability.ambushPenalty"));
         assertEquals(1, hillsModifierSet.size());
         Modifier hillsModifier = hillsModifierSet.iterator().next();
 
@@ -250,7 +250,7 @@ public class CombatTest extends FreeColTestCase {
         Game game = getGame();
         Map map = getTestMap(true);
         game.setMap(map);
-    	
+
         Colony colony = getStandardColony();
 
         @SuppressWarnings("unused")
@@ -280,7 +280,7 @@ public class CombatTest extends FreeColTestCase {
     	Game game = getGame();
     	Map map = getTestMap(true);
     	game.setMap(map);
-    	
+
         Colony colony = getStandardColony();
 
         SimpleCombatModel combatModel = new SimpleCombatModel();
@@ -333,7 +333,7 @@ public class CombatTest extends FreeColTestCase {
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement settlement = builder.player(inca).settlementTile(tile1).skillToTeach(null).capital(true).build();
-        
+
         //IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
         Unit defender = new ServerUnit(game, settlement, inca, braveType,
                                        UnitState.ACTIVE);
@@ -354,7 +354,7 @@ public class CombatTest extends FreeColTestCase {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
     }
-    
+
     public void testAttackIgnoresMovementPoints() throws Exception {
 
         Game game = getStandardGame();
@@ -381,6 +381,45 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 9, false));
         assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 1, false));
         assertEquals(Unit.MoveType.MOVE_NO_MOVES, soldier.getMoveType(tile2, tile1, 0, false));
+
+    }
+
+    public void testSpanishAgainstNatives() throws Exception {
+
+        Game game = getStandardGame();
+        Player spanish = game.getPlayer("model.nation.spanish");
+        Player tupi = game.getPlayer("model.nation.tupi");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel();
+
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+        tile1.setType(hills);
+        assertEquals(hills, tile1.getType());
+
+        spanish.setStance(tupi, Player.Stance.WAR);
+        tupi.setStance(spanish, Player.Stance.WAR);
+
+        Unit soldier = new ServerUnit(game, tile1, spanish, colonistType,
+                                      UnitState.ACTIVE, muskets);
+        Unit brave = new ServerUnit(game, tile2, tupi, braveType,
+                                    UnitState.ACTIVE);
+
+        assertEquals(tile1, soldier.getLocation());
+        assertEquals(tile2, brave.getLocation());
+
+        Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(soldier, brave);
+        Modifier offenceAgainst = null;
+        for (Modifier modifier : offenceModifiers) {
+            if (Modifier.OFFENCE_AGAINST.equals(modifier.getId())) {
+                offenceAgainst = modifier;
+                break;
+            }
+        }
+        assertNotNull(offenceAgainst);
+        assertEquals(50, (int) offenceAgainst.getValue());
 
     }
 

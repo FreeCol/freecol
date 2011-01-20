@@ -168,9 +168,13 @@ public class SimpleCombatModel extends CombatModel {
                                     Specification.BASE_OFFENCE_SOURCE,
                                     type.getOffence(),
                                     Modifier.Type.ADDITIVE));
-            result.addAll(type.getModifierSet(Modifier.OFFENCE));
-            result.addAll(attackerUnit.getOwner()
-                          .getModifierSet(Modifier.OFFENCE, type));
+            result.addAll(attackerUnit
+                          .getModifierSet(Modifier.OFFENCE));
+            if (defender instanceof Ownable) {
+                result.addAll(attackerUnit
+                              .getModifierSet(Modifier.OFFENCE_AGAINST,
+                                              (Ownable) defender));
+            }
             if (attackerUnit.isNaval()) {
                 addNavalOffensiveModifiers(attackerUnit, result);
             } else {

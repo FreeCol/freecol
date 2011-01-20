@@ -40,6 +40,8 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
 
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
+    public static final String OFFENCE_AGAINST = "model.modifier.offenceAgainst";
+    public static final String DEFENCE_AGAINST = "model.modifier.defenceAgainst";
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 

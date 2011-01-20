@@ -785,6 +785,26 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Get a modifier that applies to the given Ownable. This is used
+     * for the offenceAgainst and defenceAgainst modifiers.
+     *
+     * @param id a <code>String</code> value
+     * @param id a <code>Ownable</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Set<Modifier> getModifierSet(String id, Ownable ownable) {
+        Set<Modifier> result = new HashSet<Modifier>();
+        NationType nationType = ownable.getOwner().getNationType();
+        Turn turn = getGame().getTurn();
+        result.addAll(unitType.getFeatureContainer().getModifierSet(id, nationType, turn));
+        result.addAll(getOwner().getFeatureContainer().getModifierSet(id, nationType, turn));
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            result.addAll(equipmentType.getFeatureContainer().getModifierSet(id, nationType, turn));
+        }
+        return result;
+    }
+
+    /**
      * Add the given Feature to the Features Map. If the Feature given
      * can not be combined with a Feature with the same ID already
      * present, the old Feature will be replaced.

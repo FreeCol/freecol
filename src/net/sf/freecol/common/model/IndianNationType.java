@@ -85,6 +85,15 @@ public class IndianNationType extends NationType {
     }
 
     /**
+     * Returns true.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isIndian() {
+        return true;
+    }
+
+    /**
      * Returns false.
      *
      * @return a <code>boolean</code> value

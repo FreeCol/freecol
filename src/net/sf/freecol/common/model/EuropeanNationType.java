@@ -92,6 +92,15 @@ public class EuropeanNationType extends NationType {
     }
 
     /**
+     * Returns false.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isIndian() {
+        return false;
+    }
+
+    /**
      * Returns a list of this Nation's starting units.
      *
      * @return a list of this Nation's starting units.
