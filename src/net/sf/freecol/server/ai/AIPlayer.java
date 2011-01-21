@@ -44,7 +44,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -195,37 +194,6 @@ public abstract class AIPlayer extends AIObject {
      */
     public void setDebuggingConnection(Connection debuggingConnection) {
         this.debuggingConnection = debuggingConnection;
-    }
-
-    /**
-     * Send some tiles to update to all players which can see them
-     * 
-     * @param tiles The tiles to update.
-     */
-    protected void sendUpdatedTilesToAll(ArrayList<Tile> tiles) {
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
-            try {
-                Element updateElement = Message.createNewRootElement("update");
-                boolean send = false;
-                for(Tile tile : tiles) {
-                    if (enemyPlayer.canSee(tile)) {
-                        updateElement.appendChild(tile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                        send = true;
-                    }
-                }
-                if (send) {
-                    enemyPlayer.getConnection().send(updateElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
     }
 
     /**

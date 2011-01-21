@@ -885,16 +885,6 @@ public class StandardAIPlayer extends AIPlayer {
             }
 
             c.rearrangeWorkers(getConnection());
-
-            ArrayList<Tile> tilesToUpdate = new ArrayList<Tile>();
-            for (ColonyTile colonyTile : c.getColony().getColonyTiles()) {
-                boolean isOccupied = colonyTile.getUnit() != null;
-                boolean wasOccupied = oldWorkTiles.remove(colonyTile.getWorkTile());
-                if (isOccupied != wasOccupied) {
-                    tilesToUpdate.add(colonyTile.getWorkTile());
-                }
-            }
-            sendUpdatedTilesToAll(tilesToUpdate);
         }
     }
 
