@@ -105,7 +105,7 @@ public final class FreeColClient {
     private InGameInputHandler inGameInputHandler;
 
     private MapEditorController mapEditorController;
-    
+
 
     // Gui:
     private GraphicsDevice gd;
@@ -132,20 +132,20 @@ public final class FreeColClient {
 
     /** The player "owning" this client. */
     private Player player;
-    
+
     private boolean isRetired = false;
 
     /** The Server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
 
     private boolean windowed;
-    
+
     private boolean mapEditor;
 
     private boolean singleplayer;
 
     private final ActionManager actionManager;
-    
+
     private ClientOptions clientOptions;
 
     public final Worker worker;
@@ -156,7 +156,7 @@ public final class FreeColClient {
      * it is an indication of an approved login to a server.
      */
     private boolean loggedIn = false;
-    
+
     private Rectangle windowBounds;
 
     /**
@@ -168,7 +168,7 @@ public final class FreeColClient {
     /**
      * Creates a new <code>FreeColClient</code>. Creates the control objects
      * and starts the GUI.
-     * 
+     *
      * @param savegameFile a <code>File</code> value
      * @param size a <code>Dimension</code> value
      * @param sound True if sounds should be played
@@ -193,14 +193,14 @@ public final class FreeColClient {
         if (!baseDirectory.exists() || !baseDirectory.isDirectory()) {
             System.err.println("Could not find base data directory: "
                                + baseDirectory.getName());
-            System.exit(1);            
+            System.exit(1);
         }
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         FreeColTcFile tcData = new FreeColTcFile("classic");
         ResourceManager.setTcMapping(tcData.getResourceMapping());
-        
+
         imageLibrary = new ImageLibrary();
         windowed = (size != null);
         if (size != null && size.width < 0) {
@@ -244,7 +244,7 @@ public final class FreeColClient {
         logger.info("Now starting to load images.");
 
         mapEditor = false;
-        
+
         clientOptions = new ClientOptions();
         actionManager = new ActionManager(this);
         if (!headless) {
@@ -254,7 +254,7 @@ public final class FreeColClient {
                 && FreeCol.getClientOptionsFile().exists()) {
             clientOptions.load(FreeCol.getClientOptionsFile());
         }
-        
+
         List<ResourceMapping> modMappings = new ArrayList<ResourceMapping>();
         for (FreeColModFile f : clientOptions.getActiveMods()) {
             modMappings.add(f.getResourceMapping());
@@ -278,7 +278,7 @@ public final class FreeColClient {
         mapEditorController = new MapEditorController(this);
 
         removeSplash(splash);
-        
+
         // Gui:
         if (!headless) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -297,7 +297,7 @@ public final class FreeColClient {
                     }
                 });
         }
-        
+
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
             if (!headless) {
@@ -347,7 +347,7 @@ public final class FreeColClient {
             splash.dispose();
         }
     }
-    
+
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -365,7 +365,7 @@ public final class FreeColClient {
         } else {
             soundPlayer = null;
         }
-        
+
         if (GraphicsEnvironment.isHeadless()) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
         }
@@ -423,7 +423,7 @@ public final class FreeColClient {
     public void setHeadless(final boolean newHeadless) {
         this.headless = newHeadless;
     }
-    
+
     /**
      *  Verifies if this client can save the current game
      *  Clients that do not have the server running, or that have not the required permissions
@@ -499,7 +499,7 @@ public final class FreeColClient {
         canvas.updateSizes();
         frame.setVisible(true);
     }
-    
+
     /**
      * Checks if the application is displayed in a window.
      * @return <code>true</code> if the application is currently
@@ -513,7 +513,7 @@ public final class FreeColClient {
 
     /**
      * Writes the client options to the default location.
-     * 
+     *
      * @see ClientOptions
      */
     public void saveClientOptions() {
@@ -523,14 +523,14 @@ public final class FreeColClient {
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;
     }
-    
+
     public boolean isMapEditor() {
         return mapEditor;
     }
-    
+
     /**
      * Writes the client options to the given file.
-     * 
+     *
      * @param saveFile The file where the client options should be written.
      * @see ClientOptions
      */
@@ -540,7 +540,7 @@ public final class FreeColClient {
 
     /**
      * Gets the <code>ImageLibrary</code>.
-     * 
+     *
      * @return The <code>ImageLibrary</code>.
      */
     public ImageLibrary getImageLibrary() {
@@ -556,7 +556,7 @@ public final class FreeColClient {
 
     /**
      * Reads the {@link ClientOptions} from the given file.
-     * 
+     *
      * @param loadFile The <code>File</code> to read the
      *            <code>ClientOptions</code> from.
      */
@@ -566,7 +566,7 @@ public final class FreeColClient {
 
     /**
      * Gets the object responsible for keeping and updating the actions.
-     * 
+     *
      * @return The <code>ActionManager</code>.
      */
     public ActionManager getActionManager() {
@@ -575,20 +575,20 @@ public final class FreeColClient {
 
     /**
      * Returns the object keeping the current client options.
-     * 
+     *
      * @return The <code>ClientOptions</code>.
      */
     public ClientOptions getClientOptions() {
         return clientOptions;
     }
-    
+
     public MapEditorController getMapEditorController() {
         return mapEditorController;
     }
 
     /**
      * Gets the <code>Player</code> that uses this client.
-     * 
+     *
      * @return The <code>Player</code> made to represent this clients user.
      * @see #setMyPlayer(Player)
      */
@@ -598,7 +598,7 @@ public final class FreeColClient {
 
     /**
      * Sets the <code>Player</code> that uses this client.
-     * 
+     *
      * @param player The <code>Player</code> made to represent this clients
      *            user.
      * @see #getMyPlayer()
@@ -610,7 +610,7 @@ public final class FreeColClient {
     /**
      * Sets the <code>FreeColServer</code> which has been started by the
      * client gui.
-     * 
+     *
      * @param freeColServer The <code>FreeColServer</code>.
      * @see #getFreeColServer()
      */
@@ -620,7 +620,7 @@ public final class FreeColClient {
 
     /**
      * Gets the <code>FreeColServer</code> started by the client.
-     * 
+     *
      * @return The <code>FreeColServer</code> or <code>null</code> if no
      *         server has been started.
      */
@@ -630,7 +630,7 @@ public final class FreeColClient {
 
     /**
      * Sets the <code>Game</code> that we are currently playing.
-     * 
+     *
      * @param game The <code>Game</code>.
      * @see #getGame
      */
@@ -640,7 +640,7 @@ public final class FreeColClient {
 
     /**
      * Gets the <code>Game</code> that we are currently playing.
-     * 
+     *
      * @return The <code>Game</code>.
      * @see #setGame
      */
@@ -651,7 +651,7 @@ public final class FreeColClient {
     /**
      * Gets the <code>Canvas</code> this client uses to display the
      * GUI-components.
-     * 
+     *
      * @return The <code>Canvas</code>.
      */
     public Canvas getCanvas() {
@@ -661,7 +661,7 @@ public final class FreeColClient {
     /**
      * Gets the <code>GUI</code> that is being used to draw the map on the
      * {@link Canvas}.
-     * 
+     *
      * @return The <code>GUI</code>.
      */
     public GUI getGUI() {
@@ -709,7 +709,7 @@ public final class FreeColClient {
 
     /**
      * Checks if this client is the game admin.
-     * 
+     *
      * @return <i>true</i> if the client is the game admin and <i>false</i>
      *         otherwise. <i>false</i> is also returned if a game have not yet
      *         been started.
@@ -723,7 +723,7 @@ public final class FreeColClient {
 
     /**
      * Sets whether or not this game is a singleplayer game.
-     * 
+     *
      * @param singleplayer Indicates whether or not this game is a singleplayer
      *            game.
      * @see #isSingleplayer
@@ -734,7 +734,7 @@ public final class FreeColClient {
 
     /**
      * Is the user playing in singleplayer mode.
-     * 
+     *
      * @return <i>true</i> if the user is playing in singleplayer mode and
      *         <i>false</i> otherwise.
      * @see #setSingleplayer
@@ -742,19 +742,19 @@ public final class FreeColClient {
     public boolean isSingleplayer() {
         return singleplayer;
     }
-    
+
     /**
      * Sets whether or not the user has retired the game.
-     * 
+     *
      * @param singleplayer Indicates whether or not the user has retired the game.
      */
     public void setIsRetired(boolean isRetired) {
         this.isRetired = isRetired;
     }
-    
+
     /**
      * Has the user retired the game.
-     * 
+     *
      * @return <i>true</i> if the user has retired the game and
      *         <i>false</i> otherwise.
      */
@@ -765,7 +765,7 @@ public final class FreeColClient {
     /**
      * Gets the controller responsible for starting a server and connecting to
      * it.
-     * 
+     *
      * @return The <code>ConnectController</code>.
      */
     public ConnectController getConnectController() {
@@ -774,7 +774,7 @@ public final class FreeColClient {
 
     /**
      * Gets the controller that will be used before the game has been started.
-     * 
+     *
      * @return The <code>PreGameController</code>.
      */
     public PreGameController getPreGameController() {
@@ -784,7 +784,7 @@ public final class FreeColClient {
     /**
      * Gets the input handler that will be used before the game has been
      * started.
-     * 
+     *
      * @return The <code>PreGameInputHandler</code>.
      */
     public PreGameInputHandler getPreGameInputHandler() {
@@ -793,7 +793,7 @@ public final class FreeColClient {
 
     /**
      * Gets the controller that will be used when the game has been started.
-     * 
+     *
      * @return The <code>InGameController</code>.
      */
     public InGameController getInGameController() {
@@ -802,7 +802,7 @@ public final class FreeColClient {
 
     /**
      * Gets the input handler that will be used when the game has been started.
-     * 
+     *
      * @return The <code>InGameInputHandler</code>.
      */
     public InGameInputHandler getInGameInputHandler() {
@@ -812,7 +812,7 @@ public final class FreeColClient {
     /**
      * Sets the <code>Client</code> that shall be used to send messages to the
      * server.
-     * 
+     *
      * @param client the <code>Client</code>
      * @see #getClient
      */
@@ -823,7 +823,7 @@ public final class FreeColClient {
     /**
      * Gets the <code>Client</code> that can be used to send messages to the
      * server.
-     * 
+     *
      * @return the <code>Client</code>
      * @see #setClient
      */
@@ -846,7 +846,7 @@ public final class FreeColClient {
                           + " sound: " + sound);
         }
     }
-    
+
     /**
      * Verifies if the client can play sounds.
      */
@@ -857,7 +857,7 @@ public final class FreeColClient {
     /**
      * Returns <i>true</i> if this client is logged in to a server or
      * <i>false</i> otherwise.
-     * 
+     *
      * @return <i>true</i> if this client is logged in to a server or
      *         <i>false</i> otherwise.
      */
@@ -867,7 +867,7 @@ public final class FreeColClient {
 
     /**
      * Sets whether or not this client is logged in to a server.
-     * 
+     *
      * @param loggedIn An indication of whether or not this client is logged in
      *            to a server.
      */
