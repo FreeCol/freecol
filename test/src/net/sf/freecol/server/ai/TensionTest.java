@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.networking.ClaimLandMessage;
+import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
@@ -118,7 +118,7 @@ public class TensionTest extends FreeColTestCase {
         // the european player steals 1 tile from the indians
         Tile tile2 = map.getTile(6,8);
         assertEquals(indian, tile2.getOwner());
-        igc.claimLand(european, tile2, null, ClaimLandMessage.STEAL_LAND);
+        igc.claimLand(european, tile2, null, NetworkConstants.STEAL_LAND);
         assertEquals(european, tile2.getOwner());
 
         // check the tension and stance have expected values

@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
  */
 public class ClaimLandMessage extends Message {
 
-    public static int STEAL_LAND = -1;
     /**
      * The ID of the tile to claim.
      */

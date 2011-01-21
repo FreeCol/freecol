@@ -77,7 +77,6 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.goal.ManageMissionariesGoal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;

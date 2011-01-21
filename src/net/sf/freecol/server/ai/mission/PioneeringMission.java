@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.ClaimLandMessage;
+import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -335,7 +335,7 @@ public class PioneeringMission extends Mission {
                 ; // fail
             } else {
                 if (price > 0 && player.getGold() < price) {
-                    price = ClaimLandMessage.STEAL_LAND;
+                    price = NetworkConstants.STEAL_LAND;
                 }
                 AIMessage.askClaimLand(connection, target, null, price);
             }

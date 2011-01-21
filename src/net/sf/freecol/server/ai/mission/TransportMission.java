@@ -50,8 +50,6 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.EmbarkMessage;
-import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;

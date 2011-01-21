@@ -3428,7 +3428,7 @@ public final class InGameController implements NetworkConstants {
             if (offer >= price) { // offered more than enough
                 price = offer;
             } else if (offer < 0) { // plan to steal
-                price = ClaimLandMessage.STEAL_LAND;
+                price = NetworkConstants.STEAL_LAND;
             } else {
                 boolean canAccept = price <= player.getGold();
                 switch (canvas.showClaimDialog(tile, player, price,
@@ -3438,7 +3438,7 @@ public final class InGameController implements NetworkConstants {
                 case ACCEPT: // accepted price
                     break;
                 case STEAL:
-                    price = ClaimLandMessage.STEAL_LAND;
+                    price = NetworkConstants.STEAL_LAND;
                     break;
                 default:
                     throw new IllegalStateException("showClaimDialog fail");

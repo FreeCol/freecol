@@ -38,8 +38,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DeliverGiftMessage;
-import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
