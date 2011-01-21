@@ -854,6 +854,9 @@ public final class FreeColServer {
             // that are not part of the difficulty settings.
             // Annotate with save format version where introduced
             // so we can remove this backward compatibility code in future.
+            if (specification == null) {
+                specification = getSpecification();
+            }
             if (!specification.hasOption("model.option.monarchSupport")) {
                 // Introduced: SAVEGAME_VERSION == 11
                 addIntegerOption("model.option.monarchSupport", 2);
