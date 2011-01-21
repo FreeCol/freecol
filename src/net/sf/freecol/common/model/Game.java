@@ -247,19 +247,19 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Returns the first <code>Settlement</code> with the given name.
+     * Finds a settlement by name.
      *
      * @param name The name of the <code>Settlement</code>.
-     * @return The <code>Settlement</code> or <code>null</code> if there is no
-     *         known <code>Settlement</code> with the specified name (the settlement
-     *         might not be visible to a client).
+     * @return The <code>Settlement</code> or <code>null</code> if
+     *         there is no known <code>Settlement</code> with the
+     *         specified name (the settlement might not be visible to
+     *         a client).
      */
     public Settlement getSettlement(String name) {
-        Iterator<Player> pit = getPlayerIterator();
-        while (pit.hasNext()) {
-            Player p = pit.next();
-            Settlement settlement = p.getSettlement(name);
-            if (settlement != null) return settlement;
+        for (Player p : getPlayers()) {
+            for (Settlement s : p.getSettlements()) {
+                if (name.equals(s.getName())) return s;
+            }
         }
         return null;
     }
