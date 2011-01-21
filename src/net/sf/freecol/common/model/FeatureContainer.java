@@ -25,9 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
+import java.util.logging.Logger;
 
 public class FeatureContainer {
+
+    private static final Logger logger = Logger.getLogger(FeatureContainer.class.getName());
 
     private Map<String, Set<Ability>> abilities = new HashMap<String, Set<Ability>>();
     private Map<String, Set<Modifier>> modifiers = new HashMap<String, Set<Modifier>>();
@@ -135,7 +137,8 @@ public class FeatureContainer {
      */
     public boolean hasAbility(String id, FreeColGameObjectType objectType, Turn turn) {
         if (specification.getAbilities(id) == null) {
-            throw new IllegalArgumentException("Unknown ability key: " + id);
+            logger.warning("Unknown ability key: " + id + ". Possible spelling error?");
+            return false;
         }
         Set<Ability> abilitySet = abilities.get(id);
         if (abilitySet == null) {
@@ -206,9 +209,9 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType, Turn turn) {
-        if (specification.getModifiers(id) == null &&
-            specification.getType(id) == null) {
-            throw new IllegalArgumentException("Unknown modifier key: " + id);
+        if (specification.getModifiers(id) == null) {
+            logger.warning("Unknown modifier key: " + id + ". Possible spelling error?");
+            return new HashSet<Modifier>();
         }
         Set<Modifier> modifierSet = modifiers.get(id);
         if (modifierSet == null) {
