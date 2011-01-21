@@ -850,9 +850,16 @@ public final class FreeColServer {
             }
             xs.close();
 
-            // Add a default value for options new to each version.
-            if (savegameVersion < 11) {
+            // Add a default value for options new to each version
+            // that are not part of the difficulty settings.
+            // Annotate with save format version where introduced
+            // so we can remove this backward compatibility code in future.
+            if (!specification.hasOption("model.option.monarchSupport")) {
+                // Introduced: SAVEGAME_VERSION == 11
                 addIntegerOption("model.option.monarchSupport", 2);
+            }
+            if (!specification.hasOption("model.option.buildOnNativeLand")) {
+                // Introduced: SAVEGAME_VERSION == 11
                 addStringOption("model.option.buildOnNativeLand",
                                 "model.option.buildOnNativeLand.never");
             }
