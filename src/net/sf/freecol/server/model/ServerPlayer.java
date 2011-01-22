@@ -1863,6 +1863,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (moveAttacker) {
             attackerUnit.setMovesLeft(attackerUnit.getInitialMovesLeft());
             ((ServerUnit) attackerUnit).csMove(defenderTile, random, cs);
+            attackerUnit.setMovesLeft(0);
             // Move adds in updates for the tiles, but...
             attackerTileDirty = defenderTileDirty = false;
             // ...with visibility of perhaps().
