@@ -43,15 +43,15 @@ public class RiverSection {
      * Base numbers used to encode/decode the river style
      */
     private static int[] base = {1, 3, 9, 27};
-    
+
     /**
      * River magnitude (size) for each direction toward the edges of the tile
      */
-    private int branch[] = {TileImprovement.NO_RIVER, 
-                            TileImprovement.NO_RIVER, 
-                            TileImprovement.NO_RIVER, 
+    private int branch[] = {TileImprovement.NO_RIVER,
+                            TileImprovement.NO_RIVER,
+                            TileImprovement.NO_RIVER,
                             TileImprovement.NO_RIVER};
-    
+
     /**
      * River magnitude (size) at the center of the tile
      */
@@ -61,7 +61,7 @@ public class RiverSection {
      * Direction the river is flowing toward, at the current section
      */
     public Direction direction;
-    
+
     /**
      * Position of the current river section
      */
@@ -75,7 +75,7 @@ public class RiverSection {
     public RiverSection(int style) {
         decodeStyle(style);
     }
-    
+
     /**
      * Constructor used to automatically generate rivers.
      *
@@ -87,7 +87,7 @@ public class RiverSection {
         this.direction = direction;
         setBranch(direction, TileImprovement.SMALL_RIVER);
     }
-    
+
     /**
      * Returns the position
      * @return position
@@ -95,7 +95,7 @@ public class RiverSection {
     public Map.Position getPosition() {
         return position;
     }
-    
+
     /**
      * Returns the size
      * @return size
@@ -103,7 +103,7 @@ public class RiverSection {
     public int getSize() {
         return size;
     }
-    
+
     /**
      * Decodes the style
      * @param style
@@ -154,7 +154,7 @@ public class RiverSection {
             }
         }
     }
-    
+
     /**
      * Gets the size of a branch
      */
@@ -176,7 +176,7 @@ public class RiverSection {
     public void removeBranch(Direction direction) {
         setBranch(direction, TileImprovement.NO_RIVER);
     }
-    
+
     /**
      * Increases the size a branch
      */
@@ -194,7 +194,7 @@ public class RiverSection {
             }
         }
     }
-    
+
     /**
      * Increases the size of this section by one.
      */
