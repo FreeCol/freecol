@@ -32,11 +32,11 @@ import java.util.Map;
 public class InstallerTranslations {
 
     private static final File SOURCE_DIRECTORY =
-        new File("src/net/sf/freecol/client/gui/i18n/");
+        new File("data/strings");
     private static final File MAIN_FILE =
         new File(SOURCE_DIRECTORY, "FreeColMessages.properties");
     private static final File DESTINATION_DIRECTORY =
-        new File("build/installer");
+        new File("build/bin/langpacks/installer");
     private static final File LANGUAGE_CODES =
         new File(DESTINATION_DIRECTORY, "iso-639-2.txt");
 
@@ -94,7 +94,7 @@ public class InstallerTranslations {
         "UserFiles.other"
     };
 
-    
+
     public static void main(String[] args) throws Exception {
 
         /*
@@ -107,6 +107,10 @@ public class InstallerTranslations {
         if (!MAIN_FILE.exists()) {
             System.out.println("Main input file not found.");
             System.exit(1);
+        }
+
+        if (!DESTINATION_DIRECTORY.exists()) {
+            DESTINATION_DIRECTORY.mkdirs();
         }
 
         //Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);
@@ -183,7 +187,7 @@ public class InstallerTranslations {
         Map<String, String> result = new HashMap<String, String>();
         try {
             FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader); 
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             while (line != null) {
                 int index = line.indexOf('=');
@@ -202,7 +206,7 @@ public class InstallerTranslations {
         Map<String, String> result = new HashMap<String, String>();
         try {
             FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader); 
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             String[] fields;
             while (line != null) {
