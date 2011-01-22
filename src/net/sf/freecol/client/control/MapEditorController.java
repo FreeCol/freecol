@@ -182,6 +182,9 @@ public final class MapEditorController {
 
         try {
             //game.setMapGeneratorOptions(mapGenerator.getMapGeneratorOptions());
+            if (game.getSpecification().getDifficultyLevel() == null) {
+                game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+            }
             mapGenerator.createMap(game);
             freeColClient.getGUI().setFocus(1, 1);
             freeColClient.getActionManager().update();
