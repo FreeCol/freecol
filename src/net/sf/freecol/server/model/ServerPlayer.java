@@ -953,7 +953,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         // Units.
         for (Unit unit : new ArrayList<Unit>(getUnits())) {
-            ((ServerModelObject) unit).csNewTurn(random, cs);
+            try {
+                ((ServerModelObject) unit).csNewTurn(random, cs);
+            } catch (ClassCastException e) {
+                logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(), e);
+            }
         }
 
         if (isEuropean()) { // Update liberty and immigration
