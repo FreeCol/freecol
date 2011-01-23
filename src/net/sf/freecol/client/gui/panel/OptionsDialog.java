@@ -51,7 +51,7 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private static final String RESET = "RESET";
     private static final String SAVE = "SAVE";
-    private static final String LOAD = "LOAD";
+    protected static final String LOAD = "LOAD";
 
     private OptionGroupUI ui;
     private OptionGroup group;
@@ -63,7 +63,7 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
     private List<JButton> buttons = new ArrayList<JButton>();
     private boolean editable = true;
 
-    private static final FileFilter[] filters = new FileFilter[] {
+    protected static final FileFilter[] filters = new FileFilter[] {
         new FileFilter() {
             public boolean accept(File pathname) {
                 return pathname.getName().endsWith(".xml");

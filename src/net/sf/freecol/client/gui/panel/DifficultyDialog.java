@@ -23,13 +23,18 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -130,6 +135,22 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         if (EDIT.equals(command)) {
             OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
             custom.setValue(getGroup());
+            difficultyBox.setSelectedItem(CUSTOM_LEVEL);
+        } else if (LOAD.equals(command)) {
+            File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), filters);
+            if (loadFile != null) {
+                try {
+                    FileInputStream in = new FileInputStream(loadFile);
+                    XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
+                    xsr.nextTag();
+                    OptionGroup group = new OptionGroup(xsr);
+                    in.close();
+                    OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
+                    custom.setValue(group);
+                } catch(Exception e) {
+                    logger.warning("Failed to load game options from " + loadFile.getName());
+                }
+            }
             difficultyBox.setSelectedItem(CUSTOM_LEVEL);
         } else {
             super.actionPerformed(event);
