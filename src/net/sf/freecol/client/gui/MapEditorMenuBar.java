@@ -90,11 +90,6 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         buildToolsMenu();
         buildColopediaMenu();
 
-        // --> Debug
-        if (FreeCol.isInDebugMode()) {
-            add(new DebugMenu(freeColClient));
-        }
-
         update();
     }
 
