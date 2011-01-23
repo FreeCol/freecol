@@ -1515,7 +1515,7 @@ public final class InGameController extends Controller {
                     Tile tile = u.getTile();
                     if (tile == null) continue;
                     if (tile.isLand() && tile.getOwner() == welcomer) {
-                        tile.setOwner(serverPlayer);
+                        tile.changeOwnership(serverPlayer, null);
                         cs.add(See.perhaps(), tile);
                         break;
                     }
