@@ -114,6 +114,8 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         edit.setEnabled(!CUSTOM_LEVEL.equals(group.getId()));
         getButtons().add(edit);
 
+        save.setEnabled(CUSTOM_LEVEL.equals(group.getId()));
+
         difficultyBox.addItemListener(this);
 
         initialize(group, Messages.message("difficulty"), difficultyBox);
@@ -160,6 +162,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     public void itemStateChanged(ItemEvent event) {
         String id = (String) difficultyBox.getSelectedItem();
         edit.setEnabled(!CUSTOM_LEVEL.equals(id));
+        save.setEnabled(CUSTOM_LEVEL.equals(id));
         updateUI(specification.getOptionGroup(id));
     }
 
