@@ -57,7 +57,7 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
     private OptionGroup group;
     private JButton reset = new JButton(Messages.message("reset"));
     private JButton load = new JButton(Messages.message("load"));
-    private JButton save = new JButton(Messages.message("save"));
+    protected JButton save = new JButton(Messages.message("save"));
     private JPanel optionPanel;
 
     private List<JButton> buttons = new ArrayList<JButton>();
