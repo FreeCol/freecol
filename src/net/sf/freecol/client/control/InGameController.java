@@ -1337,6 +1337,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         if (tile.getOwner() != player
+            && !player.canClaimToFoundSettlement(tile)
             && !claimTile(player, tile, null, player.getLandPrice(tile), 0)) {
             return;
         }
