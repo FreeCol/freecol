@@ -95,6 +95,12 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
 
+        // try to load saved custom difficulty
+        File customFile = new File(FreeCol.getSaveDirectory(), getDefaultFileName());
+        if (customFile.exists()) {
+            load(customFile);
+        }
+
         OptionGroup group = null;
         for (OptionGroup level : specification.getDifficultyLevels()) {
             String id = level.getId();
@@ -141,19 +147,9 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         } else if (LOAD.equals(command)) {
             File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), filters);
             if (loadFile != null) {
-                try {
-                    FileInputStream in = new FileInputStream(loadFile);
-                    XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
-                    xsr.nextTag();
-                    OptionGroup group = new OptionGroup(xsr);
-                    in.close();
-                    OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
-                    custom.setValue(group);
-                } catch(Exception e) {
-                    logger.warning("Failed to load game options from " + loadFile.getName());
-                }
+                load(loadFile);
+                difficultyBox.setSelectedItem(CUSTOM_LEVEL);
             }
-            difficultyBox.setSelectedItem(CUSTOM_LEVEL);
         } else {
             super.actionPerformed(event);
         }
@@ -164,6 +160,23 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         edit.setEnabled(!CUSTOM_LEVEL.equals(id));
         save.setEnabled(CUSTOM_LEVEL.equals(id));
         updateUI(specification.getOptionGroup(id));
+    }
+
+    /**
+     * Load custom difficulty level from given File.
+     *
+     * @param file a <code>File</code> value
+     */
+    private void load(File file) {
+        try {
+            FileInputStream in = new FileInputStream(file);
+            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
+            xsr.nextTag();
+            specification.getOptionGroup(CUSTOM_LEVEL).setValue(new OptionGroup(xsr));
+            in.close();
+        } catch(Exception e) {
+            logger.warning("Failed to load custom difficulty level from " + file.getName());
+        }
     }
 
     public String getDefaultFileName() {
