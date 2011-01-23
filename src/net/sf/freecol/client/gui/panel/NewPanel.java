@@ -242,9 +242,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     Specification specification = tcData.getSpecification();
                     OptionGroup level = getCanvas()
                         .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
-                    specification.applyDifficultyLevel(level);
-                    Advantages advantages = (Advantages) nationalAdvantages.getSelectedItem();
-                    connectController.startSingleplayerGame(specification, name.getText(), advantages);
+                    Advantages advantages;
+                    if (level != null) {
+                        specification.applyDifficultyLevel(level);
+                        advantages = (Advantages) nationalAdvantages.getSelectedItem();
+                        connectController.startSingleplayerGame(specification, name.getText(), advantages);
+                    }
                     break;
                 case JOIN:
                     try {
