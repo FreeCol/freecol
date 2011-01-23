@@ -201,7 +201,7 @@
         For a formal release, none of these properties should be set.
     -->
     <target name="dist" description="Creates archives and installers for distribution."
-            depends="init,initDist,tarJavaBundle,zipJavaBundle,tarSourceBundle,zipSourceBundle,javaInstallerBundle,winInstallerBundle,tarMacJavaBundle">
+            depends="init,initDist,zipJavaBundle,zipSourceBundle,javaInstallerBundle,winInstallerBundle,tarMacJavaBundle">
 
         <echo message="" />
         <echo message="-------------------------------------------------"/>
@@ -267,25 +267,11 @@
         </move>
     </target>
 
-    <target name="tarJavaBundle" unless="skip.dist.java" depends="initDist,prepareManual,prepareBaseFiles">
-        <tar destfile="${freecol.release.dir}/${freecol.release.name}.tar.gz" compression="gzip">
-            <tarfileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
-            <tarfileset dir="${freecol.release.dir}/manual" includes="${freecol.name}/**"/>
-        </tar>
-    </target>
-
     <target name="zipJavaBundle" unless="skip.dist.java" depends="initDist,prepareManual,prepareBaseFiles">
         <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
             <fileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
             <fileset dir="${freecol.release.dir}/manual" includes="${freecol.name}/**"/>
         </zip>
-    </target>
-
-    <target name="tarSourceBundle" unless="skip.dist.source" depends="initDist,prepareSourceFiles">
-        <tar destfile="${freecol.release.dir}/${freecol.release.name}-src.tar.gz" compression="gzip">
-            <tarfileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
-            <tarfileset dir="${freecol.release.dir}/source" includes="${freecol.name}/**"/>
-        </tar>
     </target>
 
     <target name="zipSourceBundle" unless="skip.dist.source" depends="initDist,prepareSourceFiles">
@@ -296,17 +282,7 @@
     </target>
 
     <target name="executeIzpack">
-        <condition property="beginExtraPacks" value="" else="&lt;!--">
-            <istrue value="${includeExtraPacks}" />
-        </condition>
-        <condition property="endExtraPacks" value="" else="--&gt;">
-            <istrue value="${includeExtraPacks}" />
-        </condition>
-        <condition property="sourcesIncluded" value="-with-sources" else="">
-            <istrue value="${includeExtraPacks}" />
-        </condition>
-
-        <izpack output="${freecol.release.dir}/${freecol.release.name}-installer${sourcesIncluded}.jar"
+        <izpack output="${freecol.release.dir}/${freecol.release.name}-installer.jar"
                 installerType="standard"
                 basedir="${freecol.release.dir}/"
                 izpackdir="${freecol.build.dir}">
@@ -411,12 +387,6 @@
                             <description>This pack includes the game manual.</description>
                             <fileset dir="manual/@{freecol.name}" targetdir="$INSTALL_PATH"/>
                         </pack>
-                        @{beginExtraPacks}
-                        <pack id="SourceCode" name="Source Code" required="no" preselected="no">
-                            <description>The source code used for building this distribution. These files are intended for developers and give no extra functionality to normal users.</description>
-                            <fileset dir="source/@{freecol.name}" targetdir="$INSTALL_PATH"/>
-                        </pack>
-                        @{endExtraPacks}
                     </packs>
                 </installation>
             ]]></config>
@@ -430,9 +400,6 @@
                 classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
         />
         <antcall target="executeIzpack" />
-        <antcall target="executeIzpack">
-            <param name="includeExtraPacks" value="true" />
-        </antcall>
     </target>
 
     <target name="winInstallerBundle" unless="skip.dist.installer" description="Builds a windows installer"
