@@ -701,37 +701,34 @@ public class IndianSettlement extends Settlement {
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
      *
-     * <br><br>
-     *
      * It is only meaningful to call this method from the
      * server, since the settlement's {@link GoodsContainer}
-     * is hidden from the clients.
+     * is hidden from the clients.  Note that this takes no account
+     * of whether the native player actually has the gold.
+     *
+     * TODO: this is rancid with magic numbers.
      *
      * @param type The type of <code>Goods</code> to price.
      * @param amount The amount of <code>Goods</code> to price.
      * @return The price.
      */
     public int getPrice(GoodsType type, int amount) {
+        if (amount > 100) throw new IllegalArgumentException("Amount > 100");
+
+        Specification spec = getSpecification();
+        final GoodsType armsType = spec.getGoodsType("model.goods.muskets");
+        final GoodsType horsesType = spec.getGoodsType("model.goods.horses");
         int returnPrice = 0;
 
-    	GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
-    	GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-    	EquipmentType armsEqType = getSpecification().getEquipmentType("model.equipment.indian.muskets");
-    	EquipmentType horsesEqType = getSpecification().getEquipmentType("model.equipment.indian.horses");
-
-    	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
-    	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
-        int musketsCurrAvail = getGoodsCount(armsType);
-        int horsesCurrAvail = getGoodsCount(horsesType);
-
-        if (amount > 100) {
-            throw new IllegalArgumentException();
-        }
-
         if (type == armsType) {
+            final EquipmentType armsEqType
+                = spec.getEquipmentType("model.equipment.indian.muskets");
+            final int musketsToArmIndian
+                = armsEqType.getAmountRequiredOf(armsType);
+            int musketsCurrAvail = getGoodsCount(armsType);
             int need = 0;
             int supply = musketsCurrAvail;
-            for (int i=0; i<ownedUnits.size(); i++) {
+            for (int i = 0; i < ownedUnits.size(); i++) {
                 need += musketsToArmIndian;
                 if (ownedUnits.get(i).isArmed()) {
                     supply += musketsToArmIndian;
@@ -740,17 +737,22 @@ public class IndianSettlement extends Settlement {
 
             int sets = ((musketsCurrAvail + amount) / musketsToArmIndian)
                 - (musketsCurrAvail / musketsToArmIndian);
-            int startPrice = (19+getPriceAddition()) - (supply / musketsToArmIndian);
-            for (int i=0; i<sets; i++) {
-                if ((startPrice-i) < 8 && (need > supply || musketsCurrAvail < musketsToArmIndian)) {
-                    startPrice = 8+i;
+            int startPrice = (19 + getPriceAddition()) - (supply / musketsToArmIndian);
+            for (int i = 0; i < sets; i++) {
+                if ((startPrice - i) < 8 && (need > supply || musketsCurrAvail < musketsToArmIndian)) {
+                    startPrice = 8 + i;
                 }
-                returnPrice += musketsToArmIndian * (startPrice-i);
+                returnPrice += musketsToArmIndian * (startPrice - i);
             }
         } else if (type == horsesType) {
+            final EquipmentType horsesEqType
+                = spec.getEquipmentType("model.equipment.indian.horses");
+            final int horsesToMountIndian
+                = horsesEqType.getAmountRequiredOf(horsesType);
+            int horsesCurrAvail = getGoodsCount(horsesType);
             int need = 0;
             int supply = horsesCurrAvail;
-            for (int i=0; i<ownedUnits.size(); i++) {
+            for (int i = 0; i < ownedUnits.size(); i++) {
                 need += horsesToMountIndian;
                 if (ownedUnits.get(i).isMounted()) {
                     supply += horsesToMountIndian;
@@ -759,60 +761,61 @@ public class IndianSettlement extends Settlement {
 
             int sets = (horsesCurrAvail + amount) / horsesToMountIndian
                 - (horsesCurrAvail / horsesToMountIndian);
-            int startPrice = (24+getPriceAddition()) - (supply/horsesToMountIndian);
+            int startPrice = (24 + getPriceAddition()) - (supply / horsesToMountIndian);
 
-            for (int i=0; i<sets; i++) {
-                if ((startPrice-(i*4)) < 4 &&
-                    (need > supply ||
-                    		horsesCurrAvail < horsesToMountIndian * 2)) {
-                    startPrice = 4+(i*4);
+            for (int i = 0; i < sets; i++) {
+                if ((startPrice - (i * 4)) < 4 && (need > supply ||	horsesCurrAvail < horsesToMountIndian * 2)) {
+                    startPrice = 4 + (i * 4);
                 }
-                returnPrice += horsesToMountIndian * (startPrice-(i*4));
+                returnPrice += horsesToMountIndian * (startPrice - (i * 4));
             }
         } else if (type.isFarmed()) {
             returnPrice = 0;
         } else {
-            int currentGoods = getGoodsCount(type);
+            int current = getGoodsCount(type);
 
-            // Increase amount if raw materials are produced:
+            // Increase amount if raw materials are produced.
             GoodsType rawType = type.getRawMaterial();
             if (rawType != null) {
                 int rawProduction = getMaximumProduction(rawType);
-                if (currentGoods < 100) {
+                if (current < 100) {
                     if (rawProduction < 5) {
-                        currentGoods += rawProduction * 10;
+                        current += rawProduction * 10;
                     } else if (rawProduction < 10) {
-                        currentGoods += 50 + Math.max((rawProduction-5) * 5, 0);
+                        current += 50 + Math.max((rawProduction - 5) * 5, 0);
                     } else if (rawProduction < 20) {
-                        currentGoods += 75 + Math.max((rawProduction-10) * 2, 0);
+                        current += 75 + Math.max((rawProduction - 10) * 2, 0);
                     } else {
-                        currentGoods += 100;
+                        current += 100;
                     }
                 }
             }
-            if (type.isTradeGoods()) {
-                currentGoods += 20;
-            }
 
-            int valueGoods = Math.min(currentGoods + amount, 200) - currentGoods;
-            if (valueGoods < 0) {
-                valueGoods = 0;
-            }
+            // Small artificial increase of the trade goods stored.
+            if (type.isTradeGoods()) current += 20;
 
-            returnPrice = (int) (((20.0+getPriceAddition())-(0.05*(currentGoods+valueGoods)))*(currentGoods+valueGoods)
-                                 - ((20.0+getPriceAddition())-(0.05*(currentGoods)))*(currentGoods));
+            // Only interested in the amount of goods that keeps the
+            // total under 200.
+            int valued = Math.max(0, Math.min(amount, 200 - current));
+
+            // Unit price then is maximum price (20) + price addition,
+            // less the total amount of goods the natives will have
+            // post-sale (current + valued) / 20.
+            int unitPrice = 20 + getPriceAddition() - (current + valued) / 20;
+            returnPrice = valued * unitPrice;
+            System.err.println("Price " + type
+                               + " amount=" + amount
+                               + " current=" + current
+                               + " valued=" + valued
+                               + " unitPrice=" + unitPrice
+                               + " totalPrice=" + returnPrice);
         }
 
-        // Bonus for top 3 types of goods:
-        if (type == wantedGoods[0]) {
-            returnPrice = (returnPrice*12)/10;
-        } else if (type == wantedGoods[1]) {
-            returnPrice = (returnPrice*11)/10;
-        } else if (type == wantedGoods[2]) {
-            returnPrice = (returnPrice*105)/100;
-        }
-
-        return returnPrice;
+        // Bonus for top 3 types of goods.
+        return (type == wantedGoods[0]) ? (returnPrice * 12) / 10
+            : (type == wantedGoods[1])  ? (returnPrice * 11) / 10
+            : (type == wantedGoods[2])  ? (returnPrice * 105) / 100
+            : returnPrice;
     }
 
     /**

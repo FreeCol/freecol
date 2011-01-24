@@ -197,7 +197,13 @@ public class GoodsTest extends FreeColTestCase {
         assertFalse(crosses.isRawBuildingMaterial());
         assertFalse(cloth.isRawBuildingMaterial());
         assertFalse(cotton.isRawBuildingMaterial());
-   }
+    }
+
+    public void testTradeGoods() {
+        GoodsType tradeGoods = spec().getGoodsType("model.goods.tradeGoods");
+
+        assertTrue(tradeGoods.isTradeGoods());
+    }
 
     public void testGetTakeSpace() {
         Map map = getTestMap(plainsType, true);

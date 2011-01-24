@@ -282,16 +282,6 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
-     * Set the <code>TradeGoods</code> value.
-     *
-     * @param newTradeGoods The new TradeGoods value.
-     */
-    public void setTradeGoods(final boolean newTradeGoods) {
-        this.tradeGoods = newTradeGoods;
-    }
-
-
-    /**
      * Whether this type of goods produces liberty points.
      *
      * @return a <code>boolean</code> value
@@ -364,6 +354,7 @@ public final class GoodsType extends FreeColGameObjectType {
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
         newWorldGoods = getAttribute(in, "new-world-goods", false);
+        tradeGoods = getAttribute(in, "trade-goods", false);
         breedingNumber = getAttribute(in, "breeding-number", INFINITY);
         price = getAttribute(in, "price", INFINITY);
 
@@ -406,6 +397,7 @@ public final class GoodsType extends FreeColGameObjectType {
         out.writeAttribute("is-food", Boolean.toString(isFood));
         out.writeAttribute("ignore-limit", Boolean.toString(ignoreLimit));
         out.writeAttribute("new-world-goods", Boolean.toString(newWorldGoods));
+        out.writeAttribute("trade-goods", Boolean.toString(tradeGoods));
         out.writeAttribute("storable", Boolean.toString(storable));
         if (breedingNumber != INFINITY) {
             out.writeAttribute("breeding-number", Integer.toString(breedingNumber));

@@ -169,22 +169,23 @@ public class ServerPlayer extends Player implements ServerModelObject {
                  * just before starting the game. See
                  * "net.sf.freecol.server.control.PreGameController".
                  */
-                gold = 0;
-                europe = new ServerEurope(game, this);
-                playerType = (nationType.isREF()) ? PlayerType.ROYAL
+                this.playerType = (nationType.isREF()) ? PlayerType.ROYAL
                     : PlayerType.COLONIAL;
-                if (playerType == PlayerType.COLONIAL) {
+                europe = new ServerEurope(game, this);
+                if (this.playerType == PlayerType.COLONIAL) {
                     monarch = new Monarch(game, this, nation.getRulerNameKey());
                 }
+                gold = 0;
             } else { // indians
+                this.playerType = PlayerType.NATIVE;
                 gold = 1500;
-                playerType = PlayerType.NATIVE;
             }
         } else {
             // virtual "enemy privateer" player
             // or undead ?
             this.nationID = Nation.UNKNOWN_NATION_ID;
             this.playerType = PlayerType.COLONIAL;
+            gold = 0;
         }
         market = new Market(getGame(), this);
         immigration = 0;

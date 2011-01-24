@@ -2218,10 +2218,10 @@ public final class InGameController extends Controller {
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
         tile.updatePlayerExploredTile(serverPlayer, true);
-        cs.add(See.only(serverPlayer),
-            settlement.modifyAlarm(serverPlayer, -amount / 50));
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
+        cs.add(See.only(serverPlayer),
+            settlement.modifyAlarm(serverPlayer, -amount / 50));
         cs.add(See.only(serverPlayer), settlement);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
@@ -2271,9 +2271,9 @@ public final class InGameController extends Controller {
 
         Player settlementPlayer = settlement.getOwner();
         settlementPlayer.modifyGold(-amount);
-        cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
-                -settlement.getPrice(goods) / 500));
         serverPlayer.modifyGold(amount);
+        cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
+                -amount / 500));
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
         tile.updatePlayerExploredTile(serverPlayer, true);
