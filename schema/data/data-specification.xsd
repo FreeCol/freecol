@@ -547,6 +547,7 @@
       <xs:attribute name="maximumSize" type="xs:integer"/>
       <xs:attribute name="minimumGrowth" type="xs:integer"/>
       <xs:attribute name="maximumGrowth" type="xs:integer"/>
+      <xs:attribute name="tradeBonus" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
 

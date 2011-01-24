@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.56 -->
+<!-- specification version 0.57 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -1407,7 +1407,8 @@
       <settlement id="model.settlement.camp" capital="false"
                   claimableRadius="1" extraClaimableRadius="2"
                   minimumSize="4" maximumSize="6"
-                  minimumGrowth="1" maximumGrowth="8">
+                  minimumGrowth="1" maximumGrowth="8"
+                  tradeBonus="1">
         <plunder probability="20" minimum="2" maximum="3" factor="100">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1420,7 +1421,8 @@
       <settlement id="model.settlement.camp.capital" capital="true"
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="6" maximumSize="8"
-                  minimumGrowth="2" maximumGrowth="10">
+                  minimumGrowth="2" maximumGrowth="10"
+                  tradeBonus="2">
         <plunder probability="100" minimum="2" maximum="4" factor="200">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1435,7 +1437,8 @@
       <settlement id="model.settlement.village" capital="false"
                   claimableRadius="1" extraClaimableRadius="2"
                   minimumSize="6" maximumSize="8"
-                  minimumGrowth="1" maximumGrowth="8">
+                  minimumGrowth="1" maximumGrowth="8"
+                  tradeBonus="2">
         <plunder probability="50" minimum="3" maximum="8" factor="100">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1448,7 +1451,8 @@
       <settlement id="model.settlement.village.capital" capital="true"
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="8" maximumSize="10"
-                  minimumGrowth="2" maximumGrowth="10">
+                  minimumGrowth="2" maximumGrowth="10"
+                  tradeBonus="3">
         <plunder probability="100" minimum="3" maximum="8" factor="200">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1526,7 +1530,8 @@
       <settlement id="model.settlement.inca" capital="false"
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="8" maximumSize="12"
-                  minimumGrowth="3" maximumGrowth="12">
+                  minimumGrowth="3" maximumGrowth="12"
+                  tradeBonus="3">
         <plunder probability="100" minimum="2" maximum="6" factor="2100">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1539,7 +1544,8 @@
       <settlement id="model.settlement.inca.capital" capital="true"
                   claimableRadius="3" extraClaimableRadius="3"
                   minimumSize="10" maximumSize="12"
-                  minimumGrowth="4" maximumGrowth="14">
+                  minimumGrowth="4" maximumGrowth="14"
+                  tradeBonus="4">
         <plunder probability="100" minimum="2" maximum="6" factor="3000">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1559,7 +1565,8 @@
       <settlement id="model.settlement.aztec" capital="false"
                   claimableRadius="2" extraClaimableRadius="2"
                   minimumSize="8" maximumSize="12"
-                  minimumGrowth="3" maximumGrowth="12">
+                  minimumGrowth="3" maximumGrowth="12"
+                  tradeBonus="3">
         <plunder probability="100" minimum="5" maximum="9" factor="1000">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>
@@ -1572,7 +1579,8 @@
       <settlement id="model.settlement.aztec.capital" capital="true"
                   claimableRadius="3" extraClaimableRadius="3"
                   minimumSize="10" maximumSize="12"
-                  minimumGrowth="4" maximumGrowth="14">
+                  minimumGrowth="4" maximumGrowth="14"
+                  tradeBonus="4">
         <plunder probability="100" minimum="7" maximum="12" factor="1000">
           <scope ability-id="model.ability.plunderNatives" ability-value="false"/>
         </plunder>

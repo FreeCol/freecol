@@ -674,11 +674,6 @@ public class IndianSettlement extends Settlement {
         return defender;
     }
 
-    // TODO: make this work again
-    private int getPriceAddition() {
-        return 3;
-    }
-
     /**
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
@@ -694,6 +689,13 @@ public class IndianSettlement extends Settlement {
      */
     public int getPrice(Goods goods) {
         return getPrice(goods.getType(), goods.getAmount());
+    }
+
+    /**
+     * Gets the settlement type trade bonus.
+     */
+    private int getPriceAddition() {
+        return getType().getTradeBonus();
     }
 
 
@@ -798,9 +800,9 @@ public class IndianSettlement extends Settlement {
             // total under 200.
             int valued = Math.max(0, Math.min(amount, 200 - current));
 
-            // Unit price then is maximum price (20) + price addition,
-            // less the total amount of goods the natives will have
-            // post-sale (current + valued) / 20.
+            // Unit price then is maximum price (20) + bonus for
+            // settlement type, less the total amount of goods the
+            // natives will have post-sale (current + valued) / 20.
             int unitPrice = 20 + getPriceAddition() - (current + valued) / 20;
             returnPrice = valued * unitPrice;
         }

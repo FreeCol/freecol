@@ -66,6 +66,12 @@ public class SettlementType extends FreeColGameObjectType {
      */
     private int maximumGrowth = 10;
 
+    /**
+     * The general trade bonus, roughly proportional to the settlement
+     * size and general sophistication.
+     */
+    private int tradeBonus = 1;
+
 
     /**
      * Creates a new <code>SettlementType</code> instance.
@@ -215,6 +221,15 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
+     * Gets the trade bonus.
+     *
+     * @return The general bonus to trade.
+     */
+    public final int getTradeBonus() {
+        return tradeBonus;
+    }
+
+    /**
      * Get the <code>Plunder</code> value.
      *
      * @param unit an <code>Unit</code> value
@@ -293,6 +308,7 @@ public class SettlementType extends FreeColGameObjectType {
         out.writeAttribute("wanderingRadius", Integer.toString(wanderingRadius));
         out.writeAttribute("minimumGrowth", Integer.toString(minimumGrowth));
         out.writeAttribute("maximumGrowth", Integer.toString(maximumGrowth));
+        out.writeAttribute("tradeBonus", Integer.toString(tradeBonus));
     }
 
 
@@ -317,6 +333,7 @@ public class SettlementType extends FreeColGameObjectType {
         wanderingRadius = getAttribute(in, "wanderingRadius", wanderingRadius);
         minimumGrowth = getAttribute(in, "minimumGrowth", minimumGrowth);
         maximumGrowth = getAttribute(in, "maximumGrowth", maximumGrowth);
+        tradeBonus = getAttribute(in, "tradeBonus", tradeBonus);
     }
 
     @Override
