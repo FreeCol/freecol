@@ -803,12 +803,6 @@ public class IndianSettlement extends Settlement {
             // post-sale (current + valued) / 20.
             int unitPrice = 20 + getPriceAddition() - (current + valued) / 20;
             returnPrice = valued * unitPrice;
-            System.err.println("Price " + type
-                               + " amount=" + amount
-                               + " current=" + current
-                               + " valued=" + valued
-                               + " unitPrice=" + unitPrice
-                               + " totalPrice=" + returnPrice);
         }
 
         // Bonus for top 3 types of goods.
