@@ -22,11 +22,14 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -150,6 +153,23 @@ public final class Market extends FreeColGameObject implements Ownable {
     // ------------------------------------------------------------ API methods
 
     /**
+     * Makes a slight randomization to all the new world and luxury goods
+     * types.  Used at the start of game by the PreGameController.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void randomizeInitialPrice(Random random) {
+        for (GoodsType type : getGame().getSpecification().getGoodsTypeList()) {
+            if (type.isNewWorldGoodsType() || type.isNewWorldLuxuryType()) {
+                int add = Utils.randomInt(null, null, random, 3);
+                if (add > 0) {
+                    setInitialPrice(type, add + getInitialPrice(type));
+                }
+            }
+        }
+    }
+
+    /**
      * Return the market data for a type of goods.  This one is public
      * so the server can send individual MarketData updates.
      *
@@ -227,6 +247,17 @@ public final class Market extends FreeColGameObject implements Ownable {
                                         data.getAmountInMarket() + amount));
         data.setTraded(true);
         data.price();
+    }
+
+    /**
+     * Gets the initial price of a given goods type.
+     *
+     * @param goodsType The <code>GoodsType</code> to get the initial price of.
+     * @return The initial price.
+     */
+    public int getInitialPrice(GoodsType goodsType) {
+        MarketData data = requireMarketData(goodsType);
+        return data.getInitialPrice();
     }
 
     /**

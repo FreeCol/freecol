@@ -32,20 +32,18 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.option.StringOption;
-import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
@@ -95,10 +93,11 @@ public final class PreGameController extends Controller {
      *   <li>Sends the "startGame"-message to the clients.
      * </ol>
      */
-    public void startGame() throws FreeColException{
+    public void startGame() throws FreeColException {
         FreeColServer freeColServer = getFreeColServer();
 
         Game game = freeColServer.getGame();
+        Specification spec = game.getSpecification();
         // Apply the difficulty level
         
         MapGenerator mapGenerator = freeColServer.getMapGenerator();
@@ -122,17 +121,38 @@ public final class PreGameController extends Controller {
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the
         // createMap should not really use the entire loadGame method
-        OptionGroup gameOptions = game.getSpecification().getOptionGroup("gameOptions");
+        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
         Element oldGameOptions = gameOptions.toXMLElement(Message.createNewRootElement("oldGameOptions")
                                                           .getOwnerDocument());
-        
-        // Make the map:
+
+        // Make the map.
         mapGenerator.createMap(game);
-        // Restore the GameOptions that may have been overwritten by loadGame in createMap
+
+        // Restore the GameOptions that may have been overwritten by
+        // loadGame in createMap
         gameOptions.readFromXMLElement(oldGameOptions);
         
-        // Inform the clients:
-        sendUpdatedGame();        
+        // Initial randomizations for all players.
+        Random random = getFreeColServer().getServerRandom();
+        for (Player player : game.getPlayers()) {
+            ((ServerPlayer) player).startGame(random);
+        }
+
+        // Inform the clients.
+        for (Player player : game.getPlayers()) {
+            if (!player.isAI()) {
+                Connection conn = ((ServerPlayer) player).getConnection();
+                try {
+                    XMLStreamWriter out = conn.send();
+                    out.writeStartElement("updateGame");
+                    game.toXML(out, player);
+                    out.writeEndElement();
+                    conn.endTransmission(null);
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "EXCEPTION: ", e);
+                }
+            }
+        }
         
         // Start the game:
         freeColServer.setGameState(FreeColServer.GameState.IN_GAME);
@@ -144,69 +164,4 @@ public final class PreGameController extends Controller {
         freeColServer.getServer().sendToAll(startGameElement);
         freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
     }
-    
-    /**
-     * Sets the map and sends an updated <code>Game</code>-object
-     * (that includes the map) to the clients.
-     */
-    public void sendUpdatedGame() {
-        Game game = getFreeColServer().getGame();
-        Random random = getFreeColServer().getServerRandom();
-
-        Iterator<Player> playerIterator = game.getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            
-            if (player.isEuropean() && !player.isREF()) {
-                player.modifyGold(getGame().getSpecification()
-                                  .getIntegerOption(GameOptions.STARTING_MONEY).getValue());
-
-                // Generates the initial recruits for this player.
-                // Recruits may be determined by the difficulty level,
-                // or generated randomly.
-                Europe europe = player.getEurope();
-                List<RandomChoice<UnitType>> recruits
-                    = player.generateRecruitablesList();
-                for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
-                    String optionId = "model.option.recruitable.slot" + index;
-                    if (getGame().getSpecification().hasOption(optionId)) {
-                        String unitTypeId = getGame().getSpecification()
-                            .getStringOption(optionId).getValue();
-                        if (!StringOption.NONE.equals(unitTypeId)) {
-                            europe.setRecruitable(index, getGame().getSpecification().getUnitType(unitTypeId));
-                            continue;
-                        }
-                    }
-                    europe.setRecruitable(index,
-                        RandomChoice.getWeightedRandom(null, null,
-                                                       random, recruits));
-                }
-
-                Market market = player.getMarket();
-                for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
-                    if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {
-                        int increase = Utils.randomInt(null, null, random, 3);
-                        if (increase > 0) {
-                            int newPrice = goodsType.getInitialSellPrice() + increase;
-                            market.setInitialPrice(goodsType, newPrice);
-                        }
-                    }
-                }
-            }
-            if (player.isAI()) {
-                continue;
-            }
-
-            try {
-                XMLStreamWriter out = player.getConnection().send();
-                out.writeStartElement("updateGame");
-                game.toXML(out, player);
-                out.writeEndElement();
-                player.getConnection().endTransmission(null);
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "EXCEPTION: ", e);
-            }
-        }
-    }
-
 }

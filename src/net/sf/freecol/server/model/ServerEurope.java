@@ -34,6 +34,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -66,6 +68,32 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public ServerEurope(Game game, Player owner) {
         super(game, owner);
+    }
+
+
+    /**
+     * Generates the initial recruits for this player.  Recruits may
+     * be determined by the difficulty level, or generated randomly.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void initializeMigration(Random random) {
+        Specification spec = getGame().getSpecification();
+        ServerPlayer player = (ServerPlayer) getOwner();
+        List<RandomChoice<UnitType>> recruits
+            = player.generateRecruitablesList();
+        for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
+            String optionId = "model.option.recruitable.slot" + index;
+            if (spec.hasOption(optionId)) {
+                String unitTypeId = spec.getStringOption(optionId).getValue();
+                if (!StringOption.NONE.equals(unitTypeId)) {
+                    setRecruitable(index, spec.getUnitType(unitTypeId));
+                    continue;
+                }
+            }
+            setRecruitable(index,
+                RandomChoice.getWeightedRandom(null, null, random, recruits));
+        }
     }
 
     /**

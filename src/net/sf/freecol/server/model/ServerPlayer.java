@@ -255,6 +255,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Performs initial randomizations for this player.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void startGame(Random random) {
+        Specification spec = getGame().getSpecification();
+        if (isEuropean() && !isREF()) {
+            modifyGold(spec.getIntegerOption(GameOptions.STARTING_MONEY)
+                       .getValue());
+            ((ServerEurope) getEurope()).initializeMigration(random);
+            getMarket().randomizeInitialPrice(random);
+        }
+    }
+
+    /**
      * Checks if this player has died.
      *
      * @return True if this player should die.
