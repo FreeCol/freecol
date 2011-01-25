@@ -299,9 +299,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         } else {
             removeFood(foodRequired);
             int production = getFoodProduction();
-            if (foodRequired > production){
-                int turns = (foodAvailable - foodRequired)
-                    / (foodRequired - production);
+            if (foodRequired > production) {
+                int turns = getFoodCount() / (foodRequired - production);
                 if (turns <= 3) {
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -309,6 +308,11 @@ public class ServerColony extends Colony implements ServerModelObject {
                                          this)
                                   .addName("%colony%", getName())
                                   .addName("%number%", String.valueOf(turns)));
+                    logger.finest("Famine feared in " + getName()
+                                  + " food=" + getFoodCount()
+                                  + " required=" + foodRequired
+                                  + " production=" + production
+                                  + " turns=" + turns);
                 }
             }
         }

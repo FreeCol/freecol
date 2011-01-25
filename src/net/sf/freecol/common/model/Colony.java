@@ -2299,6 +2299,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         buildingMap.clear();
         exportData.clear();
         buildQueue.clear();
+        populationQueue.clear();
 
         // Read child elements:
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
