@@ -544,7 +544,8 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
 
-        if (freeColClient.getMyPlayer().equals(player)) {
+        if (freeColClient.getMyPlayer().equals(player)
+            && freeColClient.getFreeColServer() != null) {
             // Autosave the game.
             ClientOptions options = freeColClient.getClientOptions();
             int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);

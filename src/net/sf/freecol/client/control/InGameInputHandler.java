@@ -423,37 +423,16 @@ public final class InGameInputHandler extends InputHandler {
      * @param setCurrentPlayerElement The element (root element in a DOM-parsed
      *            XML tree) that holds all the information.
      */
-    private Element setCurrentPlayer(Element setCurrentPlayerElement) {
+    private Element setCurrentPlayer(Element element) {
         Game game = getGame();
-        // Is it our player whose move is ending? If so we should close
-        // any outstanding popups.
-        final boolean popDown = getFreeColClient().getMyPlayer().equals(game.getCurrentPlayer());
+        Player newPlayer = (Player) game
+            .getFreeColGameObject(element.getAttribute("player"));
+        Player player = getFreeColClient().getMyPlayer();
 
-        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
-
-        logger.finest("About to set currentPlayer to " + currentPlayer.getName());
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    FreeColClient fcc = getFreeColClient();
-                    if (popDown) {
-                        fcc.getCanvas().closeMenus();
-                    }
-                    fcc.getInGameController().setCurrentPlayer(currentPlayer);
-                    if (fcc.getMyPlayer().equals(currentPlayer)) {
-                        fcc.getInGameController().nextActiveUnit();
-                    }
-                    fcc.getActionManager().update();
-                }
-            });
-        } catch (InterruptedException e) {
-            // Ignore
-        } catch (InvocationTargetException e) {
-            // Ignore
-        }
-        logger.finest("Succeeded in setting currentPlayer to " + currentPlayer.getName());
-
-        new RefreshCanvasSwingTask(true).invokeLater();
+        new SetCurrentPlayerSwingTask(newPlayer,
+                                      player.equals(game.getCurrentPlayer()),
+                                      player.equals(newPlayer))
+            .invokeLater();
         return null;
     }
 
@@ -1214,6 +1193,51 @@ public final class InGameInputHandler extends InputHandler {
 
 
         private final boolean _requestFocus;
+    }
+
+    /**
+     * A task to set a new current player.
+     */
+    class SetCurrentPlayerSwingTask extends RefreshCanvasSwingTask {
+
+        private Player newPlayer;
+        private boolean oldTurn;
+        private boolean newTurn;
+
+        /**
+         * Task constructor.
+         *
+         * @param newPlayer The <code>Player</code> to set to be the
+         *     current player.
+         * @param oldTurn True if the client player is to be replaced as
+         *     current player.
+         * @param newTurn True if the client player is to become the
+         *     current player.
+         */
+        public SetCurrentPlayerSwingTask(Player newPlayer, boolean oldTurn,
+                                         boolean newTurn) {
+            super(true);
+            this.newPlayer = newPlayer;
+            this.oldTurn = oldTurn;
+            this.newTurn = newTurn;
+        }
+
+        public void doWork(Canvas canvas) {
+            super.doWork(canvas);
+            FreeColClient fcc = getFreeColClient();
+
+            // If our turn is ending, clean up all open popups.
+            if (oldTurn) canvas.closeMenus();
+
+            // Set the new player
+            fcc.getInGameController().setCurrentPlayer(newPlayer);
+
+            // If our turn is beginning, select a unit.
+            if (newTurn) {
+                fcc.getInGameController()
+                    .nextActiveUnit(newPlayer.getEntryLocation().getTile());
+            }
+        }
     }
 
     class RefreshTilesSwingTask extends NoResultCanvasSwingTask {
