@@ -650,8 +650,9 @@ public class SimpleMapGenerator implements MapGenerator {
         for (Tile tile : tiles) {
             for (Direction d : Direction.getRandomDirectionArray(random)) {
                 Tile t = tile.getNeighbourOrNull(d);
-                if (t.getOwningSettlement() == null
-                    && is.getOwner().canClaimForSettlement(t)) return t;
+                if ((t != null)
+                    && (t.getOwningSettlement() == null)
+                    && (is.getOwner().canClaimForSettlement(t))) return t;
             }
         }
         return null;
