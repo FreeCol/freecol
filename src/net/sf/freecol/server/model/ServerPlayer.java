@@ -3027,6 +3027,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addDispose(loserPlayer, loser.getLocation(), loser);
     }
 
+    /**
+     * Updates the PlayerExploredTile for each new tile on a supplied list,
+     * and update a changeset as well.
+     *
+     * @param newTiles A list of <code>Tile</code>s to update.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csSeeNewTiles(List<Tile> newTiles, ChangeSet cs) {
+        for (Tile t : newTiles) {
+            t.updatePlayerExploredTile(this, false);
+            cs.add(See.only(this), t);
+        }
+    }
+
 
     @Override
     public String toString() {

@@ -767,6 +767,22 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
     /**
+     * Collects the tiles surrounding this unit that the player
+     * can not currently see, but now should as a result of a move.
+     *
+     * @param tile The center tile to look from.
+     * @return A list of new tiles to see.
+     */
+    public List<Tile> collectNewTiles(Tile tile) {
+        List<Tile> newTiles = new ArrayList<Tile>();
+        int los = getLineOfSight();
+        for (Tile t : tile.getSurroundingTiles(los)) {
+            if (!getOwner().canSee(t)) newTiles.add(t);
+        }
+        return newTiles;
+    }
+
+    /**
      * Move a unit.
      *
      * @param newTile The <code>Tile</code> to move to.
@@ -781,11 +797,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
-        List<Tile> newTiles = new ArrayList<Tile>();
-        int los = getLineOfSight();
-        for (Tile tile : newTile.getSurroundingTiles(los)) {
-            if (!serverPlayer.canSee(tile)) newTiles.add(tile);
-        }
+        List<Tile> newTiles = collectNewTiles(newTile);
 
         // Update unit state.
         Location oldLocation = getLocation();
@@ -827,10 +839,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
         cs.add(See.perhaps().always(serverPlayer), newTile);
         if (isDisposed()) return;
-        for (Tile t : newTiles) {
-            t.updatePlayerExploredTile(serverPlayer, false);
-            cs.add(See.only(serverPlayer), t);
-        }
+        serverPlayer.csSeeNewTiles(newTiles, cs);
 
         if (newTile.isLand()) {
             // Claim land for tribe?

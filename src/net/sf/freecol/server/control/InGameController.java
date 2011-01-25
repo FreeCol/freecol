@@ -1672,10 +1672,15 @@ public final class InGameController extends Controller {
 
         Unit carrier = (Unit) unit.getLocation();
         Location newLocation = carrier.getLocation();
+        List<Tile> newTiles = (newLocation.getTile() == null) ? null
+            : ((ServerUnit) unit).collectNewTiles(newLocation.getTile());
         unit.setLocation(newLocation);
         unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
         unit.setState(UnitState.ACTIVE);
         cs.add(See.perhaps(), (FreeColGameObject) newLocation);
+        if (newTiles != null) {
+            serverPlayer.csSeeNewTiles(newTiles, cs);
+        }
 
         // Others can (potentially) see the location.
         sendToOthers(serverPlayer, cs);
