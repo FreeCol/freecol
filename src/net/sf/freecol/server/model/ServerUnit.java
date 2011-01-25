@@ -214,7 +214,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             setAttrition(0);
         }
 
-        setMovesLeft((isUnderRepair()) ? 0 : getInitialMovesLeft());
+        setMovesLeft((isUnderRepair() || isInMission()) ? 0
+                     : getInitialMovesLeft());
 
         if (getWorkLeft() > 0) {
             unitDirty = true;

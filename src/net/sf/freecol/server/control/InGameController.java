@@ -2043,10 +2043,15 @@ public final class InGameController extends Controller {
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
             unit.setLocation(null);
             unit.setMovesLeft(0);
+            cs.add(See.only(serverPlayer), unit);
             settlement.changeMissionary(unit);
             settlement.setConvertProgress(0);
-            cs.add(See.only(serverPlayer),
-                   settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY));
+            List<FreeColGameObject> modifiedSettlements
+                = settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY);
+            modifiedSettlements.remove(settlement);
+            if (!modifiedSettlements.isEmpty()) {
+                cs.add(See.only(serverPlayer), modifiedSettlements);
+            }
             cs.add(See.perhaps().always(serverPlayer), tile);
             break;
         }

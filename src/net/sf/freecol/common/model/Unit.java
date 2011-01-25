@@ -2418,6 +2418,16 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Checks if this unit is running a mission.
+     *
+     * @return True if this unit is running a mission.
+     */
+    public boolean isInMission() {
+        return getRole() == Role.MISSIONARY
+            && getTile() == null;
+    }
+
+    /**
      * Returns a String representation of this Unit.
      *
      * @return A String representation of this Unit.
