@@ -268,7 +268,17 @@ public class IndianSettlement extends Settlement {
      */
     public void setAlarm(Player player, Tension newAlarm) {
         if (player != null && player != owner) alarm.put(player, newAlarm);
-     }
+    }
+
+    /**
+     * Removes all alarm towards the given player.  Used the a player leaves
+     * the game.
+     *
+     * @param player The <code>Player</code> to remove the alarm for.
+     */
+    public void removeAlarm(Player player) {
+        if (player != null) alarm.remove(player);
+    }
 
     /**
      * Change the alarm level of this settlement by a given amount.

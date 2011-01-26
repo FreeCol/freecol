@@ -509,15 +509,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
                              this)
                 .addStringTemplate("%nation%", getNationName()));
 
-        // Clean up missions
+        // Clean up missions and remove tension/alarm.
         if (isEuropean()) {
             for (Player other : getGame().getPlayers()) {
-                for (IndianSettlement s : other.getIndianSettlementsWithMission(this)) {
+                for (IndianSettlement s : other.getIndianSettlements()) {
                     Unit unit = s.getMissionary();
-                    s.changeMissionary(null);
-                    cs.addDispose(this, s.getTile(), unit);
-                    cs.add(See.perhaps(), s.getTile());
+                    if (unit != null
+                        && ((ServerPlayer) unit.getOwner()) == this) {
+                        s.changeMissionary(null);
+                        cs.addDispose(this, s.getTile(), unit);
+                        cs.add(See.perhaps(), s.getTile());
+                    }
+                    s.removeAlarm(this);
                 }
+                other.removeTension(this);
             }
         }
 
