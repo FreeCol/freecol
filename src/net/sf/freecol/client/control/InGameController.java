@@ -1910,16 +1910,13 @@ public final class InGameController implements NetworkConstants {
             && reply.hasAttribute("regionType")) {
             String newRegionType = reply.getAttribute("regionType");
             String defaultName = reply.getAttribute("discoverRegion");
-            for (;;) {
-                String newRegionName = canvas.showInputDialog(unit.getTile(),
-                        "nameRegion.text", defaultName, "ok", "cancel", true,
-                        "%name%", newRegionType);
-                // Default out on null, 0-length invalid.
-                if (newRegionName != null) {
-                    askNewRegionName(newRegionName, unit);
-                    break;
-                }
+            String newRegionName = canvas.showInputDialog(unit.getTile(),
+                "nameRegion.text", defaultName, "ok", null, true,
+                "%name%", newRegionType);
+            if (newRegionName == null || "".equals(newRegionName)) {
+                newRegionName = defaultName;
             }
+            askNewRegionName(newRegionName, unit);
         }
 
         if (reply.hasAttribute("fountainOfYouth")) {
