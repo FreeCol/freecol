@@ -154,8 +154,8 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     public boolean canBuildEquipment(EquipmentType equipmentType) {
         for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
             GoodsType goodsType = requiredGoods.getType();
-            if (!(getOwner().canTrade(goodsType) &&
-                  getOwner().getGold() >= getOwner().getMarket().getBidPrice(goodsType, requiredGoods.getAmount()))) {
+            if (!(getOwner().canTrade(goodsType)
+                  && getOwner().checkGold(getOwner().getMarket().getBidPrice(goodsType, requiredGoods.getAmount())))) {
                 return false;
             }
         }

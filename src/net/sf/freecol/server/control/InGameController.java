@@ -783,7 +783,7 @@ public final class InGameController extends Controller {
                         for (AbstractUnit au : mercenaries) {
                             price += serverPlayer.getPrice(au);
                         }
-                        if (price > serverPlayer.getGold()) {
+                        if (!serverPlayer.checkGold(price)) {
                             price = serverPlayer.getGold();
                         }
                         cs.add(See.only(serverPlayer),
@@ -2099,7 +2099,7 @@ public final class InGameController extends Controller {
         if (gold < 0) { // Initial enquiry.
             cs.addAttribute(See.only(serverPlayer),
                             "gold", Integer.toString(goldToPay));
-        } else if (gold < goldToPay || serverPlayer.getGold() < gold) {
+        } else if (gold < goldToPay || !serverPlayer.checkGold(gold)) {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "indianSettlement.inciteGoldFail",
@@ -2217,7 +2217,7 @@ public final class InGameController extends Controller {
         if (returnGold != amount) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
         }
-        if (serverPlayer.getGold() < amount) { // Check this is funded.
+        if (!serverPlayer.checkGold(amount)) { // Check this is funded.
             return Message.clientError("Insufficient gold to buy.");
         }
 
@@ -3027,7 +3027,7 @@ public final class InGameController extends Controller {
         if (arrears <= 0) {
             return Message.clientError("No arrears for pay for: "
                                        + type.getId());
-        } else if (serverPlayer.getGold() < arrears) {
+        } else if (!serverPlayer.checkGold(arrears)) {
             return Message.clientError("Not enough gold to pay arrears for: "
                                        + type.getId());
         }
@@ -3163,7 +3163,7 @@ public final class InGameController extends Controller {
         HashMap<GoodsType, Integer> required
             = colony.getGoodsForBuilding(build);
         int price = colony.priceGoodsForBuilding(required);
-        if (price > serverPlayer.getGold()) {
+        if (!serverPlayer.checkGold(price)) {
             return Message.clientError("Insufficient funds to pay for build.");
         }
 
@@ -3261,7 +3261,7 @@ public final class InGameController extends Controller {
         int price = europe.getUnitPrice(type);
         if (price <= 0) {
             return Message.clientError("Bogus price: " + price);
-        } else if (price > serverPlayer.getGold()) {
+        } else if (!serverPlayer.checkGold(price)) {
             return Message.clientError("Not enough gold to train " + type);
         }
 

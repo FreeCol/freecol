@@ -99,7 +99,7 @@ public class EmigrateUnitMessage extends Message {
                 return Message.clientError("Invalid slot for normal migration.");
             }
             type = MigrationType.NORMAL;
-        } else if (europe.getRecruitPrice() <= player.getGold()) {
+        } else if (player.checkGold(europe.getRecruitPrice())) {
             if (!selected) {
                 return Message.clientError("Invalid slot for recruitment.");
             }

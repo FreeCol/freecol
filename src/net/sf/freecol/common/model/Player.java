@@ -65,6 +65,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
+    // A magic constant to denote that a players gold is not tracked.
+    public static final int GOLD_NOT_ACCOUNTED = Integer.MIN_VALUE;
+
     public static final int SCORE_SETTLEMENT_DESTROYED = -40;
 
     public static final String ASSIGN_SETTLEMENT_NAME = "";
@@ -1721,8 +1724,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns the amount of gold that this player has.
      *
-     * @return The amount of gold that this player has or <code>-1</code> if
-     *         the amount of gold is unknown.
+     * @return The amount of gold that this player has.  May return
+     *     GOLD_NOT_ACCOUNTED for players whose gold is not accounted.
      */
     public int getGold() {
         return gold;
@@ -1738,18 +1741,27 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Checks if the player has enough gold to make a purchase.
+     * Use this rather than comparing with getGold(), as this handles
+     * players that do not account for gold.
+     *
+     * @param amount The purchase price to check.
+     * @return True if the player can afford the purchase.
+     */
+    public boolean checkGold(int amount) {
+        return this.gold == GOLD_NOT_ACCOUNTED || this.gold >= amount;
+    }
+
+    /**
      * Modifies the amount of gold that this player has. The argument can be
      * both positive and negative.
      *
      * @param amount The amount of gold that should be added to this player's
      *            gold amount (can be negative!).
-     * @exception IllegalArgumentException if the player gets a negative amount
-     *                of gold after adding <code>amount</code>.
      */
     public void modifyGold(int amount) {
-        if (this.gold == -1) {
-            return;
-        }
+        if (this.gold == Player.GOLD_NOT_ACCOUNTED) return;
+
         if ((gold + amount) >= 0) {
             modifyScore((gold + amount) / 1000 - gold / 1000);
             gold += amount;
@@ -1759,7 +1771,8 @@ public class Player extends FreeColGameObject implements Nameable {
             // for another player, where the balance is unknown. Just keep
             // going and do the best thing possible, we don't want to crash
             // the game here.
-            logger.warning("Cannot add " + amount + " gold for " + this + ": would be negative!");
+            logger.warning("Cannot add " + amount + " gold for "
+                           + this + ": would be negative!");
             gold = 0;
         }
     }

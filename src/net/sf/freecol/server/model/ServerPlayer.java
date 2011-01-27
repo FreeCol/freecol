@@ -178,7 +178,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 gold = 0;
             } else { // indians
                 this.playerType = PlayerType.NATIVE;
-                gold = 1500;
+                gold = Player.GOLD_NOT_ACCOUNTED;
             }
         } else {
             // virtual "enemy privateer" player
@@ -418,11 +418,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             goldNeeded += lowerPrice;
 
             // cannot buy carrier
-            if(goldNeeded > getGold()){
+            if (!checkGold(goldNeeded)) {
                 logger.info(getName() + " does not have enough money to buy carrier");
                 return true;
             }
-            logger.info(getName() + " has enough money to buy carrier, has=" + getGold() + ", needs=" + lowerPrice);
+            logger.info(getName() + " has enough money to buy carrier, has="
+                        + getGold() + ", needs=" + lowerPrice);
         }
 
         /*
@@ -484,7 +485,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         goldNeeded += Math.min(goldToTrain, goldToRecruit);
 
-        if (goldNeeded <= getGold()) return false;
+        if (checkGold(goldNeeded)) return false;
         // Does not have enough money for recruiting or training
         logger.info(getName() + " does not have enough money for recruiting or training");
         return true;
@@ -833,7 +834,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         logger.finest(getName() + " buys " + amount + " " + type);
         Market market = getMarket();
         int price = market.getBidPrice(type, amount);
-        if (price > getGold()) {
+        if (!checkGold(price)) {
             throw new IllegalStateException("Player " + getName()
                 + " tried to buy " + Integer.toString(amount)
                 + " " + type.toString()
@@ -2050,8 +2051,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Allocate some plunder
         if (plunder > 0) {
             attackerPlayer.modifyGold(plunder);
-            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
             colonyPlayer.modifyGold(-plunder);
+            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
             cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
         }
 
@@ -2424,8 +2425,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Allocate some plunder.
         if (plunder > 0) {
             attackerPlayer.modifyGold(plunder);
-            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
             colonyPlayer.modifyGold(-plunder);
+            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
             cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
         }
 

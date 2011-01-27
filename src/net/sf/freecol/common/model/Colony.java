@@ -899,7 +899,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      *     colony.
      */
     public boolean canBePlundered() {
-        return owner.getGold() > 0;
+        return owner.checkGold(1);
     }
 
     /**
@@ -1648,7 +1648,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      */
     public boolean canPayToFinishBuilding(BuildableType buildableType) {
         return buildableType != null
-            && getPriceForBuilding(buildableType) <= getOwner().getGold();
+            && getOwner().checkGold(getPriceForBuilding(buildableType));
     }
 
     /**

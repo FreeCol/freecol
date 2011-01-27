@@ -923,7 +923,7 @@ public class TransportMission extends Mission {
         Player player = aiPlayer.getPlayer();
         Market market = player.getMarket();
 
-        if (player.getGold() >= market.getBidPrice(type, amount)) {
+        if (player.checkGold(market.getBidPrice(type, amount))) {
             boolean success = AIMessage.askBuyGoods(getAIUnit(), type, amount);
             if(!success){
                 return null;
@@ -983,7 +983,7 @@ public class TransportMission extends Mission {
         }
         // Try recruiting the unit, unless it would be cheaper to
         // train
-        if (player.getGold() >= player.getRecruitPrice()
+        if (player.checkGold(player.getRecruitPrice())
             && price > player.getRecruitPrice()) {
             for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
                 // Note, used to be 1-3 but the method expects 0-2
@@ -994,7 +994,7 @@ public class TransportMission extends Mission {
         }
 
         // Try training the unit:
-        if (price > 0 && player.getGold() >= price) {
+        if (price > 0 && player.checkGold(price)) {
             return aiPlayer.trainAIUnitInEurope(unitType);
         }
 
@@ -1040,14 +1040,15 @@ public class TransportMission extends Mission {
             }
         }
         // Try recruiting the unit:
-        if (player.getGold() >= player.getRecruitPrice() && cheapestTrained != null
-                && player.getRecruitPrice() < priceTrained) {
+        if (player.checkGold(player.getRecruitPrice())
+            && cheapestTrained != null
+            && player.getRecruitPrice() < priceTrained) {
             // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc)
             return aiPlayer.recruitAIUnitInEurope(1);
         }
 
         // Try training the unit:
-        if (cheapestTrained != null && player.getGold() >= priceTrained) {
+        if (cheapestTrained != null && player.checkGold(priceTrained)) {
             return aiPlayer.trainAIUnitInEurope(cheapestTrained);
         }
 
@@ -1449,7 +1450,8 @@ public class TransportMission extends Mission {
 
         // Move back to America:
         Unit carrier = getUnit();
-        if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
+        if (!carrier.getOwner().checkGold(MINIMUM_GOLD_TO_STAY_IN_EUROPE)
+            || transportList.size() > 0) {
             moveUnitToAmerica();
         }        
     }

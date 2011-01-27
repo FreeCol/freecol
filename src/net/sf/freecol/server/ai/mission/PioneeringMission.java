@@ -334,7 +334,7 @@ public class PioneeringMission extends Mission {
             if (price < 0) {
                 ; // fail
             } else {
-                if (price > 0 && player.getGold() < price) {
+                if (price > 0 && !player.checkGold(price)) {
                     price = NetworkConstants.STEAL_LAND;
                 }
                 AIMessage.askClaimLand(connection, target, null, price);

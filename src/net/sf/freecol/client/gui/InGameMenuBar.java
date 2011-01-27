@@ -259,10 +259,10 @@ public class InGameMenuBar extends FreeColMenuBar {
                                  RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                                  RenderingHints.VALUE_RENDER_QUALITY);
-
+            final int gold = freeColClient.getMyPlayer().getGold();
             String displayString =
                 Messages.message(StringTemplate.template("menuBar.statusLine")
-                                 .addAmount("%gold%", freeColClient.getMyPlayer().getGold())
+                                 .addAmount("%gold%", gold)
                                  .addAmount("%tax%", freeColClient.getMyPlayer().getTax())
                                  .addAmount("%score%", freeColClient.getMyPlayer().getScore())
                                  .addStringTemplate("%year%", freeColClient.getGame().getTurn().getLabel()));

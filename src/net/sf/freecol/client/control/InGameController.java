@@ -1637,7 +1637,7 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return;
-        } else if (player.getGold() < player.getRecruitPrice()) {
+        } else if (!player.checkGold(player.getRecruitPrice())) {
             canvas.errorMessage("notEnoughGold");
             return;
         }
@@ -2633,7 +2633,7 @@ public final class InGameController implements NetworkConstants {
             return;
         case INDIAN_SETTLEMENT_SPEAK:
             Player player = unit.getOwner();
-            int gold = player.getGold();
+            final int oldGold = player.getGold();
             String result = askScoutSpeak(unit, direction);
             if (result == null) {
                 logger.warning("Null result from askScoutSpeak");
@@ -2653,7 +2653,7 @@ public final class InGameController implements NetworkConstants {
                 canvas.updateGoldLabel();
                 canvas.showInformationMessage(settlement,
                                               "scoutSettlement.speakBeads",
-                                              "%amount%", Integer.toString(player.getGold() - gold));
+                                              "%amount%", Integer.toString(player.getGold() - oldGold));
             } else if ("nothing".equals(result)) {
                 canvas.showInformationMessage(settlement,
                                               "scoutSettlement.speakNothing");
@@ -2741,7 +2741,7 @@ public final class InGameController implements NetworkConstants {
             int gold = askIncite(unit, direction, enemy, -1);
             if (gold < 0) {
                 ; // protocol fail
-            } else if (player.getGold() < gold) {
+            } else if (!player.checkGold(gold)) {
                 canvas.showInformationMessage(settlement,
                     "missionarySettlement.inciteGoldFail",
                     "%player%", Messages.message(enemy.getName()),
@@ -3153,7 +3153,7 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for buy proposal
-                boolean canBuy = gold <= player.getGold();
+                boolean canBuy = player.checkGold(gold);
                 switch (canvas.showBuyDialog(unit, settlement, goods, gold,
                                              canBuy)) {
                 case CANCEL: // User cancelled
@@ -3429,7 +3429,7 @@ public final class InGameController implements NetworkConstants {
             } else if (offer < 0) { // plan to steal
                 price = NetworkConstants.STEAL_LAND;
             } else {
-                boolean canAccept = price <= player.getGold();
+                boolean canAccept = player.checkGold(price);
                 switch (canvas.showClaimDialog(tile, player, price,
                                                owner, canAccept)) {
                 case CANCEL:
@@ -3821,7 +3821,7 @@ public final class InGameController implements NetworkConstants {
 
         // Check that the purchase is funded.
         Market market = player.getMarket();
-        if (market.getBidPrice(type, toBuy) > player.getGold()) {
+        if (!player.checkGold(market.getBidPrice(type, toBuy))) {
             canvas.errorMessage("notEnoughGold");
             return false;
         }
@@ -4548,7 +4548,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Europe europe = player.getEurope();
-        if (player.getGold() < europe.getUnitPrice(unitType)) {
+        if (!player.checkGold(europe.getUnitPrice(unitType))) {
             canvas.errorMessage("notEnoughGold");
             return;
         }
@@ -4653,7 +4653,7 @@ public final class InGameController implements NetworkConstants {
 
         int arrears = player.getArrears(type);
         if (arrears <= 0) return false;
-        if (player.getGold() < arrears) {
+        if (!player.checkGold(arrears)) {
             canvas.showInformationMessage("model.europe.cantPayArrears",
                                           "%amount%", String.valueOf(arrears));
             return false;

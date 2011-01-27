@@ -147,13 +147,14 @@ public class IndianDemandMission extends Mission {
                 int gold = 0;
                 int oldGoods = (goods == null) ? 0
                     : unit.getGoodsContainer().getGoodsCount(goods.getType());
-                int oldGold = unit.getOwner().getGold();
+                final int oldGold = unit.getOwner().getGold();
                 if (goods == null) {
-                    if (enemy.getGold() <= 0) {
+                    if (!enemy.checkGold(1)) {
                         completed = true;
                         return;
                     }
                     gold = enemy.getGold() / 20;
+                    if (gold == 0) gold = enemy.getGold();
                 }
                 AIMessage.askIndianDemand(getAIUnit(), target, goods, gold);
 
@@ -164,7 +165,7 @@ public class IndianDemandMission extends Mission {
                 boolean accepted = (goods != null
                     && unit.getGoodsContainer().getGoodsCount(goods.getType())
                                     > oldGoods)
-                    || (gold > 0 && unit.getOwner().getGold() > oldGold);
+                    || (gold > 0 && unit.getOwner().checkGold(oldGold+1));
                 if (accepted) {
                     String tribute = (goods != null) ? goods.toString()
                         : (Integer.toString(gold) + " gold");

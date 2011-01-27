@@ -358,7 +358,6 @@ public class IndianAIPlayer extends NewAIPlayer {
             }
         } else {
             price = ((IndianSettlement) settlement).getPrice(goods) - getPlayer().getTension(unit.getOwner()).getValue();
-            price = Math.min(price, getPlayer().getGold() / 2);
             if (price <= 0) {
                 return 0;
             }
@@ -366,9 +365,6 @@ public class IndianAIPlayer extends NewAIPlayer {
         }
         if (gold < 0 || price == gold) {
             return price;
-        } else if (gold > (getPlayer().getGold() * 3) / 4) {
-            sessionRegister.put(goldKey, new Integer(-1));
-            return NetworkConstants.NO_TRADE;
         } else if (gold > (price * 11) / 10) {
             logger.warning("Cheating attempt: haggling with a request too high");
             sessionRegister.put(goldKey, new Integer(-1));

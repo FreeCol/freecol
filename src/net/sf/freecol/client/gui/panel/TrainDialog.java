@@ -116,11 +116,11 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
 
             ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, Role.DEFAULT,
-                                                               (price > player.getGold()), 0.66);
+                                                               !player.checkGold(price), 0.66);
             JLabel unitName = localizedLabel(unitType.getNameKey());
             JLabel unitPrice = new JLabel(Messages.message("goldAmount", "%amount%", 
                                                            String.valueOf(price)));
-            if (price > player.getGold()) {
+            if (!player.checkGold(price)) {
                 unitName.setEnabled(false);
                 unitPrice.setEnabled(false);
                 newButton.setEnabled(false);

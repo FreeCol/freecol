@@ -122,12 +122,7 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
                 ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, 0.66);
                 person[index].setText(Messages.message(unitType.getNameKey()));
                 person[index].setIcon(unitIcon);
-
-                if (recruitPrice > player.getGold()) {
-                    person[index].setEnabled(false);
-                } else {
-                    person[index].setEnabled(true);
-                }
+                person[index].setEnabled(player.checkGold(recruitPrice));
 
                 add(person[index], "growx");
             }

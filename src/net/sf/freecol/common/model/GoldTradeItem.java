@@ -61,7 +61,7 @@ public class GoldTradeItem extends TradeItem {
      * @return a <code>boolean</code> value
      */
     public boolean isValid() {
-        return ((gold >= 0) && (getSource().getGold() >= gold));
+        return gold >= 0 && getSource().checkGold(gold);
     }
 
     /**

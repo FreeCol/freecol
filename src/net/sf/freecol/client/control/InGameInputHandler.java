@@ -656,7 +656,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
         Goods goods = message.getGoods();
-        int gold = message.getGold();
+        String goldStr = Integer.toString(message.getGold());
         boolean accepted;
         ModelMessage m = null;
         String nation = Messages.message(unit.getOwner().getNationName());
@@ -670,14 +670,14 @@ public final class InGameInputHandler extends InputHandler {
                         "indianDemand.gold.yes", "indianDemand.gold.no",
                         "%nation%", nation,
                         "%colony%", colony.getName(),
-                        "%amount%", String.valueOf(gold)).confirm();
+                        "%amount%", goldStr).confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
-                    .addName("%amount%", String.valueOf(gold));
+                    .addName("%amount%", goldStr);
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
@@ -685,7 +685,7 @@ public final class InGameInputHandler extends InputHandler {
                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
-                    .addName("%amount%", String.valueOf(gold));
+                    .addName("%amount%", goldStr);
                 accepted = false;
                 break;
             default:

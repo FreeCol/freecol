@@ -206,10 +206,6 @@ public class ServerIndianSettlement extends IndianSettlement
         if (getGoodsCount(type) > 0) {
             amount = Math.min(amount, getGoodsCount(type));
             removeGoods(type, amount);
-            // CHEAT: increase the gold by a corresponding amount
-            if (type.isNewWorldLuxuryType()) {
-                getOwner().modifyGold(amount);
-            }
         }
     }
 

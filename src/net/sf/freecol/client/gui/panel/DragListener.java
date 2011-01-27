@@ -489,7 +489,7 @@ public final class DragListener extends MouseAdapter {
                                                                              goodsRequired.getAmount());
                         newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsRequired.getType(), 0.66f));
                     }
-                    while (count * price > tempUnit.getOwner().getGold()) {
+                    while (!tempUnit.getOwner().checkGold(count * price)) {
                         count--;
                     }
                     newItem.setText(Messages.message(equipmentType.getId() + ".add") + " (" +

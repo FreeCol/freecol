@@ -61,7 +61,7 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
         question = getDefaultTextArea(Messages.message("goodsTransfer.text"));
 
         if (needToPay) {
-            int gold = getMyPlayer().getGold();
+            final int gold = getMyPlayer().getGold();
             int price = getMyPlayer().getMarket().getCostToBuy(goodsType);
             available = Math.min(available, gold/price);
         }

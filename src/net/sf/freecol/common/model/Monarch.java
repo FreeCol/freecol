@@ -351,7 +351,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         if (actionIsValid(MonarchAction.SUPPORT_LAND)) {
-            if (player.getGold() < MINIMUM_PRICE) {
+            if (!player.checkGold(MINIMUM_PRICE)) {
                 if (dx < 3) {
                     choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_LAND,
                                                                 3 - dx));
@@ -565,7 +565,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         int mercPrice = spec.getIntegerOption("model.option.mercenaryPrice")
             .getValue();
         List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
-        int gold = player.getGold();
         int price = 0;
         int limit = unitTypes.size();
         UnitType unitType = null;
@@ -577,7 +576,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 for (int number = 3; number > 0; number--) {
                     au = new AbstractUnit(unitType, Role.DRAGOON, number);
                     int newPrice = player.getPrice(au) * mercPrice / 100;
-                    if (price + newPrice <= gold) {
+                    if (player.checkGold(price + newPrice)) {
                         mercs.add(au);
                         price += newPrice;
                         break;
@@ -586,7 +585,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 for (int number = 3; number > 0; number--) {
                     au = new AbstractUnit(unitType, Role.SOLDIER, number);
                     int newPrice = player.getPrice(au) * mercPrice / 100;
-                    if (price + newPrice <= gold) {
+                    if (player.checkGold(price + newPrice)) {
                         mercs.add(au);
                         price += newPrice;
                         break;
@@ -596,7 +595,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 for (int number = 3; number > 0; number--) {
                     au = new AbstractUnit(unitType, Role.DEFAULT, number);
                     int newPrice = player.getPrice(au) * mercPrice / 100;;
-                    if (price + newPrice <= gold) {
+                    if (player.checkGold(price + newPrice)) {
                         mercs.add(au);
                         price += newPrice;
                         break;
