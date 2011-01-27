@@ -133,13 +133,13 @@ public class FoundingFatherTest extends FreeColTestCase {
         NationType inca = spec().getNationType("model.nationType.inca");
         SettlementType incaCity = inca.getSettlementType("model.settlement.inca");
 
-        RandomRange range = incaCity.getPlunder(unit);
+        RandomRange range = incaCity.getPlunderRange(unit);
         assertEquals(2100, range.getFactor());
 
         FoundingFather father = spec().getFoundingFather("model.foundingFather.hernanCortes");
         player.addFather(father);
 
-        range = incaCity.getPlunder(unit);
+        range = incaCity.getPlunderRange(unit);
         assertEquals(3100, range.getFactor());
 
     }

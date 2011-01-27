@@ -768,7 +768,13 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse("Defender should not be a defensive unit",
                     defender.isDefensiveUnit());
 
-        // Attacker wins and slaughters the defender
+        // Make sure pillaging is out.
+        assertFalse("Colony can not be plundered",
+                    colony.canBePlundered());
+        assertFalse("Colony can not be pillaged",
+                    colony.canBePillaged(attacker));
+
+        // Attacker wins and slaughters the defender.
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
         assertTrue("Brave v Colony (3) failed", crs.size() == 2
                    && crs.get(0) == CombatResult.WIN

@@ -1808,19 +1808,23 @@ public final class InGameController extends Controller {
         Player indianPlayer = settlement.getOwner();
         int gold = 0;
         int year = getGame().getTurn().getNumber();
+        RandomRange gifts = settlement.getType().getGifts(unit);
         settlement.makeContactSettlement(serverPlayer);
         if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
-            && indianPlayer.getGold() > 0) {
+            && gifts != null) {
             switch (indianPlayer.getTension(serverPlayer).getLevel()) {
             case HAPPY: case CONTENT:
-                gold = Math.min(indianPlayer.getGold() / 10, 100);
+                gold = Math.min(gifts.getAmount("Tribute", random, true) / 10,
+                                100);
                 break;
             case DISPLEASED:
-                gold = Math.min(indianPlayer.getGold() / 20, 100);
+                gold = Math.min(gifts.getAmount("Tribute", random, true) / 20,
+                                100);
                 break;
             case ANGRY: case HATEFUL:
             default:
-                break; // do nothing
+                gold = 0; // No tribute for you.
+                break;
             }
         }
 
@@ -1902,10 +1906,8 @@ public final class InGameController extends Controller {
             } else {
                 // ...and the rest are beads.
                 RandomRange gifts = settlement.getType().getGifts(unit);
-                int randomLimit = Utils.randomInt(logger, "Base beads amount",
-                                                  random,
-                                                  gifts.getRandomLimit());
-                gold = gifts.getAmount(randomLimit);
+                gold = (gifts == null) ? 0
+                    : gifts.getAmount("Base beads amount", random, true);
                 if (unit.hasAbility("model.ability.expertScout")) {
                     gold = (gold * 11) / 10;
                 }

@@ -2,13 +2,20 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.util.Utils;
+
+
 public class RandomRange {
+
+    private static Logger logger = Logger.getLogger(RandomRange.class.getName());
 
     /**
      * Probability that the result is not zero.
@@ -168,6 +175,32 @@ public class RandomRange {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Gets the amount of plunder.
+     *
+     * @param prefix A logger prefix.
+     * @param random A pseudo-random number source.
+     * @param continuous Choose a continuous or discrete result.
+     * @return A random amount of plunder as defined by this RandomRange.
+     */
+    public int getAmount(String prefix, Random random, boolean continuous) {
+        if (probability >= 100
+            || (probability > 0
+                && Utils.randomInt(logger, prefix + " check-for-zero",
+                                   random, 100) < probability)) {
+            if (continuous) {
+                int r = Utils.randomInt(logger, prefix + " random-range",
+                                        random, getRange() * factor);
+                return r + minimum * factor;
+            } else {
+                int r = Utils.randomInt(logger, prefix + " random-range",
+                                    random, getRange());
+                return getAmount(r);
+            }
+        }
+        return 0;
     }
 
     /**

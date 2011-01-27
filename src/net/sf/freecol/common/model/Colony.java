@@ -43,6 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.RandomRange;
 
 import org.w3c.dom.Element;
 
@@ -887,7 +888,18 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                  && (getLootableGoodsList().isEmpty()
                      || !attacker.getType().canCarryGoods()
                      || attacker.getSpaceLeft() == 0)
-                 && getPlunder() == 0);
+                 && !canBePlundered());
+    }
+
+    /**
+     * Checks if this colony can be plundered.  That is, can it yield
+     * non-zero gold.
+     *
+     * @return True if at least one piece of gold can be plundered from this
+     *     colony.
+     */
+    public boolean canBePlundered() {
+        return owner.getGold() > 0;
     }
 
     /**
@@ -932,14 +944,19 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     }
 
     /**
-     * Calculates the amount of gold to be plundered when this colony
-     * is looted or captured.
+     * Gets the plunder range for this colony.
      *
-     * @return The amount of gold plundered.
+     * @param attacker An attacking <code>Unit</code>.
+     * @return The plunder range.
      */
-    public int getPlunder() {
-        return (owner.getGold() * (getUnitCount() + 1))
-            / (owner.getColoniesPopulation() + 1);
+    public RandomRange getPlunderRange(Unit attacker) {
+        if (canBePlundered()) {
+            int upper = (owner.getGold() * (getUnitCount() + 1))
+                / (owner.getColoniesPopulation() + 1);
+            return new RandomRange(100, 1, upper, 1);
+        } else {
+            return new RandomRange(0, 0, 1, 1);
+        }
     }
 
     /**

@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.RandomRange;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
 
@@ -1223,10 +1224,10 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Get the amount of gold plundered when this settlement is captured.
+     * Gets the range of gold plunderable when this settlement is captured.
      */
-    public int getPlunder() {
-        return owner.getGold() / 10;
+    public RandomRange getPlunderRange(Unit attacker) {
+        return getType().getPlunderRange(attacker);
     }
 
     /**

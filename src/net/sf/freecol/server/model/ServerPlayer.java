@@ -1595,7 +1595,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     && colony != null
                     && isEuropean() && defenderPlayer.isEuropean();
                 if (ok) {
-                    csCaptureColony(attackerUnit, colony, cs);
+                    csCaptureColony(attackerUnit, colony, random, cs);
                     attackerTileDirty = defenderTileDirty = true;
                     moveAttacker = true;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
@@ -1679,7 +1679,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     && colony != null
                     && isIndian() && defenderPlayer.isEuropean();
                 if (ok) {
-                    csDestroyColony(attackerUnit, colony, cs);
+                    csDestroyColony(attackerUnit, colony, random, cs);
                     attackerTileDirty = defenderTileDirty = true;
                     moveAttacker = true;
                     attackerTension -= Tension.TENSION_ADD_NORMAL;
@@ -2009,16 +2009,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param attacker The attacking <code>Unit</code>.
      * @param colony The <code>Colony</code> to capture.
+     * @param random A pseudo-random number source.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csCaptureColony(Unit attacker, Colony colony, ChangeSet cs) {
+    private void csCaptureColony(Unit attacker, Colony colony, Random random,
+                                 ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationName();
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
         StringTemplate colonyNation = colonyPlayer.getNationName();
         Tile tile = colony.getTile();
-        int plunder = colony.getPlunder();
+        int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony handover
         cs.addHistory(attackerPlayer,
@@ -2046,10 +2048,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%player%", attackerNation));
 
         // Allocate some plunder
-        attackerPlayer.modifyGold(plunder);
-        cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
-        colonyPlayer.modifyGold(-plunder);
-        cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+        if (plunder > 0) {
+            attackerPlayer.modifyGold(plunder);
+            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
+            colonyPlayer.modifyGold(-plunder);
+            cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+        }
 
         // Hand over the colony
         colony.changeOwner(attackerPlayer);
@@ -2382,17 +2386,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param attacker The <code>Unit</code> that attacked.
      * @param colony The <code>Colony</code> that was attacked.
+     * @param random A pseudo-random number source.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csDestroyColony(Unit attacker, Colony colony,
+    private void csDestroyColony(Unit attacker, Colony colony, Random random,
                                  ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationName();
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
         StringTemplate colonyNation = colonyPlayer.getNationName();
-        int plunder = colony.getPlunder();
         Tile tile = colony.getTile();
+        int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony destruction.
         cs.addHistory(colonyPlayer,
@@ -2417,10 +2422,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%attackerNation%", attackerNation));
 
         // Allocate some plunder.
-        attackerPlayer.modifyGold(plunder);
-        cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
-        colonyPlayer.modifyGold(-plunder);
-        cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+        if (plunder > 0) {
+            attackerPlayer.modifyGold(plunder);
+            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
+            colonyPlayer.modifyGold(-plunder);
+            cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+        }
 
         // Dispose of the colony and its contents.
         csDisposeSettlement(colony, cs);
@@ -2444,35 +2451,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate nativeNation = nativePlayer.getNationName();
         String settlementName = settlement.getName();
         boolean capital = settlement.isCapital();
-        SettlementType settlementType = settlement.getType();
-
-        // Calculate the treasure amount.  Larger if Hernan Cortes is
-        // present in the congress, from cities, and capitals.
-        RandomRange plunder = settlementType.getPlunder(attacker);
-        int treasure = 0;
-        int r = plunder.getRandomLimit();
-        if (r > 0) {
-            r = Utils.randomInt(logger, "Plunder native settlement", random, r);
-            treasure = plunder.getAmount(r);
-        }
+        int plunder = settlement.getPlunder(attacker, random);
 
         // Destroy the settlement, update settlement tiles.
         csDisposeSettlement(settlement, cs);
 
         // Make the treasure train if there is treasure.
-        if (treasure > 0) {
+        if (plunder > 0) {
             List<UnitType> unitTypes = game.getSpecification()
                 .getUnitTypesWithAbility("model.ability.carryTreasure");
             UnitType type = Utils.getRandomMember(logger, "Choose train",
                                                   unitTypes, random);
             Unit train = new ServerUnit(game, tile, attackerPlayer, type,
                                         UnitState.ACTIVE);
-            train.setTreasureAmount(treasure);
+            train.setTreasureAmount(plunder);
         }
 
         // This is an atrocity.
         int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
-        if (settlementType.getClaimableRadius() > 1) atrocities *= 2;
+        if (settlement.getType().getClaimableRadius() > 1) atrocities *= 2;
         if (capital) atrocities = (atrocities * 3) / 2;
         attackerPlayer.modifyScore(atrocities);
         cs.addPartial(See.only(attackerPlayer), attackerPlayer, "score");
@@ -2483,7 +2480,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                        "model.unit.indianTreasure",
                                        attacker)
                       .addName("%settlement%", settlementName)
-                      .addAmount("%amount%", treasure));
+                      .addAmount("%amount%", plunder));
         cs.addHistory(attackerPlayer,
                       new HistoryEvent(game.getTurn(),
                                        HistoryEvent.EventType.DESTROY_SETTLEMENT)
@@ -2802,7 +2799,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         int pillage = Utils.randomInt(logger, "Pillage choice", random,
                                       buildingList.size() + shipList.size()
                                       + goodsList.size()
-                                      + ((colony.getPlunder() == 0) ? 0 : 1));
+                                      + ((colony.canBePlundered()) ? 1 : 0));
         if (pillage < buildingList.size()) {
             Building building = buildingList.get(pillage);
             cs.addMessage(See.only(colonyPlayer),
@@ -2839,14 +2836,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
                           .addStringTemplate("%enemyUnit%", attacker.getLabel()));
 
         } else {
-            int gold = colonyPlayer.getGold() / 10;
-            colonyPlayer.modifyGold(-gold);
-            attackerPlayer.modifyGold(gold);
+            int plunder = colony.getPlunder(attacker, random) / 10;
+            if (plunder > 0) {
+                colonyPlayer.modifyGold(-plunder);
+                attackerPlayer.modifyGold(plunder);
+                cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+            }
             cs.addMessage(See.only(colonyPlayer),
                           new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                            "model.unit.indianPlunder",
                                            colony)
-                          .addAmount("%amount%", gold)
+                          .addAmount("%amount%", plunder)
                           .addName("%colony%", colony.getName())
                           .addStringTemplate("%enemyNation%", attackerNation)
                           .addStringTemplate("%enemyUnit%", attacker.getLabel()));

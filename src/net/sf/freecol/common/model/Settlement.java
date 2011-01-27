@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Random;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -32,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.RandomRange;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -260,9 +262,26 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     abstract public Unit getDefendingUnit(Unit attacker);
 
     /**
-     * Get the amount of gold plundered when this settlement is captured.
+     * Gets the range of gold plunderable when this settlement is captured.
+     *
+     * @param attacker The <code>Unit</code> that takes the settlement.
+     * @return A <code>RandomRange</code> encapsulating the range of plunder
+     *     available.
      */
-    abstract public int getPlunder();
+    abstract public RandomRange getPlunderRange(Unit attacker);
+
+    /**
+     * Gets an amount of plunder when this settlement is taken.
+     *
+     * @param attacker The <code>Unit</code> that takes the settlement.
+     * @param random A pseudo-random number source.
+     * @return An amount of gold plundered.
+     */
+    public int getPlunder(Unit attacker, Random random) {
+        RandomRange range = getPlunderRange(attacker);
+        return (range == null) ? 0
+            : range.getAmount("Plunder " + getName(), random, false);
+    }
 
     /**
      * Gets the <code>Tile</code> where this <code>Settlement</code> is located.

@@ -230,12 +230,12 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>Plunder</code> value.
+     * Gets the plunder range available for the supplied unit.
      *
-     * @param unit an <code>Unit</code> value
-     * @return a <code>RandomRange</code> value
+     * @param unit The <code>Unit</code> to check.
+     * @return The plunder range.
      */
-    public final RandomRange getPlunder(Unit unit) {
+    public final RandomRange getPlunderRange(Unit unit) {
         for (RandomRange range : plunder) {
             List<Scope> scopes = range.getScopes();
             if (scopes.isEmpty()) {
