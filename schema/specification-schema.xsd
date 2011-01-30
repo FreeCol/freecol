@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.57
+<!-- XSD for specification version 0.59
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -33,6 +33,8 @@
      0.55: add increment and incrementType to modifier
      0.56: add scope to plunder and gifts elements
      0.57: add tradeBonus attribute to settlement
+     0.58: change unit type changes to use percentages rather than booleans
+     0.59: add maximumExperience attribute to UnitType
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -337,6 +339,7 @@
       <xs:attribute name="expert-production" type="GoodsTypeId"/>
       <xs:attribute name="skillTaught" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:int"/>
+      <xs:attribute name="maximumExperience" type="xs:nonNegativeInteger"/>
       <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
       <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
     </xs:complexType>

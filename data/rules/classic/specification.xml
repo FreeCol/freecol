@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.57 -->
+<!-- specification version 0.59 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">

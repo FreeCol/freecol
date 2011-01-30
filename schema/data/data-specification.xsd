@@ -298,6 +298,7 @@
       <xs:attribute name="expert-production" type="GoodsTypeId"/>
       <xs:attribute name="skillTaught" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:int"/>
+      <xs:attribute name="maximumExperience" type="xs:nonNegativeInteger"/>
       <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
       <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
     </xs:complexType>

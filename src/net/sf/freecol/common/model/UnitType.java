@@ -97,6 +97,11 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     private int scoreValue = 0;
 
     /**
+     * The maximum experience a unit of this type can accumulate.
+     */
+    private int maximumExperience = 200;
+
+    /**
      * Describe maximumAttrition here.
      */
     private int maximumAttrition = INFINITY;
@@ -365,6 +370,24 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     }
 
     /**
+     * Get the <code>MaximumExperience</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getMaximumExperience() {
+        return maximumExperience;
+    }
+
+    /**
+     * Set the <code>MaximumExperience</code> value.
+     *
+     * @param newMaximumExperience The new MaximumExperience value.
+     */
+    public final void setMaximumExperience(final int newMaximumExperience) {
+        this.maximumExperience = newMaximumExperience;
+    }
+
+    /**
      * Get the <code>MaximumAttrition</code> value.
      *
      * @return an <code>int</code> value
@@ -579,6 +602,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         space = getAttribute(in, "space", parent.space);
         hitPoints = getAttribute(in, "hitPoints", parent.hitPoints);
         spaceTaken = getAttribute(in, "spaceTaken", parent.spaceTaken);
+        maximumExperience = getAttribute(in, "maximumExperience", parent.maximumExperience);
         maximumAttrition = getAttribute(in, "maximumAttrition", parent.maximumAttrition);
         String skillString = in.getAttributeValue(null, "skillTaught");
         skillTaught = (skillString == null) ? this : getSpecification().getUnitType(skillString);
@@ -673,6 +697,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         out.writeAttribute("space", Integer.toString(space));
         out.writeAttribute("spaceTaken", Integer.toString(spaceTaken));
         out.writeAttribute("hitPoints", Integer.toString(hitPoints));
+        out.writeAttribute("maximumExperience", Integer.toString(maximumExperience));
         if (maximumAttrition < INFINITY) {
             out.writeAttribute("maximumAttrition", Integer.toString(maximumAttrition));
         }
