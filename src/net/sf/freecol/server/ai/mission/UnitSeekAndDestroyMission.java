@@ -196,7 +196,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             }
         };
         return getGame().getMap().search(unit, start, gd,
-                CostDeciders.avoidIllegal(), Integer.MAX_VALUE, carrier);
+                CostDeciders.avoidSettlementsAndBlockingUnits(),
+                Integer.MAX_VALUE, carrier);
     }
     
     /**
