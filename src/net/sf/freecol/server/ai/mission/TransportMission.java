@@ -66,7 +66,7 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for transporting units and goods on a carrier.
- * 
+ *
  * @see net.sf.freecol.common.model.Unit Unit
  */
 public class TransportMission extends Mission {
@@ -83,7 +83,7 @@ public class TransportMission extends Mission {
     	private boolean atDestination;
     	private boolean moveToEurope;
     	private PathNode path;
-    	
+
     	/*
     	 * Returns an "Already at destination"
     	 */
@@ -92,22 +92,22 @@ public class TransportMission extends Mission {
     		this.moveToEurope = false;
     		this.path = null;
     	}
-    	
-    	
+
+
     	public Destination(boolean moveToEurope,PathNode path){
     		this.atDestination = false;
     		this.moveToEurope = moveToEurope;
     		this.path = path;
     	}
-    	
+
     	public boolean moveToEurope(){
     		return moveToEurope;
     	}
-    	
+
     	public PathNode getPath(){
     		return path;
     	}
-    	
+
     	public boolean isAtDestination(){
     		return atDestination;
     	}
@@ -115,7 +115,7 @@ public class TransportMission extends Mission {
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
@@ -130,7 +130,7 @@ public class TransportMission extends Mission {
 
     /**
      * Loads a <code>TransportMission</code> from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -143,7 +143,7 @@ public class TransportMission extends Mission {
     /**
      * Creates a new <code>TransportMission</code> and reads the given
      * element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -157,7 +157,7 @@ public class TransportMission extends Mission {
     /**
      * Adds every <code>Goods</code> and <code>Unit</code> onboard the
      * carrier to the transport list.
-     * 
+     *
      * @see Goods
      * @see Unit
      */
@@ -174,7 +174,7 @@ public class TransportMission extends Mission {
             }
             addToTransportList(aiUnit);
         }
-        
+
         // Remove items that are no longer on the transport list:
         List<Transportable> ts = new LinkedList<Transportable>();
         for (Transportable t : new LinkedList<Transportable>(transportList)) {
@@ -194,7 +194,7 @@ public class TransportMission extends Mission {
     /**
      * Checks if the carrier using this mission is carrying the given
      * <code>Transportable</code>.
-     * 
+     *
      * @param t The <code>Transportable</code>.
      * @return <code>true</code> if the given <code>Transportable</code> is
      *         {@link Unit#getLocation located} in the carrier.
@@ -212,7 +212,7 @@ public class TransportMission extends Mission {
     	//elsewhere in between loop calls
     	List<Transportable> cargoList = new ArrayList<Transportable>();
     	List<Transportable> scheduledCargoList = new ArrayList<Transportable>();
-    	
+
     	Iterator<Transportable> ti = transportList.iterator();
         while (ti.hasNext()) {
             Transportable t = ti.next();
@@ -225,20 +225,20 @@ public class TransportMission extends Mission {
             	scheduledCargoList.add(t);
             }
         }
-        
+
         for (Transportable t : cargoList)
         	((AIObject) t).dispose();
-        
+
         for (Transportable t : scheduledCargoList)
         	t.setTransport(null);
-        
+
         super.dispose();
     }
 
     /**
      * Checks if the given <code>Transportable</code> is on the transport
      * list.
-     * 
+     *
      * @param newTransportable The <code>Transportable</code> to be checked
      * @return <code>true</code> if the given <code>Transportable</code> was
      *         on the transport list, and <code>false</code> otherwise.
@@ -255,7 +255,7 @@ public class TransportMission extends Mission {
     /**
      * Removes the given <code>Transportable</code> from the transport list.
      * This method calls {@link Transportable#setTransport(AIUnit)}.
-     * 
+     *
      * @param transportable The <code>Transportable</code>.
      */
     public void removeFromTransportList(Transportable transportable) {
@@ -276,16 +276,16 @@ public class TransportMission extends Mission {
      * Adds the given <code>Transportable</code> to the transport list. The
      * method returns immediately if the {@link Transportable} has already be
      * added.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Both the source and destination {@link Location} for the
      * <code>Transportable</code> is entered into the transport list if the
      * <code>Transportable</code> is not already loaded onto the transport. If
      * the <code>Transportable</code> is onboard the transport, then only the
      * destination is put on the transport list.
-     * 
+     *
      * @param newTransportable The <code>Transportable</code>.
      */
     public void addToTransportList(Transportable newTransportable) {
@@ -318,7 +318,7 @@ public class TransportMission extends Mission {
 
         int bestSourceIndex = -1;
         if (!isCarrying(newTransportable)) {
-            
+
             int distToSource;
             if (carrier.getLocation().getTile() == newSource.getTile()) {
                 distToSource = 0;
@@ -344,10 +344,10 @@ public class TransportMission extends Mission {
                 }
 
             }
-            
+
             for (int i = 1; i < transportList.size() && bestSourceDistance > 0; i++) {
                 Transportable t1 = transportList.get(i - 1);
-                 
+
                 if (isCarrying(t1)){
                     int distToDestination = getDistanceTo(newTransportable, t1.getTransportDestination(), true);
                     if(distToDestination == Map.COST_INFINITY){
@@ -361,7 +361,7 @@ public class TransportMission extends Mission {
                     distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), true);
                     if(distToSource == Map.COST_INFINITY){
                         continue;
-                    }   
+                    }
                     if (distToSource <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToSource;
@@ -404,7 +404,7 @@ public class TransportMission extends Mission {
                     bestDestinationDistance = distToDestination;
                 }
             } else{
-                int distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), false); 
+                int distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), false);
                 if(distToSource == Map.COST_INFINITY){
                     continue;
                 }
@@ -423,7 +423,7 @@ public class TransportMission extends Mission {
 
     /**
      * Gets the distance to the given <code>Transportable</code>.
-     * 
+     *
      * @param start The <code>Location</code> to check the distance from.
      *            <code>Europe</code> is used instead of this location if
      *            <code>start.getTile() == null</code>.
@@ -437,22 +437,22 @@ public class TransportMission extends Mission {
     private int getDistanceTo(Transportable t, Location start, boolean source) {
         // TODO: This takes to much resources - find another method:
         PathNode path = getPath(t, start, source);
-        
+
         if(path == null){
             return Map.COST_INFINITY;
         }
-        
+
         return path.getTotalTurns();
     }
-    
+
     private boolean canAttackEnemyShips() {
         final Unit carrier = getUnit();
         return (carrier.getTile() != null)
                 && carrier.isNaval()
                 && carrier.isOffensiveUnit();
-        
+
     }
-    
+
     private boolean hasCargo() {
         final Unit carrier = getUnit();
         return (carrier.getGoodsCount() + carrier.getUnitCount()) > 0;
@@ -476,7 +476,7 @@ public class TransportMission extends Mission {
         }
         return isValid();
     }
-    
+
     /**
      * Attack suitable enemy ships.
      *
@@ -501,12 +501,12 @@ public class TransportMission extends Mission {
         }
         return isValid();
     }
-    
+
     private boolean canAttackPlayer(Player target) {
         return getUnit().getOwner().atWarWith(target)
             || getUnit().hasAbility("model.ability.piracy");
     }
-    
+
     /**
      * Finds the best target to attack within the given range.
      *
@@ -524,19 +524,19 @@ public class TransportMission extends Mission {
             throw new IllegalStateException("A target can only be found for naval units. You tried with: "
                                             + getUnit().toString());
         }
-        
+
         final GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
             private int bestValue = 0;
-            
+
             public PathNode getGoal() {
-                return bestTarget;              
+                return bestTarget;
             }
-            
+
             public boolean hasSubGoals() {
                 return true;
             }
-            
+
             public boolean check(final Unit unit, final PathNode pathNode) {
                 final Tile newTile = pathNode.getTile();
                 final Unit defender = newTile.getDefendingUnit(unit);
@@ -562,10 +562,10 @@ public class TransportMission extends Mission {
                 CostDeciders.avoidSettlements(),
                 maxTurns);
     }
-    
+
     /**
      * Performs the mission.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
@@ -586,7 +586,7 @@ public class TransportMission extends Mission {
             // Actually in Europe
             inEurope(connection);
             return;
-            
+
         }
 
         if (!attackEnemyShips(connection)) return;
@@ -599,7 +599,7 @@ public class TransportMission extends Mission {
             if(carrier.getMovesLeft() == 0){
             	return;
             }
-        	
+
             moreWork = false;
 
             if (transportListChanged) {
@@ -608,11 +608,11 @@ public class TransportMission extends Mission {
             }
 
             Destination destination = getNextStop();
-            
+
             // Special case, already on a tile which gives direct access to Europe
             //path will be null
-            boolean canMoveToEurope = destination != null 
-            			&& destination.moveToEurope() 
+            boolean canMoveToEurope = destination != null
+            			&& destination.moveToEurope()
             			&& carrier.canMoveToEurope();
 
             if(destination == null || (destination.getPath() == null && !canMoveToEurope)){
@@ -627,13 +627,13 @@ public class TransportMission extends Mission {
             			carrierLoc += " (" + carrierTile.getColony().getName() + ")";
             		}
             	}
-            	
-            	logger.info("Could not get a next move for unit " + carrier 
+
+            	logger.info("Could not get a next move for unit " + carrier
             			+ "(" + carrier.getId() + "), staying put at " + carrierLoc);
             	//carrier.setMovesLeft(0);
             	return;
             }
-            
+
             if(destination.isAtDestination()){
                 transportListChanged = restockCargoAtDestination(connection);
                 continue;
@@ -728,28 +728,28 @@ public class TransportMission extends Mission {
     Destination getDefaultDestination() {
         Unit unit = getUnit();
         PathNode path = null;
-		
+
         // If in Europe, stay in Europe
         if (unit.getLocation() instanceof Europe) {
             return new Destination();
         }
-		
+
         // Otherwise should be on the map
         if (unit.getTile() == null) {
             throw new IllegalStateException("Unit not on the map: "
                                             + unit.getId());
         }
-		
+
         // Already at a settlement
         if (unit.getSettlement() != null) {
             return new Destination();
         }
-		
+
         // Try nearest colony
         if ((path = findNearestColony(unit)) != null) {
             return new Destination(false, path);
         }
-		
+
         // Try Europe
         if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
             if (unit.canMoveToEurope()) {
@@ -767,13 +767,13 @@ public class TransportMission extends Mission {
 
 	/**
      * Buys cargo (units and goods) when the carrier is in <code>Europe</code>.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * <b>Warning:</b> This method can only be called when the carrier is
      * located in {@link Europe}.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     private void buyCargo(Connection connection) {
@@ -903,13 +903,13 @@ public class TransportMission extends Mission {
 
     /**
      * Buys the given cargo.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * <b>Warning:</b> This method can only be called when the carrier is
      * located in {@link Europe}.
-     * 
+     *
      * @param connection The <code>Connection</code> to use when communicating
      *            with the server.
      * @param type The type of goods to buy.
@@ -937,16 +937,16 @@ public class TransportMission extends Mission {
 
     /**
      * Returns the given type of <code>Unit</code>.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * <b>Warning:</b> This method can only be called when the carrier is
      * located in {@link Europe}.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * This sequence is used when trying to get the unit: <br>
      * <br>
      * <ol>
@@ -954,7 +954,7 @@ public class TransportMission extends Mission {
      * <li>Recruiting the unit.
      * <li>Training the unit.
      * </ol>
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      * @param unitType The type of {@link Unit} to be found/recruited/trained.
      * @return The <code>AIUnit</code>.
@@ -1003,7 +1003,7 @@ public class TransportMission extends Mission {
 
     /**
      * Returns the cheapest unit which can be bought in <code>Europe</code>.
-     * 
+     *
      * @param connection The connection to use when communicating with the
      *            server.
      * @return The <code>AIUnit</code>.
@@ -1058,7 +1058,7 @@ public class TransportMission extends Mission {
     /**
      * Returns the path the carrier should use to get/drop the given
      * <code>Transportable</code>.
-     * 
+     *
      * @param transportable The <code>Transportable</code>.
      * @return The path.
      */
@@ -1069,7 +1069,7 @@ public class TransportMission extends Mission {
     /**
      * Returns the path the carrier should use to get/drop the given
      * <code>Transportable</code>.
-     * 
+     *
      * @param transportable The <code>Transportable</code>.
      * @param start The <code>Tile</code> to search from. If
      *            <code>start == null</code> or
@@ -1123,7 +1123,7 @@ public class TransportMission extends Mission {
 
     /**
      * Returns the available space for the given <code>Transportable</code>.
-     * 
+     *
      * @param t The <code>Transportable</code>
      * @return The space available for <code>Transportable</code>s with the
      *         same source and
@@ -1141,7 +1141,7 @@ public class TransportMission extends Mission {
     /**
      * Returns the available space for the given type of <code>Unit</code> at
      * the given <code>Location</code>.
-     * 
+     *
      * @param unitType The type of {@link Unit} or <code>null</code> for
      *            {@link Goods}
      * @param source The source for the unit. This is where the unit is
@@ -1157,7 +1157,7 @@ public class TransportMission extends Mission {
     /**
      * Returns the available space for any type of unit going to any type of
      * location.
-     * 
+     *
      * @return The space available
      */
     public int getAvailableSpace() {
@@ -1167,7 +1167,7 @@ public class TransportMission extends Mission {
 
     /**
      * Loads and unloads any <code>Transportable</code>.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      * @return <code>true</code> if something has been loaded/unloaded and
      *         <code>false</code>otherwise.
@@ -1179,7 +1179,7 @@ public class TransportMission extends Mission {
     /**
      * Unloads any <code>Transportable</code>s which have reached their
      * destination.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      * @return <code>true</code> if something has been unloaded and
      *         <code>false</code>otherwise.
@@ -1193,7 +1193,7 @@ public class TransportMission extends Mission {
         if(carrier.isBetweenEuropeAndNewWorld()){
         	return false;
         }
-        
+
         // START Debug code
         String locStr = carrier.getLocation().toString();
         if(carrier.getLocation() instanceof Europe){
@@ -1203,7 +1203,7 @@ public class TransportMission extends Mission {
         	locStr = carrier.getLocation().getColony().getName();
         }
         // END Debug code
-        
+
         // Make a copy for iteration, the main list may change inside the loop
         for (Transportable t : new ArrayList<Transportable>(transportList)) {
             // to pickup, ignore
@@ -1214,7 +1214,7 @@ public class TransportMission extends Mission {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
                 Mission mission = au.getMission();
-                
+
                 // Sanitation, to force game to reset
                 if(mission == null || au.getTransportDestination() == null){
                 	if(carrier.getLocation() instanceof Europe
@@ -1224,11 +1224,11 @@ public class TransportMission extends Mission {
                 		continue;
                 	}
                 }
-                
+
                 if (mission != null && mission.isValid()) {
                     if (au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() == carrier.getTile()) {
-                    	logger.finest(carrier + "(" 
+                    	logger.finest(carrier + "("
                         		+ carrier.getId() + ") unloading " + u + " at " + locStr);
                     	if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
                           unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
@@ -1243,7 +1243,7 @@ public class TransportMission extends Mission {
                         PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
                                 au.getTransportDestination().getTile(), carrier);
                         if (p != null) {
-                        	logger.finest(carrier + "(" 
+                        	logger.finest(carrier + "("
                             		+ carrier.getId() + ") unloading " + u + " at " + locStr);
                             final PathNode dropNode = p.getTransportDropNode();
                             int distToCarrier = dropNode.getTile().getDistanceTo(carrier.getTile());
@@ -1254,7 +1254,7 @@ public class TransportMission extends Mission {
                                 if (u.getLocation() != getUnit()) {
                                     removeFromTransportList(au);
                                     transportListChanged = true;
-                                }    
+                                }
                             }
                         }
                         /*
@@ -1290,7 +1290,7 @@ public class TransportMission extends Mission {
                 if (ag.getTransportDestination() == null ||
                 		(ag.getTransportDestination() != null
                 				&& ag.getTransportDestination().getTile() == carrier.getLocation().getTile())) {
-                    logger.finest(carrier + "(" 
+                    logger.finest(carrier + "("
                     		+ carrier.getId() + ") unloading " + ag + " at " + locStr);
                     if (carrier.getLocation() instanceof Europe) {
                         boolean success = sellCargoInEurope(ag.getGoods());
@@ -1318,7 +1318,7 @@ public class TransportMission extends Mission {
 
     /**
      * Loads any <code>Transportable</code>s being in range of the carrier.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      * @return <code>true</code> if something has been unloaded and
      *         <code>false</code>otherwise.
@@ -1379,14 +1379,14 @@ public class TransportMission extends Mission {
      * @param aiUnit The unit.
      * @return <code>true</code> if this mission is valid to perform
      *         and <code>false</code> otherwise.
-     */    
+     */
     public static boolean isValid(AIUnit aiUnit) {
         Unit unit = aiUnit.getUnit();
-        
+
         if(!unit.isNaval()){
         	return true;
         }
-        
+
         if(unit.isUnderRepair()){
         	return false;
         }
@@ -1395,8 +1395,8 @@ public class TransportMission extends Mission {
         if(hasCargo){
         	return true;
         }
-    
-        // Verify if empty unit is a privateer and able to be assigned a PrivateerMisison 
+
+        // Verify if empty unit is a privateer and able to be assigned a PrivateerMisison
         if(unit.hasAbility("model.ability.piracy")){
             AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(unit.getOwner().getId());
         	// Do not consider this unit mission
@@ -1408,13 +1408,13 @@ public class TransportMission extends Mission {
         		return false;
         	}
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks if this mission is still valid to perform.
-     * 
+     *
      * @return <code>true</code>
      */
     public boolean isValid() {
@@ -1423,7 +1423,7 @@ public class TransportMission extends Mission {
 
     /**
      * Returns the destination of a required transport.
-     * 
+     *
      * @return <code>null</code>
      */
     public Tile getTransportDestination() {
@@ -1432,7 +1432,7 @@ public class TransportMission extends Mission {
 
     /**
      * Returns the priority of getting the unit to the transport destination.
-     * 
+     *
      * @return o
      */
     public int getTransportPriority() {
@@ -1440,7 +1440,7 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * unit is in Europe, unload cargo on board, buy required goods and board unit 
+     * unit is in Europe, unload cargo on board, buy required goods and board unit
      * @param connection  The <code>Connection</code> to the server.
      */
     private void inEurope(Connection connection){
@@ -1453,12 +1453,12 @@ public class TransportMission extends Mission {
         if (!carrier.getOwner().checkGold(MINIMUM_GOLD_TO_STAY_IN_EUROPE)
             || transportList.size() > 0) {
             moveUnitToAmerica();
-        }        
+        }
     }
-    
+
     /**
      * Finds the best path to <code>Europe</code>.
-     * 
+     *
      * @param start The starting <code>Tile</code>.
      * @return The path to the target or <code>null</code> if no target can be
      *         found.
@@ -1467,14 +1467,14 @@ public class TransportMission extends Mission {
     protected PathNode findPathToEurope(Tile start) {
         return getGame().getMap().findPathToEurope(getUnit(), start);
     }
-    
+
     /**
      * Gives the number of naval units assigned with a Transport Mission
      */
     public static int getPlayerNavalTransportMissionCount(AIPlayer aiPlayer, Unit unitExcluded){
         Player player = aiPlayer.getPlayer();
         int units = 0;
-        
+
         for(Unit unit : player.getUnits()){
         	if(unit == unitExcluded){
         		continue;
@@ -1493,7 +1493,7 @@ public class TransportMission extends Mission {
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -1516,7 +1516,7 @@ public class TransportMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -1549,17 +1549,17 @@ public class TransportMission extends Mission {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return The <code>String</code> "transportMission".
      */
     public static String getXMLElementTagName() {
         return "transportMission";
     }
-    
+
     /**
      * Gets debugging information about this mission. This string is a short
      * representation of this object's state.
-     * 
+     *
      * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
      *         <code>x</code> and <code>y</code> is the coordinates of the
      *         target tile for this mission, and <code>z</code> is the value
@@ -1582,7 +1582,7 @@ public class TransportMission extends Mission {
             Locatable l = t.getTransportLocatable();
             sb.append(l.toString());
             sb.append(" (");
-            Location target; 
+            Location target;
             if (ts.contains(t) || isCarrying(t)) {
                 sb.append("to ");
                 target = t.getTransportDestination();

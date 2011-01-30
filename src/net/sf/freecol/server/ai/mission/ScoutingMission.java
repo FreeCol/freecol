@@ -51,7 +51,7 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for controlling a scout.
- * 
+ *
  * @see net.sf.freecol.common.model.Unit.Role#SCOUT
  */
 public class ScoutingMission extends Mission {
@@ -70,7 +70,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
@@ -80,7 +80,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -92,7 +92,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Creates a new <code>ScoutingMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -112,7 +112,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Performs this mission.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
@@ -283,7 +283,7 @@ public class ScoutingMission extends Mission {
      * either be the target {@link Tile} of the transport or the target for the
      * entire <code>Transportable</code>'s mission. The target for the tansport
      * is determined by {@link TransportMission} in the latter case.
-     * 
+     *
      * @return The destination for this <code>Transportable</code>.
      */
     public Tile getTransportDestination() {
@@ -302,7 +302,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Returns the priority of getting the unit to the transport destination.
-     * 
+     *
      * @return The priority.
      */
     public int getTransportPriority() {
@@ -316,7 +316,7 @@ public class ScoutingMission extends Mission {
     /**
      * Checks if this mission is still valid to perform.
      * Unit must be mounted.
-     * 
+     *
      * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
@@ -325,7 +325,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Checks if this mission is valid to perform.
-     * 
+     *
      * @param au The unit to be tested.
      * @return <code>true</code> if this mission is still valid to perform and
      *         <code>false</code> otherwise.
@@ -347,7 +347,7 @@ public class ScoutingMission extends Mission {
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related information
      * to an XML-stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -363,7 +363,7 @@ public class ScoutingMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -373,7 +373,7 @@ public class ScoutingMission extends Mission {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return The <code>String</code> "scoutingMission".
      */
     public static String getXMLElementTagName() {
@@ -383,7 +383,7 @@ public class ScoutingMission extends Mission {
     /**
      * Gets debugging information about this mission. This string is a short
      * representation of this object's state.
-     * 
+     *
      * @return The <code>String</code>.
      */
     public String getDebuggingInfo() {

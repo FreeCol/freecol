@@ -58,11 +58,11 @@ public class PrivateerMission extends Mission {
 	private Location nearestPort = null;
 	private Tile target = null;
 	private boolean invalidateMission = false;
-	
-	
+
+
     /**
     * Creates a mission for the given <code>AIUnit</code>.
-    * 
+    *
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
@@ -76,7 +76,7 @@ public class PrivateerMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -85,10 +85,10 @@ public class PrivateerMission extends Mission {
         super(aiMain);
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>UnitWanderHostileMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -127,7 +127,7 @@ public class PrivateerMission extends Mission {
             }
         }
     }
-    
+
     private void hunt4Target(Connection  connection){
         Unit unit = getUnit();
 
@@ -143,10 +143,10 @@ public class PrivateerMission extends Mission {
             state = PrivateerMissionState.TRANSPORTING;
             return;
         }
-        
+
         final int MAX_TURNS_TO_TARGET = 1;
         PathNode pathToTarget = findTarget(MAX_TURNS_TO_TARGET);
-        // Found a target        
+        // Found a target
         if (pathToTarget != null) {
         	target = pathToTarget.getLastNode().getTile();
             logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " found target at " + target);
@@ -175,20 +175,20 @@ public class PrivateerMission extends Mission {
         }
         // some movement points may still remain
     	//due to some block or just not enough points for next node
-    	// we need to make sure the unit has no points left, 
+    	// we need to make sure the unit has no points left,
     	//so the game can move to next unit
     	unit.setMovesLeft(0);
     }
-    
+
     private void gotoNearestPort(Connection connection){
         Unit unit = getUnit();
-        
+
         if(isUnitInPort()){
             dumpCargoInPort(connection);
             state = PrivateerMissionState.HUNTING;
             return;
         }
-        
+
         PathNode path = getValidPathForNearestPort();
         if(path == null){
             findNearestPort();
@@ -204,20 +204,20 @@ public class PrivateerMission extends Mission {
                 return;
             }
         }
-        
+
         boolean moveToEurope = nearestPort instanceof Europe;
         Direction direction = moveTowards(path);
         if (direction == null) {
             unit.setMovesLeft(0);
             return;
         }
-        
+
         if (moveToEurope && unit.getMoveType(direction) == MoveType.MOVE_HIGH_SEAS) {
         	moveUnitToEurope();
         	unit.setMovesLeft(0);
         	return;
         }
-        
+
         if(unit.getMoveType(direction) == MoveType.MOVE){
         	Position unitPos = unit.getTile().getPosition();
         	Position ColPos = unitPos.getAdjacent(direction);
@@ -231,45 +231,45 @@ public class PrivateerMission extends Mission {
         		throw new IllegalStateException(errMsg);
         	}
         }
-        
+
         // some movement points may still remain
     	//due to some block or just not enough points for next node
-    	// we need to make sure the unit has no points left, 
+    	// we need to make sure the unit has no points left,
     	//so the game can move to next unit
     	unit.setMovesLeft(0);
     }
-        
+
     private PathNode getValidPathForNearestPort(){
         Unit unit = getUnit();
         Player player = unit.getOwner();
-        
+
         if(nearestPort == null){
         	return null;
         }
-        
+
         if(nearestPort instanceof Europe){
             if(player.getEurope() == null){
                 nearestPort = null;
                 return null;
-            }       
+            }
             return getGame().getMap().findPathToEurope(unit,unit.getTile());
         }
-        
+
         Colony nearestColony = (Colony) nearestPort;
-        if(nearestColony == null 
-        		|| nearestColony.isDisposed() 
+        if(nearestColony == null
+        		|| nearestColony.isDisposed()
         		|| nearestColony.getOwner() != player){
             nearestPort = null;
             return null;
         }
 
         return unit.findPath(nearestColony.getTile());
-    }    
-    
-    private void findNearestPort(){        
+    }
+
+    private void findNearestPort(){
         nearestPort = null;
         Unit unit = getUnit();
-        
+
         PathNode path = findNearestColony(unit);
         if(path != null){
             nearestPort = path.getLastNode().getTile().getColony();
@@ -281,26 +281,26 @@ public class PrivateerMission extends Mission {
             }
         }
     }
-    
+
     private boolean isUnitInPort(){
         if(nearestPort == null){
             return false;
         }
-        
+
         Unit unit = getUnit();
-        
+
         if(nearestPort instanceof Europe){
             return unit.getLocation() == nearestPort;
         }
-        
-        return unit.getTile() == nearestPort.getTile();   
+
+        return unit.getTile() == nearestPort.getTile();
     }
-    
+
     private void dumpCargoInPort(Connection connection){
     	logger.finest("Dumping goods");
         Unit unit = getUnit();
-        boolean inEurope = unit.getLocation() instanceof Europe; 
-                
+        boolean inEurope = unit.getLocation() instanceof Europe;
+
         List<Goods> goodsLst = new ArrayList<Goods>(unit.getGoodsList());
         for(Goods goods : goodsLst){
             if(inEurope){
@@ -314,20 +314,20 @@ public class PrivateerMission extends Mission {
             	logger.finest("After dumping: " +  colony.getGoodsCount(goods.getType()) + " " + goods.getType());
             }
         }
-        
+
         List<Unit> unitLst = new ArrayList<Unit>(unit.getUnitList());
         for(Unit u : unitLst){
             unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
         }
     }
-    
+
     /**
      * Checks if this mission is valid for the given unit.
      *
      * @param aiUnit The unit.
      * @return <code>true</code> if this mission is valid to perform
      *         and <code>false</code> otherwise.
-     */    
+     */
     public static boolean isValid(AIUnit aiUnit) {
         Unit unit = aiUnit.getUnit();
         AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(unit.getOwner().getId());
@@ -338,10 +338,10 @@ public class PrivateerMission extends Mission {
             && unit.getUnitCount() == 0
             && TransportMission.getPlayerNavalTransportMissionCount(aiPlayer, unit) != 0;
     }
-    
+
     /**
      * Checks if this mission is still valid to perform.
-     * 
+     *
      * @return True if the mission is still valid.
      */
     public boolean isValid() {
@@ -349,7 +349,7 @@ public class PrivateerMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -358,7 +358,7 @@ public class PrivateerMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
         out.writeAttribute("state", state.toString());
 
@@ -383,11 +383,11 @@ public class PrivateerMission extends Mission {
     public static String getXMLElementTagName() {
         return "privateerMission";
     }
-    
+
     /**
      * Gets debugging information about this mission. This string is a short
      * representation of this object's state.
-     * 
+     *
      */
     public String getDebuggingInfo() {
     	StringBuffer sb = new StringBuffer("State: " + state.name());
@@ -400,7 +400,7 @@ public class PrivateerMission extends Mission {
     	}
         return sb.toString();
     }
-    
+
     /**
      * Calculates the modifier used when assessing the value of a target to a privateer
      * Note: it gives a modifier value, other parameters should be considered as well
@@ -413,14 +413,14 @@ public class PrivateerMission extends Mission {
     public static int getModifierValueForTarget(CombatModel combatModel, Unit attacker, Unit defender){
     	// pirates are greedy ;)
     	int modifier = 100;
-    	modifier += defender.getGoodsCount() * 200;  
+    	modifier += defender.getGoodsCount() * 200;
     	modifier += defender.getUnitCount() * 100;
-        
+
         // they are also coward
         if(defender.isOffensiveUnit()){
         	modifier -= combatModel.getDefencePower(attacker, defender) * 100;
         }
-        
+
         return modifier;
     }
 }

@@ -46,7 +46,7 @@ public class UnitWanderMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
-    * 
+    *
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
@@ -55,10 +55,10 @@ public class UnitWanderMission extends Mission {
         super(aiMain, aiUnit);
     }
 
-    
+
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -70,7 +70,7 @@ public class UnitWanderMission extends Mission {
 
     /**
      * Creates a new <code>UnitWanderMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -81,7 +81,7 @@ public class UnitWanderMission extends Mission {
         super(aiMain);
         readFromXML(in);
     }
-    
+
     /**
     * Performs the mission. This is done by moving in a random direction
     * until the move points are zero or the unit gets stuck.
@@ -90,12 +90,12 @@ public class UnitWanderMission extends Mission {
     */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
-        
+
         while(unit.getMovesLeft() > 0) {
             moveRandomly(connection);
         }
     }
-    
+
     /**
      * Checks if this mission is still valid to perform.
      *
@@ -106,7 +106,7 @@ public class UnitWanderMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -115,7 +115,7 @@ public class UnitWanderMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();

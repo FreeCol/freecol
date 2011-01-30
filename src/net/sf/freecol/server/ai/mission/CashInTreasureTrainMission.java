@@ -47,18 +47,18 @@ import org.w3c.dom.Element;
 /**
  * Mission for cashing in a treasure train.
  */
-public class CashInTreasureTrainMission extends Mission { 
+public class CashInTreasureTrainMission extends Mission {
     // TODO: Use a transport
     // TODO: Avoid enemy units
     // TODO: Require protection
-    
+
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
-    
+
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission
      *        is created for.
@@ -69,7 +69,7 @@ public class CashInTreasureTrainMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -78,10 +78,10 @@ public class CashInTreasureTrainMission extends Mission {
         super(aiMain);
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>CashInTreasureTrainMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -92,38 +92,38 @@ public class CashInTreasureTrainMission extends Mission {
          super(aiMain);
          readFromXML(in);
      }
-    
+
     /**
      * Disposes this <code>Mission</code>.
      */
     public void dispose() {
         super.dispose();
     }
-    
+
     /**
      * Performs this mission.
      * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {     
+    public void doMission(Connection connection) {
         Unit unit = getUnit();
     	Map map = unit.getGame().getMap();
-                
+
         if (!isValid()) {
             return;
         }
-        
+
         if (!unit.canCashInTreasureTrain()) {
             GoalDecider destinationDecider = new GoalDecider() {
                 private PathNode best = null;
-                
+
                 public PathNode getGoal() {
                     return best;
                 }
-                
+
                 public boolean hasSubGoals() {
                     return false;
                 }
-                
+
                 public boolean check(Unit u, PathNode pathNode) {
                     Tile t = pathNode.getTile();
                     if (u.canCashInTreasureTrain(t)) {
@@ -142,7 +142,7 @@ public class CashInTreasureTrainMission extends Mission {
                 if (r == null || !moveButDontAttack(r)) return;
             }
         }
-        
+
         if (unit.canCashInTreasureTrain()) {
             AIMessage.askCashInTreasureTrain(getAIUnit());
         }
@@ -156,7 +156,7 @@ public class CashInTreasureTrainMission extends Mission {
      * {@link TransportMission} in the latter case.
      *
      * @return The destination for this <code>Transportable</code>.
-     */    
+     */
     public Tile getTransportDestination() {
         return null;
     }
@@ -180,12 +180,12 @@ public class CashInTreasureTrainMission extends Mission {
      *
      * @return True if this mission is still valid to perform.
      */
-    public boolean isValid() {  
+    public boolean isValid() {
         return super.isValid();
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -194,7 +194,7 @@ public class CashInTreasureTrainMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();
@@ -209,7 +209,7 @@ public class CashInTreasureTrainMission extends Mission {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
         in.nextTag();
     }
-        
+
     /**
      * Returns the tag name of the root element representing this object.
      * @return The <code>String</code> "cashInTreasureTrainMission".

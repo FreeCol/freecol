@@ -71,7 +71,7 @@ public abstract class Mission extends AIObject {
     public Mission(AIMain aiMain) {
         this(aiMain, null);
     }
-    
+
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
@@ -83,7 +83,7 @@ public abstract class Mission extends AIObject {
     */
     public Mission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain);
-        this.aiUnit = aiUnit;   
+        this.aiUnit = aiUnit;
     }
 
     /**
@@ -111,10 +111,10 @@ public abstract class Mission extends AIObject {
      *     move can not be made.
      */
     protected Direction moveTowards(PathNode pathNode) {
-        if (getUnit().getMovesLeft() <= 0) {            
+        if (getUnit().getMovesLeft() <= 0) {
             return null;
         }
-        
+
         while (pathNode.next != null && pathNode.getTurns() == 0) {
             if (!isValid()) {
                 return null;
@@ -162,12 +162,12 @@ public abstract class Mission extends AIObject {
     protected void moveUnitToAmerica() {
         AIMessage.askMoveToAmerica(aiUnit);
     }
-    
+
     protected void moveUnitToEurope() {
         AIMessage.askMoveToEurope(aiUnit);
     }
-    
-    
+
+
     /**
      * Move in a specified direction, but do not attack.
      * Always check the return from this in case the unit blundered into
@@ -185,7 +185,7 @@ public abstract class Mission extends AIObject {
         }
         return getUnit() != null && !getUnit().isDisposed();
     }
-    
+
     /**
      * Finds the best target to attack within the given range.
      *
@@ -199,24 +199,24 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("A target can only be found for offensive units. You tried with: "
                                             + getUnit().toString());
         }
-        
+
         GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
             private int higherTension = 0;
-            
+
             public PathNode getGoal() {
-                return bestTarget;              
+                return bestTarget;
             }
-            
+
             public boolean hasSubGoals() {
                 return true;
             }
-            
+
             public boolean check(Unit unit, PathNode pathNode) {
                 CombatModel combatModel = getGame().getCombatModel();
                 Tile newTile = pathNode.getTile();
                 Unit defender = newTile.getDefendingUnit(unit);
-                
+
                 if( defender == null){
                     return false;
                 }
@@ -249,7 +249,7 @@ public abstract class Mission extends AIObject {
                     tension += PrivateerMission.getModifierValueForTarget(combatModel, unit, defender);
                 }
                 // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
-                if (unit.getOwner().isIndian() 
+                if (unit.getOwner().isIndian()
                         && defender.getOwner().isAI()) {
                     tension -= 200;
                 }
@@ -272,11 +272,11 @@ public abstract class Mission extends AIObject {
         return getGame().getMap().search(getUnit(), getUnit().getTile(), gd,
                 CostDeciders.avoidIllegal(), maxTurns);
     }
-    
-   
+
+
     /**
     * Returns the destination of a required transport.
-    * @return The destination of a required transport or 
+    * @return The destination of a required transport or
     *         <code>null</code> if no transport is needed.
     */
     public Tile getTransportDestination() {
@@ -285,27 +285,27 @@ public abstract class Mission extends AIObject {
         } else if (!getUnit().isOnCarrier()) {
             return null;
         }
-        
+
         Unit carrier = (Unit) getUnit().getLocation();
-        
+
         if (carrier.getSettlement() != null) {
             return carrier.getTile();
-        }        
+        }
         // Find the closest friendly Settlement:
         GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
-            
+
             public PathNode getGoal() {
-                return bestTarget;              
+                return bestTarget;
             }
-            
+
             public boolean hasSubGoals() {
                 return false;
             }
-            
+
             public boolean check(Unit unit, PathNode pathNode) {
                 Tile newTile = pathNode.getTile();
-                boolean hasOurSettlement = (newTile.getSettlement() != null) 
+                boolean hasOurSettlement = (newTile.getSettlement() != null)
                         && newTile.getSettlement().getOwner() == unit.getOwner();
                 if (hasOurSettlement) {
                     bestTarget = pathNode;
@@ -322,8 +322,8 @@ public abstract class Mission extends AIObject {
             return null;
         }
     }
-    
-    
+
+
     /**
     * Returns the priority of getting the unit to the
     * transport destination.
@@ -337,7 +337,7 @@ public abstract class Mission extends AIObject {
             return 0;
         }
     }
-    
+
     protected boolean unloadCargoInColony(Goods goods) {
         return AIMessage.askUnloadCargo(aiUnit, goods);
     }
@@ -351,14 +351,14 @@ public abstract class Mission extends AIObject {
         }
         return AIMessage.askSellGoods(aiUnit, goods);
     }
-    
+
     /**
      * Disposes this mission by removing any references to it.
      */
     public void dispose() {
         // Nothing to do yet.
     }
-    
+
 
     /**
     * Performs the mission. This method should be implemented by a subclass.
@@ -398,21 +398,21 @@ public abstract class Mission extends AIObject {
     public AIUnit getAIUnit() {
         return aiUnit;
     }
-    
-    
+
+
     /**
      * Sets the AI-unit this mission has been created for.
      * @param aiUnit The <code>AIUnit</code>.
-     */    
+     */
     protected void setAIUnit(AIUnit aiUnit) {
         this.aiUnit = aiUnit;
     }
-    
+
     /**
      * Gets debugging information about this mission.
      * This string is a short representation of this
      * object's state.
-     * 
+     *
      * @return An empty <code>String</code>. Should be
      *      replaced by subclasses.
      */
@@ -424,17 +424,17 @@ public abstract class Mission extends AIObject {
     protected boolean unitLeavesShip(AIUnit aiUnit) {
         return AIMessage.askDisembark(aiUnit);
     }
-    
+
     public boolean buyGoods(Connection connection, Unit carrier,
                             GoodsType goodsType, int amount) {
         return AIMessage.askBuyGoods(aiUnit, goodsType, amount);
     }
-    
+
     public PathNode findNearestColony(Unit unit){
         Player player = unit.getOwner();
         PathNode nearestColony = null;
         int distToColony = Integer.MAX_VALUE;
-        
+
         // First try colonies
         for(Colony colony : player.getColonies()){
             PathNode path = unit.findPath(colony.getTile());
@@ -442,18 +442,18 @@ public abstract class Mission extends AIObject {
                 continue;
             }
             int dist = path.getTotalTurns();
-            
+
             if(dist <= 1){
                 nearestColony = path;
                 break;
             }
-            
+
             if(dist < distToColony){
                 nearestColony = path;
-                distToColony = dist; 
+                distToColony = dist;
             }
-        }       
-        
+        }
+
         return nearestColony;
     }
 }

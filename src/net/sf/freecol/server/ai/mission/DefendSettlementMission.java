@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
 */
 public class DefendSettlementMission extends Mission {
     /*
-     * TODO: This Mission should later use sub-missions for 
+     * TODO: This Mission should later use sub-missions for
      *       eliminating threats etc.
      */
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
@@ -60,7 +60,7 @@ public class DefendSettlementMission extends Mission {
 
     /** The <code>Settlement</code> to be protected. */
     private Settlement settlement;
-    
+
     //private Mission subMission;
 
 
@@ -71,7 +71,7 @@ public class DefendSettlementMission extends Mission {
     *        is created for.
     * @param settlement The <code>Settlement</code> to defend.
     * @exception NullPointerException if <code>aiUnit == null</code> or
-    *        <code>settlement == null</code>. 
+    *        <code>settlement == null</code>.
     */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit, Settlement settlement) {
         super(aiMain, aiUnit);
@@ -81,7 +81,7 @@ public class DefendSettlementMission extends Mission {
 
     /**
      * Creates a new <code>DefendSettlementMission</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -93,7 +93,7 @@ public class DefendSettlementMission extends Mission {
 
     /**
      * Creates a new <code>DefendSettlementMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -104,28 +104,28 @@ public class DefendSettlementMission extends Mission {
          super(aiMain);
          readFromXML(in);
      }
-    
+
     /**
     * Performs this mission.
     * @param connection The <code>Connection</code> to the server.
     */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
-        
+
         if (!isValid()) {
             return;
         }
-        
+
         if (unit.getTile() == null) {
             return;
         }
-        
+
         if (unit.isOffensiveUnit()) {
             CombatModel combatModel = unit.getGame().getCombatModel();
             Unit bestTarget = null;
             float bestDifference = Float.MIN_VALUE;
             Direction bestDirection = null;
-            
+
             Direction[] directions = Direction.getRandomDirectionArray(getAIRandom());
             for (Direction direction : directions) {
                 Tile t = unit.getTile().getNeighbourOrNull(direction);
@@ -151,7 +151,7 @@ public class DefendSettlementMission extends Mission {
                     }
                 }
             }
-            
+
             if (bestTarget != null) {
                 // this must be true, since it is the only way to get
                 // a bestTarget
@@ -159,7 +159,7 @@ public class DefendSettlementMission extends Mission {
                 return;
             }
         }
-            
+
         if (unit.getTile() != settlement.getTile()) {
             // Move towards the target.
             Direction r = moveTowards(settlement.getTile());
@@ -181,7 +181,7 @@ public class DefendSettlementMission extends Mission {
      * {@link TransportMission} in the latter case.
      *
      * @return The destination for this <code>Transportable</code>.
-     */    
+     */
      public Tile getTransportDestination() {
          if (settlement == null) {
              return null;
@@ -210,7 +210,7 @@ public class DefendSettlementMission extends Mission {
             return 0;
         }
      }
-     
+
      /**
       * Gets the settlement.
       * @return The <code>Settlement</code> to be defended by
@@ -219,7 +219,7 @@ public class DefendSettlementMission extends Mission {
      public Settlement getSettlement() {
          return settlement;
      }
-     
+
     /**
      * Checks if this mission is still valid to perform.
      *
@@ -233,7 +233,7 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -242,7 +242,7 @@ public class DefendSettlementMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
         if (settlement != null) {
             out.writeAttribute("settlement", settlement.getId());
@@ -257,9 +257,9 @@ public class DefendSettlementMission extends Mission {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));        
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
         settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "settlement"));
-        
+
         in.nextTag();
     }
 
@@ -270,13 +270,13 @@ public class DefendSettlementMission extends Mission {
     public static String getXMLElementTagName() {
         return "defendSettlementMission";
     }
-    
+
     /**
      * Gets debugging information about this mission.
      * This string is a short representation of this
      * object's state.
-     * 
-     * @return The <code>String</code>: 
+     *
+     * @return The <code>String</code>:
      *      "(x, y) ColonyName"
      *      where <code>x</code> and <code>y</code> is the
      *      coordinates of the settlement for this mission,

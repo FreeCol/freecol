@@ -62,7 +62,7 @@ public class WishRealizationMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
-    * 
+    *
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
@@ -72,7 +72,7 @@ public class WishRealizationMission extends Mission {
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
         this.wish = wish;
-        
+
         if (wish == null) {
             throw new NullPointerException("wish == null");
         }
@@ -81,7 +81,7 @@ public class WishRealizationMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -93,7 +93,7 @@ public class WishRealizationMission extends Mission {
 
     /**
      * Creates a new <code>WishRealizationMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -162,7 +162,7 @@ public class WishRealizationMission extends Mission {
     * {@link TransportMission} in the latter case.
     *
     * @return The destination for this <code>Transportable</code>.
-    */    
+    */
     public Tile getTransportDestination() {
         if (getUnit().isOnCarrier()) {
             return wish.getDestination().getTile();
@@ -213,7 +213,7 @@ public class WishRealizationMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -260,12 +260,12 @@ public class WishRealizationMission extends Mission {
     public static String getXMLElementTagName() {
         return "wishRealizationMission";
     }
-    
+
     /**
      * Gets debugging information about this mission.
      * This string is a short representation of this
      * object's state.
-     * 
+     *
      * @return The <code>String</code>.
      */
     public String getDebuggingInfo() {

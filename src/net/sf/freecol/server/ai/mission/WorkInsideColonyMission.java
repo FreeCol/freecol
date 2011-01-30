@@ -46,7 +46,7 @@ public class WorkInsideColonyMission extends Mission{
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
-    * 
+    *
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
@@ -64,7 +64,7 @@ public class WorkInsideColonyMission extends Mission{
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -76,7 +76,7 @@ public class WorkInsideColonyMission extends Mission{
 
     /**
      * Creates a new <code>WorkInsideColonyMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -87,7 +87,7 @@ public class WorkInsideColonyMission extends Mission{
         super(aiMain);
         readFromXML(in);
     }
-    
+
 
     /**
     * Disposes this <code>Mission</code>.
@@ -120,7 +120,7 @@ public class WorkInsideColonyMission extends Mission{
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -129,7 +129,7 @@ public class WorkInsideColonyMission extends Mission{
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
         out.writeAttribute("colony", aiColony.getId());
 

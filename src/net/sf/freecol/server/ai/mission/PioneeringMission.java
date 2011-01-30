@@ -57,30 +57,30 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for controlling a pioneer.
- * 
+ *
  * @see net.sf.freecol.common.model.Unit.Role#PIONEER
  */
 public class PioneeringMission extends Mission {
-    /* 
+    /*
      * TODO-LATER: "updateTileImprovementPlan" should be called
      *             only once (in the beginning of the turn).
      */
-    
+
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
     private static enum PioneeringMissionState {GET_TOOLS,IMPROVING};
-    
+
     private PioneeringMissionState state = PioneeringMissionState.GET_TOOLS;
-    
+
     private TileImprovementPlan tileImprovementPlan = null;
-    
+
     private Colony colonyWithTools = null;
 
     private boolean invalidateMission = false;
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission
      *        is created for.
@@ -100,7 +100,7 @@ public class PioneeringMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -112,7 +112,7 @@ public class PioneeringMission extends Mission {
 
     /**
      * Creates a new <code>PioneeringMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -123,8 +123,8 @@ public class PioneeringMission extends Mission {
         super(aiMain);
         readFromXML(in);
     }
-    
-    
+
+
     /**
      * Disposes this <code>Mission</code>.
      */
@@ -139,7 +139,7 @@ public class PioneeringMission extends Mission {
     /**
      * Sets the <code>TileImprovementPlan</code> which should
      * be the next target.
-     * 
+     *
      * @param tileImprovementPlan The <code>TileImprovementPlan</code>.
      */
     public void setTileImprovementPlan(TileImprovementPlan tileImprovementPlan) {
@@ -149,7 +149,7 @@ public class PioneeringMission extends Mission {
     private void updateTileImprovementPlan() {
         final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
-        
+
         Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
         // invalid tileImprovementPlan, remove and get a new valid one
         if (tileImprovementPlan != null && improvementTarget == null) {
@@ -158,7 +158,7 @@ public class PioneeringMission extends Mission {
             tileImprovementPlan.dispose();
             tileImprovementPlan = null;
         }
-        
+
         // Verify if the improvement has been applied already
         // If it has, remove this improvement
         if (tileImprovementPlan != null &&
@@ -168,12 +168,12 @@ public class PioneeringMission extends Mission {
             tileImprovementPlan.dispose();
             tileImprovementPlan = null;
         }
-        
+
         // mission still valid, no update needed
         if (tileImprovementPlan != null && improvementTarget != null) {
             return;
         }
-        
+
         final Tile startTile;
         if (getUnit().getTile() == null) {
             startTile = ((getUnit().isOnCarrier())
@@ -187,10 +187,10 @@ public class PioneeringMission extends Mission {
         } else {
             startTile = getUnit().getTile();
         }
-                
+
         TileImprovementPlan bestChoice = null;
         int bestValue = 0;
-        Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();            
+        Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();
         while (tiIterator.hasNext()) {
             TileImprovementPlan ti = tiIterator.next();
             if (ti.getPioneer() == null) {
@@ -201,16 +201,16 @@ public class PioneeringMission extends Mission {
                     ti.dispose();
                     continue;
                 }
-                
+
                 PathNode path = null;
                 int value;
                 if (startTile != ti.getTarget()) {
                     path = getGame().getMap().findPath(getUnit(), startTile, ti.getTarget(), carrier);
                     if (path != null) {
                         value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
-                        
+
                         /*
-                         * Avoid picking a TileImprovementPlan with a path being blocked 
+                         * Avoid picking a TileImprovementPlan with a path being blocked
                          * by an enemy unit (apply a penalty to the value):
                          */
                         PathNode pn = path;
@@ -226,34 +226,34 @@ public class PioneeringMission extends Mission {
                     }
                 } else {
                     value = ti.getValue() + 10000;
-                }                
+                }
                 if (value > bestValue) {
                     bestChoice = ti;
                     bestValue = value;
                 }
             }
         }
-        
+
         if (bestChoice != null) {
             tileImprovementPlan = bestChoice;
             bestChoice.setPioneer(getAIUnit());
         }
-        
+
         if(tileImprovementPlan == null){
             invalidateMission = true;
         }
     }
-    
-    
+
+
     /**
      * Performs this mission.
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
         logger.finest("Entering PioneeringMission.doMission()");
-        
+
         Unit unit = getUnit();
-        
+
         boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
         if(unit.getState() == UnitState.IMPROVING || hasTools){
             state = PioneeringMissionState.IMPROVING;
@@ -261,7 +261,7 @@ public class PioneeringMission extends Mission {
         else{
             state = PioneeringMissionState.GET_TOOLS;
         }
-        
+
         while(isValid() && unit.getMovesLeft() > 0){
             switch(state){
             case GET_TOOLS:
@@ -273,7 +273,7 @@ public class PioneeringMission extends Mission {
             default:
                 logger.warning("Unknown state");
                 invalidateMission = true;
-            }        
+            }
         }
     }
 
@@ -293,13 +293,13 @@ public class PioneeringMission extends Mission {
             invalidateMission = true;
             return;
         }
-                
+
         // move toward the target tile
         if (getUnit().getTile() != tileImprovementPlan.getTarget()) {
             PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
             if (pathToTarget == null) {
                 invalidateMission = true;
-                return; 
+                return;
             }
 
             Direction direction = moveTowards(pathToTarget);
@@ -307,7 +307,7 @@ public class PioneeringMission extends Mission {
                 && unit.getMoveType(direction).isProgress()) {
                 AIMessage.askMove(getAIUnit(), direction);
             }
-            
+
             if(unit.getTile() != tileImprovementPlan.getTarget()){
                 unit.setMovesLeft(0);
             }
@@ -322,7 +322,7 @@ public class PioneeringMission extends Mission {
             logger.warning(errMsg);
             invalidateMission = true;
             return;
-        }            
+        }
 
         Tile target = tileImprovementPlan.getTarget();
         Player player = getUnit().getOwner();
@@ -356,7 +356,7 @@ public class PioneeringMission extends Mission {
             unit.setMovesLeft(0);
             return;
         }
-        
+
         if (unit.checkSetState(UnitState.IMPROVING)) {
             // start improving now
             int price = unit.getOwner().getLandPrice(unit.getTile());
@@ -375,9 +375,9 @@ public class PioneeringMission extends Mission {
         if(invalidateMission){
             return;
         }
-          
+
         Unit unit = getUnit();
-        
+
         // Not there yet
         if(unit.getTile() != colonyWithTools.getTile()){
             PathNode path = unit.findPath(colonyWithTools.getTile());
@@ -391,7 +391,7 @@ public class PioneeringMission extends Mission {
             Direction direction = moveTowards(path);
             if (direction == null || !moveButDontAttack(direction)) return;
 
-            // not there yet, remove any moves left 
+            // not there yet, remove any moves left
             if(unit.getTile() != colonyWithTools.getTile()){
                 unit.setMovesLeft(0);
                 return;
@@ -414,13 +414,13 @@ public class PioneeringMission extends Mission {
             if (availableAmount < requiredAmount) {
                 invalidateMission = true;
                 return;
-            } 
+            }
             amount = Math.min(amount, availableAmount / requiredAmount);
         }
 
         logger.finest("Equipping " + unit + " at=" + colonyWithTools.getName() + " amount=" + amount);
         AIMessage.askEquipUnit(getAIUnit(), toolsType, amount);
-        
+
         // Unit is now equipped, get to work
         if(unit.getEquipmentCount(toolsType) > 0){
             state = PioneeringMissionState.IMPROVING;
@@ -431,7 +431,7 @@ public class PioneeringMission extends Mission {
     private boolean validateColonyWithTools() {
         EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
         if(colonyWithTools != null){
-            if(colonyWithTools.isDisposed() 
+            if(colonyWithTools.isDisposed()
                || colonyWithTools.getOwner() != getUnit().getOwner()
                || !colonyWithTools.canBuildEquipment(toolsType)){
                 colonyWithTools = null;
@@ -445,7 +445,7 @@ public class PioneeringMission extends Mission {
                 invalidateMission = true;
                 return false;
             }
-            logger.finest("Colony found=" + colonyWithTools.getName());            
+            logger.finest("Colony found=" + colonyWithTools.getName());
         }
         return true;
     }
@@ -459,7 +459,7 @@ public class PioneeringMission extends Mission {
      * {@link TransportMission} in the latter case.
      *
      * @return The destination for this <code>Transportable</code>.
-     */    
+     */
     public Tile getTransportDestination() {
         updateTileImprovementPlan();
         if (tileImprovementPlan == null) {
@@ -496,20 +496,20 @@ public class PioneeringMission extends Mission {
      * @param aiUnit The unit.
      * @return <code>true</code> if this mission is still valid to perform
      *         and <code>false</code> otherwise.
-     */    
+     */
     public static boolean isValid(AIUnit aiUnit) {
         if(!aiUnit.getUnit().isColonist()){
             return false;
         }
-        
+
         if(aiUnit.getUnit().getTile() == null){
             return false;
         }
-        
+
         AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getId());
-        Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();            
-        
-        
+        Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();
+
+
         boolean foundImprovementPlan = false;
         while (tiIterator.hasNext()) {
             TileImprovementPlan ti = tiIterator.next();
@@ -527,31 +527,31 @@ public class PioneeringMission extends Mission {
         boolean unitHasToolsAvail = aiUnit.getUnit().getEquipmentCount(toolsType) > 0;
         if(unitHasToolsAvail){
             logger.finest("Tools equipped, PioneeringMission valid");
-            return true; 
+            return true;
         }
-        
+
         // Search colony with tools to equip the unit with
         Colony colonyWithTools = findColonyWithTools(aiUnit);
         if(colonyWithTools != null){
             logger.finest("Tools found, PioneeringMission valid");
             return true;
         }
-        
+
         logger.finest("Tools not found, PioneeringMission not valid");
         return false;
     }
-    
+
     public static Colony findColonyWithTools(AIUnit aiu) {
         final int MAX_TURN_DISTANCE = 10;
         Colony best = null;
         int bestValue = Integer.MIN_VALUE;
-        
+
         Unit unit = aiu.getUnit();
         // Sanitation
         if(unit == null){
             return null;
         }
-        
+
         EquipmentType toolsType = aiu.getAIMain().getGame().getSpecification()
             .getEquipmentType("model.equipment.tools");
         for(Colony colony : unit.getOwner().getColonies()){
@@ -564,7 +564,7 @@ public class PioneeringMission extends Mission {
             if(ac == null){
                 continue;
             }
-            
+
             // check if it possible for the unit to reach the colony
             PathNode pathNode = null;
             if(unit.getTile() != colony.getTile()){
@@ -578,28 +578,28 @@ public class PioneeringMission extends Mission {
                     continue;
                 }
             }
-            
+
             int value = 100;
             // Prefer units with plenty of tools
             for(AbstractGoods goods : toolsType.getGoodsRequired()){
                 value += colony.getGoodsCount(goods.getType());
             }
-            
+
             if(pathNode != null){
                 value -= pathNode.getTotalTurns() * 10;
             }
-                
+
             if(best == null || value > bestValue){
                 best = colony;
                 bestValue = value;
             }
-        }        
+        }
         return best;
     }
-    
+
     public static List<AIUnit>getPlayerPioneers(AIPlayer aiPlayer){
         List<AIUnit> list = new ArrayList<AIUnit>();
-        
+
         AIMain aiMain = aiPlayer.getAIMain();
         for(Unit u : aiPlayer.getPlayer().getUnits()){
             AIUnit aiu =  (AIUnit) aiMain.getAIObject(u);
@@ -648,7 +648,7 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -657,7 +657,7 @@ public class PioneeringMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
         if (tileImprovementPlan != null) {
             out.writeAttribute("tileImprovementPlan", tileImprovementPlan.getId());
@@ -673,7 +673,7 @@ public class PioneeringMission extends Mission {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        
+
         final String tileImprovementPlanStr = in.getAttributeValue(null, "tileImprovementPlan");
         if (tileImprovementPlanStr != null) {
             tileImprovementPlan = (TileImprovementPlan) getAIMain().getAIObject(tileImprovementPlanStr);
@@ -683,7 +683,7 @@ public class PioneeringMission extends Mission {
         } else {
             tileImprovementPlan = null;
         }
-        
+
         in.nextTag();
     }
 
@@ -694,13 +694,13 @@ public class PioneeringMission extends Mission {
     public static String getXMLElementTagName() {
         return "tileImprovementPlanMission";
     }
-    
+
     /**
      * Gets debugging information about this mission.
      * This string is a short representation of this
      * object's state.
-     * 
-     * @return The <code>String</code>: 
+     *
+     * @return The <code>String</code>:
      *      <ul>
      *          <li>"(x, y) P" (for plowing)</li>
      *          <li>"(x, y) R" (for building road)</li>

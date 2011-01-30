@@ -47,10 +47,10 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for bringing a gift to a specified player.
- * 
+ *
  * <BR>
  * <BR>
- * 
+ *
  * The mission has three different tasks to perform:
  * <ol>
  * <li>Get the gift (goods) from the {@link IndianSettlement} that owns the
@@ -74,7 +74,7 @@ public class IndianBringGiftMission extends Mission {
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The <code>Colony</code> receiving the gift.
@@ -93,7 +93,7 @@ public class IndianBringGiftMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -106,7 +106,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Creates a new <code>IndianBringGiftMission</code> and reads the given
      * element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -123,16 +123,16 @@ public class IndianBringGiftMission extends Mission {
     }
     /**
      * Performs the mission.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        
+
         if (!isValid()) {
             // the destination colony may have been destroyed
             return;
         }
-        
+
         if (!hasGift()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
@@ -183,7 +183,7 @@ public class IndianBringGiftMission extends Mission {
 
     /**
      * Checks if the unit is carrying a gift (goods).
-     * 
+     *
      * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and
      *         false otherwise.
      */
@@ -193,12 +193,12 @@ public class IndianBringGiftMission extends Mission {
 
     /**
      * Checks if this mission is still valid to perform.
-     * 
+     *
      * This mission will be invalidated when the gift has been delivered. In
      * case of the stances {@link Stance#WAR WAR} or
      * {@link Stance#CEASE_FIRE CEASE_FIRE} towards the target player, the
      * mission would be invalidated as well.
-     * 
+     *
      * @return True if this mission is still valid.
      */
     public boolean isValid() {
@@ -212,7 +212,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Checks if the player <code>owner</code> can bring a gift to the
      * <code>targetPlayer</code>.
-     * 
+     *
      * @param owner The owner of this mission.
      * @param targetPlayer The target of the gift.
      * @return <code>true</code> if this mission is still valid to perform
@@ -231,7 +231,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -249,7 +249,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading
      *             from the stream.
@@ -271,7 +271,7 @@ public class IndianBringGiftMission extends Mission {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return The <code>String</code> "indianBringGiftMission".
      */
     public static String getXMLElementTagName() {
@@ -281,7 +281,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Gets debugging information about this mission. This string is a short
      * representation of this object's state.
-     * 
+     *
      * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
      *         "[ColonyName] Getting gift: (x, y)".
      */

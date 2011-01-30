@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
 /**
 * Mission for attacking any unit owned by a player we do not like that is within
 * a radius of 1 tile. If no such unit can be found; just wander
-* around. 
+* around.
 */
 public class UnitWanderHostileMission extends Mission {
     @SuppressWarnings("unused")
@@ -51,7 +51,7 @@ public class UnitWanderHostileMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
-    * 
+    *
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
@@ -63,7 +63,7 @@ public class UnitWanderHostileMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -72,10 +72,10 @@ public class UnitWanderHostileMission extends Mission {
         super(aiMain);
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>UnitWanderHostileMission</code> and reads the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -100,12 +100,12 @@ public class UnitWanderHostileMission extends Mission {
         if (!(unit.getLocation() instanceof Tile)) {
             return;
         }
-        
+
         PathNode pathToTarget = null;
         if (unit.isOffensiveUnit()) {
             pathToTarget = findTarget(5);
         }
-        
+
         if (pathToTarget != null) {
             Direction direction = moveTowards(pathToTarget);
             if (direction != null
@@ -128,7 +128,7 @@ public class UnitWanderHostileMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -137,7 +137,7 @@ public class UnitWanderHostileMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();

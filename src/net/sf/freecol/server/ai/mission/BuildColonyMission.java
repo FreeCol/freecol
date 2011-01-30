@@ -50,21 +50,21 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for building a <code>Colony</code>.
- * 
+ *
  * <br />
  * <br />
- * 
+ *
  * This mission can be used in two different ways:
  * <ul>
  * <li>Build a colony at a specific location.</li>
  * <li>Find a site for a colony and build it there.</li>
  * </ul>
- * 
+ *
  * This mission will be aborted in the former case if the value gets below a
  * given threshold, while a colony will always get built (if there is sufficient
  * space on the map) in the latter case. Use the appropriate constructor to get
  * the desired behaviour.
- * 
+ *
  * @see net.sf.freecol.common.model.Colony Colony
  */
 public class BuildColonyMission extends Mission {
@@ -89,7 +89,7 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The <code>Tile</code> where the <code>Colony</code>
@@ -120,7 +120,7 @@ public class BuildColonyMission extends Mission {
      * <code>AIUnit</code>. The mission will try to find the closest and best
      * site for a colony, and build the colony there. It will not stop until a
      * {@link Colony} gets built.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
@@ -139,7 +139,7 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Creates a new <code>BuildColonyMission</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -152,7 +152,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Creates a new <code>BuildColonyMission</code> and reads the given
      * element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -165,7 +165,7 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Performs this mission.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
@@ -236,7 +236,7 @@ public class BuildColonyMission extends Mission {
      * either be the target {@link Tile} of the transport or the target for the
      * entire <code>Transportable</code>'s mission. The target for the
      * transport is determined by {@link TransportMission} in the latter case.
-     * 
+     *
      * @return The destination for this <code>Transportable</code>.
      */
     public Tile getTransportDestination() {
@@ -259,7 +259,7 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Returns the priority of getting the unit to the transport destination.
-     * 
+     *
      * @return The priority.
      */
     public int getTransportPriority() {
@@ -272,7 +272,7 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Finds a site for a new colony.
-     * 
+     *
      * @param unit The <code>Unit</code> to find a colony site for. This unit
      *            will be used for determining the path to a colony location and
      *            colony sites far away from the unit (in turns) will be less
@@ -347,10 +347,10 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Checks if this mission is still valid to perform.
-     * 
+     *
      * This mission will be invalidated when the colony has been built
      * or if the <code>target.getColonyValue()</code> decreases.
-     * 
+     *
      * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
@@ -364,7 +364,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -385,7 +385,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -410,7 +410,7 @@ public class BuildColonyMission extends Mission {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return The <code>String</code> "buildColonyMission".
      */
     public static String getXMLElementTagName() {
@@ -420,7 +420,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Gets debugging information about this mission. This string is a short
      * representation of this object's state.
-     * 
+     *
      * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
      *         <code>x</code> and <code>y</code> is the coordinates of the
      *         target tile for this mission, and <code>z</code> is the value

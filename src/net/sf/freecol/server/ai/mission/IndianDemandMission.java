@@ -65,7 +65,7 @@ public class IndianDemandMission extends Mission {
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The <code>Colony</code> receiving the gift.
@@ -83,7 +83,7 @@ public class IndianDemandMission extends Mission {
 
     /**
      * Loads a mission from the given element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -96,7 +96,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Creates a new <code>IndianDemandMission</code> and reads the given
      * element.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -109,7 +109,7 @@ public class IndianDemandMission extends Mission {
 
     /**
      * Performs the mission.
-     * 
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
@@ -190,7 +190,7 @@ public class IndianDemandMission extends Mission {
 
     /**
      * Selects the most desirable goods from the colony.
-     * 
+     *
      * @param target The colony.
      * @return The goods to demand.
      */
@@ -290,7 +290,7 @@ public class IndianDemandMission extends Mission {
 
     /**
      * Checks if the unit is carrying a gift (goods).
-     * 
+     *
      * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and
      *         false otherwise.
      */
@@ -302,7 +302,7 @@ public class IndianDemandMission extends Mission {
      * Checks if this mission is still valid to perform.
      * This mission will be invalidated when complete, if the home settlement
      * is gone, the target is gone, or tension reduces to happy.
-     * 
+     *
      * @return True if this mission is still valid.
      */
     public boolean isValid() {
@@ -318,7 +318,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -336,7 +336,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading
      *             from the stream.
@@ -355,7 +355,7 @@ public class IndianDemandMission extends Mission {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return The <code>String</code> "indianDemandMission".
      */
     public static String getXMLElementTagName() {
@@ -365,7 +365,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Gets debugging information about this mission. This string is a short
      * representation of this object's state.
-     * 
+     *
      * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
      *         "[ColonyName] Getting gift: (x, y)".
      */
