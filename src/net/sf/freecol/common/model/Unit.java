@@ -1694,7 +1694,7 @@ public class Unit extends FreeColGameObject
         }
         boolean connected = tile.isConnected()
             || (tile.getColony() != null && tile.getColony().isConnected());
-        return (closestLocation != null) ? closestLocation
+        return (closestLocation != null) ? closestLocation.getTile()
             : (connected) ? player.getEurope()
             : null;
     }
