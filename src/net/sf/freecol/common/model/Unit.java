@@ -63,7 +63,12 @@ import org.w3c.dom.Element;
 public class Unit extends FreeColGameObject
     implements Consumer, Locatable, Location, Nameable, Ownable {
 
-    private static Comparator<Unit> skillLevelComp  = null;
+    private static Comparator<Unit> skillLevelComp =
+        new Comparator<Unit>() {
+        public int compare(Unit u1, Unit u2) {
+            return u1.getSkillLevel() - u2.getSkillLevel();
+        }
+    };
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
@@ -639,25 +644,13 @@ public class Unit extends FreeColGameObject
         return 0;
     }
 
-    public static Comparator<Unit> getSkillLevelComparator(){
-        if(skillLevelComp != null){
-            return skillLevelComp;
-        }
-
-        // Create comparator to sort units by skill level
-        // Prefer unit with less qualifications
-        skillLevelComp = new Comparator<Unit>(){
-            public int compare(Unit u1,Unit u2){
-                if(u1.getSkillLevel() < u2.getSkillLevel()){
-                    return -1;
-                }
-                if(u1.getSkillLevel() > u2.getSkillLevel()){
-                    return 1;
-                }
-                return 0;
-            }
-        };
-
+    /**
+     * Returns a Comparator that compares the skill levels of given
+     * units.
+     *
+     * @return skill Comparator
+     */
+    public static Comparator<Unit> getSkillLevelComparator() {
         return skillLevelComp;
     }
 
