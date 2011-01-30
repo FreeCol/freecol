@@ -131,7 +131,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             goodsContainer = new GoodsContainer(game, this);
         }
 
-        UnitType newType = type.getUnitTypeChange(ChangeType.CREATION, owner);
+        UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
         unitType = (newType == null) ? type : newType;
         this.owner = owner;
         owner.getNationID();

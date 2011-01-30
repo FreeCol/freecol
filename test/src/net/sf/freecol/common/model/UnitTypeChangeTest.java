@@ -62,15 +62,15 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
         assertTrue(gardener.canBeUpgraded(farmer, education));
         assertEquals(null, gardener.getUnitTypeChange(education, dutch));
-        assertEquals(farmer, gardener.getUnitTypeChange(education, inca));
+        assertEquals(farmer, gardener.getTargetType(education, inca));
         assertFalse(change.appliesTo(dutch));
         assertTrue(change.appliesTo(inca));
 
         scope.setMatchNegated(true);
         assertTrue(change.appliesTo(dutch));
         assertFalse(change.appliesTo(inca));
-        assertEquals(farmer, gardener.getUnitTypeChange(education, dutch));
-        assertEquals(null, gardener.getUnitTypeChange(education, inca));
+        assertEquals(farmer, gardener.getTargetType(education, dutch));
+        assertEquals(null, gardener.getTargetType(education, inca));
 
     }
 
@@ -91,7 +91,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
         assertTrue(gardener.canBeUpgraded(farmer, creation));
         assertTrue(change.appliesTo(dutch));
-        assertEquals(farmer, gardener.getUnitTypeChange(creation, dutch));
+        assertEquals(farmer, gardener.getTargetType(creation, dutch));
 
         Unit gardenerUnit = new ServerUnit(game, null, dutch, gardener,
                                            UnitState.ACTIVE);

@@ -1047,8 +1047,8 @@ public final class InGameController extends Controller {
             = new HashMap<UnitType, UnitType>();
         Specification spec = getGame().getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
-            UnitType upgrade = unitType.getUnitTypeChange(ChangeType.INDEPENDENCE,
-                                                          serverPlayer);
+            UnitType upgrade = unitType.getTargetType(ChangeType.INDEPENDENCE,
+                                                      serverPlayer);
             if (upgrade != null) {
                 upgrades.put(unitType, upgrade);
             }
@@ -2943,7 +2943,7 @@ public final class InGameController extends Controller {
 
         // Check for upgrade.
         UnitType type
-            = unit.getType().getUnitTypeChange(ChangeType.ENTER_COLONY,
+            = unit.getType().getTargetType(ChangeType.ENTER_COLONY,
                                                unit.getOwner());
         if (type != null) unit.setType(type);
 

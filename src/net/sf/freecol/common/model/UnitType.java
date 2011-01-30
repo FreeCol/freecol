@@ -500,12 +500,24 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * @param player a <code>Player</code> value
      * @return an <code>UnitType</code> value
      */
-    public UnitType getUnitTypeChange(ChangeType changeType, Player player) {
+    public UnitType getTargetType(ChangeType changeType, Player player) {
+        UnitTypeChange change = getUnitTypeChange(changeType, player);
+        return (change == null) ? null : change.getNewUnitType();
+    }
+
+    /**
+     * Describe <code>getUnitTypeChange</code> method here.
+     *
+     * @param changeType an <code>UnitTypeChange.Type</code> value
+     * @param player a <code>Player</code> value
+     * @return an <code>UnitType</code> value
+     */
+    public UnitTypeChange getUnitTypeChange(ChangeType changeType, Player player) {
         for (UnitTypeChange change : typeChanges) {
             if (change.asResultOf(changeType) && change.appliesTo(player)) {
                 UnitType result = change.getNewUnitType();
                 if (result.isAvailableTo(player)) {
-                    return result;
+                    return change;
                 }
             }
         }
@@ -519,7 +531,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * none.
      *
      * @param newType the target UnitType
-     * @return the change type
+     * @return the type change
      */
     public UnitTypeChange getUnitTypeChange(UnitType newType) {
         for (UnitTypeChange change : typeChanges) {
@@ -529,7 +541,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         }
         return null;
     }
-
 
     /**
      * Return true if this UnitType can be upgraded to the given

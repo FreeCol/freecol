@@ -3953,8 +3953,8 @@ public final class InGameController implements NetworkConstants {
 
         // Check this makes sense and confirm.
         UnitType oldType = unit.getType();
-        UnitType newType = oldType.getUnitTypeChange(ChangeType.CLEAR_SKILL,
-                                                     unit.getOwner());
+        UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
+                                                 unit.getOwner());
         if (newType == null) {
             canvas.showInformationMessage(unit,
                 StringTemplate.template("clearSpeciality.impossible")

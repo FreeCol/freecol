@@ -3131,7 +3131,7 @@ public class Unit extends FreeColGameObject
      * @return The resulting unit type or null if there is no change suitable.
      */
     public UnitType getTypeChange(ChangeType change, Player owner) {
-        return getType().getUnitTypeChange(change, owner);
+        return getType().getTargetType(change, owner);
     }
 
     /**

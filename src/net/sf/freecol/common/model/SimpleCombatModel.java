@@ -645,9 +645,10 @@ public class SimpleCombatModel extends CombatModel {
         }
 
         // Promote great winners or with automatic promotion, if possible.
-        if ((great || winner.hasAbility("model.ability.automaticPromotion"))
-            && winner.getTypeChange(ChangeType.PROMOTION, winnerPlayer)
-            != null) {
+        UnitTypeChange promotion = winner.getType().getUnitTypeChange(ChangeType.PROMOTION, winnerPlayer);
+        if (promotion != null
+            && (winner.hasAbility("model.ability.automaticPromotion")
+                || (great && (100 * (r - Math.floor(r)) <= promotion.getProbability(ChangeType.PROMOTION))))) {
             crs.add(CombatResult.PROMOTE_UNIT);
         }
     }
