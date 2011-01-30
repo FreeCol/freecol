@@ -175,28 +175,31 @@ public class ServerUnit extends Unit implements ServerModelObject {
         boolean unitDirty = false;
 
         // Check for experience-promotion.
-        // TODO: magic 5000/200
         GoodsType produce;
         UnitType learn;
         if (loc instanceof WorkLocation
             && (produce = getWorkType()) != null
             && (learn = spec.getExpertForProducing(produce)) != null
             && learn != getType()
-            && getType().canBeUpgraded(learn, ChangeType.EXPERIENCE)
-            && (Utils.randomInt(logger, "Experience", random, 5000)
-                < Math.min(getExperience(), 200))) {
-            StringTemplate oldName = getLabel();
-            setType(learn);
-            cs.addMessage(See.only(owner),
-                          new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                           "model.unit.experience",
-                                           getColony(), this)
-                          .addStringTemplate("%oldName%", oldName)
-                          .addStringTemplate("%unit%", getLabel())
-                          .addName("%colony%", getColony().getName()));
-            logger.finest("Experience upgrade for unit " + getId()
-                          + " to " + getType());
-            unitDirty = true;
+            && getType().canBeUpgraded(learn, ChangeType.EXPERIENCE)) {
+            int maximumExperience = getType().getMaximumExperience();
+            int maxValue = (100 * maximumExperience) /
+                getType().getUnitTypeChange(learn).getProbability(ChangeType.EXPERIENCE);
+            if (Utils.randomInt(logger, "Experience", random, maxValue)
+                < Math.min(getExperience(), maximumExperience)) {
+                StringTemplate oldName = getLabel();
+                setType(learn);
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                               "model.unit.experience",
+                                               getColony(), this)
+                              .addStringTemplate("%oldName%", oldName)
+                              .addStringTemplate("%unit%", getLabel())
+                              .addName("%colony%", getColony().getName()));
+                logger.finest("Experience upgrade for unit " + getId()
+                              + " to " + getType());
+                unitDirty = true;
+            }
         }
 
         // Attrition

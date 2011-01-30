@@ -513,6 +513,23 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     }
 
 
+    /**
+     * Returns the <code>UnitTypeChange</code> associated with the
+     * given <code>UnitType</code>, or <code>null</code> if there is
+     * none.
+     *
+     * @param newType the target UnitType
+     * @return the change type
+     */
+    public UnitTypeChange getUnitTypeChange(UnitType newType) {
+        for (UnitTypeChange change : typeChanges) {
+            if (change.getNewUnitType() == newType) {
+                return change;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Return true if this UnitType can be upgraded to the given
