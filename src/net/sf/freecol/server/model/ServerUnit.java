@@ -219,8 +219,36 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         if (getWorkLeft() > 0) {
             unitDirty = true;
-            tileDirty = csDoAssignedWork(random, cs);
+            switch (getState()) {
+            case IMPROVING:
+                // Has the improvement been completed already? Do nothing.
+                TileImprovement ti = getWorkImprovement();
+                if (ti.isComplete()) {
+                    setState(UnitState.ACTIVE);
+                    setWorkLeft(-1);
+                } else {
+                    // Otherwise do work
+                    int amount = (getType().hasAbility("model.ability.expertPioneer"))
+                        ? 2 : 1;
+                    int turns = ti.getTurnsToComplete();
+                    if ((turns -= amount) < 0) turns = 0;
+                    ti.setTurnsToComplete(turns);
+                    setWorkLeft(turns);
+                }
+                break;
+            case TO_AMERICA:
+                if (getOwner().isREF()) { // Swift travel to America for the REF
+                    setWorkLeft(0);
+                    break;
+                }
+                // Fall through
+            default:
+                setWorkLeft(getWorkLeft() - 1);
+                break;
+            }
         }
+
+        if (getWorkLeft() == 0) csCompleteWork(random, cs);
 
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
@@ -237,78 +265,46 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
     /**
-     * The status of units that are currently working (for instance on
-     * building a road, or fortifying themselves) is updated in this
-     * method.
+     * Complete the work a unit is doing.
      *
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if the tile under the unit needs an update.
      */
-    private boolean csDoAssignedWork(Random random, ChangeSet cs) {
-        ServerPlayer owner = (ServerPlayer) getOwner();
+    private boolean csCompleteWork(Random random, ChangeSet cs) {
+        setWorkLeft(-1);
 
         switch (getState()) {
-        case IMPROVING:
-            // Has the improvement been completed already? Do nothing.
-            TileImprovement ti = getWorkImprovement();
-            if (ti.isComplete()) {
+        case TO_EUROPE:
+            logger.info(toString() + " arrives in Europe");
+            if (getTradeRoute() != null) {
+                setMovesLeft(0);
                 setState(UnitState.ACTIVE);
                 return false;
             }
-
-            // Otherwise do work
-            int amount = (getType().hasAbility("model.ability.expertPioneer"))
-                ? 2 : 1;
-            int turns = ti.getTurnsToComplete();
-            if ((turns -= amount) < 0) turns = 0;
-            ti.setTurnsToComplete(turns);
-            setWorkLeft(turns);
+            ServerPlayer owner = (ServerPlayer) getOwner();
+            Europe europe = owner.getEurope();
+            cs.addMessage(See.only(owner),
+                          new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                           "model.unit.arriveInEurope",
+                                           europe, this)
+                          .add("%europe%", europe.getNameKey()));
+            setState(UnitState.ACTIVE);
             break;
         case TO_AMERICA:
-            if (getOwner().isREF()) { // Shorter travel to America for the REF
-                setWorkLeft(0);
-                break;
-            }
-            // Fall through
-        default:
-            setWorkLeft(getWorkLeft() - 1);
+            logger.info(toString() + " arrives in America");
+            csMove(getVacantEntryLocation(random), random, cs);
             break;
-        }
-
-        if (getWorkLeft() == 0) {
-            setWorkLeft(-1);
-            switch (getState()) {
-            case TO_EUROPE:
-                logger.info(toString() + " arrives in Europe");
-                if (getTradeRoute() != null) {
-                    setMovesLeft(0);
-                    setState(UnitState.ACTIVE);
-                    return false;
-                }
-                Europe europe = owner.getEurope();
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                     "model.unit.arriveInEurope",
-                                     europe, this)
-                              .add("%europe%", europe.getNameKey()));
-                setState(UnitState.ACTIVE);
-                break;
-            case TO_AMERICA:
-                logger.info(toString() + " arrives in America");
-                csMove(getVacantEntryLocation(random), random, cs);
-                break;
-            case FORTIFYING:
-                setState(UnitState.FORTIFIED);
-                break;
-            case IMPROVING:
-                csImproveTile(random, cs);
-                return true;
-            default:
-                logger.warning("Unknown work completed, state=" + getState());
-                setState(UnitState.ACTIVE);
-                break;
-            }
+        case FORTIFYING:
+            setState(UnitState.FORTIFIED);
+            break;
+        case IMPROVING:
+            csImproveTile(random, cs);
+            return true;
+        default:
+            logger.warning("Unknown work completed, state=" + getState());
+            setState(UnitState.ACTIVE);
+            break;
         }
         return false;
     }

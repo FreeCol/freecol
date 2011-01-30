@@ -1113,8 +1113,6 @@ public class Unit extends FreeColGameObject
         }
 
         Map map = getGame().getMap();
-        int sailTurns = getSpecification()
-            .getIntegerOption("model.option.turnsToSail").getValue();
         boolean toEurope = destination instanceof Europe;
         Unit carrier = (isOnCarrier()) ? (Unit) getLocation() : null;
         PathNode p;
@@ -1150,7 +1148,8 @@ public class Unit extends FreeColGameObject
                 p = map.findPath(this, carrier.getFullEntryLocation(),
                                  destination.getTile(), carrier);
             }
-            return (p == null) ? INFINITY : p.getTotalTurns() + sailTurns;
+            return (p == null) ? INFINITY
+                : p.getTotalTurns() + carrier.getSailTurns();
         }
         if (isBetweenEuropeAndNewWorld()) {
             if (isNaval()) {
@@ -2567,6 +2566,20 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Gets the number of turns this unit will need to sail to/from Europe.
+     *
+     * @return The number of turns to sail to/from Europe.
+     */
+    public int getSailTurns() {
+        return (int) getOwner().getFeatureContainer()
+            .applyModifier(getSpecification()
+                           .getIntegerOption("model.option.turnsToSail")
+                           .getValue(),
+                           "model.modifier.sailHighSeas",
+                           unitType, getGame().getTurn());
+    }
+
+    /**
      * Sets a new state for this unit and initializes the amount of work the
      * unit has left.
      *
@@ -2590,11 +2603,14 @@ public class Unit extends FreeColGameObject
     }
 
     protected void setStateUnchecked(UnitState s) {
+        // TODO: move to the server.
         // Cleanup the old UnitState, for example destroy the
         // TileImprovment being built by a pioneer.
+        int turns;
+
         switch (state) {
         case IMPROVING:
-            if (workLeft > 0) {
+            if (getWorkLeft() > 0) {
                 if (!workImprovement.isComplete()) {
                     workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
                 }
@@ -2609,51 +2625,40 @@ public class Unit extends FreeColGameObject
         // Now initiate the new UnitState
         switch (s) {
         case ACTIVE:
-            workLeft = -1;
+            setWorkLeft(-1);
             break;
         case SENTRY:
-            workLeft = -1;
+            setWorkLeft(-1);
             break;
         case FORTIFIED:
-            workLeft = -1;
+            setWorkLeft(-1);
             movesLeft = 0;
             break;
         case FORTIFYING:
+            setWorkLeft(1);
             movesLeft = 0;
-            workLeft = 1;
             break;
         case IMPROVING:
-            movesLeft = 0;
-            workLeft = -1;
-            if (workImprovement != null) {
-                workLeft = workImprovement.getTurnsToComplete();
+            if (workImprovement == null) {
+                setWorkLeft(-1);
+            } else {
+                setWorkLeft(workImprovement.getTurnsToComplete());
             }
-            state = s;
-            // TODO: Removed a doAssignedWork() from here.  Was that right?
-            return;
-        case TO_EUROPE:
-            workLeft = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
-            if (state == UnitState.TO_AMERICA) {
-                workLeft += 1 - workLeft;
-            }
-            workLeft = (int) getOwner().getFeatureContainer().applyModifier(workLeft,
-                "model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
-        case TO_AMERICA:
-            workLeft = getSpecification().getIntegerOption("model.option.turnsToSail").getValue();
-            if (state == UnitState.TO_EUROPE) {
-                workLeft += 1 - workLeft;
+        case TO_EUROPE: case TO_AMERICA:
+            if ((s == UnitState.TO_EUROPE && state == UnitState.TO_AMERICA)
+                || (s == UnitState.TO_AMERICA && state == UnitState.TO_EUROPE)) {
+                setWorkLeft(getSailTurns() - getWorkLeft() + 1);
+            } else {
+                setWorkLeft(getSailTurns());
             }
-            workLeft = (int) getOwner().getFeatureContainer().applyModifier(workLeft,
-                "model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
-        case SKIPPED:
-            // do nothing
+        case SKIPPED: // do nothing
             break;
         default:
-            workLeft = -1;
+            setWorkLeft(-1);
         }
         state = s;
     }
@@ -2791,8 +2796,8 @@ public class Unit extends FreeColGameObject
     public int getWorkTurnsLeft() {
         return (state == UnitState.IMPROVING
                 && unitType.hasAbility("model.ability.expertPioneer"))
-            ? (workLeft + 1) / 2
-            : workLeft;
+            ? (getWorkLeft() + 1) / 2
+            : getWorkLeft();
     }
 
     /**
