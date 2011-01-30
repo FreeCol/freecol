@@ -1837,6 +1837,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 logger.warning("player is null, but showAll is false");
             }
         }
+        boolean full = getGame().isClientTrusted() || showAll;
         PlayerExploredTile pet = (showAll) ? null
             : getPlayerExploredTile(player);
 
@@ -1855,47 +1856,55 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             out.writeAttribute("connected", Boolean.toString(true));
         }
 
-        if (getGame().isClientTrusted() || showAll) {
+        if (full) {
             if (owner != null) {
                 out.writeAttribute("owner", owner.getId());
+                if (owningSettlement != null) {
+                    out.writeAttribute("owningSettlement",
+                                       owningSettlement.getId());
+                }
             }
         } else if (pet != null) {
             if (pet.getOwner() != null) {
-                writeAttribute(out, "owner", pet.getOwner());
+                out.writeAttribute("owner", pet.getOwner().getId());
+                if (pet.getOwningSettlement() != null) {
+                    out.writeAttribute("owningSettlement",
+                                       pet.getOwningSettlement().getId());
+                }
             }
         }
-
-        if (getGame().isClientTrusted() || showAll) {
-            if (owningSettlement != null) {
-                out.writeAttribute("owningSettlement",
-                                   owningSettlement.getId());
-            }
-        } else if (pet != null) {
-            if (pet.getOwningSettlement() != null) {
-                out.writeAttribute("owningSettlement",
-                                   pet.getOwningSettlement().getId());
-            }
-        }
+        // End of attributes
 
         if (settlement != null) {
-            settlement.toXML(out, player, showAll, toSavedGame);
+            if (full || settlement.getOwner() == player) {
+                settlement.toXML(out, player, showAll, toSavedGame);
+            } else if (pet != null) {
+                // Only display the settlement if we know it owns the tile
+                // and we have a useful level of information about it.
+                // This is a compromise, but something more precise is too
+                // complex for the present.
+                if (pet.getOwningSettlement() == settlement
+                    && pet.getOwner() == settlement.getOwner()
+                    && !(settlement instanceof Colony
+                         && pet.getColonyUnitCount() <= 0)) {
+                    settlement.toXML(out, player, showAll, toSavedGame);
+                }
+            }
         }
 
-        // Check if the player can see the tile:
-        // Do not show enemy units on a tile out-of-sight.
-        // But show enemy units if:
-        // 1) the tile is visible,
-        // 2) there is no settlement there owned by another player.
-        if (getGame().isClientTrusted() || showAll
-            || (player.canSee(this)
-                && (settlement == null || settlement.getOwner() == player))) {
-            if (!units.isEmpty()) {
-                out.writeStartElement(UNITS_TAG_NAME);
-                for (Unit unit : units) {
-                    unit.toXML(out, player, showAll, toSavedGame);
-                }
-                out.writeEndElement();
+        // Check if the player can see the tile.
+        // Do not show enemy units on a tile out-of-sight, but do show
+        // enemy units if the tile is visible and there is no
+        // settlement there owned by another player.
+        if (!units.isEmpty()
+            && (full || (player.canSee(this)
+                         && (settlement == null
+                             || settlement.getOwner() == player)))) {
+            out.writeStartElement(UNITS_TAG_NAME);
+            for (Unit unit : units) {
+                unit.toXML(out, player, showAll, toSavedGame);
             }
+            out.writeEndElement();
         }
         if (tileItemContainer != null) {
             tileItemContainer.toXML(out, player, showAll, toSavedGame);

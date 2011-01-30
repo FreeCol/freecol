@@ -772,7 +772,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (s instanceof IndianSettlement) {
                 indianSettlements.add((IndianSettlement) s);
             } else {
-                throw new RuntimeException("getIndianSettlements can only be called for players whose settlements are IndianSettlements.");
+                throw new RuntimeException("getIndianSettlements found: " + s);
             }
         }
         return indianSettlements;

@@ -2225,7 +2225,8 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        boolean full = getGame().isClientTrusted() || showAll || player == getOwner();
+        boolean full = getGame().isClientTrusted() || showAll
+            || player == getOwner();
         PlayerExploredTile pet;
 
         // Start element:
@@ -2270,13 +2271,9 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 out.writeEndElement();
             }
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            if (pet.getOwner() != null) {
-                out.writeAttribute("owner", pet.getOwner().getId());
-            }
-            if (pet.getColonyUnitCount() > 0) {
-                out.writeAttribute("unitCount",
-                                   Integer.toString(pet.getColonyUnitCount()));
-            }
+            out.writeAttribute("owner", pet.getOwner().getId());
+            out.writeAttribute("unitCount",
+                               Integer.toString(pet.getColonyUnitCount()));
             if (pet.getColonyStockadeKey() != null) {
                 out.writeAttribute("stockadeKey",
                                    pet.getColonyStockadeKey());
