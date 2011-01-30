@@ -623,7 +623,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
                 if ("downgrade".equals(nodeName)
                     && change.getChangeTypes().isEmpty()) {
                     // add default downgrade type
-                    change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
+                    change.getChangeTypes().put(ChangeType.CLEAR_SKILL, 100);
                 }
                 typeChanges.add(change);
             }

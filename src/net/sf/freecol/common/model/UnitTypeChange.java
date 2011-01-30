@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +73,8 @@ public class UnitTypeChange extends FreeColObject {
 
     protected int turnsToLearn = 0;
 
-    protected Set<ChangeType> changeTypes = new HashSet<ChangeType>();
+    protected Map<ChangeType, Integer> changeTypes =
+        new EnumMap<ChangeType, Integer>(ChangeType.class);
 
     /**
      * A list of Scopes limiting the applicability of this Feature.
@@ -99,11 +99,24 @@ public class UnitTypeChange extends FreeColObject {
         readChildren(in, specification);
     }
 
+    /**
+     * Returns the probability of a change taking place (defaults to
+     * zero). At the moment, this probability only applies to the
+     * ChangeTypes EXPERIENCE and PROMOTION.
+     *
+     * @param type a <code>ChangeType</code> value
+     * @return an <code>int</code> value
+     */
+    public final int getProbability(ChangeType type) {
+        Integer result = changeTypes.get(type);
+        return (result == null) ? 0 : result;
+    }
+
     public List<Scope> getScopes() {
         return scopes;
     }
 
-    public Set<ChangeType> getChangeTypes() {
+    public Map<ChangeType, Integer> getChangeTypes() {
         return changeTypes;
     }
 
@@ -114,7 +127,8 @@ public class UnitTypeChange extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public boolean asResultOf(ChangeType type) {
-        return changeTypes.contains(type);
+        return changeTypes.containsKey(type)
+            && changeTypes.get(type) > 0;
     }
 
     /**
@@ -184,12 +198,21 @@ public class UnitTypeChange extends FreeColObject {
             newUnitType = specification.getType(newTypeId, UnitType.class);
             turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
             if (turnsToLearn > 0) {
-                changeTypes.add(ChangeType.EDUCATION);
+                changeTypes.put(ChangeType.EDUCATION, 100);
             }
             for (ChangeType type : ChangeType.values()) {
-                if (getAttribute(in, tags.get(type), false)) {
-                    changeTypes.add(type);
+                // TODO: remove 0.9.x compatibility code
+                String value = in.getAttributeValue(null, tags.get(type));
+                if (value != null) {
+                    if(value.equalsIgnoreCase("false")) {
+                        changeTypes.put(type, 0);
+                    } else if (value.equalsIgnoreCase("true")) {
+                        changeTypes.put(type, 100);
+                    } else {
+                        changeTypes.put(type, Math.max(0, Math.min(100, new Integer(value))));
+                    }
                 }
+                // end compatibility code
             }
         }
     }
@@ -211,8 +234,8 @@ public class UnitTypeChange extends FreeColObject {
         if (turnsToLearn != UNDEFINED) {
             out.writeAttribute("turnsToLearn", Integer.toString(turnsToLearn));
         }
-        for (ChangeType type : changeTypes) {
-            out.writeAttribute(tags.get(type), "true");
+        for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
+            out.writeAttribute(tags.get(entry.getKey()), entry.getValue().toString());
         }
         out.writeEndElement();
     }

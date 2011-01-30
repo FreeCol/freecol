@@ -31,7 +31,7 @@ import net.sf.freecol.util.test.FreeColTestUtils.ColonyBuilder;
 
 
 public class SchoolTest extends FreeColTestCase {
-	
+
     private enum SchoolLevel { SCHOOLHOUSE, COLLEGE, UNIVERSITY };
 
     private UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
@@ -67,7 +67,7 @@ public class SchoolTest extends FreeColTestCase {
 
     /**
      * Returns a list of all units in this colony of the given type.
-     * 
+     *
      * @param type The type of the units to include in the list. For instance
      *            Unit.EXPERT_FARMER.
      * @return A list of all the units of the given type in this colony.
@@ -101,7 +101,7 @@ public class SchoolTest extends FreeColTestCase {
 
         Game game = getGame();
         game.setMap(getTestMap(true));
-    	
+
         Colony colony = getStandardColony(5);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -150,7 +150,7 @@ public class SchoolTest extends FreeColTestCase {
     	colBuilder.initialColonists(3).addColonist(expertLumberJackType).addColonist(expertLumberJackType);
     	Colony colony = colBuilder.build();
     	Building school = addSchoolToColony(game, colony, SchoolLevel.COLLEGE);
-    
+
     	Unit student = getUnitList(colony, freeColonistType).get(0);
     	List<Unit> teacherList = getUnitList(colony, expertLumberJackType);
     	Unit teacher1 = teacherList.get(0);

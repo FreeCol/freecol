@@ -834,23 +834,24 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
       <xs:attribute name="unit" use="optional" type="xs:string"/>
-      <xs:attribute name="learnFromNatives" type="xs:boolean"/>
-      <xs:attribute name="learnFromExperience" type="xs:boolean"/>
-      <xs:attribute name="learnInLostCity" type="xs:boolean"/>
-      <xs:attribute name="learnInSchool" type="xs:boolean"/>
-      <xs:attribute name="promotion" type="xs:boolean"/>
-      <xs:attribute name="creation" type="xs:boolean"/>
       <xs:attribute name="delete" type="xs:boolean"/>
-      <xs:attribute name="independence" type="xs:boolean"/>
-      <xs:attribute name="enterColony" type="xs:boolean"/>
+      <!-- TODO: change these types to percentage -->
+      <xs:attribute name="learnFromNatives" type="PercentageType"/>
+      <xs:attribute name="learnFromExperience" type="PercentageType"/>
+      <xs:attribute name="learnInLostCity" type="PercentageType"/>
+      <xs:attribute name="learnInSchool" type="PercentageType"/>
+      <xs:attribute name="promotion" type="PercentageType"/>
+      <xs:attribute name="creation" type="PercentageType"/>
+      <xs:attribute name="independence" type="PercentageType"/>
+      <xs:attribute name="enterColony" type="PercentageType"/>
       <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
       <!-- TODO: these are downgrades, but serialization can not
         handle non-static XML Element tag names! We need to combine
         upgrade and downgrade into a typechange. -->
-        <xs:attribute name="capture" type="xs:boolean"/>
-        <xs:attribute name="demotion" type="xs:boolean"/>
-        <xs:attribute name="clearSkill" type="xs:boolean"/>
-        <xs:attribute name="undead" type="xs:boolean"/>
+      <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="demotion" type="PercentageType"/>
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <xs:attribute name="undead" type="PercentageType"/>
     </xs:complexType>
   </xs:element>
 
@@ -860,11 +861,11 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
       <xs:attribute name="unit" use="optional" type="xs:string"/>
-      <xs:attribute name="capture" type="xs:boolean"/>
-      <xs:attribute name="demotion" type="xs:boolean"/>
-      <xs:attribute name="clearSkill" type="xs:boolean"/>
-      <xs:attribute name="undead" type="xs:boolean"/>
       <xs:attribute name="delete" type="xs:boolean"/>
+      <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="demotion" type="PercentageType"/>
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <xs:attribute name="undead" type="PercentageType"/>
     </xs:complexType>
   </xs:element>
 
@@ -947,6 +948,14 @@
   </xs:complexType>
 
   <!-- Game Object Types -->
+
+  <xs:simpleType name="PercentageType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
 
   <!-- Either a building type or a unit type -->
   <xs:simpleType name="AbilityId">

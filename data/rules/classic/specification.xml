@@ -597,8 +597,8 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
-      <downgrade unit="model.unit.undead" undead="true"/>
-      <downgrade unit="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.undead" undead="100"/>
+      <downgrade unit="model.unit.freeColonist" clearSkill="100"/>
       <consumes id="model.goods.food" value="2" />
       <consumes id="model.goods.bells" value="1" />
     </unit-type>
@@ -608,27 +608,27 @@
       <ability id="model.ability.foundInLostCity" value="true"/>
       <required-goods id="model.goods.food" value="200"/>
       <downgrade unit="model.unit.freeColonist" delete="true" />
-      <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.expertSilverMiner" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.expertLumberJack" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.expertOreMiner" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.masterSugarPlanter" turnsToLearn="6" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.masterCottonPlanter" turnsToLearn="6" learnFromNatives="true" learnFromExperience="true"/>
-      <upgrade unit="model.unit.masterTobaccoPlanter" turnsToLearn="6" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.expertSilverMiner" turnsToLearn="4" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.expertLumberJack" turnsToLearn="4" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.expertOreMiner" turnsToLearn="4" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.masterSugarPlanter" turnsToLearn="6" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.masterCottonPlanter" turnsToLearn="6" learnFromNatives="100" learnFromExperience="4"/>
+      <upgrade unit="model.unit.masterTobaccoPlanter" turnsToLearn="6" learnFromNatives="100" learnFromExperience="4"/>
       <upgrade unit="model.unit.firebrandPreacher" turnsToLearn="8"/>
       <upgrade unit="model.unit.elderStatesman" turnsToLearn="8"/>
       <upgrade unit="model.unit.masterCarpenter" turnsToLearn="4"/>
       <upgrade unit="model.unit.masterDistiller" turnsToLearn="6"/>
-      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6" learnFromNatives="true"/>
+      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6" learnFromNatives="100"/>
       <upgrade unit="model.unit.masterTobacconist" turnsToLearn="6"/>
-      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6" learnFromNatives="true"/>
+      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6" learnFromNatives="100"/>
       <upgrade unit="model.unit.masterBlacksmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterGunsmith" turnsToLearn="6"/>
-      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="true" learnInLostCity="true"/>
+      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="100" learnInLostCity="100"/>
       <upgrade unit="model.unit.hardyPioneer" turnsToLearn="4"/>
-      <upgrade unit="model.unit.veteranSoldier" turnsToLearn="6" promotion="true"/>
+      <upgrade unit="model.unit.veteranSoldier" turnsToLearn="6" promotion="100"/>
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
     </unit-type>
     <unit-type id="model.unit.expertFarmer" extends="colonist" price="1100"
@@ -739,29 +739,29 @@
       <ability id="model.ability.supportUnit" value="true"/>
       <modifier id="model.modifier.offence" type="percentage" value="50"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <upgrade unit="model.unit.colonialRegular" promotion="true" independence="true"/>
-      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
+      <upgrade unit="model.unit.colonialRegular" promotion="100" independence="100"/>
+      <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary" extends="colonist" price="1400"
                skill="3" recruitProbability="1" scoreValue="5" >
       <default-equipment id="model.equipment.missionary"/>
-      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.expertMissionary" value="true"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant" extends="colonist"
                skill="-1" recruitProbability="20" scoreValue="2" >
       <downgrade unit="model.unit.freeColonist" delete="true" />
-      <upgrade unit="model.unit.freeColonist" turnsToLearn="4" promotion="true"/>
-      <upgrade unit="model.unit.expertFarmer" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.expertFisherman" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.expertFurTrapper" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.expertSilverMiner" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.expertLumberJack" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.expertOreMiner" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.masterSugarPlanter" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="true" learnInSchool="false"/>
-      <upgrade unit="model.unit.seasonedScout" learnFromNatives="true" learnInLostCity="true" learnInSchool="false"/>
+      <upgrade unit="model.unit.freeColonist" turnsToLearn="4" promotion="100"/>
+      <upgrade unit="model.unit.expertFarmer" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.expertFisherman" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.expertFurTrapper" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.expertSilverMiner" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.expertLumberJack" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.expertOreMiner" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.masterSugarPlanter" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="100" learnInSchool="0"/>
+      <upgrade unit="model.unit.seasonedScout" learnFromNatives="100" learnInLostCity="100" learnInSchool="0"/>
       <modifier id="model.goods.rum" type="additive" value="-1" />
       <modifier id="model.goods.cigars" type="additive" value="-1" />
       <modifier id="model.goods.cloth" type="additive" value="-1" />
@@ -775,8 +775,8 @@
     <unit-type id="model.unit.pettyCriminal" extends="colonist"
                skill="-2" recruitProbability="20" scoreValue="1" >
       <downgrade unit="model.unit.freeColonist" delete="true" />
-      <upgrade unit="model.unit.indenturedServant" turnsToLearn="4" promotion="true"/>
-      <upgrade unit="model.unit.seasonedScout" learnInLostCity="true" learnInSchool="false"/>
+      <upgrade unit="model.unit.indenturedServant" turnsToLearn="4" promotion="100"/>
+      <upgrade unit="model.unit.seasonedScout" learnInLostCity="100" learnInSchool="0"/>
       <modifier id="model.goods.rum" type="additive" value="-2" />
       <modifier id="model.goods.cigars" type="additive" value="-2" />
       <modifier id="model.goods.cloth" type="additive" value="-2" />
@@ -807,7 +807,7 @@
       <modifier id="model.goods.hammers" type="additive" value="-2" />
       <modifier id="model.goods.tools" type="additive" value="-2" />
       <downgrade unit="model.unit.freeColonist" delete="true" />
-      <upgrade unit="model.unit.freeColonist" learnInSchool="false"/>
+      <upgrade unit="model.unit.freeColonist" learnInSchool="0"/>
       <consumes id="model.goods.food" value="2" />
       <consumes id="model.goods.bells" value="1" />
     </unit-type>
@@ -832,7 +832,7 @@
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
                skillTaught="model.unit.veteranSoldier" skill="4">
-      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
@@ -840,7 +840,7 @@
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular" extends="colonist" skill="4">
-      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
@@ -901,7 +901,7 @@
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.supportUnit" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
-      <downgrade unit="model.unit.damagedArtillery" demotion="true"/>
+      <downgrade unit="model.unit.damagedArtillery" demotion="100"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery" extends="wagon" offence="5" defence="3" movement="3"
                scoreValue="1">

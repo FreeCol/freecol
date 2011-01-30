@@ -28,7 +28,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
 
     public void testEmptyScope() {
-    	
+
         UnitTypeChange change = new UnitTypeChange();
 
         assertTrue(change.getScopes().isEmpty());
@@ -55,7 +55,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitTypeChange.ChangeType education = UnitTypeChange.ChangeType.EDUCATION;
         UnitTypeChange change = new UnitTypeChange();
         change.setNewUnitType(farmer);
-        change.getChangeTypes().add(education);
+        change.getChangeTypes().put(education, 100);
         change.getScopes().add(scope);
 
         gardener.getTypeChanges().add(change);
@@ -85,7 +85,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitTypeChange.ChangeType creation = UnitTypeChange.ChangeType.CREATION;
         UnitTypeChange change = new UnitTypeChange();
         change.setNewUnitType(farmer);
-        change.getChangeTypes().add(creation);
+        change.getChangeTypes().put(creation, 100);
 
         gardener.getTypeChanges().add(change);
 
