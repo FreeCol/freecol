@@ -255,7 +255,6 @@ public class CargoPanel extends FreeColPanel
                 }
             } else if (comp instanceof GoodsLabel) {
                 Goods goods = ((GoodsLabel) comp).getGoods();
-
                 int loadableAmount = carrier.getLoadableAmount(goods.getType());
                 if (loadableAmount == 0) {
                     return null;

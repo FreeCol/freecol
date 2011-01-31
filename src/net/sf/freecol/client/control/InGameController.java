@@ -691,6 +691,8 @@ public final class InGameController implements NetworkConstants {
         // not to be unloaded at this stop, check if the cargo is
         // completely full and if not, try to fill to capacity.
         Colony colony = unit.getColony();
+        Location loc = (unit.isInEurope()) ? unit.getOwner().getEurope()
+            : colony;
         Game game = freeColClient.getGame();
         ArrayList<Goods> loaded = new ArrayList<Goods>();
         for (Goods goods : unit.getGoodsList()) {
@@ -698,12 +700,12 @@ public final class InGameController implements NetworkConstants {
             int index, toLoad;
             if ((toLoad = GoodsContainer.CARGO_SIZE - goods.getAmount()) > 0
                 && (index = goodsTypesToLoad.indexOf(type)) >= 0) {
-                int atStop = (colony == null) ? Integer.MAX_VALUE // Europe
+                int atStop = (unit.isInEurope()) ? Integer.MAX_VALUE
                     : colony.getExportAmount(type);
                 if (atStop > 0) {
-                    Goods cargo = new Goods(game, colony, type,
+                    Goods cargo = new Goods(game, loc, type,
                                             Math.min(toLoad, atStop));
-                    if (loadGoods(cargo, colony, unit)) {
+                    if (loadGoods(cargo, unit)) {
                         loaded.add(cargo);
                     }
                 }
@@ -718,12 +720,12 @@ public final class InGameController implements NetworkConstants {
         for (GoodsType type : goodsTypesToLoad) {
             if (unit.getSpaceLeft() <= 0) break; // Full
             int toLoad = GoodsContainer.CARGO_SIZE;
-            int atStop = (colony == null) ? Integer.MAX_VALUE // Europe
+            int atStop = (unit.isInEurope()) ? Integer.MAX_VALUE
                 : colony.getExportAmount(type);
             if (atStop > 0) {
-                Goods cargo = new Goods(game, colony, type,
+                Goods cargo = new Goods(game, loc, type,
                                         Math.min(toLoad, atStop));
-                if (loadGoods(cargo, colony, unit)) {
+                if (loadGoods(cargo, unit)) {
                     loaded.add(cargo);
                 }
             }
@@ -742,13 +744,11 @@ public final class InGameController implements NetworkConstants {
      * Load some goods onto a carrier.
      *
      * @param goods The <code>Goods</code> to load.
-     * @param colony The <code>Colony</code> to load from,
-     *               or null if in Europe.
      * @param carrier The <code>Unit</code> to load onto.
      * @return True if the load succeeded.
      */
-    private boolean loadGoods(Goods goods, Colony colony, Unit carrier) {
-        if (colony == null) {
+    private boolean loadGoods(Goods goods, Unit carrier) {
+        if (carrier.isInEurope() && goods.getLocation() instanceof Europe) {
             if (!carrier.getOwner().canTrade(goods)) return false;
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
@@ -757,10 +757,11 @@ public final class InGameController implements NetworkConstants {
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
         UnitWas unitWas = new UnitWas(carrier);
-        ColonyWas colonyWas = new ColonyWas(colony);
+        Colony colony = carrier.getColony();
+        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         if (askLoadCargo(goods, carrier)
             && container.getGoodsCount(type) != oldAmount) {
-            colonyWas.fireChanges();
+            if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
             return true;
         }
@@ -3683,7 +3684,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Try to load.
-        if (loadGoods(goods, colony, carrier)) {
+        if (loadGoods(goods, carrier)) {
             freeColClient.playSound("sound.event.loadCargo");
         }
     }

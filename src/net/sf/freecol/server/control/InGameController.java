@@ -2373,6 +2373,7 @@ public final class InGameController extends Controller {
     public Element loadCargo(ServerPlayer serverPlayer, Unit unit,
                              Goods goods) {
         ChangeSet cs = new ChangeSet();
+        Location oldLocation = goods.getLocation();
 
         goods.adjustAmount();
         moveGoods(goods, unit);
@@ -2382,13 +2383,11 @@ public final class InGameController extends Controller {
             moved = true;
         }
 
-        // Only have to update the carrier location, as that *must*
-        // include the original location of the goods, but if it is in
-        // a colony it is better still just to update the goods
-        // containers.
-        Settlement settlement = unit.getSettlement();
-        if (settlement != null) {
-            cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
+        // Update the goodsContainers only if within a settlement,
+        // otherwise update the shared location so that others can
+        // see capacity changes.
+        if (unit.getSettlement() != null) {
+            cs.add(See.only(serverPlayer), oldLocation.getGoodsContainer());
             cs.add(See.only(serverPlayer), unit.getGoodsContainer());
             if (moved) cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         } else {
