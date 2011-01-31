@@ -434,8 +434,8 @@ public class SimpleCombatModel extends CombatModel {
             if (r < odds.win || isBeached(defenderUnit)) {
                 great = r < 0.1f * odds.win; // Great Win
                 crs.add(CombatResult.WIN);
-                resolveAttack(attackerUnit, defenderUnit, great, r / odds.win,
-                              crs);
+                r /= 0.1f * odds.win; // Rescale to 0 <= r < 1
+                resolveAttack(attackerUnit, defenderUnit, great, r, crs);
             } else if (r < 0.8f * odds.win + 0.2f
                     && defenderUnit.hasAbility("model.ability.evadeAttack")) {
                 crs.add(CombatResult.NO_RESULT);
@@ -443,7 +443,10 @@ public class SimpleCombatModel extends CombatModel {
             } else {
                 great = r >= 0.1f * odds.win + 0.9f; // Great Loss
                 crs.add(CombatResult.LOSE);
-                resolveAttack(defenderUnit, attackerUnit, great, -1.0f, crs);
+                // Rescale to 0 <= r < 1
+                //   (by rearranging: 0.8 * odds.win + 0.2 <= r < 1.0)
+                r = (1.25f * r - 0.25f - odds.win) / (1.0f - odds.win);
+                resolveAttack(defenderUnit, attackerUnit, great, r, crs);
             }
 
         } else if (combatIsBombard(attacker, defender)) {
