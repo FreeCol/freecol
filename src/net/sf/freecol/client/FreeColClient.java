@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -361,7 +362,15 @@ public final class FreeColClient {
                 = (AudioMixerOption) opts.getOption(ClientOptions.AUDIO_MIXER);
             final PercentageOption volume
                 = (PercentageOption) opts.getOption(ClientOptions.AUDIO_VOLUME);
-            soundPlayer = new SoundPlayer(amo, volume);
+            try {
+                soundPlayer = new SoundPlayer(amo, volume);
+            } catch (Exception e) {
+                // #3168279 reports an undocumented NPE thrown by
+                // AudioSystem.getMixer(null).  Workaround this and other
+                // such failures by just disabling sound.
+                soundPlayer = null;
+                logger.log(Level.WARNING, "Unexpected sound failure", e);
+            }
         } else {
             soundPlayer = null;
         }
