@@ -2022,10 +2022,6 @@ public class Player extends FreeColGameObject implements Nameable {
         this.ready = ready;
     }
 
-    public void incrementLiberty(int amount) {
-        liberty += amount;
-    }
-
     public void incrementImmigration(int amount) {
         immigration += amount;
     }
@@ -2696,7 +2692,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return This player's number of liberty earned towards the
      *     current Founding Father.
-     * @see #incrementLiberty
      */
     public int getLiberty() {
         return (canHaveFoundingFathers()) ? liberty : 0;
@@ -2709,6 +2704,15 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setLiberty(int liberty) {
         this.liberty = liberty;
+    }
+
+    /**
+     * Adds to the current amount of liberty this player has.
+     *
+     * @param liberty The additional amount of liberty.
+     */
+    public void incrementLiberty(int amount) {
+        setLiberty(getLiberty() + amount);
     }
 
     /**
