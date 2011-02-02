@@ -90,6 +90,7 @@ public class UpdateTradeRouteMessage extends Message {
             return Message.clientError("Not your trade route: " + id);
         }
         realRoute.updateFrom(tradeRoute);
+        tradeRoute.dispose();
         return null;
     }
 

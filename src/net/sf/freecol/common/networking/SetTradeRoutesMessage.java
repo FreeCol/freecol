@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -68,8 +70,8 @@ public class SetTradeRoutesMessage extends Message {
         List<TradeRoute> newRoutes = new ArrayList<TradeRoute>();
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
-            TradeRoute route = tradeRouteFromElement(game,
-                                                     (Element) nodes.item(i));
+            TradeRoute route
+                = tradeRouteFromElement(game, (Element) nodes.item(i));
             if (route != null) newRoutes.add(route);
         }
         this.tradeRoutes = newRoutes;
@@ -93,7 +95,7 @@ public class SetTradeRoutesMessage extends Message {
         try {
             return new TradeRoute(game, element);
         } catch (Exception e) {
-            logger.warning("Could not build trade route: " + id);
+            logger.log(Level.WARNING, "Could not build trade route " + id, e);
             return null;
         }
     }
@@ -122,21 +124,32 @@ public class SetTradeRoutesMessage extends Message {
         Game game = server.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
         List<TradeRoute> newRoutes = new ArrayList<TradeRoute>();
+        String errors = "";
 
         for (TradeRoute tradeRoute : tradeRoutes) {
             if (tradeRoute.getId() == null || !hasPrefix(tradeRoute)) {
-                return Message.clientError("Bogus route");
+                errors += "Bogus route: " + tradeRoute.getId() + ". ";
+                continue;
             }
             String id = removePrefix(tradeRoute);
             if (!(game.getFreeColGameObject(id) instanceof TradeRoute)) {
-                return Message.clientError("Not a trade route: " + id);
+                errors += "Not a trade route: " + id + ". ";
+                continue;
             }
             TradeRoute realRoute = (TradeRoute) game.getFreeColGameObject(id);
             if (tradeRoute.getOwner() != (Player) serverPlayer) {
-                return Message.clientError("Not your trade route: " + id);
+                errors += "Not your trade route: " + id + ". ";
+                continue;
             }
+        }
+        if (!"".equals(errors)) return Message.clientError(errors);
+        
+        for (TradeRoute tradeRoute : tradeRoutes) {
+            TradeRoute realRoute = (TradeRoute) game
+                .getFreeColGameObject(removePrefix(tradeRoute));
             realRoute.updateFrom(tradeRoute);
             newRoutes.add(realRoute);
+            tradeRoute.dispose();
         }
 
         // Proceed to set trade routes
