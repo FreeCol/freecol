@@ -578,15 +578,11 @@ public class TransportMission extends Mission {
         if(carrier.getMovesLeft() == 0){
         	return;
         }
-        if (carrier.getLocation() instanceof Europe) {
-            // Coming to/from Europe, do nothing
-            if (carrier.isBetweenEuropeAndNewWorld()) {
-                return;
-            }
-            // Actually in Europe
-            inEurope(connection);
+        if (carrier.isBetweenEuropeAndNewWorld()) {
+            return; // Going to/from Europe, do nothing
+        } else if (carrier.isInEurope()) {
+            inEurope(connection); // Actually in Europe
             return;
-
         }
 
         if (!attackEnemyShips(connection)) return;
@@ -779,7 +775,7 @@ public class TransportMission extends Mission {
     private void buyCargo(Connection connection) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
 
-        if (!(getUnit().getLocation() instanceof Europe)) {
+        if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");
         }
 
@@ -964,7 +960,7 @@ public class TransportMission extends Mission {
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
-        if (!(getUnit().getLocation() instanceof Europe)) {
+        if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");
         }
 
@@ -1013,7 +1009,7 @@ public class TransportMission extends Mission {
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
-        if (!(getUnit().getLocation() instanceof Europe)) {
+        if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");
         }
         if (!player.canRecruitUnits()) {
@@ -1173,7 +1169,8 @@ public class TransportMission extends Mission {
      *         <code>false</code>otherwise.
      */
     private boolean restockCargoAtDestination(Connection connection) {
-        return unloadCargoAtDestination(connection) | loadCargoAtDestination(connection);
+        return unloadCargoAtDestination(connection)
+            || loadCargoAtDestination(connection);
     }
 
     /**
@@ -1185,114 +1182,98 @@ public class TransportMission extends Mission {
      *         <code>false</code>otherwise.
      */
     private boolean unloadCargoAtDestination(Connection connection) {
+        Map map = getGame().getMap();
         Unit carrier = getUnit();
-
         boolean transportListChanged = false;
 
-        //Sanitation
-        if(carrier.isBetweenEuropeAndNewWorld()){
-        	return false;
-        }
-
-        // START Debug code
-        String locStr = carrier.getLocation().toString();
-        if(carrier.getLocation() instanceof Europe){
-        	locStr = "Europe";
-        }
-        if(carrier.getLocation().getColony() != null){
-        	locStr = carrier.getLocation().getColony().getName();
-        }
-        // END Debug code
+        // Sanitation
+        if (carrier.isBetweenEuropeAndNewWorld()) return false;
 
         // Make a copy for iteration, the main list may change inside the loop
         for (Transportable t : new ArrayList<Transportable>(transportList)) {
-            // to pickup, ignore
-        	if (!isCarrying(t)) {
-                continue;
-            }
+            if (!isCarrying(t)) continue; // To pickup, ignore
+
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
                 Mission mission = au.getMission();
+                String reason = null;
+                boolean unload = false;
+                Tile destTile;
 
-                // Sanitation, to force game to reset
-                if(mission == null || au.getTransportDestination() == null){
-                	if(carrier.getLocation() instanceof Europe
-                     || carrier.getSettlement() != null) {
-                		logger.warning("Unloading unit without mission or destination");
-                		unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
-                		continue;
-                	}
-                }
+                if (mission == null || !mission.isValid()) {
+                    // Get rid of the unit ASAP if it has no mission
+                    unload = true;
+                    reason = "No valid mission";
 
-                if (mission != null && mission.isValid()) {
-                    if (au.getTransportDestination() != null
-                            && au.getTransportDestination().getTile() == carrier.getTile()) {
-                    	logger.finest(carrier + "("
-                        		+ carrier.getId() + ") unloading " + u + " at " + locStr);
-                    	if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
-                          unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
-                        }
-                        mission.doMission(connection);
-                        if (u.getLocation() != getUnit()) {
-                            removeFromTransportList(au);
-                            transportListChanged = true;
-                        }
-                    } else if (!(carrier.getLocation() instanceof Europe) && au.getTransportDestination() != null
-                            && au.getTransportDestination().getTile() != null) {
-                        PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
-                                au.getTransportDestination().getTile(), carrier);
-                        if (p != null) {
-                        	logger.finest(carrier + "("
-                            		+ carrier.getId() + ") unloading " + u + " at " + locStr);
-                            final PathNode dropNode = p.getTransportDropNode();
-                            int distToCarrier = dropNode.getTile().getDistanceTo(carrier.getTile());
-                            if (dropNode != null &&
-                                    distToCarrier != Map.COST_INFINITY &&
-                                    distToCarrier <= 1) {
-                                mission.doMission(connection);
-                                if (u.getLocation() != getUnit()) {
-                                    removeFromTransportList(au);
-                                    transportListChanged = true;
-                                }
-                            }
-                        }
-                        /*
-                        boolean atTarget = (au.getTransportDestination().getTile() == carrier.getTile());
-                        for (Tile c : getGame().getMap().getSurroundingTiles(carrier.getTile(), 1)) {
-                            if (c == au.getTransportDestination().getTile()) {
-                                atTarget = true;
-                            }
-                        }
-                        if (atTarget) {
+                } else if (au.getTransportDestination() == null) {
+                    // Get rid of the unit ASAP if it has no destination
+                    unload = true;
+                    reason = "No destination";
+
+                } else if (au.getTransportDestination() instanceof Europe) {
+                    if (carrier.isInEurope()) {
+                        // Unload at destination of Europe
+                        unload = true;
+                        reason = "Arrived in Europe";
+                    }
+
+                } else if ((destTile = au.getTransportDestination().getTile())
+                           != null) {
+                    PathNode p;
+                    if (carrier.getTile() == null) {
+                        ;// Get back on the map
+                    } else if (destTile == carrier.getTile()) {
+                        // Unload at destination tile
+                        unload = true;
+                        reason = "Arrived at " + destTile;
+                    } else if ((p = map.findPath(u, carrier.getTile(), destTile,
+                                                 carrier)) != null) {
+                        final PathNode dropNode = p.getTransportDropNode();
+                        int d;
+                        if (dropNode != null && dropNode.getTile() != null
+                            && (d = dropNode.getTile().getDistanceTo(carrier.getTile())) != Map.COST_INFINITY
+                            && d <= 1) {
+                            // Next to the drop node, proceed with mission
                             mission.doMission(connection);
-                            if (u.getLocation() != getUnit()) {
-                                removeFromTransportList(au);
-                                transportListChanged = true;
-                            }
-                        }
-                        */
-                        /*
-                        PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
-                                au.getTransportDestination().getTile());
-                        if (p != null && p.getTransportDropNode().getTurns() <= 0) {
-                            mission.doMission(connection);
-                            if (u.getLocation() != getUnit()) {
-                                removeFromTransportList(au);
-                                transportListChanged = true;
-                            }
-                        }
-                        */
+                            reason = "Next to drop node " + dropNode.getTile();
+                         }
+                    } else {
+                        // Destination has become unreachable
+                        unload = true;
+                        reason = "No path to destination: " + destTile;
                     }
                 }
+
+                // If unloading, do not drop transported unit into the sea
+                if (unload && (carrier.getSettlement() != null
+                             || carrier.isInEurope())) {
+                    unitLeavesShip(au);
+                }
+                // If unload or doMission succeeded, update the transportables
+                if (u.getLocation() != carrier) {
+                    removeFromTransportList(au);
+                    transportListChanged = true;
+                }
+                if (reason != null) {
+                    logger.finest("Unloading(" + reason + "," + unload
+                                  + "): " + u
+                                  + " from: " + carrier
+                                  + " -> " + (u.getLocation() != carrier));
+                }
+
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
+                String locStr = (carrier.isInEurope()) ? "Europe"
+                    : (carrier.getLocation().getSettlement() != null)
+                    ? carrier.getLocation().getSettlement().getName()
+                    : carrier.getLocation().toString();
                 if (ag.getTransportDestination() == null ||
                 		(ag.getTransportDestination() != null
                 				&& ag.getTransportDestination().getTile() == carrier.getLocation().getTile())) {
                     logger.finest(carrier + "("
                     		+ carrier.getId() + ") unloading " + ag + " at " + locStr);
-                    if (carrier.getLocation() instanceof Europe) {
+                    if (carrier.isInEurope()) {
                         boolean success = sellCargoInEurope(ag.getGoods());
                         if(success){
                             removeFromTransportList(ag);
