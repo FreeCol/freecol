@@ -1857,6 +1857,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
             defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
             for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
+                is.makeContactSettlement(this);
                 is.getAlarm(this).setValue(Tension.SURRENDERED);
                 cs.add(See.perhaps(), is);
             }
