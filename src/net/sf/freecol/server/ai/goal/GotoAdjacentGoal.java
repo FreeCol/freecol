@@ -56,7 +56,7 @@ public class GotoAdjacentGoal extends Goal {
         //target and move towards it. Return to parent if adjacent to target,
         //or no path can be found.
         Iterator<AIUnit> uit = availableUnitsList.iterator();
-        while (uit.hasNext()) {
+        nextUnit: while (uit.hasNext()) {
             AIUnit u = uit.next();
 
             PathNode pathNode = u.getUnit().findPath(target);
@@ -75,6 +75,10 @@ public class GotoAdjacentGoal extends Goal {
                             }
                         
                             AIMessage.askMove(u, pathNode.getDirection());
+                            if (u.getUnit() == null
+                                || u.getUnit().isDisposed()) {
+                                continue nextUnit;
+                            }
                             pathNode = pathNode.next;
                 }
                 if (u.getUnit().getTile().isAdjacent(target)) {

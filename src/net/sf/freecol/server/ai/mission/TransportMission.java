@@ -653,7 +653,7 @@ public class TransportMission extends Mission {
                 if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
                     moveUnitToEurope();
                 } else {
-                    AIMessage.askMove(getAIUnit(), r);
+                    if (!moveButDontAttack(r)) return;
                 }
 
                 if (!(carrier.getLocation() instanceof Europe)) {

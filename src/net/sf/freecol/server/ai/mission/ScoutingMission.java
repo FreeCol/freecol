@@ -178,8 +178,8 @@ public class ScoutingMission extends Mission {
                     if (mt == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
                         AIMessage.askScoutIndianSettlement(getAIUnit(),
                                                            direction);
-                    } else if (mt.isProgress()) {
-                        AIMessage.askMove(getAIUnit(), direction);
+                    } else {
+                        if (!moveButDontAttack(direction)) return;
                     }
                 }
             } else {

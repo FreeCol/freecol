@@ -122,7 +122,8 @@ public abstract class Mission extends AIObject {
             if (!getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
                 break;
             }
-            if (!AIMessage.askMove(aiUnit, pathNode.getDirection())) {
+            if (!AIMessage.askMove(aiUnit, pathNode.getDirection())
+                || getUnit() == null || getUnit().isDisposed()) {
                 return null;
             }
             pathNode = pathNode.next;
@@ -149,8 +150,8 @@ public abstract class Mission extends AIObject {
             for (int j = 0; j < randomDirections.length; j++) {
                 Direction direction = randomDirections[j];
                 if (thisTile.getNeighbourOrNull(direction) != null
-                    && unit.getMoveType(direction) == MoveType.MOVE
-                    && AIMessage.askMove(aiUnit, direction)) {
+                    && unit.getMoveType(direction) == MoveType.MOVE) {
+                    AIMessage.askMove(aiUnit, direction);
                     break;
                 }
             }

@@ -303,9 +303,8 @@ public class PioneeringMission extends Mission {
             }
 
             Direction direction = moveTowards(pathToTarget);
-            if (direction != null
-                && unit.getMoveType(direction).isProgress()) {
-                AIMessage.askMove(getAIUnit(), direction);
+            if (direction != null) {
+                if (!moveButDontAttack(direction)) return;
             }
 
             if(unit.getTile() != tileImprovementPlan.getTarget()){
