@@ -71,7 +71,7 @@ public final class PreGameController {
     /**
      * Gets the <code>MapGeneratorOptions</code> used when creating
      * a map.
-     * 
+     *
      * @return The <code>MapGeneratorOptions</code>.
      */
     public OptionGroup getMapGeneratorOptions() {
@@ -166,7 +166,7 @@ public final class PreGameController {
                                                   Boolean.FALSE);
         freeColClient.getClient().send(chatMessage.toXMLElement());
     }
-    
+
 
     /**
     * Sends the {@link GameOptions} to the server.
@@ -176,7 +176,7 @@ public final class PreGameController {
         Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
         OptionGroup gameOptions = freeColClient.getGame().getSpecification().getOptionGroup("gameOptions");
         updateGameOptionsElement.appendChild(gameOptions.toXMLElement(updateGameOptionsElement.getOwnerDocument()));
-        freeColClient.getClient().send(updateGameOptionsElement);        
+        freeColClient.getClient().send(updateGameOptionsElement);
     }
 
     /**
@@ -190,7 +190,7 @@ public final class PreGameController {
              .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
          //freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
          freeColClient.getClient().send(updateMapGeneratorOptionsElement);
-     }    
+     }
 
     /**
      * Add player-specific resources to the resource manager.
@@ -246,7 +246,7 @@ public final class PreGameController {
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,
                  freeColClient.getGame().getMap()));
-        
+
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             myPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                                       "tutorial.startGame",

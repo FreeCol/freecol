@@ -46,7 +46,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class MainPanel extends FreeColPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
-    
+
     public static final int     NEW = 0,
                                 OPEN = 1,
                                 MAP_EDITOR = 2,
@@ -54,7 +54,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                                 QUIT = 4;
 
     private JButton newButton;
-    
+
 
     /**
     * The constructor that will add the items to this panel.
@@ -67,7 +67,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         JButton mapEditorButton = new JButton( Messages.message("mainPanel.editor") );
         JButton optionsButton = new JButton( Messages.message("mainPanel.options") );
         JButton quitButton = new JButton( Messages.message("quitAction.name") );
-        
+
         setCancelComponent(quitButton);
         newButton = new JButton( Messages.message("newAction.name") );
 
@@ -82,7 +82,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         openButton.addActionListener(this);
         optionsButton.addActionListener(this);
         quitButton.addActionListener(this);
-        
+
         enterPressesWhenFocused(newButton);
         enterPressesWhenFocused(mapEditorButton);
         enterPressesWhenFocused(openButton);
@@ -105,7 +105,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         buttons.add(optionsButton);
         buttons.add(quitButton);
 
-        buttons.setBorder(new EmptyBorder(25, 25, 25, 25));        
+        buttons.setBorder(new EmptyBorder(25, 25, 25, 25));
         buttons.setOpaque(false);
 
         add(buttons, BorderLayout.SOUTH);
@@ -142,7 +142,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case NEW:
-                    getCanvas().remove(this);                
+                    getCanvas().remove(this);
                     getCanvas().showPanel(new NewPanel(getCanvas()));
                     break;
                 case OPEN:

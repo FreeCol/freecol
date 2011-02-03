@@ -82,7 +82,7 @@ public final class ConnectController {
         this.freeColClient = freeColClient;
     }
 
-    
+
     /**
      * Starts a multiplayer server and connects to it.
      *
@@ -101,7 +101,7 @@ public final class ConnectController {
             logout(true);
         }
 
-        if (freeColClient.getFreeColServer() != null && 
+        if (freeColClient.getFreeColServer() != null &&
             freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text",
                                                             "stopServer.yes",
@@ -137,7 +137,7 @@ public final class ConnectController {
     public void startSingleplayerGame(Specification specification, String username, Advantages advantages) {
 
         freeColClient.setMapEditor(false);
-        
+
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
@@ -176,7 +176,7 @@ public final class ConnectController {
             freeColClient.getPreGameController().setReady(true);
             freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
                                                          true);
-                                                         
+
         }
     }
 
@@ -191,7 +191,7 @@ public final class ConnectController {
     public void joinMultiplayerGame(String username, String host, int port) {
         final Canvas canvas = freeColClient.getCanvas();
         freeColClient.setMapEditor(false);
-        
+
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
@@ -228,7 +228,7 @@ public final class ConnectController {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         freeColClient.setMapEditor(false);
-        
+
         if (client != null) {
             client.disconnect();
         }
@@ -262,10 +262,10 @@ public final class ConnectController {
 
                 in.nextTag();
                 Game game = new Game(in, username);
-                
+
                 // this completes the client's view of the spec with options obtained from the server difficulty
                 // it should not be required in the client, to be removed later, when newTurn() only runs in the server
-                
+
                 Player thisPlayer = game.getPlayerByName(username);
 
                 freeColClient.setGame(game);
@@ -273,9 +273,9 @@ public final class ConnectController {
 
                 freeColClient.getActionManager().addSpecificationActions(game.getSpecification());
                 freeColClient.setActiveUnit();
-                
+
                 c.endTransmission(in);
-                
+
                 // If (true) --> reconnect
                 if (startGame) {
                     freeColClient.setSingleplayer(singleplayer);
@@ -297,7 +297,7 @@ public final class ConnectController {
                 logger.warning("Unkown message received: " + in.getLocalName());
                 c.endTransmission(in);
                 return false;
-            }            
+            }
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -323,7 +323,7 @@ public final class ConnectController {
         final String username = freeColClient.getMyPlayer().getName();
         final String host = freeColClient.getClient().getHost();
         final int port = freeColClient.getClient().getPort();
-        
+
         freeColClient.getCanvas().removeInGameComponents();
         logout(true);
         login(username, host, port);
@@ -414,13 +414,13 @@ public final class ConnectController {
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());                    
+            logger.warning(sw.toString());
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
         } finally {
             xs.close();
         }
-        
+
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -430,7 +430,7 @@ public final class ConnectController {
         }
 
         canvas.showStatusPanel(Messages.message("status.loadingGame"));
-        
+
         Runnable loadGameJob = new Runnable() {
             public void run() {
                 FreeColServer freeColServer = null;
@@ -478,11 +478,11 @@ public final class ConnectController {
                             freeColClient.getCanvas().showMainPanel();
                         }
                     });
-                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );                    
+                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
                 }
             }
         };
-        freeColClient.worker.schedule( loadGameJob );        
+        freeColClient.worker.schedule( loadGameJob );
     }
 
     /**
@@ -508,7 +508,7 @@ public final class ConnectController {
 
         ResourceManager.setScenarioMapping(null);
         ResourceManager.setCampaignMapping(null);
-        
+
         if (!freeColClient.isHeadless()) {
             freeColClient.getGUI().setInGame(false);
         }
@@ -516,7 +516,7 @@ public final class ConnectController {
         freeColClient.setMyPlayer(null);
         freeColClient.setClient(null);
 
-        freeColClient.setLoggedIn(false);        
+        freeColClient.setLoggedIn(false);
     }
 
 
@@ -536,7 +536,7 @@ public final class ConnectController {
     */
     public void quitGame(boolean bStopServer, boolean notifyServer) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        if (bStopServer && server != null) {            
+        if (bStopServer && server != null) {
             server.getController().shutdown();
             freeColClient.setFreeColServer(null);
 
@@ -546,11 +546,11 @@ public final class ConnectController {
             freeColClient.setGame(null);
             freeColClient.setMyPlayer(null);
             freeColClient.setIsRetired(false);
-            freeColClient.setClient(null);                
-            freeColClient.setLoggedIn(false);            
+            freeColClient.setClient(null);
+            freeColClient.setLoggedIn(false);
         } else if (freeColClient.isLoggedIn()) {
             logout(notifyServer);
-        }          
+        }
     }
 
 
@@ -596,7 +596,7 @@ public final class ConnectController {
                 logger.warning("The reply has an unknown type: " + reply.getTagName());
                 return null;
             }
-                        
+
             NodeList nl = reply.getChildNodes();
             for (int i=0; i<nl.getLength(); i++) {
                 items.add(((Element) nl.item(i)).getAttribute("username"));
@@ -610,7 +610,7 @@ public final class ConnectController {
                 logger.warning("Could not close connection.");
             }
         }
-                        
+
         return items;
     }
 
