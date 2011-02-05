@@ -674,6 +674,25 @@ public class Building extends FreeColGameObject
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
+        ProductionInfo result = new ProductionInfo();
+        for (AbstractGoods goods : input) {
+            if (goods.getType() == getGoodsInputType()) {
+                int amount = canAutoProduce()
+                    ? getAutoProduction(goods.getAmount())
+                    : getProductionAdding(goods.getAmount());
+                result.addProduction(new AbstractGoods(getGoodsOutputType(), amount));
+                result.addConsumption(new AbstractGoods(getGoodsInputType(), getGoodsInput()));
+                result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), getMaximumProduction()));
+                break;
+            }
+        }
+        return result;
+    }
+
 
     /**
      * Returns the actual production of this building.

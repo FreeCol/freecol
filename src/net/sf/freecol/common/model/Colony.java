@@ -2113,6 +2113,30 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         disposeList();
     }
 
+    public TypeCountMap<GoodsType> getProduction() {
+        TypeCountMap<GoodsType> result = new TypeCountMap<GoodsType>();
+        for (ColonyTile colonyTile : getColonyTiles()) {
+            for (AbstractGoods goods : colonyTile.getProduction()) {
+                result.incrementCount(goods.getType(), goods.getAmount());
+            }
+        }
+        for (Consumer consumer : getConsumers()) {
+            boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
+            List<AbstractGoods> goods = new ArrayList<AbstractGoods>(consumer.getConsumedGoods());
+            for (AbstractGoods g : goods) {
+                g.setAmount(result.getCount(g.getType())
+                            + (surplusOnly ? 0 : getGoodsCount(g.getType())));
+            }
+            ProductionInfo info = consumer.getProductionInfo(goods);
+            for (AbstractGoods g : info.getProduction()) {
+                result.incrementCount(g.getType(), g.getAmount());
+            }
+            for (AbstractGoods g : info.getConsumption()) {
+                result.incrementCount(g.getType(), -g.getAmount());
+            }
+        }
+        return result;
+    }
 
     public int getInputAvailable(GoodsType goodsType, Consumer consumer) {
         int production = getProductionOf(goodsType);

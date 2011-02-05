@@ -861,6 +861,27 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
+        ProductionInfo result = new ProductionInfo();
+        for (GoodsType goodsType : consumption.keySet()) {
+            for (AbstractGoods goods : input) {
+                if (goodsType == goods.getType()) {
+                    int amount = consumption.getCount(goodsType);
+                    if (amount > goods.getAmount()) {
+                        result.setFailed(true);
+                        result.addConsumption(goods);
+                    } else {
+                        result.addConsumption(new AbstractGoods(goodsType, amount));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * The priority of this Consumer. The higher the priority, the
      * earlier will the Consumer be allowed to consume the goods it
      * requires.

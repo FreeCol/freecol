@@ -217,7 +217,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals("Wrong net horse production",0, colony.getProductionNetOf(horsesType));
     }
 
-    public void testConsumers() {
+
+    public void testConsumersOld() {
 
         Game game = getGame();
         game.setMap(getTestMap());
@@ -279,6 +280,59 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertTrue(consumers.get(1) instanceof Building);
         assertEquals("model.building.armory",
                      ((Building) consumers.get(1)).getType().getId());
+
+
+    }
+
+    public void testConsumers() {
+
+        Game game = getGame();
+        game.setMap(getTestMap());
+
+        Colony colony = getStandardColony(3);
+        List<Consumer> consumers = colony.getConsumers();
+
+        // units come first
+        for (int index = 0; index < 3; index++) {
+            assertTrue(consumers.get(index).toString(),
+                       consumers.get(index) instanceof Unit);
+        }
+        // buildings come next
+        for (int index = 3; index < 10; index++) {
+            assertTrue(consumers.get(index).toString(),
+                       consumers.get(index) instanceof Building);
+        }
+        // build and population queues come last
+        for (int index = 10; index < 12; index++) {
+            assertTrue(consumers.get(index).toString(),
+                       consumers.get(index) instanceof BuildQueue);
+        }
+
+        BuildingType armoryType = spec().getBuildingType("model.building.armory");
+        Building armory = new ServerBuilding(getGame(), colony, armoryType);
+        colony.addBuilding(armory);
+        consumers = colony.getConsumers();
+
+        // units come first
+        for (int index = 0; index < 3; index++) {
+            assertTrue(consumers.get(index).toString(),
+                       consumers.get(index) instanceof Unit);
+        }
+        // buildings come next
+        for (int index = 3; index < 10; index++) {
+            assertTrue(consumers.get(index).toString(),
+                       consumers.get(index) instanceof Building);
+        }
+        // build queue come last
+        assertTrue(consumers.get(10).toString(),
+                   consumers.get(10) instanceof BuildQueue);
+        // armory has a lower priority than the build queue
+        assertTrue(consumers.get(11).toString(),
+                   consumers.get(11) instanceof Building);
+        assertEquals(armoryType, ((Building) consumers.get(11)).getType());
+        // population queue come last
+        assertTrue(consumers.get(12).toString(),
+                   consumers.get(12) instanceof BuildQueue);
 
 
     }

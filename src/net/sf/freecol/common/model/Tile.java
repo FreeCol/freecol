@@ -1364,20 +1364,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * standard rule sets, this is always some kind of food and all
      * tile improvements contribute to the production.
      *
-     * @return an <code>int</code> value
+     * @return an <code>AbstractGoods</code> value
      */
-    public int getPrimaryProduction() {
+    public AbstractGoods getPrimaryProduction() {
         AbstractGoods primaryProduction = type.getPrimaryGoods();
-        if (primaryProduction == null) {
-            return 0;
-        } else {
+        if (primaryProduction != null) {
             int potential = primaryProduction.getAmount();
             if (tileItemContainer != null) {
                 potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null,
                                                                      potential, false);
             }
-            return potential;
+            primaryProduction.setAmount(potential);
         }
+        return primaryProduction;
     }
 
     /**
@@ -1388,18 +1387,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *
      * @return an <code>int</code> value
      */
-    public int getSecondaryProduction() {
+    public AbstractGoods getSecondaryProduction() {
         AbstractGoods secondaryProduction = type.getSecondaryGoods();
-        if (secondaryProduction == null) {
-            return 0;
-        } else {
+        if (secondaryProduction != null) {
             int potential = secondaryProduction.getAmount();
             if (tileItemContainer != null) {
                 potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null,
                                                                      potential, true);
             }
-            return potential;
+            secondaryProduction.setAmount(potential);
         }
+        return secondaryProduction;
     }
 
     /**

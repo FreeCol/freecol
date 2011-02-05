@@ -157,6 +157,35 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
+        ProductionInfo result = new ProductionInfo();
+        T current = getCurrentlyBuilding();
+        if (current != null) {
+            // ATTENTION: this code presupposes that we will consume
+            // all required goods at once
+            for (AbstractGoods required : current.getGoodsRequired()) {
+                boolean satisfied = false;
+                for (AbstractGoods available : input) {
+                    if (required.getType() == available.getType()
+                        && required.getAmount() <= available.getAmount()) {
+                        satisfied = true;
+                        break;
+                    }
+                }
+                if (!satisfied) {
+                    result.setFailed(true);
+                    return result;
+                }
+            }
+            result.setConsumption(current.getGoodsRequired());
+        }
+        return result;
+    }
+
+
+    /**
      * The priority of this Consumer. The higher the priority, the
      * earlier will the Consumer be allowed to consume the goods it
      * requires.
@@ -169,17 +198,17 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
    /**
-     * Returns whether the consumer has the ability with the given
-     * id. The two abilities most relevant to consumers are
-     * "consumeAllOrNothing", which implies that the consumer will not
-     * consume any goods if its requirements can not be met (used by
-     * the Colony when building), as well as
-     * "consumeOnlySurplusProduction", which implies that the consumer
-     * does not consume stored goods (used by the country and stables).
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
+    * Returns whether the consumer has the ability with the given
+    * id. The two abilities most relevant to consumers are
+    * "consumeAllOrNothing", which implies that the consumer will not
+    * consume any goods if its requirements can not be met (used by
+    * the Colony when building), as well as
+    * "consumeOnlySurplusProduction", which implies that the consumer
+    * does not consume stored goods (used by the country and stables).
+    *
+    * @param id a <code>String</code> value
+    * @return a <code>boolean</code> value
+    */
     public boolean hasAbility(String id) {
         return "model.ability.consumeAllOrNothing".equals(id);
     }

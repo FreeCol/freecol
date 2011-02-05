@@ -105,12 +105,10 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         if (isColonyCenterTile()) {
             GoodsType goodsType;
             if (workType.getPrimaryGoods() != null) {
-                colony.addGoods(workType.getPrimaryGoods().getType(),
-                                workTile.getPrimaryProduction());
+                colony.addGoods(workTile.getPrimaryProduction());
             }
             if (workType.getSecondaryGoods() != null) {
-                colony.addGoods(workType.getSecondaryGoods().getType(),
-                                workTile.getSecondaryProduction());
+                colony.addGoods(workTile.getSecondaryProduction());
             }
         } else if (unit != null && canBeWorked()) {
             int amount = getProductionOf(unit.getWorkType());

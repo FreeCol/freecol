@@ -206,33 +206,33 @@ public class TileTest extends FreeColTestCase {
 
         Tile tile = new Tile(game, prairie, 0, 0);
         assertEquals(grain, tile.getType().getPrimaryGoods().getType());
-        assertEquals(3, tile.getPrimaryProduction());
+        assertEquals(3, tile.getPrimaryProduction().getAmount());
         assertEquals(cotton, tile.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile.getSecondaryProduction());
+        assertEquals(3, tile.getSecondaryProduction().getAmount());
 
         TileImprovement ti = new TileImprovement(game, tile, spec().getTileImprovementType("model.improvement.plow"));
         ti.setTurnsToComplete(0);
         tile.add(ti);
 
         assertEquals(grain, tile.getType().getPrimaryGoods().getType());
-        assertEquals(4, tile.getPrimaryProduction());
+        assertEquals(4, tile.getPrimaryProduction().getAmount());
         assertEquals(cotton, tile.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile.getSecondaryProduction());
+        assertEquals(3, tile.getSecondaryProduction().getAmount());
 
         Tile tile2 = new Tile(game, plainsForest, 0, 0);
         assertEquals(grain, tile2.getType().getPrimaryGoods().getType());
-        assertEquals(3, tile2.getPrimaryProduction());
+        assertEquals(3, tile2.getPrimaryProduction().getAmount());
         assertEquals(furs, tile2.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile2.getSecondaryProduction());
+        assertEquals(3, tile2.getSecondaryProduction().getAmount());
 
         ti = new TileImprovement(game, tile2, spec().getTileImprovementType("model.improvement.road"));
         ti.setTurnsToComplete(0);
         tile2.add(ti);
 
         assertEquals(grain, tile2.getType().getPrimaryGoods().getType());
-        assertEquals(3, tile2.getPrimaryProduction());
+        assertEquals(3, tile2.getPrimaryProduction().getAmount());
         assertEquals(furs, tile2.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile2.getSecondaryProduction());
+        assertEquals(3, tile2.getSecondaryProduction().getAmount());
 
     }
 

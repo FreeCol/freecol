@@ -3189,6 +3189,13 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
+        return unitType.getProductionInfo(input);
+    }
+
+    /**
      * The priority of this Consumer. The higher the priority, the
      * earlier will the Consumer be allowed to consume the goods it
      * requires.

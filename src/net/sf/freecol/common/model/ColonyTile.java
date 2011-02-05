@@ -465,6 +465,25 @@ public class ColonyTile extends FreeColGameObject
         return workType;
     }
 
+    public List<AbstractGoods> getProduction() {
+        List<AbstractGoods> result = new ArrayList<AbstractGoods>(2);
+        if (isColonyCenterTile()) {
+            AbstractGoods primaryProduction = workTile.getPrimaryProduction();
+            if (primaryProduction != null) {
+                result.add(primaryProduction);
+            }
+            AbstractGoods secondaryProduction = workTile.getSecondaryProduction();
+            if (secondaryProduction != null) {
+                result.add(secondaryProduction);
+            }
+        } else if (getUnit() != null) {
+            GoodsType goodsType = getUnit().getWorkType();
+            result.add(new AbstractGoods(goodsType, getProductionOf(getUnit(), goodsType)));
+        }
+        return result;
+    }
+
+
     /**
      * Returns the production of the given type of goods.
      *
@@ -475,10 +494,10 @@ public class ColonyTile extends FreeColGameObject
         if (isColonyCenterTile()) {
             if (workTile.getType().getPrimaryGoods() != null
                 && workTile.getType().getPrimaryGoods().getType() == goodsType) {
-                return workTile.getPrimaryProduction();
+                return workTile.getPrimaryProduction().getAmount();
             } else if (workTile.getType().getSecondaryGoods() != null
                        && workTile.getType().getSecondaryGoods().getType() == goodsType) {
-                return workTile.getSecondaryProduction();
+                return workTile.getSecondaryProduction().getAmount();
             } else {
                 return 0;
             }
