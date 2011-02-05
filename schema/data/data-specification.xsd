@@ -21,6 +21,7 @@
       </xs:choice>
       <xs:attribute name="id" type="xs:ID"/>
       <xs:attribute name="extends" type="xs:string"/>
+      <xs:attribute name="version" type="xs:string"/>
       <xs:attribute name="difficultyLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>
@@ -99,7 +100,7 @@
         <xs:element name="resource">
           <xs:complexType>
             <xs:attribute name="type" use="required" type="ResourceTypeId"/>
-            <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
+            <xs:attribute name="probability" use="required" type="PercentageType"/>
           </xs:complexType>
         </xs:element>
         <xs:element ref="production"/>
@@ -294,7 +295,7 @@
       <xs:attribute name="spaceTaken" type="xs:nonNegativeInteger"/>
       <xs:attribute name="price" type="xs:nonNegativeInteger"/>
       <xs:attribute name="hitPoints" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="recruitProbability" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="recruitProbability" type="PercentageType"/>
       <xs:attribute name="expert-production" type="GoodsTypeId"/>
       <xs:attribute name="skillTaught" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:int"/>
@@ -526,7 +527,7 @@
   <xs:element name="skill">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="UnitTypeId"/>
-      <xs:attribute name="probability" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="probability" use="required" type="PercentageType"/>
     </xs:complexType>
   </xs:element>
 
@@ -766,7 +767,7 @@
     <xs:sequence minOccurs="0">
       <xs:element name="scope" type="ScopeType"/>
     </xs:sequence>
-    <xs:attribute name="probability" use="required" type="xs:integer"/>
+    <xs:attribute name="probability" use="required" type="PercentageType"/>
     <xs:attribute name="minimum" use="required" type="xs:integer"/>
     <xs:attribute name="maximum" use="required" type="xs:integer"/>
     <xs:attribute name="factor" use="required" type="xs:integer"/>
@@ -813,13 +814,21 @@
   </xs:complexType>
 
   <xs:complexType name="PlunderType">
-    <xs:attribute name="probability" type="xs:int"/>
+    <xs:attribute name="probability" type="PercentageType"/>
     <xs:attribute name="minimum" type="xs:int"/>
     <xs:attribute name="maximum" type="xs:int"/>
     <xs:attribute name="factor" type="xs:int"/>
   </xs:complexType>
 
   <!-- Game Object Types -->
+
+  <xs:simpleType name="PercentageType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
 
   <!-- Either a building type or a unit type -->
   <xs:simpleType name="AbilityId">
