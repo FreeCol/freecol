@@ -603,7 +603,7 @@
       <consumes id="model.goods.bells" value="1" />
     </unit-type>
     <unit-type id="model.unit.freeColonist" extends="colonist" scoreValue="3" skill="0"
-               recruitProbability="20">
+               recruitProbability="20" maximumExperience="200">
       <ability id="model.ability.bornInColony" value="true"/>
       <ability id="model.ability.foundInLostCity" value="true"/>
       <required-goods id="model.goods.food" value="200"/>

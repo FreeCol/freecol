@@ -99,7 +99,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     /**
      * The maximum experience a unit of this type can accumulate.
      */
-    private int maximumExperience = 200;
+    private int maximumExperience = 0;
 
     /**
      * Describe maximumAttrition here.

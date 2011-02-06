@@ -696,7 +696,7 @@ public class Unit extends FreeColGameObject
      * @see #modifyExperience
      */
     public void setExperience(int experience) {
-        this.experience = experience;
+        this.experience = Math.min(experience, getType().getMaximumExperience());
     }
 
     /**

@@ -342,7 +342,8 @@ public final class DragListener extends MouseAdapter {
                         menuItem.addActionListener(unitLabel);
                     } else {
                         String teacherName = Messages.message(teacher.getType().getNameKey());
-                        menuItem = new JMenuItem(Messages.message("menu.unit.apprentice", "%unit%", teacherName), teacherIcon);
+                        menuItem = new JMenuItem(Messages.message("menu.unit.apprentice", "%unit%", teacherName),
+                                                 teacherIcon);
                         menuItem.setEnabled(false);
                     }
                     menu.add(menuItem);
@@ -360,7 +361,7 @@ public final class DragListener extends MouseAdapter {
             separatorNeeded = true;
         }
 
-        int experience = Math.min(unit.getExperience(), 200);
+        int experience = unit.getExperience();
         GoodsType goods = unit.getExperienceType();
         if (goods == null) {
             goods = unit.getWorkType();
@@ -368,9 +369,15 @@ public final class DragListener extends MouseAdapter {
         if (experience > 0 && goods != null) {
             UnitType expertType = canvas.getSpecification().getExpertForProducing(goods);
             if (unit.getType().canBeUpgraded(expertType, ChangeType.EXPERIENCE)) {
+                int maxExperience = unit.getType().getMaximumExperience();
+                double probability = unit.getType().getUnitTypeChange(expertType)
+                    .getProbability(ChangeType.EXPERIENCE) * experience / (double) maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
                 ImageIcon expertIcon = imageLibrary.getUnitImageIcon(expertType, 0.5);
-                JMenuItem experienceItem = new JMenuItem(Messages.message("menu.unit.experience", "%job%", jobName) + " " + experience + "/5000", expertIcon);
+                JMenuItem experienceItem = new JMenuItem(Messages.message("menu.unit.experience", "%job%", jobName)
+                                                         + " " + experience + "/" + maxExperience + " ("
+                                                         + FreeColPanel.getModifierFormat().format(probability) + "%)",
+                                                         expertIcon);
                 experienceItem.setEnabled(false);
                 menu.add(experienceItem);
                 separatorNeeded = true;
