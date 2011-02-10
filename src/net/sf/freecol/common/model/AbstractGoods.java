@@ -102,6 +102,11 @@ public class AbstractGoods extends FreeColObject {
         this.amount = newAmount;
     }
 
+
+    public AbstractGoods clone() {
+        return new AbstractGoods(type, amount);
+    }
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

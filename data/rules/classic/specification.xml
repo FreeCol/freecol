@@ -1146,15 +1146,18 @@
     </building-type>
     <building-type id="model.building.country" workplaces="0" consumes="model.goods.grain"
                    produces="model.goods.horses">
-      <modifier id="model.modifier.autoProduction" type="multiplicative" value="0.05" />
+      <modifier id="model.modifier.breedingDivisor" type="additive" value="50"/>
+      <modifier id="model.modifier.breedingFactor" type="additive" value="2"/>
+      <ability id="model.ability.autoProduction"/>
       <ability id="model.ability.consumeOnlySurplusProduction"/>
+      <ability id="model.ability.avoidExcessProduction"/>
       <ability id="model.ability.build">
         <scope type="model.equipment.horses"/>
       </ability>
     </building-type>
     <building-type id="model.building.stables" extends="model.building.country"
                    upgradesFrom="model.building.country" upkeep="5">
-      <modifier id="model.modifier.autoProduction" type="multiplicative" value="2" />
+      <modifier id="model.modifier.breedingDivisor" type="multiplicative" value="0.5" />
       <required-goods id="model.goods.hammers" value="64"/>
     </building-type>
     <building-type id="model.building.docks" workplaces="0" upkeep="5">

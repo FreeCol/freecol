@@ -2113,29 +2113,32 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         disposeList();
     }
 
-    public TypeCountMap<GoodsType> getProduction() {
-        TypeCountMap<GoodsType> result = new TypeCountMap<GoodsType>();
+    public ProductionMap getProduction() {
+        ProductionMap production = new ProductionMap();
         for (ColonyTile colonyTile : getColonyTiles()) {
             for (AbstractGoods goods : colonyTile.getProduction()) {
-                result.incrementCount(goods.getType(), goods.getAmount());
+                production.add(goods);
             }
         }
         for (Consumer consumer : getConsumers()) {
             boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
-            List<AbstractGoods> goods = new ArrayList<AbstractGoods>(consumer.getConsumedGoods());
-            for (AbstractGoods g : goods) {
-                g.setAmount(result.getCount(g.getType())
-                            + (surplusOnly ? 0 : getGoodsCount(g.getType())));
+            List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
+            for (AbstractGoods g : consumer.getConsumedGoods()) {
+                AbstractGoods surplus = production.get(g.getType());
+                if (!surplusOnly) {
+                    surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
+                }
+                goods.add(g);
             }
             ProductionInfo info = consumer.getProductionInfo(goods);
             for (AbstractGoods g : info.getProduction()) {
-                result.incrementCount(g.getType(), g.getAmount());
+                production.add(g);
             }
             for (AbstractGoods g : info.getConsumption()) {
-                result.incrementCount(g.getType(), -g.getAmount());
+                production.remove(g);
             }
         }
-        return result;
+        return production;
     }
 
     public int getInputAvailable(GoodsType goodsType, Consumer consumer) {

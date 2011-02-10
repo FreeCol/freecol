@@ -26,24 +26,40 @@ import java.util.List;
 public class ProductionInfo {
 
     /**
-     * Describe failed here.
+     * Possible actions when consumption fails.
      */
-    private boolean failed;
+    public enum Failure {
+        NOTHING, // do nothing
+        WAIT,    // wait for more goods
+        STARVE   // starve (units only)
+    };
 
     /**
-     * Describe maximumProduction here.
+     * What to do if consumption fails.
+     */
+    private Failure failure = Failure.NOTHING;
+
+    /**
+     * The goods moved to storage.
+     */
+    private List<AbstractGoods> storage;
+
+    /**
+     * The maximum production possible given unlimited input.
      */
     private List<AbstractGoods> maximumProduction = new ArrayList<AbstractGoods>();
 
     /**
-     * Describe production here.
+     * The actual production.
      */
     private List<AbstractGoods> production = new ArrayList<AbstractGoods>();
 
     /**
-     * Describe consumption here.
+     * The actual consumption.
      */
     private List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
+
+
 
     /**
      * Get the <code>Consumption</code> value.
@@ -127,20 +143,48 @@ public class ProductionInfo {
     }
 
     /**
-     * Get the <code>Failed</code> value.
+     * Get the <code>Storage</code> value.
      *
-     * @return a <code>boolean</code> value
+     * @return a <code>List<AbstractGoods></code> value
      */
-    public final boolean failed() {
-        return failed;
+    public final List<AbstractGoods> getStorage() {
+        return storage;
     }
 
     /**
-     * Set the <code>Failed</code> value.
+     * Set the <code>Storage</code> value.
      *
-     * @param newFailed The new Failed value.
+     * @param newStorage The new Storage value.
      */
-    public final void setFailed(final boolean newFailed) {
-        this.failed = newFailed;
+    public final void setStorage(final List<AbstractGoods> newStorage) {
+        this.storage = newStorage;
     }
+
+    /**
+     * Describe <code>addStorage</code> method here.
+     *
+     * @param goods an <code>AbstractGoods</code> value
+     */
+    public void addStorage(AbstractGoods goods) {
+        storage.add(goods);
+    }
+
+    /**
+     * Get the <code>Failure</code> value.
+     *
+     * @return a <code>Failure</code> value
+     */
+    public final Failure getFailure() {
+        return failure;
+    }
+
+    /**
+     * Set the <code>Failure</code> value.
+     *
+     * @param newFailure The new Failure value.
+     */
+    public final void setFailure(final Failure newFailure) {
+        this.failure = newFailure;
+    }
+
 }

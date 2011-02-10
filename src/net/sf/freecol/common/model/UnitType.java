@@ -870,7 +870,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
                 if (goodsType == goods.getType()) {
                     int amount = consumption.getCount(goodsType);
                     if (amount > goods.getAmount()) {
-                        result.setFailed(true);
                         result.addConsumption(goods);
                     } else {
                         result.addConsumption(new AbstractGoods(goodsType, amount));

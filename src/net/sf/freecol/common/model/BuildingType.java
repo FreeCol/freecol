@@ -188,13 +188,20 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
             readChild(in);
         }
         try {
-            if (hasAbility("model.ability.autoProduction")) {
+            if (hasAbility("model.ability.autoProduction")
+                && !hasAbility("model.ability.avoidExcessProduction")) {
                 // old-style auto-production
+                Ability ability = new Ability("model.ability.avoidExcessProduction");
+                addAbility(ability);
                 getFeatureContainer().removeModifiers("model.goods.horses");
                 float value = ("model.building.country".equals(getId()))
-                    ? 0.05f : 0.1f;
-                Modifier modifier = new Modifier("model.modifier.autoProduction", this,
-                                                 value, Modifier.Type.MULTIPLICATIVE);
+                    ? 50 : 25;
+                Modifier modifier = new Modifier("model.modifier.breedingDivisor", this,
+                                                 value, Modifier.Type.ADDITIVE);
+                addModifier(modifier);
+                getSpecification().addModifier(modifier);
+                modifier = new Modifier("model.modifier.breedingFactor", this, 2,
+                                        Modifier.Type.ADDITIVE);
                 addModifier(modifier);
                 getSpecification().addModifier(modifier);
             }

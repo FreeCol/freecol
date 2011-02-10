@@ -543,7 +543,7 @@ public class Building extends FreeColGameObject
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return getMaximumAutoProduction();
+            return getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
         } else {
             return getProductivity();
         }
@@ -571,7 +571,7 @@ public class Building extends FreeColGameObject
         if (inputType == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return getMaximumAutoProduction();
+            return getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
         } else {
             return Math.min(getMaximumGoodsInput(), getStoredInput());
         }
@@ -678,6 +678,10 @@ public class Building extends FreeColGameObject
      * {@inheritDoc}
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
+        return getProductionInfo(null, input);
+    }
+
+    public ProductionInfo getProductionInfo(AbstractGoods output, List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
         for (AbstractGoods goods : input) {
             if (goods.getType() == getGoodsInputType()) {
@@ -688,6 +692,16 @@ public class Building extends FreeColGameObject
                 result.addConsumption(new AbstractGoods(getGoodsInputType(), getGoodsInput()));
                 result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), getMaximumProduction()));
                 break;
+            }
+        }
+        for (Modifier modifier : buildingType.getFeatureContainer().getModifierSet("model.modifier.storeSurplus")) {
+            for (AbstractGoods goods : input) {
+                if (modifier.appliesTo(goods.getType())) {
+                    int amount = (modifier.getType() == Modifier.Type.ADDITIVE) ? 0 : goods.getAmount();
+                    amount = (int) Math.min(amount, modifier.applyTo(amount));
+                    result.addStorage(new AbstractGoods(goods.getType(), amount));
+                    result.addConsumption(new AbstractGoods(goods.getType(), amount));
+                }
             }
         }
         return result;
@@ -743,7 +757,7 @@ public class Building extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean canAutoProduce() {
-        return !buildingType.getModifierSet("model.modifier.autoProduction").isEmpty();
+        return buildingType.hasAbility("model.ability.autoProduction");
     }
 
     /**
@@ -762,7 +776,7 @@ public class Building extends FreeColGameObject
             return 0;
         }
 
-        int goodsOutput = getMaximumAutoProduction();
+        int goodsOutput = getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
 
         // Limit production to available raw materials
         if (getGoodsInputType() != null && availableInput < goodsOutput) {
@@ -864,7 +878,7 @@ public class Building extends FreeColGameObject
      */
     public int getMaximumProduction() {
         if (canAutoProduce()) {
-            return getMaximumAutoProduction();
+            return getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
         } else {
             return applyModifiers(getProductivity());
         }
@@ -876,19 +890,21 @@ public class Building extends FreeColGameObject
      *
      * TODO: make this more generic
      */
-    private int getMaximumAutoProduction() {
-        int available = colony.getGoodsCount(getGoodsOutputType());
+    private int getMaximumAutoProduction(int available) {
         System.out.println(available + " " + getGoodsOutputType() + " available");
         if (available < getGoodsOutputType().getBreedingNumber()) {
-            // we need at least two horses/animals to breed
+            // we need at least these many horses/animals to breed
             System.out.println("Too few animals to breed");
             return 0;
         }
 
-        int result = (int) getType().getFeatureContainer()
-            .applyModifier(available, "model.modifier.autoProduction");
-        System.out.println("Maximum autoproduction is " + Math.max(1, result));
-        return Math.max(1, result);
+        int divisor = (int) getType().getFeatureContainer()
+            .applyModifier(0, "model.modifier.breedingDivisor");
+        int factor = (int) getType().getFeatureContainer()
+            .applyModifier(0, "model.modifier.breedingFactor");
+        int result = ((available - 1) / divisor + 1) * factor;
+        System.out.println("Maximum autoproduction is " + result);
+        return result;
     }
 
     /**
@@ -998,6 +1014,26 @@ public class Building extends FreeColGameObject
         GoodsType inputType = getGoodsInputType();
         if (inputType != null) {
             result.add(new AbstractGoods(inputType, getConsumedAmount(inputType, Integer.MAX_VALUE)));
+        }
+        result.addAll(getStoredGoods());
+        return result;
+    }
+
+    /**
+     * Returns a list of GoodsTypes this Building stores.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<AbstractGoods> getStoredGoods() {
+        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        for (Modifier modifier : buildingType.getFeatureContainer()
+                 .getModifierSet("model.modifier.storeSurplus")) {
+            for (Scope scope : modifier.getScopes()) {
+                GoodsType type = getSpecification().getGoodsType(scope.getType());
+                if (type != null) {
+                    result.add(new AbstractGoods(type, Integer.MAX_VALUE));
+                }
+            }
         }
         return result;
     }

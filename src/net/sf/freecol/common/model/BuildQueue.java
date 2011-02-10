@@ -175,7 +175,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
                     }
                 }
                 if (!satisfied) {
-                    result.setFailed(true);
+                    result.setFailure(ProductionInfo.Failure.WAIT);
                     return result;
                 }
             }
