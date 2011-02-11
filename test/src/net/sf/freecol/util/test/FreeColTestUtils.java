@@ -16,9 +16,9 @@ import net.sf.freecol.server.model.ServerUnit;
 
 
 public class FreeColTestUtils {
-    
+
     private static ColonyBuilder colonyBuilder = null;
-    
+
     public static ColonyBuilder getColonyBuilder(){
         Game game = FreeColTestCase.getGame();
         if(game == null){
@@ -30,16 +30,16 @@ public class FreeColTestUtils {
         else{
             colonyBuilder = colonyBuilder.reset().setGame(game);
         }
-        
+
         return colonyBuilder;
     }
-    
+
     public static class ColonyBuilder{
-        
+
         // Required parameter
         static final UnitType colonistType = FreeColTestCase.spec().getUnitType("model.unit.freeColonist");
         private Game game;
-        
+
         private HashMap<UnitType,Integer> colonists = new HashMap<UnitType,Integer>();
         private Player player;
         private String name;
@@ -48,35 +48,35 @@ public class FreeColTestUtils {
         private String defaultName = "New Amsterdam";
         private int initialDefaultColonists = 1;
         private Tile colonyTile;
-        
-        
+
+
         private ColonyBuilder(Game game){
             this.game = game;
             setStartingParams();
         }
-        
+
         private void setStartingParams(){
-            // Some params can only be set in build(), because the default values 
+            // Some params can only be set in build(), because the default values
             //may not be valid for the game set
-            // However, the tester himself may set them to valid values later, 
+            // However, the tester himself may set them to valid values later,
             //so they are set to null for now
             player = null;
             colonyTile = null;
-            name = defaultName; 
+            name = defaultName;
             initialColonists = initialDefaultColonists;
             colonists.clear();
         }
-        
+
         public ColonyBuilder player(Player player){
             this.player = player;
-            
+
             if(player == null || !game.getPlayers().contains(player)){
                 throw new IllegalArgumentException("Player not in game");
             }
-            
+
             return this;
         }
-        
+
         public ColonyBuilder initialColonists(int colonists){
             if(colonists <= 0){
                 throw new IllegalArgumentException("Number of colonists must be positive");
@@ -84,7 +84,7 @@ public class FreeColTestUtils {
             this.initialColonists = colonists;
             return this;
         }
-        
+
         public ColonyBuilder colonyTile(Tile tile){
             Tile tileOnMap = this.game.getMap().getTile(tile.getPosition());
             if(tile != tileOnMap){
@@ -93,7 +93,7 @@ public class FreeColTestUtils {
             this.colonyTile = tile;
             return this;
         }
-        
+
         public ColonyBuilder colonyName(String name){
             if(name == null){
                 throw new IllegalArgumentException("Name cannot be null");
@@ -101,7 +101,7 @@ public class FreeColTestUtils {
             this.name = name;
             return this;
         }
-        
+
         public ColonyBuilder addColonist(UnitType type){
             if(!colonists.containsKey(type)){
                 colonists.put(type, 0);
@@ -110,9 +110,9 @@ public class FreeColTestUtils {
             colonists.put(type, nCol + 1);
             return this;
         }
-        
+
         public Colony build(){
-                        
+
             // player not set, get default
             if(player == null){
                 player = game.getPlayer(defaultPlayer);
@@ -120,7 +120,7 @@ public class FreeColTestUtils {
                     throw new IllegalArgumentException("Default Player " + defaultPlayer + " not in game");
                 }
             }
-            
+
             // settlement tile no set, get default
             if(colonyTile == null){
                 colonyTile = game.getMap().getTile(5, 8);
@@ -128,7 +128,7 @@ public class FreeColTestUtils {
                     throw new IllegalArgumentException("Default tile not in game");
                 }
             }
-            
+
             /*
             if(this.name != null){
                 for(Colony colony : player.getColonies()){
@@ -138,11 +138,11 @@ public class FreeColTestUtils {
                 }
             }
             */
-            
+
             Colony colony = new ServerColony(game, player, name, colonyTile);
             colony.placeSettlement();
 
-            
+
             // Add colonists
             int nCol = 0;
             Iterator<UnitType> iter = colonists.keySet().iterator();
@@ -164,20 +164,20 @@ public class FreeColTestUtils {
                         colonistType.getDefaultEquipment());
                 colonist.setLocation(colony);
             }
-            
+
             return colony;
         }
-        
+
         public ColonyBuilder setGame(Game game){
             this.game = game;
             return reset();
         }
-        
+
         public ColonyBuilder reset() {
             setStartingParams();
-            
+
             return this;
         }
     }
-    
+
 }
