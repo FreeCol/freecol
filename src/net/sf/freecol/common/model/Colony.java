@@ -2113,12 +2113,16 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         disposeList();
     }
 
-    public ProductionMap getProduction() {
+    @SuppressWarnings("unchecked")
+    public java.util.Map<Object, ProductionInfo> getProductionAndConsumption() {
+        java.util.Map<Object, ProductionInfo> result = new HashMap<Object, ProductionInfo>();
         ProductionMap production = new ProductionMap();
         for (ColonyTile colonyTile : getColonyTiles()) {
-            for (AbstractGoods goods : colonyTile.getProduction()) {
-                production.add(goods);
-            }
+            List<AbstractGoods> p = colonyTile.getProduction();
+            production.add(p);
+            ProductionInfo info = new ProductionInfo();
+            info.addProduction(p);
+            result.put(colonyTile, info);
         }
         for (Consumer consumer : getConsumers()) {
             boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
@@ -2128,17 +2132,28 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 if (!surplusOnly) {
                     surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
                 }
-                goods.add(g);
+                goods.add(surplus);
             }
-            ProductionInfo info = consumer.getProductionInfo(goods);
-            for (AbstractGoods g : info.getProduction()) {
-                production.add(g);
+            ProductionInfo info = null;
+            if (consumer instanceof Building) {
+                Building building = (Building) consumer;
+                AbstractGoods output = null;
+                if (building.getGoodsOutputType() != null) {
+                    output = production.get(building.getGoodsOutputType());
+                    output.setAmount(output.getAmount() + getGoodsCount(output.getType()));
+                }
+                info = building.getProductionInfo(output, goods);
+            } else if (consumer instanceof Unit) {
+                info = ((Unit) consumer).getProductionInfo(goods);
+            } else if (consumer instanceof BuildQueue) {
+                System.out.println(goods);
+                info = ((BuildQueue) consumer).getProductionInfo(goods);
             }
-            for (AbstractGoods g : info.getConsumption()) {
-                production.remove(g);
-            }
+            production.add(info.getProduction());
+            production.remove(info.getConsumption());
+            result.put(consumer, info);
         }
-        return production;
+        return result;
     }
 
     public int getInputAvailable(GoodsType goodsType, Consumer consumer) {
@@ -2203,23 +2218,10 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
 
     public List<Consumer> getConsumers() {
         List<Consumer> result = new ArrayList<Consumer>();
-        for (Unit unit : getUnitList()) {
-            if (!unit.getConsumedGoods().isEmpty()) {
-                result.add(unit);
-            }
-        }
-        for (Building building : buildingMap.values()) {
-            if (!building.getConsumedGoods().isEmpty()) {
-                result.add(building);
-            }
-        }
-        // Add build queues;
-        if (!buildQueue.getConsumedGoods().isEmpty()) {
-            result.add(buildQueue);
-        }
-        if (!populationQueue.getConsumedGoods().isEmpty()) {
-            result.add(populationQueue);
-        }
+        result.addAll(getUnitList());
+        result.addAll(buildingMap.values());
+        result.add(buildQueue);
+        result.add(populationQueue);
 
         Collections.sort(result, Consumer.COMPARATOR);
         return result;

@@ -202,4 +202,17 @@ public class ProductionMap {
         add(new AbstractGoods(goods.getType(), -goods.getAmount()));
     }
 
+
+    public void add(List<AbstractGoods> goods) {
+        for (AbstractGoods g : goods) {
+            add(g);
+        }
+    }
+
+    public void remove(List<AbstractGoods> goods) {
+        for (AbstractGoods g : goods) {
+            remove(g);
+        }
+    }
+
 }

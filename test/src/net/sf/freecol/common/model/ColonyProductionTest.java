@@ -289,21 +289,25 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap());
 
+
         Colony colony = getStandardColony(3);
+        int units = colony.getUnitCount();
+        int buildings = colony.getBuildings().size();
+
         List<Consumer> consumers = colony.getConsumers();
 
         // units come first
-        for (int index = 0; index < 3; index++) {
+        for (int index = 0; index < units; index++) {
             assertTrue(consumers.get(index).toString(),
                        consumers.get(index) instanceof Unit);
         }
         // buildings come next
-        for (int index = 3; index < 10; index++) {
+        for (int index = units; index < units + buildings; index++) {
             assertTrue(consumers.get(index).toString(),
                        consumers.get(index) instanceof Building);
         }
         // build and population queues come last
-        for (int index = 11; index < 13; index++) {
+        for (int index = units + buildings; index < units + buildings + 2; index++) {
             assertTrue(consumers.get(index).toString(),
                        consumers.get(index) instanceof BuildQueue);
         }
@@ -318,27 +322,78 @@ public class ColonyProductionTest extends FreeColTestCase {
         consumers = colony.getConsumers();
 
         // units come first
-        for (int index = 0; index < 3; index++) {
+        for (int index = 0; index < units; index++) {
             assertTrue(consumers.get(index).toString(),
                        consumers.get(index) instanceof Unit);
         }
+        int offset = units + buildings;
         // buildings come next
-        for (int index = 3; index < 11; index++) {
+        for (int index = units; index < offset; index++) {
             assertTrue(consumers.get(index).toString(),
                        consumers.get(index) instanceof Building);
         }
-        // build queue come last
-        assertTrue(consumers.get(11).toString(),
-                   consumers.get(11) instanceof BuildQueue);
+        // build queue comes last
+        assertTrue(consumers.get(offset).toString(),
+                   consumers.get(offset) instanceof BuildQueue);
         // armory has a lower priority than the build queue
-        assertTrue(consumers.get(12).toString(),
-                   consumers.get(12) instanceof Building);
-        assertEquals(armoryType, ((Building) consumers.get(12)).getType());
-        // population queue come last
-        assertTrue(consumers.get(13).toString(),
-                   consumers.get(13) instanceof BuildQueue);
+        assertTrue(consumers.get(offset + 1).toString(),
+                   consumers.get(offset + 1) instanceof Building);
+        assertEquals(armoryType, ((Building) consumers.get(offset + 1)).getType());
+        // population queue comes last
+        assertTrue(consumers.get(offset + 2).toString(),
+                   consumers.get(offset + 2) instanceof BuildQueue);
 
 
+    }
+
+
+    public void testProduction() {
+
+        Game game = getGame();
+        game.setMap(getTestMap());
+
+        Colony colony = getStandardColony(3);
+
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        GoodsType grainType = spec().getGoodsType("model.goods.grain");
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+        GoodsType crossesType = spec().getGoodsType("model.goods.crosses");
+
+        assertEquals(0, colony.getGoodsCount(foodType));
+
+        java.util.Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
+        for (Unit unit : colony.getUnitList()) {
+            ProductionInfo unitInfo = info.get(unit);
+            assertNotNull(unitInfo);
+            assertEquals(2, unitInfo.getConsumption().size());
+            assertEquals(2, unitInfo.getMaximumConsumption().size());
+            assertTrue(unitInfo.getConsumption().get(0)
+                       .equals(unitInfo.getMaximumConsumption().get(0)));
+            ProductionInfo tileInfo = info.get(unit.getLocation());
+            assertEquals(1, tileInfo.getProduction().size());
+            assertEquals(grainType, tileInfo.getProduction().get(0).getType());
+            assertEquals(5, tileInfo.getProduction().get(0).getAmount());
+        }
+
+        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
+        for (ProductionInfo productionInfo : info.values()) {
+            for (AbstractGoods goods : productionInfo.getProduction()) {
+                netProduction.incrementCount(goods.getType(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getStorage()) {
+                netProduction.incrementCount(goods.getType(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getConsumption()) {
+                netProduction.incrementCount(goods.getType(), -goods.getAmount());
+            }
+        }
+
+        assertEquals(2, netProduction.getCount(cottonType));
+        assertEquals(20, netProduction.getCount(grainType));
+        assertEquals(-2, netProduction.getCount(bellsType));
+        assertEquals(1, netProduction.getCount(crossesType));
+        assertEquals(-6, netProduction.getCount(foodType));
     }
 
 }

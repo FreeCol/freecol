@@ -674,34 +674,36 @@ public class Building extends FreeColGameObject
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
-        return getProductionInfo(null, input);
-    }
-
     public ProductionInfo getProductionInfo(AbstractGoods output, List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
-        for (AbstractGoods goods : input) {
-            if (goods.getType() == getGoodsInputType()) {
+        if (getGoodsOutputType() != null) {
+            if (getGoodsInputType() == null) {
                 int amount = canAutoProduce()
-                    ? getAutoProduction(goods.getAmount())
-                    : getProductionAdding(goods.getAmount());
+                    ? getAutoProduction(0)
+                    : getProductionAdding(0);
                 result.addProduction(new AbstractGoods(getGoodsOutputType(), amount));
-                result.addConsumption(new AbstractGoods(getGoodsInputType(), getGoodsInput()));
-                result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), getMaximumProduction()));
-                break;
+                result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), amount));
+            } else {
+                for (AbstractGoods goods : input) {
+                    if (goods.getType() == getGoodsInputType()) {
+                        int amount = canAutoProduce()
+                            ? getAutoProduction(goods.getAmount())
+                            : getProductionAdding(goods.getAmount());
+                        result.addProduction(new AbstractGoods(getGoodsOutputType(), amount));
+                        result.addConsumption(new AbstractGoods(getGoodsInputType(), getGoodsInput()));
+                        result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), getMaximumProduction()));
+                        break;
+                    }
+                }
             }
         }
-        for (Modifier modifier : buildingType.getFeatureContainer().getModifierSet("model.modifier.storeSurplus")) {
-            for (AbstractGoods goods : input) {
-                if (modifier.appliesTo(goods.getType())) {
-                    int amount = (modifier.getType() == Modifier.Type.ADDITIVE) ? 0 : goods.getAmount();
-                    amount = (int) Math.min(amount, modifier.applyTo(amount));
-                    result.addStorage(new AbstractGoods(goods.getType(), amount));
-                    result.addConsumption(new AbstractGoods(goods.getType(), amount));
-                }
+        for (AbstractGoods goods : input) {
+            for (Modifier modifier : buildingType.getFeatureContainer()
+                     .getModifierSet("model.modifier.storeSurplus", goods.getType())) {
+                int amount = (modifier.getType() == Modifier.Type.ADDITIVE) ? 0 : goods.getAmount();
+                amount = (int) Math.min(amount, modifier.applyTo(amount));
+                result.addStorage(new AbstractGoods(goods.getType(), amount));
+                result.addConsumption(new AbstractGoods(goods.getType(), amount));
             }
         }
         return result;

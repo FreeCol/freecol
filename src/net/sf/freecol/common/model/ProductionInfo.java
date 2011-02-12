@@ -42,7 +42,7 @@ public class ProductionInfo {
     /**
      * The goods moved to storage.
      */
-    private List<AbstractGoods> storage;
+    private List<AbstractGoods> storage = new ArrayList<AbstractGoods>();
 
     /**
      * The maximum production possible given unlimited input.
@@ -55,10 +55,14 @@ public class ProductionInfo {
     private List<AbstractGoods> production = new ArrayList<AbstractGoods>();
 
     /**
+     * The maximum consumption possible given unlimited input.
+     */
+    private List<AbstractGoods> maximumConsumption = new ArrayList<AbstractGoods>();
+
+    /**
      * The actual consumption.
      */
     private List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
-
 
 
     /**
@@ -116,6 +120,15 @@ public class ProductionInfo {
     }
 
     /**
+     * Describe <code>addProduction</code> method here.
+     *
+     * @param goods an <code>AbstractGoods</code> value
+     */
+    public void addProduction(List<AbstractGoods> goods) {
+        production.addAll(goods);
+    }
+
+    /**
      * Get the <code>MaximumProduction</code> value.
      *
      * @return a <code>List<AbstractGoods></code> value
@@ -140,6 +153,33 @@ public class ProductionInfo {
      */
     public void addMaximumProduction(AbstractGoods goods) {
         maximumProduction.add(goods);
+    }
+
+    /**
+     * Get the <code>MaximumConsumption</code> value.
+     *
+     * @return a <code>List<AbstractGoods></code> value
+     */
+    public final List<AbstractGoods> getMaximumConsumption() {
+        return maximumConsumption;
+    }
+
+    /**
+     * Set the <code>MaximumConsumption</code> value.
+     *
+     * @param newMaximumConsumption The new MaximumConsumption value.
+     */
+    public final void setMaximumConsumption(final List<AbstractGoods> newMaximumConsumption) {
+        this.maximumConsumption = newMaximumConsumption;
+    }
+
+    /**
+     * Describe <code>addMaximumConsumption</code> method here.
+     *
+     * @param goods an <code>AbstractGoods</code> value
+     */
+    public void addMaximumConsumption(AbstractGoods goods) {
+        maximumConsumption.add(goods);
     }
 
     /**

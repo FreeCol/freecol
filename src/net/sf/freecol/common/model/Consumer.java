@@ -75,14 +75,6 @@ public interface Consumer {
     public int getConsumedAmount(GoodsType goodsType, int available);
 
     /**
-     * Returns the <code>ProductionInfo</code> about this Consumer.
-     *
-     * @param input available goods
-     * @return <code>ProductionInfo</code> about this Consumer
-     */
-    public ProductionInfo getProductionInfo(List<AbstractGoods> input);
-
-    /**
      * Returns true if this Consumer consumes the given GoodsType.
      *
      * @param goodsType a <code>GoodsType</code> value

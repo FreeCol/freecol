@@ -102,6 +102,10 @@ public class AbstractGoods extends FreeColObject {
         this.amount = newAmount;
     }
 
+    public boolean equals(AbstractGoods other) {
+        return type == other.type && amount == other.amount;
+    }
+
 
     public AbstractGoods clone() {
         return new AbstractGoods(type, amount);
