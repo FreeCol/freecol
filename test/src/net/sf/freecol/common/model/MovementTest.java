@@ -41,7 +41,7 @@ public class MovementTest extends FreeColTestCase {
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType indianHorses = spec().getEquipmentType("model.equipment.indian.horses");
     EquipmentType indianMuskets = spec().getEquipmentType("model.equipment.indian.muskets");
-    
+
     public void testMoveFromPlainsToPlains() throws Exception {
 
         Game game = getStandardGame();
@@ -57,7 +57,7 @@ public class MovementTest extends FreeColTestCase {
                                        UnitState.ACTIVE);
 
         int moveCost = plains.getBasicMoveCost();
-        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
 
@@ -68,7 +68,7 @@ public class MovementTest extends FreeColTestCase {
         tile2.setTileItemContainer(new TileItemContainer(game, tile2));
         tile2.getTileItemContainer().addTileItem(ti);
         assertTrue("Plowed", tile2.getCompletedTileImprovements().size() == 1);
-        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
     }
@@ -89,7 +89,7 @@ public class MovementTest extends FreeColTestCase {
                                        UnitState.ACTIVE);
 
         int moveCost = hills.getBasicMoveCost();
-        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertTrue(moveCost > colonist.getMovesLeft());
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
 
@@ -127,7 +127,7 @@ public class MovementTest extends FreeColTestCase {
                                        UnitState.ACTIVE);
 
         int moveCost = 1;
-        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
 
@@ -163,7 +163,7 @@ public class MovementTest extends FreeColTestCase {
                                        UnitState.ACTIVE);
 
         int moveCost = 1;
-        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
 
@@ -173,11 +173,11 @@ public class MovementTest extends FreeColTestCase {
     	Game game = getGame();
     	Map map = getTestMap(true);
     	game.setMap(map);
-    	
+
         Player french = game.getPlayer("model.nation.french");
         Player dutch = game.getPlayer("model.nation.dutch");
         Player iroquois = game.getPlayer("model.nation.iroquois");
-        
+
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(6, 8);
@@ -213,7 +213,7 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testScoutIndianSettlement() {
-        
+
         Game game = getStandardGame();
         Player french = game.getPlayer("model.nation.french");
         Player inca = game.getPlayer("model.nation.inca");

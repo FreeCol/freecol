@@ -40,21 +40,21 @@ public class TileImprovement extends TileItem implements Named {
 
     private TileImprovementType type;
     private int turnsToComplete;
-    
+
     /**
      * Default is type.getMagnitude(), but this will override.
      */
     private int magnitude;
-    
+
     /**
      * River magnitudes
      */
     public static final int NO_RIVER = 0;
     public static final int SMALL_RIVER = 1;
     public static final int LARGE_RIVER = 2;
-    public static final int FJORD_RIVER = 3; 
+    public static final int FJORD_RIVER = 3;
 
-    
+
     /**
      * To store the style of multi-image TileImprovements (eg. rivers)
      * Rivers have 4 directions {NE=1, SE=3, SW=9, NW=27}, and 3 levels (see above)
@@ -69,14 +69,14 @@ public class TileImprovement extends TileItem implements Named {
      * be removed along with the structure that granted them.
      */
     private boolean virtual;
-    
+
     // ------------------------------------------------------------ constructor
 
     /**
      * Creates a standard <code>TileImprovement</code>-instance.
-     * 
+     *
      * This constructor asserts that the game, tile and type are valid.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belongs.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>TileImprovementType</code> of this TileImprovement.
@@ -108,7 +108,7 @@ public class TileImprovement extends TileItem implements Named {
      * should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -268,7 +268,7 @@ public class TileImprovement extends TileItem implements Named {
                 // Matched
                 return type.getMovementCost(moveCost);
             }
-        }       
+        }
         // No match
         return moveCost;
     }
@@ -301,12 +301,15 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Returns an int[NUMBER_OF_DIRECTIONS] array based on the baseNumber and the 'active' directions given.
+     * Returns an int[NUMBER_OF_DIRECTIONS] array based on the
+     * baseNumber and the 'active' directions given.
+     *
      * @param directions An int[] that gives the active directions eg
      * {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
      * or {Map.E, Map.SW};
      * @param baseNumber The base to be used to create the base array.
-     * @return A base array that can create unique identifiers for any combination
+     * @return A base array that can create unique identifiers for any
+     * combination
      */
     public static int[] getBase(Direction[] directions, int baseNumber) {
         Direction[] allDirections = Direction.values();
@@ -328,8 +331,8 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Breaks the Style of this Improvement into 8 directions - used for Rivers (at the moment)
      * @param directions An int[] that gives the active directions
-     eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
-     or {Map.E, Map.SW};
+     * eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
+     * or {Map.E, Map.SW};
      * @param baseNumber The base to be used to create the base array.
      * @return An int[] with the magnitude in each direction.
      */
@@ -424,14 +427,14 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -467,7 +470,7 @@ public class TileImprovement extends TileItem implements Named {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -484,7 +487,7 @@ public class TileImprovement extends TileItem implements Named {
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
         style = Integer.parseInt(in.getAttributeValue(null, "style"));
         virtual = getAttribute(in, "virtual", false);
-        
+
         in.nextTag();
     }
 

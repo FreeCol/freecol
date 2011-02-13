@@ -272,14 +272,6 @@ public class TileTest extends FreeColTestCase {
         assertEquals(6, tile3.getMaximumPotential(grain, null));
     }
 
-    public void testMovement() {
-        Game game = getStandardGame();
-        Tile tile1 = new Tile(game, plains, 0, 0);
-        Tile tile2 = new Tile(game, plains, 0, 1);
-        assertEquals(3, tile1.getMoveCost(tile2));
-    }
-
-
     public void testCanHaveImprovement() {
         for (TileType tileType : spec().getTileTypeList()) {
 

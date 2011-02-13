@@ -483,29 +483,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return defender;
     }
 
-    /**
-     * Returns the cost of moving onto this tile from a given <code>Tile</code>.
-     *
-     * <br>
-     * <br>
-     *
-     * This method does not take special unit behavior into account. Use
-     * {@link Unit#getMoveCost} whenever it is possible.
-     *
-     * @param fromTile The <code>Tile</code> the moving {@link Unit} comes
-     *            from.
-     * @return The cost of moving the unit.
-     * @see Unit#getMoveCost
-     */
-    public int getMoveCost(Tile fromTile) {
-        // TODO: find more elegant way to deny river movement bonus to
-        // ships
-        if (!isLand() || tileItemContainer == null) {
-            return getType().getBasicMoveCost();
-        } else {
-            return tileItemContainer.getMoveCost(getType().getBasicMoveCost(), fromTile);
-        }
-    }
 
     /**
      * Disposes all units on this <code>Tile</code>.

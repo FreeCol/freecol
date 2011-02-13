@@ -1198,7 +1198,15 @@ public class Unit extends FreeColGameObject
         // Remember to also change map.findPath(...) if you change anything
         // here.
 
-        int cost = target.getMoveCost(from);
+        // TODO: also pass direction, so that we can check for rivers
+
+        int cost = target.getType().getBasicMoveCost();
+        if (target.isLand()) {
+            TileItemContainer container = target.getTileItemContainer();
+            if (container != null) {
+                cost = container.getMoveCost(cost, from);
+            }
+        }
 
         if (isNaval() && from.isLand()
             && from.getSettlement() == null) {

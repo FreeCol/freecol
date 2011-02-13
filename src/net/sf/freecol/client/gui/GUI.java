@@ -2225,13 +2225,16 @@ public final class GUI {
                         } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            g.drawImage(lib.getBorderImage(borderingTile.getType(), direction, tile.getX(), tile.getY()), 0, 0, null);
+                            g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
+                                                           tile.getX(), tile.getY()), 0, 0, null);
                             TileImprovement river = borderingTile.getRiver();
                             if (river != null && (direction == Direction.SE || direction == Direction.SW ||
                                                   direction == Direction.NE || direction == Direction.NW)) {
                                 int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
                                 if (branches[direction.getReverseDirection().ordinal()] > 0) {
-                                    g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(), tile.getX(), tile.getY()), 0, 0, null);
+                                    g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver()
+                                                                       .getMagnitude(), tile.getX(),
+                                                                       tile.getY()), 0, 0, null);
                                 }
                             }
                         } else if (borderingTile.isExplored()) {

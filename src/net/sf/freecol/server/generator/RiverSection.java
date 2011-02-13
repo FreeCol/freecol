@@ -111,9 +111,6 @@ public class RiverSection {
     public void decodeStyle(int style) {
         int tempStyle = style;
         for (int i = base.length - 1; i >= 0; i--) {
-            if (base[i] == 0) {
-                continue;                       // Skip this direction
-            }
             if (tempStyle>0) {
                 branch[i] = tempStyle / base[i];    // Get an integer value for a direction
                 tempStyle -= branch[i] * base[i];   // Remove the component of this direction
@@ -146,11 +143,9 @@ public class RiverSection {
             size = TileImprovement.LARGE_RIVER;
         }
         for (int i=0; i<Direction.longSides.length; i++) {
-            if (base[i] == 0) {
-                continue;                       // Skip this direction
-            }
             if (Direction.longSides[i]==direction) {
                 branch[i] = size;
+                break;
             }
         }
     }
@@ -160,9 +155,6 @@ public class RiverSection {
      */
     public int getBranch(Direction direction) {
         for (int i=0; i<Direction.longSides.length; i++) {
-            if (base[i] == 0) {
-                continue;                       // Skip this direction
-            }
             if (Direction.longSides[i]==direction) {
                 return branch[i];
             }
@@ -182,15 +174,11 @@ public class RiverSection {
      */
     public void growBranch(Direction direction, int increment) {
         for (int i=0; i<Direction.longSides.length; i++) {
-            if (base[i] == 0) {
-                continue;                       // Skip this direction
-            }
-            if (Direction.longSides[i]==direction) {
-                branch[i]+=increment;
-                if (branch[i]>TileImprovement.LARGE_RIVER)
-                    branch[i] = TileImprovement.LARGE_RIVER;
-                else if (branch[i]<TileImprovement.NO_RIVER)
-                    branch[i] = TileImprovement.NO_RIVER;
+            if (Direction.longSides[i] == direction) {
+                branch[i] = Math.min(TileImprovement.LARGE_RIVER,
+                                     Math.max(TileImprovement.NO_RIVER,
+                                              branch[i] + increment));
+                break;
             }
         }
     }
