@@ -168,7 +168,6 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
             for (AbstractGoods required : current.getGoodsRequired()) {
                 boolean satisfied = false;
                 for (AbstractGoods available : input) {
-                    System.out.println("xx available " + available.getAmount());
                     if (required.getType() == available.getType()
                         && required.getAmount() <= available.getAmount()) {
                         satisfied = true;

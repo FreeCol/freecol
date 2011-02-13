@@ -2146,7 +2146,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             } else if (consumer instanceof Unit) {
                 info = ((Unit) consumer).getProductionInfo(goods);
             } else if (consumer instanceof BuildQueue) {
-                System.out.println(goods);
                 info = ((BuildQueue) consumer).getProductionInfo(goods);
             }
             production.add(info.getProduction());

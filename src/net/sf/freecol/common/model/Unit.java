@@ -3195,15 +3195,8 @@ public class Unit extends FreeColGameObject
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
+        result.setConsumption(getType().getConsumedGoods());
         result.setMaximumConsumption(getType().getConsumedGoods());
-        for (AbstractGoods required : getType().getConsumedGoods()) {
-            for (AbstractGoods goods : input) {
-                if (required.getType() == goods.getType()) {
-                    result.addConsumption(new AbstractGoods(goods.getType(),
-                                                            Math.min(required.getAmount(), goods.getAmount())));
-                }
-            }
-        }
         return result;
     }
 

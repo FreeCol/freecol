@@ -170,7 +170,7 @@ public class ProductionMap {
 
     public void add(AbstractGoods goods) {
         GoodsType goodsType = goods.getType();
-        Object value = cache.get(goods);
+        Object value = cache.get(goodsType);
         if (value == null) {
             // no entry yet
             GoodsType rootType = goodsType.getStoredAs();
@@ -199,7 +199,12 @@ public class ProductionMap {
     }
 
     public void remove(AbstractGoods goods) {
-        add(new AbstractGoods(goods.getType(), -goods.getAmount()));
+        Object value = cache.get(goods.getType());
+        if (value instanceof ProductionTree) {
+            ((ProductionTree) value).remove(goods);
+        } else {
+            add(new AbstractGoods(goods.getType(), -goods.getAmount()));
+        }
     }
 
 

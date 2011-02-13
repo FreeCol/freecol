@@ -347,6 +347,32 @@ public class ColonyProductionTest extends FreeColTestCase {
     }
 
 
+    public void testProductionMap() {
+
+        GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        GoodsType grainType = spec().getGoodsType("model.goods.grain");
+
+        ProductionMap pm = new ProductionMap();
+
+        pm.add(new AbstractGoods(cottonType, 33));
+        assertEquals(33, pm.get(cottonType).getAmount());
+
+        pm.add(new AbstractGoods(grainType, 44));
+        assertEquals(44, pm.get(grainType).getAmount());
+        assertEquals(44, pm.get(foodType).getAmount());
+
+        pm.remove(new AbstractGoods(grainType, 22));
+        assertEquals(22, pm.get(grainType).getAmount());
+        assertEquals(22, pm.get(foodType).getAmount());
+
+        pm.remove(new AbstractGoods(foodType, 11));
+        assertEquals(11, pm.get(grainType).getAmount());
+        assertEquals(11, pm.get(foodType).getAmount());
+
+    }
+
+
     public void testProduction() {
 
         Game game = getGame();
@@ -368,32 +394,44 @@ public class ColonyProductionTest extends FreeColTestCase {
             assertNotNull(unitInfo);
             assertEquals(2, unitInfo.getConsumption().size());
             assertEquals(2, unitInfo.getMaximumConsumption().size());
-            assertTrue(unitInfo.getConsumption().get(0)
-                       .equals(unitInfo.getMaximumConsumption().get(0)));
             ProductionInfo tileInfo = info.get(unit.getLocation());
             assertEquals(1, tileInfo.getProduction().size());
             assertEquals(grainType, tileInfo.getProduction().get(0).getType());
             assertEquals(5, tileInfo.getProduction().get(0).getAmount());
         }
 
+        TypeCountMap<GoodsType> grossProduction = new TypeCountMap<GoodsType>();
         TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
         for (ProductionInfo productionInfo : info.values()) {
             for (AbstractGoods goods : productionInfo.getProduction()) {
-                netProduction.incrementCount(goods.getType(), goods.getAmount());
+                grossProduction.incrementCount(goods.getType(), goods.getAmount());
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
             }
             for (AbstractGoods goods : productionInfo.getStorage()) {
-                netProduction.incrementCount(goods.getType(), goods.getAmount());
+                grossProduction.incrementCount(goods.getType(), goods.getAmount());
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
             }
             for (AbstractGoods goods : productionInfo.getConsumption()) {
-                netProduction.incrementCount(goods.getType(), -goods.getAmount());
+                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
             }
         }
 
+        assertEquals(2, grossProduction.getCount(cottonType));
         assertEquals(2, netProduction.getCount(cottonType));
-        assertEquals(20, netProduction.getCount(grainType));
+
+        assertEquals(20, grossProduction.getCount(grainType));
+        assertEquals(0, netProduction.getCount(grainType));
+
+        assertEquals(1, grossProduction.getCount(bellsType));
         assertEquals(-2, netProduction.getCount(bellsType));
+
+        assertEquals(1, grossProduction.getCount(crossesType));
         assertEquals(1, netProduction.getCount(crossesType));
-        assertEquals(-6, netProduction.getCount(foodType));
+
+        // this is storage only
+        assertEquals(7, grossProduction.getCount(foodType));
+        // this includes implicit type change and consumption
+        assertEquals(14, netProduction.getCount(foodType));
     }
 
 }
