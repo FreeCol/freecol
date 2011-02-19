@@ -36,6 +36,7 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.Mixer.Info;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -55,7 +56,7 @@ public class SoundPlayer {
     public static final int STANDARD_DELAY = 2000;
     private static final int MAXIMUM_FADE_MS = 7000;
     private static final int FADE_UPDATE_MS = 5;
-    
+
     /** The thread-group containing all of the <i>SoundPlayerThreads</i>. */
     private ThreadGroup soundPlayerThreads
         = new ThreadGroup("soundPlayerThreads");
@@ -73,7 +74,7 @@ public class SoundPlayer {
      * the new instead.
      */
     private boolean multipleSounds;
-    
+
     /**
      * Used with <code>multipleSounds</code>.
      */
@@ -105,10 +106,10 @@ public class SoundPlayer {
     private final int defaultPickMode;
 
     private Mixer mixer;
-    
+
     private PercentageOption volume;
 
-    
+
     /**
      * Creates a sound player.
      *
@@ -170,19 +171,27 @@ public class SoundPlayer {
         if (volume == null) {
             throw new NullPointerException();
         }
-        
+
         this.volume = volume;
         this.multipleSounds = multipleSounds;
         this.defaultPlayContinues = defaultPlayContinues;
         this.defaultRepeatMode = defaultRepeatMode;
         this.defaultPickMode = defaultPickMode;
-        
+
         mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
-                mixer = AudioSystem.getMixer(((MixerWrapper) e.getNewValue()).getMixerInfo());
+                MixerWrapper wrap = (MixerWrapper) e.getNewValue();
+                try { mixer = AudioSystem.getMixer(wrap.getMixerInfo());
+                } catch ( Exception ex ) {
+                     logger.warning( "** Audio Mixer unavailable: " + wrap );
+                }
             }
         });
         mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
+    }
+
+    public Mixer getCurrentMixer () {
+        return mixer;
     }
 
     /**
@@ -195,11 +204,11 @@ public class SoundPlayer {
         play(playlist, defaultPlayContinues, defaultRepeatMode,
              defaultPickMode, 0);
     }
-    
+
     /**
      * Plays a playlist using the default play-continues, repeat-mode
      * and pick-mode for this <i>SoundPlayer</i>.
-     * 
+     *
      * @param playlist The <code>Playlist</code> to be played.
      * @param delay A delay before playing the sound (ms).
      */
@@ -225,10 +234,10 @@ public class SoundPlayer {
     public void playOnce(Playlist playlist) {
         play(playlist, false, defaultRepeatMode, defaultPickMode, 0);
     }
-    
+
     /**
      * Plays a single random sound from the given playlist.
-     * 
+     *
      * @param playlist The <code>Playlist</code> to be played.
      * @param delay A delay before playing the sound (ms).
      */
@@ -360,7 +369,7 @@ public class SoundPlayer {
         }
 
         private boolean shouldStopThread() {
-            return !multipleSounds && currentSoundPlayerThread != this; 
+            return !multipleSounds && currentSoundPlayerThread != this;
         }
 
         /**
@@ -378,7 +387,7 @@ public class SoundPlayer {
                     Thread.sleep(delay);
                 } catch (InterruptedException e) {}
             }
-            
+
             do {
                 playSound(playlist.next());
 
@@ -408,7 +417,7 @@ public class SoundPlayer {
                     in.close();
                 }
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not play audio: "
+                logger.log(Level.WARNING, "Could not play audio file: "
                            + file.getName(), e);
             }
         }
@@ -423,32 +432,39 @@ public class SoundPlayer {
             final float gain = 20*(float)Math.log10(volume / 100d);
             c.setValue(gain);
         }
-        
+
         private void rawplay(AudioFormat targetFormat,  AudioInputStream din)
             throws IOException, LineUnavailableException {
             DataLine.Info info = new DataLine.Info(SourceDataLine.class,
                                                    targetFormat);
-            SourceDataLine line = (SourceDataLine) mixer.getLine(info);
+            SourceDataLine line;
+            try { line = (SourceDataLine) mixer.getLine(info); }
+            catch ( IllegalArgumentException e ) {
+            	throw new LineUnavailableException( e.toString() );
+            }
             if (line != null) {
                 FloatControl control = null;
                 PropertyChangeListener pcl = null;
 
                 line.open(targetFormat);
                 line.start();
-                
+
                 // Volume control:
                 if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                    control = (FloatControl)
+                    try { control = (FloatControl)
                         line.getControl(FloatControl.Type.MASTER_GAIN);
-                    final FloatControl c = control;
-                    pcl = new PropertyChangeListener() {
-                            public void propertyChange(PropertyChangeEvent e) {
-                                int v = ((Integer) e.getNewValue()).intValue();
-                                updateVolume(c, v);
-                            }
-                        };
-                    volume.addPropertyChangeListener(pcl);
-                    updateVolume(control, volume.getValue());
+                    } catch ( IllegalArgumentException e ) {}
+                    if ( control != null ) {
+	                    final FloatControl c = control;
+	                    pcl = new PropertyChangeListener() {
+	                            public void propertyChange(PropertyChangeEvent e) {
+	                                int v = ((Integer) e.getNewValue()).intValue();
+	                                updateVolume(c, v);
+	                            }
+	                        };
+	                    volume.addPropertyChangeListener(pcl);
+	                    updateVolume(control, volume.getValue());
+                    }
                 }
 
                 // Playing audio:
@@ -469,9 +485,9 @@ public class SoundPlayer {
                 } finally {
                     if (pcl != null) volume.removePropertyChangeListener(pcl);
                 }
-                
+
                 // Implements fading down:
-                if (!soundStopped) {
+                if (!soundStopped & control != null ) {
                     long ms = System.currentTimeMillis() + FADE_UPDATE_MS;
                     long fadeStop = System.currentTimeMillis() + MAXIMUM_FADE_MS;
                     while (!soundStopped
@@ -491,7 +507,7 @@ public class SoundPlayer {
                         }
                     }
                 }
-                
+
                 line.drain();
                 line.stop();
                 line.close();

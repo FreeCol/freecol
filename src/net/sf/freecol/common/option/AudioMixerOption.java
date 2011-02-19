@@ -37,6 +37,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * Option for selecting an audio mixer.
+ *
+ * <p>Element <tt>MixerWrapper</tt> may return a <b>null</b> value in <tt>getMixerInfo()</tt>.
+ * <br>Element <tt>MixerWrapper</tt> may be <b>null</b> in <tt>getValue()</tt> (unusual).
  */
 public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapper> {
 
@@ -47,11 +50,11 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
     public static final String AUTO = Messages.message("clientOptions.audio.audioMixer.automatic");
 
-    private static final Mixer AUTODETECT_MIXER = tryGetMixer();
+    private static final Mixer AUTODETECT_MIXER = tryGetDefaultMixer();
     private static final MixerWrapper DEFAULT = new MixerWrapper(AUTO,
             (AUTODETECT_MIXER != null) ? AUTODETECT_MIXER.getMixerInfo() : null);
 
-    private static Mixer tryGetMixer() {
+    private static Mixer tryGetDefaultMixer() {
         Mixer mixer = null;
         try {
             mixer = AudioSystem.getMixer(null);
@@ -60,7 +63,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         }
         return mixer;
     }
-
 
     private static Comparator<MixerWrapper> audioMixerComparator = new Comparator<MixerWrapper>() {
         public int compare(MixerWrapper m1, MixerWrapper m2) {
@@ -109,7 +111,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     public final void setValue(MixerWrapper newValue) {
         final MixerWrapper oldValue = this.value;
         if (newValue == null) {
-            newValue = audioMixers.get(AUTO);
+            newValue = DEFAULT; // audioMixers.get(AUTO); ** does it make a difference?
         }
         this.value = newValue;
         if (!newValue.equals(oldValue)) {
@@ -178,7 +180,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         } else if (defaultValue != null) {
             setValue(audioMixers.get(defaultValue));
         } else {
-            setValue(audioMixers.get(AUTO));
+            setValue(DEFAULT); // audioMixers.get(AUTO)); ** does it make a difference?
         }
         in.nextTag();
     }
