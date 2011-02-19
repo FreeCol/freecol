@@ -312,9 +312,20 @@ public class ColonyProductionTest extends FreeColTestCase {
                        consumers.get(index) instanceof BuildQueue);
         }
 
+        BuildingType countryType = spec().getBuildingType("model.building.country");
+        Building country = colony.getBuilding(countryType);
+        assertTrue(consumers.contains(country));
+
         BuildingType depotType = spec().getBuildingType("model.building.depot");
         Building depot = colony.getBuilding(depotType);
         assertTrue(consumers.contains(depot));
+
+        int countryIndex = consumers.indexOf(country);
+        int depotIndex = consumers.indexOf(depot);
+        assertTrue(countryIndex >= 0);
+        assertTrue(depotIndex >= 0);
+        assertTrue("Priority of depot should be higher than that of country",
+                   depotIndex < countryIndex);
 
         BuildingType armoryType = spec().getBuildingType("model.building.armory");
         Building armory = new ServerBuilding(getGame(), colony, armoryType);

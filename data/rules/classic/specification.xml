@@ -946,10 +946,11 @@
 
   <!--
       The priority value determines the order in which consumers are
-      granted access to goods. Units have a priority of 1000, the
-      colony's build queue has a priority of 500, and the colony's
-      population queue has a priority of 300. Consumers with a higher
-      priority are served first.
+      granted access to goods. Units have a priority of 1000,
+      buildings have a default priority of 800, the colony's build
+      queue has a priority of 500, and the colony's population queue
+      has a priority of 300. Consumers with a higher priority are
+      served first.
   -->
   <building-types>
     <building-type id="model.building.townHall" basicProduction="3"
@@ -1144,8 +1145,8 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.country" workplaces="0" consumes="model.goods.grain"
-                   produces="model.goods.horses">
+    <building-type id="model.building.country" workplaces="0" priority="700"
+                   consumes="model.goods.grain" produces="model.goods.horses">
       <modifier id="model.modifier.breedingDivisor" type="additive" value="50"/>
       <modifier id="model.modifier.breedingFactor" type="additive" value="2"/>
       <ability id="model.ability.autoProduction"/>
