@@ -690,7 +690,8 @@ public class Building extends FreeColGameObject
                             ? getAutoProduction(goods.getAmount())
                             : getProductionAdding(goods.getAmount());
                         result.addProduction(new AbstractGoods(getGoodsOutputType(), amount));
-                        result.addConsumption(new AbstractGoods(getGoodsInputType(), getGoodsInput()));
+                        result.addConsumption(new AbstractGoods(getGoodsInputType(),
+                                                                Math.min(getMaximumGoodsInput(), goods.getAmount())));
                         result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), getMaximumProduction()));
                         break;
                     }

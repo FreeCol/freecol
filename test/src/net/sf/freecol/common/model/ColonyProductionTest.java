@@ -393,8 +393,10 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         GoodsType foodType = spec().getGoodsType("model.goods.food");
         GoodsType grainType = spec().getGoodsType("model.goods.grain");
+        GoodsType clothType = spec().getGoodsType("model.goods.cloth");
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
         GoodsType crossesType = spec().getGoodsType("model.goods.crosses");
 
         assertEquals(0, colony.getGoodsCount(foodType));
@@ -443,6 +445,51 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(7, grossProduction.getCount(foodType));
         // this includes implicit type change and consumption
         assertEquals(14, netProduction.getCount(foodType));
+
+        colony.addGoods(horsesType, 50);
+        colony.getUnitList().get(0).setWorkType(cottonType);
+        Building weaverHouse = colony.getBuilding(spec().getBuildingType("model.building.weaverHouse"));
+        colony.getUnitList().get(1).setLocation(weaverHouse);
+
+        info = colony.getProductionAndConsumption();
+        grossProduction = new TypeCountMap<GoodsType>();
+        netProduction = new TypeCountMap<GoodsType>();
+        for (ProductionInfo productionInfo : info.values()) {
+            for (AbstractGoods goods : productionInfo.getProduction()) {
+                grossProduction.incrementCount(goods.getType(), goods.getAmount());
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getStorage()) {
+                grossProduction.incrementCount(goods.getType(), goods.getAmount());
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getConsumption()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
+            }
+        }
+
+        assertEquals(4, grossProduction.getCount(cottonType));
+        assertEquals(1, netProduction.getCount(cottonType));
+
+        assertEquals(3, grossProduction.getCount(clothType));
+        assertEquals(3, netProduction.getCount(clothType));
+
+        assertEquals(10, grossProduction.getCount(grainType));
+        assertEquals(0, netProduction.getCount(grainType));
+
+        assertEquals(2, grossProduction.getCount(horsesType));
+        assertEquals(2, netProduction.getCount(horsesType));
+
+        assertEquals(1, grossProduction.getCount(bellsType));
+        assertEquals(-2, netProduction.getCount(bellsType));
+
+        assertEquals(1, grossProduction.getCount(crossesType));
+        assertEquals(1, netProduction.getCount(crossesType));
+
+        // this is storage only
+        assertEquals(2, grossProduction.getCount(foodType));
+        // this includes implicit type change and consumption
+        assertEquals(2, netProduction.getCount(foodType));
     }
 
 }
