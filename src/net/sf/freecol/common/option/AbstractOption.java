@@ -57,7 +57,7 @@ abstract public class AbstractOption<T> extends FreeColObject implements Option 
 
     /**
      * Should this option be updated directly so that
-     * changes may be previewes?
+     * changes may be previewed?
      *
      * @return <code>true</code> if changes to this
      *      option should be made directly (and reset
