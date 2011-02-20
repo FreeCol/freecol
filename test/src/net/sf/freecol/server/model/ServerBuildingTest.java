@@ -57,6 +57,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
 
@@ -141,6 +143,9 @@ public class ServerBuildingTest extends FreeColTestCase {
     public void testExpertTeaching() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
+        // otherwise this test will crash and burn
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+
         Colony colony = getSchoolColony(4, SchoolLevel.SCHOOLHOUSE);
         Building school = colony.getBuilding(schoolType);
         assertTrue(schoolType.hasAbility("model.ability.teach"));
@@ -170,6 +175,9 @@ public class ServerBuildingTest extends FreeColTestCase {
     public void testCollege() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
+        // otherwise this test will crash and burn
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+
         Colony colony = getSchoolColony(4, SchoolLevel.COLLEGE);
         Building college = colony.getBuilding(collegeType);
         Iterator<Unit> units = colony.getUnitIterator();
@@ -190,6 +198,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
     public void testUniversity() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
+
+        // otherwise this test will crash and burn
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         assertEquals(4, colony.getUnitCount());
@@ -239,7 +250,13 @@ public class ServerBuildingTest extends FreeColTestCase {
     public void testTrackerBug1616384() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
+        // otherwise this test will crash and burn
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+
         Colony colony = getSchoolColony(8, SchoolLevel.COLLEGE);
+        // prevent starvation
+        colony.addGoods(foodType, 100);
+
         Building college = colony.getBuilding(collegeType);
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -282,6 +299,11 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         while (4 == getUnitList(colony, freeColonistType).size()) {
             ServerTestHelper.newTurn();
+            System.out.println("new turn");
+        }
+
+        for (Unit unit: colony.getUnitList()) {
+            System.out.println(unit);
         }
         assertEquals(3, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
@@ -330,6 +352,9 @@ public class ServerBuildingTest extends FreeColTestCase {
             .setValue(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
         Colony colony = getSchoolColony(5, SchoolLevel.UNIVERSITY);
+        // prevent starvation
+        colony.addGoods(foodType, 100);
+
         Building university = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -645,6 +670,9 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
+        // prevent starvation
+        colony.addGoods(foodType, 100);
+
         Building university = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -776,6 +804,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony otherColony = getStandardColony(1, 10, 10);
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
+        // prevent starvation
+        colony.addGoods(foodType, 100);
+
         Building university = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -937,6 +968,9 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
+        // prevent starvation
+        colony.addGoods(foodType, 100);
+
         Building university = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -1004,6 +1038,9 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
+        // prevent starvation
+        colony.addGoods(foodType, 100);
+
         Building university = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
 

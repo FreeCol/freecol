@@ -2113,6 +2113,16 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         disposeList();
     }
 
+    /**
+     * Returns a data structure containing all relevant information
+     * about the production and consumption of the colony. This
+     * includes the production of all colony tiles and buildings, as
+     * well as the consumption of all units, buildings and build
+     * queues. The method has no side-effects.
+     *
+     * @return a map using units, work locations and build queues as
+     * keys, and <code>ProductionInfo</code> objects as values
+     */
     @SuppressWarnings("unchecked")
     public java.util.Map<Object, ProductionInfo> getProductionAndConsumption() {
         java.util.Map<Object, ProductionInfo> result = new HashMap<Object, ProductionInfo>();
@@ -2124,13 +2134,13 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             info.addProduction(p);
             result.put(colonyTile, info);
         }
-        for (Consumer consumer : getConsumers()) {
+       for (Consumer consumer : getConsumers()) {
             boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
             List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
                 AbstractGoods surplus = production.get(g.getType());
                 if (!surplusOnly) {
-                    surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
+                    surplus = new AbstractGoods(g.getType(), surplus.getAmount() + getGoodsCount(g.getType()));
                 }
                 goods.add(surplus);
             }

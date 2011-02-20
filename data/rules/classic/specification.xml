@@ -1130,6 +1130,7 @@
     </building-type>
     <building-type id="model.building.depot" workplaces="0" priority="750">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
+      <ability id="model.ability.consumeOnlySurplusProduction"/>
       <modifier id="model.modifier.storeSurplus" type="multiplicative" value="0.5">
         <scope type="model.goods.food"/>
       </modifier>

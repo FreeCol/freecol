@@ -90,14 +90,14 @@ public class ServerColonyTest extends FreeColTestCase {
 
         int quantity = colony.getFoodConsumption() * 2;
         colony.addGoods(foodGoodsType, quantity);
-        int foodStored = colony.getFoodCount();
+        int foodStored = colony.getGoodsCount(foodGoodsType);
         assertEquals(quantity, foodStored);
         int foodExpected = foodStored - colony.getFoodConsumption()
             + colony.getFoodProduction();
 
         ServerTestHelper.newTurn();
         assertEquals("Unexpected value for remaining food, ",
-                     foodExpected, colony.getFoodCount());
+                     foodExpected, colony.getGoodsCount(foodGoodsType));
     }
 
     public void testEqualFoodProductionConsumptionCase() {
@@ -213,7 +213,7 @@ public class ServerColonyTest extends FreeColTestCase {
             + String.valueOf(production) + ")";
         assertTrue( errMsg, consumption  > production);
 
-        foodStored = colony.getFoodCount();
+        foodStored = colony.getGoodsCount(foodGoodsType);
         errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")";
         assertTrue(errMsg,foodStored == 0);
     }

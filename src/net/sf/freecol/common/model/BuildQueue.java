@@ -165,21 +165,28 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         if (current != null) {
             // ATTENTION: this code presupposes that we will consume
             // all required goods at once
+            boolean overflow = colony.getSpecification()
+                .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
+            List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
             for (AbstractGoods required : current.getGoodsRequired()) {
                 boolean satisfied = false;
                 for (AbstractGoods available : input) {
                     if (required.getType() == available.getType()
                         && required.getAmount() <= available.getAmount()) {
+                        int amount = (overflow || required.getType().isStorable())
+                            ? required.getAmount()
+                            : available.getAmount();
+                        consumption.add(new AbstractGoods(required.getType(), amount));
                         satisfied = true;
                         break;
                     }
                 }
                 if (!satisfied) {
-                    result.setFailure(ProductionInfo.Failure.WAIT);
+                    // don't build anything
                     return result;
                 }
             }
-            result.setConsumption(current.getGoodsRequired());
+            result.setConsumption(consumption);
         }
         return result;
     }

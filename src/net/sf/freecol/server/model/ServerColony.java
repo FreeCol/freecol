@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +35,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.BuildQueue;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ExportData;
@@ -47,6 +49,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -54,9 +57,11 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
@@ -167,141 +172,83 @@ public class ServerColony extends Colony implements ServerModelObject {
         GoodsContainer container = getGoodsContainer();
         container.saveState();
 
-        // Update the colony tiles (hopefully producing food).
-        for (ColonyTile colonyTile : colonyTiles) {
-            ((ServerModelObject) colonyTile).csNewTurn(random, cs);
+        java.util.Map<Object, ProductionInfo> info = getProductionAndConsumption();
+        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
+        for (Entry<Object, ProductionInfo> entry : info.entrySet()) {
+            ProductionInfo productionInfo = entry.getValue();
+            if (entry.getKey() instanceof WorkLocation) {
+                WorkLocation workLocation = (WorkLocation) entry.getKey();
+                ((ServerModelObject) workLocation).csNewTurn(random, cs);
+                if (workLocation.getUnitCount() > 0) {
+                    for (AbstractGoods goods : productionInfo.getProduction()) {
+                        int experience = goods.getAmount() / workLocation.getUnitCount();
+                        for (Unit unit : workLocation.getUnitList()) {
+                            unit.setExperience(unit.getExperience() + experience);
+                            cs.addPartial(See.only(owner), unit, "experience");
+                        }
+                    }
+                }
+            }
+            for (AbstractGoods goods : productionInfo.getProduction()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getStorage()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getConsumption()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
+            }
+
+            if (entry.getKey() instanceof BuildQueue
+                && !productionInfo.getConsumption().isEmpty()) {
+                // this means we are actually building something
+                BuildQueue queue = (BuildQueue) entry.getKey();
+                BuildableType buildable = queue.getCurrentlyBuilding();
+                if (buildable instanceof UnitType) {
+                    tileDirty = buildUnit(queue, cs, random);
+                } else if (buildable instanceof BuildingType) {
+                    colonyDirty = buildBuilding(queue, cs, updates);
+                } else {
+                    throw new IllegalStateException("Bogus buildable: " + buildable);
+                }
+                // Having removed something from the build queue, nudge it again
+                // to see if there is a problem with the next item if any.
+                buildable = csGetBuildable(cs);
+            }
+
         }
 
-        // Categorize buildings as {food, materials, other}-producers
-        // To determine materials, examine the requirements for the
-        // current building if any.
-        List<GoodsType> forBuilding = new ArrayList<GoodsType>();
-        BuildableType buildable = csGetBuildable(cs);
-        if (buildable != null) {
-            for (AbstractGoods ag : buildable.getGoodsRequired()) {
-                forBuilding.add(ag.getType());
-            }
-        }
-        List<Building> forFood = new ArrayList<Building>();
-        List<Building> forMaterials = new ArrayList<Building>();
-        List<Building> foodConsumers = new ArrayList<Building>();
-        List<Building> forOther = new ArrayList<Building>();
-        for (Building building : getBuildings()) {
-            GoodsType outputType = building.getGoodsOutputType();
-            GoodsType inputType = building.getGoodsInputType();
-            if (outputType == null) {
-                forOther.add(building);
-            } else if (outputType.isFoodType()) {
-                forFood.add(building);
-            } else if (inputType != null && inputType.isFoodType()) {
-                foodConsumers.add(building);
-            } else if (forBuilding.contains(outputType)) {
-                forMaterials.add(building);
+        for (Entry<GoodsType, Integer> entry : netProduction.getValues().entrySet()) {
+            GoodsType goodsType = entry.getKey();
+            int net = entry.getValue();
+            int stored = getGoodsCount(goodsType);
+            int total = net + stored;
+            if (total < 0) {
+                if (goodsType.isFoodType()) {
+                    if (getUnitCount() > 1) {
+                        Unit victim = Utils.getRandomMember(logger, "Choose starver",
+                                                            getUnitList(), random);
+                        updates.add((FreeColGameObject) victim.getLocation());
+                        cs.addDispose(owner, this, victim);
+                        cs.addMessage(See.only(owner),
+                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                                       "model.colony.colonistStarved",
+                                                       this)
+                                      .addName("%colony%", getName()));
+                    } else { // Its dead, Jim.
+                        cs.addMessage(See.only(owner),
+                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                                       "model.colony.colonyStarved",
+                                                       this)
+                                      .addName("%colony%", getName()));
+                        cs.addDispose(owner, getTile(), this);
+                        return;
+                    }
+                }
+                removeGoods(goodsType, stored);
             } else {
-                int index = -1;
-                for (int i = 0; i < forOther.size(); i++) {
-                    GoodsType input = forOther.get(i).getGoodsInputType();
-                    if (outputType.equals(input)) {
-                        index = i;
-                        break;
-                    }
-                }
-                if (index < 0) {
-                    forOther.add(building);
-                } else { // insert before consumer
-                    forOther.add(index, building);
-                }
-            }
-        }
-
-        // Update the food producers (none in the standard rule set).
-        for (Building building : forFood) {
-            ((ServerModelObject) building).csNewTurn(random, cs);
-        }
-
-        int foodRequired = getFoodConsumption();
-        if (!foodConsumers.isEmpty()) {
-            // check for surplus available to produce goods from food
-            // types (e.g. horses)
-            int surplus = 0;
-            for (Goods goods : container.getCompactGoods()) {
-                if (goods.getType().isFoodType()) {
-                    surplus += (goods.getAmount() - container.getOldGoodsCount(goods.getType()));
-                }
-            }
-            surplus -= foodRequired;
-            System.out.println("----------------------------------------");
-            System.out.println("Food surplus in " + getName() + " is " + surplus);
-
-            if (surplus > 0) {
-                // TODO: make more generic
-                surplus = Math.max(0, surplus - storedSurplus(spec.getPrimaryFoodType(), surplus));
-                System.out.println("Surplus after storage is " + surplus);
-            }
-
-            if (surplus > 0) {
-                for (Building building : foodConsumers) {
-                    GoodsType inputType = building.getGoodsInputType();
-                    GoodsType outputType = building.getGoodsOutputType();
-                    System.out.println("Food consumer is " + building.getType().getId());
-                    int inputCount = getGoodsCount(inputType);
-                    int outputCount = getGoodsCount(outputType);
-                    System.out.println("Goods input is " + Math.min(inputCount, surplus)
-                                       + " " + inputType.getId());
-                    ((ServerBuilding) building).csNewTurn(random, cs, Math.min(inputCount, surplus));
-                    surplus -= inputCount - getGoodsCount(inputType);
-                    System.out.println("Produced " + (getGoodsCount(outputType) - outputCount)
-                                       + " " + outputType);
-                    System.out.println("Surplus is now " + surplus);
-                    if (surplus < 0) {
-                        logger.warning("Building " + building.getId() + " consumed more than allowed!");
-                        break;
-                    } else if (surplus == 0) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        // convert all food types to food (or whatever)
-        for (Goods goods : container.getCompactGoods()) {
-            GoodsType goodsType = goods.getType();
-            if (goodsType.isFoodType() && goodsType.isStoredAs()) {
-                container.addGoods(goodsType.getStoredAs(), goods.getAmount());
-                container.removeGoods(goods);
-            }
-        }
-
-        // All food should be produced, so now check for starvation,
-        // and hence whether the colony will survive.
-        int foodAvailable = getFoodCount();
-        if (foodRequired > foodAvailable) { // Someone starves.
-            removeFood(foodAvailable);
-            if (getUnitCount() > 1) {
-                Unit victim = Utils.getRandomMember(logger, "Choose starver",
-                                                    getUnitList(), random);
-                updates.add((FreeColGameObject) victim.getLocation());
-                cs.addDispose(owner, this, victim);
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                     "model.colony.colonistStarved",
-                                     this)
-                              .addName("%colony%", getName()));
-            } else { // Its dead, Jim.
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                     "model.colony.colonyStarved",
-                                     this)
-                              .addName("%colony%", getName()));
-                cs.addDispose(owner, getTile(), this);
-                return;
-            }
-        } else {
-            removeFood(foodRequired);
-            int production = getFoodProduction();
-            if (foodRequired > production) {
-                int turns = getFoodCount() / (foodRequired - production);
-                if (turns <= 3) {
+                if (goodsType.isFoodType() && net < 0) {
+                    int turns = Math.abs(stored / net);
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
                                          "model.colony.famineFeared",
@@ -309,106 +256,17 @@ public class ServerColony extends Colony implements ServerModelObject {
                                   .addName("%colony%", getName())
                                   .addName("%number%", String.valueOf(turns)));
                     logger.finest("Famine feared in " + getName()
-                                  + " food=" + getFoodCount()
-                                  + " required=" + foodRequired
-                                  + " production=" + production
+                                  + " food=" + stored
+                                  //+ " required=" + foodRequired
+                                  + " production=" + net
                                   + " turns=" + turns);
                 }
+                addGoods(goodsType, net);
             }
         }
 
-        // Now produce the materials.
-        for (Building building : forMaterials) {
-            ((ServerModelObject) building).csNewTurn(random, cs);
-        }
+        /*
 
-        // Now that materials are present, check if the buildable is
-        // complete or blocked by absence of a storable good.  If
-        // complete, then complete it.
-        if (buildable != null
-            && csHasAllRequirements(buildable, cs)) {
-            // TODO: why do we need this? how can this be called twice?
-            if (lastVisited == getGame().getTurn().getNumber()) {
-                throw new IllegalStateException("Double call!");
-            }
-            lastVisited = getGame().getTurn().getNumber();
-
-            // Consume the goods.
-            // Waste excess goods if not storable or overflow allowed.
-            boolean overflow
-                = spec.getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
-            for (AbstractGoods required : buildable.getGoodsRequired()) {
-                if (overflow || required.getType().isStorable()) {
-                    removeGoods(required);
-                } else {
-                    removeGoods(required.getType());
-                }
-            }
-
-            // Create the buildable.
-            if (buildable instanceof UnitType) {
-                Unit unit = new ServerUnit(getGame(), getTile(), owner,
-                                           (UnitType) buildable,
-                                           UnitState.ACTIVE);
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                     "model.colony.unitReady",
-                                     this, unit)
-                              .addName("%colony%", getName())
-                              .addStringTemplate("%unit%", unit.getLabel()));
-                // Remove the unit-to-build unless it is the last entry.
-                if (buildQueue.size() > 1) buildQueue.remove(0);
-                tileDirty = true;
-
-            } else if (buildable instanceof BuildingType) {
-                BuildingType type = (BuildingType) buildable;
-                BuildingType from = type.getUpgradesFrom();
-                boolean success;
-                if (from == null) {
-                    addBuilding(new ServerBuilding(getGame(), this, type));
-                    colonyDirty = true;
-                    success = true;
-                } else {
-                    Building building = getBuilding(from);
-                    if (building.upgrade()) {
-                        updates.add(building);
-                        success = true;
-                    } else {
-                        cs.addMessage(See.only(owner),
-                            new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                     "colonyPanel.unbuildable",
-                                     this)
-                              .addName("%colony%", getName())
-                              .add("%object%", buildable.getNameKey()));
-                        success = false;
-                    }
-                }
-                if (success) {
-                    tile.updatePlayerExploredTiles(); // See stockade changes
-                    cs.addMessage(See.only(owner),
-                        new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                         "model.colony.buildingReady",
-                                         this)
-                                  .addName("%colony%", getName())
-                                  .add("%building%", buildable.getNameKey()));
-                    if (buildQueue.size() == 1) {
-                        cs.addMessage(See.only(owner),
-                            new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                             "model.colony.notBuildingAnything",
-                                             this)
-                                      .addName("%colony%", getName())
-                                      .add("%building%", buildable.getNameKey()));
-                    }
-                }
-                buildQueue.remove(0);
-            } else {
-                throw new IllegalStateException("Bogus buildable: "
-                                                + buildable);
-            }
-
-            // Having removed something from the build queue, nudge it again
-            // to see if there is a problem with the next item if any.
-            buildable = csGetBuildable(cs);
         } else {
             if (buildQueue.size() == 0) {
                 cs.addMessage(See.only(owner),
@@ -418,43 +276,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                               .addName("%colony%", getName()));
             }
         }
-
-        // The other buildings that do not produce building materials can
-        // run now.
-        for (Building building : forOther) {
-            ((ServerModelObject) building).csNewTurn(random, cs);
-        }
-
-        // Now that other production which might consume food (e.g. horses)
-        // has been done, check for new colonists.
-        if (!populationQueue.isEmpty()) {
-            UnitType type = populationQueue.getCurrentlyBuilding();
-            boolean canBuild = true;
-            for (AbstractGoods goods : type.getGoodsRequired()) {
-                if (getGoodsCount(goods.getType()) < goods.getAmount()) {
-                    canBuild = false;
-                    break;
-                }
-            }
-            if (canBuild) {
-                Unit unit = new ServerUnit(getGame(), getTile(), owner, type,
-                                           UnitState.ACTIVE);
-                for (AbstractGoods goods : type.getGoodsRequired()) {
-                    removeGoods(goods);
-                }
-                cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                               "model.colony.newColonist",
-                                               this, unit)
-                              .addName("%colony%", getName()));
-                logger.info("New colonist created in " + getName()
-                            + " with ID=" + unit.getId());
-                if (populationQueue.size() > 1) {
-                    Collections.shuffle(populationQueue.getValues(), random);
-                }
-                tileDirty = true;
-            }
-        }
+            */
 
         // Export goods if custom house is built.
         // Do not flush price changes yet, as any price change may change
@@ -587,6 +409,82 @@ public class ServerColony extends Colony implements ServerModelObject {
             cs.add(See.only(owner), this);
         }
     }
+
+
+    private boolean buildUnit(BuildQueue buildQueue, ChangeSet cs, Random random) {
+        Unit unit = new ServerUnit(getGame(), getTile(), owner,
+                                   (UnitType) buildQueue.getCurrentlyBuilding(),
+                                   UnitState.ACTIVE);
+        if (unit.hasAbility("model.ability.bornInColony")) {
+            cs.addMessage(See.only((ServerPlayer) owner),
+                          new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                           "model.colony.newColonist",
+                                           this, unit)
+                          .addName("%colony%", getName()));
+                if (buildQueue.size() > 1) {
+                    Collections.shuffle(buildQueue.getValues(), random);
+                }
+        } else {
+            cs.addMessage(See.only((ServerPlayer) owner),
+                          new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                           "model.colony.unitReady",
+                                           this, unit)
+                          .addName("%colony%", getName())
+                          .addStringTemplate("%unit%", unit.getLabel()));
+            // Remove the unit-to-build unless it is the last entry.
+            if (buildQueue.size() > 1) buildQueue.remove(0);
+        }
+
+        logger.info("New unit created in " + getName() + ": " + unit.toString());
+        return true;
+    }
+
+
+    private boolean buildBuilding(BuildQueue buildQueue, ChangeSet cs, List<FreeColGameObject> updates) {
+        BuildingType type = (BuildingType) buildQueue.getCurrentlyBuilding();
+        BuildingType from = type.getUpgradesFrom();
+        boolean success;
+        boolean colonyDirty = false;
+        if (from == null) {
+            addBuilding(new ServerBuilding(getGame(), this, type));
+            colonyDirty = true;
+            success = true;
+        } else {
+            Building building = getBuilding(from);
+            if (building.upgrade()) {
+                updates.add(building);
+                success = true;
+            } else {
+                cs.addMessage(See.only((ServerPlayer) owner),
+                              new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                               "colonyPanel.unbuildable",
+                                               this)
+                              .addName("%colony%", getName())
+                              .add("%object%", type.getNameKey()));
+                success = false;
+            }
+        }
+        if (success) {
+            tile.updatePlayerExploredTiles(); // See stockade changes
+            cs.addMessage(See.only((ServerPlayer) owner),
+                          new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                           "model.colony.buildingReady",
+                                           this)
+                          .addName("%colony%", getName())
+                          .add("%building%", type.getNameKey()));
+            if (buildQueue.size() == 1) {
+                cs.addMessage(See.only((ServerPlayer) owner),
+                              new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                               "model.colony.notBuildingAnything",
+                                               this)
+                              .addName("%colony%", getName())
+                              .add("%building%", type.getNameKey()));
+            }
+        }
+        buildQueue.remove(0);
+        return colonyDirty;
+    }
+
 
     /**
      * Gets what this colony really is building, removing anything that
