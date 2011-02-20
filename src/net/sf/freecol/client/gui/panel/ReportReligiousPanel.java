@@ -23,15 +23,18 @@ import java.awt.event.ActionListener;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -61,8 +64,10 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
         int production = 0;
         for (Colony colony : colonies) {
+            Map<Object, ProductionInfo> productionMap = colony.getProductionAndConsumption();
+            Building building = colony.getBuildingForProducing(crosses);
             reportPanel.add(createColonyButton(colony), "split 2, flowy, align center");
-            reportPanel.add(new BuildingPanel(colony.getBuildingForProducing(crosses), getCanvas()));
+            reportPanel.add(new BuildingPanel(building, productionMap.get(building), getCanvas()));
             production += colony.getProductionOf(crosses);
         }
 

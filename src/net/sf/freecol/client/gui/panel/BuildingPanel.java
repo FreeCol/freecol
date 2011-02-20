@@ -38,9 +38,10 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -57,20 +58,23 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private final Building building;
 
-    private ProductionLabel productionOutput = null;;
+    private ProductionInfo info;
+
+    private ProductionLabel productionOutput = null;
 
     private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
 
     /**
      * Creates this BuildingPanel.
-     * 
+     *
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingPanel(Building building, Canvas parent) {
+    public BuildingPanel(Building building, ProductionInfo info, Canvas parent) {
 
         this.building = building;
         this.parent = parent;
+        this.info = info;
 
         addPropertyChangeListeners();
 
@@ -80,16 +84,16 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     }
 
     public void initialize() {
-   
+
         removeAll();
         unitLabels.clear();
 
-        if (building.getProductionNextTurn() == 0) {
+        if (info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {
-            productionOutput = new ProductionLabel(building.getGoodsOutputType(),
-                                                   building.getProductionNextTurn(),
-                                                   building.getMaximumProduction(), parent);
+            AbstractGoods output = info.getProduction().get(0);
+            AbstractGoods maximum = info.getMaximumProduction().get(0);
+            productionOutput = new ProductionLabel(output, maximum, parent);
             add(productionOutput, "span, align center");
         }
 
@@ -99,7 +103,6 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
             add(unitLabel);
         }
 
-//        setSize(getPreferredSize());
         setSize(new Dimension(96,76));
         revalidate();
         repaint();
@@ -107,7 +110,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     /**
      * Paints this component.
-     * 
+     *
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {
@@ -145,7 +148,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     }
 
     public JToolTip createToolTip() {
-        return new BuildingToolTip(building, parent);
+        return new BuildingToolTip(building, info, parent);
     }
 
     public void addPropertyChangeListeners() {

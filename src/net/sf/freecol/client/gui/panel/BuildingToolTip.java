@@ -29,7 +29,9 @@ import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -44,11 +46,11 @@ public class BuildingToolTip extends JToolTip {
 
     /**
      * Creates this BuildingToolTip.
-     * 
+     *
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingToolTip(Building building, Canvas parent) {
+    public BuildingToolTip(Building building, ProductionInfo info, Canvas parent) {
 
         setLayout(new MigLayout("fill", "", ""));
 
@@ -61,18 +63,20 @@ public class BuildingToolTip extends JToolTip {
 
         add(new JLabel(buildingName), "span, align center");
 
-        if (building.getProductionNextTurn() == 0) {
+        if (info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {
-            ProductionLabel productionOutput = new ProductionLabel(building.getGoodsOutputType(),
-                                                                   building.getProductionNextTurn(),
-                                                                   building.getMaximumProduction(), parent);
-            if (building.getGoodsInputNextTurn() == 0) {
+            AbstractGoods production = info.getProduction().get(0);
+            AbstractGoods maximumProduction = info.getMaximumProduction().isEmpty()
+                ? production : info.getMaximumProduction().get(0);
+            ProductionLabel productionOutput = new ProductionLabel(production, maximumProduction, parent);
+            if (info.getConsumption().isEmpty()) {
                 add(productionOutput, "span, align center");
             } else {
-                ProductionLabel productionInput = new ProductionLabel(building.getGoodsInputType(),
-                                                                      building.getGoodsInputNextTurn(),
-                                                                      building.getMaximumGoodsInput(), parent);
+                AbstractGoods consumption = info.getConsumption().get(0);
+                AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
+                    ? consumption: info.getMaximumConsumption().get(0);
+                ProductionLabel productionInput = new ProductionLabel(consumption, maximumConsumption, parent);
                 JLabel arrow = new JLabel("\u2192");
                 arrow.setFont(arrowFont);
                 add(productionInput, "span, split 3, align center");

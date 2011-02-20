@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,6 +38,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.TypeCountMap;
 
 import net.miginfocom.swing.MigLayout;
@@ -55,7 +57,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportProductionPanel(Canvas parent) {
@@ -152,6 +154,7 @@ public final class ReportProductionPanel extends ReportPanel {
             int[] totalProduction = new int[selectedTypes.size()];
 
             for (Colony colony : colonies) {
+                Map<Object, ProductionInfo> productionMap = colony.getProductionAndConsumption();
 
                 // colonyButton
                 JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());
@@ -177,7 +180,8 @@ public final class ReportProductionPanel extends ReportPanel {
                             reportPanel.add(newLabel);
                         } else {
                             buildingCount.incrementCount(building.getType(), 1);
-                            BuildingPanel buildingPanel = new BuildingPanel(building, getCanvas());
+                            BuildingPanel buildingPanel =
+                                new BuildingPanel(building, productionMap.get(building), getCanvas());
                             buildingPanel.setBorder(FreeColPanel.CELLBORDER);
                             reportPanel.add(buildingPanel);
                         }

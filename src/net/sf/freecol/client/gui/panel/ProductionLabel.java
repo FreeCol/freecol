@@ -119,6 +119,17 @@ public final class ProductionLabel extends JComponent {
     /**
      * Creates a new <code>ProductionLabel</code> instance.
      *
+     * @param goods a <code>AbstractGoods</code> value
+     * @param maximum a <code>AbstractGoods</code> value
+     * @param parent a <code>Canvas</code> value
+     */
+    public ProductionLabel(AbstractGoods goods, AbstractGoods maximum, Canvas parent) {
+        this(goods.getType(), goods.getAmount(), maximum.getAmount(), parent);
+    }
+
+    /**
+     * Creates a new <code>ProductionLabel</code> instance.
+     *
      * @param goodsType an <code>int</code> value
      * @param amount an <code>int</code> value
      * @param parent a <code>Canvas</code> value

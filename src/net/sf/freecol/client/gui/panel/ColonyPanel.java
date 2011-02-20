@@ -815,7 +815,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(building, getCanvas());
+                super(building, productionMap.get(building), getCanvas());
             }
 
             public void initialize() {
