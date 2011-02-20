@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
@@ -80,12 +81,14 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -138,6 +141,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private final MouseListener releaseListener;
 
     private Colony colony;
+
+    private java.util.Map<Object, ProductionInfo> productionMap;
 
     private UnitLabel selectedUnitLabel;
 
@@ -347,6 +352,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      */
     private void initialize(final Colony colony, Unit preSelectedUnit) {
         setColony(colony);
+        productionMap = colony.getProductionAndConsumption();
 
         // Set listeners and transfer handlers
         outsideColonyPanel.removeMouseListener(releaseListener);
@@ -418,114 +424,26 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     public void updateProductionPanel() {
         netProductionPanel.removeAll();
+        productionMap = colony.getProductionAndConsumption();
 
-        int gross = 0, net = 0;
-        Specification spec = getSpecification();
-
-
-        // food
-        List<AbstractGoods> ratios;
-        List<GoodsType> goodsTypes = spec.getFoodGoodsTypeList();
-        // TODO: make this generic
-        net = colony.getFoodProduction() - colony.getFoodConsumption();
-        net -= colony.getProductionNetOf(spec.getGoodsType("model.goods.horses"));
-        if (net != 0) {
-            GoodsType goodsType = spec.getPrimaryFoodType();
-            netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-        }
-
-        // liberty
-        gross = net = 0;
-        goodsTypes = spec.getLibertyGoodsTypeList();
-        for (GoodsType goodsType : goodsTypes) {
-            gross += getColony().getProductionOf(goodsType);
-            net += getColony().getProductionNetOf(goodsType);
-        }
-        if (net != 0) {
-            GoodsType goodsType = spec.getGoodsType("model.goods.bells");
-            netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-        }
-
-
-        // immigration
-        gross = net = 0;
-        goodsTypes = spec.getImmigrationGoodsTypeList();
-        for (GoodsType goodsType : goodsTypes) {
-            gross += getColony().getProductionOf(goodsType);
-            net += getColony().getProductionNetOf(goodsType);
-        }
-        if (net != 0) {
-            GoodsType goodsType = spec.getGoodsType("model.goods.crosses");
-            netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-        }
-
-
-
-        List<GoodsType> generalGoods = new ArrayList<GoodsType>(spec.getGoodsTypeList());
-        generalGoods.removeAll(spec.getFoodGoodsTypeList());
-        generalGoods.removeAll(spec.getLibertyGoodsTypeList());
-        generalGoods.removeAll(spec.getImmigrationGoodsTypeList());
-        generalGoods.removeAll(spec.getFarmedGoodsTypeList());
-
-        // non-storable goods
-        goodsTypes = new ArrayList<GoodsType>(generalGoods);
-        for (GoodsType goodsType : goodsTypes) {
-            if (!goodsType.isStorable()) {
-                generalGoods.remove(goodsType);
-                net = getColony().getProductionNetOf(goodsType);
-                if (net != 0) {
-                    netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-                }
+        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
+        for (Entry<Object, ProductionInfo> entry : productionMap.entrySet()) {
+            ProductionInfo productionInfo = entry.getValue();
+            for (AbstractGoods goods : productionInfo.getProduction()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getStorage()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getConsumption()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
             }
         }
 
-
-        // farmed goods
-        goodsTypes = new ArrayList<GoodsType>(spec.getFarmedGoodsTypeList());
-        goodsTypes.removeAll(spec.getFoodGoodsTypeList());
-        goodsTypes.removeAll(spec.getLibertyGoodsTypeList());
-        goodsTypes.removeAll(spec.getImmigrationGoodsTypeList());
-        for (GoodsType goodsType : goodsTypes) {
-            net = getColony().getProductionNetOf(goodsType);
-            if (net != 0) {
-                netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-            }
-        }
-
-
-        // everything left except military & breedables
-        goodsTypes = new ArrayList<GoodsType>(generalGoods);
-        for (GoodsType goodsType : goodsTypes) {
-            if (!goodsType.isMilitaryGoods() && !goodsType.isBreedable()) {
-                generalGoods.remove(goodsType);
-                net = getColony().getProductionNetOf(goodsType);
-                if (net != 0) {
-                    netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-                }
-            }
-        }
-
-
-        // military goods
-        goodsTypes = new ArrayList<GoodsType>(generalGoods);
-        for (GoodsType goodsType : goodsTypes) {
-            if (!goodsType.isBreedable()) {
-                generalGoods.remove(goodsType);
-                net = getColony().getProductionNetOf(goodsType);
-                if (net != 0) {
-                    netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
-                }
-            }
-        }
-
-
-        // breedable things go last
-        goodsTypes = new ArrayList<GoodsType>(generalGoods);
-        for (GoodsType goodsType : goodsTypes) {
-            generalGoods.remove(goodsType);
-            net = getColony().getProductionNetOf(goodsType);
-            if (net != 0) {
-                netProductionPanel.add(new ProductionLabel(goodsType, net, getCanvas()));
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+            int amount = netProduction.getCount(goodsType);
+            if (amount != 0) {
+                netProductionPanel.add(new ProductionLabel(goodsType, amount, getCanvas()));
             }
         }
 
@@ -1423,28 +1341,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                 setLayout(new GridLayout(2, 1));
 
-                TileType tileType = colonyTile.getTile().getType();
-
-                AbstractGoods primaryGoods = tileType.getPrimaryGoods();
-                if (primaryGoods != null) {
-                    GoodsType goodsType = primaryGoods.getType();
-                    ImageIcon goodsIcon = getLibrary().getGoodsImageIcon(goodsType);
-                    ProductionLabel pl =
-                        new ProductionLabel(goodsType, colonyTile.getProductionOf(goodsType),
-                                            getCanvas());
-                    pl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
-                    add(pl);
-                }
-
-                AbstractGoods secondaryGoods = tileType.getSecondaryGoods();
-                if (secondaryGoods != null) {
-                    GoodsType goodsType = secondaryGoods.getType();
-                    ImageIcon goodsIcon = getLibrary().getGoodsImageIcon(goodsType);
-                    ProductionLabel pl =
-                        new ProductionLabel(goodsType, colonyTile.getProductionOf(goodsType),
-                                            getCanvas());
-                    pl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
-                    add(pl);
+                for (AbstractGoods goods : productionMap.get(colonyTile).getProduction()) {
+                    add(new ProductionLabel(goods, getCanvas()));
                 }
             }
 

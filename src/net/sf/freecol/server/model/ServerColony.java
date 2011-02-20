@@ -188,18 +188,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                         }
                     }
                 }
-            }
-            for (AbstractGoods goods : productionInfo.getProduction()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getStorage()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getConsumption()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
-            }
-
-            if (entry.getKey() instanceof BuildQueue
+            } else if (entry.getKey() instanceof BuildQueue
                 && !productionInfo.getConsumption().isEmpty()) {
                 // this means we are actually building something
                 BuildQueue queue = (BuildQueue) entry.getKey();
@@ -214,6 +203,16 @@ public class ServerColony extends Colony implements ServerModelObject {
                 // Having removed something from the build queue, nudge it again
                 // to see if there is a problem with the next item if any.
                 buildable = csGetBuildable(cs);
+            }
+
+            for (AbstractGoods goods : productionInfo.getProduction()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getStorage()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getConsumption()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
             }
 
         }

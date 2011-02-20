@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
@@ -108,10 +109,10 @@ public final class ProductionLabel extends JComponent {
     /**
      * Creates a new <code>ProductionLabel</code> instance.
      *
-     * @param goods a <code>Goods</code> value
+     * @param goods a <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(Goods goods, Canvas parent) {
+    public ProductionLabel(AbstractGoods goods, Canvas parent) {
         this(goods.getType(), goods.getAmount(), -1, parent);
     }
 
@@ -144,7 +145,7 @@ public final class ProductionLabel extends JComponent {
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 
-        
+
         setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
         if (amount < 0) {
             setForeground(Color.RED);
@@ -178,7 +179,7 @@ public final class ProductionLabel extends JComponent {
 
     /**
      * Returns the parent Canvas object.
-     * 
+     *
      * @return This ProductionLabel's Canvas.
      */
     public Canvas getCanvas() {
@@ -415,7 +416,7 @@ public final class ProductionLabel extends JComponent {
 
     /**
      * Paints this ProductionLabel.
-     * 
+     *
      * @param g The graphics context in which to do the painting.
      */
     public void paintComponent(Graphics g) {
