@@ -88,6 +88,9 @@ import org.w3c.dom.Element;
 public final class FreeColClient {
 
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
+    private static FreeColClient instance;
+
+    public static FreeColClient get () {return instance;}
 
     /**
      * The space not being used in windowed mode.
@@ -316,6 +319,10 @@ public final class FreeColClient {
                     });
             }
         }
+
+        // remember the first instance as (quasi) singleton
+        if ( instance == null )
+                instance = this;
     }
 
     /**
@@ -838,6 +845,11 @@ public final class FreeColClient {
      */
     public Client getClient() {
         return client;
+    }
+
+    public SoundPlayer getSoundPlayer ()
+    {
+        return soundPlayer;
     }
 
     /**
