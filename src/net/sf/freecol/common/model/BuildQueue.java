@@ -102,36 +102,6 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     // Interface Consumer
 
     /**
-     * Returns the number of units of the given GoodsType this Colony
-     * consumes this turn. Colonies consume goods only in order to
-     * build units or buildings.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param available an <code>int</code> value
-     * @return units consumed
-     */
-    public int getConsumedAmount(GoodsType goodsType, int available) {
-        int amount = 0;
-        T current = getCurrentlyBuilding();
-        if (current != null) {
-            // ATTENTION: this code presupposes that we will consume
-            // all required goods at once
-            for (AbstractGoods required : current.getGoodsRequired()) {
-                if (required.getType() == goodsType) {
-                    amount = required.getAmount();
-                    if (amount < available) {
-                        return 0;
-                    }
-                } else if (colony.getInputAvailable(goodsType, this) < required.getAmount()) {
-                    return 0;
-                }
-            }
-        }
-        return amount;
-    }
-
-
-    /**
      * Returns true if this Consumer consumes the given GoodsType.
      *
      * @param goodsType a <code>GoodsType</code> value

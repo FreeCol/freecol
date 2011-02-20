@@ -828,26 +828,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     // Interface Consumer
 
     /**
-     * Returns the number of units of the given GoodsType this
-     * UnitType consumes per turn (when in a settlement).
-     *
-     * @return units consumed
-     */
-    public int getConsumedAmount(GoodsType goodsType, int available) {
-        return Math.min(available, consumption.getCount(goodsType));
-    }
-
-    /**
-     * Returns true if this Consumer consumes the given GoodsType.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean consumes(GoodsType goodsType) {
-        return getConsumedAmount(goodsType, Integer.MAX_VALUE) > 0;
-    }
-
-    /**
      * Returns a list of GoodsTypes this Consumer consumes.
      *
      * @return a <code>List</code> value

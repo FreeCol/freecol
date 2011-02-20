@@ -62,27 +62,6 @@ public interface Consumer {
     public static final int UNIT_PRIORITY = 1000;
 
     /**
-     * Returns the number of units of the given GoodsType consumed
-     * this turn. Since some consumers consume a certain percentage of
-     * the goods available rather than a fixed amount, the amount of
-     * available goods must be passed as a parameter. This method may
-     * return 0 even if the method consumes returns true.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param available an <code>int</code> value
-     * @return units consumed
-     */
-    public int getConsumedAmount(GoodsType goodsType, int available);
-
-    /**
-     * Returns true if this Consumer consumes the given GoodsType.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean consumes(GoodsType goodsType);
-
-    /**
      * Returns a list of GoodsTypes this Consumer consumes.
      *
      * @return a <code>List</code> value

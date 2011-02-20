@@ -26,20 +26,6 @@ import java.util.List;
 public class ProductionInfo {
 
     /**
-     * Possible actions when consumption fails.
-     */
-    public enum Failure {
-        NOTHING, // do nothing
-        WAIT,    // wait for more goods
-        STARVE   // starve (units only)
-    };
-
-    /**
-     * What to do if consumption fails.
-     */
-    private Failure failure = Failure.NOTHING;
-
-    /**
      * The goods moved to storage.
      */
     private List<AbstractGoods> storage = new ArrayList<AbstractGoods>();
@@ -207,24 +193,6 @@ public class ProductionInfo {
      */
     public void addStorage(AbstractGoods goods) {
         storage.add(goods);
-    }
-
-    /**
-     * Get the <code>Failure</code> value.
-     *
-     * @return a <code>Failure</code> value
-     */
-    public final Failure getFailure() {
-        return failure;
-    }
-
-    /**
-     * Set the <code>Failure</code> value.
-     *
-     * @param newFailure The new Failure value.
-     */
-    public final void setFailure(final Failure newFailure) {
-        this.failure = newFailure;
     }
 
 }

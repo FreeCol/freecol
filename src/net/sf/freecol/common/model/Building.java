@@ -979,22 +979,6 @@ public class Building extends FreeColGameObject
     // Interface Consumer
 
     /**
-     * Returns the number of units of the given GoodsType this
-     * Building consumes per turn.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param available an <code>int</code> value
-     * @return units consumed
-     */
-    public int getConsumedAmount(GoodsType goodsType, int available) {
-        if (consumes(goodsType)) {
-            return getGoodsInputNextTurn(available);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
      * Returns true if this Consumer consumes the given GoodsType.
      *
      * @param goodsType a <code>GoodsType</code> value
@@ -1016,7 +1000,7 @@ public class Building extends FreeColGameObject
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
         GoodsType inputType = getGoodsInputType();
         if (inputType != null) {
-            result.add(new AbstractGoods(inputType, getConsumedAmount(inputType, Integer.MAX_VALUE)));
+            result.add(new AbstractGoods(inputType, getGoodsInputNextTurn(Integer.MAX_VALUE)));
         }
         result.addAll(getStoredGoods());
         return result;

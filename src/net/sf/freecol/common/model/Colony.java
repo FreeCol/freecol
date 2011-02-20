@@ -2165,66 +2165,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         return result;
     }
 
-    public int getInputAvailable(GoodsType goodsType, Consumer consumer) {
-        int production = getProductionOf(goodsType);
-        int stored = getGoodsCount(goodsType);
-        for (Consumer other : getConsumersOf(goodsType)) {
-            if (other.getPriority() < consumer.getPriority()) {
-                if (other.hasAbility("model.ability.consumeOnlySurplusProduction")) {
-                    production -= other.getConsumedAmount(goodsType, production);
-                    if (production <= 0) {
-                        return 0;
-                    }
-                } else {
-                    stored -= other.getConsumedAmount(goodsType, production + stored);
-                    if (stored < 0) {
-                        production += stored;
-                        stored = 0;
-                    }
-                    if (production <= 0 && stored <= 0) {
-                        return 0;
-                    }
-                }
-            } else {
-                break;
-            }
-        }
-        if (consumer.hasAbility("model.ability.consumeOnlySurplusProduction")) {
-            return production;
-        } else {
-            return production + stored;
-        }
-    }
-
-    /**
-     * Returns a list of Consumers requiring the given types of goods.
-     *
-     * @param goodsTypes the types of goods
-     * @return a list of consumers
-     */
-    public List<Consumer> getConsumersOf(GoodsType... goodsTypes) {
-        List<Consumer> result = new ArrayList<Consumer>();
-        for (GoodsType goodsType : goodsTypes) {
-            for (Unit unit : getUnitList()) {
-                if (unit.consumes(goodsType)) {
-                    result.add(unit);
-                }
-            }
-            for (Building building : buildingMap.values()) {
-                if (building.consumes(goodsType)) {
-                    result.add(building);
-                }
-            }
-            // Add build queues;
-            if (buildQueue.consumes(goodsType)) {
-                result.add(buildQueue);
-            }
-
-        }
-        Collections.sort(result, Consumer.COMPARATOR);
-        return result;
-    }
-
     public List<Consumer> getConsumers() {
         List<Consumer> result = new ArrayList<Consumer>();
         result.addAll(getUnitList());
