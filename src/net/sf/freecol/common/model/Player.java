@@ -2023,7 +2023,7 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     public void incrementImmigration(int amount) {
-        immigration += amount;
+        immigration = Math.max(0, immigration + amount);
     }
 
     /**
@@ -2712,7 +2712,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param liberty The additional amount of liberty.
      */
     public void incrementLiberty(int amount) {
-        setLiberty(getLiberty() + amount);
+        setLiberty(Math.max(0, getLiberty() + amount));
     }
 
     /**
