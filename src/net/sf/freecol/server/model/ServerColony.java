@@ -217,6 +217,19 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         }
 
+        /** TODO: do we want this?
+        if (goodsInput == 0 && !canAutoProduce()
+            && getMaximumGoodsInput() > 0) {
+            cs.addMessage(See.only(owner),
+                          new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                           "model.building.notEnoughInput",
+                                           colony, goodsInputType)
+                          .add("%inputGoods%", goodsInputType.getNameKey())
+                          .add("%building%", getNameKey())
+                          .addName("%colony%", colony.getName()));
+        }
+        */
+
         for (Entry<GoodsType, Integer> entry : netProduction.getValues().entrySet()) {
             GoodsType goodsType = entry.getKey();
             int net = entry.getValue();

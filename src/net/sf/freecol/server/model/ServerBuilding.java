@@ -93,8 +93,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     public void csNewTurn(Random random, ChangeSet cs) {
         logger.finest("ServerBuilding.csNewTurn, for " + toString());
         BuildingType type = getType();
-        Colony colony = getColony();
-        ServerPlayer owner = (ServerPlayer) colony.getOwner();
+        ServerPlayer owner = (ServerPlayer) getColony().getOwner();
 
         if (type.hasAbility("model.ability.teach")) {
             teach(cs, owner);
@@ -104,66 +103,6 @@ public class ServerBuilding extends Building implements ServerModelObject {
             repairUnits(cs);
         }
 
-        /*
-        if (getGoodsOutputType() != null) {
-            produceGoods(cs, owner, maxInput);
-        }
-        */
-    }
-
-    private void produceGoods(ChangeSet cs, ServerPlayer owner, int maxInput) {
-        final int goodsInput = Math.min(getGoodsInput(), maxInput);
-        final int goodsOutput = canAutoProduce()
-            ? getAutoProduction(goodsInput)
-            : getProductionAdding(maxInput);
-        final GoodsType goodsInputType = getGoodsInputType();
-        final GoodsType goodsOutputType = getGoodsOutputType();
-
-        String message = (goodsInput + " " +
-                          (goodsInputType == null ? "NULL" : goodsInputType.getId())
-                          + " converts to "
-                          + goodsOutput + " " +
-                          (goodsOutputType == null ? "NULL" : goodsOutputType.getId()));
-        logger.finest(message);
-        if (canAutoProduce()) {
-            System.out.println(message);
-        }
-        if (goodsInput == 0 && !canAutoProduce()
-            && getMaximumGoodsInput() > 0) {
-            cs.addMessage(See.only(owner),
-                          new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                           "model.building.notEnoughInput",
-                                           colony, goodsInputType)
-                          .add("%inputGoods%", goodsInputType.getNameKey())
-                          .add("%building%", getNameKey())
-                          .addName("%colony%", colony.getName()));
-        }
-
-        // Produce if:
-        //   - there is output
-        // and not
-        //   - produces building material that is not storable
-        //   and
-        //   - for some reason the colony is not building
-        //     that turn
-        if (goodsOutput > 0
-            && !(goodsOutputType.isBuildingMaterial()
-                 && !goodsOutputType.isStorable()
-                 && !colony.canBuild())) {
-            // Actually produce the goods:
-            if (goodsInputType != null) {
-                colony.removeGoods(goodsInputType, goodsInput);
-            }
-            colony.addGoods(goodsOutputType, goodsOutput);
-
-            if (getUnitCount() > 0) {
-                int experience = goodsOutput / getUnitCount();
-                for (Unit unit : getUnitList()) {
-                    unit.setExperience(unit.getExperience() + experience);
-                    cs.addPartial(See.only(owner), unit, "experience");
-                }
-            }
-        }
     }
 
     private void teach(ChangeSet cs, ServerPlayer owner) {
