@@ -1432,47 +1432,8 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      *         turn.
      */
     public int getProductionNetOf(GoodsType goodsType) {
-        int count = getProductionNextTurn(goodsType);
-        int used = getConsumptionOf(goodsType);
-        Building bldg = getBuildingForConsuming(goodsType);
-        if (bldg != null) {
-            if (goodsType.isBreedable()) {
-                // TODO: make this more generic
-                used += bldg.getGoodsInputNextTurn(getSurplusFoodProduction(goodsType));
-            } else {
-                used += bldg.getGoodsInputNextTurn();
-            }
-        }
-
-        if (goodsType.isStorable()) {
-            BuildableType currentBuildable = getCurrentlyBuilding();
-            if (currentBuildable != null &&
-                currentBuildable.getGoodsRequired().isEmpty() == false) {
-                boolean willBeFinished = true;
-                int possiblyUsed = 0;
-                for (AbstractGoods goodsRequired : currentBuildable.getGoodsRequired()) {
-                    GoodsType requiredType = goodsRequired.getType();
-                    int requiredAmount = goodsRequired.getAmount();
-                    int presentAmount = getGoodsCount(requiredType);
-                    if (requiredType.equals(goodsType)) {
-                        if (presentAmount + (count - used) < requiredAmount) {
-                            willBeFinished = false;
-                            break;
-                        } else if (presentAmount < requiredAmount) {
-                            possiblyUsed = requiredAmount - presentAmount;
-                        }
-                    } else if (getGoodsCount(requiredType) + getProductionNextTurn(requiredType) <
-                               goodsRequired.getAmount()) {
-                        willBeFinished = false;
-                        break;
-                    }
-                }
-                if (willBeFinished && possiblyUsed > 0) {
-                    used += possiblyUsed;
-                }
-            }
-        }
-        return count - used;
+        // TODO: we need to cache the production map
+        return getNetProduction().getCount(goodsType);
     }
 
     /**
@@ -2068,20 +2029,18 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     }
 
     /**
-     * Verify if colony has the conditions to bombard an
-     * enemy ship adjacent to it
+     * Verify if colony has the ability to bombard an enemy ship
+     * adjacent to it.
      * @return true if it can, false otherwise
      */
-    public boolean canBombardEnemyShip(){
-    	// only sea-side colonies can bombard
-    	if(isLandLocked()){
+    public boolean canBombardEnemyShip() {
+    	if (isLandLocked()) {
+            // only sea-side colonies can bombard
             return false;
-    	}
-    	// does not have the buildings that give such abilities
-    	if(!hasAbility("model.ability.bombardShips")){
-            return false;
-    	}
-    	return true;
+        } else {
+            // does it have the buildings that give such abilities?
+            return hasAbility("model.ability.bombardShips");
+        }
     }
 
     /**
