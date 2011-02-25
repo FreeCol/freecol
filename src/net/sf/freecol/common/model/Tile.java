@@ -1344,7 +1344,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>AbstractGoods</code> value
      */
     public AbstractGoods getPrimaryProduction() {
-        AbstractGoods primaryProduction = type.getPrimaryGoods();
+        AbstractGoods primaryProduction = new AbstractGoods(type.getPrimaryGoods());
         if (primaryProduction != null) {
             int potential = primaryProduction.getAmount();
             if (tileItemContainer != null) {
@@ -1365,7 +1365,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>int</code> value
      */
     public AbstractGoods getSecondaryProduction() {
-        AbstractGoods secondaryProduction = type.getSecondaryGoods();
+        AbstractGoods secondaryProduction = new AbstractGoods(type.getSecondaryGoods());
         if (secondaryProduction != null) {
             int potential = secondaryProduction.getAmount();
             if (tileItemContainer != null) {

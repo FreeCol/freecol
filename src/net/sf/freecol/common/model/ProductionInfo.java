@@ -142,6 +142,22 @@ public class ProductionInfo {
     }
 
     /**
+     * Returns true if production equals maximum production.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasMaximumProduction() {
+        for (int index = 0; index < production.size(); index++) {
+            if (maximumProduction.size() < index) {
+                return true;
+            } else if (maximumProduction.get(index).getAmount() > production.get(index).getAmount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Get the <code>MaximumConsumption</code> value.
      *
      * @return a <code>List<AbstractGoods></code> value

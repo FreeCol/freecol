@@ -2113,6 +2113,28 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         disposeList();
     }
 
+
+    public TypeCountMap<GoodsType> getNetProduction() {
+        return getNetProduction(getProductionAndConsumption());
+    }
+
+    public TypeCountMap<GoodsType> getNetProduction(java.util.Map<Object, ProductionInfo> productionMap) {
+        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
+        for (Entry<Object, ProductionInfo> entry : productionMap.entrySet()) {
+            ProductionInfo productionInfo = entry.getValue();
+            for (AbstractGoods goods : productionInfo.getProduction()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getStorage()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+            }
+            for (AbstractGoods goods : productionInfo.getConsumption()) {
+                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
+            }
+        }
+        return netProduction;
+    }
+
     /**
      * Returns a data structure containing all relevant information
      * about the production and consumption of the colony. This
@@ -2127,6 +2149,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     public java.util.Map<Object, ProductionInfo> getProductionAndConsumption() {
         java.util.Map<Object, ProductionInfo> result = new HashMap<Object, ProductionInfo>();
         ProductionMap production = new ProductionMap();
+        int count = 0;
         for (ColonyTile colonyTile : getColonyTiles()) {
             List<AbstractGoods> p = colonyTile.getProduction();
             production.add(p);

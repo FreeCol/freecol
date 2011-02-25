@@ -63,6 +63,17 @@ public class AbstractGoods extends FreeColObject {
     }
 
     /**
+     * Creates a new <code>AbstractGoods</code> instance.
+     *
+     * @param other an <code>AbstractGoods</code> value
+     */
+    public AbstractGoods(AbstractGoods other) {
+        setId(other.type.getId());
+        this.type = other.type;
+        this.amount = other.amount;
+    }
+
+    /**
      * Get the <code>Type</code> value.
      *
      * @return a <code>GoodsType</code> value
@@ -104,11 +115,6 @@ public class AbstractGoods extends FreeColObject {
 
     public boolean equals(AbstractGoods other) {
         return type == other.type && amount == other.amount;
-    }
-
-
-    public AbstractGoods clone() {
-        return new AbstractGoods(type, amount);
     }
 
     /**

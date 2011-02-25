@@ -45,12 +45,12 @@ public class ProductionMap {
                 this.leafs = new ArrayList<AbstractGoods>();
                 int amount = root.getAmount();
                 for (AbstractGoods leaf : leafs) {
-                    this.leafs.add(leaf.clone());
+                    this.leafs.add(new AbstractGoods(leaf));
                     amount += leaf.getAmount();
                 }
                 this.root = new AbstractGoods(root.getType(), amount);
             } else {
-                this.root = root.clone();
+                this.root = new AbstractGoods(root);
             }
         }
 
