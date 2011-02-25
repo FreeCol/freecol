@@ -426,20 +426,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         netProductionPanel.removeAll();
         productionMap = colony.getProductionAndConsumption();
 
-        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
-        for (Entry<Object, ProductionInfo> entry : productionMap.entrySet()) {
-            ProductionInfo productionInfo = entry.getValue();
-            for (AbstractGoods goods : productionInfo.getProduction()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getStorage()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getConsumption()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
-            }
-        }
-
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction(productionMap);
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             int amount = netProduction.getCount(goodsType);
             if (amount != 0) {

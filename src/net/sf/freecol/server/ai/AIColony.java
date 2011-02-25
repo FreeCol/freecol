@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -305,6 +306,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int expertValue = 100;
         int goodsWishValue = 50;
 
+        Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
+
         // for every non-expert, request expert replacement
         for (Unit unit : colony.getUnitList()) {
             if (unit.getWorkType() != null
@@ -373,7 +376,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 Building building = (Building) workLocation;
                 GoodsType inputType = building.getGoodsInputType();
                 if (inputType != null
-                    && colony.getProductionNetOf(inputType) < building.getMaximumGoodsInput()) {
+                    && !info.get(building).hasMaximumProduction()) {
+                    // TODO: find better heuristics
                     requiredGoods.incrementCount(inputType, 100);
                 }
             }

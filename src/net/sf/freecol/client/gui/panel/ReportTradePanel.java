@@ -25,7 +25,9 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 
 import javax.swing.JButton;
@@ -40,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -203,6 +206,8 @@ public final class ReportTradePanel extends ReportPanel {
 
         for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
             Colony colony = colonies.get(colonyIndex);
+            Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
+            TypeCountMap<GoodsType> netProduction = colony.getNetProduction(info);
             JButton colonyButton = createColonyButton(colony, colonyIndex);
             reportPanel.add(colonyButton, "cell 0 " + row + " 1 2");
             column = 0;
@@ -223,7 +228,7 @@ public final class ReportTradePanel extends ReportPanel {
                 }
                 reportPanel.add(goodsLabel, "cell " + column + " " + row);
 
-                int production = colony.getProductionNetOf(goodsType);
+                int production = netProduction.getCount(goodsType);
 
                 JLabel productionLabel = new JLabel(String.valueOf(production), JLabel.TRAILING);
                 if (production < 0) {
