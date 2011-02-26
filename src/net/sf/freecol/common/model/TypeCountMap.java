@@ -50,6 +50,12 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
         }
     }
 
+    public void add(TypeCountMap<T> other) {
+        for (Map.Entry<T, Integer> entry : other.values.entrySet()) {
+            incrementCount(entry.getKey(), entry.getValue());
+        }
+    }
+
     public void clear() {
         values.clear();
     }

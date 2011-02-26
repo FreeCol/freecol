@@ -324,6 +324,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         game.setMap(getTestMap());
 
         Colony colony = getStandardColony(3);
+        ColonyTile tile = colony.getColonyTile(colony.getTile());
 
         GoodsType foodType = spec().getGoodsType("model.goods.food");
         GoodsType grainType = spec().getGoodsType("model.goods.grain");
@@ -336,6 +337,12 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(0, colony.getGoodsCount(foodType));
 
         java.util.Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
+
+        assertEquals(grainType, tile.getProduction().get(0).getType());
+        assertEquals(5, tile.getProduction().get(0).getAmount());
+        assertEquals(cottonType, tile.getProduction().get(1).getType());
+        assertEquals(2, tile.getProduction().get(1).getAmount());
+
         for (Unit unit : colony.getUnitList()) {
             ProductionInfo unitInfo = info.get(unit);
             assertNotNull(unitInfo);
@@ -386,6 +393,12 @@ public class ColonyProductionTest extends FreeColTestCase {
         colony.getUnitList().get(1).setLocation(weaverHouse);
 
         info = colony.getProductionAndConsumption();
+
+        assertEquals(grainType, tile.getProduction().get(0).getType());
+        assertEquals(5, tile.getProduction().get(0).getAmount());
+        assertEquals(cottonType, tile.getProduction().get(1).getType());
+        assertEquals(2, tile.getProduction().get(1).getAmount());
+
         grossProduction = new TypeCountMap<GoodsType>();
         netProduction = new TypeCountMap<GoodsType>();
         for (ProductionInfo productionInfo : info.values()) {
