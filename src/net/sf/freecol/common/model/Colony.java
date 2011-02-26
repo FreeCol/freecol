@@ -1424,19 +1424,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     }
 
     /**
-     * Returns how much of a Good will be produced by this colony this turn,
-     * taking into account how much is consumed - by workers, horses, etc.
-     *
-     * @param goodsType The goods' type.
-     * @return The amount of the given goods currently unallocated for next
-     *         turn.
-     */
-    public int getProductionNetOf(GoodsType goodsType) {
-        // TODO: we need to cache the production map
-        return getNetProduction().getCount(goodsType);
-    }
-
-    /**
      * Returns <code>true</code> if this Colony can breed the given
      * type of Goods. Only animals (such as horses) are expected to be
      * breedable.
@@ -2074,6 +2061,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
 
 
     public TypeCountMap<GoodsType> getNetProduction() {
+        // TODO: cache productionMap
         return getNetProduction(getProductionAndConsumption());
     }
 

@@ -264,8 +264,8 @@ public class ScoutingMission extends Mission {
         } else if (scoutEquipment != null && t.getColony() != null && t.getColony().getOwner() == u.getOwner()) {
             for (AbstractGoods goods : scoutEquipment.getGoodsRequired()) {
                 if (goods.getType().isBreedable() && !t.getColony().canBreed(goods.getType()) &&
-                // TODO: remove assumptions about auto-production implementation
-                        t.getColony().getProductionNetOf(goods.getType()) > 1) {
+                    // TODO: remove assumptions about auto-production implementation
+                    t.getColony().getNetProduction().getCount(goods.getType()) > 1) {
                     return true;
                 }
             }

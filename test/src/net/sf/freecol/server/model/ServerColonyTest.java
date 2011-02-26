@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -336,10 +337,11 @@ public class ServerColonyTest extends FreeColTestCase {
 
         assertEquals(population, colony.getUnitCount());
         assertEquals(4, colony.getProductionOf(bellsType));
-        assertEquals(population - 2, colony.getConsumptionOf(bellsType));
+        assertEquals(population, colony.getConsumptionOf(bellsType));
 
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
         int bells = colony.getProductionOf(bellsType) - colony.getConsumptionOf(bellsType);
-        assertEquals(bells, colony.getProductionNetOf(bellsType));
+        assertEquals(bells, netProduction.getCount(bellsType));
         assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
 
@@ -354,7 +356,7 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals(bells, colony.getLiberty());
 
         int crosses = colony.getProductionOf(crossType) - colony.getConsumptionOf(crossType);
-        assertEquals(crosses, colony.getProductionNetOf(crossType));
+        assertEquals(crosses, netProduction.getCount(crossType));
         assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());
 

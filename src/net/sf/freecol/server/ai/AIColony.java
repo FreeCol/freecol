@@ -307,6 +307,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int goodsWishValue = 50;
 
         Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction(info);
 
         // for every non-expert, request expert replacement
         for (Unit unit : colony.getUnitList()) {
@@ -356,7 +357,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // add building materials
         if (colony.getCurrentlyBuilding() != null) {
             for (AbstractGoods goods : colony.getCurrentlyBuilding().getGoodsRequired()) {
-                if (colony.getProductionNetOf(goods.getType()) == 0) {
+                if (netProduction.getCount(goods.getType()) == 0) {
                     requiredGoods.incrementCount(goods.getType(), goods.getAmount());
                 }
             }
@@ -580,6 +581,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         } else {
 
+            GoodsType toolType = colony.getSpecification().getGoodsType("model.goods.tools");
+            GoodsType hammerType = colony.getSpecification().getGoodsType("model.goods.hammers");
+
+            TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
             ArrayList<AIGoods> newAIGoods = new ArrayList<AIGoods>();
 
             List<GoodsType> goodsList = colony.getSpecification().getGoodsTypeList();
@@ -595,9 +600,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
                 // Only export military goods if we do not have room for them:
                 if (goodsType.isMilitaryGoods()
-                    && (colony.getProductionOf(goodsType) == 0
+                    && (netProduction.getCount(goodsType) == 0
                         || (colony.getGoodsCount(goodsType)
-                            < capacity - colony.getProductionOf(goodsType)))) {
+                            < capacity - netProduction.getCount(goodsType)))) {
                     continue;
                 }
 
@@ -608,9 +613,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         continue loop;
                     }
                 }
-                Building consumer = colony.getBuildingForConsuming(goodsType);
-                if (consumer != null
-                    && colony.getProductionOf(goodsType) < consumer.getGoodsInput()) {
+                if (netProduction.getCount(goodsType) < 0) {
                     continue;
                 }
 
@@ -619,23 +622,23 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                  * sufficient amounts in warehouse:
                  */
                 // TODO: make this more generic
-                if (goodsType == colony.getSpecification().getGoodsType("model.goods.tools") && colony.getGoodsCount(colony.getSpecification().getGoodsType("model.goods.tools")) > 0) {
-                    if (colony.getProductionNetOf(colony.getSpecification().getGoodsType("model.goods.tools")) > 0) {
+                if (goodsType == toolType && colony.getGoodsCount(toolType) > 0) {
+                    if (netProduction.getCount(toolType) > 0) {
                         final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
                         int requiredTools = getToolsRequired(currentlyBuilding);
                         int requiredHammers = getHammersRequired(currentlyBuilding);
-                        int buildTurns = (requiredHammers - colony.getGoodsCount(colony.getSpecification().getGoodsType("model.goods.hammers"))) /
-                            (colony.getProductionOf(colony.getSpecification().getGoodsType("model.goods.hammers")) + 1);
+                        int buildTurns = (requiredHammers - colony.getGoodsCount(hammerType)) /
+                            (netProduction.getCount(hammerType) + 1);
                         if (requiredTools > 0) {
                             if (colony.getWarehouseCapacity() > 100) {
                                 requiredTools += 100;
                             }
-                            int toolsProductionTurns = requiredTools / colony.getProductionNetOf(colony.getSpecification().getGoodsType("model.goods.tools"));
+                            int toolsProductionTurns = requiredTools / netProduction.getCount(toolType);
                             if (buildTurns <= toolsProductionTurns + 1) {
                                 continue;
                             }
                         } else if (colony.getWarehouseCapacity() > 100
-                                   && colony.getGoodsCount(colony.getSpecification().getGoodsType("model.goods.tools")) <= 100) {
+                                   && colony.getGoodsCount(toolType) <= 100) {
                             continue;
                         }
                     } else {
@@ -1040,9 +1043,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Changes the production type of workers producing a cargo there
         // is no room for.
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
         List<GoodsType> goodsList = colony.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsList) {
-            int production = colony.getProductionNetOf(goodsType);
+            int production = netProduction.getCount(goodsType);
             int in_stock = colony.getGoodsCount(goodsType);
             if (foodType != goodsType
                 && goodsType.isStorable()
@@ -1055,7 +1059,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         final Location oldLocation = unit.getLocation();
                         unit.putOutsideColony();
                         boolean working = false;
-                        waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
+                        waste = colony.getGoodsCount(goodsType) + netProduction.getCount(goodsType)
                             - colony.getWarehouseCapacity();
                         int best = 0;
                         for (GoodsType goodsType2 : goodsList) {
@@ -1065,7 +1069,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                             int production2 = (bestTile == null ? 0 :
                                                bestTile.getProductionOf(unit, goodsType2));
                             if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
-                                + colony.getProductionNetOf(goodsType2) < colony.getWarehouseCapacity()){
+                                + netProduction.getCount(goodsType2) < colony.getWarehouseCapacity()){
                                 if (working){
                                     unit.putOutsideColony();
                                 }

@@ -365,16 +365,17 @@ public class ServerColony extends Colony implements ServerModelObject {
             if (!(exportData.isExported()
                   && hasAbility("model.ability.export")
                   && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
-                && amount <= limit
-                && amount + getProductionNetOf(type) > limit) {
-                int lose = amount + getProductionNetOf(type) - limit;
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                     "model.building.warehouseSoonFull",
-                                     this, type)
-                              .add("%goods%", goods.getNameKey())
-                              .addName("%colony%", getName())
-                              .addName("%amount%", String.valueOf(lose)));
+                && amount <= limit) {
+                int loss = amount + netProduction.getCount(type) - limit;
+                if (loss > 0) {
+                    cs.addMessage(See.only(owner),
+                                  new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                                   "model.building.warehouseSoonFull",
+                                                   this, type)
+                                  .add("%goods%", goods.getNameKey())
+                                  .addName("%colony%", getName())
+                                  .addAmount("%amount%", loss));
+                }
             }
         }
 

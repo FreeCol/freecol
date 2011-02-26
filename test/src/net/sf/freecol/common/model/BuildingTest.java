@@ -337,20 +337,22 @@ public class BuildingTest extends FreeColTestCase {
         weaver.add(worker);
         assertEquals(worker, weaver.getUnitList().get(0));
 
-        assertEquals(2, colony.getProductionOf(cottonType));
         colony.addGoods(cottonType, 2);
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
+        assertEquals(2, colony.getProductionOf(cottonType));
         assertEquals(2, weaver.getProductionOf(clothType));
         assertEquals(2, colony.getProductionOf(clothType));
-        assertEquals(-1, colony.getProductionNetOf(cottonType));
-        assertEquals(3, colony.getProductionNetOf(clothType));
+        assertEquals(-1, netProduction.getCount(cottonType));
+        assertEquals(3, netProduction.getCount(clothType));
 
         colonist.setWorkType(cottonType);
 
+        netProduction = colony.getNetProduction();
         assertEquals(4, colony.getProductionOf(cottonType));
         colony.addGoods(cottonType, 4);
         assertEquals(3, colony.getProductionOf(clothType));
-        assertEquals(1, colony.getProductionNetOf(cottonType));
-        assertEquals(3, colony.getProductionNetOf(clothType));
+        assertEquals(1, netProduction.getCount(cottonType));
+        assertEquals(3, netProduction.getCount(clothType));
 
     }
 
@@ -368,44 +370,54 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(grainType, pasture.getGoodsInputType());
         assertEquals(horsesType, pasture.getGoodsOutputType());
 
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
+
         // no horses yet
-        assertEquals(10, colony.getFoodProduction());
+        assertEquals(8, netProduction.getCount(foodType));
         assertEquals(0, pasture.getProductionOf(horsesType));
-        assertEquals(2, colony.getFoodConsumption());
-        assertEquals(0, pasture.getGoodsInputNextTurn());
-        //assertEquals(8, colony.getProductionNetOf(foodType));
-        assertEquals(0, colony.getProductionNetOf(horsesType));
+        assertEquals(0, netProduction.getCount(horsesType));
         assertEquals(0, pasture.getMaximumProduction());
 
         colony.addGoods(horsesType, 50);
+        netProduction = colony.getNetProduction();
         assertEquals(2, pasture.getProductionOf(horsesType));
         assertEquals(2, pasture.getMaximumProduction());
-        assertEquals(2, colony.getProductionNetOf(horsesType));
+        assertEquals(2, netProduction.getCount(horsesType));
+
         colony.addGoods(horsesType, 1);
+        netProduction = colony.getNetProduction();
         assertEquals(4, pasture.getProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProduction());
-        assertEquals(4, colony.getProductionNetOf(horsesType));
+        assertEquals(4, netProduction.getCount(horsesType));
 
         pasture.upgrade();
         colony.removeGoods(horsesType);
 
         colony.addGoods(horsesType, 25);
+        netProduction = colony.getNetProduction();
         assertEquals(2, pasture.getProductionOf(horsesType));
         assertEquals(2, pasture.getMaximumProduction());
-        assertEquals(2, colony.getProductionNetOf(horsesType));
+        assertEquals(2, netProduction.getCount(horsesType));
+
         colony.addGoods(horsesType, 1);
+        netProduction = colony.getNetProduction();
         assertEquals(4, pasture.getProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProduction());
-        assertEquals(4, colony.getProductionNetOf(horsesType));
+        assertEquals(4, netProduction.getCount(horsesType));
+
         colony.addGoods(horsesType, 24);
+        netProduction = colony.getNetProduction();
         assertEquals(4, pasture.getProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProduction());
-        assertEquals(4, colony.getProductionNetOf(horsesType));
+        assertEquals(4, netProduction.getCount(horsesType));
+
         colony.addGoods(horsesType, 1);
+        netProduction = colony.getNetProduction();
         assertEquals(6, pasture.getProductionOf(horsesType));
         assertEquals(6, pasture.getMaximumProduction());
-        // TODO: find out why this still fails
-        // assertEquals(6, colony.getProductionNetOf(horsesType));
+        assertEquals("Horse production should equal food surplus.",
+                     netProduction.getCount(foodType),
+                     netProduction.getCount(horsesType));
     }
 
     public void testTownhallProduction() {

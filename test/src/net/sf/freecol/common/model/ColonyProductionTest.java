@@ -177,7 +177,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     	int expectedBellProd = 1;
     	int bellsUpkeep = colony.getConsumptionOf(bellsType);
     	int expectedBellUpkeep =  colony.getUnitCount() - 2;
-    	int bellsNetProdPerTurn = colony.getProductionNetOf(bellsType);
+    	int bellsNetProdPerTurn = colony.getNetProduction().getCount(bellsType);
     	int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
 
     	assertEquals("Wrong bell count", expectedBellCount, initialBellCount);
@@ -194,6 +194,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         game.setMap(getTestMap());
 
         Colony colony = getStandardColony(1);
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
         Building pasture = colony.getBuilding(spec().getBuildingType("model.building.country"));
@@ -202,19 +203,20 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // Still room for more
         colony.addGoods(horsesType, 99);
-
-        assertTrue(colony.getFoodProduction() > colony.getFoodConsumption());
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
+        assertTrue(netProduction.getCount(foodType) > 0);
 
         assertEquals("Wrong horse production",1, pasture.getProductionOf(horsesType));
         assertEquals("Wrong maximum horse production", 4, pasture.getMaximumProduction());
-        assertEquals("Wrong net horse production",1, colony.getProductionNetOf(horsesType));
+        assertEquals("Wrong net horse production",1, netProduction.getCount(horsesType));
 
         // No more room available
         colony.addGoods(horsesType, 1);
+        netProduction = colony.getNetProduction();
         assertEquals("Wrong number of horses in colony",colony.getWarehouseCapacity(), colony.getGoodsCount(horsesType));
         assertEquals("Wrong horse production",0, pasture.getProductionOf(horsesType));
         assertEquals("Wrong maximum horse production", 4, pasture.getMaximumProduction());
-        assertEquals("Wrong net horse production",0, colony.getProductionNetOf(horsesType));
+        assertEquals("Wrong net horse production",0, netProduction.getCount(horsesType));
     }
 
 
