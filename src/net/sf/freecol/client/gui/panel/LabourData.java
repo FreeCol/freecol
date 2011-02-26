@@ -435,7 +435,7 @@ public class LabourData {
                 for (Colony colony : player.getColonies()) {
                     LocationData data = unitData.details.containsKey(colony) ? unitData.getLocationData(colony) : null;
 
-                    int netProduction = colony.getProductionNetOf(expertProduction);
+                    int netProduction = colony.getNetProduction().getCount(expertProduction);
                     if (data != null) {
                         data.netProduction = netProduction;
                     }

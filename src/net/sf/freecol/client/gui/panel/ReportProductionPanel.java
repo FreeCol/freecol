@@ -155,6 +155,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
             for (Colony colony : colonies) {
                 Map<Object, ProductionInfo> productionMap = colony.getProductionAndConsumption();
+                TypeCountMap<GoodsType> netProduction = colony.getNetProduction(productionMap);
 
                 // colonyButton
                 JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());
@@ -164,7 +165,7 @@ public final class ReportProductionPanel extends ReportPanel {
                 // production
                 for (int index = 0; index < selectedTypes.size(); index++) {
                     GoodsType goodsType = selectedTypes.get(index);
-                    int newValue = colony.getProductionNetOf(goodsType);
+                    int newValue = netProduction.getCount(goodsType);
                     totalProduction[index] += newValue;
                     Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
                     GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());

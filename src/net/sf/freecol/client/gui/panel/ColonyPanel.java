@@ -144,6 +144,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private java.util.Map<Object, ProductionInfo> productionMap;
 
+    private TypeCountMap<GoodsType> netProduction;
+
     private UnitLabel selectedUnitLabel;
 
     private JButton exitButton = new JButton(Messages.message("close"));
@@ -353,6 +355,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private void initialize(final Colony colony, Unit preSelectedUnit) {
         setColony(colony);
         productionMap = colony.getProductionAndConsumption();
+        netProduction = colony.getNetProduction(productionMap);
 
         // Set listeners and transfer handlers
         outsideColonyPanel.removeMouseListener(releaseListener);
@@ -425,8 +428,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public void updateProductionPanel() {
         netProductionPanel.removeAll();
         productionMap = colony.getProductionAndConsumption();
+        netProduction = colony.getNetProduction(productionMap);
 
-        TypeCountMap<GoodsType> netProduction = colony.getNetProduction(productionMap);
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             int amount = netProduction.getCount(goodsType);
             if (amount != 0) {
@@ -923,7 +926,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public JToolTip createToolTip() {
-            return new RebelToolTip(colony, getCanvas());
+            return new RebelToolTip(colony, netProduction, getCanvas());
         }
 
         @Override

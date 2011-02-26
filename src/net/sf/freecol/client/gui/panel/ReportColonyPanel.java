@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -49,7 +50,7 @@ public final class ReportColonyPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportColonyPanel(Canvas parent) {
@@ -93,21 +94,11 @@ public final class ReportColonyPanel extends ReportPanel {
             }
 
             // Production
-            GoodsType food = getSpecification().getPrimaryFoodType();
             GoodsType horses = getSpecification().getGoodsType("model.goods.horses");
             int count = 0;
-            int netFood = colony.getFoodProduction() - colony.getFoodConsumption();
-            if (netFood != 0) {
-                ProductionLabel productionLabel = new ProductionLabel(food, netFood, getCanvas());
-                productionLabel.setStockNumber(colony.getFoodCount());
-                reportPanel.add(productionLabel, "span 2, top");
-                count++;
-            }
+            TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                if (goodsType.isFoodType()) {
-                    continue;
-                }
-                int newValue = colony.getProductionNetOf(goodsType);
+                int newValue = netProduction.getCount(goodsType);
                 int stockValue = colony.getGoodsCount(goodsType);
                 if (newValue != 0 || stockValue > 0) {
                     Building building = colony.getBuildingForProducing(goodsType);

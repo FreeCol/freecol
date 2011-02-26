@@ -79,7 +79,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportRequirementsPanel(Canvas parent) {
@@ -108,12 +108,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
             unitCount.put(colony, newUnitCount);
             canTrain.put(colony, newCanTrain);
-
-            TypeCountMap<GoodsType> newSurplus = new TypeCountMap<GoodsType>();
-            for (GoodsType goodsType : goodsTypes) {
-                newSurplus.incrementCount(goodsType, colony.getProductionNetOf(goodsType));
-            }
-            surplus.put(colony, newSurplus);
+            surplus.put(colony, colony.getNetProduction());
         }
 
         for (Colony colony : colonies) {
@@ -149,7 +144,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                 int nonExpertProductionNow = 0;
                                 int expertProductionPotential = 0;
                                 int nonExpertProductionPotential = 0;
-                                
+
                                 // get the current and potential productions for the work location of the expert
                                 if (expert.getWorkTile() != null) {
                                     expertProductionNow = expert.getWorkTile().getProductionOf(expert, expertise);
@@ -158,7 +153,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                     expertProductionNow = expert.getWorkBuilding().getUnitProductivity(expert);
                                     nonExpertProductionPotential = expert.getWorkBuilding().getUnitProductivity(nonExpert);
                                 }
-                                
+
                                 // get the current and potential productions for the work location of the non-expert
                                 if (nonExpert.getWorkTile() != null) {
                                     nonExpertProductionNow = nonExpert.getWorkTile().getProductionOf(nonExpert, expertise);
@@ -167,7 +162,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                     nonExpertProductionNow = nonExpert.getWorkBuilding().getUnitProductivity(nonExpert);
                                     expertProductionPotential = nonExpert.getWorkBuilding().getUnitProductivity(expert);
                                 }
-                                
+
                                 // let the player know if the two units would be more productive were they to swap roles
                                 if ((expertProductionNow + nonExpertProductionNow)
                                     < (expertProductionPotential + nonExpertProductionPotential)
@@ -191,11 +186,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
                         missingExpertWarning.add(expert);
                     }
                 }
-            } 
+            }
             for (Building building : colony.getBuildings()) {
                 GoodsType goodsType = building.getGoodsOutputType();
                 UnitType expert = building.getExpertUnitType();
-                    
+
                 if (goodsType != null && expert != null) {
                     // check if this building has no expert producing goods
                     if (building.getFirstUnit() != null &&
@@ -292,7 +287,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             if (!misusedExperts.isEmpty()) {
                 doc.insertString(doc.getLength(), "\n"
                                  + Messages.message("report.requirements.misusedExperts",
-                                                    "%unit%", expertName, "%work%", work) + " ", 
+                                                    "%unit%", expertName, "%work%", work) + " ",
                                  doc.getStyle("regular"));
                 int lastExpertsIndex = misusedExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {
@@ -306,8 +301,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
             if (!severalExperts.isEmpty()) {
-                doc.insertString(doc.getLength(), 
-                        "\n" + Messages.message("report.requirements.severalExperts", "%unit%", expertName) + " ", 
+                doc.insertString(doc.getLength(),
+                        "\n" + Messages.message("report.requirements.severalExperts", "%unit%", expertName) + " ",
                         doc.getStyle("regular"));
                 int lastExpertsIndex = severalExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {
@@ -321,8 +316,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
             if (!canTrainExperts.isEmpty()) {
-                doc.insertString(doc.getLength(), 
-                        "\n" + Messages.message("report.requirements.canTrainExperts", "%unit%", expertName) + " ", 
+                doc.insertString(doc.getLength(),
+                        "\n" + Messages.message("report.requirements.canTrainExperts", "%unit%", expertName) + " ",
                         doc.getStyle("regular"));
                 int lastExpertsIndex = canTrainExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {
@@ -334,11 +329,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     }
                 }
             }
-  
+
         } catch(Exception e) {
             logger.warning(e.toString());
         }
-        
+
     }
 
     private void addProductionWarning(StyledDocument doc, Colony colony, GoodsType output, GoodsType input) {
@@ -384,7 +379,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         } catch(Exception e) {
             logger.warning(e.toString());
         }
-        
+
     }
 
     private JButton createColonyButton(Colony colony, boolean headline) {
