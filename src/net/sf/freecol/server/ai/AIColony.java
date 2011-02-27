@@ -824,6 +824,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public boolean rearrangeWorkers(Connection connection) {
         colonyPlan.create();
 
+        Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction(info);
+
         if (!rearrangeWorkers) {
             logger.fine("No need to rearrange workers in " + colony.getName() + ".");
             return false;
@@ -1003,8 +1006,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Move any workers not producing anything to a temporary location.
+        info = colony.getProductionAndConsumption();
         for (WorkLocation wl : colony.getWorkLocations()) {
-            while (wl.getUnitCount() > 0 && wl instanceof Building && ((Building) wl).getProductionNextTurn() <= 0) {
+            while (wl.getUnitCount() > 0 && wl instanceof Building
+                   && (info.get(wl).getProduction().isEmpty()
+                       || info.get(wl).getProduction().get(0).getAmount() == 0)) {
                 Iterator<Unit> unitIterator = wl.getUnitIterator();
                 Unit bestPick = unitIterator.next();
                 while (unitIterator.hasNext()) {
@@ -1043,7 +1049,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Changes the production type of workers producing a cargo there
         // is no room for.
-        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
         List<GoodsType> goodsList = colony.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsList) {
             int production = netProduction.getCount(goodsType);

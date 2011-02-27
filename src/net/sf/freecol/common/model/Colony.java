@@ -1009,6 +1009,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         boolean goodsBeingProduced = false;
         boolean productionMissing = false;
 
+        TypeCountMap<GoodsType> netProduction = getNetProduction();
         for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
@@ -1016,7 +1017,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
                 continue;
             }
             goodsMissing = true;
-            int amountProduced = getProductionNextTurn(requiredGoods.getType());
+            int amountProduced = netProduction.getCount(requiredGoods.getType());
             if (amountProduced <= 0) {
                 productionMissing = true;
                 continue;
@@ -1407,23 +1408,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     }
 
     /**
-     * Returns how much of a Good will be produced by this colony this turn
-     *
-     * @param goodsType The goods' type.
-     * @return The amount of the given goods will be produced for next turn.
-     */
-    public int getProductionNextTurn(GoodsType goodsType) {
-        int count = 0;
-        Building building = getBuildingForProducing(goodsType);
-        if (building == null) {
-            count = getProductionOf(goodsType);
-        } else {
-            count = building.getProductionNextTurn();
-        }
-        return count;
-    }
-
-    /**
      * Returns <code>true</code> if this Colony can breed the given
      * type of Goods. Only animals (such as horses) are expected to be
      * breedable.
@@ -1608,6 +1592,8 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @return all warnings
      */
     public Collection<StringTemplate> getWarnings(GoodsType goodsType, int amount, int production) {
+
+        java.util.Map<Object, ProductionInfo> info = getProductionAndConsumption();
         List<StringTemplate> result = new LinkedList<StringTemplate>();
 
         if (goodsType.isFoodType() && goodsType.isStorable()) {
@@ -1641,12 +1627,12 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             }
         }
 
-        addInsufficientProductionMessage(result, getBuildingForProducing(goodsType));
+        addInsufficientProductionMessage(result, info.get(getBuildingForProducing(goodsType)));
 
         Building buildingForConsuming = getBuildingForConsuming(goodsType);
         if (buildingForConsuming != null && !buildingForConsuming.getGoodsOutputType().isStorable()) {
             //the warnings are for a non-storable good, which is not displayed in the trade report
-            addInsufficientProductionMessage(result, buildingForConsuming);
+            addInsufficientProductionMessage(result, info.get(buildingForConsuming));
         }
 
         return result;
@@ -1658,36 +1644,24 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @param warnings where to add the warnings
      * @param building for this building
      */
-    private void addInsufficientProductionMessage(List<StringTemplate> warnings, Building building) {
-        if (building != null) {
-            int delta = building.getMaximumProduction() - building.getProductionNextTurn();
-            if (delta > 0) {
-                warnings.add(createInsufficientProductionMessage(building.getGoodsOutputType(),
-                                                                 delta,
-                                                                 building.getGoodsInputType(),
-                                                                 building.getMaximumGoodsInput()
-                                                                 - building.getGoodsInputNextTurn()));
+    private void addInsufficientProductionMessage(List<StringTemplate> warnings, ProductionInfo info) {
+        if (!info.getProduction().isEmpty()) {
+            int missingOutput = info.getMaximumProduction().get(0).getAmount()
+                - info.getProduction().get(0).getAmount();
+            if (missingOutput > 0) {
+                GoodsType outputType = info.getProduction().get(0).getType();
+                GoodsType inputType = info.getConsumption().isEmpty()
+                    ? null : info.getConsumption().get(0).getType();
+                int missingInput = info.getMaximumConsumption().get(0).getAmount()
+                    - info.getConsumption().get(0).getAmount();
+                warnings.add(StringTemplate.template("model.colony.insufficientProduction")
+                             .addAmount("%outputAmount%", missingOutput)
+                             .add("%outputType%", outputType.getNameKey())
+                             .addName("%colony%", getName())
+                             .addAmount("%inputAmount%", missingInput)
+                             .add("%inputType%", inputType.getNameKey()));
             }
         }
-    }
-
-    /**
-     * create a message about insufficient production
-     *
-     * @param outputType    output type
-     * @param missingOutput missing output
-     * @param inputType     input type
-     * @param missingInput  missing input
-     * @return message
-     */
-    private StringTemplate createInsufficientProductionMessage(GoodsType outputType, int missingOutput,
-                                                               GoodsType inputType, int missingInput) {
-        return StringTemplate.template("model.colony.insufficientProduction")
-            .addAmount("%outputAmount%", missingOutput)
-            .add("%outputType%", outputType.getNameKey())
-            .addName("%colony%", getName())
-            .addAmount("%inputAmount%", missingInput)
-            .add("%inputType%", inputType.getNameKey());
     }
 
     /**

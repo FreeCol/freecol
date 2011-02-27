@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -175,6 +176,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     }
                 }
             }
+
+            Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
                 Unit unit = colonyTile.getUnit();
                 if (unit != null) {
@@ -202,7 +205,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 }
                 if (goodsType != null) {
                     // not enough input
-                    if (building.getProductionNextTurn() < building.getMaximumProduction()
+                    if (!info.get(building).hasMaximumProduction()
                         && !productionWarning.contains(goodsType)) {
                         addProductionWarning(doc, colony, goodsType, building.getGoodsInputType());
                         productionWarning.add(goodsType);

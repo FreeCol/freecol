@@ -228,8 +228,8 @@ public class AIColonyTest extends FreeColTestCase {
         aiColony.rearrangeWorkers(player.getConnection());
 
         final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
-        assertTrue("Lumberjack should have been assigned to collect lumber",
-                   lumberjack.getWorkType() == lumberType);
+        assertEquals("Lumberjack should have been assigned to collect lumber",
+                     lumberType, lumberjack.getWorkType());
 
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, fullStock);

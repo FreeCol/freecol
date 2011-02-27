@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ai.ColonyProfile.ProfileType;
@@ -1013,6 +1014,7 @@ public class ColonyPlan {
         };
         Collections.sort(producers, comp);
 
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
         // shift units gathering raw materials to production of manufactured goods
         Iterator<Unit> iter = new ArrayList<Unit>(producers).iterator();
         while(iter.hasNext()){
@@ -1031,8 +1033,8 @@ public class ColonyPlan {
             }
 
             // get  the production values if the unit is shifted
-            int rawProd = colony.getProductionNextTurn(rawMat) - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
-            int mfnProd = colony.getProductionNextTurn(producedGoods) + factory.getAdditionalProductionNextTurn(u);
+            int rawProd = netProduction.getCount(rawMat) - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
+            int mfnProd = netProduction.getCount(producedGoods) + factory.getAdditionalProductionNextTurn(u);
             if(stockRawMat < 50 && rawProd < mfnProd){
                 return;
             }

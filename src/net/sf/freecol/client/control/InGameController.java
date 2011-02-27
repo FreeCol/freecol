@@ -92,6 +92,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -464,12 +465,17 @@ public final class InGameController implements NetworkConstants {
 
         // TODO: fix this non-OO nastiness
         private int getAmount(Location location, GoodsType goodsType) {
-            return (location == null || goodsType == null) ? 0
-                : (location instanceof Building)
-                ? ((Building)location).getProductionNextTurn()
-                : (location instanceof ColonyTile)
-                ? ((ColonyTile)location).getProductionOf(goodsType)
-                : 0;
+            if (goodsType != null) {
+                if (location instanceof Building) {
+                    Building building = (Building) location;
+                    ProductionInfo info = building.getColony().getProductionAndConsumption()
+                        .get(building);
+                    return info.getProduction().get(0).getAmount();
+                } else if (location instanceof ColonyTile) {
+                    return ((ColonyTile)location).getProductionOf(goodsType);
+                }
+            }
+            return 0;
         }
 
         // TODO: fix this non-OO nastiness

@@ -577,44 +577,6 @@ public class Building extends FreeColGameObject
         }
     }
 
-    /**
-     * Returns the amount of goods being used to get the current
-     * {@link #getProduction production} at the next turn.
-     *
-     * @return The actual amount of goods that will be used to support the
-     *         production at the next turn.
-     * @see #getMaximumGoodsInput
-     * @see #getProduction
-     */
-    public int getGoodsInputNextTurn() {
-        int available = colony.getProductionNextTurn(getGoodsInputType());
-        if (!canAutoProduce()) {
-            available += getStoredInput();
-        }
-        return getGoodsInputNextTurn(available);
-    }
-
-    /**
-     * Returns the amount of goods being used to get the current
-     * {@link #getProduction production} at the next turn.
-     *
-     * @param available the amount of input goods available
-     * @return The actual amount of goods that will be used to support the
-     *         production at the next turn.
-     * @see #getMaximumGoodsInput
-     * @see #getProduction
-     */
-    public int getGoodsInputNextTurn(int available) {
-        GoodsType inputType = getGoodsInputType();
-        if (inputType == null) {
-            return 0;
-        } else if (canAutoProduce()) {
-            return getGoodsInputAuto(available);
-        } else {
-            return Math.min(getMaximumGoodsInput(), available);
-        }
-    }
-
     private int getGoodsInputAuto(int available) {
         if (getGoodsInputType() == null) {
             return 0;
@@ -717,7 +679,6 @@ public class Building extends FreeColGameObject
      * @return The amount of goods being produced by this <code>Building</code>
      *         the current turn. The type of goods being produced is given by
      *         {@link #getGoodsOutputType}.
-     * @see #getProductionNextTurn
      * @see #getMaximumProduction
      */
     public int getProduction() {
@@ -725,32 +686,6 @@ public class Building extends FreeColGameObject
             return getAutoProduction(getGoodsInput());
         } else {
             return getProductionAdding(getStoredInput());
-        }
-    }
-
-    /**
-     * Returns the actual production of this building for next turn.
-     *
-     * @return The production of this building the next turn.
-     * @see #getProduction
-     */
-    public int getProductionNextTurn() {
-        if (canAutoProduce()) {
-            int rawInput = colony.getSurplusFoodProduction(getGoodsInputType());
-            if (rawInput > 0) {
-                int input = getGoodsInputAuto(rawInput);
-                int output = getAutoProduction(input);
-                System.out.println("Raw input: " + rawInput + ", input: " + input
-                                   + " --> " + output);
-                return output;
-            } else {
-                return 0;
-            }
-        } else if (getGoodsInputType() == null) {
-            return getProductionAdding(0);
-        } else {
-            return getProductionAdding(getStoredInput() +
-                                       colony.getProductionNextTurn(getGoodsInputType()));
         }
     }
 
@@ -804,9 +739,8 @@ public class Building extends FreeColGameObject
      * @see #getProduction
      */
     public int getAdditionalProductionNextTurn(Unit addUnit) {
-        return getProductionAdding(getStoredInput() +
-                                   colony.getProductionNextTurn(getGoodsInputType()), addUnit) -
-            getProductionNextTurn();
+        // TODO: restore calculation of actual production
+        return getUnitProductivity(addUnit);
     }
 
     /**
@@ -1000,7 +934,7 @@ public class Building extends FreeColGameObject
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
         GoodsType inputType = getGoodsInputType();
         if (inputType != null) {
-            result.add(new AbstractGoods(inputType, getGoodsInputNextTurn(Integer.MAX_VALUE)));
+            result.add(new AbstractGoods(inputType, 0));
         }
         result.addAll(getStoredGoods());
         return result;
