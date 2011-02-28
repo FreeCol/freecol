@@ -1645,7 +1645,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      * @param building for this building
      */
     private void addInsufficientProductionMessage(List<StringTemplate> warnings, ProductionInfo info) {
-        if (!info.getProduction().isEmpty()) {
+        if (info != null && !info.getProduction().isEmpty()) {
             int missingOutput = info.getMaximumProduction().get(0).getAmount()
                 - info.getProduction().get(0).getAmount();
             if (missingOutput > 0) {
