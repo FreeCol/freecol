@@ -574,68 +574,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return getConsumptionOf(getSpecification().getFoodGoodsTypeList());
     }
 
-    public int storedSurplus(GoodsType goodsType, int surplus) {
-        Set<Modifier> storeSurplus = featureContainer.getModifierSet("model.modifier.storeSurplus", goodsType);
-        int result = 0;
-        if (!storeSurplus.isEmpty()) {
-            result = (int) featureContainer.applyModifierSet(surplus, getGame().getTurn(), storeSurplus);
-        }
-        System.out.println("stored surplus is " + result + " " + goodsType);
-        return result;
-    }
-
-    public int getSurplusProduction(GoodsType goodsType) {
-        int result = getProductionOf(goodsType) - getConsumptionOf(goodsType);
-        if (result > 0) {
-            return Math.min(0, result - storedSurplus(goodsType, result));
-        }
-        return result;
-    }
-
-    public int getSurplusFoodProduction(GoodsType goodsType) {
-        int result = 0;
-        int total = 0;
-        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            int surplus = getProductionOf(foodType);
-            total += surplus;
-            if (foodType == goodsType) {
-                result = surplus;
-            }
-        }
-        total -= getFoodConsumption();
-        if (total > 0) {
-            // TODO: make this more generic
-            GoodsType food = getSpecification().getPrimaryFoodType();
-            total = Math.max(0, total - storedSurplus(food, total));
-        }
-        if (goodsType == null) {
-            return total;
-        } else {
-            return Math.min(result, total);
-        }
-    }
-
-    protected void removeFood(final int amount) {
-        int rest = amount;
-        List<AbstractGoods> backlog = new ArrayList<AbstractGoods>();
-        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            int available = getGoodsCount(foodType);
-            if (available >= rest) {
-                removeGoods(foodType, rest);
-                for (AbstractGoods food : backlog) {
-                    removeGoods(food.getType(), food.getAmount());
-                }
-                rest = 0;
-            } else {
-                backlog.add(new AbstractGoods(foodType, available));
-                rest -= available;
-            }
-        }
-        if (rest > 0) {
-            throw new IllegalStateException("Attempted to remove more food than was present.");
-        }
-    }
-
     /**
      * Returns the total amount of food present.
      *
