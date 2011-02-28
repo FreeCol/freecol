@@ -615,43 +615,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         }
     }
 
-    /**
-     * Gets food consumption by type
-     */
-    public int getFoodConsumptionByType(GoodsType type) {
-    	// Since for now only model.goods.food are needed for other
-    	// purposes we will hard code the preference of consumption
-    	// for other types of food If later other requirements appear,
-    	// an allocation algorithm needs to be implemented
-
-    	if(!type.isFoodType()){
-            logger.warning("Good type given isnt food type");
-            return 0;
-    	}
-
-    	int required = getFoodConsumption();
-    	int consumed = 0;
-    	GoodsType corn = getSpecification().getGoodsType("model.goods.grain");
-
-    	for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            if(foodType == corn){
-                // consumption of corn calculated last
-                continue;
-            }
-
-            consumed = Math.min(getProductionOf(foodType),required);
-            if(type == foodType){
-                return consumed;
-            }
-            required -= consumed;
-        }
-
-    	// type asked is corn, calculate consumption and return
-    	consumed = Math.min(getProductionOf(corn),required);
-
-    	return consumed;
-    }
-
     protected void removeFood(final int amount) {
         int rest = amount;
         List<AbstractGoods> backlog = new ArrayList<AbstractGoods>();
