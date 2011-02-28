@@ -209,17 +209,18 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType, Turn turn) {
+        HashSet<Modifier> result = new HashSet<Modifier>();
+
         if (specification.getModifiers(id) == null) {
             logger.warning("Unknown modifier key: " + id + ". Possible spelling error?");
-            return new HashSet<Modifier>();
+            return result;
         }
         Set<Modifier> modifierSet = modifiers.get(id);
         if (modifierSet == null) {
-            return new HashSet<Modifier>();
+            return result;
         } else if (objectType == null) {
             return modifierSet;
         } else {
-            Set<Modifier> result = new HashSet<Modifier>();
             for (Modifier modifier : modifierSet) {
                 if (modifier.appliesTo(objectType, turn)) {
                     result.add(modifier);

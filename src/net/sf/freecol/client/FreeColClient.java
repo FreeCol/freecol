@@ -193,12 +193,15 @@ public final class FreeColClient {
 
         headless = "true".equals(System.getProperty("java.awt.headless", "false"));
 
+        // look for data base directory
         File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
         if (!baseDirectory.exists() || !baseDirectory.isDirectory()) {
             System.err.println("Could not find base data directory: "
                                + baseDirectory.getName());
             System.exit(1);
         }
+
+        // load the resource mappings (whatever that is!)
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
@@ -206,15 +209,19 @@ public final class FreeColClient {
         ResourceManager.setTcMapping(tcData.getResourceMapping());
 
         imageLibrary = new ImageLibrary();
+
+        // calculate a window size (if "windowed" mode is opted)
         windowed = (size != null);
         if (size != null && size.width < 0) {
-            final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                                     .getMaximumWindowBounds();
             size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
                                  bounds.height - DEFAULT_WINDOW_SPACE);
         }
         final Dimension windowSize = size;
         logger.info("Window size is " + windowSize);
 
+        // Swing system + LAF init
         Font font = null;
         if (fontName != null) {
             font = Font.decode(fontName);
@@ -249,6 +256,7 @@ public final class FreeColClient {
 
         mapEditor = false;
 
+        // load options
         clientOptions = new ClientOptions();
         actionManager = new ActionManager(this);
         if (!headless) {
@@ -313,7 +321,8 @@ public final class FreeColClient {
                             } else {
                                 Locale l = ((Language) e.getNewValue()).getLocale();
                                 Messages.setMessageBundle(l);
-                                canvas.showInformationMessage("newLanguageSelected", "%language%", l.getDisplayName());
+                                canvas.showInformationMessage("newLanguageSelected",
+                                        "%language%", l.getDisplayName());
                             }
                         }
                     });
@@ -388,7 +397,10 @@ public final class FreeColClient {
         gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (!windowed) {
             if (!gd.isFullScreenSupported()) {
-                String fullscreenNotSupported = "\nIt seems that full screen mode is not fully supported for this\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience any graphical problems while running FreeCol.";
+                String fullscreenNotSupported =
+                   "\nIt seems that full screen mode is not fully supported for this" +
+                   "\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience" +
+                   "any graphical problems while running FreeCol.";
                 logger.info(fullscreenNotSupported);
                 System.out.println(fullscreenNotSupported);
                 /*

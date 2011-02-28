@@ -46,7 +46,7 @@ public class ImageResource extends Resource {
     private Map<Dimension, Image> grayscaleImages = new HashMap<Dimension, Image>();
     private Map<Dimension, Image> scaledImages = new HashMap<Dimension, Image>();
     private Image image = null;
-    private Object loadingLock = new Object();
+    private final Object loadingLock = new Object();
     private static final Component _c = new Component() {};
     
     /**
@@ -86,8 +86,8 @@ public class ImageResource extends Resource {
                     }
                     logger.finest("Preloaded image " + url.toString());
                 } catch (Exception e) {
-                    logger.warning("Failed to load image from: "
-                                   + getResourceLocator());
+                    logger.warning("Failed to load image from: " + getResourceLocator()
+                                   + "\r\nProblem: " + e );
                 }
             }
         }
@@ -148,8 +148,8 @@ public class ImageResource extends Resource {
                     return scaledVersion;
                 }
             } catch (Exception e) {
-                logger.warning("Failed to scale image: "
-                               + getResourceLocator());
+                logger.warning("Failed to scale image: " + getResourceLocator()
+                               + "\r\nProblem: " + e );
             }
         }
         return null;

@@ -59,7 +59,8 @@ public class AudioResource extends Resource {
             this.file = f;
             ais.close();
         } catch (Exception e) {
-            logger.warning("Not an audio file: " + url.getFile());
+            logger.warning("Not an audio file: " + url.getFile()
+                    + "\r\nProblem: " + e );
             this.file = null;
         }
     }
