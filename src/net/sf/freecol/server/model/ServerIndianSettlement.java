@@ -160,7 +160,7 @@ public class ServerIndianSettlement extends IndianSettlement
         List<UnitType> unitTypes
             = spec.getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
         if (!unitTypes.isEmpty()
-            && (getFoodCount() + 4 * getGoodsCount(rumType)
+            && (getGoodsCount(foodType) + 4 * getGoodsCount(rumType)
                 > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)
             && ownedUnits.size() <= getType().getMaximumSize()) {
             // Allow one more brave than the initially generated number.

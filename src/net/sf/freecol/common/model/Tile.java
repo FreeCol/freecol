@@ -1344,16 +1344,20 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>AbstractGoods</code> value
      */
     public AbstractGoods getPrimaryProduction() {
-        AbstractGoods primaryProduction = new AbstractGoods(type.getPrimaryGoods());
-        if (primaryProduction != null) {
-            int potential = primaryProduction.getAmount();
-            if (tileItemContainer != null) {
-                potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null,
-                                                                     potential, false);
+        if (type.getPrimaryGoods() == null) {
+            return null;
+        } else {
+            AbstractGoods primaryProduction = new AbstractGoods(type.getPrimaryGoods());
+            if (primaryProduction != null) {
+                int potential = primaryProduction.getAmount();
+                if (tileItemContainer != null) {
+                    potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null,
+                                                                         potential, false);
+                }
+                primaryProduction.setAmount(potential);
             }
-            primaryProduction.setAmount(potential);
+            return primaryProduction;
         }
-        return primaryProduction;
     }
 
     /**
@@ -1365,16 +1369,20 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>int</code> value
      */
     public AbstractGoods getSecondaryProduction() {
-        AbstractGoods secondaryProduction = new AbstractGoods(type.getSecondaryGoods());
-        if (secondaryProduction != null) {
-            int potential = secondaryProduction.getAmount();
-            if (tileItemContainer != null) {
-                potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null,
-                                                                     potential, true);
+        if (type.getSecondaryGoods() == null) {
+            return null;
+        } else {
+            AbstractGoods secondaryProduction = new AbstractGoods(type.getSecondaryGoods());
+            if (secondaryProduction != null) {
+                int potential = secondaryProduction.getAmount();
+                if (tileItemContainer != null) {
+                    potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null,
+                                                                         potential, true);
+                }
+                secondaryProduction.setAmount(potential);
             }
-            secondaryProduction.setAmount(potential);
+            return secondaryProduction;
         }
-        return secondaryProduction;
     }
 
     /**

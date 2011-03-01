@@ -58,7 +58,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         IndianSettlement camp = builder.build();
 
         assertEquals(1, camp.getUnitCount());
-        assertEquals(0, camp.getFoodCount());
+        assertEquals(0, camp.getGoodsCount(foodType));
 
         int foodProduced = camp.getProductionOf(grainType);
         int foodConsumed = camp.getFoodConsumption();
@@ -67,7 +67,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         int foodRemaining = Math.max(foodProduced - foodConsumed, 0);
-        assertEquals("Unexpected value for remaining food, ", foodRemaining,camp.getFoodCount());
+        assertEquals("Unexpected value for remaining food, ", foodRemaining,camp.getGoodsCount(foodType));
     }
 
     public void testHorseBreeding() {
@@ -79,7 +79,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
         //verify initial conditions
         assertEquals(1, camp.getUnitCount());
-        assertEquals(0, camp.getFoodCount());
+        assertEquals(0, camp.getGoodsCount(foodType));
 
         //add horses
         int initialHorses = horsesType.getBreedingNumber();
@@ -126,7 +126,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
         //verify initial conditions
         assertEquals(initialBravesInCamp, camp1.getUnitCount());
-        assertEquals(0, camp1.getFoodCount());
+        assertEquals(0, camp1.getGoodsCount(foodType));
 
         int foodProduced = camp1.getProductionOf(grainType);
         int foodConsumed = camp1.getFoodConsumption();

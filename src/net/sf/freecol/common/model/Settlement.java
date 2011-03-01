@@ -575,19 +575,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     /**
-     * Returns the total amount of food present.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getFoodCount() {
-        int result = 0;
-        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            result += getGoodsCount(foodType);
-        }
-        return result;
-    }
-
-    /**
      * Return true if this Colony could build at least one item of the
      * given EquipmentType.
      *

@@ -67,6 +67,8 @@ public class ServerColonyTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType lumberGoodsType
         = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
     private static final GoodsType foodGoodsType
         = spec().getPrimaryFoodType();
 
@@ -87,7 +89,7 @@ public class ServerColonyTest extends FreeColTestCase {
         new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
                        colonistType, UnitState.ACTIVE,
                        colonistType.getDefaultEquipment());
-        assertEquals(0, colony.getFoodCount());
+        assertEquals(0, colony.getGoodsCount(foodType));
 
         int quantity = colony.getFoodConsumption() * 2;
         colony.addGoods(foodGoodsType, quantity);
@@ -195,7 +197,7 @@ public class ServerColonyTest extends FreeColTestCase {
             + String.valueOf(production) + ")";
         assertTrue( errMsg, consumption  > production);
 
-        int foodStored = colony.getFoodCount();
+        int foodStored = colony.getGoodsCount(foodType);
         colony.removeGoods(foodGoodsType);
         errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")";
 

@@ -1294,29 +1294,71 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
      *         <code>Unit</code> or <code>null</code> if there is none.
      */
     private Occupation getOccupationFor(Unit unit) {
-        if (getFoodProduction() > getFoodConsumption() +
-            unit.getType().getConsumptionOf(getSpecification().getPrimaryFoodType())) {
-            GoodsType expertProduction = unit.getType().getExpertProduction();
-            if (expertProduction == null) {
-                if (unit.getExperience() > 0) {
-                    expertProduction = unit.getWorkType();
-                    if (expertProduction != null && expertProduction.isFarmed()) {
-                        ColonyTile colonyTile = getVacantColonyTileFor(unit, false, expertProduction);
-                        if (colonyTile != null) {
-                            return new Occupation(colonyTile, expertProduction);
+        TypeCountMap<GoodsType> netProduction = getNetProduction();
+        GoodsType workType = null;
+        for (AbstractGoods consumption : unit.getType().getConsumedGoods()) {
+            // TODO: this should consider a list of all consumed
+            // goods, weighted by priority. This, in turn, would
+            // require the consumption element to state the
+            // consequences if consumption can not be satisfied.
+            if (consumption.getType().isFoodType()
+                && netProduction.getCount(consumption.getType()) < consumption.getAmount()) {
+                // try to satisfied increased demands
+                List<GoodsType> rawTypes = new ArrayList<GoodsType>();
+                for (GoodsType type : getSpecification().getGoodsTypeList()) {
+                    if (type.getStoredAs() == consumption.getType()) {
+                        rawTypes.add(type);
+                    }
+                }
+                rawTypes.add(consumption.getType());
+                ColonyTile bestTile = null;
+                GoodsType bestWork = null;
+                int bestAmount = 0;
+                for (ColonyTile tile : colonyTiles) {
+                    if (tile.canAdd(unit)) {
+                        for (GoodsType type : rawTypes) {
+                            int amount = tile.getProductionOf(unit, type);
+                            if (amount > bestAmount) {
+                                bestAmount = amount;
+                                bestWork = type;
+                                bestTile = tile;
+                            }
                         }
                     }
                 }
-            } else if (expertProduction.isFarmed()) {
-                ColonyTile colonyTile = getVacantColonyTileFor(unit, true, expertProduction);
-                if (colonyTile != null) {
-                    return new Occupation(colonyTile, expertProduction);
+                if (bestAmount > 0) {
+                    return new Occupation(bestTile, bestWork);
+                } else {
+                    for (GoodsType type : rawTypes) {
+                        Building building = getBuildingForProducing(type);
+                        if (building != null && building.canAdd(unit)) {
+                            return new Occupation(building, type);
+                        }
+                    }
                 }
-            } else {
-                Building building = getBuildingFor(unit);
-                if (building != null) {
-                    return new Occupation(building, building.getGoodsOutputType());
+            }
+        }
+
+        GoodsType expertProduction = unit.getType().getExpertProduction();
+        if (expertProduction == null) {
+            if (unit.getExperience() > 0) {
+                expertProduction = unit.getWorkType();
+                if (expertProduction != null && expertProduction.isFarmed()) {
+                    ColonyTile colonyTile = getVacantColonyTileFor(unit, false, expertProduction);
+                    if (colonyTile != null) {
+                        return new Occupation(colonyTile, expertProduction);
+                    }
                 }
+            }
+        } else if (expertProduction.isFarmed()) {
+            ColonyTile colonyTile = getVacantColonyTileFor(unit, true, expertProduction);
+            if (colonyTile != null) {
+                return new Occupation(colonyTile, expertProduction);
+            }
+        } else {
+            Building building = getBuildingFor(unit);
+            if (building != null) {
+                return new Occupation(building, building.getGoodsOutputType());
             }
         }
 
