@@ -1582,7 +1582,9 @@ public final class Canvas extends JDesktopPane {
         // point the GUI should have been informed.
         closeMenus();
         removeInGameComponents();
+
         showMainPanel();
+        freeColClient.playSound("sound.intro.general");
         repaint();
     }
 

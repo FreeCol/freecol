@@ -185,12 +185,6 @@ public final class FreeColClient {
                          final String splashFilename,
                          final boolean showOpeningVideo, String fontName) {
 
-        // Display splash screen:
-        JWindow splash = null;
-        if (splashFilename != null) {
-            splash = displaySplash(splashFilename);
-        }
-
         headless = "true".equals(System.getProperty("java.awt.headless", "false"));
 
         // look for data base directory
@@ -199,6 +193,12 @@ public final class FreeColClient {
             System.err.println("Could not find base data directory: "
                                + baseDirectory.getName());
             System.exit(1);
+        }
+
+        // display the splash screen
+        JWindow splash = null;
+        if (splashFilename != null) {
+            splash = displaySplash(splashFilename);
         }
 
         // load the resource mappings (whatever that is!)

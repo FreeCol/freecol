@@ -136,7 +136,8 @@ public final class MapEditorController {
      */
     public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
-        MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
+        MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager()
+                                .getFreeColAction(MapControlsAction.id);
         if (mca.getMapControls() != null) {
             mca.getMapControls().update(mt);
         }
@@ -317,40 +318,31 @@ public final class MapEditorController {
                         }
                     } );
                 } catch (NoRouteToServerException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
-                        }
-                    });
+                    reloadMainPanel();
                     SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
                 } catch (FileNotFoundException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
-                        }
-                    });
+                    reloadMainPanel();
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
                 } catch (IOException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
-                        }
-                    });
+                    reloadMainPanel();
                     SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
                 } catch (FreeColException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
-                        }
-                    });
+                    reloadMainPanel();
                     SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
                 }
             }
         };
         freeColClient.worker.schedule( loadGameJob );
+    }
+
+    private void reloadMainPanel ()
+    {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                freeColClient.getCanvas().closeMainPanel();
+                freeColClient.getCanvas().showMainPanel();
+                freeColClient.playSound("sound.intro.general");
+            }
+        });
     }
 }

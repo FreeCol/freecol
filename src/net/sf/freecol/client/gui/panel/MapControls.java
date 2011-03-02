@@ -91,6 +91,7 @@ public final class MapControls {
         ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(SentryAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.id)));
+        if ( freeColClient.getGame() != null )  // ** DOUBTFUL !! just for testing
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
             if (!type.isNatural()) {
