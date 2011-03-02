@@ -335,17 +335,15 @@ public class ServerColonyTest extends FreeColTestCase {
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         GoodsType crossType = spec().getGoodsType("model.goods.crosses");
 
+        assertEquals(0, colony.getGoodsCount(bellsType));
         ServerTestHelper.newTurn();
 
-        assertEquals(population, colony.getUnitCount());
-        assertEquals(4, colony.getProductionOf(bellsType));
-        assertEquals(population, colony.getConsumptionOf(bellsType));
-
         TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
-        int bells = colony.getProductionOf(bellsType) - colony.getConsumptionOf(bellsType);
+
+        int bells = 3;
+        assertEquals(population, colony.getUnitCount());
         assertEquals(bells, netProduction.getCount(bellsType));
         assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getLiberty());
 
         colony.addGoods(bellsType, 7);
         bells += 7;

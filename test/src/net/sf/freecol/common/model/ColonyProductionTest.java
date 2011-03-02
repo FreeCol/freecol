@@ -378,8 +378,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(20, grossProduction.getCount(grainType));
         assertEquals(0, netProduction.getCount(grainType));
 
-        assertEquals(1, grossProduction.getCount(bellsType));
-        assertEquals(-2, netProduction.getCount(bellsType));
+        assertEquals(3, grossProduction.getCount(bellsType));
+        assertEquals(0, netProduction.getCount(bellsType));
 
         assertEquals(1, grossProduction.getCount(crossesType));
         assertEquals(1, netProduction.getCount(crossesType));
@@ -429,8 +429,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(2, grossProduction.getCount(horsesType));
         assertEquals(2, netProduction.getCount(horsesType));
 
-        assertEquals(1, grossProduction.getCount(bellsType));
-        assertEquals(-2, netProduction.getCount(bellsType));
+        assertEquals(3, grossProduction.getCount(bellsType));
+        assertEquals(0, netProduction.getCount(bellsType));
 
         assertEquals(1, grossProduction.getCount(crossesType));
         assertEquals(1, netProduction.getCount(crossesType));

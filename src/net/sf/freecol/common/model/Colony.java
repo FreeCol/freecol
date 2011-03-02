@@ -2120,7 +2120,14 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             info.addProduction(p);
             result.put(colonyTile, info);
         }
-       for (Consumer consumer : getConsumers()) {
+
+        GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
+        int unitsThatUseNoBells = getSpecification().getIntegerOption("model.option.unitsThatUseNoBells").getValue();
+        ProductionInfo bellsInfo = new ProductionInfo();
+        bellsInfo.addProduction(new AbstractGoods(bells, Math.min(unitsThatUseNoBells, getUnitCount())));
+        result.put(this, bellsInfo);
+
+        for (Consumer consumer : getConsumers()) {
             boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
             List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
