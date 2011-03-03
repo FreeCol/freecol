@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -31,14 +30,12 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.networking.BuildColonyMessage;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;

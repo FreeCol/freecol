@@ -22,23 +22,14 @@ package net.sf.freecol.tools;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
-
-import org.xml.sax.SAXParseException;
 
 
 public class MapConverter {

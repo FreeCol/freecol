@@ -19,38 +19,13 @@
 
 package net.sf.freecol.server.control;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
-
-import org.w3c.dom.Element;
 
 /**
  * A server-side implementation of the <code>ModelController</code> interface.
