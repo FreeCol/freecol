@@ -26,11 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.TestCase;
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public final class SpecificationTest extends FreeColTestCase {

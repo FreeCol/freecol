@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;

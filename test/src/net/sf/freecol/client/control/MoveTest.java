@@ -19,8 +19,8 @@
 
 package net.sf.freecol.client.control;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.ClientTestHelper;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -30,7 +30,6 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;

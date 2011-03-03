@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.HashSet;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.util.test.FreeColTestCase;

@@ -19,12 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;

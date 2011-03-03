@@ -19,16 +19,12 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockPseudoRandom;
 
 
 public class UnitTest extends FreeColTestCase {

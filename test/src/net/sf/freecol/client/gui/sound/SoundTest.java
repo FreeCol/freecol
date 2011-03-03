@@ -24,13 +24,9 @@ import java.io.File;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.gui.sound.SoundPlayer;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDataFile;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
-import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.util.test.FreeColTestCase;
 

@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Iterator;
-
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;

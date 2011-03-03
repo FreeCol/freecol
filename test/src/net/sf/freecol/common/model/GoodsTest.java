@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.List;
 import java.util.Locale;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;

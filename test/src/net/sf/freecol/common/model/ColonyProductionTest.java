@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;

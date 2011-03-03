@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.StringReader;
@@ -39,9 +38,7 @@ import javax.xml.validation.Validator;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.xml.sax.SAXException;

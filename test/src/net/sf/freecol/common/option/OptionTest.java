@@ -19,13 +19,7 @@
 
 package net.sf.freecol.common.option;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class OptionTest extends FreeColTestCase {

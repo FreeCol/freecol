@@ -25,9 +25,6 @@ import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class FontTest extends FreeColTestCase {

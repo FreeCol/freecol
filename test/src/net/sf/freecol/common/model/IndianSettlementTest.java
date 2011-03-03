@@ -1,7 +1,5 @@
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

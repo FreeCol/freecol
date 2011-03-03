@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ModifierTest extends FreeColTestCase {
