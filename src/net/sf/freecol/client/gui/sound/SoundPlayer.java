@@ -23,7 +23,9 @@ package net.sf.freecol.client.gui.sound;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -398,7 +400,9 @@ public class SoundPlayer {
 
         public void playSound(File file) {
             try {
-                AudioInputStream in = AudioSystem.getAudioInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream( new FileInputStream(file) );
+                bis.mark(1000); bis.skip(1); bis.reset();
+                AudioInputStream in = AudioSystem.getAudioInputStream(bis);
                 if (in != null) {
                     AudioFormat baseFormat = in.getFormat();
                     AudioFormat decodedFormat = new AudioFormat(
