@@ -21,12 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -37,11 +32,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ChangeSet.ChangePriority;
-import net.sf.freecol.server.control.ChangeSet.See;
-import net.sf.freecol.server.model.ServerModelObject;
-import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.model.ServerUnit;
 
 
 /**

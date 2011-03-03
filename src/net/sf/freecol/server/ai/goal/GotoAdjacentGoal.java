@@ -1,6 +1,5 @@
 package net.sf.freecol.server.ai.goal;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -11,12 +10,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
-
-import org.w3c.dom.Element;
 
 public class GotoAdjacentGoal extends Goal {
     private static final Logger logger = Logger.getLogger(GotoAdjacentGoal.class.getName());
