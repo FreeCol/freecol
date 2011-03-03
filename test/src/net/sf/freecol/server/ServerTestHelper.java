@@ -29,20 +29,15 @@ import java.util.Random;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerGame;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 

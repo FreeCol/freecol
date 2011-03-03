@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -27,15 +26,12 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class ColonyPlanTest extends FreeColTestCase {

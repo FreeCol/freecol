@@ -19,7 +19,6 @@
 
 package net.sf.freecol.util.test;
 
-import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +28,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import junit.framework.TestCase;
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
@@ -48,14 +47,12 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.util.test.MockPseudoRandom;
 
 
 /**

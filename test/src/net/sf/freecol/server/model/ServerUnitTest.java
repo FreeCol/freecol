@@ -32,22 +32,18 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
-import net.sf.freecol.util.test.MockPseudoRandom;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.FreeColTestUtils;
+import net.sf.freecol.util.test.MockPseudoRandom;
 
 
 public class ServerUnitTest extends FreeColTestCase {

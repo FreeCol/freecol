@@ -21,8 +21,6 @@ package net.sf.freecol.server.model;
 
 import java.util.Random;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -31,21 +29,16 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
-import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class ServerPlayerTest extends FreeColTestCase {	

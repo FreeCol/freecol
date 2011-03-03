@@ -21,29 +21,24 @@ package net.sf.freecol.server.ai;
 
 import java.util.Iterator;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.NetworkConstants;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.control.Controller;
+import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class TensionTest extends FreeColTestCase {

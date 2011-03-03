@@ -19,23 +19,9 @@
 
 package net.sf.freecol.util.test;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.server.model.ServerBuilding;
 
 
 public class MockModelController implements ModelController {

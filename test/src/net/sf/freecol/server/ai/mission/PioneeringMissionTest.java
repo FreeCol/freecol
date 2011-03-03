@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -28,19 +27,15 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.TileImprovementPlan;
-import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class PioneeringMissionTest extends FreeColTestCase {

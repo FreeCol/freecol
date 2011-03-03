@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -32,22 +31,17 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
-import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class AIColonyTest extends FreeColTestCase {
