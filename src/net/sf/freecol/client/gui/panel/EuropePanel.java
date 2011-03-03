@@ -19,11 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -52,6 +49,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -64,9 +62,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

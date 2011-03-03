@@ -47,7 +47,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;

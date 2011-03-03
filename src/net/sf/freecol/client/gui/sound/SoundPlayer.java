@@ -36,12 +36,11 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.Mixer.Info;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
-import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
+import net.sf.freecol.common.option.PercentageOption;
 
 
 /**

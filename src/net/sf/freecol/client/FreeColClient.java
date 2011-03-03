@@ -30,12 +30,12 @@ import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -61,13 +61,12 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -79,6 +78,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
+
 import org.w3c.dom.Element;
 
 /**

@@ -30,9 +30,9 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -47,14 +47,14 @@ import javax.swing.SwingConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.action.ColopediaAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -82,8 +82,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

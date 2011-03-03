@@ -33,7 +33,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;

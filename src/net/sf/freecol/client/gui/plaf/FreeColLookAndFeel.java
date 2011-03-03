@@ -19,16 +19,13 @@
 
 package net.sf.freecol.client.gui.plaf;
 
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.File;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

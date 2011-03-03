@@ -25,14 +25,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 
 import com.fluendo.player.Cortado;
-// Disable the feature that seems to be missing from the stock Cortado
-// import com.fluendo.player.StopListener;
 
 /**
  * A component for playing video.

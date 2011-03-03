@@ -25,13 +25,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

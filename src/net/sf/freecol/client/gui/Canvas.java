@@ -55,13 +55,8 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.action.DebugAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.action.MoveAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
-import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
-import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
@@ -113,7 +108,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -124,11 +119,9 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
  * The main container for the other GUI components in FreeCol. This container is

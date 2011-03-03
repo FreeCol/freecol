@@ -28,7 +28,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,6 +47,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -63,13 +63,10 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.util.Utils;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

@@ -21,14 +21,12 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.awt.Graphics2D;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -37,15 +35,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel represents a single building in a Colony.

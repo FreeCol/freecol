@@ -27,17 +27,15 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Native Affairs Advisor.

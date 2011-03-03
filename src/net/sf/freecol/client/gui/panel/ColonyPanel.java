@@ -39,12 +39,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
@@ -72,6 +70,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -83,15 +82,12 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**

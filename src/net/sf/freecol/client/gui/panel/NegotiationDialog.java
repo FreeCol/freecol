@@ -36,11 +36,10 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -59,10 +58,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTradeItem;
-
-import org.w3c.dom.Element;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

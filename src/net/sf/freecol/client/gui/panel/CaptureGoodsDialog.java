@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -33,16 +32,14 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.StringTemplate;
-
-import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.common.model.Unit;
 
 
 /**

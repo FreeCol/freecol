@@ -19,28 +19,10 @@
 
 package net.sf.freecol.client.control;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.networking.Message;
-
-import org.w3c.dom.Element;
 
 /**
  * A client-side implementation of the <code>ModelController</code> interface.

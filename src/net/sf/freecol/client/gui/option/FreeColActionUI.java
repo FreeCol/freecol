@@ -43,7 +43,6 @@ import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.Option;
 
 

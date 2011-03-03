@@ -19,12 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Font;
-
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -33,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
@@ -43,8 +42,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-
-import net.miginfocom.swing.MigLayout;
 
 
 public class PreCombatDialog extends FreeColDialog<Boolean> {
