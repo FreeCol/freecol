@@ -363,15 +363,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
 
-        // Remove goods consumed by the colonists (except food, which
-        // has already been handled). In the future, colonists might
-        // consume luxury goods, for example
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
-            if (!goodsType.isFoodType()) {
-                removeGoods(goodsType, getConsumptionOf(goodsType));
-            }
-        }
-
         // Check for free buildings
         for (BuildingType buildingType : spec.getBuildingTypeList()) {
             if (isAutomaticBuild(buildingType)) {
