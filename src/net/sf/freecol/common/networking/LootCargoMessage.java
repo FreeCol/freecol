@@ -20,7 +20,6 @@
 package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.freecol.common.model.Game;

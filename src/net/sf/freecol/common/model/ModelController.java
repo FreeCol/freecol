@@ -20,9 +20,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-
-import net.sf.freecol.common.model.Player.Stance;
 
 /**
 * The <code>ModelController</code> is used by the model to perform

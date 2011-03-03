@@ -25,17 +25,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.RandomChoice;
 
 

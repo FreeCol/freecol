@@ -19,9 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -43,16 +42,11 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AbstractOption;
-import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
-import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.StringOption;
 
 /**

@@ -26,17 +26,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.RandomRange;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 import org.w3c.dom.Element;

@@ -25,12 +25,9 @@ import java.util.List;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -20,18 +20,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Turn;
 
 import org.w3c.dom.Element;
 

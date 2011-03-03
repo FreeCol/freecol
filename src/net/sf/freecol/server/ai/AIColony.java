@@ -21,8 +21,6 @@ package net.sf.freecol.server.ai;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,12 +52,9 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
-import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.ai.AIMessage;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
