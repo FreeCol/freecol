@@ -101,6 +101,7 @@ public final class MapEditorController {
             freeColClient.setFreeColServer(freeColServer);
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);
+            freeColClient.playSound(null);
 
             final Canvas canvas = freeColClient.getCanvas();
             final GUI gui = freeColClient.getGUI();

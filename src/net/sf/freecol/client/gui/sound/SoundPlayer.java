@@ -68,6 +68,9 @@ public class SoundPlayer {
     /** Is the sound stopped? */
     private boolean soundStopped = true;
 
+    /** Should the current sound fade out and stop? */
+    private boolean fadeOut = false;
+
     /**
      * Should the <i>SoundPlayer</i> play multiple sounds at the same
      * time, or only one?  If it does not allow multiple sounds, then
@@ -294,6 +297,13 @@ public class SoundPlayer {
     }
 
     /**
+     * Causes the current sound to fade out and stop.
+     */
+    public void fade() {
+        fadeOut = true;
+    }
+
+    /**
      * Are the sounds paused?
      *
      * @return <code>true</code> is the sounds are paused.
@@ -370,7 +380,7 @@ public class SoundPlayer {
         }
 
         private boolean shouldStopThread() {
-            return !multipleSounds && currentSoundPlayerThread != this;
+            return !multipleSounds && currentSoundPlayerThread != this || fadeOut;
         }
 
         /**
@@ -382,6 +392,7 @@ public class SoundPlayer {
 
             soundPaused = false;
             soundStopped = false;
+            fadeOut = false;
 
             if (delay != 0) {
                 try {
