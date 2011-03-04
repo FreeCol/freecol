@@ -243,7 +243,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
 
-        if (getWorkLeft() == 0) csCompleteWork(random, cs);
+        if (getWorkLeft() == 0) tileDirty |= csCompleteWork(random, cs);
 
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
