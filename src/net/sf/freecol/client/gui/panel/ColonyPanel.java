@@ -1373,21 +1373,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         Tile tile = colonyTile.getWorkTile();
                         Player player = unit.getOwner();
 
-                        if (tile.getOwner() != player
-                            || tile.getOwningSettlement() != getColony()) {
-                            if (getController().claimLand(tile, getColony(), 0)) {
-                                logger.info("Colony " + getColony().getName()
-                                            + " claims tile " + tile.toString()
-                                            + " with unit " + unit.getId());
-                            } else {
-                                logger.warning("Colony " + getColony().getName()
-                                               + " could not claim tile " + tile.toString()
-                                               + " with unit " + unit.getId());
-                                return null;
-                            }
-                        }
-
                         if (colonyTile.canAdd(unit)) {
+                            if (tile.getOwner() != player
+                                || tile.getOwningSettlement() != getColony()) {
+                                String name = getColony().getName();
+                                if (getController().claimLand(tile, getColony(), 0)) {
+                                    logger.info("Colony " + name
+                                        + " claims tile " + tile.toString()
+                                        + " with unit " + unit.getId());
+                                } else {
+                                    logger.warning("Colony " + name
+                                        + " could not claim " + tile.toString()
+                                        + " with unit " + unit.getId());
+                                    return null;
+                                }
+                            }
                             oldParent.remove(comp);
 
                             GoodsType workType = colonyTile.getWorkType(unit);
