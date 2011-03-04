@@ -201,6 +201,58 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         }
 
+        // Apply the changes accumulated in the netProduction map
+        for (Entry<GoodsType, Integer> entry
+                 : netProduction.getValues().entrySet()) {
+            GoodsType goodsType = entry.getKey();
+            int net = entry.getValue();
+            int stored = getGoodsCount(goodsType);
+            if (net + stored < 0) {
+                removeGoods(goodsType, stored);
+            } else {
+                addGoods(goodsType, net);
+            }
+        }
+
+        // Now check the food situation
+        int storedFood = getGoodsCount(spec.getPrimaryFoodType());
+        if (storedFood <= 0) {
+            if (getUnitCount() > 1) {
+                Unit victim = Utils.getRandomMember(logger, "Choose starver",
+                                                    getUnitList(), random);
+                updates.add((FreeColGameObject) victim.getLocation());
+                cs.addDispose(owner, this, victim);
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                               "model.colony.colonistStarved",
+                                               this)
+                              .addName("%colony%", getName()));
+            } else { // Its dead, Jim.
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                               "model.colony.colonyStarved",
+                                               this)
+                              .addName("%colony%", getName()));
+                cs.addDispose(owner, getTile(), this);
+                return;
+            }
+        } else {
+            int netFood = netProduction.getCount(spec.getPrimaryFoodType());
+            int turns = Math.abs(storedFood / netFood);
+            if (netFood < 0 && turns <= 3) {
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.WARNING,
+                                               "model.colony.famineFeared",
+                                               this)
+                              .addName("%colony%", getName())
+                              .addName("%number%", String.valueOf(turns)));
+                logger.finest("Famine feared in " + getName()
+                              + " food=" + storedFood
+                              + " production=" + netFood
+                              + " turns=" + turns);
+            }
+        }
+
         /** TODO: do we want this?
         if (goodsInput == 0 && !canAutoProduce()
             && getMaximumGoodsInput() > 0) {
@@ -213,66 +265,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                           .addName("%colony%", colony.getName()));
         }
         */
-
-        for (Entry<GoodsType, Integer> entry : netProduction.getValues().entrySet()) {
-            GoodsType goodsType = entry.getKey();
-            int net = entry.getValue();
-            int stored = getGoodsCount(goodsType);
-            int total = net + stored;
-            if (total < 0) {
-                if (goodsType.isFoodType()) {
-                    if (getUnitCount() > 1) {
-                        Unit victim = Utils.getRandomMember(logger, "Choose starver",
-                                                            getUnitList(), random);
-                        updates.add((FreeColGameObject) victim.getLocation());
-                        cs.addDispose(owner, this, victim);
-                        cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                                       "model.colony.colonistStarved",
-                                                       this)
-                                      .addName("%colony%", getName()));
-                    } else { // Its dead, Jim.
-                        cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                                       "model.colony.colonyStarved",
-                                                       this)
-                                      .addName("%colony%", getName()));
-                        cs.addDispose(owner, getTile(), this);
-                        return;
-                    }
-                }
-                removeGoods(goodsType, stored);
-            } else {
-                if (goodsType.isFoodType() && net < 0) {
-                    int turns = Math.abs(stored / net);
-                    cs.addMessage(See.only(owner),
-                        new ModelMessage(ModelMessage.MessageType.WARNING,
-                                         "model.colony.famineFeared",
-                                         this)
-                                  .addName("%colony%", getName())
-                                  .addName("%number%", String.valueOf(turns)));
-                    logger.finest("Famine feared in " + getName()
-                                  + " food=" + stored
-                                  //+ " required=" + foodRequired
-                                  + " production=" + net
-                                  + " turns=" + turns);
-                }
-                addGoods(goodsType, net);
-            }
-        }
-
-        /*
-
-        } else {
-            if (buildQueue.size() == 0) {
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                     "model.colony.notBuildingAnything",
-                                     this)
-                              .addName("%colony%", getName()));
-            }
-        }
-            */
 
         // Export goods if custom house is built.
         // Do not flush price changes yet, as any price change may change
