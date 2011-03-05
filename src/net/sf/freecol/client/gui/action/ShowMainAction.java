@@ -27,7 +27,7 @@ import net.sf.freecol.client.gui.panel.MainPanel;
 /**
  * Returns to the <code>MainPanel</code>.
  * All in-game components are removed.
- * 
+ *
  * @see MainPanel
  */
 public class ShowMainAction extends FreeColAction {
@@ -37,7 +37,7 @@ public class ShowMainAction extends FreeColAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ShowMainAction(FreeColClient freeColClient) {
@@ -54,7 +54,7 @@ public class ShowMainAction extends FreeColAction {
                                                               "stopCurrentGame.no")) {
             return;
         }
-        
+        getFreeColClient().getConnectController().quitGame(true);
         getFreeColClient().getCanvas().removeInGameComponents();
         getFreeColClient().setMapEditor(false);
         getFreeColClient().setGame(null);

@@ -34,7 +34,7 @@ public abstract class Controller extends FreeColServerHolder {
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param freeColServer The main server object.
      */
     public Controller(FreeColServer freeColServer) {
@@ -48,6 +48,7 @@ public abstract class Controller extends FreeColServerHolder {
         Server server = getFreeColServer().getServer();
         if (server != null) {
             server.shutdown();
+            logger.info("Shut down server.");
         } else {
             logger.warning("Server object is null while trying to shut down server.");
         }

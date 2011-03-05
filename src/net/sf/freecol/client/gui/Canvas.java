@@ -1976,7 +1976,7 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BoycottAction>(
                 Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
-        BoycottAction result = 
+        BoycottAction result =
             showChoiceDialog(null,
                              Messages.message(StringTemplate.template("boycottedGoods.text")
                                               .add("%goods%", goods.getNameKey())
@@ -2501,7 +2501,7 @@ public final class Canvas extends JDesktopPane {
      * A class for frames being used as tool boxes.
      */
     class ToolBoxFrame extends JInternalFrame {
-        
+
     }
 
     /**
