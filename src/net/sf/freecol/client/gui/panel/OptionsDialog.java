@@ -33,6 +33,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -45,7 +47,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
  */
-public class OptionsDialog extends FreeColDialog<OptionGroup>  {
+public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
@@ -82,6 +84,9 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         super(parent);
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
+
+        // try to load saved custom options
+        loadCustomOptions();
 
         reset.setActionCommand(RESET);
         reset.addActionListener(this);
@@ -180,9 +185,9 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         return group;
     }
 
-    public String getDefaultFileName() {
-        return "options.xml";
-    }
+    public abstract String getDefaultFileName();
+
+    public abstract String getOptionGroupId();
 
     /**
      * This function analyses an event and calls the right methods to take
@@ -213,16 +218,39 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
         } else if (LOAD.equals(command)) {
             File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), filters);
             if (loadFile != null) {
-                try {
-                    FileInputStream in = new FileInputStream(loadFile);
-                    getGame().getSpecification().loadFragment(in);
-                    in.close();
-                } catch(Exception e) {
-                    logger.warning("Failed to load game options from " + loadFile.getName());
-                }
+                load(loadFile);
             }
         } else {
             logger.warning("Invalid ActionCommand: " + command);
         }
     }
+
+    /**
+     * Load OptionGroup from given File.
+     *
+     * @param file a <code>File</code> value
+     */
+    protected void load(File file) {
+        try {
+            FileInputStream in = new FileInputStream(file);
+            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
+            xsr.nextTag();
+            getSpecification().getOptionGroup(getOptionGroupId()).setValue(new OptionGroup(xsr));
+            in.close();
+        } catch(Exception e) {
+            logger.warning("Failed to load OptionGroup with ID " + getOptionGroupId()
+                           + " from " + file.getName() + ": " + e.toString());
+        }
+    }
+
+    /**
+     * Load custom OptionGroup from default file.
+     */
+    protected void loadCustomOptions() {
+        File customFile = new File(FreeCol.getSaveDirectory(), getDefaultFileName());
+        if (customFile.exists()) {
+            load(customFile);
+        }
+    }
+
 }

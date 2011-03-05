@@ -52,6 +52,11 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
+    public static final String OPTION_GROUP_ID = "mapGeneratorOptions";
+
+    private JScrollPane scrollPane = null;
+
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -61,8 +66,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
      */
     public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable) {
         super(parent, editable);
-
-        JScrollPane scrollPane = null;
 
         if (editable) {
             JPanel mapPanel = new JPanel();
@@ -125,6 +128,10 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
         return "map_generator_options.xml";
     }
 
+    public String getOptionGroupId() {
+        return OPTION_GROUP_ID;
+    }
+
     private void setFile(File file) {
         OptionGroupUI ui = getOptionUI();
         ui.reset();
@@ -150,6 +157,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
                 getClient().getPreGameController().sendMapGeneratorOptions();
                 getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
             }
+        } else {
+            initialize(getGroup(), getGroup().getName(), scrollPane);
         }
     }
 }

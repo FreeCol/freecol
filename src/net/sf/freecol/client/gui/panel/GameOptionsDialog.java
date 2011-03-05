@@ -33,6 +33,8 @@ import net.sf.freecol.common.model.GameOptions;
  */
 public final class GameOptionsDialog extends OptionsDialog implements ActionListener {
 
+    public static final String OPTION_GROUP_ID = "gameOptions";
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -40,8 +42,8 @@ public final class GameOptionsDialog extends OptionsDialog implements ActionList
      */
     public GameOptionsDialog(Canvas parent, boolean editable) {
         super(parent, editable);
-        initialize(getSpecification().getOptionGroup("gameOptions"),
-                   Messages.message("gameOptions"), null);
+        initialize(getSpecification().getOptionGroup(OPTION_GROUP_ID),
+                   Messages.message(OPTION_GROUP_ID), null);
 
         // Set special cases
         // Disable victory option "All humans defeated"
@@ -56,6 +58,10 @@ public final class GameOptionsDialog extends OptionsDialog implements ActionList
 
     public String getDefaultFileName() {
         return "game_options.xml";
+    }
+
+    public String getOptionGroupId() {
+        return OPTION_GROUP_ID;
     }
 
 }

@@ -37,6 +37,8 @@ public final class ClientOptionsDialog extends OptionsDialog  {
 
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
 
+    public static final String OPTION_GROUP_ID = "clientOptions";
+
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
@@ -45,6 +47,14 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         super(parent, true);
         getButtons().clear();
         initialize(getClient().getClientOptions(), getClient().getClientOptions().getName(), null);
+    }
+
+    public String getDefaultFileName() {
+        return "options.xml";
+    }
+
+    public String getOptionGroupId() {
+        return OPTION_GROUP_ID;
     }
 
     /**
