@@ -238,8 +238,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         } else {
             int netFood = netProduction.getCount(spec.getPrimaryFoodType());
-            int turns = Math.abs(storedFood / netFood);
-            if (netFood < 0 && turns <= 3) {
+            int turns;
+            if (netFood < 0 && (turns = storedFood / -netFood) <= 3) {
                 cs.addMessage(See.only(owner),
                               new ModelMessage(ModelMessage.MessageType.WARNING,
                                                "model.colony.famineFeared",
