@@ -170,7 +170,8 @@ public class OptionsDialog extends FreeColDialog<OptionGroup>  {
     protected void updateUI(OptionGroup group) {
         this.group = group;
         optionPanel.removeAll();
-        optionPanel.add(new OptionGroupUI(group, isGroupEditable()));
+        ui = new OptionGroupUI(group, isGroupEditable());
+        optionPanel.add(ui);
         revalidate();
         repaint();
     }
