@@ -1669,10 +1669,13 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             }
         }
 
-        addInsufficientProductionMessage(result, info.get(getBuildingForProducing(goodsType)));
-
+        Building buildingForProducing = getBuildingForProducing(goodsType);
+        if (buildingForProducing != null) {
+            addInsufficientProductionMessage(result, info.get(buildingForProducing));
+        }
         Building buildingForConsuming = getBuildingForConsuming(goodsType);
-        if (buildingForConsuming != null && !buildingForConsuming.getGoodsOutputType().isStorable()) {
+        if (buildingForConsuming != null
+            && !buildingForConsuming.getGoodsOutputType().isStorable()) {
             //the warnings are for a non-storable good, which is not displayed in the trade report
             addInsufficientProductionMessage(result, info.get(buildingForConsuming));
         }

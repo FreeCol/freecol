@@ -813,11 +813,14 @@ public class Building extends FreeColGameObject
      *         workers, when there is enough "input goods".
      */
     public int getMaximumProduction() {
-        if (canAutoProduce()) {
-            return getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
-        } else {
-            return applyModifiers(getProductivity());
+        int production = canAutoProduce()
+            ? getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()))
+            : applyModifiers(getProductivity());
+        if (getType().hasAbility("model.ability.avoidExcessProduction")) {
+            int capacity = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
+            production = Math.min(capacity, production);
         }
+        return production;
     }
 
     /**
@@ -827,10 +830,8 @@ public class Building extends FreeColGameObject
      * TODO: make this more generic
      */
     private int getMaximumAutoProduction(int available) {
-        System.out.println(available + " " + getGoodsOutputType() + " available");
         if (available < getGoodsOutputType().getBreedingNumber()) {
             // we need at least these many horses/animals to breed
-            System.out.println("Too few animals to breed");
             return 0;
         }
 
@@ -839,7 +840,6 @@ public class Building extends FreeColGameObject
         int factor = (int) getType().getFeatureContainer()
             .applyModifier(0, "model.modifier.breedingFactor");
         int result = ((available - 1) / divisor + 1) * factor;
-        System.out.println("Maximum autoproduction is " + result);
         return result;
     }
 
