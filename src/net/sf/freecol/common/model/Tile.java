@@ -1337,55 +1337,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Returns the primary production of a colony center tile. In the
-     * standard rule sets, this is always some kind of food and all
-     * tile improvements contribute to the production.
-     *
-     * @return an <code>AbstractGoods</code> value
-     */
-    public AbstractGoods getPrimaryProduction() {
-        if (type.getPrimaryGoods() == null) {
-            return null;
-        } else {
-            AbstractGoods primaryProduction = new AbstractGoods(type.getPrimaryGoods());
-            if (primaryProduction != null) {
-                int potential = primaryProduction.getAmount();
-                if (tileItemContainer != null) {
-                    potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null,
-                                                                         potential, false);
-                }
-                primaryProduction.setAmount(potential);
-            }
-            return primaryProduction;
-        }
-    }
-
-    /**
-     * Returns the secondary production of a colony center tile. Only
-     * natural tile improvements, such as rivers, contribute to the
-     * production. Artificial tile improvements, such as plowing, are
-     * ignored.
-     *
-     * @return an <code>int</code> value
-     */
-    public AbstractGoods getSecondaryProduction() {
-        if (type.getSecondaryGoods() == null) {
-            return null;
-        } else {
-            AbstractGoods secondaryProduction = new AbstractGoods(type.getSecondaryGoods());
-            if (secondaryProduction != null) {
-                int potential = secondaryProduction.getAmount();
-                if (tileItemContainer != null) {
-                    potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null,
-                                                                         potential, true);
-                }
-                secondaryProduction.setAmount(potential);
-            }
-            return secondaryProduction;
-        }
-    }
-
-    /**
      * Sorts GoodsTypes according to potential based on TileType,
      * TileItemContainer if any.
      *

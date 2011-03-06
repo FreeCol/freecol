@@ -465,14 +465,61 @@ public class ColonyTile extends FreeColGameObject
         return workType;
     }
 
+    /**
+     * Returns the primary production of a colony center tile. In the
+     * standard rule sets, this is always some kind of food and all
+     * tile improvements contribute to the production.
+     *
+     * @return an <code>AbstractGoods</code> value
+     */
+    private AbstractGoods getPrimaryProduction() {
+        if (workTile.getType().getPrimaryGoods() == null) {
+            return null;
+        } else {
+            AbstractGoods primaryProduction = new AbstractGoods(workTile.getType().getPrimaryGoods());
+            int potential = primaryProduction.getAmount();
+            if (workTile.getTileItemContainer() != null) {
+                potential = workTile.getTileItemContainer()
+                    .getTotalBonusPotential(primaryProduction.getType(), null,
+                                            potential, false);
+            }
+            primaryProduction.setAmount(potential + Math.max(0, getColony().getProductionBonus()));
+            return primaryProduction;
+        }
+    }
+
+    /**
+     * Returns the secondary production of a colony center tile. Only
+     * natural tile improvements, such as rivers, contribute to the
+     * production. Artificial tile improvements, such as plowing, are
+     * ignored.
+     *
+     * @return an <code>int</code> value
+     */
+    private AbstractGoods getSecondaryProduction() {
+        if (workTile.getType().getSecondaryGoods() == null) {
+            return null;
+        } else {
+            AbstractGoods secondaryProduction = new AbstractGoods(workTile.getType().getSecondaryGoods());
+            int potential = secondaryProduction.getAmount();
+            if (workTile.getTileItemContainer() != null) {
+                potential = workTile.getTileItemContainer()
+                    .getTotalBonusPotential(secondaryProduction.getType(), null,
+                                            potential, true);
+            }
+            secondaryProduction.setAmount(potential + Math.max(0, getColony().getProductionBonus()));
+            return secondaryProduction;
+        }
+    }
+
     public List<AbstractGoods> getProduction() {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>(2);
         if (isColonyCenterTile()) {
-            AbstractGoods primaryProduction = workTile.getPrimaryProduction();
+            AbstractGoods primaryProduction = getPrimaryProduction();
             if (primaryProduction != null) {
                 result.add(primaryProduction);
             }
-            AbstractGoods secondaryProduction = workTile.getSecondaryProduction();
+            AbstractGoods secondaryProduction = getSecondaryProduction();
             if (secondaryProduction != null) {
                 result.add(secondaryProduction);
             }
@@ -494,10 +541,10 @@ public class ColonyTile extends FreeColGameObject
         if (isColonyCenterTile()) {
             if (workTile.getType().getPrimaryGoods() != null
                 && workTile.getType().getPrimaryGoods().getType() == goodsType) {
-                return workTile.getPrimaryProduction().getAmount();
+                return getPrimaryProduction().getAmount();
             } else if (workTile.getType().getSecondaryGoods() != null
                        && workTile.getType().getSecondaryGoods().getType() == goodsType) {
-                return workTile.getSecondaryProduction().getAmount();
+                return getSecondaryProduction().getAmount();
             } else {
                 return 0;
             }

@@ -203,36 +203,55 @@ public class TileTest extends FreeColTestCase {
     public void testPrimarySecondaryGoods() {
 
         Game game = getStandardGame();
+        game.setMap(getTestMap(true));
+        Colony colony = getStandardColony();
+        Tile tile = colony.getTile();
+        ColonyTile center = colony.getColonyTile(tile);
 
-        Tile tile = new Tile(game, prairie, 0, 0);
-        assertEquals(grain, tile.getType().getPrimaryGoods().getType());
-        assertEquals(3, tile.getPrimaryProduction().getAmount());
-        assertEquals(cotton, tile.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile.getSecondaryProduction().getAmount());
+        List<AbstractGoods> production = center.getProduction();
+        assertEquals(2, production.size());
+        AbstractGoods primaryProduction = production.get(0);
+        AbstractGoods secondaryProduction = production.get(1);
+        assertEquals(grain, primaryProduction.getType());
+        assertEquals(5, primaryProduction.getAmount());
+        assertEquals(cotton, secondaryProduction.getType());
+        assertEquals(2, secondaryProduction.getAmount());
 
         TileImprovement ti = new TileImprovement(game, tile, spec().getTileImprovementType("model.improvement.plow"));
         ti.setTurnsToComplete(0);
         tile.add(ti);
 
-        assertEquals(grain, tile.getType().getPrimaryGoods().getType());
-        assertEquals(4, tile.getPrimaryProduction().getAmount());
-        assertEquals(cotton, tile.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile.getSecondaryProduction().getAmount());
+        production = center.getProduction();
+        assertEquals(2, production.size());
+        primaryProduction = production.get(0);
+        secondaryProduction = production.get(1);
+        assertEquals(grain, primaryProduction.getType());
+        assertEquals(6, primaryProduction.getAmount());
+        assertEquals(cotton, secondaryProduction.getType());
+        assertEquals(2, secondaryProduction.getAmount());
 
-        Tile tile2 = new Tile(game, plainsForest, 0, 0);
-        assertEquals(grain, tile2.getType().getPrimaryGoods().getType());
-        assertEquals(3, tile2.getPrimaryProduction().getAmount());
-        assertEquals(furs, tile2.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile2.getSecondaryProduction().getAmount());
+        tile.setType(plainsForest);
+        production = center.getProduction();
+        assertEquals(2, production.size());
+        primaryProduction = production.get(0);
+        secondaryProduction = production.get(1);
+        assertEquals(grain, primaryProduction.getType());
+        assertEquals(3, primaryProduction.getAmount());
+        assertEquals(furs, secondaryProduction.getType());
+        assertEquals(3, secondaryProduction.getAmount());
 
-        ti = new TileImprovement(game, tile2, spec().getTileImprovementType("model.improvement.road"));
+        ti = new TileImprovement(game, tile, spec().getTileImprovementType("model.improvement.road"));
         ti.setTurnsToComplete(0);
-        tile2.add(ti);
+        tile.add(ti);
 
-        assertEquals(grain, tile2.getType().getPrimaryGoods().getType());
-        assertEquals(3, tile2.getPrimaryProduction().getAmount());
-        assertEquals(furs, tile2.getType().getSecondaryGoods().getType());
-        assertEquals(3, tile2.getSecondaryProduction().getAmount());
+        production = center.getProduction();
+        assertEquals(2, production.size());
+        primaryProduction = production.get(0);
+        secondaryProduction = production.get(1);
+        assertEquals(grain, primaryProduction.getType());
+        assertEquals(3, primaryProduction.getAmount());
+        assertEquals(furs, secondaryProduction.getType());
+        assertEquals(3, secondaryProduction.getAmount());
 
     }
 
