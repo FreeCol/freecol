@@ -1260,8 +1260,13 @@ public final class InGameController implements NetworkConstants {
                                           colony.getName(),
                                           "renameColony.yes", "renameColony.no",
                                           true);
-            if (name == null) return; // User cancelled, 0-length invalid.
-            if (player.getSettlement(name) != null) {
+            if (name == null) {
+                // User cancelled, 0-length invalid.
+                return;
+            } else if (colony.getName().equals(name)) {
+                // No change
+                return;
+            } else if (player.getSettlement(name) != null) {
                 // Colony name must be unique.
                 canvas.showInformationMessage((Colony) object,
                                               "nameColony.notUnique",
