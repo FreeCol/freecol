@@ -95,12 +95,14 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
             }
             */
         } else if (unit != null && canBeWorked()) {
+            /*
             int amount = getProductionOf(unit.getWorkType());
             if (amount > 0) {
                 colony.addGoods(unit.getWorkType(), amount);
                 unit.setExperience(amount + unit.getExperience());
                 cs.addPartial(See.only(owner), unit, "experience");
             }
+            */
             Resource resource
                 = workTile.expendResource(unit.getWorkType(),
                                           unit.getType(), colony);
