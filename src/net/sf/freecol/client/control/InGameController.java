@@ -445,8 +445,9 @@ public final class InGameController implements NetworkConstants {
     // change, and fire off any consequent property changes.
     private class UnitWas {
         private Unit unit;
-        private Location loc;
         private UnitType type;
+        private Unit.Role role;
+        private Location loc;
         private GoodsType work;
         private int amount;
         private Colony colony;
@@ -454,6 +455,7 @@ public final class InGameController implements NetworkConstants {
         public UnitWas(Unit unit) {
             this.unit = unit;
             this.type = unit.getType();
+            this.role = unit.getRole();
             this.loc = unit.getLocation();
             this.work = unit.getWorkType();
             this.amount = getAmount(loc, work);
@@ -489,14 +491,16 @@ public final class InGameController implements NetworkConstants {
          * Fire any property changes resulting from actions of a unit.
          */
         public void fireChanges() {
-            Location newLoc = null;
             UnitType newType = null;
+            Unit.Role newRole = null;
+            Location newLoc = null;
             GoodsType newWork = null;
             int newAmount = 0;
             if (!unit.isDisposed()) {
                 newLoc = unit.getLocation();
                 if (colony != null) {
                     newType = unit.getType();
+                    newRole = unit.getRole();
                     newWork = unit.getWorkType();
                     newAmount = (newWork == null) ? 0
                         : getAmount(newLoc, newWork);
@@ -515,6 +519,10 @@ public final class InGameController implements NetworkConstants {
                 if (type != newType && newType != null) {
                     String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
                     colony.firePropertyChange(pc, type, newType);
+                } else if (role != newRole && newRole != null) {
+                    String pc = Tile.UNIT_CHANGE.toString();
+                    colony.firePropertyChange(pc, role.toString(),
+                                              newRole.toString());
                 }
                 if (work == newWork) {
                     if (work != null && amount != newAmount) {
