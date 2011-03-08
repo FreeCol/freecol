@@ -342,7 +342,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Modifies the sales of a type of goods.
      *
      * @param goodsType The <code>GoodsType</code> to set the sales for.
-     * @param value The amount of sales to add to the current amount.
+     * @param amount The amount of sales to add to the current amount.
      */
     public void modifySales(GoodsType goodsType, int amount) {
         if (amount != 0) {
@@ -367,7 +367,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Modifies the income before taxes on sales of a type of goods.
      *
      * @param goodsType The <code>GoodsType</code> to set the income for.
-     * @param value The amount of tax income to add to the current amount.
+     * @param amount The amount of tax income to add to the current amount.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);
@@ -389,7 +389,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Modifies the income after taxes on sales of a type of goods.
      *
      * @param goodsType The <code>GoodsType</code> to set the income for.
-     * @param value The amount of tax income to add to the current amount.
+     * @param amount The amount of tax income to add to the current amount.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);

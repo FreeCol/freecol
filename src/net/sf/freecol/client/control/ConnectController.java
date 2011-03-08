@@ -85,10 +85,8 @@ public final class ConnectController {
     /**
      * Starts a multiplayer server and connects to it.
      *
-     * @param tc a <code>String</code> value
      * @param username The name to use when logging in.
      * @param port The port in which the server should listen for new clients.
-     * @param nationOptions a <code>NationOptions</code> value
      * @param level a <code>DifficultyLevel</code> value
      */
     public void startMultiplayerGame(Specification specification, boolean publicServer, String username, int port,

@@ -2422,7 +2422,6 @@ public final class InGameController implements NetworkConstants {
      *
      * @param winner The <code>Unit</code> that is looting.
      * @param loser The <code>Unit</code> that is looted.
-     * @return The <code>Goods</code> to loot.
      */
     private void askLoot(Unit winner, Unit loser, List<Goods> goods) {
         Client client = freeColClient.getClient();
@@ -4163,7 +4162,6 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code>.
      * @param workLocation The <code>WorkLocation</code>.
-     * @return true if worker set to work
      */
     public void work(Unit unit, WorkLocation workLocation) {
         Canvas canvas = freeColClient.getCanvas();

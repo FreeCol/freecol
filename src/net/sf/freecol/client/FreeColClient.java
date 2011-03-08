@@ -774,7 +774,7 @@ public final class FreeColClient {
     /**
      * Sets whether or not the user has retired the game.
      *
-     * @param singleplayer Indicates whether or not the user has retired the game.
+     * @param isRetired Indicates whether or not the user has retired the game.
      */
     public void setIsRetired(boolean isRetired) {
         this.isRetired = isRetired;
@@ -915,7 +915,6 @@ public final class FreeColClient {
     /**
      * Set the game-wide next active unit if one can be found.
      *
-     * @param active The <code>Unit</code> to set as active.
      */
     public void setActiveUnit() {
         if (getFreeColServer() != null) {

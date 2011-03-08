@@ -885,9 +885,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Returns the neighbouring Tile of the given Tile in the given direction.
      *
      * @param direction
-     *            The direction in which the neighbour is located given t.
-     * @param t
-     *            The Tile to get a neighbour of.
+     *            The direction in which the neighbour tile is located.
      * @return The neighbouring Tile of the given Tile in the given direction.
      */
     public Tile getNeighbourOrNull(Direction direction) {
@@ -1596,14 +1594,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 }
 
      /**
-      * Returns all the tiles surrounding the given tile within the
-      * given range. The center tile itself is not included.
+      * Returns all the tiles surrounding this tile within the
+      * given range. This tile is not included.
       *
-      * @param t
-      *            The tile that lies on the center of the tiles to return.
       * @param range
-      *            How far away do we need to go starting from the center tile.
-      * @return The tiles surrounding the given tile.
+      *            How far away do we need to go starting from this.
+      * @return The tiles surrounding this tile.
       */
      public Iterable<Tile> getSurroundingTiles(final int range) {
          return new Iterable<Tile>(){
@@ -1635,14 +1631,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
 
      /**
-      * Returns all the tiles surrounding the given tile within the
+      * Returns all the tiles surrounding this tile within the
       * given inclusive upper and lower bounds.
-      * getSurroundingTiles(t, r) is equivalent to getSurroundingTiles(t, 1, r).
+      * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r).
       *
-      * @param t The <code>Tile</code> that lies on the center.
-      * @param rangeMin The inclusive minimum distance from the center tile.
-      * @param rangeMax The inclusive maximum distance from the center tile.
-      * @return A list of the tiles surrounding the given tile.
+      * @param rangeMin The inclusive minimum distance from this tile.
+      * @param rangeMax The inclusive maximum distance from this tile.
+      * @return A list of the tiles surrounding this tile.
       */
      public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
          List<Tile> result = new ArrayList<Tile>();
