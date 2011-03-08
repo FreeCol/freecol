@@ -19,10 +19,14 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.Timer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
@@ -35,7 +39,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 /**
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
-public final class CanvasMouseListener implements MouseListener {
+public final class CanvasMouseListener implements ActionListener, MouseListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
 
@@ -43,9 +47,14 @@ public final class CanvasMouseListener implements MouseListener {
 
     private final GUI gui;
 
+    private final int doubleClickDelay = 200; // Milliseconds
+    private Timer doubleClickTimer = new Timer(doubleClickDelay,this);
+
+    private int centerX, centerY;
+
     /**
      * The constructor to use.
-     * 
+     *
      * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      */
@@ -56,7 +65,7 @@ public final class CanvasMouseListener implements MouseListener {
 
     /**
      * Invoked when a mouse button was clicked.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseClicked(MouseEvent e) {
@@ -81,7 +90,7 @@ public final class CanvasMouseListener implements MouseListener {
 
     /**
      * Invoked when the mouse enters the component.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseEntered(MouseEvent e) {
@@ -90,7 +99,7 @@ public final class CanvasMouseListener implements MouseListener {
 
     /**
      * Invoked when the mouse exits the component.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseExited(MouseEvent e) {
@@ -99,7 +108,7 @@ public final class CanvasMouseListener implements MouseListener {
 
     /**
      * Invoked when a mouse button was pressed.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mousePressed(MouseEvent e) {
@@ -112,7 +121,7 @@ public final class CanvasMouseListener implements MouseListener {
                 if (gui.isGotoStarted()) {
                     gui.stopGoto();
                 }
-                
+
                 canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
             } else if (e.getButton() == MouseEvent.BUTTON2) {
                 Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
@@ -141,8 +150,12 @@ public final class CanvasMouseListener implements MouseListener {
                             canvas.getClient().getInGameController().moveToDestination(unit);
                         }
                     }
+                } else if (doubleClickTimer.isRunning()) {
+                    doubleClickTimer.stop();
                 } else {
-                    gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()), true);
+                    centerX = e.getX();
+                    centerY = e.getY();
+                    doubleClickTimer.start();
                 }
                 canvas.requestFocus();
             }
@@ -153,7 +166,7 @@ public final class CanvasMouseListener implements MouseListener {
 
     /**
      * Invoked when a mouse button was released.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseReleased(MouseEvent e) {
@@ -179,12 +192,17 @@ public final class CanvasMouseListener implements MouseListener {
                     }
                     ctlr.nextActiveUnit();
                 }
-                
+
             } else if (gui.isGotoStarted()) {
                 gui.stopGoto();
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseReleased!", ex);
         }
+    }
+
+    public void actionPerformed(ActionEvent timerEvent){
+        doubleClickTimer.stop();
+        gui.setSelectedTile(gui.convertToMapCoordinates(centerX, centerY), true);
     }
 }
