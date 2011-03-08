@@ -952,7 +952,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                     // not a production bonus
                     String bonus = getFeatureName(productionBonus)
                         + ": " + getModifierAsString(productionBonus);
-                    productionPanel.add(new JLabel(bonus));
+                    JLabel label = new JLabel(bonus);
+                    label.setToolTipText(Messages.message(productionBonus.getId() + ".shortDescription"));
+                    productionPanel.add(label);
                 }
             }
         }
@@ -961,7 +963,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (!abilities.isEmpty()) {
             for (Ability ability : abilities) {
                 if (ability.getValue()) {
-                    productionPanel.add(new JLabel(getAbilityAsString(ability)));
+                    JLabel label = new JLabel(getAbilityAsString(ability));
+                    label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
+                    productionPanel.add(label);
                 }
             }
         }
