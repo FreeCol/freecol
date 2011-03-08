@@ -936,12 +936,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         }
 
-        Set<Modifier> bonusList = buildingType.getFeatureContainer().getModifiers();
-        int bonusNumber = bonusList.size();
-        if (bonusNumber > 0) {
+        JPanel productionPanel = new JPanel(new GridLayout(0, 2, 10, 0));
+        productionPanel.setOpaque(false);
 
-            JPanel productionPanel = new JPanel();
-            productionPanel.setOpaque(false);
+        Set<Modifier> bonusList = buildingType.getFeatureContainer().getModifiers();
+        if (!bonusList.isEmpty()) {
 
             for (Modifier productionBonus : bonusList) {
                 try {
@@ -956,7 +955,18 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                     productionPanel.add(new JLabel(bonus));
                 }
             }
+        }
 
+        Set<Ability> abilities = buildingType.getFeatureContainer().getAbilities();
+        if (!abilities.isEmpty()) {
+            for (Ability ability : abilities) {
+                if (ability.getValue()) {
+                    productionPanel.add(new JLabel(getAbilityAsString(ability)));
+                }
+            }
+        }
+
+        if (productionPanel.getComponentCount() > 0) {
             detailPanel.add(new JLabel(Messages.message("colopedia.buildings.modifiers")), "top");
             detailPanel.add(productionPanel);
         }
@@ -1194,6 +1204,22 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
     private String getFeatureName(Feature feature) {
         return Messages.message(feature.getNameKey());
+    }
+
+    private String getAbilityAsString(Ability ability) {
+        String label = Messages.message(getFeatureName(ability)) + ":";
+        if (ability.hasScope()) {
+            for (Scope scope : ability.getScopes()) {
+                if (scope.getType() != null) {
+                    label += (scope.isMatchNegated() ? " !" : " ")
+                        + Messages.message(scope.getType() + ".name") + ",";
+                } else if (scope.getAbilityID() != null) {
+                    label += (scope.isMatchNegated() ? " !" : " ")
+                        + Messages.message(scope.getAbilityID() + ".name") + ",";
+                }
+            }
+        }
+        return label.substring(0, label.length() - 1);
     }
 
     public String getModifierAsString(Modifier modifier) {
