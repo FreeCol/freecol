@@ -2298,6 +2298,10 @@ public final class InGameController implements NetworkConstants {
         Player enemy;
         if (target.getSettlement() != null) {
             enemy = target.getSettlement().getOwner();
+        } else if (target == attacker.getTile()) {
+            // Fortify on tile owned by another nation
+            enemy = target.getOwner();
+            if (enemy == null) return true;
         } else {
             Unit defender = target.getDefendingUnit(attacker);
             if (defender == null) {
