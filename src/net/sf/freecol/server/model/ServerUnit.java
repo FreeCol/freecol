@@ -177,7 +177,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             int maximumExperience = getType().getMaximumExperience();
             int maxValue = (100 * maximumExperience) /
                 getType().getUnitTypeChange(learn).getProbability(ChangeType.EXPERIENCE);
-            if (Utils.randomInt(logger, "Experience", random, maxValue)
+            if (maxValue > 0
+                && Utils.randomInt(logger, "Experience", random, maxValue)
                 < Math.min(getExperience(), maximumExperience)) {
                 StringTemplate oldName = getLabel();
                 setType(learn);
