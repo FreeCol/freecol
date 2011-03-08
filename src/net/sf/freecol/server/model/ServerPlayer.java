@@ -890,11 +890,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                            modifyTension(otherPlayer, modifier));
                 }
                 cs.addStance(See.perhaps(), this, stance, otherPlayer);
-                change = true;
                 logger.finest("Stance change " + getName()
                               + " " + old.toString()
                               + " -> " + stance.toString()
                               + " wrt " + otherPlayer.getName());
+                change = true;
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }
@@ -907,12 +907,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     cs.add(See.only(null).perhaps(this),
                            otherPlayer.modifyTension(this, modifier));
                 }
-                cs.addStance(See.perhaps(), otherPlayer, stance, this);
+                if (!change) {
+                    cs.addStance(See.perhaps(), otherPlayer, stance, this);
+                    logger.finest("Stance change " + otherPlayer.getName()
+                                  + " " + old.toString()
+                                  + " -> " + stance.toString()
+                                  + " wrt " + getName());
+                }
                 change = true;
-                logger.finest("Stance change " + otherPlayer.getName()
-                              + " " + old.toString()
-                              + " -> " + stance.toString()
-                              + " wrt " + getName());
             } catch (IllegalStateException e) { // Catch illegal transitions
                 logger.log(Level.WARNING, "Illegal stance transition", e);
             }

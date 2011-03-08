@@ -730,7 +730,7 @@ public final class InGameController extends Controller {
                         cs.add(See.only(serverPlayer),
                                ChangePriority.CHANGE_EARLY,
                                new MonarchActionMessage(enemy));
-                        sendElement(serverPlayer, cs);
+                        sendToAll(cs);
                     }
                 };
             break;
