@@ -3774,7 +3774,7 @@ public final class InGameController implements NetworkConstants {
         if (unit.getColony() != null) {
             // In colony, unload units and goods.
             for (Unit u : new ArrayList<Unit>(unit.getUnitList())) {
-                leaveShip(unit);
+                leaveShip(u);
             }
             for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
                 unloadCargo(goods, false);
