@@ -265,7 +265,8 @@ public class SoundPlayer {
     public void play(Playlist playlist, boolean playContinues,
                      int repeatMode, int pickMode, int delay) {
         if (playlist != null) {
-            currentSoundPlayerThread = new SoundPlayerThread(playlist, playContinues, repeatMode, pickMode, delay);
+            currentSoundPlayerThread = new SoundPlayerThread(playlist, playContinues,
+                    repeatMode, pickMode, delay);
             currentSoundPlayerThread.start();
         } else {
             currentSoundPlayerThread = null;
@@ -466,18 +467,18 @@ public class SoundPlayer {
                 // Volume control:
                 if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
                     try { control = (FloatControl)
-                        line.getControl(FloatControl.Type.MASTER_GAIN);
+                              line.getControl(FloatControl.Type.MASTER_GAIN);
                     } catch ( IllegalArgumentException e ) {}
                     if ( control != null ) {
-	                    final FloatControl c = control;
-	                    pcl = new PropertyChangeListener() {
-	                            public void propertyChange(PropertyChangeEvent e) {
-	                                int v = ((Integer) e.getNewValue()).intValue();
-	                                updateVolume(c, v);
-	                            }
-	                        };
-	                    volume.addPropertyChangeListener(pcl);
-	                    updateVolume(control, volume.getValue());
+                         final FloatControl c = control;
+                         pcl = new PropertyChangeListener() {
+                                 public void propertyChange(PropertyChangeEvent e) {
+                                     int v = ((Integer) e.getNewValue()).intValue();
+                                     updateVolume(c, v);
+                                 }
+                             };
+                         volume.addPropertyChangeListener(pcl);
+                         updateVolume(control, volume.getValue());
                     }
                 }
 

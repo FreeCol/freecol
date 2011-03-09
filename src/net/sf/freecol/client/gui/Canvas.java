@@ -424,6 +424,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showPanel(FreeColPanel panel, boolean centered) {
         //closeMenus();
+        repaint();
         addAsFrame(panel, false, (centered) ? PopupPosition.CENTERED
                    : PopupPosition.ORIGIN);
         panel.requestFocus();
@@ -434,6 +435,7 @@ public final class Canvas extends JDesktopPane {
      *
      */
     public void showSubPanel(FreeColPanel panel) {
+        repaint();
         addAsFrame(panel);
         panel.requestFocus();
     }
@@ -444,6 +446,7 @@ public final class Canvas extends JDesktopPane {
      * @param popupPosition The generalized position to place the panel.
      */
     public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition) {
+        repaint();
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
@@ -1668,13 +1671,14 @@ public final class Canvas extends JDesktopPane {
      * shows the new game panel.
      */
     public void newGame() {
-        if (!showConfirmDialog("stopCurrentGame.text",
-                               "stopCurrentGame.yes", "stopCurrentGame.no")) {
-            return;
+        if (freeColClient.getGame() != null) {
+           if (!showConfirmDialog("stopCurrentGame.text",
+                               "stopCurrentGame.yes", "stopCurrentGame.no")) 
+              return;
+           freeColClient.getConnectController().quitGame(true);
+           removeInGameComponents();
         }
 
-        freeColClient.getConnectController().quitGame(true);
-        removeInGameComponents();
         showPanel(new NewPanel(this));
     }
 
