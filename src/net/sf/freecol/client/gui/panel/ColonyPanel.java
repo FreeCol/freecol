@@ -1528,10 +1528,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateProductionPanel();
             updateWarehousePanel();
             buildingsPanel.update();
-            if (property.equals("model.goods.hammers")
-                || property.equals("model.goods.tools")) {
-                constructionPanel.update();
-            }
+            constructionPanel.update();
         } else if (Tile.UNIT_CHANGE.equals(property)) {
             updateOutsideColonyPanel();
             updateInPortPanel();
