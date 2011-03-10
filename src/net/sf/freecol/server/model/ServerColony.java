@@ -216,7 +216,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Now check the food situation
         int storedFood = getGoodsCount(spec.getPrimaryFoodType());
-        if (storedFood <= 0) {
+        if (storedFood < 0) {
             if (getUnitCount() > 1) {
                 Unit victim = Utils.getRandomMember(logger, "Choose starver",
                                                     getUnitList(), random);
