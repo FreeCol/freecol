@@ -571,21 +571,6 @@ public final class InGameController extends Controller {
                               ChangePriority.CHANGE_LATE,
                               "player", player.getId());
 
-                // Do the special actions (founding fathers and monarch)
-                // that use their own thread.  Keep them here rather
-                // than in ServerPlayer because of the c-s communication.
-                if (player.canRecruitFoundingFather()) {
-                    final ServerPlayer threadPlayer = player;
-                    final List<FoundingFather> ffs
-                        = player.getRandomFoundingFathers(random);
-                    Thread t = new Thread(FreeCol.SERVER_THREAD
-                                          + "FoundingFather") {
-                            public void run() {
-                                chooseFoundingFather(threadPlayer, ffs);
-                            }
-                        };
-                    t.start();
-                }
                 Monarch monarch = player.getMonarch();
                 MonarchAction action = null;
                 if (monarch != null) {
@@ -615,35 +600,6 @@ public final class InGameController extends Controller {
             }
 
             return cs.build(serverPlayer);
-        }
-    }
-
-    /**
-     * Handles the choice of a new random founding father.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is choosing.
-     * @param ffs A list of <code>FoundingFather</code>s to choose from.
-     * @return The <code>FoundingFather</code> chosen.
-     */
-    private void chooseFoundingFather(final ServerPlayer serverPlayer,
-                                      final List<FoundingFather> ffs) {
-        if (ffs.isEmpty()) return;
-        List<String> attributes = new ArrayList<String>();
-        for (FoundingFather father : ffs) {
-            attributes.add(father.getType().toString());
-            attributes.add(father.getId());
-        }
-        ChangeSet cs = new ChangeSet();
-        cs.addTrivial(See.only(serverPlayer), "chooseFoundingFather",
-                      ChangePriority.CHANGE_NORMAL,
-                      attributes.toArray(new String[0]));
-        Element reply = askElement(serverPlayer, cs);
-        FoundingFather father = getGame().getSpecification()
-            .getFoundingFather(reply.getAttribute("foundingFather"));
-        if (ffs.contains(father)) {
-            serverPlayer.setCurrentFather(father);
-        } else {
-            logger.warning("Bogus father chosen: " + father.getId());
         }
     }
 
@@ -933,6 +889,32 @@ public final class InGameController extends Controller {
             // The victory panel is shown after end turn, end turn again
             // to start turn of next player.
             endTurn((ServerPlayer) game.getCurrentPlayer());
+        }
+        return null;
+    }
+
+
+    /**
+     * Choose a founding father from the current offered fathers.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is choosing.
+     * @param id The id of the <code>FoundingFather</code> to pick.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element chooseFoundingFather(ServerPlayer serverPlayer, String id) {
+        FoundingFather father = getGame().getSpecification()
+            .getFoundingFather(id);
+        if (father == null) {
+            return Message.clientError("Not a founding father: " + id);
+        } else if (serverPlayer.getCurrentFather() != null) {
+            return Message.clientError("Already recruiting: "
+                    + serverPlayer.getCurrentFather().getId());
+        } else if (!serverPlayer.getOfferedFathers().contains(father)) {
+            return Message.clientError("Not an offered father: " + id);
+        } else {
+            serverPlayer.setCurrentFather(father);
+            serverPlayer.setOfferedFathers(new HashSet<FoundingFather>());
+            logger.info("Selected founding father: " + father.getId());
         }
         return null;
     }

@@ -550,7 +550,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "chooseFoundingFather"-request.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -559,16 +559,24 @@ public final class InGameInputHandler extends InputHandler {
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
             if (id != null && !id.equals("")) {
-                possibleFoundingFathers.add(getGame().getSpecification().getFoundingFather(id));
+                FoundingFather father = getGame().getSpecification()
+                    .getFoundingFather(id);
+                if (father == null) {
+                    logger.warning("Bogus " + type + " father: " + id);
+                } else {
+                    possibleFoundingFathers.add(father);
+                }
             }
         }
 
         FoundingFather foundingFather = new ShowSelectFoundingFatherSwingTask(possibleFoundingFathers).select();
-
-        Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", foundingFather.getId());
-        getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
-        return reply;
+        if (foundingFather != null) {
+            getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
+            Element e = Message.createNewRootElement("chooseFoundingFather");
+            e.setAttribute("foundingFather", foundingFather.getId());
+            getFreeColClient().getClient().send(e);
+        }
+        return null;
     }
 
     /**
@@ -972,6 +980,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         return null;
     }
+
 
     /**
      * Handle all the children of this element.

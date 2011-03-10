@@ -26,10 +26,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -584,7 +586,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @return A list of FoundingFathers.
      */
-    public List<FoundingFather> getRandomFoundingFathers(Random random) {
+    private Set<FoundingFather> getRandomFoundingFathers(Random random) {
         // Build weighted random choice for each father type
         Specification spec = getGame().getSpecification();
         int age = getGame().getTurn().getAge();
@@ -605,7 +607,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Select one from each father type
-        List<FoundingFather> randomFathers = new ArrayList<FoundingFather>();
+        Set<FoundingFather> randomFathers = new HashSet<FoundingFather>();
         String logMessage = "Random fathers";
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
@@ -999,6 +1001,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
             FoundingFather father = checkFoundingFather();
             if (father != null) {
                 csAddFoundingFather(father, random, cs);
+            }
+            if (canRecruitFoundingFather()) {
+                Set<FoundingFather> ffs = getOfferedFathers();
+                if (ffs.isEmpty()) {
+                    ffs = getRandomFoundingFathers(random);
+                    setOfferedFathers(ffs);
+                }
+                List<String> attributes = new ArrayList<String>();
+                for (FoundingFather ff : ffs) {
+                    attributes.add(ff.getType().toString());
+                    attributes.add(ff.getId());
+                }
+                cs.addTrivial(See.only(this), "chooseFoundingFather",
+                              ChangeSet.ChangePriority.CHANGE_NORMAL,
+                              attributes.toArray(new String[0]));
             }
 
         } else if (isIndian()) {

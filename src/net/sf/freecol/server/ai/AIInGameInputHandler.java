@@ -224,13 +224,22 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
             if (id != null && id != "") {
-                possibleFoundingFathers.add(aiMain.getGame().getSpecification().getFoundingFather(id));
+                FoundingFather father = aiMain.getGame().getSpecification()
+                    .getFoundingFather(id);
+                if (father == null) {
+                    logger.warning("Bogus " + type.toString()
+                                   + " father: " + id);
+                } else {
+                    possibleFoundingFathers.add(father);
+                }
             }
         }
 
-        FoundingFather foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
-        return AIMessage.makeTrivial("chosenFoundingFather",
-                                     "foundingFather", foundingFather.getId());
+        FoundingFather foundingFather = getAIPlayer()
+            .selectFoundingFather(possibleFoundingFathers);
+        return (foundingFather == null) ? null
+            : AIMessage.makeTrivial("chooseFoundingFather",
+                                    "foundingFather", foundingFather.getId());
     }
 
     /**

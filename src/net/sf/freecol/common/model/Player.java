@@ -75,6 +75,11 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final String FOUNDING_FATHER_TAG = "foundingFathers";
 
     /**
+     * The XML tag name for the set of offered founding fathers.
+     */
+    private static final String OFFERED_FATHER_TAG = "offeredFathers";
+
+    /**
      * The XML tag name for the stance array.
      */
     private static final String STANCE_TAG = "stance";
@@ -294,6 +299,9 @@ public class Player extends FreeColGameObject implements Nameable {
         = new HashSet<FoundingFather>();
     /** Current founding father being recruited. */
     protected FoundingFather currentFather;
+    /** The offered founding fathers. */
+    final protected Set<FoundingFather> offeredFathers
+        = new HashSet<FoundingFather>();
 
     /** The current tax rate for this player. */
     protected int tax = 0;
@@ -1591,6 +1599,18 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Gets the {@link FoundingFather founding father} this player is working
+     * towards.
+     *
+     * @return The current FoundingFather or null if there is none
+     * @see #setCurrentFather
+     * @see FoundingFather
+     */
+    public FoundingFather getCurrentFather() {
+        return currentFather;
+    }
+
+    /**
      * Sets this players liberty bell production to work towards recruiting
      * <code>father</code> to its congress.
      *
@@ -1602,15 +1622,22 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the {@link FoundingFather founding father} this player is working
-     * towards.
+     * Gets the set of offered fathers for this player.
      *
-     * @return The current FoundingFather or null if there is none
-     * @see #setCurrentFather
-     * @see FoundingFather
+     * @return The current set of offered fathers.
      */
-    public FoundingFather getCurrentFather() {
-        return currentFather;
+    public Set<FoundingFather> getOfferedFathers() {
+        return offeredFathers;
+    }
+
+    /**
+     * Sets the set of offered fathers.
+     *
+     * @param fathers A list of <code>FoundingFather</code>s to offer.
+     */
+    public void setOfferedFathers(Set<FoundingFather> fathers) {
+        offeredFathers.clear();
+        offeredFathers.addAll(fathers);
     }
 
     /**
@@ -3302,6 +3329,15 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             out.writeEndElement();
 
+            out.writeStartElement(OFFERED_FATHER_TAG);
+            out.writeAttribute(ARRAY_SIZE, Integer.toString(offeredFathers.size()));
+            index = 0;
+            for (FoundingFather father : offeredFathers) {
+                out.writeAttribute("x" + Integer.toString(index), father.getId());
+                index++;
+            }
+            out.writeEndElement();
+
             if (europe != null) {
                 europe.toXML(out, player, showAll, toSavedGame);
             }
@@ -3382,6 +3418,7 @@ public class Player extends FreeColGameObject implements Nameable {
         tension.clear();
         stance.clear();
         allFathers.clear();
+        offeredFathers.clear();
         europe = null;
         monarch = null;
         history.clear();
@@ -3399,6 +3436,14 @@ public class Player extends FreeColGameObject implements Nameable {
                     String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
                     FoundingFather father = getSpecification().getFoundingFather(fatherId);
                     addFather(father);
+                }
+                in.nextTag();
+            } else if (in.getLocalName().equals(OFFERED_FATHER_TAG)) {
+                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+                for (int index = 0; index < length; index++) {
+                    String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
+                    FoundingFather father = getSpecification().getFoundingFather(fatherId);
+                    offeredFathers.add(father);
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(STANCE_TAG)) {

@@ -33,45 +33,60 @@
   <xs:element name="player">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element name="tension">
-	  <xs:complexType>
-	    <xs:attribute name="player" type="xs:string" use="required"/>
-	    <xs:attribute name="value" type="xs:int" use="optional"
-			  default="0"/>
-	  </xs:complexType>
-	</xs:element>
-	<xs:element name="foundingFathers">
-	  <xs:complexType>
-	    <xs:attribute name="xLength" use="required">
-	      <xs:annotation>
-		<xs:documentation>Element count</xs:documentation>
-	      </xs:annotation>
-	    </xs:attribute>
+        <xs:element name="tension">
+          <xs:complexType>
+            <xs:attribute name="player" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:int" use="optional"
+                          default="0"/>
+          </xs:complexType>
+        </xs:element>
 
-	    <xs:anyAttribute namespace="##local" processContents="skip">
-	      <xs:annotation>
-		<xs:documentation>
-		  ID of father with the names "x0", "x1", "x2"
-		  etc.
+        <xs:element name="foundingFathers">
+          <xs:complexType>
+            <xs:attribute name="xLength" use="required">
+              <xs:annotation>
+                <xs:documentation>Element count</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:anyAttribute namespace="##local" processContents="skip">
+              <xs:annotation>
+                <xs:documentation>
+                  ID of father with the names "x0", "x1", "x2" etc.
                 </xs:documentation>
-	      </xs:annotation>
-	    </xs:anyAttribute>
-	  </xs:complexType>
-	</xs:element>
+              </xs:annotation>
+            </xs:anyAttribute>
+          </xs:complexType>
+        </xs:element>
 
-	<xs:element name="stance">
-	  <xs:complexType>
-	    <xs:attribute name="player" type="xs:string" use="required"/>
-	    <xs:attribute name="value" type="PlayerStance" use="required"/>
-	  </xs:complexType>
-	</xs:element>
+        <xs:element name="offeredFathers">
+          <xs:complexType>
+            <xs:attribute name="xLength" use="required">
+              <xs:annotation>
+                <xs:documentation>Element count</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:anyAttribute namespace="##local" processContents="skip">
+              <xs:annotation>
+                <xs:documentation>
+                  ID of offered father with the names "x0", "x1", "x2" etc.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:anyAttribute>
+          </xs:complexType>
+        </xs:element>
 
-	<xs:element ref="europe"/>
-	<xs:element ref="monarch" />
-	<xs:element ref="historyEvent" />
-	<xs:element ref="tradeRoute"/>
-	<xs:element ref="market" />
+        <xs:element name="stance">
+          <xs:complexType>
+            <xs:attribute name="player" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="PlayerStance" use="required"/>
+          </xs:complexType>
+        </xs:element>
 
+        <xs:element ref="europe"/>
+        <xs:element ref="monarch" />
+        <xs:element ref="historyEvent" />
+        <xs:element ref="tradeRoute"/>
+        <xs:element ref="market" />
       </xs:choice>
 
       <xs:attribute name="ID" type="PlayerId" use="required"/>

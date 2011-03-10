@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.59
+<!-- XSD for specification version 0.60
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -35,6 +35,7 @@
      0.57: add tradeBonus attribute to settlement
      0.58: change unit type changes to use percentages rather than booleans
      0.59: add maximumExperience attribute to UnitType
+     0.60: add offeredFathers to player
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
