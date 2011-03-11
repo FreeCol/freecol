@@ -52,9 +52,7 @@ public class AssignTradeRouteMessage extends Message {
      */
     public AssignTradeRouteMessage(Unit unit, TradeRoute tradeRoute) {
         this.unitId = unit.getId();
-        this.tradeRouteId = (tradeRoute == null
-                             || tradeRoute == TradeRoute.NO_TRADE_ROUTE) ? null
-            : tradeRoute.getId();
+        this.tradeRouteId = (tradeRoute == null) ? null : tradeRoute.getId();
     }
 
     /**

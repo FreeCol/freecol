@@ -4837,10 +4837,12 @@ public final class InGameController implements NetworkConstants {
      */
     public void assignTradeRoute(Unit unit) {
         Canvas canvas = freeColClient.getCanvas();
+        TradeRoute oldRoute = unit.getTradeRoute();
         TradeRoute route = canvas.showTradeRouteDialog(unit);
         if (route == null) return; // Cancelled
-        assignTradeRoute(unit, (route == TradeRoute.NO_TRADE_ROUTE) ? null
-                         : route);
+        // Delete or deassign of trade route removes the route from the unit
+        if (oldRoute != null && unit.getTradeRoute() == null) route = null;
+        assignTradeRoute(unit, route);
     }
 
     /**

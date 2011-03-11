@@ -39,8 +39,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     private static final String CARGO_TAG = "cargo";
 
-    public static final TradeRoute NO_TRADE_ROUTE = new TradeRoute();
-    
     /**
      * The name of this trade route.
      */

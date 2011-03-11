@@ -210,39 +210,40 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      */
     public void actionPerformed(ActionEvent event) {
         Action action = Enum.valueOf(Action.class, event.getActionCommand());
-        switch (action) {
-        case OK:
-            getCanvas().remove(this);
-            ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
-            for (int index = 0; index < listModel.getSize(); index++) {
-                routes.add((TradeRoute) listModel.getElementAt(index));
-            }
-            getController().setTradeRoutes(routes);
-            setResponse((TradeRoute) tradeRoutes.getSelectedValue());
-            break;
-        case CANCEL:
-            getCanvas().remove(this);
-            setResponse(null);
-            break;
-        case DEASSIGN: case DELETE:
-            TradeRoute route = (TradeRoute) tradeRoutes.getSelectedValue();
-            if (route != null) {
-                for (Unit unit : route.getAssignedUnits()) {
-                    getController().clearOrders(unit);
-                }
-            }
-            if (action == Action.DEASSIGN) {
+        Unit unit = getCanvas().getGUI().getActiveUnit();
+        TradeRoute route = (TradeRoute) tradeRoutes.getSelectedValue();
+        if (unit != null && route != null) {
+            switch (action) {
+            case OK:
                 getCanvas().remove(this);
-                setResponse(TradeRoute.NO_TRADE_ROUTE);
+                ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
+                for (int index = 0; index < listModel.getSize(); index++) {
+                    routes.add((TradeRoute) listModel.getElementAt(index));
+                }
+                getController().setTradeRoutes(routes);
+                unit.setTradeRoute(route);
+                setResponse(route);
                 return;
-            }
-            if (route != null) {
+            case DEASSIGN:
+                getCanvas().remove(this);
+                getController().clearOrders(unit);
+                setResponse(route);
+                return;
+            case DELETE:
+                for (Unit u : route.getAssignedUnits()) {
+                    getController().clearOrders(u);
+                }
                 listModel.removeElementAt(tradeRoutes.getSelectedIndex());
                 Player player = getMyPlayer();
                 player.getTradeRoutes().remove(route);
                 getController().setTradeRoutes(player.getTradeRoutes());
+                // Do not set response
+                return;
+            case CANCEL: default:
+                break;
             }
-            break;
         }        
+        getCanvas().remove(this);
+        setResponse(null);
     }
 }
