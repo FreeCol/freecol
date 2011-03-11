@@ -524,7 +524,8 @@ public class Game extends FreeColGameObject {
     public void setCurrentPlayer(Player newCp) {
         if (newCp != null) {
             if (currentPlayer != null) {
-                currentPlayer.endTurn();
+                currentPlayer.removeModelMessages();
+                currentPlayer.invalidateCanSeeTiles();
             }
         } else {
             logger.info("Current player set to 'null'.");

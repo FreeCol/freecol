@@ -1674,14 +1674,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets called when this player's turn has ended.
-     */
-    public void endTurn() {
-        removeModelMessages();
-        invalidateCanSeeTiles();
-    }
-
-    /**
      * Checks if this <code>Player</code> can move units to
      * <code>Europe</code>.
      *

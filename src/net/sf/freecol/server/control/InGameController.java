@@ -557,49 +557,58 @@ public final class InGameController extends Controller {
             }
 
             if ((player = (ServerPlayer) game.getNextPlayer()) == null) {
-                ; // Should not happen, but be defensive
-            } else if (player.checkForDeath()) {
-                player.csKill(cs);
-                logger.info(player.getNation() + " is dead.");
-            } else {
-                // Do "new turn"-like actions that need to wait until right
-                // before the player is about to move.
-                game.setCurrentPlayer(player);
-
-                player.csStartTurn(random, cs);
-                cs.addTrivial(See.all(), "setCurrentPlayer",
-                              ChangePriority.CHANGE_LATE,
-                              "player", player.getId());
-
-                Monarch monarch = player.getMonarch();
-                MonarchAction action = null;
-                if (monarch != null) {
-                    if (debugMonarchAction != null
-                        && player == debugMonarchPlayer) {
-                        action = debugMonarchAction;
-                        debugMonarchAction = null;
-                        debugMonarchPlayer = null;
-                    } else {
-                        action = RandomChoice.getWeightedRandom(logger,
-                            "Choose monarch action", random,
-                            monarch.getActionChoices());
-                    }
-                    if (action != null) monarchAction(player, action);
-                }
+                // "can not happen"
+                return Message.clientError("Can not get next player");
             }
-            sendToOthers(serverPlayer, cs);
-
-            // Keep ending turn for dead or non-AI players that are either not
-            // connected or skipping turns in debug mode.
-            if (player != null
-                && (player.isDead()
-                    || (!player.isAI()
-                        && (!player.isConnected() || debugOnlyAITurns > 0)))) {
-                sendElement(serverPlayer, cs);
+            if (player.checkForDeath()) { // Remove dead players and retry
+                player.csKill(cs);
+                sendToAll(cs);
+                logger.info(player.getNation() + " is dead.");
                 continue;
             }
 
-            return cs.build(serverPlayer);
+            // Do "new turn"-like actions that need to wait until right
+            // before the player is about to move.
+            game.setCurrentPlayer(player);
+            player.csStartTurn(random, cs);
+            cs.addTrivial(See.all(), "setCurrentPlayer",
+                          ChangePriority.CHANGE_LATE,
+                          "player", player.getId());
+            Monarch monarch = player.getMonarch();
+            if (monarch != null) {
+                MonarchAction action = null;
+                if (debugMonarchAction != null
+                    && player == debugMonarchPlayer) {
+                    action = debugMonarchAction;
+                    debugMonarchAction = null;
+                    debugMonarchPlayer = null;
+                } else {
+                    action = RandomChoice.getWeightedRandom(logger,
+                            "Choose monarch action", random,
+                            monarch.getActionChoices());
+                }
+                // TODO: monarchAction starts its own threads.
+                // The simple cases do not need them and could just
+                // use ChangeSets.  The harder cases (tax raise,
+                // mercenary offer) will need work
+                // to remove the threads.
+                if (action != null && monarch.actionIsValid(action)) {
+                    logger.finest("Monarch action: " + action);
+                    monarchAction(player, action);
+                }
+            }
+
+            // First, flush accumulated changes to other players.
+            // Then, if this is an AI or normal connected player in
+            // non-debug mode then return the accumulated changes directly,
+            // otherwise flush them out and retry.
+            sendToOthers(serverPlayer, cs);
+            if (player.isAI()
+                || (player.isConnected() && debugOnlyAITurns <= 0)) {
+                return cs.build(serverPlayer);
+            } else {
+                sendElement(serverPlayer, cs);
+            }
         }
     }
 
@@ -613,8 +622,6 @@ public final class InGameController extends Controller {
                                final MonarchAction action) {
         final Monarch monarch = serverPlayer.getMonarch();
         boolean valid = monarch.actionIsValid(action);
-        logger.finest("Monarch action: " + action
-                      + " " + ((valid) ? "valid" : "invalid"));
         if (!valid) return;
 
         Thread t = null;
@@ -872,6 +879,7 @@ public final class InGameController extends Controller {
      */
     public Element continuePlaying(ServerPlayer serverPlayer) {
         ServerGame game = (ServerGame) getGame();
+        Element reply = null;
         if (!getFreeColServer().isSingleplayer()) {
             logger.warning("Can not continue playing in multiplayer!");
         } else if (serverPlayer != game.checkForWinner()) {
@@ -888,9 +896,9 @@ public final class InGameController extends Controller {
                 .setValue(false);
             // The victory panel is shown after end turn, end turn again
             // to start turn of next player.
-            endTurn((ServerPlayer) game.getCurrentPlayer());
+            reply = endTurn((ServerPlayer) game.getCurrentPlayer());
         }
-        return null;
+        return reply;
     }
 
 

@@ -682,15 +682,16 @@ public final class InGameInputHandler extends InputHandler
          * TODO: Setting the player dead directly should be a server option, but
          * for now - allow the player to reconnect:
          */
+        Element reply = null;
         player.setConnected(false);
         if (getFreeColServer().getGame().getCurrentPlayer() == player
                 && !getFreeColServer().isSingleplayer()) {
-            getFreeColServer().getInGameController().endTurn(player);
+            reply = getFreeColServer().getInGameController().endTurn(player);
         }
         try {
             getFreeColServer().updateMetaServer();
         } catch (NoRouteToServerException e) {}
         
-        return null;
+        return reply;
     }
 }
