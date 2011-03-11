@@ -830,6 +830,62 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
     }
 
     /**
+     * Find a teacher for the specified student.
+     * Do not search if ALLOW_STUDENT_SELECTION is true--- its the player's
+     * job then.
+     *
+     * @param student The student <code>Unit</code> that needs a teacher.
+     * @return A potential teacher, or null of none found.
+     */
+    public Unit findTeacher(Unit student) {
+        if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
+            return null; // No automatic assignment
+        for (Building building : getBuildings()) {
+            if (building.getType().hasAbility("model.ability.teach")) {
+                for (Unit unit : building.getUnitList()) {
+                    if (unit.getStudent() == null
+                        && student.canBeStudent(unit)) return unit;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find a student for the specified teacher.
+     * Do not search if ALLOW_STUDENT_SELECTION is true--- its the player's
+     * job then.
+     *
+     * @param teacher The teacher <code>Unit</code> that needs a student.
+     * @return A potential student, or null of none found.
+     */
+    public Unit findStudent(final Unit teacher) {
+        if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
+            return null; // No automatic assignment
+        Unit student = null;
+        GoodsType expertProduction = teacher.getType().getExpertProduction();
+        int skillLevel = INFINITY;
+        for (Unit potentialStudent : getUnitList()) {
+            /**
+             * Always pick the student with the least skill first.
+             * Break ties by favouring the one working in the teacher's trade,
+             * otherwise first applicant wins.
+             */
+            if (potentialStudent.getTeacher() == null
+                && potentialStudent.canBeStudent(teacher)) {
+                if (student == null
+                    || potentialStudent.getSkillLevel() < skillLevel
+                    || (potentialStudent.getSkillLevel() == skillLevel
+                        && potentialStudent.getWorkType() == expertProduction)){
+                    student = potentialStudent;
+                    skillLevel = student.getSkillLevel();
+                }
+            }
+        }
+        return student;
+    }
+
+    /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Colony</code>.
      * <p>
@@ -1733,27 +1789,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             }
         }
         return null;
-    }
-
-    // Find and a teacher of given Unit, if teacher available
-    public Unit findTeacher(Unit unit) {
-        // Remains null if no teacher found.
-        Unit foundTeacher = null;
-
-        for (Building building: getColony().getBuildings()) {
-            if (building.getType().hasAbility("model.ability.teach")) {
-                for (Unit potentialTeacher: building.getUnitList()) {
-                    if (potentialTeacher.getStudent() == null && unit.canBeStudent(potentialTeacher)) {
-                        foundTeacher = potentialTeacher;
-                        break;
-                    }
-                }
-                // Break assumes only one educational facility.
-                break;
-            }
-        }
-
-        return foundTeacher;
     }
 
     /**

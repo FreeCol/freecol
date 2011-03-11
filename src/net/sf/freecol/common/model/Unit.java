@@ -808,7 +808,7 @@ public class Unit extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean canBeStudent(Unit teacher) {
-        return canBeStudent(unitType, teacher.unitType);
+        return teacher != this && canBeStudent(unitType, teacher.unitType);
     }
 
     /**
@@ -1976,11 +1976,6 @@ public class Unit extends FreeColGameObject
             // Leaving colony.
             getOwner().modifyScore(-getType().getScoreValue());
             oldColony.updatePopulation(-1);
-
-            if (teacher != null) {
-                teacher.setStudent(null);
-                teacher = null;
-            }
         } else if (newLocation instanceof WorkLocation
                    && !(oldLocation instanceof WorkLocation)) {
             // Entering colony.
@@ -1992,13 +1987,6 @@ public class Unit extends FreeColGameObject
                                + " (should be IN_COLONY) to WorkLocation in "
                                + newLocation.getColony().getName() + ". Fixing: ");
                 setState(UnitState.IN_COLONY);
-            }
-
-            // Find a teacher if available.
-            Unit potentialTeacher = newColony.findTeacher(this);
-            if (potentialTeacher != null) {
-                potentialTeacher.setStudent(this);
-                this.setTeacher(potentialTeacher);
             }
         }
 

@@ -633,19 +633,22 @@ public class ServerBuildingTest extends FreeColTestCase {
                                        colony.getOwner(), freeColonistType,
                                        UnitState.ACTIVE);
 
+        Building townHall = colony.getBuilding(townHallType);
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        colonist.setLocation(townHall);
 
         Unit teacher = units.next();
         teacher.setType(expertOreMinerType);
         teacher.setLocation(university);
+        assertEquals(teacher.getStudent(), colonist);
+        assertEquals(colonist.getTeacher(), teacher);
 
         // Train to become free colonist then swap the colonist with
         // another one.
         trainForTurns(colony, teacher.getNeededTurnsOfTraining() - 1);
         colonist.setLocation(colony.getTile());
-        outsider.setLocation(colony);
+        outsider.setLocation(townHall);
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(teacher.getStudent(), outsider);
 

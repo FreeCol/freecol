@@ -170,9 +170,9 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private boolean csAssignStudent(Unit teacher, ChangeSet cs) {
-        final Unit student = findStudent(teacher);
+        Colony colony = getColony();
+        final Unit student = colony.findStudent(teacher);
         if (student == null) {
-            Colony colony = getColony();
             cs.addMessage(See.only((ServerPlayer) colony.getOwner()),
                 new ModelMessage(ModelMessage.MessageType.WARNING,
                                  "model.building.noStudent",

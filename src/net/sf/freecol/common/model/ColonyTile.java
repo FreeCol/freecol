@@ -361,6 +361,13 @@ public class ColonyTile extends FreeColGameObject
         final Unit unit = (Unit) locatable;
         setUnit(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
+
+        Unit teacher = unit.getTeacher();
+        if (teacher == null
+            && (teacher = getColony().findTeacher(unit)) != null) {
+            unit.setTeacher(teacher);
+            teacher.setStudent(unit);
+        }
     }
 
     /**
@@ -377,6 +384,12 @@ public class ColonyTile extends FreeColGameObject
         setUnit(null);
         unit.setMovesLeft(0);
         unit.setState(Unit.UnitState.ACTIVE);
+
+        Unit teacher = unit.getTeacher();
+        if (teacher != null) {
+            teacher.setStudent(null);
+            unit.setTeacher(null);
+        }
     }
 
 

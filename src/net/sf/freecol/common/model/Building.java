@@ -371,9 +371,17 @@ public class Building extends FreeColGameObject
 
         if (buildingType.hasAbility("model.ability.teach")) {
             Unit student = unit.getStudent();
-            if (student == null && (student = findStudent(unit)) != null) {
+            if (student == null
+                && (student = getColony().findStudent(unit)) != null) {
                 unit.setStudent(student);
                 student.setTeacher(unit);
+            }
+        } else {
+            Unit teacher = unit.getTeacher();
+            if (teacher == null
+                && (teacher = getColony().findTeacher(unit)) != null) {
+                unit.setTeacher(teacher);
+                teacher.setStudent(unit);
             }
         }
     }
@@ -398,6 +406,12 @@ public class Building extends FreeColGameObject
                 if (student != null) {
                     student.setTeacher(null);
                     unit.setStudent(null);
+                }
+            } else {
+                Unit teacher = unit.getTeacher();
+                if (teacher != null) {
+                    teacher.setStudent(null);
+                    unit.setTeacher(null);
                 }
             }
         }
@@ -467,41 +481,6 @@ public class Building extends FreeColGameObject
      */
     public GoodsContainer getGoodsContainer() {
         return null;
-    }
-
-    /**
-     * Find a student for the specified teacher.
-     * Do not search if ALLOW_STUDENT_SELECTION is true--- its the player's
-     * job then.
-     *
-     * @param teacher The teacher <code>Unit</code> that needs a student.
-     * @return A potential student, or null of none found.
-     */
-    public Unit findStudent(final Unit teacher) {
-        if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)){
-            return null; // Do not automatically assign students.
-        }
-        Unit student = null;
-        GoodsType expertProduction = teacher.getType().getExpertProduction();
-        int skillLevel = INFINITY;
-        for (Unit potentialStudent : getColony().getUnitList()) {
-            /**
-             * Always pick the student with the least skill first.
-             * Break ties by favouring the one working in the teacher's trade,
-             * otherwise first applicant wins.
-             */
-            if (potentialStudent.getTeacher() == null
-                && potentialStudent.canBeStudent(teacher)) {
-                if (student == null
-                    || potentialStudent.getSkillLevel() < skillLevel
-                    || (potentialStudent.getSkillLevel() == skillLevel
-                        && potentialStudent.getWorkType() == expertProduction)){
-                    student = potentialStudent;
-                    skillLevel = student.getSkillLevel();
-                }
-            }
-        }
-        return student;
     }
 
     /**

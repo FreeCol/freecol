@@ -33,35 +33,53 @@ public class SchoolTest extends FreeColTestCase {
 
     private enum SchoolLevel { SCHOOLHOUSE, COLLEGE, UNIVERSITY };
 
-    private UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
-    private UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
-    private UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
-    private UnitType expertOreMinerType = spec().getUnitType("model.unit.expertOreMiner");
-    private UnitType expertLumberJackType = spec().getUnitType("model.unit.expertLumberJack");
-    private UnitType masterCarpenterType = spec().getUnitType("model.unit.masterCarpenter");
-    private UnitType masterBlacksmithType = spec().getUnitType("model.unit.masterBlacksmith");
-    private UnitType veteranSoldierType = spec().getUnitType("model.unit.veteranSoldier");
-    private UnitType elderStatesmanType = spec().getUnitType("model.unit.elderStatesman");
-    private UnitType colonialRegularType = spec().getUnitType("model.unit.colonialRegular");
-    private BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
+    private static final BuildingType schoolType
+        = spec().getBuildingType("model.building.schoolhouse");
+    private static final BuildingType collegeType
+        = spec().getBuildingType("model.building.college");
+    private static final BuildingType universityType
+        = spec().getBuildingType("model.building.university");
 
-    private Building addSchoolToColony(Game game, Colony colony, SchoolLevel level){
-        BuildingType schoolType = null;;
-        switch(level){
+    private static final UnitType colonialRegularType
+        = spec().getUnitType("model.unit.colonialRegular");
+    private static final UnitType elderStatesmanType
+        = spec().getUnitType("model.unit.elderStatesman");
+    private static final UnitType expertLumberJackType
+        = spec().getUnitType("model.unit.expertLumberJack");
+    private static final UnitType expertOreMinerType
+        = spec().getUnitType("model.unit.expertOreMiner");
+    private static final UnitType freeColonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType indenturedServantType
+        = spec().getUnitType("model.unit.indenturedServant");
+    private static final UnitType pettyCriminalType
+        = spec().getUnitType("model.unit.pettyCriminal");
+    private static final UnitType masterBlacksmithType
+        = spec().getUnitType("model.unit.masterBlacksmith");
+    private static final UnitType masterCarpenterType
+        = spec().getUnitType("model.unit.masterCarpenter");
+    private static final UnitType veteranSoldierType
+        = spec().getUnitType("model.unit.veteranSoldier");
+
+
+    private Building addSchoolToColony(Game game, Colony colony,
+                                       SchoolLevel level) {
+        BuildingType type = null;;
+        switch (level) {
         case SCHOOLHOUSE:
-                schoolType = spec().getBuildingType("model.building.schoolhouse");
-                break;
+            type = schoolType;
+            break;
         case COLLEGE:
-                schoolType = spec().getBuildingType("model.building.college");
-                break;
+            type = collegeType;
+            break;
         case UNIVERSITY:
-                schoolType = spec().getBuildingType("model.building.university");
-                break;
+            type = universityType;
+            break;
         default:
-                fail("Setup error, cannot setup school");
+            fail("Setup error, cannot setup school");
         }
-        colony.addBuilding(new ServerBuilding(game, colony, schoolType));
-        return colony.getBuilding(schoolType);
+        colony.addBuilding(new ServerBuilding(game, colony, type));
+        return colony.getBuilding(type);
     }
 
     /**
@@ -82,19 +100,18 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testUpgrades() {
-
-        UnitType colonist = spec().getUnitType("model.unit.freeColonist");
-        UnitType servant = spec().getUnitType("model.unit.indenturedServant");
-        UnitType criminal = spec().getUnitType("model.unit.pettyCriminal");
-        UnitType carpenter = spec().getUnitType("model.unit.masterCarpenter");
-
-        assertEquals(Unit.getUnitTypeTeaching(carpenter, colonist), carpenter);
-        assertEquals(Unit.getUnitTypeTeaching(carpenter, servant), colonist);
-        assertEquals(Unit.getUnitTypeTeaching(carpenter, criminal), servant);
+        assertEquals(Unit.getUnitTypeTeaching(masterCarpenterType,
+                                              freeColonistType),
+                     masterCarpenterType);
+        assertEquals(Unit.getUnitTypeTeaching(masterCarpenterType,
+                                              indenturedServantType),
+                     freeColonistType);
+        assertEquals(Unit.getUnitTypeTeaching(masterCarpenterType,
+                                              pettyCriminalType),
+                     indenturedServantType);
     }
 
     public void testEducationOption() {
-
         GoodsType lumber = spec().getGoodsType("model.goods.lumber");
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
 
@@ -116,9 +133,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         colony.addBuilding(new ServerBuilding(getGame(), colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.schoolhouse"));
+        Building school = colony.getBuilding(schoolType);
         assertTrue(schoolType.hasAbility("model.ability.teach"));
         assertTrue(colony.canTrain(lumberJack));
         assertTrue(spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION));
@@ -141,34 +157,48 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testChangeTeachers(){
-    	Game game = getGame();
-    	game.setMap(getTestMap());
+        Game game = getGame();
+        game.setMap(getTestMap());
 
-    	// Setup
-    	ColonyBuilder colBuilder = FreeColTestUtils.getColonyBuilder();
-    	colBuilder.initialColonists(3).addColonist(expertLumberJackType).addColonist(expertLumberJackType);
-    	Colony colony = colBuilder.build();
-    	Building school = addSchoolToColony(game, colony, SchoolLevel.COLLEGE);
+        // Setup
+        ColonyBuilder colBuilder = FreeColTestUtils.getColonyBuilder();
+        colBuilder.initialColonists(3).addColonist(expertLumberJackType)
+            .addColonist(expertLumberJackType);
+        Colony colony = colBuilder.build();
+        Building school = addSchoolToColony(game, colony, SchoolLevel.COLLEGE);
 
-    	Unit student = getUnitList(colony, freeColonistType).get(0);
-    	List<Unit> teacherList = getUnitList(colony, expertLumberJackType);
-    	Unit teacher1 = teacherList.get(0);
-    	Unit teacher2 = teacherList.get(1);
-    	assertTrue("Teacher1 should not have a student yet",teacher1.getStudent() == null);
-    	assertTrue("Teacher2 should not have a student yet",teacher2.getStudent() == null);
-    	// add first teacher
-    	school.add(teacher1);
-    	assertTrue("Teacher1 should now have a student",teacher1.getStudent() == student);
-    	assertTrue("Student should have assigned teacher1",student.getTeacher() == teacher1);
-    	// add a second teacher
-    	school.add(teacher2);
-    	assertTrue("Teacher1 should still have a student",teacher1.getStudent() == student);
-    	assertTrue("Teacher2 should not have a student yet",teacher2.getStudent() == null);
-    	assertTrue("Student should have assigned teacher1",student.getTeacher() == teacher1);
-    	// change teacher
-    	student.setTeacher(teacher2);
-    	assertTrue("Teacher1 should not have a student now",teacher1.getStudent() == null);
-    	assertTrue("Teacher2 should now have a student",teacher2.getStudent() == student);
-    	assertTrue("Student should have assigned teacher2",student.getTeacher() == teacher2);
+        Unit student = getUnitList(colony, freeColonistType).get(0);
+        List<Unit> teacherList = getUnitList(colony, expertLumberJackType);
+        Unit teacher1 = teacherList.get(0);
+        Unit teacher2 = teacherList.get(1);
+        assertNull("Teacher1 should not have a student yet",
+                   teacher1.getStudent());
+        assertNull("Teacher2 should not have a student yet",
+                   teacher2.getStudent());
+
+        // add first teacher
+        school.add(teacher1);
+        assertEquals("Teacher1 should now have a student",
+                     teacher1.getStudent(), student);
+        assertEquals("Student should have assigned teacher1",
+                     student.getTeacher(), teacher1);
+
+        // add a second teacher
+        school.add(teacher2);
+        assertEquals("Teacher1 should still have a student",
+                     teacher1.getStudent(), student);
+        assertNull("Teacher2 should not have a student yet",
+                   teacher2.getStudent());
+        assertEquals("Student should have assigned teacher1",
+                     student.getTeacher(), teacher1);
+
+        // change teacher
+        student.setTeacher(teacher2);
+        assertNull("Teacher1 should not have a student now",
+                   teacher1.getStudent());
+        assertEquals("Teacher2 should now have a student",
+                     teacher2.getStudent(), student);
+        assertEquals("Student should have assigned teacher2",
+                     student.getTeacher(), teacher2);
     }
 }
