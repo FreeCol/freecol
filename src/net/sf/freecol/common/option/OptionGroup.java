@@ -269,8 +269,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * This method does nothing at all. It is only needed to extend
-     * AbstractOption.
+     * Copy the options of another OptionGroup.
      *
      * @param value an <code>Object</code> value
      */
