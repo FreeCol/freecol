@@ -1671,15 +1671,19 @@ public final class Canvas extends JDesktopPane {
      * shows the new game panel.
      */
     public void newGame() {
+        Specification specification = null;
         if (freeColClient.getGame() != null) {
-           if (!showConfirmDialog("stopCurrentGame.text",
-                               "stopCurrentGame.yes", "stopCurrentGame.no")) 
-              return;
-           freeColClient.getConnectController().quitGame(true);
-           removeInGameComponents();
+            if (freeColClient.isMapEditor()) {
+                specification = freeColClient.getGame().getSpecification();
+            } else if (!showConfirmDialog("stopCurrentGame.text",
+                                          "stopCurrentGame.yes", "stopCurrentGame.no")) {
+                return;
+            }
+            freeColClient.getConnectController().quitGame(true);
+            removeInGameComponents();
         }
 
-        showPanel(new NewPanel(this));
+        showPanel(new NewPanel(this, specification));
     }
 
 

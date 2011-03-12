@@ -109,19 +109,36 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private final ConnectController connectController;
 
+    /**
+     * The specification to use for the new game.
+     */
+    private Specification specification;
+
 
     /**
-    * The constructor that will add the items to this panel.
-    * 
-    * @param parent The parent of this panel.
-    */
+     * The constructor that will add the items to this panel.
+     *
+     * @param parent The parent of this panel.
+     */
     public NewPanel(Canvas parent) {
+        this(parent, null);
+    }
+
+    /**
+     * The constructor that will add the items to this panel.
+     *
+     * @param parent The parent of this panel.
+     * @param specification a <code>Specification</code> value, may be null
+     */
+    public NewPanel(Canvas parent, Specification specification) {
         super(parent);
+        this.specification = specification;
         this.connectController = getClient().getConnectController();
 
         for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc.getModInfo());
-            if (FreeCol.DEFAULT_TC.equals(tc.getId())) {
+            if ((specification == null && FreeCol.DEFAULT_TC.equals(tc.getId()))
+                || (specification != null && specification.getId().equals(tc.getId()))) {
                 specificationBox.setSelectedItem(tc.getModInfo());
             }
         }
@@ -187,6 +204,34 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         setSize(getPreferredSize());
     }
 
+    /**
+     * Get the <code>Specification</code> value.
+     *
+     * @return a <code>Specification</code> value
+     */
+    @Override
+    public Specification getSpecification() {
+        if (specification == null) {
+            try {
+                String tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
+                FreeColTcFile tcData = new FreeColTcFile(tc);
+                specification = tcData.getSpecification();
+            } catch(Exception e) {
+                logger.warning(e.toString());
+            }
+        }
+        return specification;
+    }
+
+    /**
+     * Set the <code>Specification</code> value.
+     *
+     * @param newSpecification The new Specification value.
+     */
+    public void setSpecification(final Specification newSpecification) {
+        this.specification = newSpecification;
+    }
+
     private void enableComponents(Component[] components, boolean enable) {
         for (Component c : components) {
             c.setEnabled(enable);
@@ -218,6 +263,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             enableComponents(gameComponents, false);
             break;
         }
+        specificationBox.setEnabled(specification == null);
     }
 
     /**
@@ -234,9 +280,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                                      group.getSelection().getActionCommand());
                 switch(action) {
                 case SINGLE:
-                    String tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
-                    FreeColTcFile tcData = new FreeColTcFile(tc);
-                    Specification specification = tcData.getSpecification();
                     OptionGroup level = getCanvas()
                         .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
                     Advantages advantages;
@@ -258,9 +301,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case START:
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
-                        tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
-                        tcData = new FreeColTcFile(tc);
-                        specification = tcData.getSpecification();
                         level = getCanvas()
                             .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
                         specification.applyDifficultyLevel(level);
