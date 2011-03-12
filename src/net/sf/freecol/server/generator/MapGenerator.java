@@ -9,18 +9,18 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public interface MapGenerator {
 
-    /** 
+    /**
      * Creates the map with the current set options
      */
     public abstract void createMap(Game game) throws FreeColException;
 
     /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
-     * 
+     *
      * The <code>Map</code> is added to the <code>Game</code> after
      * it is created.
-     * 
-     * @param game The game. 
+     *
+     * @param game The game.
      * @param landMap Determines whether there should be land
      *                or ocean on a given tile. This array also
      *                specifies the size of the map that is going

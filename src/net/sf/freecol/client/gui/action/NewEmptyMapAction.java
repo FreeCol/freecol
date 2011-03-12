@@ -38,7 +38,7 @@ public class NewEmptyMapAction extends MapboardAction {
 
     /**
      * Creates this action
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     NewEmptyMapAction(FreeColClient freeColClient) {
@@ -47,7 +47,7 @@ public class NewEmptyMapAction extends MapboardAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if currently
      *      in map editor mode.
      * @see FreeColClient#isMapEditor()
@@ -58,7 +58,7 @@ public class NewEmptyMapAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
@@ -70,11 +70,11 @@ public class NewEmptyMapAction extends MapboardAction {
             return;
         }
         MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
-        mapGenerator.createEmptyMap(game, new boolean[size.width][size.height]);        
-        
+        mapGenerator.createEmptyMap(game, new boolean[size.width][size.height]);
+
         freeColClient.getGUI().setFocus(1, 1);
         freeColClient.getActionManager().update();
         canvas.refresh();
     }
-    
+
 }
