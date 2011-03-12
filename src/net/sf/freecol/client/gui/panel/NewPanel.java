@@ -281,12 +281,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 switch(action) {
                 case SINGLE:
                     OptionGroup level = getCanvas()
-                        .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
+                        .showFreeColDialog(new DifficultyDialog(getCanvas(), getSpecification()));
                     Advantages advantages;
                     if (level != null) {
-                        specification.applyDifficultyLevel(level);
+                        getSpecification().applyDifficultyLevel(level);
                         advantages = (Advantages) nationalAdvantages.getSelectedItem();
-                        connectController.startSingleplayerGame(specification, name.getText(), advantages);
+                        connectController.startSingleplayerGame(getSpecification(), name.getText(), advantages);
                     }
                     break;
                 case JOIN:
@@ -302,11 +302,11 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
                         level = getCanvas()
-                            .showFreeColDialog(new DifficultyDialog(getCanvas(), specification));
-                        specification.applyDifficultyLevel(level);
+                            .showFreeColDialog(new DifficultyDialog(getCanvas(), getSpecification()));
+                        getSpecification().applyDifficultyLevel(level);
                         advantages = (Advantages) nationalAdvantages.getSelectedItem();
-                        connectController.startMultiplayerGame(specification, publicServer.isSelected(), name.getText(),
-                                                               port, advantages, level);
+                        connectController.startMultiplayerGame(getSpecification(), publicServer.isSelected(),
+                                                               name.getText(), port, advantages, level);
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }
