@@ -74,7 +74,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         if (type.equals("getVacantPlayers")) {
             reply = getVacantPlayers(connection, element);
         } else if (type.equals("disconnect")) {
-            reply = disconnect(connection, element);                                
+            reply = disconnect(connection, element);
         } else {
             logger.warning("Unkown request: " + type);
         }
@@ -82,7 +82,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         return reply;
     }
 
-    
+
     /**
      * Handles the main element of an XML message.
      *
@@ -97,7 +97,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             logger.warning("Unkown (streamed) request: " + in.getLocalName());
         }
     }
-    
+
     /**
      * Checks if the message handler support the given message.
      * @param tagName The tag name of the message to check.
@@ -109,8 +109,8 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
     /**
      * Handles a "getVacantPlayers"-request.
-     * 
-     * @param connection The connection the message came from. 
+     *
+     * @param connection The connection the message came from.
      * @param element The element containing the request.
      * @return The reply: An XML element containing a list of the
      *       vacant players.
@@ -140,33 +140,33 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
     /**
      * Handles a "login"-request.
-     * 
+     *
      * @param connection The connection the message is comming from.
      * @param in The stream with the incoming data.
      * @param out The target stream for the reply.
      */
-    private void login(Connection connection, XMLStreamReader in, XMLStreamWriter out) {        
+    private void login(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
         // TODO: Do not allow more than one (human) player to connect
         // to a singleplayer game. This would be easy if we used a
         // dummy connection for single-player games.
         Game game = freeColServer.getGame();
         Server server = freeColServer.getServer();
-        
+
         String username = in.getAttributeValue(null, "username");
         if (username == null) {
             throw new IllegalArgumentException("The attribute 'username' is missing.");
         }
-        
+
         final String freeColVersion = in.getAttributeValue(null, "freeColVersion");
         if (freeColVersion == null) {
             throw new IllegalArgumentException("The attribute 'freeColVersion' is missing.");
         }
-        
+
         if (!freeColVersion.equals(FreeCol.getVersion())) {
             Message.createError(out, "server.wrongFreeColVersion", "The game versions do not match.");
             return;
         }
-        
+
         if (freeColServer.getGameState() != FreeColServer.GameState.STARTING_GAME) {
             if (game.getPlayerByName(username) == null) {
                 Message.createError(out, "server.alreadyStarted", "The game has already been started!");
@@ -267,7 +267,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         try {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {}
-        
+
         // Make the reply:
         try {
             out.writeStartElement("loginConfirmed");
@@ -283,7 +283,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         // Successful login:
         server.addConnection(connection);
     }
-    
+
     /**
      * Handles a "disconnect"-message.
      *
@@ -298,7 +298,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         } catch (IOException e) {
             logger.warning("Could not close the connection.");
         }
-        
+
         return null;
-    }    
+    }
 }
