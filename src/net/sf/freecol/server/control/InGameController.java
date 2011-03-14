@@ -3138,14 +3138,9 @@ public final class InGameController extends Controller {
         if (!serverPlayer.checkGold(price)) {
             return Message.clientError("Insufficient funds to pay for build.");
         }
-        // Save the correct final gold for the player, as we are going to
-        // use buy() below, but it deducts the normal uninflated price for
-        // the goods being bought.  We restore this correct amount later.
-        int savedGold = serverPlayer.modifyGold(-price);
 
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = colony.getGoodsContainer();
-        container.saveState();
         for (GoodsType type : required.keySet()) {
             int amount = required.get(type);
             if (type.isStorable()) {
@@ -3158,7 +3153,7 @@ public final class InGameController extends Controller {
         }
 
         // Nothing to see for others, colony internal.
-        serverPlayer.setGold(savedGold);
+        serverPlayer.modifyGold(-price);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), container);
         return cs.build(serverPlayer);
