@@ -90,7 +90,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
     private static final String BUY = "buy";
-    
+
     private static final int UNABLE_TO_BUILD = -1;
 
     private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
@@ -481,74 +481,80 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     private int getMaximumIndex(BuildableType buildableType) {
         ListModel buildQueue = buildQueueList.getModel();
-        int buildQueueLastPos = buildQueue.getSize() - 1;
-        
+        final int buildQueueLastPos = buildQueue.getSize();
+
         boolean canBuild = false;
         if (colony.canBuild(buildableType)) {
-        	canBuild = true;
+            canBuild = true;
         }
-        
+
         if (buildableType instanceof UnitType) {
-        	// does not depend on anything, nothing depends on it
-        	// can be built at any time
+            // does not depend on anything, nothing depends on it
+            // can be built at any time
             if(canBuild){
-            	return buildQueueLastPos;
+                return buildQueueLastPos;
             }
             // check for building in queue that allows builting this unit
-        	for (int index = 0; index < buildQueue.getSize(); index++) {
-            	BuildableType toBuild = (BuildableType) buildQueue.getElementAt(index);
-            	
-            	if(toBuild == buildableType){
-            		continue;
-            	}
-            	
-            	if (toBuild.hasAbility("model.ability.build", buildableType)) {
-            		return buildQueueLastPos;
-            	}
+            for (int index = 0; index < buildQueue.getSize(); index++) {
+                BuildableType toBuild = (BuildableType) buildQueue.getElementAt(index);
+
+                if(toBuild == buildableType){
+                    continue;
+                }
+
+                if (toBuild.hasAbility("model.ability.build", buildableType)) {
+                    return buildQueueLastPos;
+                }
             }
-            
+
             return UNABLE_TO_BUILD;
         }
-        
+
         if (buildableType instanceof BuildingType) {
             BuildingType upgradesFrom = ((BuildingType) buildableType).getUpgradesFrom();
             BuildingType upgradesTo = ((BuildingType) buildableType).getUpgradesTo();
-            
+
             // does not depend on nothing, but still cannot be built
             if (!canBuild && upgradesFrom == null) {
-            	return UNABLE_TO_BUILD;
+                return UNABLE_TO_BUILD;
             }
-            
+
+            // if can be built and does not have any upgrade,
+            //then it can be built at any time
+            if(canBuild && upgradesTo == null){
+                return buildQueueLastPos;
+            }
+
             // if can be built, does not depend on anything, mark upgradesfrom as found
             boolean foundUpgradesFrom = canBuild? true:false;
             for (int index = 0; index < buildQueue.getSize(); index++) {
-            	BuildableType toBuild = (BuildableType) buildQueue.getElementAt(index);
-            	
-            	// if can be built and does not have any upgrade,
-            	//then it can be built at any time
-            	if(canBuild && upgradesTo == null){
-            		return buildQueueLastPos;
-            	}
-            	
-            	if(toBuild == buildableType){
-            		continue;
-            	}
-            	if (!canBuild && !foundUpgradesFrom && upgradesFrom.equals(toBuild)) {
-            		foundUpgradesFrom = true;
-            		// nothing else to upgrade this building to
-            		if(upgradesTo == null){
-            			return buildQueueLastPos;
-            		}
-            	}
-            	// found a building it upgrades to, cannot go to or beyond this position
-            	if (foundUpgradesFrom && upgradesTo != null && upgradesTo.equals(toBuild)) {
-            		return index - 1;
-            	}
+                BuildableType toBuild = (BuildableType) buildQueue.getElementAt(index);
+
+                if(toBuild == buildableType){
+                    continue;
+                }
+
+                if (!canBuild && !foundUpgradesFrom && upgradesFrom.equals(toBuild)) {
+                    foundUpgradesFrom = true;
+                    // nothing else to upgrade this building to
+                    if(upgradesTo == null){
+                        return buildQueueLastPos;
+                    }
+                }
+                // found a building it upgrades to, cannot go to or beyond this position
+                if (foundUpgradesFrom && upgradesTo != null && upgradesTo.equals(toBuild)) {
+                    return index;
+                }
+
+                // Don't go past a unit this building can build.
+                if (buildableType.hasAbility("model.ability.build", toBuild)) {
+                    return index;
+                }
             }
-            
-            return UNABLE_TO_BUILD;
+
+            return buildQueueLastPos;
         }
-        
+
         return UNABLE_TO_BUILD;
     }
 
@@ -563,9 +569,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             List<BuildableType> buildables = getBuildableTypes(buildQueueList);
             if (!buildables.isEmpty() && lockReasons.get(buildables.get(0)) != null) {
                 getCanvas().showInformationMessage(buildables.get(0),
-                    StringTemplate.template("colonyPanel.unbuildable")
-                    .addName("%colony%", colony.getName())
-                    .add("%object%", buildables.get(0).getNameKey()));
+                                                   StringTemplate.template("colonyPanel.unbuildable")
+                                                   .addName("%colony%", colony.getName())
+                                                   .add("%object%", buildables.get(0).getNameKey()));
                 return;
             }
             getController().setBuildQueue(colony, buildables);
@@ -603,7 +609,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         } else if (cellRenderer == null || cellRenderer instanceof SimpleBuildQueueCellRenderer) {
             return new DefaultBuildQueueCellRenderer();
         }
-                
+
         // return current one
         return cellRenderer;
     }
@@ -619,7 +625,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
         JList source = null;
         int[] indices = null;
-        int targetIndex = -1;  // preferred index of target list
         int numberOfItems = 0;  // number of items to be added
 
         /**
@@ -642,28 +647,28 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 target = (JList) comp;
                 targetModel = (DefaultListModel) target.getModel();
                 Object transferData = data.getTransferData(buildQueueFlavor);
-                
+
                 if (!(transferData instanceof List<?>)) {
-                	return false;
+                    return false;
                 }
-                
+
                 for (Object object : (List<?>) transferData) {
                     // first we need to make sure all items are compatible
                     //with the drop zone
-                	if (!(object instanceof BuildableType)) {
-                		return false;
-                	}
+                    if (!(object instanceof BuildableType)) {
+                        return false;
+                    }
 
-                	// check if trying to drop units in the Building list
-                	//or buildings in the Unit List
-                	if ((object instanceof BuildingType && target == unitList)
-                			|| (object instanceof UnitType && target == buildingList)) {
-                		return false;
-                	}
-                
-                	// Object check complete
-                	// Add object to the to-add list
-                	buildQueue.add((BuildableType) object);
+                    // check if trying to drop units in the Building list
+                    //or buildings in the Unit List
+                    if ((object instanceof BuildingType && target == unitList)
+                        || (object instanceof UnitType && target == buildingList)) {
+                        return false;
+                    }
+
+                    // Object check complete
+                    // Add object to the to-add list
+                    buildQueue.add((BuildableType) object);
                 }
             } catch (Exception e) {
                 logger.warning(e.toString());
@@ -677,39 +682,50 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 }
             }
 
-            // set starting index to add list of Buildables
+            // This is where the dragged target was dropped.
             int preferredIndex = target.getSelectedIndex();
 
             boolean isOrderingQueue = false;
             int prevPos = -1;
             if (source.equals(target)) {
                 // only the build queue allows ordering
-            	if (target != buildQueueList && target.getParent() != buildQueueList) {
-                	return false;
+                if (target != buildQueueList && target.getParent() != buildQueueList) {
+                    return false;
                 }
-            	
-            	// find previous position
-            	for(int i=0; i < targetModel.getSize(); i++){
-            		if(targetModel.getElementAt(i) == buildQueue.get(0)){
-            			prevPos = i;
-            			break;
-            		}
-            	}
-            	
-            	// don't drop selection on itself	
-            	if(preferredIndex != -1 && prevPos == preferredIndex){	
-            		indices = null;
-            		return false;
-            	}
-            	
-            	int maximumIndex = getMaximumIndex(buildQueue.get(0));
-            	if(preferredIndex > maximumIndex){
-            		indices = null;
-            		return false;
-            	}
-            	
-            	isOrderingQueue = true;
-            	numberOfItems = buildQueue.size();
+
+                // find previous position
+                for(int i=0; i < targetModel.getSize(); i++){
+                    if(targetModel.getElementAt(i) == buildQueue.get(0)){
+                        prevPos = i;
+                        break;
+                    }
+                }
+
+                // don't drop selection on itself
+                if(preferredIndex != -1 && prevPos == preferredIndex){
+                    indices = null;
+                    return false;
+                }
+
+                int maximumIndex = getMaximumIndex(buildQueue.get(0));
+                if(preferredIndex > maximumIndex){
+                    indices = null;
+                    return false;
+                }
+
+                isOrderingQueue = true;
+                numberOfItems = buildQueue.size();
+            }
+            else if (source == buildQueueList) {
+                // Dragging out of build queue - just remove the element.
+                // updateAllLists takes care of the rest.
+                DefaultListModel sourceModel = (DefaultListModel) source.getModel();
+
+                for(Object obj : buildQueue) {
+                    sourceModel.removeElement(obj);
+                }
+
+                return true;
             }
 
             int maxIndex = targetModel.size();
@@ -717,30 +733,51 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             if (preferredIndex < 0 || preferredIndex > maxIndex) {
                 preferredIndex = maxIndex;
             }
-            
-            targetIndex = preferredIndex;
+
             if(isOrderingQueue){
-            	// First remove the element we are ordering
-            	for(Object obj : buildQueue){
-            		targetModel.removeElement(obj);
-            	}
-            }
-            
-            for (int index = 0; index < buildQueue.size(); index++) {
-            	BuildableType toBuild = (BuildableType) buildQueue.get(index);
-            	
-            	int minimumIndex = getMinimumIndex(toBuild);
-            	
-                if (minimumIndex < targetIndex + index) {
-                    minimumIndex = targetIndex + index;
+                // Remove all elements in the build queue from the target.
+                for(Object obj : buildQueue){
+                    targetModel.removeElement(obj);
                 }
-                
+            }
+
+            for (int index = 0; index < buildQueue.size(); index++) {
+                BuildableType toBuild = (BuildableType) buildQueue.get(index);
+
+                int minimumIndex = getMinimumIndex(toBuild);
+
+                // minimumIndex == targetModel.size() means it has to go at the
+                // end.
+                if (minimumIndex < targetModel.size())
+                    {
+                        int maximumIndex = getMaximumIndex(toBuild);
+
+                        // minimumIndex == maximumIndex means there is only one
+                        // place it can go.
+                        if (minimumIndex != maximumIndex)
+                            {
+                                if (minimumIndex < preferredIndex + index) {
+                                    minimumIndex = preferredIndex + index;
+                                }
+
+                                if (minimumIndex > targetModel.size())
+                                    {
+                                        minimumIndex = targetModel.size();
+                                    }
+
+                                if (minimumIndex > maximumIndex)
+                                    {
+                                        minimumIndex = maximumIndex;
+                                    }
+                            }
+                    }
+
                 targetModel.add(minimumIndex,buildQueue.get(index));
             }
 
             // update selected index to new position
             if(isOrderingQueue){
-            	buildQueueList.setSelectedIndex(targetIndex);
+                buildQueueList.setSelectedIndex(preferredIndex);
             }
             return true;
         }
@@ -754,7 +791,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         protected void exportDone(JComponent source, Transferable data, int action) {
             // clean up
             indices = null;
-            targetIndex = -1;
             numberOfItems = 0;
             updateAllLists();
         }
