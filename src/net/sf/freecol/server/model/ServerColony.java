@@ -87,7 +87,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         Specification spec = getSpecification();
 
         goodsContainer = new GoodsContainer(game, this);
-        goodsContainer.addPropertyChangeListener(this);
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
         established = game.getTurn();
