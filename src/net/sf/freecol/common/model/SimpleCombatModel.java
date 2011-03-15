@@ -430,8 +430,9 @@ public class SimpleCombatModel extends CombatModel {
             if (r < odds.win || isBeached(defenderUnit)) {
                 great = r < 0.1f * odds.win; // Great Win
                 crs.add(CombatResult.WIN);
-                r /= 0.1f * odds.win; // Rescale to 0 <= r < 1
-                resolveAttack(attackerUnit, defenderUnit, great, r, crs);
+                resolveAttack(attackerUnit, defenderUnit, great,
+                              r / (0.1f * odds.win), // Rescale to 0 <= r < 1
+                              crs);
             } else if (r < 0.8f * odds.win + 0.2f
                     && defenderUnit.hasAbility("model.ability.evadeAttack")) {
                 crs.add(CombatResult.NO_RESULT);
@@ -439,10 +440,11 @@ public class SimpleCombatModel extends CombatModel {
             } else {
                 great = r >= 0.1f * odds.win + 0.9f; // Great Loss
                 crs.add(CombatResult.LOSE);
-                // Rescale to 0 <= r < 1
-                //   (by rearranging: 0.8 * odds.win + 0.2 <= r < 1.0)
-                r = (1.25f * r - 0.25f - odds.win) / (1.0f - odds.win);
-                resolveAttack(defenderUnit, attackerUnit, great, r, crs);
+                resolveAttack(defenderUnit, attackerUnit, great,
+                              // Rescaling to 0 <= r < 1
+                              // (rearrange: 0.8 * odds.win + 0.2 <= r < 1.0)
+                              (1.25f * r - 0.25f - odds.win)/(1.0f - odds.win),
+                              crs);
             }
 
         } else if (combatIsBombard(attacker, defender)) {
@@ -493,7 +495,7 @@ public class SimpleCombatModel extends CombatModel {
         logger.info(attacker.toString() + " " + action
                     + " " + defender.toString()
                     + ": victory=" + Float.toString(odds.win)
-                    + " random(1.0) = " + Float.toString(r)
+                    + " random(1.0)=" + Float.toString(r)
                     + " great=" + Boolean.toString(great)
                     + " => " + Utils.join(" ", results));
         return crs;
@@ -600,9 +602,8 @@ public class SimpleCombatModel extends CombatModel {
                         }
                     }
                 }
-                if (settlement.getUnitCount() + tile.getUnitCount() > lose) {
-                    crs.add(CombatResult.SLAUGHTER_UNIT);
-                } else {
+                crs.add(CombatResult.SLAUGHTER_UNIT);
+                if (settlement.getUnitCount() + tile.getUnitCount() <= lose) {
                     crs.add(CombatResult.DESTROY_SETTLEMENT);
                 }
 
@@ -644,7 +645,8 @@ public class SimpleCombatModel extends CombatModel {
         }
 
         // Promote great winners or with automatic promotion, if possible.
-        UnitTypeChange promotion = winner.getType().getUnitTypeChange(ChangeType.PROMOTION, winnerPlayer);
+        UnitTypeChange promotion = winner.getType()
+            .getUnitTypeChange(ChangeType.PROMOTION, winnerPlayer);
         if (promotion != null
             && (winner.hasAbility("model.ability.automaticPromotion")
                 || (great && (100 * (r - Math.floor(r)) <= promotion.getProbability(ChangeType.PROMOTION))))) {
