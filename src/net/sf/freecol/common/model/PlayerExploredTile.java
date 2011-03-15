@@ -272,12 +272,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
                 in.nextTag(); // advance to the Unit tag
-                missionary = (Unit) game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (missionary == null) {
-                    missionary = new Unit(game, in);
-                } else {
-                    missionary.readFromXML(in);
-                }
+                missionary = updateFreeColGameObject(in, Unit.class);
                 in.nextTag(); // close <missionary> tag
             } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
                 Resource resource = (Resource) game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
