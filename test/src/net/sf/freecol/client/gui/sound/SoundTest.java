@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.sound;
 
 import java.awt.Dimension;
 import java.io.File;
+import javax.sound.sampled.AudioSystem;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -41,7 +42,11 @@ public class SoundTest extends FreeColTestCase {
             final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
             final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
             po.setValue(10); // 10% volume
-            soundPlayer = new SoundPlayer(amo, po);
+            try {
+                soundPlayer = new SoundPlayer(amo, po);
+            } catch (Exception e) {
+                fail("Could not construct sound player: " + e.getMessage());
+            }
         }
         return soundPlayer;
     }
@@ -56,6 +61,11 @@ public class SoundTest extends FreeColTestCase {
             assertTrue("Resource " + id + " should be present",
                        ResourceManager.hasResource(id));
         } else {
+            try {
+                assertNotNull(AudioSystem.getAudioInputStream(file));
+            } catch (Exception e) {
+                fail("Could not play " + id + ": " + e.getMessage());
+            }
             getSoundPlayer().playOnce(file);
             try {
                 // just play the beginning of the sound, just to check it works
