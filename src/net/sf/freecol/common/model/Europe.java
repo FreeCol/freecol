@@ -254,7 +254,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
             if (!newUnit.isBetweenEuropeAndNewWorld()) {
                 newUnit.setState(Unit.UnitState.SENTRY);
             }
-            firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
         }
     }
 
@@ -267,7 +266,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             units.remove(locatable);
-            firePropertyChange(UNIT_CHANGE, getUnitCount() + 1, getUnitCount());
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a europe.");
         }
