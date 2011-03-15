@@ -541,7 +541,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 colony.removePropertyChangeListener(this);
                 colony.getTile().removePropertyChangeListener(this);
                 colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE, outsideColonyPanel);
-                colony.getGoodsContainer().removePropertyChangeListener(warehousePanel);
+                warehousePanel.cleanup();
             }
             if (getSelectedUnit() != null) {
                 getSelectedUnit().removePropertyChangeListener(this);
@@ -574,7 +574,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         fillButton.setEnabled(false);
         if (isEditable() && selectedUnitLabel != null) {
             Unit unit = selectedUnitLabel.getUnit();
-            if (unit != null && unit.isCarrier() && unit.getSpaceLeft() < unit.getType().getSpace()) {
+            if (unit != null && unit.isCarrier()
+                && unit.getSpaceLeft() < unit.getType().getSpace()) {
                 unloadButton.setEnabled(true);
                 for (Goods goods : unit.getGoodsList()) {
                     if (getColony().getGoodsCount(goods.getType()) > 0) {
@@ -697,6 +698,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      */
     private synchronized void setColony(Colony colony) {
         if (this.colony != null) {
+            warehousePanel.cleanup();
             this.colony.removePropertyChangeListener(this);
             this.colony.getTile().removePropertyChangeListener(this);
         }
@@ -704,6 +706,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (this.colony != null) {
             this.colony.addPropertyChangeListener(this);
             this.colony.getTile().addPropertyChangeListener(this);
+            warehousePanel.initialize();
         }
         editable = (colony.getOwner() == getMyPlayer());
     }
@@ -716,6 +719,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public ColonyCargoPanel(Canvas canvas) {
             super(canvas, true);
             //setLayout(new MigLayout("wrap 4, fill"));
+        }
+
+        @Override
+        public void update() {
+            super.update();
+            // May have un/loaded cargo, "Unload" could have changed validity
+            updateCarrierButtons();
         }
 
         @Override
@@ -1096,9 +1106,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     /**
-     * A panel that holds goods that represent cargo that is inside the Colony.
+     * A panel that holds goods that represent cargo that is inside
+     * the Colony.
      */
-    public final class WarehousePanel extends JPanel implements PropertyChangeListener {
+    public final class WarehousePanel extends JPanel
+        implements PropertyChangeListener {
 
         private final ColonyPanel colonyPanel;
 
@@ -1112,71 +1124,94 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             setLayout(new MigLayout("fill, gap push"));
         }
 
+        /**
+         * Initialize this WarehousePanel.
+         */
         public void initialize() {
-            // get notified of warehouse changes
-            getColony().getGoodsContainer().addPropertyChangeListener(this);
+            addPropertyChangeListeners();
             update();
             revalidate();
             repaint();
         }
 
+        /**
+         * Clean up this WarehousePanel.
+         */
+        public void cleanup() {
+            removePropertyChangeListeners();
+        }
+
+        /**
+         * Update this WarehousePanel.
+         */
         private void update() {
+            final int threshold = getClient().getClientOptions()
+                .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             removeAll();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                if (goodsType.isStorable()) {
-                    Goods goods = getColony().getGoodsContainer().getGoods(goodsType);
-                    if (goods.getAmount() >= getClient().getClientOptions()
-                        .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS)) {
-                        GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
-                        if (colonyPanel.isEditable()) {
-                            goodsLabel.setTransferHandler(defaultTransferHandler);
-                            goodsLabel.addMouseListener(pressListener);
-                        }
-                        add(goodsLabel, false);
+                Goods goods = getColony().getGoodsContainer().getGoods(goodsType);
+                if (goodsType.isStorable() && goods.getAmount() >= threshold) {
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+                    if (colonyPanel.isEditable()) {
+                        goodsLabel.setTransferHandler(defaultTransferHandler);
+                        goodsLabel.addMouseListener(pressListener);
                     }
+                    add(goodsLabel, false);
                 }
             }
+            revalidate();
+            repaint();
+        }
+
+        /**
+         * Adds a component to this WarehousePanel and makes sure that
+         * the unit or good that the component represents gets
+         * modified so that it is on board the currently selected
+         * ship.
+         *
+         * @param comp The component to add to this WarehousePanel.
+         * @param editState Must be set to 'true' if the state of the
+         *            component that is added (which should be a
+         *            dropped component representing a Unit or good)
+         *            should be changed so that the underlying unit or
+         *            goods are on board the currently selected ship.
+         * @return The component argument.
+         */
+        public Component add(Component comp, boolean editState) {
+            if (editState) {
+                if (!(comp instanceof GoodsLabel)) {
+                    logger.warning("Invalid component dropped on this WarehousePanel.");
+                    return null;
+                }
+                comp.getParent().remove(comp);
+                ((GoodsLabel) comp).setSmall(false);
+                return comp;
+            }
+
+            Component c = add(comp);
+            return c;
+        }
+
+        public void addPropertyChangeListeners() {
+            getColony().getGoodsContainer().addPropertyChangeListener(this);
+        }
+
+        public void removePropertyChangeListeners() {
+            getColony().getGoodsContainer().removePropertyChangeListener(this);
+        }
+
+        public void propertyChange(PropertyChangeEvent event) {
+            logger.finest(getColony().getName() + "-warehouse change "
+                          + event.getPropertyName()
+                          + ": " + event.getOldValue()
+                          + " -> " + event.getNewValue());
+            update();
         }
 
         @Override
         public String getUIClassID() {
             return "WarehousePanelUI";
         }
-
-
-        /**
-         * Adds a component to this WarehousePanel and makes sure that the unit or
-         * good that the component represents gets modified so that it is on
-         * board the currently selected ship.
-         *
-         * @param comp The component to add to this WarehousePanel.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit or good) should be changed so that the
-         *            underlying unit or goods are on board the currently
-         *            selected ship.
-         * @return The component argument.
-         */
-        public Component add(Component comp, boolean editState) {
-            if (editState) {
-                if (comp instanceof GoodsLabel) {
-                    comp.getParent().remove(comp);
-                    ((GoodsLabel) comp).setSmall(false);
-                    return comp;
-                }
-                logger.warning("An invalid component got dropped on this WarehousePanel.");
-                return null;
-            }
-
-            Component c = add(comp);
-
-            return c;
-        }
-
-        public void propertyChange(PropertyChangeEvent event) {
-            update();
-        }
-
     }
 
 
