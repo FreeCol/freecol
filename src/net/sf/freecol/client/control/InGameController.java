@@ -983,23 +983,18 @@ public final class InGameController implements NetworkConstants {
     public void selectDestination(Unit unit) {
         Canvas canvas = freeColClient.getCanvas();
         Location destination = canvas.showSelectDestinationDialog(unit);
-        if (destination == null) {
-            // user aborted
-            return;
-        }
+        if (destination == null) return; // user aborted
 
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            setDestination(unit, destination);
-            return;
-        }
-
-        if (destination instanceof Europe && unit.getTile() != null
-            && (unit.getTile().canMoveToEurope() || unit.getTile().isAdjacentToMapEdge())) {
-            moveToEurope(unit);
-            nextActiveUnit();
-        } else {
-            setDestination(unit, destination);
-            moveToDestination(unit);
+        if (setDestination(unit, destination)
+            && freeColClient.getGame().getCurrentPlayer()
+                == freeColClient.getMyPlayer()) {
+            if (destination instanceof Europe && unit.getTile() != null
+                && (unit.getTile().canMoveToEurope()
+                    || unit.getTile().isAdjacentToMapEdge())) {
+                moveToEurope(unit);
+            } else {
+                moveToDestination(unit);
+            }
         }
     }
 
@@ -1018,6 +1013,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
+        GUI gui = freeColClient.getGUI();
+        gui.setActiveUnit(unit);
+
         if (unit.getTradeRoute() != null) {
             Stop currStop = unit.getStop();
             if (!TradeRoute.isStopValid(unit, currStop)) {
@@ -1035,7 +1033,7 @@ public final class InGameController implements NetworkConstants {
             // make sure we reset the destination to the next stop,
             // which will avoid the unit being considered an "active" unit.
             if (unit.getDestination() == null) {
-                unit.setDestination(currStop.getLocation());
+                setDestination(unit, currStop.getLocation());
             }
 
             String where = Messages.message(currStop.getLocation()
@@ -1056,12 +1054,14 @@ public final class InGameController implements NetworkConstants {
                 + Messages.message(unit.getDestination().getLocationName()));
         }
 
-        // Destination is either invalid (like an abandoned colony,
+        // Already arrived at destination?
+        // Or is destination invalid (not Europe and not on the map)
         // for example) or is current tile.
         final Location destination = unit.getDestination();
-        if (!(destination instanceof Europe)
-            && (destination.getTile() == null
-                || unit.getTile() == destination.getTile())) {
+        if ((destination instanceof Europe && unit.isInEurope())
+            || unit.getTile() == destination.getTile()
+            || (!(destination instanceof Europe)
+                && destination.getTile() == null)) {
             clearGotoOrders(unit);
             return;
         }
@@ -1075,92 +1075,69 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (path == null) {
+            StringTemplate destLoc = destination.getLocationNameFor(player);
             canvas.showInformationMessage(unit,
                 StringTemplate.template("selectDestination.failed")
-                .addStringTemplate("%destination%", destination.getLocationNameFor(player)));
-            setDestination(unit, null);
+                    .addStringTemplate("%destination%", destLoc));
+            clearGotoOrders(unit);
             return;
         }
 
-        while (path != null) {
+        for (; path != null; path = path.next) {
+            // Special case for the map edges on maps not surrounded by
+            // high seas.
+            if (destination instanceof Europe
+                && unit.getTile() != null
+                && unit.getTile().isAdjacentToMapEdge()) {
+                moveToEurope(unit);
+                return;
+            }
+
             MoveType mt = unit.getMoveType(path.getDirection());
             switch (mt) {
+            case MOVE_HIGH_SEAS:
+                if (destination instanceof Europe) {
+                    moveToEurope(unit);
+                    return;
+                }
+                /* Fall through */
             case MOVE:
                 moveMove(unit, path.getDirection());
                 break;
             case EXPLORE_LOST_CITY_RUMOUR:
                 moveExplore(unit, path.getDirection());
                 return;
-            case MOVE_HIGH_SEAS:
-                if (destination instanceof Europe) {
-                    moveToEurope(unit);
-                    path = null;
-                } else if (path == path.getLastNode()) {
-                    move(unit, path.getDirection());
-                    path = null;
-                } else {
-                    moveMove(unit, path.getDirection());
-                }
-                break;
-            case MOVE_NO_MOVES:
-                // The unit may have some moves left,
-                // but not enough to move to the destination.
-                unit.setMovesLeft(0); //TODO: should be in server
+            case ATTACK: // Do not auto-attack
                 return;
-            default:
-                if (path == path.getLastNode() && mt.isLegal()
-                    && (mt != MoveType.ATTACK || knownEnemyOnLastTile(path))) {
+            case EMBARK:
+            case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
+            case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+            case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+            case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                // Special cases only work if this is the last tile.
+                if (path == path.getLastNode()) {
                     move(unit, path.getDirection());
-                    // unit may have been destroyed while moving
-                    if (unit.isDisposed()) {
-                        return;
-                    }
-                } else {
-                    freeColClient.getGUI().setActiveUnit(unit);
-                    return;
+                    clearGotoOrders(unit);
                 }
-            }
-            if (path != null) {
-                path = path.next;
+                return;
+            case MOVE_NO_MOVES:
+                // The unit may have some moves left, but not enough
+                // to move to the destination.  Fake clearing its
+                // remaining moves on the client side only just to
+                // avoid it being reselected.
+                unit.setMovesLeft(0);
+                return;
+            default: // Should be illegal moves only
+                return;
             }
         }
 
-        if (unit.getTile() != null && destination instanceof Europe
-            && unit.getTile().isAdjacentToMapEdge()) {
-            moveToEurope(unit);
-        }
-
-        // We have reached our destination.
-        // If in a trade route, unload and update next stop.
+        // Reached the destination.
         if (unit.getTradeRoute() == null) {
-            setDestination(unit, null);
+            clearGotoOrders(unit);
+            checkCashInTreasureTrain(unit);
         } else {
             followTradeRoute(unit);
-        }
-
-        // Display a "cash in"-dialog if a treasure train have been
-        // moved into a coastal colony:
-        if (checkCashInTreasureTrain(unit)) {
-            unit = null;
-        }
-
-        if (unit != null && unit.getMovesLeft() > 0 && unit.getTile() != null) {
-            freeColClient.getGUI().setActiveUnit(unit);
-        } else if (unit == null || freeColClient.getGUI().getActiveUnit() == unit) {
-            nextActiveUnit();
-        }
-        return;
-    }
-
-    private boolean knownEnemyOnLastTile(PathNode path) {
-        if ((path != null) && path.getLastNode() != null) {
-            Tile tile = path.getLastNode().getTile();
-            return ((tile.getFirstUnit() != null &&
-                     tile.getFirstUnit().getOwner() != freeColClient.getMyPlayer()) ||
-                    (tile.getSettlement() != null &&
-                     tile.getSettlement().getOwner() != freeColClient.getMyPlayer()));
-        } else {
-            return false;
         }
     }
 
@@ -1589,22 +1566,36 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Clears the goto orders of the given unit by setting its destination
+     * to null.
+     *
+     * @param unit The <code>Unit</code> to clear the destination for.
+     */
+    public void clearGotoOrders(Unit unit) {
+        if (unit != null && unit.getDestination() != null) {
+            setDestination(unit, null);
+        }
+    }
+
+    /**
      * Set the destination of the given unit.
      *
      * @param unit The <code>Unit</code> to direct.
      * @param destination The destination <code>Location</code>.
+     * @return True if the destination was set.
      * @see Unit#setDestination(Location)
      */
-    public void setDestination(Unit unit, Location destination) {
+    public boolean setDestination(Unit unit, Location destination) {
         if (unit.getTradeRoute() != null) {
             Canvas canvas = freeColClient.getCanvas();
             StringTemplate template = StringTemplate.template("traderoute.reassignRoute")
                 .addStringTemplate("%unit%", Messages.getLabel(unit))
                 .add("%route%", unit.getTradeRoute().getName());
             if (!canvas.showConfirmDialog(unit.getTile(), template,
-                                          "yes", "no")) return;
+                                          "yes", "no")) return false;
         }
-        askSetDestination(unit, destination);
+        return askSetDestination(unit, destination)
+            && unit.getDestination() == destination;
     }
 
     /**
@@ -4430,19 +4421,6 @@ public final class InGameController implements NetworkConstants {
         assignTradeRoute(unit, null);
         clearGotoOrders(unit);
         return askChangeState(unit, UnitState.ACTIVE);
-    }
-
-    /**
-     * Clears the goto orders of the given unit by setting its destination
-     * to null.
-     *
-     * @param unit The <code>Unit</code>.
-     */
-    public void clearGotoOrders(Unit unit) {
-        if (unit == null) return;
-        if (unit.getDestination() != null) {
-            setDestination(unit, null);
-        }
     }
 
     /**
