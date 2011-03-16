@@ -156,7 +156,7 @@ public final class ConnectController {
         try {
             FreeColServer freeColServer = new FreeColServer(specification, false, true, port, null, advantages);
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
-                freeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
+                FreeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
             }
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
@@ -207,7 +207,7 @@ public final class ConnectController {
         }
 
         freeColClient.setSingleplayer(false);
-        if (login(username, host, port) && !freeColClient.getGUI().isInGame()) {
+        if (login(username, host, port) && !freeColClient.isInGame()) {
             canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
@@ -507,7 +507,7 @@ public final class ConnectController {
         ResourceManager.setCampaignMapping(null);
 
         if (!freeColClient.isHeadless()) {
-            freeColClient.getGUI().setInGame(false);
+            freeColClient.setInGame(false);
         }
         freeColClient.setGame(null);
         freeColClient.setMyPlayer(null);
@@ -539,7 +539,7 @@ public final class ConnectController {
 
             ResourceManager.setScenarioMapping(null);
             ResourceManager.setCampaignMapping(null);
-            freeColClient.getGUI().setInGame(false);
+            freeColClient.setInGame(false);
             freeColClient.setGame(null);
             freeColClient.setMyPlayer(null);
             freeColClient.setIsRetired(false);

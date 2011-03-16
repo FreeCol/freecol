@@ -225,9 +225,6 @@ public final class GUI {
     private TerrainCursor cursor;
     private ViewMode viewMode;
 
-    /** Indicates if the game has started, has nothing to do with whether or not the
-        client is logged in. */
-    private boolean inGame;
 
     private final Vector<GUIMessage> messages;
 
@@ -335,7 +332,6 @@ public final class GUI {
         unitsOutForAnimation = new HashMap<Unit, Integer>();
         unitsOutForAnimationLabels = new HashMap<Unit, JLabel>();
 
-        inGame = false;
         logger.info("GUI created.");
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
         viewMode = new ViewMode(this);
@@ -543,7 +539,6 @@ public final class GUI {
      */
     public void startCursorBlinking() {
 
-        final FreeColClient theFreeColClient = freeColClient;
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (!blinkingMarqueeEnabled) return;
@@ -1095,7 +1090,7 @@ public final class GUI {
         if ((freeColClient.getGame() != null)
                 && (freeColClient.getGame().getMap() != null)
                 && (focus != null)
-                && inGame) {
+                && freeColClient.isInGame()) {
             removeOldMessages();
             displayMap(g);
         } else {
@@ -3021,25 +3016,6 @@ public final class GUI {
 
 
     /**
-    * Notifies this GUI that the game has started or ended.
-    * @param inGame Indicates whether or not the game has started.
-    */
-    public void setInGame(boolean inGame) {
-        this.inGame = inGame;
-    }
-
-
-    /**
-    * Checks if the game has started.
-    * @return <i>true</i> if the game has started.
-    * @see #setInGame
-    */
-    public boolean isInGame() {
-        return inGame;
-    }
-
-
-    /**
      * Checks if the Tile/Units at the given coordinates are displayed
      * on the screen (or, if the map is already displayed and the focus
      * has been changed, whether they will be displayed on the screen
@@ -3739,16 +3715,15 @@ public final class GUI {
 
 
     public static String getTurnsText(Colony colony, BuildableType buildable) {
-        String turnsStr = Messages.message("notApplicable.short");
         int turnsLeft = colony.getTurnsToComplete(buildable);
         if (turnsLeft >= 0) {
-            turnsStr = Integer.toString(turnsLeft);
+            return Integer.toString(turnsLeft);
         }
         else if(turnsLeft != Integer.MIN_VALUE){
-            turnsStr = ">" + Integer.toString(turnsLeft*-1);
+            return ">" + Integer.toString(turnsLeft*-1);
         }
 
-        return turnsStr;
+        return Messages.message("notApplicable.short");
     }
 
 

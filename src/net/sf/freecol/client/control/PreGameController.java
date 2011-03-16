@@ -231,7 +231,7 @@ public final class PreGameController {
             .setMessageHandler(freeColClient.getInGameInputHandler());
 
         if (!freeColClient.isHeadless()) {
-            gui.setInGame(true);
+            freeColClient.setInGame(true);
             freeColClient.getFrame()
                 .setJMenuBar(new InGameMenuBar(freeColClient));
         }

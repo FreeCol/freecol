@@ -138,6 +138,11 @@ public final class FreeColClient {
     private Player player;
 
     private boolean isRetired = false;
+    
+    /** Indicates if the game has started, has nothing to do with whether or not the
+    client is logged in. */
+    private boolean inGame = false;
+
 
     /** The Server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
@@ -926,4 +931,25 @@ public final class FreeColClient {
             }
         }
     }
+    
+
+
+    /**
+    * Notifies this GUI that the game has started or ended.
+    * @param inGame Indicates whether or not the game has started.
+    */
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
+    }
+
+
+    /**
+    * Checks if the game has started.
+    * @return <i>true</i> if the game has started.
+    * @see #setInGame
+    */
+    public boolean isInGame() {
+        return inGame;
+    }
+
 }

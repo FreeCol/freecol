@@ -108,7 +108,7 @@ public final class MapEditorController {
 
             canvas.closeMainPanel();
             canvas.closeMenus();
-            gui.setInGame(true);
+            freeColClient.setInGame(true);
 
             // We may need to reset the zoom value to the default value
             gui.scaleMap(2f);
