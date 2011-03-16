@@ -93,7 +93,7 @@ public final class PreGameController extends Controller {
         Game game = freeColServer.getGame();
         Specification spec = game.getSpecification();
         // Apply the difficulty level
-        
+
         MapGenerator mapGenerator = freeColServer.getMapGenerator();
         AIMain aiMain = new AIMain(freeColServer);
         freeColServer.setAIMain(aiMain);
@@ -111,7 +111,7 @@ public final class PreGameController extends Controller {
             }
         }
         Collections.sort(game.getPlayers(), Player.playerComparator);
-        
+
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the
         // createMap should not really use the entire loadGame method
@@ -125,7 +125,7 @@ public final class PreGameController extends Controller {
         // Restore the GameOptions that may have been overwritten by
         // loadGame in createMap
         gameOptions.readFromXMLElement(oldGameOptions);
-        
+
         // Initial randomizations for all players.
         Random random = getFreeColServer().getServerRandom();
         for (Player player : game.getPlayers()) {
@@ -147,13 +147,13 @@ public final class PreGameController extends Controller {
                 }
             }
         }
-        
+
         // Start the game:
         freeColServer.setGameState(FreeColServer.GameState.IN_GAME);
         try {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {}
-        
+
         Element startGameElement = Message.createNewRootElement("startGame");
         freeColServer.getServer().sendToAll(startGameElement);
         freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());

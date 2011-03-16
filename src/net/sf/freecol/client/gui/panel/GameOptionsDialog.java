@@ -19,7 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.GameOptions;
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
  */
-public final class GameOptionsDialog extends OptionsDialog implements ActionListener {
+public final class GameOptionsDialog extends OptionsDialog {
 
     public static final String OPTION_GROUP_ID = "gameOptions";
 
@@ -53,6 +53,16 @@ public final class GameOptionsDialog extends OptionsDialog implements ActionList
 
             comp.setValue(false);
             comp.setEnabled(false);
+        }
+    }
+
+    public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
+        String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            if (!getClient().isMapEditor()) {
+                getClient().getPreGameController().sendGameOptions();
+            }
         }
     }
 

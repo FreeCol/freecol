@@ -65,7 +65,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public StartGamePanel(final Canvas parent) {
@@ -86,7 +86,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         setCancelComponent(cancel);
 
         table = new PlayersTable(getCanvas(), nationOptions, getMyPlayer());
-        
+
         start = new JButton(Messages.message("startGame"));
         gameOptions = new JButton(Messages.message("gameOptions"));
         mapGeneratorOptions = new JButton(Messages.message("mapGeneratorOptions"));
@@ -143,7 +143,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         enterPressesWhenFocused(start);
         enterPressesWhenFocused(cancel);
-        
+
         start.addActionListener(this);
         cancel.addActionListener(this);
         readyBox.addActionListener(this);
@@ -180,7 +180,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     /**
      * Sets whether or not this component is enabled. It also does this for its
      * children.
-     * 
+     *
      * @param enabled 'true' if this component and its children should be
      *            enabled, 'false' otherwise.
      */
@@ -206,7 +206,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -256,7 +256,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     /**
      * Displays a chat message to the user.
-     * 
+     *
      * @param senderName The name of the player who sent the chat message to the
      *            server.
      * @param message The chat message.

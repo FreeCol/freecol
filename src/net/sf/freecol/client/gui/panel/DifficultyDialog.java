@@ -93,9 +93,6 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
 
-        // Try to load saved custom difficulty. The superclass
-        // constructor already tries to do this, but fails, since
-        // it has no specification.
         loadCustomOptions();
 
         OptionGroup group = null;

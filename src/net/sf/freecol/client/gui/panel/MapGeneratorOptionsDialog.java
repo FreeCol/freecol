@@ -155,7 +155,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
         if (OK.equals(command)) {
             if (!getClient().isMapEditor()) {
                 getClient().getPreGameController().sendMapGeneratorOptions();
-                getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
+                //getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
             }
         } else {
             initialize(getGroup(), getGroup().getName(), scrollPane);

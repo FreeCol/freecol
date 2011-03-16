@@ -135,6 +135,7 @@ public class SimpleMapGenerator implements MapGenerator {
                                  .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
         final Game importGame;
         if (importFile != null) {
+            logger.info("Importing file " + importFile.getPath());
             importGame = loadSaveGame(importFile);
         } else {
             importGame = null;
