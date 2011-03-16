@@ -85,9 +85,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
 
-        // try to load saved custom options
-        loadCustomOptions();
-
         reset.setActionCommand(RESET);
         reset.addActionListener(this);
 
@@ -235,6 +232,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             FileInputStream in = new FileInputStream(file);
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
+            // TODO: read into group rather than specification
             getSpecification().getOptionGroup(getOptionGroupId()).setValue(new OptionGroup(xsr));
             in.close();
         } catch(Exception e) {
