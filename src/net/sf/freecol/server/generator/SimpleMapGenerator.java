@@ -212,6 +212,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         serverObjects.add(xsr.getLocalName());
                         serverObjects.add(xsr.getAttributeValue(null, "ID"));
+                        xsr.nextTag();
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
