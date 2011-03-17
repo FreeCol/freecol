@@ -698,7 +698,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      */
     private synchronized void setColony(Colony colony) {
         if (this.colony != null) {
-            warehousePanel.cleanup();
             this.colony.removePropertyChangeListener(this);
             this.colony.getTile().removePropertyChangeListener(this);
         }
@@ -706,7 +705,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (this.colony != null) {
             this.colony.addPropertyChangeListener(this);
             this.colony.getTile().addPropertyChangeListener(this);
-            warehousePanel.initialize();
         }
         editable = (colony.getOwner() == getMyPlayer());
     }
