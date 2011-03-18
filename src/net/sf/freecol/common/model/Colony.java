@@ -19,9 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,7 +50,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public class Colony extends Settlement implements Nameable, PropertyChangeListener {
+public class Colony extends Settlement implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -1958,11 +1955,6 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
         return null;
     }
 
-    public void propertyChange(PropertyChangeEvent event) {
-        firePropertyChange(event.getPropertyName(),
-                           event.getOldValue(), event.getNewValue());
-    }
-
     /**
      * Returns just this Colony itself.
      *
@@ -2335,11 +2327,7 @@ public class Colony extends Settlement implements Nameable, PropertyChangeListen
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (gc == null) {
-                    if (goodsContainer != null) {
-                        goodsContainer.removePropertyChangeListener(this);
-                    }
                     goodsContainer = new GoodsContainer(getGame(), this, in);
-                    goodsContainer.addPropertyChangeListener(this);
                 } else {
                     goodsContainer.readFromXML(in);
                 }

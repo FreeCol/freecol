@@ -1721,7 +1721,6 @@ public class Unit extends FreeColGameObject
             }
             units.add(unit);
             unit.setState(UnitState.SENTRY);
-            firePropertyChange(CARGO_CHANGE, null, locatable);
             spendAllMoves();
         } else if (locatable instanceof Goods) {
             if (!canCarryGoods()) {
@@ -1735,7 +1734,6 @@ public class Unit extends FreeColGameObject
                                                 + " on " + this.toString());
             }
             goodsContainer.addGoods(goods);
-            firePropertyChange(CARGO_CHANGE, null, locatable);
             spendAllMoves();
         } else {
             throw new IllegalStateException("Can not be added to unit: "
@@ -1754,11 +1752,9 @@ public class Unit extends FreeColGameObject
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
             units.remove(locatable);
-            firePropertyChange(CARGO_CHANGE, locatable, null);
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.removeGoods((Goods) locatable);
-            firePropertyChange(CARGO_CHANGE, locatable, null);
             spendAllMoves();
         } else {
             logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");

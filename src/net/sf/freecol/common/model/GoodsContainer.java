@@ -186,7 +186,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         } else {
             storedGoods.put(type, newAmount);
         }
-        firePropertyChange(type.getId(), oldAmount, newAmount);
     }
 
     /**
@@ -219,7 +218,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             removedGoods = new Goods(getGame(), parent, type, oldAmount);
             storedGoods.remove(type);
         }
-        firePropertyChange(type.getId(), oldAmount, newAmount);
         return removedGoods;
     }
 
@@ -245,7 +243,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         } else {
             storedGoods.put(goodsType, newAmount);
         }
-        firePropertyChange(goodsType.getId(), oldAmount, newAmount);
     }
 
     /**

@@ -1077,7 +1077,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
                 units.add((Unit) locatable);
                 ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
-                firePropertyChange(UNIT_CHANGE, null, locatable);
             }
         } else if (locatable instanceof TileItem) {
             addTileItem((TileItem) locatable);
@@ -1094,14 +1093,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            boolean removed = units.remove(locatable);
-            if (removed) {
-                firePropertyChange(UNIT_CHANGE, locatable, null);
-            } else {
-                logger.warning("Unit with ID " + ((Unit) locatable).getId() +
-                               " could not be removed from " + this.toString() + " with ID " +
-                               getId());
-            }
+            units.remove(locatable);
         } else if (locatable instanceof TileItem) {
             tileItemContainer.addTileItem((TileItem) locatable);
             updatePlayerExploredTiles();
