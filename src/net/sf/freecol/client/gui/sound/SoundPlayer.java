@@ -448,85 +448,86 @@ public class SoundPlayer {
             c.setValue(gain);
         }
 
-        private void rawplay(AudioFormat targetFormat,  AudioInputStream din)
+        private void rawplay(AudioFormat targetFormat, AudioInputStream din)
             throws IOException, LineUnavailableException {
             DataLine.Info info = new DataLine.Info(SourceDataLine.class,
                                                    targetFormat);
+            // Open the line
             SourceDataLine line;
-            try { line = (SourceDataLine) mixer.getLine(info); }
-            catch ( IllegalArgumentException e ) {
-            	throw new LineUnavailableException( e.toString() );
+            try {
+                line = (SourceDataLine) mixer.getLine(info);
+            } catch (IllegalArgumentException e) {
+                throw new LineUnavailableException(e.toString());
             }
-            if (line != null) {
-                FloatControl control = null;
-                PropertyChangeListener pcl = null;
+            if (line == null) return;
+            line.open(targetFormat);
+            line.start();
 
-                line.open(targetFormat);
-                line.start();
-
-                // Volume control:
-                if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                    try { control = (FloatControl)
-                              line.getControl(FloatControl.Type.MASTER_GAIN);
-                    } catch ( IllegalArgumentException e ) {}
-                    if ( control != null ) {
-                         final FloatControl c = control;
-                         pcl = new PropertyChangeListener() {
-                                 public void propertyChange(PropertyChangeEvent e) {
-                                     int v = ((Integer) e.getNewValue()).intValue();
-                                     updateVolume(c, v);
-                                 }
-                             };
-                         volume.addPropertyChangeListener(pcl);
-                         updateVolume(control, volume.getValue());
-                    }
-                }
-
-                // Playing audio:
-                byte[] data = new byte[8192];
-                int read = 0;
+            // Volume control (optional)
+            FloatControl control = null;
+            PropertyChangeListener pcl = null;
+            if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
                 try {
-                    while (!soundStopped && !shouldStopThread()) {
-                        try {
-                            while (soundPaused) {
-                                Thread.sleep(10);
+                    control = (FloatControl)
+                        line.getControl(FloatControl.Type.MASTER_GAIN);
+                } catch (IllegalArgumentException e) {}
+                if (control != null) {
+                    final FloatControl c = control;
+                    pcl = new PropertyChangeListener() {
+                            public void propertyChange(PropertyChangeEvent e) {
+                                int v = ((Integer) e.getNewValue()).intValue();
+                                updateVolume(c, v);
                             }
-                        } catch (InterruptedException e) {}
-                        read = din.read(data, 0, data.length);
-                        if (read < 0) break; else if (read > 0) {
-                            line.write(data, 0, read);
-                        }
-                    }
-                } finally {
-                    if (pcl != null) volume.removePropertyChangeListener(pcl);
+                        };
+                    volume.addPropertyChangeListener(pcl);
+                    updateVolume(control, volume.getValue());
                 }
-
-                // Implements fading down:
-                if (!soundStopped & control != null ) {
-                    long ms = System.currentTimeMillis() + FADE_UPDATE_MS;
-                    long fadeStop = System.currentTimeMillis() + MAXIMUM_FADE_MS;
-                    while (!soundStopped
-                           && System.currentTimeMillis() < fadeStop) {
-                        read = din.read(data, 0, data.length);
-                        if (read < 0) break; else if (read > 0) {
-                            line.write(data, 0, read);
-                        }
-                        if (System.currentTimeMillis() > ms) {
-                            // decrease the gain toward minimum (-80dB) by 1dB
-                            float currentGain = control.getValue();
-                            float newGain = currentGain - 1f;
-                            if (newGain < control.getMinimum())
-                                newGain = control.getMinimum();
-                            control.setValue(newGain);
-                            ms = System.currentTimeMillis() + FADE_UPDATE_MS;
-                        }
-                    }
-                }
-
-                line.drain();
-                line.stop();
-                line.close();
             }
+
+            // Play the audio
+            byte[] data = new byte[8192];
+            int read = 0;
+            try {
+                while (!soundStopped && !shouldStopThread()) {
+                    try {
+                        while (soundPaused) {
+                            Thread.sleep(10);
+                        }
+                    } catch (InterruptedException e) {}
+                    read = din.read(data, 0, data.length);
+                    if (read < 0) break; else if (read > 0) {
+                        line.write(data, 0, read);
+                    }
+                }
+            } finally {
+                if (pcl != null) volume.removePropertyChangeListener(pcl);
+            }
+
+            // Implements fading down:
+            if (!soundStopped && control != null) {
+                long ms = System.currentTimeMillis() + FADE_UPDATE_MS;
+                long fadeStop = System.currentTimeMillis() + MAXIMUM_FADE_MS;
+                while (!soundStopped
+                       && System.currentTimeMillis() < fadeStop) {
+                    read = din.read(data, 0, data.length);
+                    if (read < 0) break; else if (read > 0) {
+                        line.write(data, 0, read);
+                    }
+                    if (System.currentTimeMillis() > ms) {
+                        // decrease the gain toward minimum (-80dB) by 1dB
+                        float currentGain = control.getValue();
+                        float newGain = currentGain - 1f;
+                        if (newGain < control.getMinimum())
+                            newGain = control.getMinimum();
+                        control.setValue(newGain);
+                        ms = System.currentTimeMillis() + FADE_UPDATE_MS;
+                    }
+                }
+            }
+
+            line.drain();
+            line.stop();
+            line.close();
         }
     }
 }
