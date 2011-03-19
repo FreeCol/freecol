@@ -3217,7 +3217,7 @@ public class Unit extends FreeColGameObject
             : getGame().getUnknownEnemy();
         out.writeAttribute("owner", who.getId());
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        out.writeAttribute("workType", workType.getId());
+        if (workType != null) out.writeAttribute("workType", workType.getId());
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
