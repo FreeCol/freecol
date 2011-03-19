@@ -49,6 +49,15 @@ public class Map extends FreeColGameObject {
     public final static int POLAR_HEIGHT = 2;
 
     /**
+     * The layers included in the map. The RIVERS layer includes all
+     * natural tile improvements that are not resources. The NATIVES
+     * layer includes Lost City Rumours as well as settlements.
+     */
+    public static enum Layer {
+        NONE, LAND, TERRAIN, RIVERS, RESOURCES, NATIVES, ALL;
+    };
+
+    /**
      * The directions a Unit can move to. Includes deltas for moving
      * to adjacent squares, which are required due to the isometric
      * map. Starting north and going clockwise.
@@ -146,6 +155,11 @@ public class Map extends FreeColGameObject {
 
     private Tile[][] tiles;
 
+    /**
+     * The highest map layer included.
+     */
+    private Layer layer;
+
     private final java.util.Map<String, Region> regions = new HashMap<String, Region>();
 
     /**
@@ -160,6 +174,7 @@ public class Map extends FreeColGameObject {
     public Map(Game game, Tile[][] tiles) {
         super(game);
         this.tiles = tiles;
+        setLayer(Layer.RESOURCES);
     }
 
     /**
@@ -195,6 +210,24 @@ public class Map extends FreeColGameObject {
 
     public Collection<Region> getRegions() {
         return regions.values();
+    }
+
+    /**
+     * Get the <code>Layer</code> value.
+     *
+     * @return a <code>Layer</code> value
+     */
+    public final Layer getLayer() {
+        return layer;
+    }
+
+    /**
+     * Set the <code>Layer</code> value.
+     *
+     * @param newLayer The new Layer value.
+     */
+    public final void setLayer(final Layer newLayer) {
+        this.layer = newLayer;
     }
 
     /**
@@ -1738,6 +1771,7 @@ public class Map extends FreeColGameObject {
         out.writeAttribute("ID", getId());
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
+        out.writeAttribute("layer", layer.toString());
 
         for (Region region : regions.values()) {
             region.toXML(out);
@@ -1764,6 +1798,7 @@ public class Map extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
+        setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
 
         if (tiles == null) {
             int width = Integer.parseInt(in.getAttributeValue(null, "width"));

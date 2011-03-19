@@ -42,7 +42,20 @@
       <xs:attribute name="ID" type="MapId" use="required" />
       <xs:attribute name="width" type="xs:int" use="required" />
       <xs:attribute name="height" type="xs:int" use="required" />
+      <xs:attribute name="layer" type="MapLayerType" />
      </xs:complexType>
   </xs:element>
+
+  <xs:simpleType name="MapLayerType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="LAND"/>
+      <xs:enumeration value="TERRAIN"/>
+      <xs:enumeration value="RIVERS"/>
+      <xs:enumeration value="RESOURCES"/>
+      <xs:enumeration value="NATIVES"/>
+      <xs:enumeration value="ALL"/>
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
