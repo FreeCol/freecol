@@ -2124,16 +2124,10 @@ public class Unit extends FreeColGameObject
     public boolean isInEurope() {
         if (location instanceof Unit) {
             return ((Unit) location).isInEurope();
+        } else {
+            return getLocation() instanceof Europe
+                && !isBetweenEuropeAndNewWorld();
         }
-
-        if(!(getLocation() instanceof Europe)){
-            return false;
-        }
-
-        if(isBetweenEuropeAndNewWorld()){
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -2144,17 +2138,11 @@ public class Unit extends FreeColGameObject
     public boolean isBetweenEuropeAndNewWorld() {
         if (location instanceof Unit) {
             return ((Unit) location).isBetweenEuropeAndNewWorld();
+        } else {
+            return getLocation() instanceof Europe
+                && (getState() == UnitState.TO_EUROPE
+                    || getState() == UnitState.TO_AMERICA);
         }
-
-        if(!(getLocation() instanceof Europe)){
-            return false;
-        }
-
-        if(getState() == UnitState.TO_EUROPE
-                || getState() == UnitState.TO_AMERICA){
-            return true;
-        }
-        return false;
     }
 
     /**
