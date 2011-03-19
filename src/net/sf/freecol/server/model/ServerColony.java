@@ -166,8 +166,10 @@ public class ServerColony extends Colony implements ServerModelObject {
                     for (AbstractGoods goods : productionInfo.getProduction()) {
                         int experience = goods.getAmount() / workLocation.getUnitCount();
                         for (Unit unit : workLocation.getUnitList()) {
-                            unit.setExperience(unit.getExperience() + experience);
-                            cs.addPartial(See.only(owner), unit, "experience");
+                            if (goods.getType() == unit.getExperienceType()) {
+                                unit.setExperience(unit.getExperience() + experience);
+                                cs.addPartial(See.only(owner), unit, "experience");
+                            }
                         }
                     }
                 }
