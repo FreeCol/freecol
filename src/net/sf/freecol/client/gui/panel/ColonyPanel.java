@@ -733,6 +733,7 @@ public final class ColonyPanel extends FreeColPanel
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
             populationPanel.update();
+            updateProductionPanel(); // food production changes
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = getColony().checkForGovMgtChangeMessage();
             if (msg != null) {
