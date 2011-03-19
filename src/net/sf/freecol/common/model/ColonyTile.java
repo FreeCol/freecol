@@ -361,6 +361,16 @@ public class ColonyTile extends FreeColGameObject
         final Unit unit = (Unit) locatable;
         setUnit(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
+        if (unit.getWorkType() == null || !unit.getWorkType().isRawMaterial()) {
+            GoodsType workType = workTile.getType().getPrimaryGoods().getType();
+            if (workType == null) {
+                workType = workTile.getType().getSecondaryGoods().getType();
+                if (workType == null) {
+                    workType = getSpecification().getPrimaryFoodType();
+                }
+            }
+            unit.setWorkType(workType);
+        }
 
         Unit teacher = unit.getTeacher();
         if (teacher == null
@@ -407,33 +417,33 @@ public class ColonyTile extends FreeColGameObject
 
 
     /**
-    * Checks if this <code>ColonyTile</code> contains the given <code>Locatable</code>.
-    *
-    * @param locatable The <code>Locatable</code>.
-    * @return The result.
-    */
+     * Checks if this <code>ColonyTile</code> contains the given <code>Locatable</code>.
+     *
+     * @param locatable The <code>Locatable</code>.
+     * @return The result.
+     */
     public boolean contains(Locatable locatable) {
         return (locatable == unit) ? true:false;
     }
 
 
     /**
-    * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
-    *
-    * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-    * @see #setUnit
-    */
+     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
+     *
+     * @return The <code>Unit</code> or <i>null</i> if no unit is present.
+     * @see #setUnit
+     */
     public Unit getFirstUnit() {
         return getUnit();
     }
 
 
     /**
-    * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
-    *
-    * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-    * @see #setUnit
-    */
+     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
+     *
+     * @return The <code>Unit</code> or <i>null</i> if no unit is present.
+     * @see #setUnit
+     */
     public Unit getLastUnit() {
         return getUnit();
     }

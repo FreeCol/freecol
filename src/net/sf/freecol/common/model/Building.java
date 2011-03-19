@@ -368,6 +368,7 @@ public class Building extends FreeColGameObject
         final Unit unit = (Unit) locatable;
         units.add(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
+        unit.setWorkType(getGoodsOutputType());
 
         if (buildingType.hasAbility("model.ability.teach")) {
             Unit student = unit.getStudent();

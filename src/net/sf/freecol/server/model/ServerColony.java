@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
@@ -164,9 +165,11 @@ public class ServerColony extends Colony implements ServerModelObject {
                 ((ServerModelObject) workLocation).csNewTurn(random, cs);
                 if (workLocation.getUnitCount() > 0) {
                     for (AbstractGoods goods : productionInfo.getProduction()) {
+                        UnitType expert = spec.getExpertForProducing(goods.getType());
                         int experience = goods.getAmount() / workLocation.getUnitCount();
                         for (Unit unit : workLocation.getUnitList()) {
-                            if (goods.getType() == unit.getExperienceType()) {
+                            if (goods.getType() == unit.getExperienceType()
+                                && unit.getType().canBeUpgraded(expert, ChangeType.EDUCATION)) {
                                 unit.setExperience(unit.getExperience() + experience);
                                 cs.addPartial(See.only(owner), unit, "experience");
                             }
