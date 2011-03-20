@@ -121,7 +121,10 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
     /**
-     * {@inheritDoc}
+     * Return the <code>ProductionInfo</code> for this BuildQueue.
+     *
+     * @param input the goods available
+     * @return the <code>ProductionInfo</code> for this BuildQueue
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();

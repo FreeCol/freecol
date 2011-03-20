@@ -66,8 +66,6 @@ public class Building extends FreeColGameObject
      * Constructor for ServerBuilding.
      *
      * @param game The <code>Game</code> this object belongs to.
-     * @param colony The colony in which this building is located.
-     * @param type The type of building.
      */
     protected Building(Game game) {
         super(game);

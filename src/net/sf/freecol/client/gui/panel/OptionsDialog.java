@@ -45,7 +45,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
+ * Dialog for changing the options of an {@link OptionGroup}.
  */
 public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 

@@ -1593,7 +1593,7 @@ public class Colony extends Settlement implements Nameable {
      * {@link Building} that is currently being built.
      *
      * @return The price.
-     * @see #payForBuilding
+     * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
     public int getPriceForBuilding() {
         return getPriceForBuilding(getCurrentlyBuilding());
@@ -1604,7 +1604,7 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param type The <code>BuildableType</code> to build.
      * @return The price.
-     * @see #payForBuilding
+     * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
     public int getPriceForBuilding(BuildableType type) {
         return priceGoodsForBuilding(getGoodsForBuilding(type));
@@ -1615,7 +1615,7 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param required The map of resources required.
      * @return The price.
-     * @see #payForBuilding
+     * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
     public int priceGoodsForBuilding(HashMap<GoodsType, Integer> required) {
         int price = 0;

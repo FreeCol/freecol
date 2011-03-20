@@ -53,7 +53,7 @@ import net.sf.freecol.common.option.StringOption;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * This class provides visualization for an {@link OptionMap}. In order to
+ * This class provides visualization for an {@link OptionGroup}. In order to
  * enable values to be both seen and changed.
  */
 public final class OptionGroupUI extends JPanel implements OptionUpdater {
@@ -71,11 +71,11 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
-     * <code>OptionMap</code>. This is the same as using
-     * {@link #OptionGroupUI(OptionMap, boolean)} with
+     * <code>OptionGroup</code>. This is the same as using
+     * {@link #OptionGroupUI(OptionGroup, boolean)} with
      * <code>editable == true</code>.
      *
-     * @param option The <code>OptionMap</code> to make a user interface for.
+     * @param option The <code>OptionGroup</code> to make a user interface for.
      */
     public OptionGroupUI(OptionGroup option) {
         this(option, true);
@@ -83,9 +83,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
-     * <code>OptionMap</code>.
+     * <code>OptionGroup</code>.
      *
-     * @param option The <code>OptionMap</code> to make a user interface for.
+     * @param option The <code>OptionGroup</code> to make a user interface for.
      */
     public OptionGroupUI(OptionGroup option, boolean editable) {
         super(new BorderLayout());
