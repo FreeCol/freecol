@@ -2572,6 +2572,9 @@ public final class InGameController extends Controller {
         unit.setState(UnitState.IN_COLONY);
         unit.setLocation(colony);
         unit.setMovesLeft(0);
+        ((ServerUnit)unit).csRemoveEquipment(colony,
+            new HashSet<EquipmentType>(unit.getEquipment().keySet()),
+            0, random, cs);
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
