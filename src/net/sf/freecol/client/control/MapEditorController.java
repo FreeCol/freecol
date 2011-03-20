@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -177,13 +178,13 @@ public final class MapEditorController {
         final Game game = freeColClient.getGame();
         final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
 
-        OptionGroup group = canvas.showMapGeneratorOptionsDialog(mapGenerator.getMapGeneratorOptions(), true);
+        OptionGroup group = freeColClient.getPreGameController().getMapGeneratorOptions();
+        group = canvas.showFreeColDialog(new MapGeneratorOptionsDialog(canvas, group, true, true));
         if (group == null) {
             return;
         }
 
         try {
-            //game.setMapGeneratorOptions(mapGenerator.getMapGeneratorOptions());
             if (game.getSpecification().getDifficultyLevel() == null) {
                 game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
             }

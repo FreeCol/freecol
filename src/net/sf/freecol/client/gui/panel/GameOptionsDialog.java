@@ -39,15 +39,22 @@ public final class GameOptionsDialog extends OptionsDialog {
      * The constructor that will add the items to this panel.
      *
      * @param parent The parent of this panel.
+     * @param editable whether the game options can be modified
+     * @param loadCustomOptions whether to load custom options
      */
-    public GameOptionsDialog(Canvas parent, boolean editable) {
+    public GameOptionsDialog(Canvas parent, boolean editable, boolean loadCustomOptions) {
         super(parent, editable);
+
+        if (editable && loadCustomOptions) {
+            loadCustomOptions();
+        }
+
         initialize(getSpecification().getOptionGroup(OPTION_GROUP_ID),
                    Messages.message(OPTION_GROUP_ID), null);
 
         // Set special cases
         // Disable victory option "All humans defeated"
-        //when playing single player
+        // when playing single player
         if (editable && getClient().isSingleplayer()) {
             BooleanOptionUI comp = (BooleanOptionUI) getOptionUI().getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
 

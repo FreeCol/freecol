@@ -34,7 +34,11 @@ import javax.swing.ScrollPaneConstants;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
  * The panel where you choose your nation and color and connected players are
@@ -241,10 +245,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 }
                 break;
             case GAME_OPTIONS:
-                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getClient().isAdmin()));
+                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getClient().isAdmin(), true));
                 break;
             case MAP_GENERATOR_OPTIONS:
-                getCanvas().showMapGeneratorOptionsDialog(getClient().isAdmin());
+                OptionGroup mgo = getClient().getPreGameController().getMapGeneratorOptions();
+                FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
+                boolean loadCustomOptions = (importFile.getValue() == null);
+                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getCanvas(), mgo, getClient().isAdmin(),
+                                                                            loadCustomOptions));
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

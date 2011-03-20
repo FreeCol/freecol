@@ -42,8 +42,10 @@ import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
-* Dialog for changing the {@link net.sf.freecol.common.model.DifficultyLevel}.
-*/
+ * Dialog for displaying and modifying the difficulty level.
+ *
+ * @see OptionGroup
+ */
 public final class DifficultyDialog extends OptionsDialog implements ItemListener {
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
@@ -72,6 +74,13 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         }
     }
 
+    /**
+     * Use this constructor to display the difficulty level of the
+     * current game read-only.
+     *
+     * @param parent a <code>Canvas</code> value
+     * @param level an <code>OptionGroup</code> value
+     */
     public DifficultyDialog(Canvas parent, OptionGroup level) {
         super(parent, false);
         difficultyBox.setRenderer(new BoxRenderer());
@@ -85,9 +94,12 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     }
 
     /**
-    * The constructor that will add the items to this panel.
-    * @param parent The parent of this panel.
-    */
+     * Use this constructor to allow the selection of a difficulty
+     * level when starting a new game.
+     *
+     * @param parent The parent of this panel.
+     * @param specification a <code>Specification</code> value
+     */
     public DifficultyDialog(Canvas parent, Specification specification) {
         super(parent, true);
         difficultyBox.setRenderer(new BoxRenderer());
@@ -143,9 +155,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     }
 
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
@@ -164,6 +174,9 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void itemStateChanged(ItemEvent event) {
         String id = (String) difficultyBox.getSelectedItem();
         edit.setEnabled(!CUSTOM_LEVEL.equals(id));
@@ -171,6 +184,12 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         updateUI(specification.getOptionGroup(id));
     }
 
+    /**
+     * Returns the default file name to save the custom difficulty
+     * level.
+     *
+     * @return "custom.xml"
+     */
     public String getDefaultFileName() {
         return "custom.xml";
     }

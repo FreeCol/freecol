@@ -21,14 +21,9 @@ package net.sf.freecol.server.generator;
 
 /**
  * Keeps track of the available map generator options.
- * 
- * <br>
- * <br>
- * 
- * New options should be added to {@link #addDefaultOptions()} and each option
- * should be given an unique identifier (defined as a constant in this class).
- * 
+ *
  * @see MapGenerator
+ * @see OptionGroup
  */
 public class MapGeneratorOptions {
 
@@ -123,7 +118,7 @@ public class MapGeneratorOptions {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "mapGeneratorOptions".
      */
     public static String getXMLElementTagName() {

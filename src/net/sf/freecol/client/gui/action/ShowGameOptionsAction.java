@@ -34,7 +34,7 @@ public class ShowGameOptionsAction extends FreeColAction {
 
     /**
      * Creates a new <code>ShowGameOptionsAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ShowGameOptionsAction(FreeColClient freeColClient) {
@@ -43,11 +43,11 @@ public class ShowGameOptionsAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = freeColClient.getCanvas();
-        canvas.showPanel(new GameOptionsDialog(canvas, false));
+        canvas.showPanel(new GameOptionsDialog(canvas, false, false));
     }
 }

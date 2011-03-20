@@ -235,6 +235,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             // TODO: read into group rather than specification
             getSpecification().getOptionGroup(getOptionGroupId()).setValue(new OptionGroup(xsr));
             in.close();
+            logger.info("Loaded custom options from file " + file.getPath());
         } catch(Exception e) {
             logger.warning("Failed to load OptionGroup with ID " + getOptionGroupId()
                            + " from " + file.getName() + ": " + e.toString());

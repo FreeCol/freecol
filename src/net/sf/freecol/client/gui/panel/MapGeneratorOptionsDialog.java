@@ -45,8 +45,10 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 
 /**
- * Dialog for changing the
- * {@link net.sf.freecol.server.generator.OptionGroup}.
+ * Dialog for changing the map generator options.
+ *
+ * @see MapGeneratorOptions
+ * @see OptionGroup
  */
 public final class MapGeneratorOptionsDialog extends OptionsDialog implements ActionListener {
 
@@ -63,9 +65,14 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
      * @param parent The parent of this panel.
      * @param mgo the map generator options
      * @param editable whether the options may be edited
+     * @param loadCustomOptions whether to load custom options
      */
-    public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable) {
+    public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
         super(parent, editable);
+
+        if (editable && loadCustomOptions) {
+            loadCustomOptions();
+        }
 
         if (editable) {
             JPanel mapPanel = new JPanel();
