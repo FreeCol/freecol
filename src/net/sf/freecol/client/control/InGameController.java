@@ -1113,6 +1113,7 @@ public final class InGameController implements NetworkConstants {
             case EMBARK:
             case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
             case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+            case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
             case ENTER_FOREIGN_COLONY_WITH_SCOUT:
             case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
                 // Special cases only work if this is the last tile.
