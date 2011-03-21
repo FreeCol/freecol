@@ -63,10 +63,10 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
 
     /**
-    * Creates a new <code>FreeColActionUI</code> for the 
+    * Creates a new <code>FreeColActionUI</code> for the
     * given <code>FreeColAction</code>.
-    * 
-    * @param option The <code>FreeColAction</code> to make a user 
+    *
+    * @param option The <code>FreeColAction</code> to make a user
     *       interface for.
     * @param optionGroupUI The group this <code>FreeColActionUI</code>
     *       will be a part of.
@@ -92,20 +92,20 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         recordButton = new JButton(getRecordImage());
         recordButton.addActionListener(this);
         p1.add(recordButton);
-        
+
         removeButton = new JButton(getRemoveImage());
         removeButton.addActionListener(this);
         p1.add(removeButton);
-        
+
         add(p1, BorderLayout.EAST);
 
         setOpaque(false);
     }
 
-    
+
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -113,14 +113,14 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     public void rollback() {
         // TODO: Implement this.
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
         // TODO: Implement this
     }
-    
+
     /**
     * Creates an icon for symbolizing the recording of a <code>KeyStroke</code>.
     * @return The <code>ImageIcon</code>.
@@ -135,8 +135,8 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
         return new ImageIcon(bi);
     }
-    
-    
+
+
     /**
     * Creates an icon to be used on the button that removes a keyboard accelerator.
     * @return The <code>ImageIcon</code>.
@@ -156,7 +156,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
         return new ImageIcon(bi);
     }
-    
+
     /**
     * Gets a string to represent the given <code>KeyStroke</code> to the user.
     */
@@ -172,13 +172,13 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         return s + KeyEvent.getKeyText(keyStroke.getKeyCode());
     }
 
-    
+
     /**
     * Removes the given <code>KeyStroke</code>. That is:
     * This action's <code>KeyStroke</code> is set to
-    * <code>null</code> if it is the same as the given 
+    * <code>null</code> if it is the same as the given
     * <code>KeyStroke</code>.
-    * 
+    *
     * @param k The <code>KeyStroke</code> to be removed.
     */
     public void removeKeyStroke(KeyStroke k) {
@@ -195,7 +195,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     public void updateOption() {
         option.setAccelerator(keyStroke);
     }
-    
+
     /**
      * Reset with the value from the option.
      */
@@ -204,7 +204,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         bl.setText(getHumanKeyStrokeText(keyStroke));
     }
 
-    
+
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == recordButton) {
             bl.startBlinking();
