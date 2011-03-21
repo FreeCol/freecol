@@ -785,7 +785,6 @@ public class Game extends FreeColGameObject {
      * @return <code>true</code> if the <code>Game</code> has
      *      been loaded properly.
      */
-    @SuppressWarnings("unchecked")
     public boolean checkIntegrity() {
     	List<String> brokenObjects = new ArrayList<String>();
         boolean ok = true;

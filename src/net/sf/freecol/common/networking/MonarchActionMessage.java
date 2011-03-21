@@ -214,7 +214,6 @@ public class MonarchActionMessage extends Message {
      *
      * @return Null.
      */
-    @SuppressWarnings("unused")
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         return null;

@@ -307,7 +307,6 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(indianConvert.canBuildColony());
 
         UnitType braveType = spec().getUnitType("model.unit.brave");
-        @SuppressWarnings("unused")
         Unit brave = new ServerUnit(game, tile1, sioux, braveType,
                                     UnitState.ACTIVE,
                                     braveType.getDefaultEquipment());

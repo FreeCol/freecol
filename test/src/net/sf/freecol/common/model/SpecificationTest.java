@@ -171,7 +171,6 @@ public final class SpecificationTest extends FreeColTestCase {
     public void testReqAbilitiesForEquipmentTypes() {
     	String equipmentTypeStr;
     	Map<String,Boolean> abilitiesReq, expectAbilities;
-    	@SuppressWarnings("unused")
         Specification spec = spec();
 
         Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();

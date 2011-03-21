@@ -40,7 +40,6 @@ import net.sf.freecol.common.option.SelectOption;
  */
 public final class SelectOptionUI extends JComboBox implements OptionUpdater, PropertyChangeListener {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectOptionUI.class.getName());
 
     private final SelectOption option;

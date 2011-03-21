@@ -72,7 +72,6 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class ClientOptions extends OptionGroup {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
 
     /**
