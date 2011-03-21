@@ -280,6 +280,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
             ServerPlayer owner = (ServerPlayer) getOwner();
             Europe europe = owner.getEurope();
+            if (getDestination() == europe) setDestination(null);
             cs.addMessage(See.only(owner),
                           new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                            "model.unit.arriveInEurope",
