@@ -22,6 +22,8 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -35,7 +37,11 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
+import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
@@ -208,6 +214,31 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Check that the user has not specified degenerate victory conditions
+     * that are automatically true.
+     *
+     * @return True if the victory conditions are sensible.
+     */
+    private boolean checkVictoryConditions() {
+        Specification spec = getSpecification();
+        if (singlePlayerGame
+            && spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)
+            && !spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
+            int n = 0;
+            for (Entry<Nation, NationState> e
+                     : getGame().getNationOptions().getNations().entrySet()) {
+                if (e.getKey().getType().isEuropean()
+                    && e.getValue() != NationState.NOT_AVAILABLE) n++;
+            }
+            if (n == 0) {
+                getCanvas().errorMessage("victory.noEuropeans");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      *
@@ -219,6 +250,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         try {
             switch (Integer.valueOf(command).intValue()) {
             case START:
+                if (!checkVictoryConditions()) break;
+
                 // The ready flag was set to false for single player
                 // mode in order to allow the player to change
                 // whatever he wants.
