@@ -443,7 +443,9 @@ public class HighScore extends FreeColObject {
         if (nationName != null) {
             out.writeAttribute("nationName", nationName);
         }
-        out.writeAttribute("newLandName", newLandName);
+        if (newLandName != null) {
+            out.writeAttribute("newLandName", newLandName);
+        }
         out.writeAttribute("difficulty", difficulty);
         out.writeAttribute("units", Integer.toString(units));
         out.writeAttribute("colonies", Integer.toString(colonies));
@@ -455,10 +457,12 @@ public class HighScore extends FreeColObject {
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
 
         try {
-            date = dateFormat.parse(getAttribute(in, "date", "2008-01-01 00:00:00+0000"));
+            date = dateFormat.parse(getAttribute(in, "date",
+                                                 "2008-01-01 00:00:00+0000"));
         } catch (Exception e) {
             logger.warning(e.toString());
             date = new Date();
@@ -467,11 +471,13 @@ public class HighScore extends FreeColObject {
         independenceTurn = getAttribute(in, "independenceTurn", 0);
         playerName = getAttribute(in, "playerName", "");
         nationID = getAttribute(in, "nationID", "model.nation.dutch");
-        nationTypeID = getAttribute(in, "nationTypeID", "model.nationType.trade");
+        nationTypeID = getAttribute(in, "nationTypeID",
+                                    "model.nationType.trade");
         score = getAttribute(in, "score", 0);
-        level = Enum.valueOf(Level.class, getAttribute(in, "level", "PARASITIC_WORM"));
+        level = Enum.valueOf(Level.class,
+                             getAttribute(in, "level", "PARASITIC_WORM"));
         nationName = getAttribute(in, "nationName", null);
-        newLandName = getAttribute(in, "nationName", "New World");
+        newLandName = getAttribute(in, "newLandName", "New World");
         difficulty = getAttribute(in, "difficulty", "model.difficulty.medium");
         units = getAttribute(in, "units", 0);
         colonies = getAttribute(in, "colonies", 0);
