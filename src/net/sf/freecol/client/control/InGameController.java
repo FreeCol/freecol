@@ -1107,7 +1107,8 @@ public final class InGameController implements NetworkConstants {
             case EXPLORE_LOST_CITY_RUMOUR:
                 moveExplore(unit, path.getDirection());
                 return;
-            case ATTACK: // Do not auto-attack
+            case ATTACK:
+                moveAttack(unit, path.getDirection());
                 return;
             case EMBARK:
             case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
