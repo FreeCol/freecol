@@ -739,6 +739,21 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
     /**
+     * Activate sentried units on a tile.
+     *
+     * @param tile The <code>Tile</code> to activate sentries on.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csActivateSentries(Tile tile, ChangeSet cs) {
+        for (Unit u : tile.getUnitList()) {
+            if (u.getState() == UnitState.SENTRY) {
+                u.setState(UnitState.ACTIVE);
+                cs.add(See.perhaps(), u);
+            }
+        }
+    }
+
+    /**
      * Check for a special contact panel for a nation.  If not found,
      * check for a more general one if allowed.
      *
@@ -881,13 +896,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     continue; // No contact
                 }
 
-                // Activate sentries
-                for (Unit u : t.getUnitList()) {
-                    if (u.getState() == UnitState.SENTRY) {
-                        u.setState(UnitState.ACTIVE);
-                        cs.add(See.only(serverPlayer), u);
-                    }
-                }
+                csActivateSentries(t, cs);
 
                 // Ignore previously contacted nations.
                 if (serverPlayer.hasContacted(other)) continue;
@@ -948,6 +957,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     welcomer.getId());
                 cs.addAttribute(See.only(serverPlayer), "camps",
                     Integer.toString(welcomer.getNumberOfSettlements()));
+            }
+        } else { // water
+            for (Tile t : newTile.getSurroundingTiles(1, 1)) {
+                if (t == null || t.isLand() || t.getFirstUnit() == null) {
+                    continue;
+                }
+                if ((ServerPlayer) t.getFirstUnit().getOwner()
+                    != serverPlayer) csActivateSentries(t, cs);
             }
         }
 
