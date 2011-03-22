@@ -43,7 +43,7 @@ public class ActionManager extends OptionGroup {
 
     /**
      * Creates a new <code>ActionManager</code>.
-     * 
+     *
      * @param freeColClient The main client controller.
      */
     public ActionManager(FreeColClient freeColClient) {
@@ -59,7 +59,7 @@ public class ActionManager extends OptionGroup {
     public void initializeActions() {
         removeAll();
         // keep this list alphabetized.
-        
+
         add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
@@ -155,7 +155,7 @@ public class ActionManager extends OptionGroup {
 
     /**
      * Adds the given <code>FreeColAction</code>.
-     * 
+     *
      * @param freeColAction The <code>FreeColAction</code> that should be
      *            added to this <code>ActionManager</code>.
      */
@@ -166,7 +166,7 @@ public class ActionManager extends OptionGroup {
     /**
      * Gets the <code>FreeColAction</code> specified by the given
      * <code>id</code>.
-     * 
+     *
      * @param id The string identifying the action.
      * @return The <code>FreeColAction</code>.
      */
@@ -176,7 +176,7 @@ public class ActionManager extends OptionGroup {
 
     /**
      * Updates every <code>FreeColAction</code> this object keeps.
-     * 
+     *
      * @see FreeColAction
      */
     public void update() {
