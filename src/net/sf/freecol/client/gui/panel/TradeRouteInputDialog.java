@@ -278,22 +278,38 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         ok.requestFocus();
     }
 
-    private boolean verifyNewTradeRoute(){
-    	// Verify that it has at least two stops
-    	if (listModel.getSize() < 2) {
-            getCanvas().errorMessage("traderouteDialog.notEnoughStops");
-            return false;
-    	}
-    	
-    	Player player = getCanvas().getClient().getMyPlayer();
-        for (int index = 0; index < listModel.getSize(); index++) {
-            Stop stop = (Stop) listModel.get(index);
-            if (!TradeRoute.isStopValid(player, stop)) {
-            	return false;
+    /**
+     * Check that the trade route is valid.
+     *
+     * @return True if the trade route is valid.
+     */
+    private boolean verifyNewTradeRoute() {
+        Player player = getCanvas().getClient().getMyPlayer();
+
+        // Check that the name is unique
+        for (TradeRoute route : player.getTradeRoutes()) {
+            if (route.getId().equals(originalRoute.getId())) continue;
+            if (route.getName().equals(tradeRouteName.getText())) {
+                getCanvas().errorMessage("traderouteDialog.duplicateName");
+                return false;
             }
         }
 
-    	return true;
+        // Verify that it has at least two stops
+        if (listModel.getSize() < 2) {
+            getCanvas().errorMessage("traderouteDialog.notEnoughStops");
+            return false;
+        }
+
+        // Check that all stops are valid
+        for (int index = 0; index < listModel.getSize(); index++) {
+            Stop stop = (Stop) listModel.get(index);
+            if (!TradeRoute.isStopValid(player, stop)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

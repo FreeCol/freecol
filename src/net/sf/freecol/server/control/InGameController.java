@@ -3420,14 +3420,19 @@ public final class InGameController extends Controller {
     public Element assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
                                     TradeRoute tradeRoute) {
         unit.setTradeRoute(tradeRoute);
-        if (tradeRoute == null) {
-            unit.setDestination(null);
-        } else {
+        unit.setDestination(null);
+        if (tradeRoute != null) {
             List<Stop> stops = tradeRoute.getStops();
-            if (stops.size() > 0) {
-                unit.setDestination(tradeRoute.getStops().get(0).getLocation());
-                unit.setCurrentStop(0);
+            int found = -1;
+            for (int i = 0; i < stops.size(); i++) {
+                if (unit.getLocation() == stops.get(i).getLocation()) {
+                    found = i;
+                    break;
+                }
             }
+            if (found < 0) found = 0;
+            unit.setCurrentStop(found);
+            unit.setDestination(stops.get(found).getLocation());
         }
 
         // Only visible to the player

@@ -4821,8 +4821,8 @@ public final class InGameController implements NetworkConstants {
         TradeRoute route = canvas.showTradeRouteDialog(unit);
         if (route == null) return; // Cancelled
         // Delete or deassign of trade route removes the route from the unit
-        if (oldRoute != null && unit.getTradeRoute() == null) route = null;
-        assignTradeRoute(unit, route);
+        route = unit.getTradeRoute();
+        if (oldRoute != route) assignTradeRoute(unit, route);
     }
 
     /**
@@ -4832,17 +4832,11 @@ public final class InGameController implements NetworkConstants {
      * @param tradeRoute The <code>TradeRoute</code> to assign.
      */
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
-        if (tradeRoute == unit.getTradeRoute()) return;
         if (askAssignTradeRoute(unit, tradeRoute)) {
-            if ((tradeRoute = unit.getTradeRoute()) != null) {
-                Location loc = unit.getLocation();
-                if (loc instanceof Tile) loc = ((Tile) loc).getColony();
-                if (tradeRoute.getStops().get(0).getLocation() == loc) {
-                    followTradeRoute(unit);
-                } else if (freeColClient.getGame().getCurrentPlayer()
-                           == freeColClient.getMyPlayer()) {
-                    moveToDestination(unit);
-                }
+            if ((tradeRoute = unit.getTradeRoute()) != null
+                && freeColClient.getGame().getCurrentPlayer()
+                == freeColClient.getMyPlayer()) {
+                moveToDestination(unit);
             }
         }
     }

@@ -102,13 +102,6 @@ public class AssignTradeRouteMessage extends Message {
             return Message.clientError("Not a trade route: " + tradeRouteId);
         }
 
-        if (tradeRoute == null) {
-            unit.setTradeRoute(null);
-            unit.setDestination(null);
-        } else {
-            unit.setTradeRoute(tradeRoute);
-        }
-
         // Proceed to assign.
         return server.getInGameController()
             .assignTradeRoute(serverPlayer, unit, tradeRoute);
