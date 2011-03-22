@@ -21,10 +21,12 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.JMenuBar;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
@@ -45,6 +47,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      */
     public ClientOptionsDialog(Canvas parent) {
         super(parent, true);
+        //loadCustomOptions();
         getButtons().clear();
         initialize(getClient().getClientOptions(), getClient().getClientOptions().getName(), null);
     }
@@ -58,15 +61,13 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     }
 
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getClient().saveClientOptions();
+            getGroup().save(new File(FreeCol.getOptionsDirectory(), getDefaultFileName()));
             getClient().getActionManager().update();
             JMenuBar menuBar = getClient().getFrame().getJMenuBar();
             if (menuBar != null) {

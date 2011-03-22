@@ -206,14 +206,14 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         } else if (RESET.equals(command)) {
             ui.reset();
         } else if (SAVE.equals(command)) {
-            File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".xml", filters,
-                                                       getDefaultFileName());
+            File saveFile = getCanvas().showSaveDialog(FreeCol.getOptionsDirectory(), ".xml",
+                                                       filters, getDefaultFileName());
             if (saveFile != null) {
                 ui.updateOption();
                 group.save(saveFile);
             }
         } else if (LOAD.equals(command)) {
-            File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), filters);
+            File loadFile = getCanvas().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
             if (loadFile != null) {
                 load(loadFile);
             }
@@ -246,7 +246,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * Load custom OptionGroup from default file.
      */
     protected void loadCustomOptions() {
-        File customFile = new File(FreeCol.getSaveDirectory(), getDefaultFileName());
+        File customFile = new File(FreeCol.getOptionsDirectory(), getDefaultFileName());
         if (customFile.exists()) {
             load(customFile);
         }

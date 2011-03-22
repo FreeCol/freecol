@@ -73,7 +73,7 @@ public final class FreeCol {
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
     public static final int     DEFAULT_PORT = 3541;
-    
+
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
@@ -81,7 +81,7 @@ public final class FreeCol {
 
     private static final String FREECOL_VERSION = "0.10.0";
     private static String FREECOL_REVISION;
-    
+
     private static final String MIN_JDK_VERSION = "1.5";
 
     private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
@@ -118,19 +118,19 @@ public final class FreeCol {
     /** Directory containing automatically created save games.
      *  At program start, the path of this directory is based on the path
      *  where to store regular save games. If the value of saveGame is
-     *  changed by the user during the game, then the value of 
-     *  autoSaveDirectory will not be effected. 
+     *  changed by the user during the game, then the value of
+     *  autoSaveDirectory will not be effected.
      */
     private static File autoSaveDirectory;
-    
+
     private static File tcUserDirectory;
 
     private static File userModsDirectory;
-    
+
     private static String tc = DEFAULT_TC;
-    
+
     private static File savegameFile = null;
-    
+
     private static File clientOptionsFile = null;
 
     private static Level logLevel = Level.INFO;
@@ -138,7 +138,7 @@ public final class FreeCol {
     private static boolean checkIntegrity = false;
 
     private static final Options options = new Options();
-    
+
     private static String splashFilename = DEFAULT_SPLASH_FILE;
     private static boolean displaySplash = false;
     private static Dimension windowSize;
@@ -169,7 +169,7 @@ public final class FreeCol {
 
         // parse command line arguments
         handleArgs(args);
-        
+
         createAndSetDirectories();
         initLogging();
 
@@ -179,7 +179,7 @@ public final class FreeCol {
         Locale locale = getLocale();
         Locale.setDefault(locale);
         Messages.setMessageBundle(locale);
-        
+
         if (javaCheck && !checkJavaVersion()) {
             System.err.println("Java version " + MIN_JDK_VERSION +
                                " or better is recommended in order to run FreeCol." +
@@ -193,7 +193,7 @@ public final class FreeCol {
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
             System.exit(1);
         }
-        
+
         if (standAloneServer) {
             startServer();
         } else {
@@ -215,7 +215,7 @@ public final class FreeCol {
                 + "FreeCol.log";
         }
         try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile)); 
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
             Logger freecolLogger = Logger.getLogger("net.sf.freecol");
             freecolLogger.setLevel(logLevel);
         } catch (FreeColException e) {
@@ -227,31 +227,31 @@ public final class FreeCol {
                 }
             });
     }
-    
+
     /**
      * Determines the <code>Locale</code> to be used.
      * @return Currently this method returns the locale set by
      *      the ClientOptions (read directly from "options.xml").
      *      This behavior will probably be changed.
      */
-    public static Locale getLocale() { 
+    public static Locale getLocale() {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader in = null;
         try {
             in = xif.createXMLStreamReader(new FileInputStream(getClientOptionsFile()), "UTF-8");
             in.nextTag();
-            /** 
+            /**
              * The following code was contributed by armcode to fix
              * bug #[ 2045521 ] "Exception in Freecol.log on starting
              * game". I was never able to reproduce the bug, but the
              * patch did no harm either.
              */
-            for(int eventid = in.getEventType();eventid != XMLEvent.END_DOCUMENT; eventid = in.getEventType()) { 
+            for(int eventid = in.getEventType();eventid != XMLEvent.END_DOCUMENT; eventid = in.getEventType()) {
 
                 //TODO: Is checking for XMLEvent.ATTRIBUTE needed?
                 if(eventid == XMLEvent.START_ELEMENT) {
                     if (ClientOptions.LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
-                        return LanguageOption.getLocale(in.getAttributeValue(null, "value")); 
+                        return LanguageOption.getLocale(in.getAttributeValue(null, "value"));
                     }
                 }
                 in.nextTag();
@@ -259,7 +259,7 @@ public final class FreeCol {
             //We don't have a language option in our file, it is either not there or the file is corrupt
             logger.log(Level.WARNING, "Language setting not found in client options file.  Using default.");
             return Locale.getDefault();
-            
+
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while loading options.", e);
             return Locale.getDefault();
@@ -282,7 +282,7 @@ public final class FreeCol {
     public static int getDefaultPort() {
         return DEFAULT_PORT;
     }
-    
+
     /**
      * Returns the file containing the client options.
      * @return The file.
@@ -290,11 +290,11 @@ public final class FreeCol {
     public static File getClientOptionsFile() {
         return clientOptionsFile;
     }
-    
+
     /**
      * Gets the <code>FreeColClient</code>.
      * @return The <code>FreeColClient</code>, or <code>null</code>
-     *      if the game is run as a standalone server. 
+     *      if the game is run as a standalone server.
      */
     public static FreeColClient getFreeColClient() {
         return freeColClient;
@@ -319,16 +319,16 @@ public final class FreeCol {
 
     /**
      * Creates a freecol dir for the current user.
-     * 
+     *
      * The directory is created within the current user's
      * home directory. This directory will be called "freecol"
      * and underneath that directory a "save" directory will
      * be created.
-     * 
+     *
      * For MacOS X the Library/FreeCol is used
      * (which is the standard path for application related files).
-     * 
-     * For os.name beginning with "Windows" JFileChooser() is used to 
+     *
+     * For os.name beginning with "Windows" JFileChooser() is used to
      * find the path to "My Documents" (or localized equivalent)
      */
     private static void createAndSetDirectories() {
@@ -338,7 +338,7 @@ public final class FreeCol {
                 ".freecol" : "freecol";
 
         File userHome = FileSystemView.getFileSystemView().getDefaultDirectory();
-        
+
         // Checks for OS specific paths, however if the old {home}/.freecol exists
         // that overrides OS-specifics for backwards compatibility.
         // TODO: remove compatibility code
@@ -363,10 +363,10 @@ public final class FreeCol {
             saveDirectory = new File(mainUserDirectory, "save");
         }
         if (!insistDirectory(saveDirectory)) saveDirectory = null;
-        
+
         autoSaveDirectory = new File(saveDirectory, "autosave");
         if (!insistDirectory(autoSaveDirectory)) autoSaveDirectory = null;
-        
+
         tcUserDirectory = new File(mainUserDirectory, tc);
         if (!insistDirectory(tcUserDirectory)) tcUserDirectory = null;
 
@@ -386,7 +386,7 @@ public final class FreeCol {
             System.out.println("No savegame given with --load-savegame parameter");
             System.exit(1);
         }
-        
+
         savegameFile = new File(name);
         if (!savegameFile.exists() || !savegameFile.isFile()) {
             savegameFile = new File(getSaveDirectory(), name);
@@ -422,11 +422,11 @@ public final class FreeCol {
     public static File getDataDirectory() {
         if (dataFolder.equals("")) {
             return new File("data");
-        } else {        
+        } else {
             return new File(dataFolder);
         }
     }
-    
+
     /**
      * Gets the mods directory.
      *
@@ -435,7 +435,7 @@ public final class FreeCol {
     public static File getStandardModsDirectory() {
         return new File(getDataDirectory(), "mods");
     }
-    
+
     /**
      * Gets the user mods directory.
      *
@@ -446,13 +446,22 @@ public final class FreeCol {
     }
 
     /**
-     * Returns the directory where the autogenerated savegames 
+     * Returns the directory where the autogenerated savegames
      * should be put.
-     * 
+     *
      * @return The directory.
      */
     public static File getAutosaveDirectory() {
         return autoSaveDirectory;
+    }
+
+    /**
+     * Returns the directory for saving options.
+     *
+     * @return The directory.
+     */
+    public static File getOptionsDirectory() {
+        return tcUserDirectory;
     }
 
     public static InputStream getSpecificationInputStream() throws IOException {
@@ -861,7 +870,7 @@ public final class FreeCol {
                     final XMLStreamReader in = xs.getXMLStreamReader();
                     in.nextTag();
                     xs.close();
-                        
+
                     freeColServer = new FreeColServer(fis, serverPort, serverName);
                     if (checkIntegrity) {
                         String integrityCheckMsg = "";

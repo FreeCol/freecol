@@ -138,7 +138,7 @@ public final class FreeColClient {
     private Player player;
 
     private boolean isRetired = false;
-    
+
     /** Indicates if the game has started, has nothing to do with whether or not the
     client is logged in. */
     private boolean inGame = false;
@@ -267,9 +267,12 @@ public final class FreeColClient {
         if (!headless) {
             actionManager.initializeActions();
         }
-        if (FreeCol.getClientOptionsFile() != null
-                && FreeCol.getClientOptionsFile().exists()) {
-            clientOptions.load(FreeCol.getClientOptionsFile());
+        File preferences = FreeCol.getClientOptionsFile();
+        if (preferences != null && preferences.exists()) {
+            clientOptions.load(preferences);
+            logger.info("Loaded client options from file " + preferences.getPath());
+        } else {
+            logger.warning("Unable to load client options.");
         }
 
         List<ResourceMapping> modMappings = new ArrayList<ResourceMapping>();
@@ -931,7 +934,7 @@ public final class FreeColClient {
             }
         }
     }
-    
+
 
 
     /**
