@@ -263,10 +263,8 @@ public final class FreeColClient {
 
         // load options
         clientOptions = new ClientOptions();
+        logger.info("Loaded default client options.");
         actionManager = new ActionManager(this);
-        if (!headless) {
-            actionManager.initializeActions();
-        }
         File preferences = FreeCol.getClientOptionsFile();
         if (preferences != null && preferences.exists()) {
             clientOptions.load(preferences);
@@ -285,9 +283,6 @@ public final class FreeColClient {
         //If modMappings change any UI resources related to actions,
         //these would not become visible without a 2nd call to initializeActions()
         //potential TODO: find a better way to untangle this.
-        if (!headless) {
-            actionManager.initializeActions();
-        }
 
         // Control:
         connectController = new ConnectController(this);

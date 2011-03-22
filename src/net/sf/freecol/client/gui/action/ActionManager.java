@@ -56,8 +56,8 @@ public class ActionManager extends OptionGroup {
     }
 
 
-    public void initializeActions() {
-        removeAll();
+    private void initializeActions() {
+        //removeAll();
         // keep this list alphabetized.
 
         add(new AboutAction(freeColClient));
