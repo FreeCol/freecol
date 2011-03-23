@@ -597,19 +597,6 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
-            // Follow trade routes for units in Europe.
-            // TODO: Why is Europe special?
-            Europe europe = player.getEurope();
-            if (europe != null) {
-                for (Unit unit : europe.getUnitList()) {
-                    if (unit.getTradeRoute() != null && unit.isInEurope()) {
-                        // Must call isInEurope to filter out units in
-                        // Europe but in the TO_EUROPE or TO_AMERICA states.
-                        followTradeRoute(unit);
-                    }
-                }
-            }
-
             // GUI management.
             if (!freeColClient.isSingleplayer()) {
                 freeColClient.playSound("sound.anthem." + player.getNationID());
@@ -620,53 +607,59 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Follow a trade route.
+     * Operate a trade route, doing load/unload actions and updating the
+     * destination.
      *
-     * @param unit The <code>Unit</code> to move.
+     * @param unit The <code>Unit</code> on the route.
+     * @return A destination to move to, or null if none available or the
+     *     unit can not move further.
      */
-    private void followTradeRoute(Unit unit) {
-        // Complain and return if the stop is no longer valid.
+    private Location operateTradeRoute(Unit unit) {
         Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+
+        // Complain and return if the stop is no longer valid.
         Stop stop = unit.getStop();
         if (!TradeRoute.isStopValid(unit, stop)) {
             String name = unit.getTradeRoute().getName();
             canvas.showInformationMessage(unit, "traderoute.broken",
                                           "%name%", name);
-            return;
+            clearOrders(unit);
+            logger.warning("Trade unit " + unit.getId()
+                           + " in route " + name
+                           + " cannot continue: stop invalid.");
+            return null;
         }
 
-        // Return if the stop is Europe but the unit has not arrived yet.
-        if (freeColClient.getMyPlayer().getEurope() == stop.getLocation()
-            && !unit.isInEurope()) {
-            return;
+        // Defend against a bug where a unit with a trade route ends
+        // up with a null destination.  Make sure we reset the
+        // destination to the next stop, which will avoid the unit
+        // being considered an "active" unit.
+        if (unit.getDestination() == null) {
+            setDestination(unit, stop.getLocation());
         }
 
-        if (unit.getInitialMovesLeft() == unit.getMovesLeft()) {
-            // The unit was already at the stop at the beginning of the
-            // turn, so loading is allowed.
-            loadUnitAtStop(unit);
+        // Has the unit arrived at the stop?
+        if ((player.getEurope() == stop.getLocation() && unit.isInEurope())
+            || unit.getTile() == stop.getLocation().getTile()) {
+            // Look towards the next stop
 
-            // Update to next stop, and move towards it unless the
-            // unit is already there.
-            if (askUpdateCurrentStop(unit)) {
-                Stop nextStop = unit.getStop();
-                if (nextStop != null
-                    && nextStop.getLocation() != unit.getColony()) {
-                    if (unit.isInEurope()) {
-                        moveToAmerica(unit);
-                    } else {
-                        moveToDestination(unit);
-                    }
-                }
+            if (unit.getInitialMovesLeft() == unit.getMovesLeft()) {
+                // The unit was already at the stop at the beginning
+                // of the turn, so loading and further moves are OK
+                // if the stop update worked.
+                loadUnitAtStop(unit);
+                return (askUpdateCurrentStop(unit)) ? unit.getDestination()
+                    : null;
             }
-        } else {
             // The unit has just arrived, stop here and unload.
+            // Pretend to be finished moving.  This is a client-side
+            // convenience and does not need to be in the server.
             unloadUnitAtStop(unit);
+            unit.setMovesLeft(0);
         }
 
-        // Pretend to be finished moving.  This is a client-side
-        // convenience and does not need to be in the server.
-        unit.setMovesLeft(0);
+        return (unit.getMovesLeft() > 0) ? unit.getDestination() : null;
     }
 
     /**
@@ -944,6 +937,66 @@ public final class InGameController implements NetworkConstants {
         return result.substring(0, result.length() - separator.length());
     }
 
+    /**
+     * Moves the given unit towards its destinations if possible.
+     *
+     * @param unit The <code>Unit</code> to move.
+     */
+    public void moveToDestination(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        final Map map = freeColClient.getGame().getMap();
+        GUI gui = freeColClient.getGUI();
+        gui.setActiveUnit(unit);
+
+        Location destination;
+        for (;;) {
+            // Look for valid destinations
+            if (unit.getTradeRoute() == null) {
+                if ((destination = unit.getDestination()) == null) {
+                    break; // No destination
+                } else if (destination instanceof Europe) {
+                    if (unit.isInEurope()) break; // Arrived in Europe
+                } else if (destination.getTile() == null) {
+                    break; // Not on the map
+                } else if (unit.getTile() == destination.getTile()) {
+                    break; // Arrived at on-map destination
+                } else if (unit.getMovesLeft() <= 0) {
+                    break; // Out of moves
+                }
+            } else {
+                if ((destination = operateTradeRoute(unit)) == null) break;
+            }
+
+            // Find a path to the destination.
+            PathNode path = (destination instanceof Europe)
+                ? map.findPathToEurope(unit, unit.getTile())
+                : unit.findPath(destination.getTile());
+
+            // No path, give up.
+            if (path == null) {
+                StringTemplate dest = destination.getLocationNameFor(player);
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("selectDestination.failed")
+                    .addStringTemplate("%destination%", dest));
+                break;
+            }
+
+            // Try to follow the path.
+            movePath(unit, path);
+        }
+
+        // Clear ordinary destinations, leave trade routes.
+        if (unit.getTradeRoute() == null) {
+            clearGotoOrders(unit);
+            checkCashInTreasureTrain(unit);
+        }
+    }
 
     /**
      * Moves the active unit in a specified direction. This may result in an
@@ -998,150 +1051,6 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-
-    /**
-     * Moves the given unit towards the destination given by
-     * {@link Unit#getDestination()}.
-     *
-     * @param unit The <code>Unit</code> to move.
-     */
-    public void moveToDestination(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        GUI gui = freeColClient.getGUI();
-        gui.setActiveUnit(unit);
-
-        if (unit.getTradeRoute() != null) {
-            Stop currStop = unit.getStop();
-            if (!TradeRoute.isStopValid(unit, currStop)) {
-                String oldTradeRouteName = unit.getTradeRoute().getName();
-                logger.warning("Trade unit " + unit.getId()
-                               + " in route " + oldTradeRouteName
-                               + " cannot continue: stop invalid.");
-                canvas.showInformationMessage(unit, "traderoute.broken",
-                                              "%name%", oldTradeRouteName);
-                clearOrders(unit);
-                return;
-            }
-
-            // If the unit was activated the destination is cleared,
-            // make sure we reset the destination to the next stop,
-            // which will avoid the unit being considered an "active" unit.
-            if (unit.getDestination() == null) {
-                setDestination(unit, currStop.getLocation());
-            }
-
-            String where = Messages.message(currStop.getLocation()
-                                            .getLocationName());
-            String route = unit.getTradeRoute().getName();
-            if (unit.getLocation().getTile() == currStop.getLocation().getTile()) {
-                // Trade unit is at current stop
-                logger.info("Trade unit " + unit.getId()
-                            + " in route " + route + " is at " + where);
-                followTradeRoute(unit);
-                return;
-            } else {
-                logger.info("Trade unit " + unit.getId()
-                            + " in route " + route + " is going to " + where);
-            }
-        } else {
-            logger.info("Moving unit " + unit.getId() + " to position "
-                + Messages.message(unit.getDestination().getLocationName()));
-        }
-
-        // Already arrived at destination?
-        // Or is destination invalid (not Europe and not on the map)
-        // for example) or is current tile.
-        final Location destination = unit.getDestination();
-        if ((destination instanceof Europe && unit.isInEurope())
-            || unit.getTile() == destination.getTile()
-            || (!(destination instanceof Europe)
-                && destination.getTile() == null)) {
-            clearGotoOrders(unit);
-            return;
-        }
-
-        final Map map = freeColClient.getGame().getMap();
-        PathNode path;
-        if (destination instanceof Europe) {
-            path = map.findPathToEurope(unit, unit.getTile());
-        } else {
-            path = unit.findPath(destination.getTile());
-        }
-
-        if (path == null) {
-            StringTemplate destLoc = destination.getLocationNameFor(player);
-            canvas.showInformationMessage(unit,
-                StringTemplate.template("selectDestination.failed")
-                    .addStringTemplate("%destination%", destLoc));
-            clearGotoOrders(unit);
-            return;
-        }
-
-        for (; path != null; path = path.next) {
-            // Special case for the map edges on maps not surrounded by
-            // high seas.
-            if (destination instanceof Europe
-                && unit.getTile() != null
-                && unit.getTile().isAdjacentToMapEdge()) {
-                moveToEurope(unit);
-                return;
-            }
-
-            MoveType mt = unit.getMoveType(path.getDirection());
-            switch (mt) {
-            case MOVE_HIGH_SEAS:
-                if (destination instanceof Europe) {
-                    moveToEurope(unit);
-                    return;
-                }
-                /* Fall through */
-            case MOVE:
-                moveMove(unit, path.getDirection());
-                break;
-            case EXPLORE_LOST_CITY_RUMOUR:
-                moveExplore(unit, path.getDirection());
-                return;
-            case ATTACK:
-                moveAttack(unit, path.getDirection());
-                return;
-            case EMBARK:
-            case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-            case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-            case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-            case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-                // Special cases only work if this is the last tile.
-                if (path == path.getLastNode()) {
-                    move(unit, path.getDirection());
-                    clearGotoOrders(unit);
-                }
-                return;
-            case MOVE_NO_MOVES:
-                // The unit may have some moves left, but not enough
-                // to move to the destination.  Fake clearing its
-                // remaining moves on the client side only just to
-                // avoid it being reselected.
-                unit.setMovesLeft(0);
-                return;
-            default: // Should be illegal moves only
-                return;
-            }
-        }
-
-        // Reached the destination.
-        if (unit.getTradeRoute() == null) {
-            clearGotoOrders(unit);
-            checkCashInTreasureTrain(unit);
-        } else {
-            followTradeRoute(unit);
-        }
-    }
 
     // Public user actions that may require interactive confirmation
     // before requesting an update from the server.
@@ -1680,7 +1589,6 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move the unit.
-     * TODO: Unify trade and negotiation.
      */
     public void move(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
@@ -1690,91 +1598,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        // Consider all the move types
-        Tile tile = unit.getTile();
-        MoveType move = unit.getMoveType(direction);
-        switch (move) {
-        case MOVE:
-            moveMove(unit, direction);
-            break;
-        case MOVE_HIGH_SEAS:
-            moveHighSeas(unit, direction);
-            break;
-        case EXPLORE_LOST_CITY_RUMOUR:
-            moveExplore(unit, direction);
-            break;
-        case ATTACK:
-            moveAttack(unit, direction);
-            break;
-        case EMBARK:
-            moveEmbark(unit, direction);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-            moveLearnSkill(unit, direction);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            moveScoutIndianSettlement(unit, direction);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-            moveUseMissionary(unit, direction);
-            break;
-        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-            moveScoutColony(unit, direction);
-            break;
-        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            moveTrade(unit, direction);
-            break;
-
-        case MOVE_NO_ACCESS_BEACHED:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit, "move.noAccessBeached",
-                                          "%nation%", Messages.message(getNationAt(tile, direction)));
-            break;
-        case MOVE_NO_ACCESS_CONTACT:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit, "move.noAccessContact",
-                                          "%nation%", Messages.message(getNationAt(tile, direction)));
-            break;
-        case MOVE_NO_ACCESS_LAND:
-            if (!moveDisembark(unit, direction)) {
-                freeColClient.playSound("sound.event.illegalMove");
-            }
-            break;
-        case MOVE_NO_ACCESS_SETTLEMENT:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit,
-                StringTemplate.template("move.noAccessSettlement")
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%nation%", getNationAt(tile, direction)));
-            break;
-        case MOVE_NO_ACCESS_SKILL:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit,
-                StringTemplate.template("move.noAccessSkill")
-                .addStringTemplate("%unit%", Messages.getLabel(unit)));
-            break;
-        case MOVE_NO_ACCESS_TRADE:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit,
-                StringTemplate.template("move.noAccessTrade")
-                .addStringTemplate("%nation%", getNationAt(tile, direction)));
-            break;
-        case MOVE_NO_ACCESS_WAR:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit,
-                StringTemplate.template("move.noAccessWar")
-                .addStringTemplate("%nation%", getNationAt(tile, direction)));
-            break;
-        case MOVE_NO_ACCESS_WATER:
-            freeColClient.playSound("sound.event.illegalMove");
-            canvas.showInformationMessage(unit,
-                StringTemplate.template("move.noAccessWater")
-                .addStringTemplate("%unit%", Messages.getLabel(unit)));
-            break;
-        default:
-            freeColClient.playSound("sound.event.illegalMove");
-            break;
-        }
+        moveDirection(unit, direction, true);
 
         // TODO: check if this is necessary for all actions?
         SwingUtilities.invokeLater(new Runnable() {
@@ -1783,6 +1607,31 @@ public final class InGameController implements NetworkConstants {
                     freeColClient.updateMenuBar();
                 }
             });
+    }
+
+    /**
+     * Move a unit along a path.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param path The path to follow.
+     * @return True if the unit has completed the path and can move further.
+     */
+    private boolean movePath(Unit unit, PathNode path) {
+        // Traverse the path to the destination.
+        for (; path != null; path = path.next) {
+
+            // Special case for the map edges on maps not
+            // surrounded by high seas.
+            if (unit.getDestination() instanceof Europe
+                && unit.getTile() != null
+                && unit.getTile().isAdjacentToMapEdge()) {
+                moveToEurope(unit);
+                return false;
+            }
+
+            if (!moveDirection(unit, path.getDirection(), false)) return false;
+        }
+        return true;
     }
 
     /**
@@ -1820,6 +1669,141 @@ public final class InGameController implements NetworkConstants {
             player = freeColClient.getGame().getUnknownEnemy();
         }
         return player.getNationName();
+    }
+
+    /**
+     * Move a unit in a given direction.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param direction The <code>Direction</code> to move in.
+     * @param interactive Interactive mode: play sounds and emit errors.
+     * @return True if the unit can possibly move further.
+     */
+    private boolean moveDirection(Unit unit, Direction direction,
+                                  boolean interactive) {
+        Canvas canvas = freeColClient.getCanvas();
+
+        // Consider all the move types
+        switch (unit.getMoveType(direction)) {
+        case MOVE:
+            moveMove(unit, direction);
+            return unit.getMovesLeft() > 0;
+        case MOVE_HIGH_SEAS:
+            if (interactive) {
+                moveHighSeas(unit, direction);
+            } else {
+                if (unit.getDestination() instanceof Europe) {
+                    moveToEurope(unit);
+                } else {
+                    moveMove(unit, direction);
+                }
+            }
+            return false;
+        case EXPLORE_LOST_CITY_RUMOUR:
+            moveExplore(unit, direction);
+            return false;
+        case ATTACK:
+            moveAttack(unit, direction);
+            return false;
+        case EMBARK:
+            moveEmbark(unit, direction);
+            return false;
+        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
+            moveLearnSkill(unit, direction);
+            return false;
+        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+            moveScoutIndianSettlement(unit, direction);
+            return false;
+        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
+            moveUseMissionary(unit, direction);
+            return false;
+        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+            moveScoutColony(unit, direction);
+            return false;
+        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+            moveTrade(unit, direction);
+            return false;
+
+        case MOVE_NO_ACCESS_BEACHED:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit, "move.noAccessBeached",
+                    "%nation%", Messages.message(getNationAt(unit.getTile(),
+                                                             direction)));
+            }
+            return false;
+        case MOVE_NO_ACCESS_CONTACT:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit, "move.noAccessContact",
+                    "%nation%", Messages.message(getNationAt(unit.getTile(),
+                                                             direction)));
+            }
+            return false;
+        case MOVE_NO_ACCESS_LAND:
+            if (!moveDisembark(unit, direction)) {
+                if (interactive) {
+                    freeColClient.playSound("sound.event.illegalMove");
+                }
+            }
+            return false;
+        case MOVE_NO_ACCESS_SETTLEMENT:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessSettlement")
+                       .addStringTemplate("%unit%", Messages.getLabel(unit))
+                       .addStringTemplate("%nation%",
+                           getNationAt(unit.getTile(), direction)));
+            }
+            return false;
+        case MOVE_NO_ACCESS_SKILL:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessSkill")
+                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+            }
+            return false;
+        case MOVE_NO_ACCESS_TRADE:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit, "move.noAccessTrade",
+                    "%nation%", Messages.message(getNationAt(unit.getTile(),
+                                                             direction)));
+            }
+            return false;
+        case MOVE_NO_ACCESS_WAR:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit, "move.noAccessWar",
+                    "%nation%", Messages.message(getNationAt(unit.getTile(),
+                                                             direction)));
+            }
+            return false;
+        case MOVE_NO_ACCESS_WATER:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessWater")
+                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+            }
+            return false;
+        case MOVE_NO_MOVES:
+            if (!interactive) {
+                // The unit may have some moves left, but not enough
+                // to move to the next node.  Clear its remaining
+                // moves on the client side only, to avoid it being
+                // reselected.
+                unit.setMovesLeft(0);
+            }
+            return false;
+        default:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+            }
+            return false;
+        }
     }
 
     /**
@@ -2828,6 +2812,7 @@ public final class InGameController implements NetworkConstants {
      * Move to a foreign colony and either attack, negotiate with the
      * foreign power or spy on them.  Follows a move of
      * MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT.
+     * TODO: Unify trade and negotiation.
      *
      * @param unit The unit that will spy, negotiate or attack.
      * @param direction The direction in which the foreign colony lies.
