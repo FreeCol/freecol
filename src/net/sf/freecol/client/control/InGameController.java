@@ -694,7 +694,7 @@ public final class InGameController implements NetworkConstants {
     private void loadUnitAtStop(Unit unit) {
         // Copy the list of goods types to load at this stop.
         Stop stop = unit.getStop();
-        ArrayList<GoodsType> goodsTypesToLoad
+        List<GoodsType> goodsTypesToLoad
             = new ArrayList<GoodsType>(stop.getCargo());
 
         // First handle partial loads.
@@ -705,7 +705,7 @@ public final class InGameController implements NetworkConstants {
         Location loc = (unit.isInEurope()) ? unit.getOwner().getEurope()
             : colony;
         Game game = freeColClient.getGame();
-        ArrayList<Goods> loaded = new ArrayList<Goods>();
+        List<Goods> loaded = new ArrayList<Goods>();
         for (Goods goods : unit.getGoodsList()) {
             GoodsType type = goods.getType();
             int index, toLoad;
@@ -743,12 +743,12 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Report on what has been loaded.
-        if (!loaded.isEmpty()) {
-            logger.fine("Load " + unit.getId()
-                        + " in trade route " + unit.getTradeRoute().getName()
-                        + " at " + stop.getLocation().getLocationName()
-                        + " goods " + goodsSummary(loaded));
-        }
+        String trade = "Load   " + Messages.message(unit.getLabel())
+            + " in trade route " + unit.getTradeRoute().getName()
+            + " at " + Messages.message(stop.getLocation().getLocationNameFor(unit.getOwner()))
+            + ": " + ((loaded.isEmpty()) ? Messages.message("none")
+                      : goodsSummary(loaded));
+        logger.fine(trade);
     }
 
     /**
@@ -810,7 +810,7 @@ public final class InGameController implements NetworkConstants {
         // Unload everything that is on the carrier but not listed to
         // be loaded at this stop.
         Game game = freeColClient.getGame();
-        ArrayList<Goods> unloaded = new ArrayList<Goods>();
+        List<Goods> unloaded = new ArrayList<Goods>();
         for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
             GoodsType type = goods.getType();
             if (goodsTypesToLoad.contains(type)) {
@@ -877,12 +877,12 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Report on what was unloaded.
-        if (!unloaded.isEmpty()) {
-            logger.fine("Unload " + unit.getId()
-                        + " in trade route " + unit.getTradeRoute().getName()
-                        + " at " + stop.getLocation().getLocationName()
-                        + " goods " + goodsSummary(unloaded));
-        }
+        String trade = "Unload " + Messages.message(unit.getLabel())
+            + " in trade route " + unit.getTradeRoute().getName()
+            + " at " + Messages.message(stop.getLocation().getLocationNameFor(unit.getOwner()))
+            + ": " + ((unloaded.isEmpty()) ? Messages.message("none")
+                      : goodsSummary(unloaded));
+        logger.fine(trade);
     }
 
     /**
