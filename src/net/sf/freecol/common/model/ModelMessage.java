@@ -45,13 +45,12 @@ public class ModelMessage extends StringTemplate {
         BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
         FOREIGN_DIPLOMACY("model.option.guiShowForeignDiplomacy"),
         MARKET_PRICES("model.option.guiShowMarketPrices"),
-        LOST_CITY_RUMOUR(null),
-        GIFT_GOODS(null),
+        LOST_CITY_RUMOUR(null), // Displayed during the turn
         MISSING_GOODS("model.option.guiShowMissingGoods"),
         TUTORIAL("model.option.guiShowTutorial"),
-        COMBAT_RESULT(null),
-        ACCEPTED_DEMANDS(null),
-        REJECTED_DEMANDS(null);
+        COMBAT_RESULT(null), // No option, always display
+        GIFT_GOODS("model.option.guiShowGifts"),
+        DEMANDS("model.option.guiShowDemands");
 
         private String optionName;
 
@@ -148,37 +147,38 @@ public class ModelMessage extends StringTemplate {
      */
     static private FreeColObject getDefaultDisplay(MessageType messageType,
                                                    FreeColGameObject source) {
-        FreeColObject newDisplay = null;
+        FreeColObject o = null;
         switch (messageType) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
-            newDisplay = source.getSpecification().getGoodsType("model.goods.bells");
+            o = source.getSpecification().getGoodsType("model.goods.bells");
             break;
-        case LOST_CITY_RUMOUR:
         case UNIT_IMPROVED:
         case UNIT_DEMOTED:
         case UNIT_LOST:
         case UNIT_ADDED:
+        case LOST_CITY_RUMOUR:
         case COMBAT_RESULT:
-            newDisplay = source;
+        case DEMANDS:
+            o = source;
             break;
         case BUILDING_COMPLETED:
-            newDisplay = source.getSpecification().getGoodsType("model.goods.hammers");
+            o = source.getSpecification().getGoodsType("model.goods.hammers");
             break;
-        case TUTORIAL:
         case DEFAULT:
         case WARNING:
         case WAREHOUSE_CAPACITY:
         case FOREIGN_DIPLOMACY:
         case MARKET_PRICES:
-        case GIFT_GOODS:
         case MISSING_GOODS:
+        case TUTORIAL:
+        case GIFT_GOODS:
         default:
             if (source instanceof Player) {
-                newDisplay = source;
+                o = source;
             }
         }
-        return newDisplay;
+        return o;
     }
 
 

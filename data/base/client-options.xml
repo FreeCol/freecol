@@ -99,15 +99,17 @@
       <booleanOption id="model.option.guiShowWarehouseCapacity" defaultValue="true"/>
       <booleanOption id="model.option.guiShowUnitImproved" defaultValue="true"/>
       <booleanOption id="model.option.guiShowUnitDemoted" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowUnitAdded" defaultValue="true"/>
       <booleanOption id="model.option.guiShowUnitLost" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitAdded" defaultValue="true"/>
       <booleanOption id="model.option.guiShowBuildingCompleted" defaultValue="true"/>
       <booleanOption id="model.option.guiShowForeignDiplomacy" defaultValue="true"/>
       <booleanOption id="model.option.guiShowMarketPrices" defaultValue="true"/>
       <booleanOption id="model.option.guiShowMissingGoods" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowTutorial" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowGifts" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowDemands" defaultValue="true"/>
       <booleanOption id="model.option.guiShowColonyWarnings" defaultValue="true"/>
       <booleanOption id="model.option.guiShowPreCombat" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowTutorial" defaultValue="true"/>
       <booleanOption id="model.option.guiShowNotBestTile" defaultValue="true"/>
       <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->
       <booleanOption id="model.option.smoothRendering" defaultValue="false"/>

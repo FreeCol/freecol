@@ -673,7 +673,7 @@ public final class InGameInputHandler extends InputHandler {
                         "%amount%", goldStr).confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
@@ -681,7 +681,7 @@ public final class InGameInputHandler extends InputHandler {
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
@@ -716,13 +716,13 @@ public final class InGameInputHandler extends InputHandler {
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.food.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", amount);
                 } else {
-                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.other.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
@@ -733,13 +733,13 @@ public final class InGameInputHandler extends InputHandler {
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.food.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", amount);
                 } else {
-                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                          "indianDemand.other.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
