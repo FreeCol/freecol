@@ -45,11 +45,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private Map<String, Option> optionMap = new HashMap<String, Option>();
 
+    private OptionGroup parent;
 
     /**
      * Creates a new <code>OptionGroup</code>.
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
+     * @param id The identifier for this option.
      */
     public OptionGroup(String id) {
         super(id);
@@ -63,6 +63,14 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     public OptionGroup(XMLStreamReader in) throws XMLStreamException {
         this(NO_ID);
         readFromXML(in);
+    }
+
+    /**
+     * Returns the parent OptionGroup, or null if there is none.
+     * @return the parent OptionGroup, or null if there is none.
+     */
+    public OptionGroup getParent() {
+        return parent;
     }
 
     /**
@@ -197,6 +205,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 OptionGroup optionGroup = (OptionGroup) getOption(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 if (optionGroup == null) {
                     optionGroup = new OptionGroup(in);
+                    optionGroup.parent = this;
                 } else {
                     optionGroup.readFromXML(in);
                 }

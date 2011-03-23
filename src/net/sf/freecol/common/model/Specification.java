@@ -1104,7 +1104,14 @@ public final class Specification {
         writeSection(out, "european-nation-types", REFNationTypes);
         writeSection(out, "indian-nation-types", indianNationTypes);
         writeSection(out, "nations", nations);
-        writeSection(out, "options", allOptionGroups.values());
+        // option tree has been flattened
+        out.writeStartElement("options");
+        for (OptionGroup item : allOptionGroups.values()) {
+            if (item.getParent() == null) {
+                item.toXML(out);
+            }
+        }
+        out.writeEndElement();
 
         // End element:
         out.writeEndElement();
