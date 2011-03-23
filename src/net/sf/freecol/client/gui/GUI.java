@@ -1797,65 +1797,6 @@ public final class GUI {
     }
 
     /**
-     * Creates an image with a string of a given color and with
-     * a black border around the glyphs.
-     *
-     * @param c A <code>JComponent</code>-object for getting a
-     *       <code>Font</code>.
-     * @param g A <code>Graphics</code>-object for getting a
-     *       <code>Font</code>.
-     * @param text The <code>String</code> to make an image of.
-     * @param font The font with which to render.
-     * @param color The <code>Color</code> to use when displaying
-     *       the <code>text</code>.
-     * @return The image that was created.
-     */
-    /*
-    private BufferedImage createStringImage(JComponent c, Graphics g, String text, Font font, Color color) {
-        if (color == null) {
-            logger.warning("createStringImage called with color null");
-            color = Color.WHITE;
-        }
-
-        // Lookup in the cache if the image has been generated already
-        String key = text + font.getFontName() + color.getRGB();
-        BufferedImage bi = (BufferedImage) ResourceManager.getImage(key, lib.getScalingFactor());
-        if (bi != null) {
-            return bi;
-        }
-
-        // create an image of the appropriate size
-        FontRenderContext context = new FontRenderContext(null, true, true);
-        GlyphVector glyphs = font.createGlyphVector(context, text);
-        FontMetrics metrics = (c != null) ? c.getFontMetrics(font) : g.getFontMetrics(font);
-        Rectangle bounds = glyphs.getPixelBounds(context, 3.0f, (float)metrics.getMaxAscent());
-        bi = new BufferedImage(bounds.width + 6, metrics.getMaxAscent() + 6, BufferedImage.TYPE_INT_ARGB);
-
-        // set up the graphics
-        Color outlineColor = getStringBorderColor(color);
-        Graphics2D g2d = bi.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
-        // draw the string
-        Shape textShape = glyphs.getOutline(3, metrics.getMaxAscent());
-//        g2d.setColor(Color.PINK);
-//        g2d.fillRect(-1000,-1000,2000,2000);
-//        g2d.setColor(Color.CYAN);
-//        g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-        g2d.setStroke(new BasicStroke(2.0f));
-        g2d.setColor(outlineColor);
-        g2d.draw(textShape);
-        g2d.setColor(color);
-        g2d.fill(textShape);
-
-        ResourceManager.getGameMapping().add(key, new ImageResource(bi));
-        return bi;
-    }
-    */
-
-    /**
      * Creates an Image that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
@@ -2143,37 +2084,6 @@ public final class GUI {
     public void displayTerrain(Graphics2D g, Map map, Tile tile) {
         displayBaseTile(g, map, tile, true);
         displayTileItems(g, map, tile);
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Everything located on the
-     * Tile will also be drawn except for units because their image can
-     * be larger than a Tile.
-     *
-     * <br><br>The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
-     * @param tile The Tile to draw.
-     */
-    public void displayTile(Graphics2D g, Map map, Tile tile) {
-        displayTile(g, map, tile, true);
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Everything located on the
-     * Tile will also be drawn except for units because their image can
-     * be larger than a Tile.
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
-     * @param tile The Tile to draw.
-     * @param drawUnexploredBorders If true; draws border between explored and
-     *        unexplored terrain.
-     */
-    public void displayTile(Graphics2D g, Map map, Tile tile, boolean drawUnexploredBorders) {
-        displayBaseTile(g, map, tile, drawUnexploredBorders);
-        displayTileOverlays(g, map, tile, drawUnexploredBorders, true);
     }
 
     /**
