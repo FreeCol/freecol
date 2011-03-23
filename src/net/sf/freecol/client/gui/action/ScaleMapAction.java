@@ -36,7 +36,6 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Map.Position;
 
 /**
  * An action for scaling a map. This action is a part of the map editor.
@@ -231,7 +230,7 @@ public class ScaleMapAction extends FreeColAction {
             t.getTileItemContainer().updateRiver();
         }*/
         
-        freeColClient.getGUI().setSelectedTile(new Position(0, 0));
+        freeColClient.getGUI().setSelectedTile(map.getTile(0, 0));
         freeColClient.getCanvas().refresh();
     }
 }

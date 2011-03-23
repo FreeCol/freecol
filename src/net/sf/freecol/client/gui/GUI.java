@@ -591,7 +591,7 @@ public final class GUI {
         if(selectedTile != null){
             Tile newTile = selectedTile.getNeighbourOrNull(direction);
             if(newTile != null)
-                setSelectedTile(newTile.getPosition());
+                setSelectedTile(newTile);
         }
         else{
             logger.warning("selectedTile is null");
@@ -608,21 +608,10 @@ public final class GUI {
      */
     public void setSelectedTile(Tile tile) {
         if (tile != null) {
-            setSelectedTile(tile.getPosition());
+            setSelectedTile(tile.getPosition(), false);
         }
     }
 
-    /**
-     * Selects the tile at the specified position, without clearing
-     * the orders of the first unit contained.
-     *
-     * @param selectedTile The <code>Position</code> of the tile
-     *                     to be selected.
-     * @see #setSelectedTile(Map.Position, boolean)
-     */
-    public void setSelectedTile(Position selectedTile) {
-        setSelectedTile(selectedTile, false);
-    }
 
     /**
     * Selects the tile at the specified position. There are three
@@ -893,7 +882,7 @@ public final class GUI {
 
         //if (activeUnit != null && !activeUnit.getTile().getPosition().equals(selectedTile)) {
         if (activeUnit != null) {
-            setSelectedTile(activeUnit.getTile().getPosition());
+            setSelectedTile(activeUnit.getTile());
         } else {
             freeColClient.getActionManager().update();
             freeColClient.updateMenuBar();

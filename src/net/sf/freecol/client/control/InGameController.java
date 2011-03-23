@@ -69,7 +69,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
@@ -90,7 +89,6 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -1271,7 +1269,7 @@ public final class InGameController implements NetworkConstants {
             player.invalidateCanSeeTiles();
             freeColClient.playSound("sound.event.buildingComplete");
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile.getPosition());
+            gui.setSelectedTile(tile);
 
             // Check units present for treasure cash-in as they are now
             // suddenly in-colony.
@@ -1454,7 +1452,7 @@ public final class InGameController implements NetworkConstants {
             player.invalidateCanSeeTiles();
             GUI gui = freeColClient.getGUI();
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile.getPosition());
+            gui.setSelectedTile(tile);
         }
     }
 
@@ -5028,11 +5026,7 @@ public final class InGameController implements NetworkConstants {
             if (nextActiveUnit != null) {
                 moveToDestination(nextActiveUnit);
             } else if (tile != null) {
-                Position p = tile.getPosition();
-                if (p != null) {
-                    // this really shouldn't happen
-                    gui.setSelectedTile(p);
-                }
+                gui.setSelectedTile(tile);
                 gui.setActiveUnit(null);
             } else {
                 gui.setActiveUnit(null);
