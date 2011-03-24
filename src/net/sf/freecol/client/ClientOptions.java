@@ -194,6 +194,8 @@ public class ClientOptions extends OptionGroup {
 
     public static final String SHOW_NOT_BEST_TILE = "model.option.guiShowNotBestTile";
 
+    public static final String SHOW_GOODS_MOVEMENT = "model.option.guiShowGoodsMovement";
+
     /**
      * Use default values for savegames instead of displaying a dialog. <br>
      * <br>

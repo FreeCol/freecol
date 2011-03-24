@@ -108,6 +108,7 @@
       <booleanOption id="model.option.guiShowTutorial" defaultValue="true"/>
       <booleanOption id="model.option.guiShowGifts" defaultValue="true"/>
       <booleanOption id="model.option.guiShowDemands" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowGoodsMovement" defaultValue="false"/>
       <booleanOption id="model.option.guiShowColonyWarnings" defaultValue="true"/>
       <booleanOption id="model.option.guiShowPreCombat" defaultValue="true"/>
       <booleanOption id="model.option.guiShowNotBestTile" defaultValue="true"/>

@@ -50,7 +50,8 @@ public class ModelMessage extends StringTemplate {
         TUTORIAL("model.option.guiShowTutorial"),
         COMBAT_RESULT(null), // No option, always display
         GIFT_GOODS("model.option.guiShowGifts"),
-        DEMANDS("model.option.guiShowDemands");
+        DEMANDS("model.option.guiShowDemands"),
+        GOODS_MOVEMENT("model.option.guiShowGoodsMovement");
 
         private String optionName;
 
@@ -160,6 +161,7 @@ public class ModelMessage extends StringTemplate {
         case LOST_CITY_RUMOUR:
         case COMBAT_RESULT:
         case DEMANDS:
+        case GOODS_MOVEMENT:
             o = source;
             break;
         case BUILDING_COMPLETED:
@@ -177,6 +179,7 @@ public class ModelMessage extends StringTemplate {
             if (source instanceof Player) {
                 o = source;
             }
+            break;
         }
         return o;
     }
