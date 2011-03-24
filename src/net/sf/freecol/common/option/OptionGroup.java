@@ -45,8 +45,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private Map<String, Option> optionMap = new HashMap<String, Option>();
 
-    private OptionGroup parent;
-
     /**
      * Creates a new <code>OptionGroup</code>.
      * @param id The identifier for this option.
@@ -63,14 +61,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     public OptionGroup(XMLStreamReader in) throws XMLStreamException {
         this(NO_ID);
         readFromXML(in);
-    }
-
-    /**
-     * Returns the parent OptionGroup, or null if there is none.
-     * @return the parent OptionGroup, or null if there is none.
-     */
-    public OptionGroup getParent() {
-        return parent;
     }
 
     /**

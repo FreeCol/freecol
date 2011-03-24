@@ -1107,7 +1107,7 @@ public final class Specification {
         // option tree has been flattened
         out.writeStartElement("options");
         for (OptionGroup item : allOptionGroups.values()) {
-            if (item.getParent() == null) {
+            if ("".equals(item.getGroup())) {
                 item.toXML(out);
             }
         }
