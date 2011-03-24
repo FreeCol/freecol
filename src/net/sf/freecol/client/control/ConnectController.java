@@ -283,7 +283,7 @@ public final class ConnectController {
                             .setCurrentPlayer(thisPlayer);
                     }
                     freeColClient.getGUI().setSelectedTile(thisPlayer
-                        .getEntryLocation().getTile().getPosition(), false);
+                        .getEntryLocation().getTile());
                 }
             } else if (in.getLocalName().equals("error")) {
                 canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));

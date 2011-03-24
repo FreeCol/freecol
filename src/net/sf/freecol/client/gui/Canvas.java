@@ -77,7 +77,6 @@ import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
@@ -108,7 +107,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -1437,31 +1435,12 @@ public final class Canvas extends JDesktopPane {
     /**
      * Refreshes the screen at the specified Tile.
      *
-     * @param x The x-coordinate of the Tile to refresh.
-     * @param y The y-coordinate of the Tile to refresh.
-     */
-    public void refreshTile(int x, int y) {
-        if (x >= 0 && y >= 0) {
-            repaint(gui.getTileBounds(x, y));
-        }
-    }
-
-    /**
-     * Refreshes the screen at the specified Tile.
-     *
      * @param t The tile to refresh.
      */
     public void refreshTile(Tile t) {
-        refreshTile(t.getPosition());
-    }
-
-    /**
-     * Refreshes the screen at the specified Tile.
-     *
-     * @param p The position of the tile to refresh.
-     */
-    public void refreshTile(Position p) {
-        refreshTile(p.getX(), p.getY());
+        if (t.getX() >= 0 && t.getY() >= 0) {
+            repaint(gui.getTileBounds(t));
+        }
     }
 
     /**

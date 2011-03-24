@@ -541,17 +541,12 @@ public final class GUI {
 
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (!blinkingMarqueeEnabled) return;
+                if (!blinkingMarqueeEnabled) 
+                    return;
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
-                    //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
                     Tile tile = getActiveUnit().getTile();
-                    if (tile == null) return;
-                    Position pos = tile.getPosition();
-                    int x = pos.getX();
-                    int y = pos.getY();
-                    if (y >= topRow && y <= bottomRow
-                        && x >= leftColumn && x <= rightColumn) {
-                        freeColClient.getCanvas().refreshTile(x, y);
+                    if (isTileVisible(tile)) {
+                        freeColClient.getCanvas().refreshTile(tile);
                     }
                 }
             }
@@ -630,7 +625,7 @@ public final class GUI {
     * If a unit is active and is located on the selected tile,
     * then nothing (except perhaps a map reposition) will happen.
     *
-    * @param selectedTile The <code>Position</code> of the tile
+    * @param selectedPosition The <code>Position</code> of the tile
     *                     to be selected.
     * @param clearGoToOrders Use <code>true</code> to clear goto orders
     *                        of the unit which is activated.
@@ -638,22 +633,22 @@ public final class GUI {
     * @see #setActiveUnit
     * @see #setFocus(Map.Position)
     */
-    public void setSelectedTile(Position selectedTile, boolean clearGoToOrders) {
+    public void setSelectedTile(Position selectedPosition, boolean clearGoToOrders) {
         Game gameData = freeColClient.getGame();
 
-        if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
+        if (selectedPosition != null && !gameData.getMap().isValid(selectedPosition)) {
             return;
         }
 
         Position oldPosition = this.selectedTile;
 
-        this.selectedTile = selectedTile;
+        this.selectedTile = selectedPosition;
 
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
             if (activeUnit == null ||
                 (activeUnit.getTile() != null &&
-                 !activeUnit.getTile().getPosition().equals(selectedTile))) {
-                Tile t = gameData.getMap().getTile(selectedTile);
+                 !activeUnit.getTile().getPosition().equals(selectedPosition))) {
+                Tile t = gameData.getMap().getTile(selectedPosition);
                 if (t != null && t.getSettlement() != null) {
                     Canvas canvas = freeColClient.getCanvas();
                     Settlement s = t.getSettlement();
@@ -672,15 +667,15 @@ public final class GUI {
                 }
 
                 // else, just select a unit on the selected tile
-                Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
+                Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedPosition));
                 if (unitInFront != null) {
                     setActiveUnit(unitInFront);
                     updateGotoPathForActiveUnit();
                 } else {
-                    setFocus(selectedTile);
+                    setFocus(selectedPosition);
                 }
             } else if (activeUnit.getTile() != null &&
-                    activeUnit.getTile().getPosition().equals(selectedTile)) {
+                    activeUnit.getTile().getPosition().equals(selectedPosition)) {
                 // Clear goto order when unit is already active
                 if (clearGoToOrders && activeUnit.getDestination() != null) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
@@ -702,17 +697,19 @@ public final class GUI {
 
         // Check if the gui needs to reposition:
         ClientOptions options = freeColClient.getClientOptions();
-        if ((!onScreen(selectedTile)
+        if ((!onScreen(selectedPosition)
              && options.getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT))
             || options.getBoolean(ClientOptions.ALWAYS_CENTER)) {
-            setFocus(selectedTile);
+            setFocus(selectedPosition);
         } else {
             if (oldPosition != null) {
-                freeColClient.getCanvas().refreshTile(oldPosition);
+                Tile oldTilePosition = gameData.getMap().getTile(oldPosition);
+                freeColClient.getCanvas().refreshTile(oldTilePosition);
             }
 
-            if (selectedTile != null) {
-                freeColClient.getCanvas().refreshTile(selectedTile);
+            if (selectedPosition != null) {
+                Tile selectedTilePosition = gameData.getMap().getTile(selectedPosition);
+                freeColClient.getCanvas().refreshTile(selectedTilePosition);
             }
         }
     }
@@ -3536,10 +3533,7 @@ public final class GUI {
         if (bottomRow < 0) {
             positionMap();
         }
-        if (t.getY() >= topRow
-                && t.getY() <= bottomRow
-                && t.getX() >= leftColumn
-                && t.getX() <= rightColumn) {
+        if (isTileVisible(t)) {
             int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
             int y = ((t.getY() - topRow) * halfHeight) + topRowY;
             if ((t.getY() % 2) != 0) {
@@ -3560,24 +3554,11 @@ public final class GUI {
      * @return The bounds rectangle
      */
     public Rectangle getTileBounds(Tile tile) {
-        return getTileBounds(tile.getX(), tile.getY());
-    }
-
-    /**
-     * Calculate the bounds of the rectangle containing a Tile on the screen,
-     * and return it. If the Tile is not on-screen a maximal rectangle is returned.
-     * The bounds includes a one-tile padding area above the Tile, to include the space
-     * needed by any units in the Tile.
-     * @param x The x-coordinate of the Tile
-     * @param y The y-coordinate of the Tile
-     * @return The bounds rectangle
-     */
-    public Rectangle getTileBounds(int x, int y) {
         Rectangle result = new Rectangle(0, 0, size.width, size.height);
-        if (y >= topRow && y <= bottomRow && x >= leftColumn && x <= rightColumn) {
-            result.y = ((y - topRow) * halfHeight) + topRowY - tileHeight;
-            result.x = ((x - leftColumn) * tileWidth) + leftColumnX;
-            if ((y % 2) != 0) {
+        if (isTileVisible(tile)) {
+            result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
+            result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
+            if ((tile.getY() % 2) != 0) {
                 result.x += halfWidth;
             }
             result.width = tileWidth;
@@ -3585,6 +3566,7 @@ public final class GUI {
         }
         return result;
     }
+
 
 
     /**
@@ -3612,6 +3594,11 @@ public final class GUI {
         return tileWidth;
     }
 
+
+    private boolean isTileVisible(Tile tile) {
+        return tile.getY() >= topRow && tile.getY() <= bottomRow
+            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
+    }
 
     public static String getTurnsText(Colony colony, BuildableType buildable) {
         int turnsLeft = colony.getTurnsToComplete(buildable);

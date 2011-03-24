@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
