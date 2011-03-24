@@ -362,14 +362,14 @@ public class ColonyTile extends FreeColGameObject
         setUnit(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
         if (unit.getWorkType() == null || !unit.getWorkType().isRawMaterial()) {
-            GoodsType workType = workTile.getType().getPrimaryGoods().getType();
-            if (workType == null) {
-                workType = workTile.getType().getSecondaryGoods().getType();
-                if (workType == null) {
-                    workType = getSpecification().getPrimaryFoodType();
+            AbstractGoods goods = workTile.getType().getPrimaryGoods();
+            if (goods == null) {
+                goods = workTile.getType().getSecondaryGoods();
+                if (goods == null && !workTile.getType().getProduction().isEmpty()) {
+                    goods = workTile.getType().getProduction().get(0);
                 }
             }
-            unit.setWorkType(workType);
+            unit.setWorkType(goods == null ? getSpecification().getPrimaryFoodType() : goods.getType());
         }
 
         Unit teacher = unit.getTeacher();
