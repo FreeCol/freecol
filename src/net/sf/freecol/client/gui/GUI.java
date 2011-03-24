@@ -489,7 +489,6 @@ public final class GUI {
      */
     private JLabel getUnitLabel(Unit unit) {
         final Image unitImg = lib.getUnitImageIcon(unit).getImage();
-        //final Image chipImg = getOccupationIndicatorImage(unit);
 
         final int width = halfWidth + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
@@ -499,10 +498,6 @@ public final class GUI {
 
         final int unitX = (width - unitImg.getWidth(null)) / 2;
         g.drawImage(unitImg, unitX, 0, null);
-
-        //final int chipX = ((int) (STATE_OFFSET_X * lib.getScalingFactor()));
-        //final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - halfHeight);
-        //g.drawImage(chipImg, chipX, chipY, null);
 
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);
@@ -846,10 +841,6 @@ public final class GUI {
     public void setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
-        /*if ((activeUnit != null) && (activeUnit.getMovesLeft() == 0)) {
-            freeColClient.getInGameController().nextActiveUnit();
-            return;
-        }*/
 
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
@@ -877,7 +868,6 @@ public final class GUI {
         if(viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE && activeUnit != null)
             viewMode.changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
-        //if (activeUnit != null && !activeUnit.getTile().getPosition().equals(selectedTile)) {
         if (activeUnit != null) {
             setSelectedTile(activeUnit.getTile());
         } else {
@@ -1880,11 +1870,9 @@ public final class GUI {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(backgroundColor);
         g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-//        g.setColor(getForegroundColor(backgroundColor));
         g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.draw(path);
-//        g.setColor(getForegroundColor(getForegroundColor(backgroundColor)));
         g.setColor(Color.WHITE);
         g.fill(path);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
@@ -2700,9 +2688,6 @@ public final class GUI {
         float padding = 6 * lib.getScalingFactor();
         int width = (int) (label.getBounds().getWidth() + padding);
         int height = (int) (label.getAscent() + label.getDescent() + padding);
-//        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-//        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g2.setColor(border);
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);
