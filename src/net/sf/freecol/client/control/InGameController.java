@@ -1080,7 +1080,9 @@ public final class InGameController implements NetworkConstants {
         // Clear ordinary destinations, leave trade routes but display their
         // messages if required.
         if (unit.getTradeRoute() == null) {
-            clearGotoOrders(unit);
+            if (unit.getLocation() == unit.getDestination()) {
+                clearGotoOrders(unit);
+            }
             checkCashInTreasureTrain(unit);
         } else {
             if (freeColClient.getClientOptions()
