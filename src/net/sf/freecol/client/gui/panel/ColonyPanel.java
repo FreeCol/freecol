@@ -73,7 +73,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -1321,7 +1320,6 @@ public final class ColonyPanel extends FreeColPanel
         @Override
         public void paintComponent(Graphics g) {
             GUI colonyTileGUI = getCanvas().getColonyTileGUI();
-            Game game = getColony().getGame();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -1336,7 +1334,7 @@ public final class ColonyPanel extends FreeColPanel
                             int xx = ((2 - x) + y) * tileWidth;
                             int yy = (x + y) * tileHeight;
                             g.translate(xx, yy);
-                            colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tiles[x][y], getColony());
+                            colonyTileGUI.displayColonyTile((Graphics2D) g, tiles[x][y], getColony());
                             g.translate(-xx, -yy);
                         }
                     }

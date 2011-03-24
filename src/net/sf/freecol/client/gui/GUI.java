@@ -1133,15 +1133,13 @@ public final class GUI {
      * with the given y-coordinate.
      */
     private int getLeftColumns(int y) {
-        int leftColumns;
+        int leftColumns = leftSpace / tileWidth + 1;
 
         if ((y % 2) == 0) {
-            leftColumns = leftSpace / tileWidth + 1;
             if ((leftSpace % tileWidth) > 32) {
                 leftColumns++;
             }
         } else {
-            leftColumns = leftSpace / tileWidth + 1;
             if ((leftSpace % tileWidth) == 0) {
                 leftColumns--;
             }
@@ -1170,15 +1168,13 @@ public final class GUI {
      * with the given y-coordinate.
      */
     private int getRightColumns(int y) {
-        int rightColumns;
+        int rightColumns = rightSpace / tileWidth + 1;
 
         if ((y % 2) == 0) {
-            rightColumns = rightSpace / tileWidth + 1;
             if ((rightSpace % tileWidth) == 0) {
                 rightColumns--;
             }
         } else {
-            rightColumns = rightSpace / tileWidth + 1;
             if ((rightSpace % tileWidth) > 32) {
                 rightColumns++;
             }
@@ -1451,7 +1447,7 @@ public final class GUI {
             // Column per column; start at the left side to display the tiles.
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
-                displayBaseTile(g, map, tile, true);
+                displayBaseTile(g, tile, true);
                 g.translate(tileWidth, 0);
             }
             g.setTransform(rowTransform);
@@ -1497,7 +1493,7 @@ public final class GUI {
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
-                displayTileOverlays(g, map, tile, true, withNumbers);
+                displayTileOverlays(g, tile, true, withNumbers);
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
@@ -2018,14 +2014,13 @@ public final class GUI {
      *
      * @param g The <code>Graphics2D</code> object on which to draw
      *      the <code>Tile</code>.
-     * @param map The <code>Map</code>.
      * @param tile The <code>Tile</code> to draw.
      * @param colony The <code>Colony</code> to create the visualization
      *      of the <code>Tile</code> for. This object is also used to
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      */
-    public void displayColonyTile(Graphics2D g, Map map, Tile tile, Colony colony) {
-        displayBaseTile(g, map, tile, false);
+    public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
+        displayBaseTile(g, tile, false);
 
         Unit occupyingUnit = null;
         int price = 0;
@@ -2037,7 +2032,7 @@ public final class GUI {
                 g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
             }
         }
-        displayTileOverlays(g, map, tile, false, false);
+        displayTileOverlays(g, tile, false, false);
 
         if (price > 0 && tile.getSettlement() == null) {
             // tile is owned by an IndianSettlement
@@ -2064,24 +2059,22 @@ public final class GUI {
      *
      * <br><br>The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      */
-    public void displayTerrain(Graphics2D g, Map map, Tile tile) {
-        displayBaseTile(g, map, tile, true);
-        displayTileItems(g, map, tile);
+    public void displayTerrain(Graphics2D g, Tile tile) {
+        displayBaseTile(g, tile, true);
+        displayTileItems(g, tile);
     }
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Only base terrain will be drawn.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
-    private void displayBaseTile(Graphics2D g, Map map, Tile tile, boolean drawUnexploredBorders) {
+    private void displayBaseTile(Graphics2D g, Tile tile, boolean drawUnexploredBorders) {
         if (tile != null) {
             // ATTENTION: we assume that all base tiles have the same size
             g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
@@ -2251,13 +2244,12 @@ public final class GUI {
      * Tile will also be drawn except for units because their image can
      * be larger than a Tile.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      * @param withNumber indicates if the number of inhabitants should be drawn too.
      */
-    private void displayTileOverlays(Graphics2D g, Map map, Tile tile,
+    private void displayTileOverlays(Graphics2D g, Tile tile,
                                      boolean drawUnexploredBorders, boolean withNumber) {
         if (tile != null && tile.isExplored()) {
             if (drawUnexploredBorders) {
@@ -2268,10 +2260,10 @@ public final class GUI {
                     }
                 }
             }
-            displayTileItems(g, map, tile);
-            displaySettlement(g, map, tile, withNumber);
-            displayFogOfWar(g, map, tile);
-            displayOptionalValues(g, map, tile);
+            displayTileItems(g, tile);
+            displaySettlement(g, tile, withNumber);
+            displayFogOfWar(g, tile);
+            displayOptionalValues(g, tile);
         }
     }
 
@@ -2280,10 +2272,9 @@ public final class GUI {
      * location specified by the coordinates. Addtions and improvements to
      * Tile will be drawn.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      */
-    private void displayTileItems(Graphics2D g, Map map, Tile tile) {
+    private void displayTileItems(Graphics2D g, Tile tile) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
         if (!tile.isExplored()) {
@@ -2371,11 +2362,10 @@ public final class GUI {
      * location specified by the coordinates. Settlements and Lost City
      * Rumours will be shown.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      * @param withNumber a <code>boolean</code> value
      */
-    private void displaySettlement(Graphics2D g, Map map, Tile tile, boolean withNumber) {
+    private void displaySettlement(Graphics2D g, Tile tile, boolean withNumber) {
         if (tile.isExplored()) {
             Settlement settlement = tile.getSettlement();
 
@@ -2445,10 +2435,9 @@ public final class GUI {
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Fog of war will be drawn.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      */
-    private void displayFogOfWar(Graphics2D g, Map map, Tile tile) {
+    private void displayFogOfWar(Graphics2D g, Tile tile) {
         if (tile.isExplored()
             && freeColClient.getGame().getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
             && freeColClient.getMyPlayer() != null
@@ -2466,10 +2455,9 @@ public final class GUI {
      * location specified by the coordinates. Show tile names, coordinates
      * and colony values.
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
      * @param tile The Tile to draw.
      */
-    private void displayOptionalValues(Graphics2D g, Map map, Tile tile) {
+    private void displayOptionalValues(Graphics2D g, Tile tile) {
         String text = null;
         switch (displayTileText) {
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
@@ -3439,11 +3427,7 @@ public final class GUI {
      * @return 'true' if the Tile is near the top.
      */
     public boolean isMapNearTop(int y) {
-        if (y < topRows) {
-            return true;
-        } else {
-            return false;
-        }
+        return (y < topRows);
     }
 
 
@@ -3453,11 +3437,7 @@ public final class GUI {
      * @return 'true' if the Tile is near the bottom.
      */
     public boolean isMapNearBottom(int y) {
-        if (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows));
     }
 
 
@@ -3468,11 +3448,7 @@ public final class GUI {
      * @return 'true' if the Tile is near the left.
      */
     public boolean isMapNearLeft(int x, int y) {
-        if (x < getLeftColumns(y)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (x < getLeftColumns(y));
     }
 
 
@@ -3483,11 +3459,7 @@ public final class GUI {
      * @return 'true' if the Tile is near the right.
      */
     public boolean isMapNearRight(int x, int y) {
-        if (x >= (freeColClient.getGame().getMap().getWidth() - getRightColumns(y))) {
-            return true;
-        } else {
-            return false;
-        }
+        return (x >= (freeColClient.getGame().getMap().getWidth() - getRightColumns(y)));
     }
 
 
