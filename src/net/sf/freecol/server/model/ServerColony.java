@@ -205,22 +205,24 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         }
 
-        // Apply the changes accumulated in the netProduction map
+        // Apply the changes accumulated in the netProduction map.
+        // Check for famine when total primary food goes negative.
+        boolean famine = false;
         for (Entry<GoodsType, Integer> entry
                  : netProduction.getValues().entrySet()) {
             GoodsType goodsType = entry.getKey();
             int net = entry.getValue();
             int stored = getGoodsCount(goodsType);
             if (net + stored < 0) {
+                if (goodsType == spec.getPrimaryFoodType()) famine = true;
                 removeGoods(goodsType, stored);
             } else {
                 addGoods(goodsType, net);
             }
         }
 
-        // Now check the food situation
-        int storedFood = getGoodsCount(spec.getPrimaryFoodType());
-        if (storedFood < 0) {
+        // Handle the food situation
+        if (famine) {
             if (getUnitCount() > 1) {
                 Unit victim = Utils.getRandomMember(logger, "Choose starver",
                                                     getUnitList(), random);
@@ -241,6 +243,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 return;
             }
         } else {
+            int storedFood = getGoodsCount(spec.getPrimaryFoodType());
             int netFood = netProduction.getCount(spec.getPrimaryFoodType());
             int turns;
             if (netFood < 0 && (turns = storedFood / -netFood) <= 3) {
