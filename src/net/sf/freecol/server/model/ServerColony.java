@@ -284,6 +284,12 @@ public class ServerColony extends Colony implements ServerModelObject {
                     if (amount > 0) {
                         owner.sell(container, type, amount, random);
                         gold = true;
+                        cs.addMessage(See.only(owner),
+                            new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                                             "customs.sale", this)
+                            .addName("%colony%", getName())
+                            .addName("%amount%", Integer.toString(amount))
+                            .add("%goods%", type.getNameKey()));
                     }
                 }
             }
