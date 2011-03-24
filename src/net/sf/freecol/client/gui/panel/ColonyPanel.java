@@ -26,7 +26,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -1414,10 +1413,10 @@ public final class ColonyPanel extends FreeColPanel
              */
             private void initializeAsCenterTile() {
 
-                setLayout(new GridLayout(2, 1));
+                setLayout(new MigLayout("wrap 1, center"));
 
                 for (AbstractGoods goods : productionMap.get(colonyTile).getProduction()) {
-                    add(new ProductionLabel(goods, getCanvas()));
+                    add(new ProductionLabel(goods, getCanvas()), "center");
                 }
             }
 
