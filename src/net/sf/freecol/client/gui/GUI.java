@@ -715,8 +715,7 @@ public final class GUI {
      * @param tile The <code>Tile</code> with the colony.
      */
     public void debugForeignColony(Tile tile) {
-        if (FreeCol.isInDebugMode() && tile != null
-            && tile.getSettlement() instanceof Colony) {
+        if (tile.getSettlement() instanceof Colony) {
             FreeColGameObject fcgo = freeColClient.getFreeColServer().getGame()
                 .getFreeColGameObject(tile.getSettlement().getId());
             freeColClient.getCanvas().showColonyPanel((Colony) fcgo);
