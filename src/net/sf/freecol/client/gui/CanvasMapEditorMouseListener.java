@@ -502,7 +502,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                                         x = t.getX();
                                     }
 
-                                    gui.setFocus(x, y);
+                                    gui.setFocus(new Map.Position(x,y));
                                 } catch (Exception e) {
                                     logger.log(Level.WARNING, "Exception while scrolling!", e);
                                 }

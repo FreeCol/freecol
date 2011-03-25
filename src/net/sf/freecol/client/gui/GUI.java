@@ -964,20 +964,6 @@ public final class GUI {
     }
 
     /**
-    * Sets the focus of the map.
-    *
-    * @param x The x-coordinate of the center tile of the
-    *         displayed map.
-    * @param y The x-coordinate of the center tile of the
-    *         displayed map.
-    * @see #getFocus
-    */
-    public void setFocus(int x, int y) {
-        setFocus(new Map.Position(x,y));
-    }
-
-
-    /**
      * Gets the amount of message that are currently being displayed on this GUI.
      * @return The amount of message that are currently being displayed on this GUI.
      */
