@@ -640,9 +640,7 @@ public final class GUI {
         this.selectedTile = selectedPosition;
 
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
-            if (activeUnit == null ||
-                (activeUnit.getTile() != null &&
-                 !activeUnit.getTile().getPosition().equals(selectedPosition))) {
+            if (activeUnitIsAt(selectedPosition)) {
                 Tile t = gameData.getMap().getTile(selectedPosition);
                 if (t != null && t.getSettlement() != null) {
                     Canvas canvas = freeColClient.getCanvas();
@@ -701,6 +699,12 @@ public final class GUI {
                 freeColClient.getCanvas().refreshTile(selectedTilePosition);
             }
         }
+    }
+
+    private boolean activeUnitIsAt(Position selectedPosition) {
+        return activeUnit == null ||
+            (activeUnit.getTile() != null &&
+             !activeUnit.getTile().getPosition().equals(selectedPosition));
     }
 
     private void redrawMapControls() {
@@ -2811,31 +2815,11 @@ public final class GUI {
      * @return The coordinates where the unit should be drawn onscreen
      */
     private Point getUnitImagePositionInTile(Image unitImage) {
-        return getUnitImagePositionInTile(unitImage.getWidth(null), unitImage.getHeight(null));
-    }
-
-    /**
-     * Gets the coordinates to draw a unit in a given tile.
-     * @param unitImageWidth The unit image's width
-     * @param unitImageHeight The unit image's height
-     * @return The coordinates where the unit should be drawn onscreen
-     */
-    private Point getUnitImagePositionInTile(int unitImageWidth, int unitImageHeight) {
-        int unitX = (tileWidth - unitImageWidth) / 2;
-        int unitY = (tileHeight - unitImageHeight) / 2 -
+        int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
+        int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
                     (int) (UNIT_OFFSET * lib.getScalingFactor());
-
+        
         return new Point(unitX, unitY);
-    }
-
-    /**
-     * Gets the position where a unitLabel located at tile should be drawn.
-     * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
-     * @param tile The tile where the unitLabel will be drawn over
-     * @return The position where to put the label, null if the Tile is offscreen.
-     */
-    public Point getUnitLabelPositionInTile(JLabel unitLabel, Tile tile) {
-        return getUnitLabelPositionInTile(unitLabel, getTilePosition(tile));
     }
 
     /**
