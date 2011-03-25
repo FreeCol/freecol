@@ -2293,6 +2293,7 @@ public class Colony extends Settlement implements Nameable {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
+        owner.addSettlement(this);
         established = new Turn(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
