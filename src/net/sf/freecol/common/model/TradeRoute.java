@@ -280,8 +280,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     }
     
     public static boolean isStopValid(Player player, Stop stop) {
-        return (stop == null) ? false
-            : stop.isValid();
+        return (stop == null) ? false : stop.isValid();
     }
 
     public class Stop {
@@ -317,7 +316,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          */
         public boolean isValid() {
             return location != null
-                && !((FreeColGameObject) location).isDisposed();
+                && !((FreeColGameObject) location).isDisposed()
+                && !((location instanceof Ownable)
+                     && ((Ownable) location).getOwner() != getOwner());
         }
 
         /**
@@ -451,12 +452,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
                         }
                     }
                 }
-                if (stop.isValid()) {
-                    stops.add(stop);
-                } else {
-                    logger.warning("Invalid stop for " + getId()
-                                   + " at " + locationId);
-                }
+                // Do not test stop.isValid(), the colony may not exist yet
+                stops.add(stop);
             }
         }
     }

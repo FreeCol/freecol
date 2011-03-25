@@ -638,8 +638,9 @@ public final class InGameController implements NetworkConstants {
             setDestination(unit, stop.getLocation());
         }
 
-        if ((player.getEurope() == stop.getLocation() && unit.isInEurope())
-            || unit.getTile() == stop.getLocation().getTile()) {
+        if ((stop.getLocation() instanceof Europe && unit.isInEurope())
+            || (!(stop.getLocation() instanceof Europe)
+                && unit.getTile() == stop.getLocation().getTile())) {
             // The unit has arrived at its stop.
 
             if (unit.getInitialMovesLeft() == unit.getMovesLeft()) {
