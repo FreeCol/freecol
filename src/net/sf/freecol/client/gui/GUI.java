@@ -682,13 +682,7 @@ public final class GUI {
         freeColClient.getActionManager().update();
         freeColClient.updateMenuBar();
 
-        int x = 0, y = 0;
-        MapControls mapControls = freeColClient.getCanvas().getMapControls();
-        if (mapControls != null) {
-            x = getWidth() - mapControls.getInfoPanelWidth();
-            y = getHeight() - mapControls.getInfoPanelHeight();
-        }
-        freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
+        redrawMapControls();
 
         // Check if the gui needs to reposition:
         ClientOptions options = freeColClient.getClientOptions();
@@ -707,6 +701,16 @@ public final class GUI {
                 freeColClient.getCanvas().refreshTile(selectedTilePosition);
             }
         }
+    }
+
+    private void redrawMapControls() {
+        int x = 0, y = 0;
+        MapControls mapControls = freeColClient.getCanvas().getMapControls();
+        if (mapControls != null) {
+            x = getWidth() - mapControls.getInfoPanelWidth();
+            y = getHeight() - mapControls.getInfoPanelHeight();
+        }
+        freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
     }
 
     /**
@@ -873,13 +877,7 @@ public final class GUI {
             freeColClient.getActionManager().update();
             freeColClient.updateMenuBar();
 
-            int x = 0, y = 0;
-            MapControls mapControls = freeColClient.getCanvas().getMapControls();
-            if (mapControls != null) {
-                x = getWidth() - mapControls.getInfoPanelWidth();
-                y = getHeight() - mapControls.getInfoPanelHeight();
-            }
-            freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
+            redrawMapControls();
         }
     }
 
@@ -2353,69 +2351,68 @@ public final class GUI {
      * @param withNumber a <code>boolean</code> value
      */
     private void displaySettlement(Graphics2D g, Tile tile, boolean withNumber) {
-        if (tile.isExplored()) {
-            Settlement settlement = tile.getSettlement();
+        Settlement settlement = tile.getSettlement();
 
-            if (settlement != null) {
-                if (settlement instanceof Colony) {
-                    Image colonyImage = lib.getSettlementImage(settlement);
-                    // Draw image of colony in center of the tile.
-                    centerImage(g, colonyImage);
-                    if (withNumber) {
-                        String populationString = Integer.toString(((Colony)settlement).getUnitCount());
-                        Color theColor = ResourceManager
-                            .getColor("productionBonus." + ((Colony) settlement).getProductionBonus()
-                                      + ".color");
-                        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
-                        Image stringImage = createStringImage(g, populationString, theColor, font);
-                        centerImage(g, stringImage);
-                    }
-                    //g.setColor(Color.BLACK);
-                } else if (settlement instanceof IndianSettlement) {
-                    IndianSettlement indianSettlement = (IndianSettlement) settlement;
-                    Image settlementImage = lib.getSettlementImage(settlement);
+        if (settlement != null) {
+            if (settlement instanceof Colony) {
+                Image colonyImage = lib.getSettlementImage(settlement);
+                // Draw image of colony in center of the tile.
+                centerImage(g, colonyImage);
+                if (withNumber) {
+                    String populationString = Integer.toString(((Colony)settlement).getUnitCount());
+                    Color theColor = ResourceManager
+                        .getColor("productionBonus." + ((Colony) settlement).getProductionBonus()
+                                  + ".color");
+                    Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+                    Image stringImage = createStringImage(g, populationString, theColor, font);
+                    centerImage(g, stringImage);
+                }
+                //g.setColor(Color.BLACK);
+            } else if (settlement instanceof IndianSettlement) {
+                IndianSettlement indianSettlement = (IndianSettlement) settlement;
+                Image settlementImage = lib.getSettlementImage(settlement);
 
-                    // Draw image of indian settlement in center of the tile.
-                    centerImage(g, settlementImage);
+                // Draw image of indian settlement in center of the tile.
+                centerImage(g, settlementImage);
 
-                    String text = null;
-                    Image chip = null;
-                    Color background = lib.getColor(indianSettlement.getOwner());
-                    Color foreground = getForegroundColor(background);
-                    float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
-                    float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
-                    int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
-                    if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
-                        // Draw the color chip for the settlement.
-                        text = indianSettlement.getType().isCapital() ? "*" : "-";
-                        chip = createChip(text, Color.BLACK, background, foreground);
+                String text = null;
+                Image chip = null;
+                Color background = lib.getColor(indianSettlement.getOwner());
+                Color foreground = getForegroundColor(background);
+                float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
+                float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
+                int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
+                if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
+                    // Draw the color chip for the settlement.
+                    text = indianSettlement.getType().isCapital() ? "*" : "-";
+                    chip = createChip(text, Color.BLACK, background, foreground);
+                    g.drawImage(chip, (int) xOffset, (int) yOffset, null);
+                    xOffset += chip.getWidth(null) + 2;
+
+                    // Draw the mission chip if needed.
+                    Unit missionary = indianSettlement.getMissionary();
+                    if (missionary != null) {
+                        boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                        Color mission = (expert ? Color.BLACK : Color.GRAY);
+                        Color cross = lib.getColor(missionary.getOwner());
+                        chip = createChip("\u271D", Color.BLACK, mission, cross);
                         g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
-
-                        // Draw the mission chip if needed.
-                        Unit missionary = indianSettlement.getMissionary();
-                        if (missionary != null) {
-                            boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                            Color mission = (expert ? Color.BLACK : Color.GRAY);
-                            Color cross = lib.getColor(missionary.getOwner());
-                            chip = createChip("\u271D", Color.BLACK, mission, cross);
-                            g.drawImage(chip, (int) xOffset, (int) yOffset, null);
-                            xOffset += chip.getWidth(null) + 2;
-                        }
                     }
-
-                    // Draw the alarm chip if needed.
-                    Player player = freeColClient.getMyPlayer();
-                    if (player != null && indianSettlement.hasContactedSettlement(player)) {
-                        final boolean visited = indianSettlement.hasSpokenToChief(player);
-                        chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
-                        g.drawImage(chip, (int) xOffset, (int) yOffset, null);
-                    }
-                } else {
-                    logger.warning("Requested to draw unknown settlement type.");
                 }
+
+                // Draw the alarm chip if needed.
+                Player player = freeColClient.getMyPlayer();
+                if (player != null && indianSettlement.hasContactedSettlement(player)) {
+                    final boolean visited = indianSettlement.hasSpokenToChief(player);
+                    chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
+                    g.drawImage(chip, (int) xOffset, (int) yOffset, null);
+                }
+            } else {
+                logger.warning("Requested to draw unknown settlement type.");
             }
         }
+        
     }
 
     /**
