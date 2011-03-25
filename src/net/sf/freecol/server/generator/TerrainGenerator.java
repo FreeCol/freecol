@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -123,11 +124,12 @@ public class TerrainGenerator {
      * @see Map
      */
     public void createMap(Game game, Game importGame, boolean[][] landMap) {
-        ocean = game.getSpecification().getTileType("model.tile.ocean");
-        lake = game.getSpecification().getTileType("model.tile.lake");
-        riverType = game.getSpecification().getTileImprovementType("model.improvement.river");
-        fishBonusLandType = game.getSpecification().getTileImprovementType("model.improvement.fishBonusLand");
-        fishBonusRiverType = game.getSpecification().getTileImprovementType("model.improvement.fishBonusRiver");
+        Specification spec = game.getSpecification();
+        ocean = spec.getTileType("model.tile.ocean");
+        lake = spec.getTileType("model.tile.lake");
+        riverType = spec.getTileImprovementType("model.improvement.river");
+        fishBonusLandType = spec.getTileImprovementType("model.improvement.fishBonusLand");
+        fishBonusRiverType = spec.getTileImprovementType("model.improvement.fishBonusRiver");
 
         final int width = landMap.length;
         final int height = landMap[0].length;
@@ -149,7 +151,7 @@ public class TerrainGenerator {
                 if (importTerrain && importGame.getMap().isValid(x, y)) {
                     Tile importTile = importGame.getMap().getTile(x, y);
                     if (importTile.isLand() == landMap[x][y]) {
-                        t = new Tile(game, importTile.getType(), x, y);
+                        t = new Tile(game, spec.getTileType(importTile.getType().getId()), x, y);
                         if (importTile.getTileItemContainer() != null) {
                             TileItemContainer container = new TileItemContainer(game, t);
                             // TileItemContainer copies every natural item
