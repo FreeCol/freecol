@@ -45,13 +45,13 @@ import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
 /**
- * 
+ *
  * Objects of this class contains AI-information for a single {@link Player} and
  * is used for controlling this player.
- * 
+ *
  * <br />
  * <br />
- * 
+ *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
@@ -63,7 +63,7 @@ public abstract class AIPlayer extends AIObject {
      */
     private ServerPlayer player;
 
-    /** 
+    /**
      * Temporary variable, used for debugging purposes only.
      * See setDebuggingConnection()
      */
@@ -73,7 +73,7 @@ public abstract class AIPlayer extends AIObject {
      * Temporary variable, used to hold all AIUnit objects belonging to this AI.
      * Any implementation of AIPlayer needs to make sure this list is invalidated
      * as necessary, using clearAIUnits(), so that getAIUnitIterator() will
-     * create a new list.           
+     * create a new list.
      */
     private List<AIUnit> aiUnits = new ArrayList<AIUnit>();
 
@@ -85,7 +85,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Returns the <code>Player</code> this <code>AIPlayer</code> is
      * controlling.
-     * 
+     *
      * @return The <code>Player</code>.
      */
     public Player getPlayer() {
@@ -95,7 +95,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Sets the ServerPlayer this AIPlayer is controlling.
      * Used by implementing subclasses.
-     */              
+     */
     protected void setPlayer(ServerPlayer p) {
         player = p;
     }
@@ -107,9 +107,9 @@ public abstract class AIPlayer extends AIObject {
 
     /**
      * Helper method to let implementing subclasses clear aiUnits.
-     */         
+     */
     protected void clearAIUnits() {
-        aiUnits.clear();    
+        aiUnits.clear();
     }
 
     /**
@@ -134,7 +134,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Returns an iterator over all the <code>AIUnit</code>s owned by this
      * player.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     protected Iterator<AIUnit> getAIUnitIterator() {
@@ -147,7 +147,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Returns an iterator over all the <code>AIColony</code>s owned by this
      * player.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     protected Iterator<AIColony> getAIColonyIterator() {
@@ -165,7 +165,7 @@ public abstract class AIPlayer extends AIObject {
 
     /**
      * Gets the connection to the server.
-     * 
+     *
      * @return The connection that can be used when communication with the
      *         server.
      */
@@ -178,12 +178,12 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * 
+     *
      * Sets the <code>Connection</code> to be used while communicating with
      * the server.
-     * 
+     *
      * This method is only used for debugging.
-     * 
+     *
      * @param debuggingConnection The connection to be used for debugging.
      */
     public void setDebuggingConnection(Connection debuggingConnection) {
@@ -193,7 +193,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Returns the ID for this <code>AIPlayer</code>. This is the same as the
      * ID for the {@link Player} this <code>AIPlayer</code> controls.
-     * 
+     *
      * @return The ID.
      */
     @Override
@@ -204,17 +204,17 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Helper function for server communication - Ask the server
      * to train a unit in Europe on behalf of the AIPlayer.
-     *       
+     *
      * TODO: Move this to a specialized Handler class (AIEurope?)
      * TODO: Give protected access?
-     * 
-     * @return the new AIUnit created by this action. May be null.          
+     *
+     * @return the new AIUnit created by this action. May be null.
      */
     public AIUnit trainAIUnitInEurope(UnitType unitType) {
         if (unitType==null) {
             throw new IllegalArgumentException("Invalid UnitType.");
         }
-        
+
         AIUnit aiUnit = null;
         Europe europe = player.getEurope();
         int n = europe.getUnitCount();
@@ -225,16 +225,16 @@ public abstract class AIPlayer extends AIObject {
         }
         return aiUnit;
     }
-    
+
     /**
      * Helper function for server communication - Ask the server
      * to recruit a unit in Europe on behalf of the AIPlayer.
-     *       
+     *
      * TODO: Move this to a specialized Handler class (AIEurope?)
      * TODO: Give protected access?
      *
      * @param The index of the unit to recruit in the recruitables list.
-     * @return the new AIUnit created by this action. May be null.          
+     * @return the new AIUnit created by this action. May be null.
      */
     public AIUnit recruitAIUnitInEurope(int index) {
         AIUnit aiUnit = null;
@@ -261,32 +261,32 @@ public abstract class AIPlayer extends AIObject {
 
     /**
      * For REF-players: Checks if we have lost the war of independence.
-     * 
+     *
      * TODO: "REF defeat" is a gameplay decision, not a decision an AI
-     * should make for itself. Move this to another class (Player?).               
+     * should make for itself. Move this to another class (Player?).
      */
     protected boolean checkForREFDefeat() {
         logger.finest("Entering method checkForREFDefeat");
         if (!getPlayer().isREF()) {
         	throw new IllegalStateException("Checking for REF player defeat when player not REF.");
         }
-        
+
         List<Player> dominions = getPlayer().getDominionsAtWar();
-        
+
         // Return if independence should not be granted:
-        
+
         if (dominions.isEmpty()) {
             return false;
         }
-        
+
         if (!getPlayer().getSettlements().isEmpty()) {
             return false;
         }
-        
+
         if (getPlayer().hasManOfWar() && getPlayer().getNumberOfKingLandUnits() > 6) {
             return false;
         }
-        
+
         for (Player p : dominions) {
             AIMessage.askGiveIndependence(getConnection(), p);
         }
@@ -325,11 +325,11 @@ public abstract class AIPlayer extends AIObject {
 
 
     /**
-     * 
+     *
      * Tells this <code>AIPlayer</code> to make decisions. The
      * <code>AIPlayer</code> is done doing work this turn when this method
      * returns.
-     * 
+     *
      * NOTE: For the moment, any implementation of this _must_ make sure
      * to call checkForREFDefeat() at the start of a turn,
      * if the player this AI works for isREF(). See TODO at that method.
@@ -339,56 +339,56 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Returns an <code>Iterator</code> over all the
      * <code>TileImprovement</code>s needed by all of this player's colonies.
-     * 
+     *
      * @return The <code>Iterator</code>.
      * @see net.sf.freecol.common.model.TileImprovement
      */
     public abstract Iterator<TileImprovementPlan> getTileImprovementPlanIterator();
-    
+
     /**
      * Remove a <code>TileImprovementPlan</code> from the list
      */
     public abstract void removeTileImprovementPlan(TileImprovementPlan plan);
-    
+
     /**
      * This is a temporary method which are used for forcing the computer
      * players into building more colonies. The method will be removed after the
      * proper code for deciding whether a colony should be built or not has been
      * implemented.
-     * 
+     *
      * @return <code>true</code> if the AI should build more colonies.
      */
     public abstract boolean hasFewColonies();
-    
+
     /**
      * Returns an <code>Iterator</code> for all the wishes. The items are
      * sorted by the {@link Wish#getValue value}, with the item having the
      * highest value appearing first in the <code>Iterator</code>.
-     * 
+     *
      * @return The <code>Iterator</code>.
      * @see Wish
      */
     public abstract Iterator<Wish> getWishIterator();
-    
+
     /**
      * Selects the most useful founding father offered.
-     * 
+     *
      * @param foundingFathers The founding fathers on offer.
      * @return The founding father selected.
      */
     public abstract FoundingFather selectFoundingFather(List<FoundingFather> foundingFathers);
-    
+
     /**
      * Decides whether to accept the monarch's tax raise or not.
-     * 
+     *
      * @param tax The new tax rate to be considered.
      * @return <code>true</code> if the tax raise should be accepted.
      */
     public abstract boolean acceptTax(int tax);
-    
+
     /**
      * Decides whether to accept an Indian demand, or not.
-     * 
+     *
      * @param unit The unit making demands.
      * @param colony The colony where demands are being made.
      * @param goods The goods demanded.
@@ -397,29 +397,29 @@ public abstract class AIPlayer extends AIObject {
      *         indian demand and <code>false</code> otherwise.
      */
     public abstract boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold);
-    
+
     /**
      * Decides whether to accept a mercenary offer, or not.
-     * 
+     *
      * @return <code>true</code> if this <code>AIPlayer</code> accepts the
      *         offer and <code>false</code> otherwise.
      */
     public abstract boolean acceptMercenaryOffer();
-    
+
     public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
-    
+
     /**
      * Called after another <code>Player</code> sends a <code>trade</code> message
-     * 
-     * 
+     *
+     *
      * @param goods The goods which we are going to offer
      */
     public abstract void registerSellGoods(Goods goods);
-    
+
     /**
      * Called when another <code>Player</code> proposes to buy.
-     * 
-     * 
+     *
+     *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
      *            which the given <code>Unit</code> is trading.
@@ -432,8 +432,8 @@ public abstract class AIPlayer extends AIObject {
 
     /**
      * Called when another <code>Player</code> proposes a sale.
-     * 
-     * 
+     *
+     *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
      *            which the given <code>Unit</code> if trying to sell goods.
@@ -443,30 +443,30 @@ public abstract class AIPlayer extends AIObject {
      *         {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
      */
     public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
-    
+
     /**
      * Writes this object to an XML stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
     @Override
     protected abstract void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
-    
+
     /**
      * Reads information for this object from an XML stream.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
     @Override
     protected abstract void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
-    
+
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return the tag name.
      */
     public static String getXMLElementTagName() {
