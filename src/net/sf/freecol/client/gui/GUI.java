@@ -2412,8 +2412,7 @@ public final class GUI {
      * @param tile The Tile to draw.
      */
     private void displayFogOfWar(Graphics2D g, Tile tile) {
-        if (tile.isExplored()
-            && freeColClient.getGame().getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
+        if (freeColClient.getGame().getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
             && freeColClient.getMyPlayer() != null
             && !freeColClient.getMyPlayer().canSee(tile)) {
             g.setColor(Color.BLACK);
@@ -3464,8 +3463,8 @@ public final class GUI {
     public Rectangle getTileBounds(Tile tile) {
         Rectangle result = new Rectangle(0, 0, size.width, size.height);
         if (isTileVisible(tile)) {
-            result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
             result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
+            result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
             if ((tile.getY() % 2) != 0) {
                 result.x += halfWidth;
             }
