@@ -308,9 +308,13 @@ public class BuildColonyMission extends Mission {
             Tile tile = map.getTile(it.next());
 
             // No initial polar colonies
-            if (gameStart && map.isPolar(tile)) continue;
+            if (gameStart && map.isPolar(tile)) {
+                continue;
+            }
 
-            if (!player.canAcquireToFoundSettlement(tile)) continue;
+            if (!player.canAcquireToFoundSettlement(tile)) {
+                continue;
+            }
 
             float tileColonyValue = unit.getOwner().getColonyValue(tile);
             if (tileColonyValue > highestColonyValue) {
@@ -333,7 +337,7 @@ public class BuildColonyMission extends Mission {
             // this may be the first colony, in which case we'll
             // continue until we found _some_ location.
             if (++tileCounter >= maxNumberofTiles
-                && (!gameStart || bestTile != null)) break;
+                && !(gameStart && bestTile == null)) break;
         }
         if (bestTile == null) {
             logger.info("Unit " + unit.getId()

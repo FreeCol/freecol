@@ -2373,7 +2373,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final float MOD_FOOD_VERY_LOW          = 0.5f;
 
         //applied per goods
-        final float MOD_BUILD_MATERIAL_MISSING = 0.75f;
+        final float MOD_BUILD_MATERIAL_MISSING = 0.25f;
 
         //applied per surrounding tile
         final float MOD_ADJ_SETTLEMENT_BIG     = 0.25f;
@@ -2406,7 +2406,7 @@ public class Player extends FreeColGameObject implements Nameable {
         //----- END MAGIC NUMBERS
 
         //return 0 if a colony can't be built on tile t
-        if (!canClaimToFoundSettlement(t)) {
+        if (!canAcquireToFoundSettlement(t)) {
             return 0;
         }
 
@@ -2431,10 +2431,10 @@ public class Player extends FreeColGameObject implements Nameable {
         TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
         TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (type.isRawBuildingMaterial()) {
-                buildingMaterialMap.incrementCount(type, 0);
-            } else if (type.isFoodType()) {
+            if (type.isFoodType()) {
                 foodMap.incrementCount(type, 0);
+            } else if (type.isRawBuildingMaterial()) {
+                buildingMaterialMap.incrementCount(type, 0);
             }
         }
 
@@ -2504,10 +2504,10 @@ public class Player extends FreeColGameObject implements Nameable {
                                     advantage *= MOD_GOOD_PRODUCTION;
                                     highProductionValue = 1;
                                 }
-                                if (type.isRawBuildingMaterial()) {
-                                    buildingMaterialMap.incrementCount(type, highProductionValue);
-                                } else if (type.isFoodType()) {
+                                if (type.isFoodType()) {
                                     foodMap.incrementCount(type, highProductionValue);
+                                } else if (type.isRawBuildingMaterial()) {
+                                    buildingMaterialMap.incrementCount(type, highProductionValue);
                                 }
                             }
                         }
@@ -2550,8 +2550,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         //check availability of key goods        
-        for (Integer buildingMaterial : buildingMaterialMap.values()) {
-            if (buildingMaterial == 0) {
+        for (GoodsType type : buildingMaterialMap.keySet()) {
+            Integer amount = buildingMaterialMap.getCount(type);
+            if (amount == 0) {
                 advantage *= MOD_BUILD_MATERIAL_MISSING;
             }
         }
