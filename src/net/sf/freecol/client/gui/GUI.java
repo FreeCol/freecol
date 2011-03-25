@@ -2883,23 +2883,6 @@ public final class GUI {
         g.drawImage(cursorImage, 0, 0, null);
     }
 
-
-    /**
-     * Checks if the Tile/Units at the given coordinates are displayed
-     * on the screen (or, if the map is already displayed and the focus
-     * has been changed, whether they will be displayed on the screen
-     * the next time it'll be redrawn).
-     * @param x The x-coordinate of the Tile in question.
-     * @param y The y-coordinate of the Tile in question.
-     * @return 'true' if the Tile will be drawn on the screen, 'false'
-     * otherwise.
-     */
-    public boolean onScreen(int x, int y) {
-        if (bottomRow < 0) positionMap();
-        return y - 2 > topRow && y + 4 < bottomRow
-            && x - 1 > leftColumn && x + 2 < rightColumn;
-    }
-
     /**
      * Checks if the Tile/Units at the given coordinates are displayed
      * on the screen (or, if the map is already displayed and the focus
@@ -2911,7 +2894,9 @@ public final class GUI {
      * otherwise.
      */
     public boolean onScreen(Position position) {
-        return onScreen(position.getX(), position.getY());
+        if (bottomRow < 0) positionMap();
+        return position.getY() - 2 > topRow && position.getY() + 4 < bottomRow
+            && position.getX() - 1 > leftColumn && position.getX() + 2 < rightColumn;
     }
 
 
