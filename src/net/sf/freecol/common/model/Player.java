@@ -1631,12 +1631,19 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Clear the set of offered fathers.
+     */
+    public void clearOfferedFathers() {
+        offeredFathers.clear();
+    }
+
+    /**
      * Sets the set of offered fathers.
      *
      * @param fathers A list of <code>FoundingFather</code>s to offer.
      */
     public void setOfferedFathers(Set<FoundingFather> fathers) {
-        offeredFathers.clear();
+        clearOfferedFathers();
         offeredFathers.addAll(fathers);
     }
 

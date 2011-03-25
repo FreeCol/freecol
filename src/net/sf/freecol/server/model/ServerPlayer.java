@@ -1001,6 +1001,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             FoundingFather father = checkFoundingFather();
             if (father != null) {
                 csAddFoundingFather(father, random, cs);
+                clearOfferedFathers();
             }
             if (canRecruitFoundingFather()) {
                 Set<FoundingFather> ffs = getOfferedFathers();
