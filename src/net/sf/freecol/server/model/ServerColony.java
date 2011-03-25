@@ -176,13 +176,18 @@ public class ServerColony extends Colony implements ServerModelObject {
                         }
                     }
                 }
+                if (entry.getKey() instanceof Building) {
+                    // TODO: generalize to other WorkLocations?
+                    csCheckMissingInput((Building) entry.getKey(),
+                                        productionInfo, cs);
+                }
             } else if (entry.getKey() instanceof BuildQueue
                 && !productionInfo.getConsumption().isEmpty()) {
                 // this means we are actually building something
                 BuildQueue queue = (BuildQueue) entry.getKey();
                 BuildableType buildable = queue.getCurrentlyBuilding();
                 if (buildable instanceof UnitType) {
-                    tileDirty = buildUnit(queue, cs, random);
+                    tileDirty = csBuildUnit(queue, random, cs);
                 } else if (buildable instanceof BuildingType) {
                     colonyDirty = buildBuilding(queue, cs, updates);
                 } else {
@@ -202,7 +207,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             for (AbstractGoods goods : productionInfo.getConsumption()) {
                 netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
             }
-
         }
 
         // Apply the changes accumulated in the netProduction map.
@@ -259,19 +263,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                               + " turns=" + turns);
             }
         }
-
-        /** TODO: do we want this?
-        if (goodsInput == 0 && !canAutoProduce()
-            && getMaximumGoodsInput() > 0) {
-            cs.addMessage(See.only(owner),
-                          new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                           "model.building.notEnoughInput",
-                                           colony, goodsInputType)
-                          .add("%inputGoods%", goodsInputType.getNameKey())
-                          .add("%building%", getNameKey())
-                          .addName("%colony%", colony.getName()));
-        }
-        */
 
         // Export goods if custom house is built.
         // Do not flush price changes yet, as any price change may change
@@ -403,11 +394,20 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
     }
 
-
-    private boolean buildUnit(BuildQueue buildQueue, ChangeSet cs, Random random) {
+    /**
+     * Build a unit from a build queue.
+     *
+     * @param buildQueue The <code>BuildQueue</code> to find the unit in.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the unit was built.
+     */
+    private boolean csBuildUnit(BuildQueue buildQueue, Random random,
+                                ChangeSet cs) {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                    (UnitType) buildQueue.getCurrentlyBuilding(),
                                    UnitState.ACTIVE);
+        if (unit == null) return false;
         if (unit.hasAbility("model.ability.bornInColony")) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
@@ -428,8 +428,47 @@ public class ServerColony extends Colony implements ServerModelObject {
             if (buildQueue.size() > 1) buildQueue.remove(0);
         }
 
-        logger.info("New unit created in " + getName() + ": " + unit.toString());
+        logger.info("New unit created in " + getName() + ": " + unit);
         return true;
+    }
+
+    /**
+     * Check a building to see if it is missing input.
+     *
+     * @param building The <code>Building</code> to check.
+     * @param pi The <code>ProductionInfo</code> for the building.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csCheckMissingInput(Building building, ProductionInfo pi,
+                                     ChangeSet cs) {
+        // Can not happen if the building needs no input or no one is
+        // working there.
+        if (building.canAutoProduce() || building.getUnitCount() <= 0) return;
+
+        // Check all goods types produced by this building.  If the
+        // output for a type is zero and the maximum production is
+        // non-zero then the building input type must be missing, Emit
+        // a message and return avoiding possible multiple messages
+        // per building.
+        for (AbstractGoods goods : pi.getProduction()) {
+            if (goods.getAmount() > 0) continue;
+            GoodsType type = goods.getType();
+            for (AbstractGoods g : pi.getMaximumProduction()) {
+                if (g.getType() != type) continue;
+                if (goods.getAmount() >= 0) {
+                    type = building.getGoodsInputType();
+                    cs.addMessage(See.only((ServerPlayer) owner),
+                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                         "model.building.notEnoughInput",
+                                         this, type)
+                                  .add("%inputGoods%", type.getNameKey())
+                                  .add("%building%", building.getNameKey())
+                                  .addName("%colony%", getName()));
+                    return;
+                }
+                break;
+            }
+        }
     }
 
 
