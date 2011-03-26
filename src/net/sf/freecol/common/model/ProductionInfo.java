@@ -211,4 +211,30 @@ public class ProductionInfo {
         storage.add(goods);
     }
 
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        append(result, "Storage", storage);
+        append(result, "Production", production);
+        append(result, "Consumption", consumption);
+        append(result, "Maximum Production", maximumProduction);
+        append(result, "Maximum Consumption", maximumConsumption);
+        return result.toString();
+    }
+
+
+    private void append(StringBuilder result, String key, List<AbstractGoods> list) {
+        if (!list.isEmpty()) {
+            result.append(key + ": ");
+            for (AbstractGoods goods : list) {
+                result.append(goods.toString());
+                if (goods.getType().getStoredAs() != goods.getType()) {
+                    result.append(" [" + goods.getType().getStoredAs().getId() + "]");
+                }
+                result.append(", ");
+            }
+            int length = result.length();
+            result.replace(length - 2, length, "\n");
+        }
+    }
+
 }
