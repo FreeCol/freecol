@@ -2145,10 +2145,12 @@ public class Colony extends Settlement implements Nameable {
         int count = 0;
         for (ColonyTile colonyTile : getColonyTiles()) {
             List<AbstractGoods> p = colonyTile.getProduction();
-            production.add(p);
-            ProductionInfo info = new ProductionInfo();
-            info.addProduction(p);
-            result.put(colonyTile, info);
+            if (!p.isEmpty()) {
+                production.add(p);
+                ProductionInfo info = new ProductionInfo();
+                info.addProduction(p);
+                result.put(colonyTile, info);
+            }
         }
 
         GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
