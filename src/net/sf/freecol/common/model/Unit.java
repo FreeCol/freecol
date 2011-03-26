@@ -1131,6 +1131,8 @@ public class Unit extends FreeColGameObject
                     }
                     if (carrier == null) return INFINITY;
                 }
+                if (carrier.getFullEntryLocation().getTile()
+                    == destination.getTile()) return carrier.getSailTurns();
                 p = map.findPath(this, carrier.getFullEntryLocation(),
                                  destination.getTile(), carrier);
             }
