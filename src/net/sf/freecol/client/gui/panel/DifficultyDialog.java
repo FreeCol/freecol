@@ -163,7 +163,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
             custom.setValue(getGroup());
             difficultyBox.setSelectedItem(CUSTOM_LEVEL);
         } else if (LOAD.equals(command)) {
-            File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), filters);
+            File loadFile = getCanvas().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
             if (loadFile != null) {
                 load(loadFile);
                 difficultyBox.setSelectedItem(CUSTOM_LEVEL);
