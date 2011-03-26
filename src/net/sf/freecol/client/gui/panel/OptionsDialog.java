@@ -67,8 +67,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     protected static final FileFilter[] filters = new FileFilter[] {
         new FileFilter() {
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".xml");
+            public boolean accept(File file) {
+                return file.isDirectory() || file.getName().endsWith(".xml");
             }
             public String getDescription() {
                 return Messages.message("filter.xml");
