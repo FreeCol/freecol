@@ -295,7 +295,7 @@ public class ServerGame extends Game implements ServerModelObject {
                         cs.add(See.perhaps(), tile);
                     }
                 }
-                for (Tile tile : getGame().getMap().getAllTiles()) {
+                for (Tile tile : getMap().getAllTiles()) {
                     if (tile.getOwner() == weakestAIPlayer) {
                         tile.setOwner(strongestAIPlayer);
                     }
@@ -316,7 +316,7 @@ public class ServerGame extends Game implements ServerModelObject {
                                                strongestAIPlayer)
                               .addStringTemplate("%loserNation%", loser)
                               .addStringTemplate("%nation%", winner));
-                cs.addGlobalHistory(getGame(),
+                cs.addGlobalHistory(this,
                     new HistoryEvent(getTurn(),
                                      HistoryEvent.EventType.SPANISH_SUCCESSION)
                               .addStringTemplate("%loserNation%", loser)
