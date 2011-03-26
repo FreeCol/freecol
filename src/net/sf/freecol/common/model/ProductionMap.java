@@ -103,7 +103,7 @@ public class ProductionMap {
                         return;
                     }
                 }
-                leafs.add(goods);
+                leafs.add(new AbstractGoods(goods));
                 root.setAmount(root.getAmount() + goods.getAmount());
             }
         }
