@@ -246,11 +246,16 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     /**
      * Load custom OptionGroup from default file.
+     *
+     * @return true if custom options were loaded
      */
-    protected void loadCustomOptions() {
+    protected boolean loadCustomOptions() {
         File customFile = new File(FreeCol.getOptionsDirectory(), getDefaultFileName());
         if (customFile.exists()) {
             load(customFile);
+            return true;
+        } else {
+            return false;
         }
     }
 

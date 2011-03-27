@@ -104,21 +104,19 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
 
-        loadCustomOptions();
+        boolean customized = loadCustomOptions();
 
-        OptionGroup group = null;
+        OptionGroup group = specification.getDifficultyLevel(customized ? CUSTOM_LEVEL : DEFAULT_LEVEL);
+        if (group == null) {
+            // this really should not happen
+            group = specification.getDifficultyLevels().get(0);
+        }
+
         for (OptionGroup level : specification.getDifficultyLevels()) {
             String id = level.getId();
             difficultyBox.addItem(id);
-            if (DEFAULT_LEVEL.equals(id)) {
-                group = level;
-                difficultyBox.setSelectedIndex(difficultyBox.getItemCount() - 1);
-            }
         }
-
-        if (group == null) {
-            group = specification.getDifficultyLevels().get(0);
-        }
+        difficultyBox.setSelectedItem(group.getId());
 
         edit.setActionCommand(EDIT);
         edit.addActionListener(this);
