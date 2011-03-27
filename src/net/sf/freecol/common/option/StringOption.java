@@ -92,8 +92,8 @@ public class StringOption extends AbstractOption<String> {
     public String getValue() {
         return value;
     }
-    
-    
+
+
     /**
      * Sets the current value of this <code>StringOption</code>.
      * @param value The value.
@@ -101,7 +101,7 @@ public class StringOption extends AbstractOption<String> {
     public void setValue(String value) {
         final String oldValue = this.value;
         this.value = value;
-        
+
         if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
@@ -216,7 +216,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *  
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
