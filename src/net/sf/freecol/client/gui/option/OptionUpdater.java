@@ -31,14 +31,12 @@ import net.sf.freecol.common.option.Option;
  */
 public interface OptionUpdater {
 
-
-
     /**
      * Updates the value of the {@link net.sf.freecol.common.option.Option}
      * this object keeps.
      */
     public void updateOption();
-    
+
     /**
      * Reset with the value from the option.
      */
@@ -48,10 +46,10 @@ public interface OptionUpdater {
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister();
-    
+
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
