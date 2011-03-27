@@ -205,6 +205,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             setResponse(null);
         } else if (RESET.equals(command)) {
             ui.reset();
+            revalidate();
+            repaint();
         } else if (SAVE.equals(command)) {
             File saveFile = getCanvas().showSaveDialog(FreeCol.getOptionsDirectory(), ".xml",
                                                        filters, getDefaultFileName());
