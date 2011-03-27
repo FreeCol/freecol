@@ -43,7 +43,7 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
 
     private final BooleanOption option;
     private boolean originalValue;
-    
+
 
     /**
     * Creates a new <code>BooleanOptionUI</code> for the given <code>BooleanOption</code>.
@@ -60,7 +60,7 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
         setSelected(option.getValue());
         setEnabled(editable);
         setToolTipText((description != null) ? description : name);
-        
+
         option.addPropertyChangeListener(this);
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -72,13 +72,13 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
                 }
             }
         });
-        
+
     }
 
-    
+
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -86,14 +86,14 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
-    
+
     /**
      * Updates this UI with the new data from the option.
      * @param event The event.
@@ -121,12 +121,12 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
     public void reset() {
         setSelected(option.getValue());
     }
-    
+
     /**
      * Sets the value of this component.
      */
     public void setValue(boolean b) {
         setSelected(b);
     }
-    
+
 }

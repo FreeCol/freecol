@@ -54,7 +54,7 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
     /**
      * Creates a new <code>RangeOptionUI</code> for the given
      * <code>RangeOption</code>.
-     * 
+     *
      * @param option The <code>RangeOption</code> to make a user interface
      *            for.
      */
@@ -63,7 +63,7 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
         this.option = option;
         this.originalValue = option.getValue();
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                    Messages.getName(option)));
         String name = Messages.getName(option);
         String description = Messages.getShortDescription(option);
@@ -110,7 +110,7 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -118,7 +118,7 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -128,7 +128,7 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
 
     /**
      * Updates this UI with the new data from the option.
-     * 
+     *
      * @param event The event.
      */
     public void propertyChange(PropertyChangeEvent event) {

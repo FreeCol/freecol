@@ -64,29 +64,29 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     private final JList list;
     private final DefaultListModel listModel;
     private List<ListOptionElement<T>> originalValue;
-    
+
     private JButton addButton = new JButton(Messages.message("list.add"));
     private JButton removeButton = new JButton(Messages.message("list.remove"));
     private JButton upButton = new JButton(Messages.message("list.up"));
     private JButton downButton = new JButton(Messages.message("list.down"));
 
-    
+
 
     /**
      * Creates a new <code>ListOptionUI</code> for the given
      * <code>ListOption</code>.
-     * 
+     *
      * @param option The <code>ListOption</code> to make a user interface
      *            for.
      */
     public ListOptionUI(final ListOption<T> option, boolean editable) {
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                    Messages.getName(option)));
         this.option = option;
         this.originalValue = createElementList(option.getValue());
         this.listModel = new DefaultListModel();
-        for (ListOptionElement<T> e : createElementList(option.getValue())) {  
+        for (ListOptionElement<T> e : createElementList(option.getValue())) {
             this.listModel.addElement(e);
         }
 
@@ -98,7 +98,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         list.setToolTipText((description != null) ? description : name);
         list.setEnabled(editable);
         add(sp, BorderLayout.CENTER);
-        
+
         final JPanel buttonPanel = new JPanel(new GridLayout(4, 1));
         buttonPanel.setOpaque(false);
         buttonPanel.add(addButton);
@@ -107,7 +107,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         buttonPanel.add(downButton);
         add(buttonPanel, BorderLayout.EAST);
         sp.setPreferredSize(new Dimension(500, buttonPanel.getPreferredSize().height));
-        
+
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showAddElementDialog();
@@ -158,7 +158,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         option.addPropertyChangeListener(this);
         setOpaque(false);
     }
-    
+
     private void showAddElementDialog() {
         final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
         final JButton addButton = new JButton(Messages.message("list.add"));
@@ -171,13 +171,13 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         final JPanel buttons = new JPanel(new FlowLayout());
         buttons.add(addButton);
         final JButton cancelButton = new JButton(Messages.message("cancel"));
-        buttons.add(cancelButton);        
+        buttons.add(cancelButton);
         addElementDialog.setCancelComponent(cancelButton);
         addElementDialog.add(buttons, BorderLayout.SOUTH);
-        
+
         final JComboBox mods = new JComboBox(option.getListOptionSelector().getOptions().toArray());
         addElementDialog.add(mods, BorderLayout.CENTER);
-        
+
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addElementDialog.setResponse(mods.getSelectedItem());
@@ -188,7 +188,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
                 addElementDialog.setResponse(null);
             }
         });
-        
+
         canvas.addAsFrame(addElementDialog);
         addElementDialog.requestFocus();
 
@@ -204,24 +204,24 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     private List<ListOptionElement<T>> createElementList(List<T> list) {
         final List<ListOptionElement<T>> elementList = new ArrayList<ListOptionElement<T>>(list.size());
         for (T o : list) {
-            final ListOptionSelector<T> los = option.getListOptionSelector(); 
-            final ListOptionElement<T> e = new ListOptionElement<T>(o, los.toString(o)); 
+            final ListOptionSelector<T> los = option.getListOptionSelector();
+            final ListOptionElement<T> e = new ListOptionElement<T>(o, los.toString(o));
             elementList.add(e);
         }
         return elementList;
     }
-    
+
     private List<T> createNormalList(List<ListOptionElement<T>> elementList) {
         final List<T> list = new ArrayList<T>(elementList.size());
-        for (ListOptionElement<T> o : elementList) {  
+        for (ListOptionElement<T> o : elementList) {
             list.add(o.object);
         }
         return list;
     }
-    
+
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -229,7 +229,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     public void rollback() {
         option.setValue(createNormalList(originalValue));
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -239,7 +239,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
 
     /**
      * Updates this UI with the new data from the option.
-     * 
+     *
      * @param event The event.
      */
     @SuppressWarnings("unchecked")
@@ -248,7 +248,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
             final List<T> value = (List<T>) event.getNewValue();
             if (!value.equals(getValue())) {
                 listModel.clear();
-                
+
                 for (Object o : createElementList(value)) {
                     listModel.addElement(o);
                 }
@@ -272,7 +272,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         }
         return createNormalList(l);
     }
-    
+
     /**
      * Reset with the value from the option.
      */
@@ -282,16 +282,16 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
             listModel.addElement(o);
         }
     }
-    
+
     private static class ListOptionElement<T> {
         private final T object;
         private final String text;
-        
+
         private ListOptionElement(final T object, final String text) {
             this.object = object;
             this.text = text;
         }
-        
+
         public String toString() {
             return text;
         }

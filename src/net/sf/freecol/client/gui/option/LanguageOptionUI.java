@@ -44,7 +44,7 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(LanguageOptionUI.class.getName());
 
-    private final LanguageOption option;   
+    private final LanguageOption option;
     private Language originalValue;
     private JLabel label;
 
@@ -66,7 +66,7 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
 
         setModel(new DefaultComboBoxModel(languages));
         reset();
-        
+
         setEnabled(editable);
         addActionListener(new ActionListener () {
             public void actionPerformed(ActionEvent e) {
@@ -103,7 +103,7 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -111,14 +111,14 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
-    
+
     /**
      * Updates this UI with the new data from the option.
      * @param event The event.
@@ -132,7 +132,7 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
             }
         }
     }
-    
+
     /**
      * Updates the value of the {@link Option} this object keeps.
      */

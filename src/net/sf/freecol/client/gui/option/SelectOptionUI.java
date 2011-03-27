@@ -75,7 +75,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
             // TODO: fix this. It happens only for the option "difficulty level"
             logger.warning("SelectOption " + option.getId() + " has invalid value.");
         }
-        
+
         setEnabled(editable);
         addActionListener(new ActionListener () {
             public void actionPerformed(ActionEvent e) {
@@ -112,7 +112,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -120,14 +120,14 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
-    
+
     /**
      * Updates this UI with the new data from the option.
      * @param event The event.
@@ -141,7 +141,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
             }
         }
     }
-    
+
     /**
      * Updates the value of the {@link Option} this object keeps.
      */

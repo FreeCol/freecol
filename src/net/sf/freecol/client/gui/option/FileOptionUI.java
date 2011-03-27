@@ -54,11 +54,11 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
     private final JTextField fileField;
     private File originalValue;
 
-    
+
     /**
     * Creates a new <code>FileOptionUI</code> for the given
     * <code>FileOption</code>.
-    * 
+    *
     * @param option The <code>FileOption</code> to make a user interface for.
     */
     public FileOptionUI(final FileOption option, boolean editable) {
@@ -73,12 +73,12 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
         label.setToolTipText((description != null) ? description : name);
         add(label);
 
-        final String value = (option.getValue() != null) 
+        final String value = (option.getValue() != null)
             ? option.getValue().getAbsolutePath()
             : "";
         fileField = new JTextField(value, 10);
         add(fileField);
-        
+
         JButton browse = new JButton(Messages.message("file.browse"));
         if (editable) {
             browse.addActionListener(new ActionListener() {
@@ -100,7 +100,7 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
             });
         }
         add(browse);
-        
+
         JButton remove = new JButton(Messages.message("option.remove"));
         if (editable) {
             remove.addActionListener(new ActionListener() {
@@ -110,7 +110,7 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
             });
         }
         add(remove);
-        
+
         browse.setEnabled(editable);
         remove.setEnabled(editable);
         fileField.setEnabled(false);
@@ -134,16 +134,16 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
                 }
             }
         });
-        
+
         option.addPropertyChangeListener(this);
-        
+
         setOpaque(false);
     }
 
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -151,14 +151,14 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
-    
+
     /**
      * Updates this UI with the new data from the option.
      * @param event The event.
@@ -172,7 +172,7 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
             }
         }
     }
-    
+
     /**
     * Updates the value of the {@link Option} this object keeps.
     */
@@ -183,19 +183,19 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
             option.setValue(new File(fileField.getText()));
         }
     }
-    
+
     /**
      * Reset with the value from the option.
      */
     public void reset() {
         setValue(option.getValue());
     }
-    
+
     /**
      * Sets the value of this component.
      */
     public void setValue(File f) {
-        if (f != null) { 
+        if (f != null) {
             fileField.setText(f.getAbsolutePath());
         } else {
             fileField.setText("");

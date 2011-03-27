@@ -54,7 +54,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
     /**
      * Creates a new <code>PercentageOptionUI</code> for the given
      * <code>PercentageOption</code>.
-     * 
+     *
      * @param option The <code>PercentageOption</code> to make a user interface
      *            for.
      */
@@ -66,7 +66,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
         String name = Messages.getName(option);
         String description = Messages.getShortDescription(option);
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                    Messages.getName(option)));
 
         setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
@@ -106,7 +106,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -114,7 +114,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -124,7 +124,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
 
     /**
      * Updates this UI with the new data from the option.
-     * 
+     *
      * @param event The event.
      */
     public void propertyChange(PropertyChangeEvent event) {

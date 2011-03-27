@@ -106,7 +106,7 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
 
     /**
      * Rollback to the original value.
-     * 
+     *
      * This method gets called so that changes made to options with
      * {@link Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
@@ -114,14 +114,14 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
     public void rollback() {
         option.setValue(originalValue);
     }
-    
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
-    
+
     /**
      * Updates this UI with the new data from the option.
      * @param event The event.
@@ -138,7 +138,7 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
             }
         }
     }
-    
+
     /**
      * Updates the value of the {@link Option} this object keeps.
      */
