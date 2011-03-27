@@ -149,6 +149,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     }
 
     private void addOptionUI(Option option, JPanel panel, boolean editable) {
+        JComponent ui = null;
         if (option instanceof BooleanOption) {
             BooleanOptionUI c = new BooleanOptionUI((BooleanOption) option, editable);
             if (c.getText().length() > 40) {
@@ -156,47 +157,24 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             } else {
                 panel.add(c, "span 2");
             }
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof FileOption) {
             final FileOptionUI iou = new FileOptionUI((FileOption) option, editable);
             panel.add(iou, "newline, span");
-            optionUpdaters.add(iou);
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), iou);
-            }
+            ui = iou;
         } else if (option instanceof PercentageOption) {
             PercentageOptionUI c = new PercentageOptionUI((PercentageOption) option, editable);
             panel.add(c, "newline, span");
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof ListOption<?>) {
             @SuppressWarnings("unchecked")
             ListOptionUI c = new ListOptionUI((ListOption) option, editable);
             panel.add(c);
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof RangeOption) {
             RangeOptionUI c = new RangeOptionUI((RangeOption) option, editable);
             panel.add(c, "newline, span");
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof SelectOption) {
             SelectOptionUI c = new SelectOptionUI((SelectOption) option, editable);
             if (c.getLabel().getText().length() > 30) {
@@ -205,12 +183,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel(), "right");
             }
             panel.add(c);
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof IntegerOption) {
             IntegerOptionUI c = new IntegerOptionUI((IntegerOption) option, editable);
             if (c.getLabel().getText().length() > 30) {
@@ -219,12 +192,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel(), "right");
             }
             panel.add(c);
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof StringOption) {
             final StringOptionUI soi = new StringOptionUI((StringOption) option, editable);
             if (soi.getLabel().getText().length() > 30) {
@@ -233,10 +201,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(soi.getLabel(), "right");
             }
             panel.add(soi);
-            optionUpdaters.add(soi);
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), soi);
-            }
+            ui = soi;
         } else if (option instanceof LanguageOption) {
             LanguageOptionUI c = new LanguageOptionUI((LanguageOption) option, editable);
             if (c.getLabel().getText().length() > 30) {
@@ -245,12 +210,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel());
             }
             panel.add(c);
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof AudioMixerOption) {
             AudioMixerOptionUI c = new AudioMixerOptionUI((AudioMixerOption) option, editable);
             if (c.getLabel().getText().length() > 30) {
@@ -259,21 +219,20 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 panel.add(c.getLabel());
             }
             panel.add(c);
-            if (editable) {
-                optionUpdaters.add(c);
-            }
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), c);
-            }
+            ui = c;
         } else if (option instanceof FreeColAction) {
             final FreeColActionUI fau = new FreeColActionUI((FreeColAction) option, this);
-            optionUpdaters.add(fau);
             panel.add(fau, "newline, span");
-            if (!option.getId().equals(Option.NO_ID)) {
-                optionUIs.put(option.getId(), fau);
-            }
+            ui = fau;
         } else {
             logger.warning("Unknown option: " + option.getId() + " (" + option.getClass() + ")");
+            return;
+        }
+        if (editable) {
+            optionUpdaters.add((OptionUpdater) ui);
+        }
+        if (!option.getId().equals(Option.NO_ID)) {
+            optionUIs.put(option.getId(), ui);
         }
     }
 
