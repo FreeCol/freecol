@@ -150,84 +150,64 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     private void addOptionUI(Option option, JPanel panel, boolean editable) {
         JComponent ui = null;
+        String constraints = null;
+        JLabel label = null;
         if (option instanceof BooleanOption) {
             BooleanOptionUI c = new BooleanOptionUI((BooleanOption) option, editable);
-            if (c.getText().length() > 40) {
-                panel.add(c, "newline, span");
-            } else {
-                panel.add(c, "span 2");
-            }
+            constraints = c.getText().length() > 40 ? "newline, span" : "span 2";
             ui = c;
         } else if (option instanceof FileOption) {
             final FileOptionUI iou = new FileOptionUI((FileOption) option, editable);
-            panel.add(iou, "newline, span");
+            constraints = "newline, span";
             ui = iou;
         } else if (option instanceof PercentageOption) {
             PercentageOptionUI c = new PercentageOptionUI((PercentageOption) option, editable);
-            panel.add(c, "newline, span");
+            constraints = "newline, span";
             ui = c;
         } else if (option instanceof ListOption<?>) {
             @SuppressWarnings("unchecked")
             ListOptionUI c = new ListOptionUI((ListOption) option, editable);
-            panel.add(c);
             ui = c;
         } else if (option instanceof RangeOption) {
             RangeOptionUI c = new RangeOptionUI((RangeOption) option, editable);
-            panel.add(c, "newline, span");
+            constraints = "newline, span";
             ui = c;
         } else if (option instanceof SelectOption) {
             SelectOptionUI c = new SelectOptionUI((SelectOption) option, editable);
-            if (c.getLabel().getText().length() > 30) {
-                panel.add(c.getLabel(), "newline, span 3, right");
-            } else {
-                panel.add(c.getLabel(), "right");
-            }
-            panel.add(c);
+            label = c.getLabel();
             ui = c;
         } else if (option instanceof IntegerOption) {
             IntegerOptionUI c = new IntegerOptionUI((IntegerOption) option, editable);
-            if (c.getLabel().getText().length() > 30) {
-                panel.add(c.getLabel(), "newline, span 3, right");
-            } else {
-                panel.add(c.getLabel(), "right");
-            }
-            panel.add(c);
+            label = c.getLabel();
             ui = c;
         } else if (option instanceof StringOption) {
             final StringOptionUI soi = new StringOptionUI((StringOption) option, editable);
-            if (soi.getLabel().getText().length() > 30) {
-                panel.add(soi.getLabel(), "newline, span 3, right");
-            } else {
-                panel.add(soi.getLabel(), "right");
-            }
-            panel.add(soi);
+            label = soi.getLabel();
             ui = soi;
         } else if (option instanceof LanguageOption) {
             LanguageOptionUI c = new LanguageOptionUI((LanguageOption) option, editable);
-            if (c.getLabel().getText().length() > 30) {
-                panel.add(c.getLabel(), "newline, span 3");
-            } else {
-                panel.add(c.getLabel());
-            }
-            panel.add(c);
+            label = c.getLabel();
             ui = c;
         } else if (option instanceof AudioMixerOption) {
             AudioMixerOptionUI c = new AudioMixerOptionUI((AudioMixerOption) option, editable);
-            if (c.getLabel().getText().length() > 30) {
-                panel.add(c.getLabel(), "newline, span 3");
-            } else {
-                panel.add(c.getLabel());
-            }
-            panel.add(c);
+            label = c.getLabel();
             ui = c;
         } else if (option instanceof FreeColAction) {
             final FreeColActionUI fau = new FreeColActionUI((FreeColAction) option, this);
-            panel.add(fau, "newline, span");
+            constraints = "newline, span";
             ui = fau;
         } else {
             logger.warning("Unknown option: " + option.getId() + " (" + option.getClass() + ")");
             return;
         }
+        if (label != null) {
+            if (label.getText().length() > 30) {
+                panel.add(label, "newline, span 3");
+            } else {
+                panel.add(label);
+            }
+        }
+        panel.add(ui, constraints);
         if (editable) {
             optionUpdaters.add((OptionUpdater) ui);
         }
