@@ -1948,8 +1948,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         // 0.9.x compatibility code
-        // work-around for bug #3065488
         if (settlement instanceof IndianSettlement) {
+            // work-around for bug #3065488
             Unit missionary = ((IndianSettlement) settlement).getMissionary();
             if (missionary != null) {
                 PlayerExploredTile pet = getPlayerExploredTile(missionary.getOwner());
@@ -1957,9 +1957,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     pet.setMissionary(missionary);
                 }
             }
+        } else if (settlement instanceof Colony) {
+            Colony colony = (Colony) settlement;
+            for (Entry<Player, PlayerExploredTile> e
+                     : playerExploredTiles.entrySet()) {
+                Player player = e.getKey();
+                PlayerExploredTile pet = e.getValue();
+                if (pet.getColonyUnitCount() > 0
+                    && (pet.getOwner() == null
+                        || pet.getOwningSettlement() == null)) {
+                    logger.warning("0.9.x workaround reading colony: "
+                                   + colony.getName());
+                    pet.setOwner(settlement.getOwner());
+                    pet.setOwningSettlement(settlement);
+                    pet.setColonyUnitCount(colony.getUnitCount());
+                    pet.setColonyStockadeKey(colony.getStockadeKey());
+                }
+            }
         }
         // end of work-around
-
     }
 
     /**

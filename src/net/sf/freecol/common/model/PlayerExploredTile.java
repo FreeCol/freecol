@@ -166,10 +166,27 @@ public class PlayerExploredTile extends FreeColGameObject {
         return wantedGoods;
     }
 
+    // Only needed for 0.9.x workaround in Tile.readFromXMLImpl.
+    public void setOwner(Player owner) {
+        this.owner = owner;
+    }
+
+    public void setOwningSettlement(Settlement owningSettlement) {
+        this.owningSettlement = owningSettlement;
+    }
+
+    public void setColonyUnitCount(int colonyUnitCount) {
+        this.colonyUnitCount = colonyUnitCount;
+    }
+
+    public void setColonyStockadeKey(String colonyStockadeKey) {
+        this.colonyStockadeKey = colonyStockadeKey;
+    }
+
     public void setMissionary(Unit missionary) {
-        // Only needed for 0.9.x workaround in Tile.readFromXMLImpl.
         this.missionary = missionary;
     }
+    // End 0.9.x workarounds.
 
 
     /**
