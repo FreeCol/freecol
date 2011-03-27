@@ -1959,19 +1959,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         } else if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
-            for (Entry<Player, PlayerExploredTile> e
-                     : playerExploredTiles.entrySet()) {
-                Player player = e.getKey();
-                PlayerExploredTile pet = e.getValue();
-                if (pet.getColonyUnitCount() > 0
-                    && (pet.getOwner() == null
-                        || pet.getOwningSettlement() == null)) {
-                    logger.warning("0.9.x workaround reading colony: "
-                                   + colony.getName());
-                    pet.setOwner(settlement.getOwner());
-                    pet.setOwningSettlement(settlement);
-                    pet.setColonyUnitCount(colony.getUnitCount());
-                    pet.setColonyStockadeKey(colony.getStockadeKey());
+            if (playerExploredTiles != null) {
+                for (Entry<Player, PlayerExploredTile> e
+                         : playerExploredTiles.entrySet()) {
+                    Player player = e.getKey();
+                    PlayerExploredTile pet = e.getValue();
+                    if (pet.getColonyUnitCount() > 0
+                        && (pet.getOwner() == null
+                            || pet.getOwningSettlement() == null)) {
+                        logger.warning("0.9.x workaround reading colony: "
+                                       + colony.getName());
+                        pet.setOwner(settlement.getOwner());
+                        pet.setOwningSettlement(settlement);
+                        pet.setColonyUnitCount(colony.getUnitCount());
+                        pet.setColonyStockadeKey(colony.getStockadeKey());
+                    }
                 }
             }
         }
