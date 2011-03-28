@@ -49,6 +49,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
 
     private final Canvas parent;
 
+    private final boolean openBuildQueue;
+
     private Colony colony;
 
     public static final String EVENT = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
@@ -64,9 +66,10 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      * @param parent a <code>Canvas</code> value
      * @param colony a <code>Colony</code> value
      */
-    public ConstructionPanel(final Canvas parent, Colony colony) {
+    public ConstructionPanel(final Canvas parent, Colony colony, boolean openBuildQueue) {
 
         this.parent = parent;
+        this.openBuildQueue = openBuildQueue;
         setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
         setColony(colony);
     }
@@ -84,12 +87,16 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             // we are interested in changes to the build queue, as well as
             // changes to the warehouse and the colony's production bonus
             colony.addPropertyChangeListener(EVENT, this);
-            addMouseListener(new MouseAdapter() {
+
+            if (openBuildQueue)
+            {
+                addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
                         parent.showSubPanel(new BuildQueuePanel(colony,
-                                                                parent));
-                    }
-                });
+                                                                    parent));
+                        }
+                    });
+            }
         }
         initialize(colony.getCurrentlyBuilding());
     }

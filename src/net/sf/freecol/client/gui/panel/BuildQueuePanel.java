@@ -214,7 +214,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buyBuilding.setActionCommand(BUY);
         buyBuilding.addActionListener(this);
 
-        constructionPanel = new ConstructionPanel(getCanvas(), colony);
+        constructionPanel = new ConstructionPanel(getCanvas(), colony, false);
         constructionPanel.setOpaque(true);
         StringTemplate buildingNothing = StringTemplate.template("colonyPanel.currentlyBuilding")
             .add("%buildable%", "nothing");
