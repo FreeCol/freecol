@@ -578,6 +578,11 @@ is used as a secondary key, and vice versa.
 
 \end{itemize}
 
+Beware that some Java implementations have bugs that cause high CPU
+load and very slow performance if animation is enabled.  If this
+happens, either disable animation or experiment with the
+\texttt{-Dsun.java2d.pmoffscreen=false} Java command line option.
+
 \hypertarget{message options}{\subsection{Message Options}}
 
 You can choose whether to group messages by type, by source, or not at
