@@ -1553,7 +1553,7 @@ public final class GUI {
                             BuildableType buildable = colony.getCurrentlyBuilding();
                             if (buildable != null) {
                                 specs = new TextSpecification[2];
-                                String turnsStr = getTurnsText(colony, buildable);
+                                String turnsStr = colony.getTurnsText(buildable);
                                 String nowBuilding = Messages.message(buildable.getNameKey()) + " " + turnsStr;
                                 specs[1] = new TextSpecification(nowBuilding, productionFont);
                             }
@@ -3504,18 +3504,6 @@ public final class GUI {
     private boolean isTileVisible(Tile tile) {
         return tile.getY() >= topRow && tile.getY() <= bottomRow
             && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
-    }
-
-    public static String getTurnsText(Colony colony, BuildableType buildable) {
-        int turnsLeft = colony.getTurnsToComplete(buildable);
-        if (turnsLeft >= 0) {
-            return Integer.toString(turnsLeft);
-        }
-        else if(turnsLeft != Integer.MIN_VALUE){
-            return ">" + Integer.toString(turnsLeft*-1);
-        }
-
-        return Messages.message("notApplicable.short");
     }
 
 

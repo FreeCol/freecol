@@ -110,7 +110,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                 add(new JLabel(clickToBuild), "span, align center");
             }
         } else {
-            String turnsStr = GUI.getTurnsText(colony, buildable);
+            String turnsStr = colony.getTurnsText(buildable);
             add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))),
                 "spany");
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",

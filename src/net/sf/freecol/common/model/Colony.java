@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Map.Direction;
@@ -1050,11 +1051,11 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Returns how many turns it would take to build the given
-     * <code>BuildableType</code>. Returns a negative number if any of the production goods isnt
-     * being built, Integer.MIN_VAL if none is, and there are no goods available
+     * <code>BuildableType</code>.
      *
-     * @param buildable a <code>BuildableType</code> value
-     * @return an <code>int</code> value
+     * @param buildable The <code>BuildableType</code> to build.
+     * @return The number of turns to build the buildable, negative if
+     *     some goods are not being built, UNDEFINED if none is.
      */
     public int getTurnsToComplete(BuildableType buildable) {
         int result = 0;
@@ -1084,19 +1085,25 @@ public class Colony extends Settlement implements Nameable {
             }
             result = Math.max(result, eta);
         }
-        if(!goodsMissing){
-            return 0;
-        }
-        if(goodsMissing && !goodsBeingProduced){
-            return UNDEFINED;
-        }
-        if(productionMissing){
-            result = result * -1;
-        }
-
-        return result;
+        return (!goodsMissing) ? 0
+            : (!goodsBeingProduced) ? UNDEFINED
+            : (productionMissing) ? -result
+            : result;
     }
 
+    /**
+     * Gets a string describing the number of turns left for this colony
+     * to finish a Buildable.
+     *
+     * @param buildable The <code>BuildableType</code> to build.
+     * @return A descriptive string.
+     */
+    public String getTurnsText(BuildableType buildable) {
+        int turns = getTurnsToComplete(buildable);
+        return (turns == UNDEFINED) ? Messages.message("notApplicable.short")
+            : (turns >= 0) ? Integer.toString(turns)
+            : ">" + Integer.toString(-turns);
+    }
 
     /**
      * Get the <code>BuildQueue</code> value.
