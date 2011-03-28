@@ -1042,6 +1042,18 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Convenience wrapper to find a path to Europe for this unit.
+     *
+     * @return A path to Europe, or null if already there.
+     */
+    public PathNode findPathToEurope() {
+        Location loc = getLocation();
+        return (loc instanceof Tile)
+            ? getGame().getMap().findPathToEurope((Tile) loc)
+            : null;
+    }
+
+    /**
      * Finds a shortest path from the current <code>Tile</code> to the one
      * specified. Only paths on water are allowed if <code>isNaval()</code>
      * and only paths on land if not.
@@ -1108,9 +1120,9 @@ public class Unit extends FreeColGameObject
             if (isInEurope()) {
                 return 0;
             } else if (isNaval()) {
-                p = map.findPathToEurope(this, getTile());
+                p = this.findPathToEurope();
             } else if (carrier != null) {
-                p = map.findPathToEurope(carrier, carrier.getTile());
+                p = carrier.findPathToEurope();
             } else {
                 return INFINITY;
             }
@@ -2634,6 +2646,21 @@ public class Unit extends FreeColGameObject
     /**
      * Checks if this <code>Unit</code> can be moved to Europe.
      *
+     * TODO: the new Carribean map has no south pole, and this allows
+     * moving to Europe via the bottom edge of the map, which is
+     * approximately the equator line.  Should we enforce moving to
+     * Europe requires high seas, and no movement via north/south
+     * poles?
+     *
+     * mpope 201103: Just leave it up to the map itself, tiles can
+     * include a "moveToEurope" attribute to override the default
+     * behaviour, which is to allow movement to Europe from tiles with
+     * the moveToEurope ability or on the map borders.
+     *
+     * Now, IMHO on the Carribean map, settling on the land next to
+     * the south border gives an unfair advantage and we *should* set
+     * moveToEurope==false on the nearby sea tiles.
+     *
      * @return <code>true</code> if this unit can move to Europe.
      */
     public boolean canMoveToEurope() {
@@ -2644,22 +2671,8 @@ public class Unit extends FreeColGameObject
             return false;
         }
 
-
-        List<Tile> surroundingTiles = new ArrayList<Tile>();
-        for (Tile t: getTile().getSurroundingTiles(1))
-            surroundingTiles.add(t);
-
-        if (surroundingTiles.size() != 8) {
-            // TODO: the new carribean map has no south pole, and this allows moving to europe
-            // via the bottom edge of the map, which is approximately the equator line.
-            // Should we enforce moving to europe requires high seas, and no movement via north/south poles?
-            return true;
-        } else {
-            for (Tile tile: getTile().getSurroundingTiles(1)) {
-                if (tile == null || tile.canMoveToEurope()) {
-                    return true;
-                }
-            }
+        for (Tile tile : getTile().getSurroundingTiles(1)) {
+            if (tile.canMoveToEurope()) return true;
         }
         return false;
     }

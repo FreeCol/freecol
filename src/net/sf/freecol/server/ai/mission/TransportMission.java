@@ -695,12 +695,8 @@ public class TransportMission extends Mission {
             }
 
             // find path for destination location
-            if(destLoc instanceof Europe){
-                path = findPathToEurope(unit.getTile());
-            }
-            else{
-                path = getPath(transportable);
-            }
+            path = (destLoc instanceof Europe) ? unit.findPathToEurope()
+                : getPath(transportable);
             // add unavailable location to tabu list
             if(path == null){
                 unavailLoc.add(destLoc);
@@ -750,7 +746,7 @@ public class TransportMission extends Mission {
             if (unit.canMoveToEurope()) {
                 return new Destination(true, null);
             }
-            if ((path = findPathToEurope(unit.getTile())) != null) {
+            if ((path = unit.findPathToEurope()) != null) {
                 return new Destination(true, path);
             }
         }

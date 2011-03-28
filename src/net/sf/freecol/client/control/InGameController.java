@@ -1036,7 +1036,6 @@ public final class InGameController implements NetworkConstants {
         }
 
         List<ModelMessage> messages = new ArrayList<ModelMessage>();
-        final Map map = freeColClient.getGame().getMap();
         GUI gui = freeColClient.getGUI();
         gui.setActiveUnit(unit);
 
@@ -1062,7 +1061,7 @@ public final class InGameController implements NetworkConstants {
 
             // Find a path to the destination.
             PathNode path = (destination instanceof Europe)
-                ? map.findPathToEurope(unit, unit.getTile())
+                ? unit.findPathToEurope()
                 : unit.findPath(destination.getTile());
 
             // No path, give up.
@@ -1075,7 +1074,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Try to follow the path.
-            movePath(unit, path);
+            if (!movePath(unit, path)) break;
         }
 
         // Clear ordinary destinations, leave trade routes but display their

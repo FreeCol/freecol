@@ -2540,18 +2540,14 @@ public final class GUI {
     * Sets the path of the active unit to display it.
     */
     public void updateGotoPathForActiveUnit() {
-        if (activeUnit == null || activeUnit.getDestination() == null) {
-            currentPath = null;
-        } else {
-            if (activeUnit.getDestination() instanceof Europe) {
-                currentPath = freeColClient.getGame().getMap().findPathToEurope(activeUnit, activeUnit.getTile());
-            } else if (activeUnit.getDestination().getTile() == activeUnit.getTile()) {
-                // No need to do anything as the unit has arrived, there is no path to be shown.
-                currentPath = null;
-            } else {
-                currentPath = activeUnit.findPath(activeUnit.getDestination().getTile());
-            }
-        }
+        currentPath = (activeUnit == null
+                       || activeUnit.getDestination() == null)
+            ? null
+            : (activeUnit.getDestination() instanceof Europe)
+            ? activeUnit.findPathToEurope()
+            : (activeUnit.getDestination().getTile() == activeUnit.getTile())
+            ? null // Do nothing, unit has arrived
+            : activeUnit.findPath(activeUnit.getDestination().getTile());
     }
 
     /**

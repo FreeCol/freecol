@@ -252,7 +252,7 @@ public class PrivateerMission extends Mission {
                 nearestPort = null;
                 return null;
             }
-            return getGame().getMap().findPathToEurope(unit,unit.getTile());
+            return unit.findPathToEurope();
         }
 
         Colony nearestColony = (Colony) nearestPort;

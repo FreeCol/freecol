@@ -599,27 +599,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Get the <code>MoveToEurope</code> value.
+     * Can a unit move to Europe from this tile?
      *
-     * @return a <code>Boolean</code> value
+     * @return True if a unit can move to Europe from this tile.
      */
     public boolean canMoveToEurope() {
-        if (moveToEurope != null) {
-            return moveToEurope;
-        } else if (type == null) {
-            return false;
-        } else {
-            return type.hasAbility("model.ability.moveToEurope");
-        }
-    }
-
-    /**
-     * Set the <code>MoveToEurope</code> value.
-     *
-     * @param newMoveToEurope The new MoveToEurope value.
-     */
-    public void setMoveToEurope(final Boolean newMoveToEurope) {
-        this.moveToEurope = newMoveToEurope;
+        return (moveToEurope != null) ? moveToEurope
+            : (type == null) ? false
+            : (type.hasAbility("model.ability.moveToEurope")) ? true
+            : isAdjacentToMapEdge() && type.isWater();
     }
 
     /**
@@ -1564,10 +1552,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return <code>true</code> if the tile is adjacent to this tile
      */
     public boolean isAdjacent(Tile tile) {
-    	if (tile == null) {
-    		return false;
-    	}
-    	return (this.getDistanceTo(tile) == 1);
+        return (tile == null) ? false : this.getDistanceTo(tile) == 1;
     }
 
     /**
@@ -1583,7 +1568,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          int y = getY() + ((getY() & 1) != 0 ?
                                direction.getOddDY() : direction.getEvenDY());
          return getMap().getTile(x, y);
-}
+     }
 
      /**
       * Returns all the tiles surrounding this tile within the
@@ -1594,31 +1579,27 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
       * @return The tiles surrounding this tile.
       */
      public Iterable<Tile> getSurroundingTiles(final int range) {
-         return new Iterable<Tile>(){
-             public Iterator<Tile> iterator(){
-                 final Iterator<Position> m;
+         return new Iterable<Tile>() {
+             public Iterator<Tile> iterator() {
+                 final Iterator<Position> m = (range == 1)
+                     ? getMap().getAdjacentIterator(getPosition())
+                     : getMap().getCircleIterator(getPosition(), true, range);
 
-                 if (range == 1)
-                     m = getMap().getAdjacentIterator(getPosition());
-                 else
-                     m = getMap().getCircleIterator(getPosition(), true, range);
-
-                 return new Iterator<Tile>(){
+                 return new Iterator<Tile>() {
                      public boolean hasNext() {
                          return m.hasNext();
-}
+                     }
 
                      public Tile next() {
                          return getMap().getTile(m.next());
-         }
+                     }
 
                      public void remove() {
                          m.remove();
-     }
+                     }
                  };
              }
          };
-
      }
 
 
@@ -1772,6 +1753,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         writeAttribute(out, "type", getType());
         writeAttribute(out, "region", getRegion());
+        if (moveToEurope != null) {
+            out.writeAttribute("moveToEurope", Boolean.toString(moveToEurope));
+        }
 
         if (connected && !type.isConnected()) {
             out.writeAttribute("connected", Boolean.toString(true));
@@ -1867,6 +1851,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         connected = getAttribute(in, "connected", false);
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
+        moveToEurope = (in.getAttributeValue(null, "moveToEurope") == null)
+            ? null
+            : getAttribute(in, "moveToEurope", false);
 
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {

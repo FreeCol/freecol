@@ -134,7 +134,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         Collections.sort(destinations, destinationComparator);
 
         if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
-            PathNode path = getGame().getMap().findPathToEurope(unit, unit.getTile());
+            PathNode path = unit.findPathToEurope();
             if (path != null) {
                 Europe europe = getMyPlayer().getEurope();
                 destinations.add(0, new Destination(europe, path.getTotalTurns(),
