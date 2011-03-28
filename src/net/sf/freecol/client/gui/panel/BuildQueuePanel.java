@@ -996,36 +996,44 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     class BuildQueueMouseAdapter extends MouseAdapter {
 
         private boolean add = true;
+        
+        private boolean enabled = false;
 
         public BuildQueueMouseAdapter(boolean add) {
             this.add = add;
         }
 
         public void mousePressed(MouseEvent e) {
-            JList source = (JList) e.getSource();
-            if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
-                int index = source.locationToIndex(e.getPoint());
-                BuildableType type = (BuildableType) source.getModel().getElementAt(index);
-                if (type instanceof BuildingType) {
-                    getCanvas().showPanel(new ColopediaPanel(getCanvas(),
-                                                             ColopediaPanel.PanelType.BUILDINGS, type));
-                } else if (type instanceof UnitType) {
-                    getCanvas().showPanel(new ColopediaPanel(getCanvas(),
-                                                             ColopediaPanel.PanelType.UNITS, type));
-                }
-            } else if ((e.getClickCount() > 1 && !e.isConsumed())) {
-                DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
-                if (source.getSelectedIndex() == -1) {
-                    source.setSelectedIndex(source.locationToIndex(e.getPoint()));
-                }
-                for (Object type : source.getSelectedValues()) {
-                    if (add) {
-                        model.addElement(type);
-                    } else {
-                        model.removeElement(type);
+            if (!enabled && e.getClickCount() == 1 && !e.isConsumed()) {
+                enabled = true;
+            }
+
+            if (enabled) {
+                JList source = (JList) e.getSource();
+                if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
+                    int index = source.locationToIndex(e.getPoint());
+                    BuildableType type = (BuildableType) source.getModel().getElementAt(index);
+                    if (type instanceof BuildingType) {
+                        getCanvas().showPanel(new ColopediaPanel(getCanvas(),
+                                                                 ColopediaPanel.PanelType.BUILDINGS, type));
+                    } else if (type instanceof UnitType) {
+                        getCanvas().showPanel(new ColopediaPanel(getCanvas(),
+                                                                 ColopediaPanel.PanelType.UNITS, type));
                     }
+                } else if ((e.getClickCount() > 1 && !e.isConsumed())) {
+                        DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
+                        if (source.getSelectedIndex() == -1) {
+                            source.setSelectedIndex(source.locationToIndex(e.getPoint()));
+                        }
+                        for (Object type : source.getSelectedValues()) {
+                            if (add) {
+                                model.addElement(type);
+                            } else {
+                                model.removeElement(type);
+                            }
+                        }
+                        updateAllLists();
                 }
-                updateAllLists();
             }
         }
     }
