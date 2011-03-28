@@ -2739,7 +2739,10 @@ public final class GUI {
 
             // Draw the unit.
             // If unit is sentry, draw in grayscale
-            Image image = lib.getUnitImageIcon(unit, unit.getState() == UnitState.SENTRY).getImage();
+            boolean fade = (unit.getState() == UnitState.SENTRY)
+                || (unit.getTile() != null
+                    && !freeColClient.getMyPlayer().canSee(unit.getTile()));
+            Image image = lib.getUnitImageIcon(unit, fade).getImage();
             Point p = getUnitImagePositionInTile(image);
             g.drawImage(image, p.x, p.y, null);
 
