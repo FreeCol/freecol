@@ -1935,29 +1935,26 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         // 0.9.x compatibility code
-        if (settlement instanceof IndianSettlement) {
-            // work-around for bug #3065488
-            Unit missionary = ((IndianSettlement) settlement).getMissionary();
-            if (missionary != null) {
-                PlayerExploredTile pet = getPlayerExploredTile(missionary.getOwner());
-                if (pet != null) {
-                    pet.setMissionary(missionary);
-                }
-            }
-        } else if (settlement instanceof Colony) {
-            Colony colony = (Colony) settlement;
-            if (playerExploredTiles != null) {
-                for (Entry<Player, PlayerExploredTile> e
-                         : playerExploredTiles.entrySet()) {
-                    Player player = e.getKey();
-                    PlayerExploredTile pet = e.getValue();
-                    if (pet.getColonyUnitCount() > 0
-                        && (pet.getOwner() == null
-                            || pet.getOwningSettlement() == null)) {
-                        logger.warning("0.9.x workaround reading colony: "
-                                       + colony.getName());
-                        pet.setOwner(settlement.getOwner());
-                        pet.setOwningSettlement(settlement);
+        if (settlement != null && playerExploredTiles != null) {
+            for (Entry<Player, PlayerExploredTile> e
+                     : playerExploredTiles.entrySet()) {
+                Player player = e.getKey();
+                PlayerExploredTile pet = e.getValue();
+                if (pet != null && (pet.getOwner() == null
+                                    || pet.getOwningSettlement() == null)) {
+                    logger.warning("0.9.x workaround reading settlement: "
+                                   + settlement.getName());
+                    pet.setOwner(settlement.getOwner());
+                    pet.setOwningSettlement(settlement);
+                    if (settlement instanceof IndianSettlement) {
+                        // work-around for bug #3065488
+                        Unit missionary = ((IndianSettlement) settlement)
+                            .getMissionary();
+                        if (missionary != null) {
+                            pet.setMissionary(missionary);
+                        }
+                    } else if (settlement instanceof Colony) {
+                        Colony colony = (Colony) settlement;
                         pet.setColonyUnitCount(colony.getUnitCount());
                         pet.setColonyStockadeKey(colony.getStockadeKey());
                     }
@@ -1984,5 +1981,4 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public static String getXMLElementTagName() {
         return "tile";
     }
-
 }
