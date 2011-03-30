@@ -1040,7 +1040,7 @@ public final class InGameController implements NetworkConstants {
         gui.setActiveUnit(unit);
 
         Location destination;
-        for (;;) {
+        while (unit.getMovesLeft() > 0) {
             // Look for valid destinations
             if (unit.getTradeRoute() == null) {
                 if ((destination = unit.getDestination()) == null) {
@@ -1051,12 +1051,11 @@ public final class InGameController implements NetworkConstants {
                     break; // Not on the map
                 } else if (unit.getTile() == destination.getTile()) {
                     break; // Arrived at on-map destination
-                } else if (unit.getMovesLeft() <= 0) {
-                    break; // Out of moves
                 }
             } else {
                 destination = operateTradeRoute(unit, messages);
-                if (destination == null) break;
+                if (destination == null
+                    || unit.getTile() == destination.getTile()) break;
             }
 
             // Find a path to the destination.
