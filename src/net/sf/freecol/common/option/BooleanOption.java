@@ -39,6 +39,16 @@ public class BooleanOption extends AbstractOption<Boolean> {
     private boolean value;
 
     /**
+     * Creates a new <code>StringOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object
+     *            should be found in an {@link OptionGroup}.
+     */
+    public BooleanOption(String id) {
+        super(id);
+    }
+
+    /**
      * Creates a new <code>BooleanOption</code>.
      * @param in The <code>XMLStreamReader</code> containing the data.
      * @exception XMLStreamException if an error occurs

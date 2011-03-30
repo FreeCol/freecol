@@ -79,6 +79,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
@@ -858,6 +859,18 @@ public final class FreeColServer {
                 addStringOption("model.option.buildOnNativeLand",
                                 "model.option.buildOnNativeLand.never");
             }
+            if (!specification.hasOption("model.option.guiShowDemands")) {
+                // Introduced: SAVEGAME_VERSION == 11
+                addBooleanOption("model.option.guiShowDemands", true);
+            }
+            if (!specification.hasOption("model.option.guiShowGifts")) {
+                // Introduced: SAVEGAME_VERSION == 11
+                addBooleanOption("model.option.guiShowGifts", true);
+            }
+            if (!specification.hasOption("model.option.guiShowGoodsMovement")) {
+                // Introduced: SAVEGAME_VERSION == 11
+                addBooleanOption("model.option.guiShowGoodsMovement", false);
+            }
 
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null
@@ -882,6 +895,15 @@ public final class FreeColServer {
             throw new IOException(e.toString());
         } finally {
             xs.close();
+        }
+    }
+
+    private void addBooleanOption(String id, boolean defaultValue) {
+        Specification spec = game.getSpecification();
+        if (!spec.hasOption(id)) {
+            BooleanOption op = new BooleanOption(id);
+            op.setValue(defaultValue);
+            spec.addAbstractOption(op);
         }
     }
 
