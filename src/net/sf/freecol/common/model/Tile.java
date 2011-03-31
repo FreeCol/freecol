@@ -108,7 +108,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     private boolean connected = false;
 
     /**
-     * Describe moveToEurope here.
+     * Does this tile have an explicit moveToEurope state.  If null,
+     * just use the defaults (usually not, unless water and on map edge),
+     * otherwise use the explicit value provided here.
      */
     private Boolean moveToEurope;
 
@@ -599,12 +601,30 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Get the move-to-Europe state of the tile.
+     *
+     * @return The move-to-Europe state of the tile.
+     */
+    public Boolean getMoveToEurope() {
+        return moveToEurope;
+    }
+
+    /**
+     * Set the move-to-Europe state of the tile.
+     *
+     * @param moveToEurope The new move-to-Europe state for the tile.
+     */
+    public void setMoveToEurope(Boolean moveToEurope) {
+        this.moveToEurope = moveToEurope;
+    }
+
+    /**
      * Can a unit move to Europe from this tile?
      *
      * @return True if a unit can move to Europe from this tile.
      */
     public boolean canMoveToEurope() {
-        return (moveToEurope != null) ? moveToEurope
+        return (getMoveToEurope() != null) ? getMoveToEurope()
             : (type == null) ? false
             : (type.hasAbility("model.ability.moveToEurope")) ? true
             : isAdjacentToMapEdge() && type.isWater();
@@ -1673,15 +1693,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
 
-    public void toXMLMinimal(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("x", Integer.toString(x));
-        out.writeAttribute("y", Integer.toString(y));
-        out.writeAttribute("style", Integer.toString(style));
-        out.writeEndElement();
-    }
-
     /**
      * Finds the nearest settlement to this tile.
      *
@@ -1704,6 +1715,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
         return null;
+    }
+
+    /**
+     * Write a minimal version of the tile.  Useful if the player
+     * has not explored the tile.
+     *
+     * @param out The target stream.
+     */
+    public void toXMLMinimal(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute("x", Integer.toString(x));
+        out.writeAttribute("y", Integer.toString(y));
+        out.writeAttribute("style", Integer.toString(style));
+        if (moveToEurope != null) {
+            out.writeAttribute("moveToEurope", Boolean.toString(moveToEurope));
+        }
+        out.writeEndElement();
     }
 
     /**
@@ -1853,7 +1882,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         region = getFreeColGameObject(in, "region", Region.class, null);
         moveToEurope = (in.getAttributeValue(null, "moveToEurope") == null)
             ? null
-            : getAttribute(in, "moveToEurope", false);
+            : new Boolean(getAttribute(in, "moveToEurope", false));
 
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {

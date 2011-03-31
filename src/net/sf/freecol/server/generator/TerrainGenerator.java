@@ -152,6 +152,9 @@ public class TerrainGenerator {
                     Tile importTile = importGame.getMap().getTile(x, y);
                     if (importTile.isLand() == landMap[x][y]) {
                         t = new Tile(game, spec.getTileType(importTile.getType().getId()), x, y);
+                        if (importTile.getMoveToEurope() != null) {
+                            t.setMoveToEurope(importTile.getMoveToEurope());
+                        }
                         if (importTile.getTileItemContainer() != null) {
                             TileItemContainer container = new TileItemContainer(game, t);
                             // TileItemContainer copies every natural item
