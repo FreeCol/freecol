@@ -22,6 +22,7 @@ package net.sf.freecol.tools;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import javax.imageio.ImageIO;
 
@@ -47,8 +48,13 @@ public class MapConverter {
                     out.renameTo(in);
                     System.out.println("Renamed " + filename + " to " + newName + ".");
                     FreeColSavegameFile savegame = new FreeColSavegameFile(in);
-                    BufferedImage thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
-                    System.out.println("Loaded thumbnail.");
+                    BufferedImage thumbnail = null;
+                    try {
+                        thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
+                        System.out.println("Loaded thumbnail.");
+                    } catch (FileNotFoundException e) {
+                        System.out.println("No thumbnail present.");
+                    }
                     FreeColServer server = new FreeColServer(savegame, FreeCol.DEFAULT_PORT,
                                                              "mapTransformer", specification);
                     System.out.println("Started server.");
