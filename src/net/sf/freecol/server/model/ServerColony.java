@@ -613,6 +613,35 @@ public class ServerColony extends Colony implements ServerModelObject {
         return true;
     }
 
+    /**
+     * Evict the users from a tile used by this colony, due to military
+     * action from another unit.
+     *
+     * @param enemyUnit The <code>Unit</code> that has moved in.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csEvictUser(Unit enemyUnit, ChangeSet cs) {
+        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        Tile tile = enemyUnit.getTile();
+        ServerColonyTile ct = (ServerColonyTile) getColonyTile(tile);
+        Unit unit;
+        if (ct == null || (unit = ct.getUnit()) == null) return;
+        Tile centerTile = getTile();
+
+        unit.setState(UnitState.ACTIVE);
+        unit.setLocation(centerTile);
+        cs.add(See.only(serverPlayer), ct);
+        cs.add(See.perhaps(), centerTile);
+        cs.addMessage(See.only(serverPlayer),
+                      new ModelMessage(ModelMessage.MessageType.WARNING,
+                                       "model.colony.workerEvicted",
+                                       this, this)
+                      .addName("%colony%", getName())
+                      .addStringTemplate("%unit%", unit.getLabel())
+                      .addStringTemplate("%location%", tile.getLocationName())
+                      .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
+    }
+
 
     /**
      * Returns the tag name of the root element representing this object.

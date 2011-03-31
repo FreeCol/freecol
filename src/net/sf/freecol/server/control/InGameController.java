@@ -3372,10 +3372,27 @@ public final class InGameController extends Controller {
      */
     public Element changeState(ServerPlayer serverPlayer, Unit unit,
                                UnitState state) {
+        ChangeSet cs = new ChangeSet();
+
+        if (state == UnitState.FORTIFYING) {
+            Tile tile = unit.getTile();
+            ServerColony colony
+                = (tile.getOwningSettlement() instanceof Colony)
+                ? (ServerColony) tile.getOwningSettlement()
+                : null;
+            if (colony != null
+                && colony.getOwner() != unit.getOwner()
+                && colony.isTileInUse(tile)) {
+                colony.csEvictUser(unit, cs);
+            }
+        }
+
         unit.setState(state);
+        cs.add(See.perhaps(), unit.getTile());
 
         // Others might be able to see the unit.
-        return new ChangeSet().add(See.perhaps(), unit).build(serverPlayer);
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
     }
 
 
