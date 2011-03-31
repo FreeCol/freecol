@@ -29,36 +29,40 @@
   <xs:element name="indianSettlement">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element name="isVisited">
-	  <xs:complexType>
-	    <xs:attribute name="player" type="xs:string" use="required"/>
-	  </xs:complexType>
-	</xs:element>
-	<xs:element name="alarm">
-	  <xs:complexType>
-	    <xs:attribute name="player" type="xs:string" use="required"/>
-	    <xs:attribute name="value" type="xs:int" use="required"/>
-	  </xs:complexType>
-	</xs:element>
-	<xs:element ref="missionary"/>
-	<xs:element name="units">
-	  <xs:complexType>
-	    <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="unit"/>
-	    </xs:choice>
-	  </xs:complexType>
-	</xs:element>
-	<xs:element name="ownedUnits">
+        <xs:element name="isVisited">
+          <xs:complexType>
+            <xs:attribute name="player" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="alarm">
+          <xs:complexType>
+            <xs:attribute name="player" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:int" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="missionary"/>
+        <xs:element name="units">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element ref="unit"/>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ownedUnits">
           <xs:complexType>
             <xs:attribute name="ID" type="UnitId"/>
           </xs:complexType>
-	</xs:element>
-	<xs:element ref="goodsContainer"/>
+        </xs:element>
+        <xs:element ref="goodsContainer"/>
       </xs:choice>
 
       <xs:attribute name="ID" type="IndianSettlementId" use="required"/>
-      <xs:attribute name="tile" type="TileId" use="required"/>
+
+      <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="owner" type="PlayerId" use="required"/>
+      <xs:attribute name="tile" type="TileId" use="required"/>
+      <xs:attribute name="settlementType" type="xs:string"/>
+
       <xs:attribute name="convertProgress" type="xs:int" use="optional"
 		    default="0"/>
       <xs:attribute name="lastTribute" type="xs:int" use="optional"
@@ -72,7 +76,6 @@
       <xs:attribute name="wantedGoods0" type="GoodsTypeId" use="optional"/>
       <xs:attribute name="wantedGoods1" type="GoodsTypeId" use="optional"/>
       <xs:attribute name="wantedGoods2" type="GoodsTypeId" use="optional"/>
-      <xs:attribute name="name" type="xs:string" use="optional"/>
 
     </xs:complexType>
   </xs:element>
