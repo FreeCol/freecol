@@ -47,7 +47,8 @@ public class TilePopupAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         GUI gui = getFreeColClient().getGUI();
-        getFreeColClient().getCanvas().showTilePopup(gui.getSelectedTile(),
+        if (gui.getSelectedTile() != null)
+            getFreeColClient().getCanvas().showTilePopup(gui.getSelectedTile().getPosition(),
                                                      gui.getCursor().getCanvasX(),
                                                      gui.getCursor().getCanvasY());
     }

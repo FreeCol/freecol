@@ -267,7 +267,7 @@ public final class MapControls {
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
             if (gui.getSelectedTile() != null) {
-                Tile selectedTile = freeColClient.getGame().getMap().getTile(gui.getSelectedTile());
+                Tile selectedTile = gui.getSelectedTile();
                 if (infoPanel.getTile() != selectedTile) {
                     infoPanel.update(selectedTile);
                 }

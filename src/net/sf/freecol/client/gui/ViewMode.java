@@ -83,10 +83,10 @@ public class ViewMode {
     public boolean displayTileCursor(Tile tile) {
         if (currentMode == ViewMode.VIEW_TERRAIN_MODE) {
 
-            Position selectedTilePos = gui.getSelectedTile();
-            if (selectedTilePos == null || tile == null) {
+            Tile selectedTile = gui.getSelectedTile();
+            if (selectedTile == null || tile == null) {
                 return false;
-            } else if (selectedTilePos.equals(tile.getPosition())) {
+            } else if (selectedTile.equals(tile)) {
                 TerrainCursor cursor = gui.getCursor();
                 cursor.setTile(tile);
                 return true;

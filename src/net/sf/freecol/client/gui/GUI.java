@@ -228,7 +228,7 @@ public final class GUI {
 
     private final Vector<GUIMessage> messages;
 
-    private Map.Position selectedTile;
+    private Tile selectedTile;
     private Map.Position focus = null;
     private Unit activeUnit;
 
@@ -577,7 +577,6 @@ public final class GUI {
      * @param direction a <code>Direction</code> value
      */
     public void moveTileCursor(Direction direction){
-        Tile selectedTile = freeColClient.getGame().getMap().getTile(getSelectedTile());
         if(selectedTile != null){
             Tile newTile = selectedTile.getNeighbourOrNull(direction);
             if(newTile != null)
@@ -635,21 +634,23 @@ public final class GUI {
             return;
         }
 
-        Position oldPosition = this.selectedTile;
+        Tile oldTile = this.selectedTile;
 
-        this.selectedTile = selectedPosition;
-
+        if (selectedPosition == null)
+            selectedTile = null;
+        else
+            selectedTile = gameData.getMap().getTile(selectedPosition);
+        
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
-            if (activeUnitIsAt(selectedPosition)) {
-                Tile t = gameData.getMap().getTile(selectedPosition);
-                if (t != null && t.getSettlement() != null) {
+            if (activeUnitIsAt(selectedTile)) {
+                if (selectedTile != null && selectedTile.getSettlement() != null) {
                     Canvas canvas = freeColClient.getCanvas();
-                    Settlement s = t.getSettlement();
+                    Settlement s = selectedTile.getSettlement();
                     if (s instanceof Colony) {
                         if (s.getOwner().equals(freeColClient.getMyPlayer())) {
                             canvas.showColonyPanel((Colony) s);
                         } else if (FreeCol.isInDebugMode()) {
-                            debugForeignColony(t);
+                            debugForeignColony(selectedTile);
                         }
                     } else if (s instanceof IndianSettlement) {
                         canvas.showIndianSettlementPanel((IndianSettlement) s);
@@ -660,7 +661,7 @@ public final class GUI {
                 }
 
                 // else, just select a unit on the selected tile
-                Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedPosition));
+                Unit unitInFront = getUnitInFront(selectedTile);
                 if (unitInFront != null) {
                     setActiveUnit(unitInFront);
                     updateGotoPathForActiveUnit();
@@ -668,7 +669,7 @@ public final class GUI {
                     setFocus(selectedPosition);
                 }
             } else if (activeUnit.getTile() != null &&
-                    activeUnit.getTile().getPosition().equals(selectedPosition)) {
+                    activeUnit.getTile().equals(selectedTile)) {
                 // Clear goto order when unit is already active
                 if (clearGoToOrders && activeUnit.getDestination() != null) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
@@ -689,22 +690,20 @@ public final class GUI {
             || options.getBoolean(ClientOptions.ALWAYS_CENTER)) {
             setFocus(selectedPosition);
         } else {
-            if (oldPosition != null) {
-                Tile oldTilePosition = gameData.getMap().getTile(oldPosition);
-                freeColClient.getCanvas().refreshTile(oldTilePosition);
+            if (oldTile != null) {
+                freeColClient.getCanvas().refreshTile(oldTile);
             }
 
-            if (selectedPosition != null) {
-                Tile selectedTilePosition = gameData.getMap().getTile(selectedPosition);
-                freeColClient.getCanvas().refreshTile(selectedTilePosition);
+            if (selectedTile != null) {
+                freeColClient.getCanvas().refreshTile(selectedTile);
             }
         }
     }
 
-    private boolean activeUnitIsAt(Position selectedPosition) {
+    private boolean activeUnitIsAt(Tile selectedTile) {
         return activeUnit == null ||
             (activeUnit.getTile() != null &&
-             !activeUnit.getTile().getPosition().equals(selectedPosition));
+             !activeUnit.getTile().equals(selectedTile));
     }
 
     private void redrawMapControls() {
@@ -818,10 +817,10 @@ public final class GUI {
     /**
     * Gets the selected tile.
     *
-    * @return The <code>Position</code> of that tile.
-    * @see #setSelectedTile(Map.Position)
+    * @return The <code>Tile</code> selected.
+    * @see #setSelectedTile(Tile)
     */
-    public Position getSelectedTile() {
+    public Tile getSelectedTile() {
         return selectedTile;
     }
 
