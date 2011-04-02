@@ -284,7 +284,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                         public void run() {
                             try {
                                 int x, y;
-                                Tile t = map.getTile(gui.getFocus().getX(), gui.getFocus().getY());
+                                Tile t = gui.getFocus();
                                 if (t == null) {
                                     return;
                                 }
@@ -340,7 +340,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                                     x = t.getX();
                                 }
 
-                                gui.setFocus(new Map.Position(x,y));
+                                gui.setFocus(map.getTile(x,y));
                             } catch (Exception e) {
                                 logger.log(Level.WARNING, "Exception while scrolling!", e);
                             }

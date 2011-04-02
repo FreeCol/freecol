@@ -82,7 +82,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * If this option is enabled, the display will recenter in order to display
      * the active unit if it is not
-     * {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
+     * {@link net.sf.freecol.client.gui.GUI#onScreen(Tile)}).
      *
      * @see net.sf.freecol.client.gui.GUI
      */
@@ -90,7 +90,7 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * Selected tiles always gets centered if this option is enabled (even if
-     * the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
+     * the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Tile)}).
      *
      * @see net.sf.freecol.client.gui.GUI
      */

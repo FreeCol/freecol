@@ -46,7 +46,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -190,7 +189,7 @@ public final class MapEditorController {
                 game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
             }
             mapGenerator.createMap(game);
-            freeColClient.getGUI().setFocus(new Map.Position(1,1));
+            freeColClient.getGUI().setFocus(game.getMap().getTile(1,1));
             freeColClient.getActionManager().update();
             canvas.refresh();
         } catch (FreeColException e) {
@@ -315,7 +314,7 @@ public final class MapEditorController {
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             canvas.closeStatusPanel();
-                            freeColClient.getGUI().setFocus(new Map.Position(1,1));
+                            freeColClient.getGUI().setFocus(freeColClient.getGame().getMap().getTile(1,1));
                             freeColClient.getActionManager().update();
                             canvas.refresh();
                         }

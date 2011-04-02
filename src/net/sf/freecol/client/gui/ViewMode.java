@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map.Position;
 
 /**
  * This class controls the type of view currently being used

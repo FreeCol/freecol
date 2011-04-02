@@ -210,7 +210,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             
             // no option selected, just center map
             if(!isTransformActive){
-            	gui.setFocus(end);
+            	gui.setFocus(getMap().getTile(end));
             	return;
             }
             
@@ -446,7 +446,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                             public void run() {
                                 try {
                                     int x, y;
-                                    Tile t = map.getTile(gui.getFocus().getX(), gui.getFocus().getY());
+                                    Tile t = gui.getFocus();
                                     if (t == null) {
                                         return;
                                     }
@@ -502,7 +502,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                                         x = t.getX();
                                     }
 
-                                    gui.setFocus(new Map.Position(x,y));
+                                    gui.setFocus(getMap().getTile(x,y));
                                 } catch (Exception e) {
                                     logger.log(Level.WARNING, "Exception while scrolling!", e);
                                 }

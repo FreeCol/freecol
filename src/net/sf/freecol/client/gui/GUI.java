@@ -229,7 +229,7 @@ public final class GUI {
     private final Vector<GUIMessage> messages;
 
     private Tile selectedTile;
-    private Map.Position focus = null;
+    private Tile focus = null;
     private Unit activeUnit;
 
     /** A path to be displayed on the map. */
@@ -666,7 +666,7 @@ public final class GUI {
                     setActiveUnit(unitInFront);
                     updateGotoPathForActiveUnit();
                 } else {
-                    setFocus(selectedPosition);
+                    setFocus(selectedTile);
                 }
             } else if (activeUnit.getTile() != null &&
                     activeUnit.getTile().equals(selectedTile)) {
@@ -685,10 +685,10 @@ public final class GUI {
 
         // Check if the gui needs to reposition:
         ClientOptions options = freeColClient.getClientOptions();
-        if ((!onScreen(selectedPosition)
+        if ((!onScreen(selectedTile)
              && options.getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT))
             || options.getBoolean(ClientOptions.ALWAYS_CENTER)) {
-            setFocus(selectedPosition);
+            setFocus(selectedTile);
         } else {
             if (oldTile != null) {
                 freeColClient.getCanvas().refreshTile(oldTile);
@@ -745,7 +745,7 @@ public final class GUI {
             Tile t = gameData.getMap().getTile(selectedTile);
             if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony) {
                 if (t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
-                    setFocus(selectedTile);
+                    setFocus(t);
                     stopBlinking();
                     freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
                 }
@@ -837,12 +837,12 @@ public final class GUI {
 
 
     /**
-    * Sets the active unit. Invokes {@link #setSelectedTile(Map.Position)} if the
+    * Sets the active unit. Invokes {@link #setSelectedTile(Tile)} if the
     * selected tile is another tile than where the <code>activeUnit</code>
     * is located.
     *
     * @param activeUnit The new active unit.
-    * @see #setSelectedTile(Map.Position)
+    * @see #setSelectedTile(Tile)
     */
     public void setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
@@ -889,7 +889,7 @@ public final class GUI {
      */
     public void centerActiveUnit() {
         if (activeUnit != null && activeUnit.getTile() != null) {
-            setFocus(activeUnit.getTile().getPosition());
+            setFocus(activeUnit.getTile());
         }
     }
 
@@ -898,11 +898,13 @@ public final class GUI {
     * Gets the focus of the map. That is the center tile of the displayed
     * map.
     *
-    * @return The <code>Position</code> of the center tile of the
+    * @return The center tile of the
     *         displayed map
-    * @see #setFocus(Map.Position)
+    * @see #setFocus(Tile)
     */
-    public Position getFocus() {
+    public Tile getFocus() {
+        if (focus == null)
+            return null;
         return focus;
     }
 
@@ -914,7 +916,7 @@ public final class GUI {
     *             displayed map.
     * @see #getFocus
     */
-    public void setFocus(Position focus) {
+    public void setFocus(Tile focus) {
         this.focus = focus;
 
         forceReposition();
@@ -933,21 +935,21 @@ public final class GUI {
      *         if on the left, zero on failure.
      * @see #getFocus
      */
-    public int setOffsetFocus(Position tilePos) {
+    public int setOffsetFocus(Tile tile) {
         int where = 0;
-        if (tilePos != null) {
-            positionMap(tilePos);
+        if (tile != null) {
+            positionMap(tile);
             Map map = freeColClient.getGame().getMap();
             if (leftColumn == 0) {
                 where = -1; // At left edge already
             } else if (rightColumn == map.getWidth() - 1) {
                 where = 1; // At right edge already
             } else { // Move focus left 1/4 screen
-                int x = tilePos.getX() - (tilePos.getX() - leftColumn) / 2;
-                tilePos = new Position(x, tilePos.getY());
+                int x = tile.getX() - (tile.getX() - leftColumn) / 2;
+                tile = map.getTile(x, tile.getY());
                 where = 1;
             }
-            setFocus(tilePos);
+            setFocus(tile);
         }
         return where;
     }
@@ -959,7 +961,7 @@ public final class GUI {
     *             displayed map.
     * @see #getFocus
     */
-    public void setFocusImmediately(Position focus) {
+    public void setFocusImmediately(Tile focus) {
         this.focus = focus;
 
         forceReposition();
@@ -1165,7 +1167,8 @@ public final class GUI {
      * displayed at the center.
      */
     private void positionMap() {
-        if (focus != null) positionMap(focus);
+        if (focus != null) 
+            positionMap(focus);
     }
 
     /**
@@ -1174,7 +1177,7 @@ public final class GUI {
      *
      * @param pos The position to center at.
      */
-    private void positionMap(Position pos) {
+    private void positionMap(Tile pos) {
         Game gameData = freeColClient.getGame();
 
         int x = pos.getX(),
@@ -2852,14 +2855,14 @@ public final class GUI {
      * has been changed, whether they will be displayed on the screen
      * the next time it'll be redrawn).
      *
-     * @param position The position of the Tile in question.
+     * @param tileToCheck The position of the Tile in question.
      * @return <i>true</i> if the Tile will be drawn on the screen, <i>false</i>
      * otherwise.
      */
-    public boolean onScreen(Position position) {
+    public boolean onScreen(Tile tileToCheck) {
         if (bottomRow < 0) positionMap();
-        return position.getY() - 2 > topRow && position.getY() + 4 < bottomRow
-            && position.getX() - 1 > leftColumn && position.getX() + 2 < rightColumn;
+        return tileToCheck.getY() - 2 > topRow && tileToCheck.getY() + 4 < bottomRow
+            && tileToCheck.getX() - 1 > leftColumn && tileToCheck.getX() + 2 < rightColumn;
     }
 
 

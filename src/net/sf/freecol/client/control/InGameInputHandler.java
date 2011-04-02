@@ -1305,8 +1305,8 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doWork(Canvas canvas) {
             GUI gui = canvas.getGUI();
-            if (focus || !gui.onScreen(sourceTile.getPosition())) {
-                gui.setFocusImmediately(sourceTile.getPosition());
+            if (focus || !gui.onScreen(sourceTile)) {
+                gui.setFocusImmediately(sourceTile);
             }
             Animations.unitMove(canvas, unit, sourceTile, destinationTile);
             canvas.refresh();
@@ -1359,8 +1359,8 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doWork(Canvas canvas) {
             GUI gui = canvas.getGUI();
-            if (focus || !gui.onScreen(unit.getTile().getPosition())) {
-                gui.setFocusImmediately(unit.getTile().getPosition());
+            if (focus || !gui.onScreen(unit.getTile())) {
+                gui.setFocusImmediately(unit.getTile());
             }
             Animations.unitAttack(canvas, unit, defender, success);
             canvas.refresh();

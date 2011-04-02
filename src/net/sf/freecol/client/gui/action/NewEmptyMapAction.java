@@ -26,7 +26,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.server.generator.MapGenerator;
 
 /**
@@ -73,7 +72,7 @@ public class NewEmptyMapAction extends MapboardAction {
         MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
         mapGenerator.createEmptyMap(game, new boolean[size.width][size.height]);
 
-        freeColClient.getGUI().setFocus(new Map.Position(1,1));
+        freeColClient.getGUI().setFocus(game.getMap().getTile(1,1));
         freeColClient.getActionManager().update();
         canvas.refresh();
     }

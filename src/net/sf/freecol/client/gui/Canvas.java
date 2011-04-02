@@ -599,7 +599,7 @@ public final class Canvas extends JDesktopPane {
      */
     private PopupPosition getPopupPosition(Tile tile) {
         if (tile == null) return PopupPosition.CENTERED;
-        int where = gui.setOffsetFocus(tile.getPosition());
+        int where = gui.setOffsetFocus(tile);
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;

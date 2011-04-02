@@ -111,7 +111,7 @@ public final class InfoPanel extends FreeColPanel {
                     GUI gui = getClient().getGUI();
                     Unit activeUnit = gui.getActiveUnit();
                     if (activeUnit != null && activeUnit.getTile() != null) {
-                        gui.setFocus(activeUnit.getTile().getPosition());
+                        gui.setFocus(activeUnit.getTile());
                     }
                 }
             });

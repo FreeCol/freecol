@@ -67,7 +67,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
@@ -5049,7 +5048,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        freeColClient.getGUI().setFocus(unitTile.getPosition());
+        freeColClient.getGUI().setFocus(unitTile);
     }
 
     /**

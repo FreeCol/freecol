@@ -159,7 +159,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
      */
     public void valueChanged(ListSelectionEvent e) {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
-        getCanvas().getGUI().setFocus(settlement.getTile().getPosition());
+        getCanvas().getGUI().setFocus(settlement.getTile());
     }
 
     private class SettlementRenderer extends FreeColComboBoxRenderer {
