@@ -70,6 +70,9 @@ public class DefaultNumberRule extends Number {
         return rules.get(category);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Category getCategory(double input) {
 
 	for (Category number : Category.values()) {
@@ -79,23 +82,6 @@ public class DefaultNumberRule extends Number {
 	    }
 	}
 	return Category.other;
-    }
-
-    public int getIndex(double input) {
-
-	int index = 0;
-	for (Category number : Category.values()) {
-	    Rule r = rules.get(number);
-	    if (r != null) {
-		if (r.matches(input)) {
-		    return index;
-		} else {
-		    index++;
-		}
-	    }
-	}
-	return index;
-
     }
 
 }

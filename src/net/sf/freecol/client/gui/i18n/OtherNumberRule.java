@@ -29,11 +29,4 @@ public class OtherNumberRule extends Number {
 	return Category.other;
     }
 
-    public int getIndex(String input) {
-        return 0;
-    }
-
-    public int getIndex(double input) {
-	return 0;
-    }
 }

@@ -25,8 +25,8 @@ public interface Selector {
      * Return the index of the rule this input matches.
      *
      * @param input a <code>String</code> value
-     * @return an <code>int</code> value
+     * @return a <code>String</code> value
      */
-    public int getIndex(String input);
+    public String getKey(String input);
 
 }

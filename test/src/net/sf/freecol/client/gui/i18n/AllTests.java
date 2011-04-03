@@ -29,6 +29,7 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui.i18n");
         //$JUnit-BEGIN$
+        suite.addTestSuite(CLDRTest.class);
         suite.addTestSuite(MessagesTest.class);
         //$JUnit-END$
         return suite;

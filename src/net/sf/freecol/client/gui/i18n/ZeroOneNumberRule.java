@@ -20,8 +20,8 @@
 package net.sf.freecol.client.gui.i18n;
 
 /**
- * Number optimized for languages that distinguish place the numbers 0
- * and 1 in category one, and all others in category other.
+ * Number optimized for languages that place the numbers 0 and 1 in
+ * category one, and all others in category other.
  */
 public class ZeroOneNumberRule extends Number {
 
@@ -33,11 +33,4 @@ public class ZeroOneNumberRule extends Number {
 	}
     }
 
-    public int getIndex(double input) {
-	if (input == 0 || input == 1) {
-	    return 0;
-	} else {
-	    return 1;
-	}
-    }
 }

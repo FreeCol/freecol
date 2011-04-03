@@ -33,11 +33,4 @@ public class PluralNumberRule extends Number {
 	}
     }
 
-    public int getIndex(double input) {
-	if (input == 1) {
-	    return 0;
-	} else {
-	    return 1;
-	}
-    }
 }

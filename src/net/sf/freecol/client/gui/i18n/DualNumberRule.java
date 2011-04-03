@@ -26,6 +26,9 @@ package net.sf.freecol.client.gui.i18n;
  */
 public class DualNumberRule extends Number {
 
+    /**
+     * {@inheritDoc}
+     */
     public Category getCategory(double input) {
 	if (input == 1) {
 	    return Category.one;
@@ -36,13 +39,4 @@ public class DualNumberRule extends Number {
 	}
     }
 
-    public int getIndex(double input) {
-	if (input == 1) {
-	    return 0;
-	} else if (input == 2) {
-	    return 1;
-	} else {
-	    return 2;
-	}
-    }
 }

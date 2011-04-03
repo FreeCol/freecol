@@ -37,20 +37,21 @@ public abstract class Number implements Selector {
      */
     public abstract Category getCategory(double input);
 
-
-    public int getIndex(String input) {
-        return getIndex(Double.parseDouble(input));
+    /**
+     * {@inheritDoc}
+     */
+    public String getKey(String input) {
+        return getKey(Double.parseDouble(input));
     }
 
     /**
-     * Return the index of the rule this input matches. The index
-     * differs from the category in the following way: Given a
-     * language that distinguishes one, two and other, the index for
-     * the number 1 will be zero and the index for the number 2 will
-     * be 1 because there is no rule for category zero.
+     * Return the key of the rule this input matches. The key is the
+     * string representation of the Category.
      *
      * @param input a <code>double</code> value
-     * @return an <code>int</code> value
+     * @return a <code>String</code> value
      */
-    public abstract int getIndex(double input);
+    public String getKey(double input) {
+        return getCategory(input).toString();
+    }
 }

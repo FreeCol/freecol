@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -172,42 +173,117 @@ public class Messages {
     }
 
     public static String replaceChoices(String input) {
-        int openChoice = input.indexOf("{{");
-        int closeChoice = openChoice;
-        if (openChoice < 0) {
-            // nothing to do
-            return input;
-        }
+        return replaceChoices(input, null);
+    }
 
-        int index = 0;
+    public static String replaceChoices(String input, StringTemplate template) {
+        int openChoice = 0;
+        int closeChoice = 0;
+        int highWaterMark = 0;
         StringBuilder result = new StringBuilder();
-        while (openChoice >= 0) {
+        while ((openChoice = input.indexOf("{{", highWaterMark)) >= 0) {
+            result.append(input.substring(highWaterMark, openChoice));
             closeChoice = input.indexOf("}}", openChoice + 2);
-            result.append(input.substring(index, openChoice));
-            String[] choice = input.substring(openChoice + 2, closeChoice).split("\\|");
-            int lastIndex = choice.length - 1;
-            if (choice[0].startsWith("plural")
-                || choice[0].startsWith("PLURAL")) {
-                // found tag
-                int colonIndex = choice[0].indexOf(":", 6);
-                int choiceIndex;
-                if (colonIndex > 0) {
-                    int number = Integer.parseInt(choice[0].substring(colonIndex + 1));
-                    number = grammaticalNumber.getIndex(number);
-                    // add one to offset the tag
-                    choiceIndex = Math.min(number + 1, lastIndex);
-                } else {
-                    choiceIndex = lastIndex;
-                }
-                result.append(choice[choiceIndex]);
-            } else {
-                result.append(choice[lastIndex]);
+            if (closeChoice < 0) {
+                // no closing brackets found
+                logger.warning("Mismatched brackets: " + input);
+                return result.toString();
             }
-            index = closeChoice + 2;
-            openChoice = input.indexOf("{{", index);
+            highWaterMark = closeChoice + 2;
+            int colonIndex = input.indexOf(":", openChoice + 2);
+            if (colonIndex < 0 || colonIndex > closeChoice) {
+                logger.warning("No tag found: " + input);
+                continue;
+            }
+            String tag = input.substring(openChoice + 2, colonIndex);
+            int pipeIndex = input.indexOf("|", colonIndex + 1);
+            if (pipeIndex < 0 || pipeIndex > closeChoice) {
+                logger.warning("No choices found: " + input);
+                continue;
+            }
+            String selector = input.substring(colonIndex + 1, pipeIndex);
+            if (selector.startsWith("%") && selector.endsWith("%")) {
+                if (template == null) {
+                    selector = "default";
+                } else {
+                    StringTemplate replacement = template.getReplacement(selector);
+                    if (replacement == null) {
+                        logger.warning("Failed to find replacement for " + selector);
+                        continue;
+                    } else {
+                        selector = message(replacement);
+                    }
+                    if ("plural".equalsIgnoreCase(tag)) {
+                        selector = grammaticalNumber.getKey(selector);
+                    }
+                }
+            } else if ("plural".equalsIgnoreCase(tag)) {
+                selector = grammaticalNumber.getKey(selector);
+            }
+            int keyIndex = input.indexOf(selector, pipeIndex + 1);
+            if (keyIndex < 0 || keyIndex > closeChoice) {
+                // key not found, choice might be a key itself
+                String otherKey = input.substring(pipeIndex + 1, closeChoice);
+                if (otherKey.startsWith("%") && otherKey.endsWith("%")
+                    && template != null) {
+                    StringTemplate replacement = template.getReplacement(otherKey);
+                    if (replacement == null) {
+                        logger.warning("Failed to find replacement for " + otherKey);
+                        continue;
+                    } else if (replacement.getTemplateType() == TemplateType.KEY) {
+                        otherKey = messageBundle.get(replacement.getId());
+                        keyIndex = otherKey.indexOf(selector);
+                        if (keyIndex < 0) {
+                            logger.warning("Failed to find key " + selector + " in replacement "
+                                           + replacement.getId());
+                            continue;
+                        } else {
+                            result.append(getChoice(otherKey, selector));
+                        }
+                    } else {
+                        logger.warning("Choice substitution attempted, but template type was "
+                                       + replacement.getTemplateType());
+                        continue;
+                    }
+                } else if (containsKey(otherKey)) {
+                    otherKey = getChoice(messageBundle.get(otherKey), selector);
+                    result.append(otherKey);
+                } else {
+                    logger.warning("Unknown key or untagged choice: " + otherKey);
+                    continue;
+                }
+            } else {
+                int start = keyIndex + selector.length() + 1;
+                int replacementIndex = input.indexOf("|", start);
+                if (replacementIndex < 0 || replacementIndex > closeChoice) {
+                    // must be last choice
+                    result.append(input.substring(start, closeChoice));
+                } else {
+                    result.append(input.substring(start, replacementIndex));
+                }
+            }
         }
-        result.append(input.substring(index));
+        result.append(input.substring(highWaterMark));
         return result.toString();
+    }
+
+    private static String getChoice(String input, String key) {
+        int keyIndex = input.indexOf(key);
+        if (keyIndex < 0) {
+            return null;
+        } else {
+            int start = keyIndex + key.length() + 1;
+            int end = input.indexOf("|", start);
+            if (end < 0) {
+                end = input.indexOf("}}", start);
+                if (end < 0) {
+                    logger.warning("Failed to find end of choice for key " + key
+                                   + " in input " + input);
+                    return null;
+                }
+            }
+            return input.substring(start, end);
+        }
     }
 
     /**
@@ -239,11 +315,12 @@ public class Messages {
             } else if (template.getDefaultId() != null) {
                 result = messageBundle.get(template.getDefaultId());
             }
+            result = replaceChoices(result, template);
 	    for (int index = 0; index < template.getKeys().size(); index++) {
                 result = result.replace(template.getKeys().get(index),
                                         message(template.getReplacements().get(index)));
 	    }
-	    return replaceChoices(result);
+	    return result;
         case KEY:
             String key = messageBundle.get(template.getId());
             if (key == null) {

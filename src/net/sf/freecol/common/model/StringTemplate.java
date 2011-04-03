@@ -98,7 +98,7 @@ public class StringTemplate extends FreeColObject {
         switch (templateType) {
         case TEMPLATE:
             keys = new ArrayList<String>();
-        case LABEL:            
+        case LABEL:
             replacements = new ArrayList<StringTemplate>();
         }
     }
@@ -168,6 +168,28 @@ public class StringTemplate extends FreeColObject {
     public final List<StringTemplate> getReplacements() {
         return replacements;
     }
+
+
+    /**
+     * Return the replacement value for a given key, or null if there
+     * is none.
+     *
+     * @param key a <code>String</code> value
+     * @return a <code>String</code> value
+     */
+    public final StringTemplate getReplacement(String key) {
+        for (int index = 0; index < keys.size(); index++) {
+            if (key.equals(keys.get(index))) {
+                if (replacements.size() > index) {
+                    return replacements.get(index);
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Add a new key and replacement to the StringTemplate. This is
@@ -287,7 +309,7 @@ public class StringTemplate extends FreeColObject {
         } else {
 	    throw new IllegalArgumentException("Cannot add a StringTemplate to StringTemplate type "
                                                + templateType.toString());
-        }            
+        }
 	return this;
     }
 
@@ -447,7 +469,7 @@ public class StringTemplate extends FreeColObject {
         switch (templateType) {
         case TEMPLATE:
             keys = new ArrayList<String>();
-        case LABEL:            
+        case LABEL:
             replacements = new ArrayList<StringTemplate>();
         }
     }

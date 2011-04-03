@@ -166,26 +166,41 @@ public class MessagesTest extends FreeColTestCase {
 
     }
 
-    public void testReplaceChoices() {
+    public void testReplaceGarbage() {
+        // random garbage enclosed in double brackets should be
+        // removed
+        assertEquals("abc   def", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
+    }
 
+    public void testReplaceNumber() {
+
+        double[] numbers = new double[] {
+            -1.3, -1, -0.5, 0, 0.33, 1, 1.2, 2, 2.7, 3, 3.4, 11, 13, 27, 100
+        };
+        String choices = "|zero=zero|one=one|two=two|few=few|many=many|other=other}}|xyz";
         // default Number is Other
-        assertEquals("abc   xyzdef567", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
-        assertEquals("abc1abc", Messages.replaceChoices("abc{{plural:0|1|12|123}}abc"));
-        assertEquals("abc1", Messages.replaceChoices("abc{{plural:34|1|12|123}}"));
-
+        for (double d : numbers) {
+            assertEquals("abcother|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
+        }
         // apply English rules
         Messages.setGrammaticalNumber(NumberRules.PLURAL_NUMBER_RULE);
-        assertEquals("abc   xyzdef567", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
-        assertEquals("abc12abc", Messages.replaceChoices("abc{{plural:0|1|12|123}}abc"));
-        assertEquals("abc1abc", Messages.replaceChoices("abc{{plural:1|1|12|123}}abc"));
-        assertEquals("abc12abc", Messages.replaceChoices("abc{{plural:7|1|12|123}}abc"));
-        assertEquals("abc12", Messages.replaceChoices("abc{{plural:34|1|12|123}}"));
+        for (double d : numbers) {
+            if (d == 1) {
+                assertEquals("abcone|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
+            } else {
+                assertEquals("abcother|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
+            }
+        }
 
-        String unit = "{{piece of artillery|pieces of artillery|artillery}}";
-        String mapping = "some.key="
-            + "This is {{plural:%number%|a test|one of several tests|not much of a test}}.\n"
+    }
+
+    public void testReplaceChoicesPlural() {
+
+        String mapping = "some.key=This is {{plural:%number%|one=a test|other=one of several tests"
+            + "|default=not much of a test}}.\n"
             + "unit.template=%number% {{plural:%number%|%unit%}}\n"
-            + "unit.key=" + unit;
+            + "unit.key={{plural:%number%|one=piece of artillery|other=pieces of artillery|"
+            + "default=artillery}}";
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
         Messages.loadResources(stream);
 
@@ -201,6 +216,32 @@ public class MessagesTest extends FreeColTestCase {
             .add("%unit%", "unit.key");
 
         assertEquals("1 piece of artillery", Messages.message(template));
+
+    }
+
+    public void testReplaceChoicesGrammar() {
+        String mapping = "key.france={{randomTag:%randomKey%|country=France|people=French|"
+            + "default=French people}}\n"
+            + "greeting1=The {{otherRandomTag:default|%nation%}} are happy to see you.\n"
+            + "greeting2=The {{otherRandomTag:people|%nation%}} are happy to see you.\n";
+
+        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
+        Messages.loadResources(stream);
+
+        assertEquals("French people", Messages.message("key.france"));
+
+        StringTemplate t1 = StringTemplate.template("key.france")
+            .add("%randomKey%", "country");
+        assertEquals("France", Messages.message(t1));
+
+        StringTemplate t2 = StringTemplate.template("greeting1")
+            .add("%nation%", "key.france");
+        assertEquals("The French people are happy to see you.", Messages.message(t2));
+
+        StringTemplate t3 = StringTemplate.template("greeting2")
+            .add("%nation%", "key.france");
+        assertEquals("The French are happy to see you.", Messages.message(t3));
+
 
     }
 
