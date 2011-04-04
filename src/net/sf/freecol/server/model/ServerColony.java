@@ -152,11 +152,13 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         boolean tileDirty = false;
         boolean colonyDirty = false;
+        boolean newUnitBorn = false;
         List<FreeColGameObject> updates = new ArrayList<FreeColGameObject>();
         GoodsContainer container = getGoodsContainer();
         container.saveState();
 
-        java.util.Map<Object, ProductionInfo> info = getProductionAndConsumption();
+        java.util.Map<Object, ProductionInfo> info
+            = getProductionAndConsumption();
         TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
         for (Entry<Object, ProductionInfo> entry : info.entrySet()) {
             ProductionInfo productionInfo = entry.getValue();
@@ -187,7 +189,10 @@ public class ServerColony extends Colony implements ServerModelObject {
                 BuildQueue queue = (BuildQueue) entry.getKey();
                 BuildableType buildable = queue.getCurrentlyBuilding();
                 if (buildable instanceof UnitType) {
-                    tileDirty = csBuildUnit(queue, random, cs);
+                    Unit newUnit = csBuildUnit(queue, random, cs);
+                    if (newUnit.hasAbility("model.ability.bornInColony")) {
+                        newUnitBorn = true;
+                    }
                 } else if (buildable instanceof BuildingType) {
                     colonyDirty = buildBuilding(queue, cs, updates);
                 } else {
@@ -250,7 +255,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             int storedFood = getGoodsCount(spec.getPrimaryFoodType());
             int netFood = netProduction.getCount(spec.getPrimaryFoodType());
             int turns;
-            if (netFood < 0 && (turns = storedFood / -netFood) <= 3) {
+            if (!newUnitBorn && netFood < 0
+                && (turns = storedFood / -netFood) <= 3) {
                 cs.addMessage(See.only(owner),
                               new ModelMessage(ModelMessage.MessageType.WARNING,
                                                "model.colony.famineFeared",
@@ -400,23 +406,23 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @param buildQueue The <code>BuildQueue</code> to find the unit in.
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return True if the unit was built.
+     * @return The unit that was built.
      */
-    private boolean csBuildUnit(BuildQueue buildQueue, Random random,
-                                ChangeSet cs) {
+    private Unit csBuildUnit(BuildQueue buildQueue, Random random,
+                             ChangeSet cs) {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                    (UnitType) buildQueue.getCurrentlyBuilding(),
                                    UnitState.ACTIVE);
-        if (unit == null) return false;
+        if (unit == null) return null;
         if (unit.hasAbility("model.ability.bornInColony")) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                            "model.colony.newColonist",
                                            this, unit)
                           .addName("%colony%", getName()));
-                if (buildQueue.size() > 1) {
-                    Collections.shuffle(buildQueue.getValues(), random);
-                }
+            if (buildQueue.size() > 1) {
+                Collections.shuffle(buildQueue.getValues(), random);
+            }
         } else {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
@@ -429,7 +435,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         logger.info("New unit created in " + getName() + ": " + unit);
-        return true;
+        return unit;
     }
 
     /**
