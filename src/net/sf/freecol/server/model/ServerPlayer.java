@@ -914,7 +914,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     logger.finest("Stance change " + otherPlayer.getName()
                                   + " " + old.toString()
                                   + " -> " + stance.toString()
-                                  + " wrt " + getName());
+                                  + " wrt " + getName()
+                                  + " (symmetric)");
                 }
                 change = true;
             } catch (IllegalStateException e) { // Catch illegal transitions

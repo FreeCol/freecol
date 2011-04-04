@@ -661,8 +661,7 @@ public final class InGameController extends Controller {
             if (enemies.isEmpty()) break;
             Player enemy = Utils.getRandomMember(logger, "Choose enemy",
                                                  enemies, random);
-            serverPlayer.csChangeStance(Stance.WAR, enemy, enemy.isEuropean(),
-                                        cs);
+            serverPlayer.csChangeStance(Stance.WAR, enemy, true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    new MonarchActionMessage(enemy));
             break;

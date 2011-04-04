@@ -811,7 +811,6 @@ public class ChangeSet {
         @Override
         public List<Change> consequences(ServerPlayer serverPlayer) {
             List<Change> changes = new ArrayList<Change>();
-            if (serverPlayer.isAI()) return changes;
             String sta = stance.toString();
             ModelMessage m = ((ServerPlayer) first == serverPlayer)
                 ? new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
