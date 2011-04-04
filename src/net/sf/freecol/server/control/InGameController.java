@@ -587,14 +587,9 @@ public final class InGameController extends Controller {
                             "Choose monarch action", random,
                             monarch.getActionChoices());
                 }
-                // TODO: monarchAction starts its own threads.
-                // The simple cases do not need them and could just
-                // use ChangeSets.  The harder cases (tax raise,
-                // mercenary offer) will need work
-                // to remove the threads.
                 if (action != null && monarch.actionIsValid(action)) {
                     logger.finest("Monarch action: " + action);
-                    monarchAction(player, action);
+                    csMonarchAction(player, action, cs);
                 }
             }
 
@@ -614,17 +609,20 @@ public final class InGameController extends Controller {
 
     /**
      * Performs a monarchs action.
+     * TODO: This function starts its own threads for actions that
+     * need user interaction (tax raise, mercenary offer).  Protocol
+     * work will be needed to remove the threads.
      *
      * @param serverPlayer The <code>ServerPlayer</code> being acted upon.
      * @param action The monarch action.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    private void monarchAction(final ServerPlayer serverPlayer,
-                               final MonarchAction action) {
+    private void csMonarchAction(final ServerPlayer serverPlayer,
+                                 final MonarchAction action, ChangeSet cs) {
         final Monarch monarch = serverPlayer.getMonarch();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
 
-        Thread t = null;
         switch (action) {
         case NO_ACTION:
             break;
@@ -632,129 +630,68 @@ public final class InGameController extends Controller {
             final int taxRaise = monarch.raiseTax(random);
             final Goods goods = serverPlayer.getMostValuableGoods();
             if (goods == null) break;
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        raiseTax(serverPlayer, taxRaise, goods);
-                    }
-                };
+            new Thread(FreeCol.SERVER_THREAD + action.toString()) {
+                public void run() {
+                    monarchRaiseTax(serverPlayer, taxRaise, goods);
+                }
+            }.start();
             break;
         case LOWER_TAX:
-            final int taxLower = monarch.lowerTax(random);
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        ChangeSet cs = new ChangeSet();
-                        serverPlayer.setTax(taxLower);
-                        cs.addPartial(See.only(serverPlayer),
-                                      serverPlayer, "tax");
-                        cs.add(See.only(serverPlayer),
-                               ChangePriority.CHANGE_EARLY,
-                               new MonarchActionMessage(taxLower));
-                        sendElement(serverPlayer, cs);
-                    }
-                };
+            int taxLower = monarch.lowerTax(random);
+            serverPlayer.setTax(taxLower);
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "tax");
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
+                   new MonarchActionMessage(taxLower));
             break;
         case WAIVE_TAX:
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        ChangeSet cs = new ChangeSet();
-                        cs.add(See.only(serverPlayer),
-                               ChangePriority.CHANGE_NORMAL,
-                               new MonarchActionMessage(action));
-                        sendElement(serverPlayer, cs);
-                    }
-                };
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                   new MonarchActionMessage(action));
             break;
         case ADD_TO_REF:
             final List<AbstractUnit> refAdditions
                 = monarch.chooseForREF(random);
             if (refAdditions.isEmpty()) break;
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        ChangeSet cs = new ChangeSet();
-                        monarch.addToREF(refAdditions);
-                        cs.add(See.only(serverPlayer), monarch);
-                        cs.add(See.only(serverPlayer),
-                               ChangePriority.CHANGE_NORMAL,
-                               new MonarchActionMessage(action, refAdditions));
-                        sendElement(serverPlayer, cs);
-                    }
-                };
+            monarch.addToREF(refAdditions);
+            cs.add(See.only(serverPlayer), monarch);
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                   new MonarchActionMessage(action, refAdditions));
             break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
             if (enemies.isEmpty()) break;
-            final Player enemy = Utils.getRandomMember(logger, "Choose enemy",
-                                                       enemies, random);
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        ChangeSet cs = new ChangeSet();
-                        serverPlayer.csChangeStance(Stance.WAR, enemy,
-                                                    enemy.isEuropean(), cs);
-                        cs.add(See.only(serverPlayer),
-                               ChangePriority.CHANGE_EARLY,
-                               new MonarchActionMessage(enemy));
-                        sendToAll(cs);
-                    }
-                };
+            Player enemy = Utils.getRandomMember(logger, "Choose enemy",
+                                                 enemies, random);
+            serverPlayer.csChangeStance(Stance.WAR, enemy, enemy.isEuropean(),
+                                        cs);
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
+                   new MonarchActionMessage(enemy));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:
-            final boolean sea = action == MonarchAction.SUPPORT_SEA;
-            final List<AbstractUnit> support = monarch.getSupport(random, sea);
+            boolean sea = action == MonarchAction.SUPPORT_SEA;
+            List<AbstractUnit> support = monarch.getSupport(random, sea);
             if (support.isEmpty()) break;
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        ChangeSet cs = new ChangeSet();
-                        serverPlayer.createUnits(support);
-                        cs.add(See.only(serverPlayer),
-                               serverPlayer.getEurope());
-                        if (sea) {
-                            cs.addPartial(See.only(serverPlayer),
-                                          monarch, "supportSea");
-                        }
-                        cs.add(See.only(serverPlayer),
-                               ChangePriority.CHANGE_NORMAL,
-                               new MonarchActionMessage(action, support));
-                        sendElement(serverPlayer, cs);
-                    }
-                };
+            serverPlayer.createUnits(support);
+            cs.add(See.only(serverPlayer), serverPlayer.getEurope());
+            if (sea) {
+                cs.addPartial(See.only(serverPlayer), monarch, "supportSea");
+            }
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                   new MonarchActionMessage(action, support));
             break;
         case OFFER_MERCENARIES:
             final List<AbstractUnit> mercenaries
                 = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
-            t = new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                    public void run() {
-                        ChangeSet cs = new ChangeSet();
-                        int price = 0;
-                        for (AbstractUnit au : mercenaries) {
-                            price += serverPlayer.getPrice(au);
-                        }
-                        if (!serverPlayer.checkGold(price)) {
-                            price = serverPlayer.getGold();
-                        }
-                        cs.add(See.only(serverPlayer),
-                               ChangePriority.CHANGE_NORMAL,
-                               new MonarchActionMessage(price, mercenaries));
-                        Element reply = askElement(serverPlayer, cs);
-                        if (Boolean.valueOf(reply.getAttribute("accepted"))
-                            .booleanValue()) {
-                            cs = new ChangeSet();
-                            serverPlayer.createUnits(mercenaries);
-                            cs.add(See.only(serverPlayer),
-                                   serverPlayer.getEurope());
-                            serverPlayer.modifyGold(-price);
-                            cs.addPartial(See.only(serverPlayer),
-                                          serverPlayer, "gold");
-                            sendElement(serverPlayer, cs);
-                        }
-                    }
-                };
+            new Thread(FreeCol.SERVER_THREAD + action.toString()) {
+                public void run() {
+                    monarchOfferMercenaries(serverPlayer, mercenaries);
+                }
+            }.start();
             break;
         default:
             logger.warning("Bogus action: " + action);
             break;
         }
-        if (t != null) t.start();
     }
 
     /**
@@ -764,7 +701,8 @@ public final class InGameController extends Controller {
      * @param tax The new tax rate.
      * @param goods The <code>Goods</code> to use in case of a tea party.
      */
-    private void raiseTax(ServerPlayer serverPlayer, int tax, Goods goods) {
+    private void monarchRaiseTax(ServerPlayer serverPlayer, int tax,
+                                 Goods goods) {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         ChangeSet cs = new ChangeSet();
@@ -839,6 +777,36 @@ public final class InGameController extends Controller {
                     .add("%goods%", goods.getNameKey()));
         }
         sendElement(serverPlayer, cs);
+    }
+
+    /**
+     * Offer a player some mercenaries.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to offer to.
+     * @param mercenaries A list of <code>Unit</code>s to offer.
+     */
+    private void monarchOfferMercenaries(ServerPlayer serverPlayer,
+                                         List<AbstractUnit> mercenaries) {
+        ChangeSet cs = new ChangeSet();
+        int price = 0;
+        for (AbstractUnit au : mercenaries) {
+            price += serverPlayer.getPrice(au);
+        }
+        if (!serverPlayer.checkGold(price)) {
+            price = serverPlayer.getGold();
+        }
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+               new MonarchActionMessage(price, mercenaries));
+        Element reply = askElement(serverPlayer, cs);
+        if (Boolean.valueOf(reply.getAttribute("accepted")).booleanValue()) {
+            cs = new ChangeSet();
+            serverPlayer.createUnits(mercenaries);
+            cs.add(See.only(serverPlayer),
+                   serverPlayer.getEurope());
+            serverPlayer.modifyGold(-price);
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            sendElement(serverPlayer, cs);
+        }
     }
 
 
