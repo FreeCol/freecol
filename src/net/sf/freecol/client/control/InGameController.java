@@ -316,6 +316,21 @@ public final class InGameController implements NetworkConstants {
         freeColClient.updateMenuBar();
     }
 
+    /**
+     * Require that it is this client's player's turn.
+     * Put up the notYourTurn message if not.
+     *
+     * @return True if it is our turn.
+     */
+    private boolean requireOurTurn() {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * Sends the specified message to the server and returns the reply,
@@ -1048,13 +1063,8 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to move.
      */
     public void moveToDestination(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
+        if (!requireOurTurn()) return;
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
         List<ModelMessage> messages = new ArrayList<ModelMessage>();
         GUI gui = freeColClient.getGUI();
         gui.setActiveUnit(unit);
@@ -1086,7 +1096,7 @@ public final class InGameController implements NetworkConstants {
             // No path, give up.
             if (path == null) {
                 StringTemplate dest = destination.getLocationNameFor(player);
-                canvas.showInformationMessage(unit,
+                freeColClient.getCanvas().showInformationMessage(unit,
                     StringTemplate.template("selectDestination.failed")
                     .addStringTemplate("%destination%", dest));
                 break;
@@ -1120,12 +1130,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage(null, "notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         Unit unit = freeColClient.getGUI().getActiveUnit();
         if (unit != null) {
@@ -1135,8 +1140,9 @@ public final class InGameController implements NetworkConstants {
             // Centers unit if option "always center" is active.  A
             // few checks need to be remade, as the unit may no longer
             // exist or no longer be on the map.
-            boolean alwaysCenter = freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
-            if (alwaysCenter && unit.getTile() != null) {
+            boolean alwaysCenter = freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.ALWAYS_CENTER);
+            if (alwaysCenter && !unit.isDisposed() && unit.getTile() != null) {
                 centerOnUnit(unit);
             }
         } // else: nothing: There is no active unit that can be moved.
@@ -1176,15 +1182,13 @@ public final class InGameController implements NetworkConstants {
      * TODO: Move magic 50% number to the spec.
      */
     public void declareIndependence() {
+        if (!requireOurTurn()) return;
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
 
         // Check for adequate support.
-        Event event = getSpecification().getEvent("model.event.declareIndependence");
+        Event event = getSpecification()
+            .getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
                 canvas.showInformationMessage(limit.getDescriptionKey(),
@@ -1324,13 +1328,10 @@ public final class InGameController implements NetworkConstants {
      * Use the active unit to build a colony.
      */
     public void buildColony() {
+        if (!requireOurTurn()) return;
         Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        if (game.getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
 
         // Check unit can build, and is on the map.
         // Show the colony warnings if required.
@@ -1550,12 +1551,8 @@ public final class InGameController implements NetworkConstants {
      * @param colony The <code>Colony</code> to be abandoned.
      */
     public void abandonColony(Colony colony) {
+        if (!requireOurTurn()) return;
         Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
 
         // Sanity check
         if (colony == null || colony.getOwner() != player
@@ -1666,13 +1663,11 @@ public final class InGameController implements NetworkConstants {
      * @param index The index in Europe to recruit from ([0..2]).
      */
     public void recruitUnitInEurope(int index) {
-        Canvas canvas = freeColClient.getCanvas();
+        if (!requireOurTurn()) return;
+
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        } else if (!player.checkGold(player.getRecruitPrice())) {
-            canvas.errorMessage("notEnoughGold");
+        if (!player.checkGold(player.getRecruitPrice())) {
+            freeColClient.getCanvas().errorMessage("notEnoughGold");
             return;
         }
 
@@ -1706,12 +1701,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the unit.
      */
     public void move(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         moveDirection(unit, direction, true);
 
@@ -2166,20 +2156,16 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to be moved to America.
      */
     public void moveToAmerica(Unit unit) {
-        final Canvas canvas = freeColClient.getCanvas();
-        final Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
+
         if (!(unit.getLocation() instanceof Europe)) {
             freeColClient.playSound("sound.event.illegalMove");
             return;
         }
 
         // Ask for autoload emigrants
-        final ClientOptions co = canvas.getClient().getClientOptions();
-        if (co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
+        if (freeColClient.getCanvas().getClient().getClientOptions()
+            .getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
             int spaceLeft = unit.getSpaceLeft();
             for (Unit u : new ArrayList<Unit>(unit.getLocation().getUnitList())) {
                 if (!u.isNaval()) {
@@ -2218,12 +2204,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to be moved to Europe.
      */
     public void moveToEurope(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         if (!unit.canMoveToEurope()) {
             freeColClient.playSound("sound.event.illegalMove");
@@ -3508,13 +3489,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the claim succeeded.
      */
     public boolean claimLand(Tile tile, Colony colony, int offer) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
+        if (!requireOurTurn()) return false;
 
+        Player player = freeColClient.getMyPlayer();
         int price = ((colony != null) ? player.canClaimForSettlement(tile)
                      : player.canClaimForImprovement(tile)) ? 0
             : player.getLandPrice(tile);
@@ -3594,18 +3571,13 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit was cashed in (and disposed).
      */
     public boolean checkCashInTreasureTrain(Unit unit) {
-        if (!unit.canCarryTreasure() || !unit.canCashInTreasureTrain()) {
+        if (!unit.canCarryTreasure() || !unit.canCashInTreasureTrain()
+            || !requireOurTurn()) {
             return false; // Fail quickly if just not a candidate.
         }
 
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
-
         // Cash in or not?
+        Canvas canvas = freeColClient.getCanvas();
         boolean cash;
         Tile tile = unit.getTile();
         Europe europe = unit.getOwner().getEurope();
@@ -3660,12 +3632,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit boards the carrier.
      */
     public boolean boardShip(Unit unit, Unit carrier) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage(unit, "notYourTurn");
-            return false;
-        }
+        if (!requireOurTurn()) return false;
 
         // Sanity checks.
         if (unit == null) {
@@ -3724,12 +3691,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> which is to leave the ship.
      */
     public boolean leaveShip(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
+        if (!requireOurTurn()) return false;
 
         // Sanity check, and find our carrier before we get off.
         if (!(unit.getLocation() instanceof Unit)) {
@@ -3774,12 +3736,7 @@ public final class InGameController implements NetworkConstants {
      * @param carrier The <code>Unit</code> acting as carrier.
      */
     public void loadCargo(Goods goods, Unit carrier) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         // Sanity checks.
         Colony colony = null;
@@ -3810,12 +3767,7 @@ public final class InGameController implements NetworkConstants {
      * @param dump If true, dump the goods.
      */
     public void unloadCargo(Goods goods, boolean dump) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         // Sanity tests.
         if (goods == null) {
@@ -3849,12 +3801,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit<code> that is dumping.
      */
     public void unload(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         // Sanity tests.
         if (unit == null) {
@@ -3863,6 +3810,7 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalArgumentException("Unit is not a carrier.");
         }
 
+        Player player = freeColClient.getMyPlayer();
         boolean inEurope = unit.isInEurope();
         if (unit.getColony() != null) {
             // In colony, unload units and goods.
@@ -3880,7 +3828,8 @@ public final class InGameController implements NetworkConstants {
             }
             // Goods left here must be dumped.
             if (unit.getGoodsCount() > 0) {
-                List<Goods> goodsList = canvas.showDumpCargoDialog(unit);
+                List<Goods> goodsList
+                    = freeColClient.getCanvas().showDumpCargoDialog(unit);
                 if (goodsList != null) {
                     for (Goods goods : goodsList) {
                         unloadCargo(goods, true);
@@ -3900,14 +3849,11 @@ public final class InGameController implements NetworkConstants {
      * @return True if the purchase succeeds.
      */
     public boolean buyGoods(GoodsType type, int amount, Unit carrier) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
+        if (!requireOurTurn()) return false;
 
         // Sanity checks.  Should not happen!
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
         if (type == null) {
             throw new NullPointerException("Goods type must not be null.");
         } else if (carrier == null) {
@@ -3985,14 +3931,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if the sale succeeds.
      */
     public boolean sellGoods(Goods goods) {
-        Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
+        if (!requireOurTurn()) return false;
 
         // Sanity checks.
+        Player player = freeColClient.getMyPlayer();
         if (goods == null) {
             throw new NullPointerException("Goods must not be null.");
         }
@@ -4024,7 +3966,7 @@ public final class InGameController implements NetworkConstants {
             for (TransactionListener listener : market.getTransactionListener()) {
                 listener.logSale(type, amount, price, tax);
             }
-            canvas.updateGoldLabel();
+            freeColClient.getCanvas().updateGoldLabel();
             return true;
         }
 
@@ -4057,14 +3999,10 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to clear the speciality of.
      */
     public void clearSpeciality(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         // Check this makes sense and confirm.
+        Canvas canvas = freeColClient.getCanvas();
         UnitType oldType = unit.getType();
         UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
                                                  unit.getOwner());
@@ -4118,16 +4056,12 @@ public final class InGameController implements NetworkConstants {
      * Disbands the active unit.
      */
     public void disbandActiveUnit() {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         GUI gui = freeColClient.getGUI();
         Unit unit = gui.getActiveUnit();
         if (unit == null) return;
+        Canvas canvas = freeColClient.getCanvas();
         Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
         if (!canvas.showConfirmDialog(tile, "disbandUnit.text",
                                       "disbandUnit.yes", "disbandUnit.no")) {
@@ -4195,14 +4129,9 @@ public final class InGameController implements NetworkConstants {
      * @param amount How to change the amount of equipment the unit has.
      */
     public void equipUnit(Unit unit, EquipmentType type, int amount) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-        if (amount == 0) return; // no change
+        if (!requireOurTurn() || amount == 0) return;
 
+        Player player = freeColClient.getMyPlayer();
         List<AbstractGoods> requiredGoods = type.getGoodsRequired();
         HashMap<GoodsType, Integer> savedGoods = null;
         Colony colony = null;
@@ -4230,7 +4159,7 @@ public final class InGameController implements NetworkConstants {
                                     oldAmount, newAmount);
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
-            canvas.updateGoldLabel();
+            freeColClient.getCanvas().updateGoldLabel();
         }
     }
 
@@ -4261,18 +4190,14 @@ public final class InGameController implements NetworkConstants {
      * @param workLocation The <code>WorkLocation</code>.
      */
     public void work(Unit unit, WorkLocation workLocation) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         Colony colony = workLocation.getColony();
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
             if (tile.hasLostCityRumour()) {
-                canvas.showInformationMessage("tileHasRumour");
+                freeColClient.getCanvas()
+                    .showInformationMessage("tileHasRumour");
                 return;
             }
             if (tile.getOwner() != unit.getOwner()) {
@@ -4316,12 +4241,7 @@ public final class InGameController implements NetworkConstants {
      * @return <i>true</i> if the unit was successfully put outside the colony.
      */
     public boolean putOutsideColony(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
+        if (!requireOurTurn()) return false;
 
         Colony colony = unit.getColony();
         if (colony == null) {
@@ -4365,11 +4285,7 @@ public final class InGameController implements NetworkConstants {
      * @param workType The new <code>GoodsType</code> to produce.
      */
     public void changeWorkType(Unit unit, GoodsType workType) {
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         UnitWas unitWas = new UnitWas(unit);
         if (askChangeWorkType(unit, workType)) {
@@ -4405,17 +4321,14 @@ public final class InGameController implements NetworkConstants {
      */
     public void changeWorkImprovementType(Unit unit,
                                           TileImprovementType improvementType) {
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         if (!unit.checkSetState(UnitState.IMPROVING)
             || improvementType.isNatural()) {
             return; // Don't bother (and don't log, this is not exceptional)
         }
 
+        Player player = freeColClient.getMyPlayer();
         Tile tile = unit.getTile();
         if (player != tile.getOwner()) {
             if (!claimTile(player, tile, null, player.getLandPrice(tile), 0)
@@ -4456,12 +4369,7 @@ public final class InGameController implements NetworkConstants {
      * @param state The state of the unit.
      */
     public void changeState(Unit unit, UnitState state) {
-        Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         if (!unit.checkSetState(state)) {
             return; // Don't bother (and don't log, this is not exceptional)
@@ -4469,6 +4377,7 @@ public final class InGameController implements NetworkConstants {
 
         // Check if this is a hostile fortification, and give the player
         // a chance to confirm.
+        Player player = freeColClient.getMyPlayer();
         if (state == UnitState.FORTIFYING && unit.isOffensiveUnit()
             && !unit.hasAbility("model.ability.piracy")) {
             Tile tile = unit.getTile();
@@ -4481,6 +4390,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
+        Canvas canvas = freeColClient.getCanvas();
         if (askChangeState(unit, state)) {
             if (!canvas.isShowingSubPanel()
                 && (unit.getMovesLeft() == 0
@@ -4501,17 +4411,12 @@ public final class InGameController implements NetworkConstants {
      * @param True if the orders were cleared.
      */
     public boolean clearOrders(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
-
-        if (unit == null || !unit.checkSetState(UnitState.ACTIVE)) return false;
+        if (!requireOurTurn() || unit == null
+            || !unit.checkSetState(UnitState.ACTIVE)) return false;
 
         // Ask the user for confirmation, as this is a classic mistake.
         // Cancelling a pioneer terrain improvement is a waste of many turns.
+        Canvas canvas = freeColClient.getCanvas();
         if (unit.getState() == UnitState.IMPROVING
             && !canvas.showConfirmDialog(unit.getTile(),
                                          "model.unit.confirmCancelWork",
@@ -4552,12 +4457,8 @@ public final class InGameController implements NetworkConstants {
      */
     public void assignTeacher(Unit student, Unit teacher) {
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        if (student == null
+        if (!requireOurTurn()
+            || student == null
             || student.getOwner() != player
             || student.getColony() == null
             || !(student.getLocation() instanceof WorkLocation)
@@ -4599,11 +4500,7 @@ public final class InGameController implements NetworkConstants {
      * @param colony The <code>Colony</code>
      */
     public void setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
+        if (!requireOurTurn()) return;
 
         ColonyWas colonyWas = new ColonyWas(colony);
         if (askSetBuildQueue(colony, buildQueue)) {
@@ -4638,14 +4535,10 @@ public final class InGameController implements NetworkConstants {
      * @param unitType The type of unit to be trained.
      */
     public void trainUnitInEurope(UnitType unitType) {
+        if (!requireOurTurn()) return;
+
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        Game game = freeColClient.getGame();
-        if (game.getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
         Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
             canvas.errorMessage("notEnoughGold");
@@ -4684,12 +4577,9 @@ public final class InGameController implements NetworkConstants {
      * @param colony The {@link Colony} where the building should be bought.
      */
     public void payForBuilding(Colony colony) {
+        if (!requireOurTurn()) return;
+
         Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
         if (!colony.canPayToFinishBuilding()) {
             canvas.errorMessage("notEnoughGold");
             return;
@@ -4743,13 +4633,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if the arrears were paid.
      */
     public boolean payArrears(GoodsType type) {
+        if (!requireOurTurn()) return false;
+
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
-        }
-
         int arrears = player.getArrears(type);
         if (arrears <= 0) return false;
         if (!player.checkGold(arrears)) {
@@ -4792,11 +4679,7 @@ public final class InGameController implements NetworkConstants {
      * @return a <code>List</code> value
      */
     public List<AbstractUnit> getREFUnits() {
-        Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return Collections.emptyList();
-        }
+        if (!requireOurTurn()) return Collections.emptyList();
 
         return askGetREFUnits();
     }
