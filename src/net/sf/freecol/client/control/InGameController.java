@@ -211,6 +211,27 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Returns a string representation of the given turn suitable for
+     * savegame files.
+     *
+     * @param turn a <code>Turn</code> value
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "1602_1_Spring", "1503"...
+     */
+    private String getSaveGameString(Turn turn) {
+        int year = turn.getYear();
+        switch (turn.getSeason()) {
+        case SPRING:
+            return Integer.toString(year) + "_1_" + Messages.message("spring");
+        case AUTUMN:
+            return Integer.toString(year) + "_2_" + Messages.message("autumn");
+        case YEAR:
+        default:
+            return Integer.toString(year);
+        }
+    }
+
+    /**
      * Opens a dialog where the user should specify the filename and
      * saves the game.
      *
@@ -3030,7 +3051,7 @@ public final class InGameController implements NetworkConstants {
             diplomacy = reply;
             reply = null;
         } else {
-            diplomacy = getChildElement(reply, "diplomacy");
+            diplomacy = Message.getChildElement(reply, "diplomacy");
             if (diplomacy != null) {
                 reply.removeChild(diplomacy);
             }
@@ -5295,47 +5316,4 @@ public final class InGameController implements NetworkConstants {
 
         nextActiveUnit(null);
     }
-
-    /**
-     * Convenience method: returns the first child element with the specified
-     * tagname.
-     *
-     * @param element The <code>Element</code> to search for the child
-     *            element.
-     * @param tagName The tag name of the child element to be found.
-     * @return The child of the given <code>Element</code> with the given
-     *         <code>tagName</code> or <code>null</code> if no such child
-     *         exists.
-     */
-    protected Element getChildElement(Element element, String tagName) {
-        NodeList n = element.getChildNodes();
-        for (int i = 0; i < n.getLength(); i++) {
-            if (((Element) n.item(i)).getTagName().equals(tagName)) {
-                return (Element) n.item(i);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns a string representation of the given turn suitable for
-     * savegame files.
-     * @param turn a <code>Turn</code> value
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "1602_1_Spring", "1503"...
-     */
-    public String getSaveGameString(Turn turn) {
-        int year = turn.getYear();
-        switch (turn.getSeason()) {
-        case SPRING:
-            return Integer.toString(year) + "_1_" + Messages.message("spring");
-        case AUTUMN:
-            return Integer.toString(year) + "_2_" + Messages.message("autumn");
-        case YEAR:
-        default:
-            return Integer.toString(year);
-        }
-    }
-
 }
