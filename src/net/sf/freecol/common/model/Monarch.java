@@ -315,9 +315,11 @@ public final class Monarch extends FreeColGameObject implements Named {
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
 
-        // Nothing happens during the first few turns, nor after the
-        // revolution begins.
-        if (turn < grace || player.getPlayerType() != PlayerType.COLONIAL) {
+        // Nothing happens during the first few turns, if there are no
+        // colonies, or after the revolution begins.
+        if (turn < grace
+            || player.getSettlements().size() == 0
+            || player.getPlayerType() != PlayerType.COLONIAL) {
             return choices;
         }
 

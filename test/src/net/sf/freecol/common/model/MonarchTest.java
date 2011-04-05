@@ -25,6 +25,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -50,12 +51,14 @@ public class MonarchTest extends FreeColTestCase {
 
     public void testTaxActionChoices() {
         Game game = getStandardGame();
+        game.setMap(getTestMap());
         Player dutch = game.getPlayer("model.nation.dutch");
 
         // grace period has not yet expired
         List<RandomChoice<MonarchAction>> choices = dutch.getMonarch().getActionChoices();
         assertTrue(choices.isEmpty());
 
+        Colony colony = getStandardColony();
         game.setTurn(new Turn(100));
         dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
         choices = dutch.getMonarch().getActionChoices();
