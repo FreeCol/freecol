@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -207,10 +208,22 @@ public class BuildColonyMission extends Mission {
                         colony.getColonyTile(target).relocateWorkers();
                     }
                 } else { // Not our tile, claim it first
-                    if (!player.canClaimToFoundSettlement(target)
-                        || !AIMessage.askClaimLand(connection, target, null, 0)
+                    int price = player.getLandPrice(target);
+                    if (price < 0) { // Someone has got in first
+                        target = null;
+                        return;
+                    }
+                    if (price > 0 && !player.checkGold(price)
+                        && getAIRandom().nextInt(4) == 0) {
+                        // CHEAT: add gold so player can buy the land
+                        player.modifyGold(price);
+                    }
+                    if (!AIMessage.askClaimLand(connection, target, null,
+                            (player.checkGold(price))
+                                                ? price
+                                                : NetworkConstants.STEAL_LAND)
                         || target.getOwner() != player) {
-                        target = null; // Try a different one
+                        target = null; // Claim failed, try a different tile
                         return;
                     }
                 }
@@ -268,15 +281,10 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Finds a site for a new colony.
+     * Finds a site for a new colony.  Favour closer sites.
      *
-     * @param unit The <code>Unit</code> to find a colony site for. This unit
-     *            will be used for determining the path to a colony location and
-     *            colony sites far away from the unit (in turns) will be less
-     *            valuable.
-     * @return A site suitable for a <code>Colony</code> or <code>null</code>
-     *         if no such site could be found within a fixed distance from the
-     *         <code>Unit</code>.
+     * @param unit The <code>Unit</code> to find a colony site for.
+     * @return A suitable tile for a new colony.
      */
     public static Tile findColonyLocation(Unit unit) {
         Game game = unit.getGame();
@@ -293,16 +301,19 @@ public class BuildColonyMission extends Mission {
         } else {
             startTile = unit.getTile();
         }
-        if (startTile == null) return null;
+        if (startTile == null) {
+            logger.warning("findColonyLocation failed, unit " + unit.getId()
+                           + " not on the map");
+            return null;
+        }
 
-        // If called during the first few turns of the game, and our
-        // unit may be the starting unit (==isOnCarrier()) make sure
-        // to find _some_ starting position
-        boolean gameStart = game.getTurn().getNumber() < 10 && carrier != null;
-        int maxNumberofTiles = 500;
+        // If no colonies, do not fail.
+        boolean noFail = player.getSettlements().size() == 0;
+        boolean gameStart = game.getTurn().getNumber() < 20;
+        final int maxNumberofTiles = 500;
         int tileCounter = 0;
         Tile bestTile = null;
-        float highestColonyValue = 0.0f;
+        float bestValue = 0.0f;
         Iterator<Position> it = map.getFloodFillIterator(startTile.getPosition());
         while (it.hasNext()) {
             Tile tile = map.getTile(it.next());
@@ -312,37 +323,44 @@ public class BuildColonyMission extends Mission {
                 continue;
             }
 
+            // Can we acquire the tile?
             if (!player.canAcquireToFoundSettlement(tile)) {
                 continue;
             }
 
-            float tileColonyValue = unit.getOwner().getColonyValue(tile);
-            if (tileColonyValue > highestColonyValue) {
-                float newColonyValue;
-                if (tile != startTile) {
-                    PathNode path = (carrier != null)
-                        ? map.findPath(unit, startTile, tile, carrier)
-                        : map.findPath(unit, startTile, tile);
-                    newColonyValue = (path == null) ? -1.0f
-                        : tileColonyValue / (path.getTotalTurns() + 1.0f);
-                } else {
-                    newColonyValue = tileColonyValue;
-                }
-                if (newColonyValue > highestColonyValue) {
-                    highestColonyValue = newColonyValue;
+            // Work out the path length to the target tile, ignore if we
+            // can not get there.
+            int len;
+            if (tile == startTile) {
+                len = 1;
+            } else {
+                PathNode path = (carrier == null)
+                    ? map.findPath(unit, startTile, tile)
+                    : map.findPath(unit, startTile, tile, carrier);
+                len = (path == null) ? -1 : path.getTotalTurns() + 1;
+            }
+
+            // Score is proportional to tile value and inversely proportional
+            // to distance.
+            if (len > 0) {
+                float value = unit.getOwner().getColonyValue(tile) / len;
+                if (value > bestValue) {
+                    bestValue = value;
                     bestTile = tile;
                 }
             }
+
             // Break after checking a fixed number of tiles unless
             // this may be the first colony, in which case we'll
-            // continue until we found _some_ location.
-            if (++tileCounter >= maxNumberofTiles
-                && !(gameStart && bestTile == null)) break;
+            // continue until we found _some_ location, except if there
+            // is no carrier available which may mean we are marooned
+            // on land with no available sites.
+            if (++tileCounter >= maxNumberofTiles) {
+                if (!noFail || bestTile != null || carrier == null) break;
+            }
         }
-        if (bestTile == null) {
-            logger.info("Unit " + unit.getId()
-                        + " unsuccessfully searched for colony spot");
-        }
+        logger.finest("findColonyLocation(" + unit.getId()
+                      + ") found tile: " + bestTile);
         return bestTile;
     }
 

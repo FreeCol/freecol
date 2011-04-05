@@ -2412,16 +2412,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
         //----- END MAGIC NUMBERS
 
-        //return 0 if a colony can't be built on tile t
-        if (!canAcquireToFoundSettlement(t)) {
-            return 0;
-        }
-
-        //also return 0 if a neighbouring tile contains a colony
+        // Also return 0 if a neighbouring tile contains a settlement.
         for (Tile tile : t.getSurroundingTiles(1)) {
-            if (tile.getColony() != null) {
-                return 0;
-            }
+            if (tile.getSettlement() != null) return 0;
         }
 
         //initialize tile value        
