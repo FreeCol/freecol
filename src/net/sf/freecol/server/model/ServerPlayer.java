@@ -70,6 +70,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -358,9 +359,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
          * settlements on the map.
          */
 
-        // After the year 1600, no presence in New World means endgame
-        if (getGame().getTurn().getYear() >= 1600) {
-            logger.info(getName() + " no presence in new world after 1600");
+        // After the season cutover year, no presence in New World
+        // means death
+        if (getGame().getTurn().getYear() >= Turn.SEASON_YEAR) {
+            logger.info(getName() + " no presence in new world after "
+                        + Turn.SEASON_YEAR);
             return true;
         }
 
