@@ -1235,8 +1235,11 @@ public final class InGameInputHandler extends InputHandler {
 
             // If our turn is beginning, select a unit.
             if (newTurn) {
-                fcc.getInGameController()
-                    .nextActiveUnit(newPlayer.getEntryLocation().getTile());
+                List<Settlement> settlements = newPlayer.getSettlements();
+                Tile defTile = (settlements.size() > 0)
+                    ? settlements.get(0).getTile()
+                    : newPlayer.getEntryLocation().getTile();
+                fcc.getInGameController().nextActiveUnit(defTile);
             }
         }
     }
