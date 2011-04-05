@@ -1948,71 +1948,84 @@ public class StandardAIPlayer extends AIPlayer {
         return value;
     }
 
+    /**
+     * Evaluate a potential seek and destroy mission for a given unit
+     * to a given tile.
+     *
+     * @param unit The <code>Unit</code> to do the mission.
+     * @param newTile The <code>Tile</code> to go to.
+     * @param turns How long to travel to the tile.
+     * @return A score for the proposed mission.
+     */
     int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
-        logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
-
         Unit defender = newTile.getDefendingUnit(unit);
-
-        if(!isTargetValidForSeekAndDestroy(unit, defender)){
-        	return Integer.MIN_VALUE;
-        }
-
         int value = 10020;
-        CombatModel combatModel = unit.getGame().getCombatModel();
 
-        if (getBestTreasureTrain(newTile) != null) {
-        	value += Math.min(getBestTreasureTrain(newTile).getTreasureAmount() / 10, 50);
-        }
-        if (defender.getType().getOffence() > 0 &&
-        		newTile.getSettlement() == null) {
-        	value += 200 - combatModel.getDefencePower(unit, defender) * 2 - turns * 50;
-        }
+        if (!isTargetValidForSeekAndDestroy(unit, defender)) {
+            value = Integer.MIN_VALUE;
+        } else {
+            CombatModel combatModel = unit.getGame().getCombatModel();
+            float off = combatModel.getOffencePower(unit, defender);
+            float def = combatModel.getDefencePower(unit, defender);
 
-        value += combatModel.getOffencePower(defender, unit) -
-              combatModel.getDefencePower(defender, unit);
-        
-        // Take distance to target into account
-        value -= turns * 100;
-
-        if (!defender.isNaval()) {
-        	if (defender.hasAbility("model.ability.expertSoldier")
-                    && !defender.isArmed()) {
-                value += 10 - combatModel.getDefencePower(unit, defender) * 2 - turns * 25;
+            Unit train = getBestTreasureTrain(newTile);
+            if (train != null) {
+                value += Math.min(train.getTreasureAmount() / 10, 50);
             }
-            if (newTile.getSettlement() != null) {
-                value += 300;
-                Iterator<Unit> dp = newTile.getUnitIterator();
-                while (dp.hasNext()) {
-                    Unit u = dp.next();
-                    if (u.isDefensiveUnit()) {
-                        if (combatModel.getDefencePower(unit, u) > combatModel.getOffencePower(unit, u)) {
-                            value -= 100 * (combatModel.getDefencePower(unit, u) - combatModel.getOffencePower(unit, u));
-                        } else {
-                            value -= combatModel.getDefencePower(unit, u);
-                        }
-                    }
+
+            if (defender.getType().getOffence() > 0
+                && newTile.getSettlement() == null) {
+                value += 200 - def * 2 - turns * 50;
+            }
+
+            value += combatModel.getOffencePower(defender, unit)
+                - combatModel.getDefencePower(defender, unit);
+        
+            // Take distance to target into account
+            value -= turns * 100;
+
+            if (!defender.isNaval()) {
+                if (defender.hasAbility("model.ability.expertSoldier")
+                    && !defender.isArmed()) {
+                    value += 10 - def * 2 - turns * 25;
+                }
+                if (newTile.getSettlement() != null) {
+                    // Do not cheat and look inside the settlement.
+                    // Just work from the known defender, assuming
+                    // there are more like it to come.
+                    value += 100 * (off - def);
                 }
             }
+            if (value < 0) value = 0;
         }
-        return Math.max(0, value);
+        logger.finest("getUnitSeekAndDestroyMissionValue " + unit.getId()
+                      + " v " + ((defender == null) ? "none" : defender.getId())
+                      + " = " + value);
+        return value;
     }
 
     /**
      * TODO: Package for access by a test only - necessary?
      */
     boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
-        if (defender == null) { // Sanitation
+        if (attacker == null || attacker.getTile() == null
+            || defender == null || defender.getTile() == null) { // Sanitation
             return false;
         }
     	
-        // A naval unit cannot attack a land unit and vice-versa
-        if (attacker.isNaval() != defender.isNaval()) {
+        // A naval unit cannot attack a land unit, but a land unit
+        // *can* attack a naval unit if it is on land (next test).
+        if (attacker.isNaval() && !defender.isNaval()) {
             return false;
         }
 
-        if (attacker.isNaval()) { // Naval units can only fight at sea
-            if (attacker.getTile() == null || attacker.getTile().isLand()
-                || defender.getTile() == null || defender.getTile().isLand()) {
+        // Naval units can only fight at sea, land units only on land.
+        if (attacker.isNaval()) {
+            if (attacker.getTile().isLand() || defender.getTile().isLand()) {
+                return false;
+            }
+        } else {
+            if (!attacker.getTile().isLand() || !defender.getTile().isLand()) {
                 return false;
             }
         }

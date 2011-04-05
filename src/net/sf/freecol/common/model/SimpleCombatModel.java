@@ -94,7 +94,9 @@ public class SimpleCombatModel extends CombatModel {
     public float getOffencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
         float result = 0.0f;
-        if (combatIsMeasurement(attacker, defender)
+        if (attacker == null) {
+            throw new IllegalArgumentException("Null attacker");
+        } else if (combatIsMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             result = FeatureContainer.applyModifierSet(0,
@@ -112,7 +114,6 @@ public class SimpleCombatModel extends CombatModel {
                 }
             }
             if (result > MAXIMUM_BOMBARD_POWER) result = MAXIMUM_BOMBARD_POWER;
-
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
@@ -129,7 +130,9 @@ public class SimpleCombatModel extends CombatModel {
     public float getDefencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
         float result;
-        if (combatIsAttack(attacker, defender)
+        if (attacker == null) {
+            throw new IllegalArgumentException("Null attacker");
+        } else if (combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             result = FeatureContainer.applyModifierSet(0,
                     defender.getGame().getTurn(),
@@ -237,11 +240,13 @@ public class SimpleCombatModel extends CombatModel {
             result.addAll(spec.getModifiers(SMALL_MOVEMENT_PENALTY));
         }
 
-        if (combatIsSettlementAttack(attacker, defender)) {
+        if (combatIsMeasurement(attacker, defender)) {
+            ; // No defender information available
+        } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, REF bombardment bonus
             result.addAll(attackerUnit
                           .getModifierSet("model.modifier.bombardBonus"));
-        } else if (defender != null && ((Unit) defender).getTile() != null) {
+        } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             if (defenderUnit.getSettlement() != null) {
                 result.addAll(attackerUnit
@@ -264,6 +269,8 @@ public class SimpleCombatModel extends CombatModel {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
             }
+        } else {
+            throw new IllegalStateException("Bogus combat");
         }
     }
 
