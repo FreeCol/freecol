@@ -1150,6 +1150,7 @@
                    consumes="model.goods.grain" produces="model.goods.horses">
       <modifier id="model.modifier.breedingDivisor" type="additive" value="50"/>
       <modifier id="model.modifier.breedingFactor" type="additive" value="2"/>
+      <modifier id="model.goods.horses" type="multiplicative" value="1.0"/>
       <ability id="model.ability.autoProduction"/>
       <ability id="model.ability.consumeOnlySurplusProduction"/>
       <ability id="model.ability.avoidExcessProduction"/>
