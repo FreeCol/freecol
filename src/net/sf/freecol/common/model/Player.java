@@ -2842,29 +2842,36 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the current tax. If Thomas Paine has already joined the Continental
-     * Congress, the libertyBonus is adjusted accordingly.
+     * Sets the current tax
      *
      * @param amount The new tax.
      */
     public void setTax(int amount) {
         tax = amount;
+    }
 
+    /**
+     * Recalculate bells bonus when tax changes.
+     *
+     * @return True if a bells bonus was set.
+     */
+    public boolean recalculateBellsBonus() {
         Set<Modifier> libertyBonus
             = featureContainer.getModifierSet("model.goods.bells");
+        boolean ret = false;
         for (Ability ability : featureContainer.getAbilitySet("model.ability.addTaxToBells")) {
             FreeColGameObjectType source = ability.getSource();
             if (source != null) {
                 for (Modifier modifier : libertyBonus) {
                     if (source.equals(modifier.getSource())) {
                         modifier.setValue(tax);
-                        return;
+                        ret = true;
                     }
                 }
             }
         }
+        return ret;
     }
-
 
     /**
      * Returns the current sales.
@@ -3483,8 +3490,8 @@ public class Player extends FreeColGameObject implements Nameable {
             market = new Market(getGame(), this);
         }
 
-        // Need to set the model.goods.bells bonuses
-        setTax(tax);
+        // Bells bonuses depend on tax
+        recalculateBellsBonus();
 
         invalidateCanSeeTiles();
     }

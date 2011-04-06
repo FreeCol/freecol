@@ -638,8 +638,7 @@ public final class InGameController extends Controller {
             break;
         case LOWER_TAX:
             int taxLower = monarch.lowerTax(random);
-            serverPlayer.setTax(taxLower);
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "tax");
+            serverPlayer.csSetTax(taxLower, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    new MonarchActionMessage(taxLower));
             break;
@@ -711,17 +710,12 @@ public final class InGameController extends Controller {
         Element reply = askElement(serverPlayer, cs);
         cs = new ChangeSet();
         if (Boolean.valueOf(reply.getAttribute("accepted")).booleanValue()) {
-            // TODO: setTax is still non-trivial on client side
-            serverPlayer.setTax(tax);
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                          "tax");
+            serverPlayer.csSetTax(tax, cs);
         } else if (colony.getGoodsCount(goodsType) < goods.getAmount()) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
             final int extraTax = 3;
-            serverPlayer.setTax(tax + extraTax);
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                          "tax");
+            serverPlayer.csSetTax(tax + extraTax, cs);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.WARNING,
                                  "model.monarch.forceTaxRaise",
@@ -1084,6 +1078,7 @@ public final class InGameController extends Controller {
         Turn turn = getGame().getTurn();
         independent.modifyScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
         independent.setTax(0);
+        independent.recalculateBellsBonus();
         independent.reinitialiseMarket();
         independent.addHistory(new HistoryEvent(turn,
                 HistoryEvent.EventType.INDEPENDENCE));

@@ -205,6 +205,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertFalse(player.getFeatureContainer().getModifierSet("model.goods.bells").isEmpty());
 
         player.setTax(30);
+        player.recalculateBellsBonus();
         // TODO: find out why the following changes anything
         colony.getModifierSet("model.goods.bells");
 

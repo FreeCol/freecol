@@ -1271,12 +1271,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        for (Ability ability : father.getFeatureContainer().getAbilities()) {
-            if ("model.ability.addTaxToBells".equals(ability.getId())) {
-                // Provoke a tax/liberty recalculation
-                setTax(getTax());
-                cs.addPartial(See.only(this), this, "tax");
-            }
+        if (recalculateBellsBonus()) {
+            cs.add(See.only(this), this);
         }
 
         for (Event event : father.getEvents()) {
@@ -3061,6 +3057,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Tile t : newTiles) {
             t.updatePlayerExploredTile(this, false);
             cs.add(See.only(this), t);
+        }
+    }
+
+    /**
+     * Set the player tax rate.
+     * If this requires a change to the bells bonuses, we have to update
+     * the whole player (bah) because we can not yet independently update
+     * the feature container.
+     *
+     * @param tax The new tax rate.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csSetTax(int tax, ChangeSet cs) {
+        setTax(tax);
+        if (recalculateBellsBonus()) {
+            cs.add(See.only(this), this);
+        } else {
+            cs.addPartial(See.only(this), this, "tax");
         }
     }
 
