@@ -1810,7 +1810,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         // End of attributes
 
         if (settlement != null) {
-            if (full || settlement.getOwner() == player) {
+            if (full || player.canSee(this)) {
                 settlement.toXML(out, player, showAll, toSavedGame);
             } else if (pet != null) {
                 // Only display the settlement if we know it owns the tile
