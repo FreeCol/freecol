@@ -871,10 +871,6 @@ public final class FreeColServer {
                 // Introduced: SAVEGAME_VERSION == 11
                 addBooleanOption("model.option.guiShowGoodsMovement", false);
             }
-            if (!specification.hasOption("model.option.amphibiousMoves")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addBooleanOption("model.option.amphibiousMoves", false);
-            }
 
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null
