@@ -169,7 +169,7 @@ public class ServerGame extends Game implements ServerModelObject {
     public Player checkForWinner() {
         Specification spec = getSpecification();
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            for (Player player : getPlayers()) {
+            for (Player player : getLiveEuropeanPlayers()) {
                 if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
                     return player;
                 }
@@ -177,9 +177,8 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             Player winner = null;
-            for (Player player : getPlayers()) {
-                if (!player.isDead() && player.isEuropean()
-                    && !player.isREF()) {
+            for (Player player : getLiveEuropeanPlayers()) {
+                if (!player.isREF()) {
                     if (winner != null) { // A live European player
                         winner = null;
                         break;
@@ -191,8 +190,8 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             Player winner = null;
-            for (Player player : getPlayers()) {
-                if (!player.isDead() && !player.isAI()) {
+            for (Player player : getLiveEuropeanPlayers()) {
+                if (!player.isAI()) {
                     if (winner != null) { // A live human player
                         winner = null;
                         break;
@@ -255,77 +254,69 @@ public class ServerGame extends Game implements ServerModelObject {
         Player weakestAIPlayer = null;
         Player strongestAIPlayer = null;
         int rebelPlayers = 0;
-        for (Player player : getEuropeanPlayers()) {
-            if (player.isREF()) continue;
-            if (player.isAI()) {
-                if (weakestAIPlayer == null
-                    || weakestAIPlayer.getScore() > player.getScore()) {
-                    weakestAIPlayer = player;
-                }
-                if (strongestAIPlayer == null
-                    || strongestAIPlayer.getScore() < player.getScore()) {
-                    strongestAIPlayer = player;
-                }
+        for (Player player : getLiveEuropeanPlayers()) {
+            if (player.isREF() || !player.isAI()) continue;
+            if (weakestAIPlayer == null
+                || weakestAIPlayer.getScore() > player.getScore()) {
+                weakestAIPlayer = player;
+            }
+            if (strongestAIPlayer == null
+                || strongestAIPlayer.getScore() < player.getScore()) {
+                strongestAIPlayer = player;
             }
         }
 
         // Only eliminate the weakest AI if limits are met
+        Limit weakestPlayerLimit;
+        Limit strongestPlayerLimit;
         if (weakestAIPlayer != null
             && strongestAIPlayer != null
-            && weakestAIPlayer != strongestAIPlayer) {
-            Limit weakestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.weakestPlayer");
-            Limit strongestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.strongestPlayer");
-            if ((weakestPlayerLimit == null
-                 || weakestPlayerLimit.evaluate(weakestAIPlayer))
-                && (strongestPlayerLimit == null
-                    || strongestPlayerLimit.evaluate(strongestAIPlayer))) {
-                for (Player player : getPlayers()) {
-                    for (IndianSettlement settlement
-                             : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
-                        Unit missionary = settlement.getMissionary();
-                        missionary.setOwner(strongestAIPlayer);
-                        settlement.getTile().updatePlayerExploredTiles();
-                        cs.add(See.perhaps().always((ServerPlayer)strongestAIPlayer),
-                               settlement);
-                    }
+            && weakestAIPlayer != strongestAIPlayer
+            && ((weakestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.weakestPlayer")) == null
+                || weakestPlayerLimit.evaluate(weakestAIPlayer))
+            && ((strongestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.strongestPlayer")) == null
+                || strongestPlayerLimit.evaluate(strongestAIPlayer))) {
+            for (Player player : getPlayers()) {
+                for (IndianSettlement settlement
+                         : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
+                    Unit missionary = settlement.getMissionary();
+                    missionary.setOwner(strongestAIPlayer);
+                    settlement.getTile().updatePlayerExploredTiles();
+                    cs.add(See.perhaps().always((ServerPlayer)strongestAIPlayer),
+                           settlement);
                 }
-                for (Colony colony : weakestAIPlayer.getColonies()) {
-                    colony.changeOwner(strongestAIPlayer);
-                    for (Tile tile : colony.getOwnedTiles()) {
-                        cs.add(See.perhaps(), tile);
-                    }
-                }
-                for (Tile tile : getMap().getAllTiles()) {
-                    if (tile.getOwner() == weakestAIPlayer) {
-                        tile.setOwner(strongestAIPlayer);
-                    }
-                }
-                for (Unit unit : weakestAIPlayer.getUnits()) {
-                    unit.setOwner(strongestAIPlayer);
-                    if (unit.getLocation() instanceof Europe) {
-                        unit.setLocation(strongestAIPlayer.getEurope());
-                    }
-                    cs.add(See.perhaps(), unit);
-                }
-
-                StringTemplate loser = weakestAIPlayer.getNationName();
-                StringTemplate winner = strongestAIPlayer.getNationName();
-                cs.addMessage(See.all(),
-                              new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                               "model.diplomacy.spanishSuccession",
-                                               strongestAIPlayer)
-                              .addStringTemplate("%loserNation%", loser)
-                              .addStringTemplate("%nation%", winner));
-                cs.addGlobalHistory(this,
-                    new HistoryEvent(getTurn(),
-                                     HistoryEvent.EventType.SPANISH_SUCCESSION)
-                              .addStringTemplate("%loserNation%", loser)
-                              .addStringTemplate("%nation%", winner));
-                weakestAIPlayer.setDead(true);
-                cs.addDead((ServerPlayer) weakestAIPlayer);
-                setSpanishSuccession(true);
-                cs.addPartial(See.all(), this, "spanishSuccession");
             }
+            for (Colony colony : weakestAIPlayer.getColonies()) {
+                colony.changeOwner(strongestAIPlayer);
+                for (Tile tile : colony.getOwnedTiles()) {
+                    cs.add(See.perhaps(), tile);
+                }
+            }
+            for (Unit unit : weakestAIPlayer.getUnits()) {
+                unit.setOwner(strongestAIPlayer);
+                if (unit.getLocation() instanceof Europe) {
+                    unit.setLocation(strongestAIPlayer.getEurope());
+                }
+                cs.add(See.perhaps(), unit);
+            }
+
+            StringTemplate loser = weakestAIPlayer.getNationName();
+            StringTemplate winner = strongestAIPlayer.getNationName();
+            cs.addMessage(See.all(),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "model.diplomacy.spanishSuccession",
+                                 strongestAIPlayer)
+                          .addStringTemplate("%loserNation%", loser)
+                          .addStringTemplate("%nation%", winner));
+            cs.addGlobalHistory(this,
+                new HistoryEvent(getTurn(),
+                                 HistoryEvent.EventType.SPANISH_SUCCESSION)
+                                .addStringTemplate("%loserNation%", loser)
+                                .addStringTemplate("%nation%", winner));
+            setSpanishSuccession(true);
+            cs.addPartial(See.all(), this, "spanishSuccession");
+
+            ((ServerPlayer) weakestAIPlayer).csKill(cs);
         }
     }
 

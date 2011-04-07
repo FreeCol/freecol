@@ -561,7 +561,7 @@ public final class InGameController extends Controller {
                 return Message.clientError("Can not get next player");
             }
             if (player.checkForDeath()) { // Remove dead players and retry
-                player.csKill(cs);
+                player.csWithdraw(cs);
                 sendToAll(cs);
                 logger.info(player.getNation() + " is dead.");
                 continue;
@@ -823,7 +823,7 @@ public final class InGameController extends Controller {
 
         // Clean up the player.
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csKill(cs);
+        serverPlayer.csWithdraw(cs);
         cs.addAttribute(See.only(serverPlayer), "highScore",
                         Boolean.toString(highScore));
 

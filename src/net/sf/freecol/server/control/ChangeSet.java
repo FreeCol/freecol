@@ -1059,7 +1059,7 @@ public class ChangeSet {
      */
     public ChangeSet addGlobalHistory(Game game, HistoryEvent history) {
         changes.add(new OwnedChange(See.all(), history));
-        for (Player p : game.getEuropeanPlayers()) {
+        for (Player p : game.getLiveEuropeanPlayers()) {
             p.addHistory(history);
         }
         return this;

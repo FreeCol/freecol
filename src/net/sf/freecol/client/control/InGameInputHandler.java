@@ -461,8 +461,8 @@ public final class InGameInputHandler extends InputHandler {
     private Element setDead(Element element) {
         FreeColClient freeColClient = getFreeColClient();
         Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
-
-        if (player == freeColClient.getMyPlayer()) {
+        Player myPlayer = freeColClient.getMyPlayer();
+        if (player == myPlayer) {
             if (freeColClient.isSingleplayer()) {
                 if (!new ShowConfirmDialogSwingTask(null, "defeatedSingleplayer.text", "defeatedSingleplayer.yes",
                         "defeatedSingleplayer.no").confirm()) {
@@ -475,6 +475,8 @@ public final class InGameInputHandler extends InputHandler {
                     freeColClient.quit();
                 }
             }
+        } else {
+            myPlayer.setStance(player, null);
         }
 
         return null;

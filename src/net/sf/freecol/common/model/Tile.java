@@ -1437,10 +1437,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (playerExploredTiles == null || getGame().getViewOwner() != null) {
             return;
         }
-        for (Player player : getGame().getPlayers()) {
-            if (player.isEuropean() && player.canSee(this)) {
-                updatePlayerExploredTile(player, false);
-            }
+        for (Player player : getGame().getLiveEuropeanPlayers()) {
+            if (player.canSee(this)) updatePlayerExploredTile(player, false);
         }
     }
 

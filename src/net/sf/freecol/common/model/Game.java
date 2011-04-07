@@ -718,14 +718,14 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Returns all the European players known by the player of this game.
+     * Returns all the live European players known by the player of this game.
      *
-     * @return All the European players known by the player of this game.
+     * @return All the live European players known by the player of this game.
      */
-    public List<Player> getEuropeanPlayers() {
+    public List<Player> getLiveEuropeanPlayers() {
         List<Player> europeans = new ArrayList<Player>();
         for (Player player : players) {
-            if (player.isEuropean()) {
+            if (player.isEuropean() && !player.isDead()) {
                 europeans.add(player);
             }
         }

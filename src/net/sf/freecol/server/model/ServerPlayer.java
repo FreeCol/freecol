@@ -285,7 +285,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return true;
 
         case ROYAL: // Still alive if there are rebels to quell
-            for (Player enemy : getGame().getPlayers()) {
+            for (Player enemy : getGame().getLiveEuropeanPlayers()) {
                 if (enemy.getREFPlayer() == (Player) this
                     && enemy.getPlayerType() == PlayerType.REBEL) {
                     return false;
@@ -479,41 +479,32 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Marks a player dead and remove any leftovers.
+     * Kill off a player and clear out its remains.
      *
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public ChangeSet csKill(ChangeSet cs) {
-        // Mark the player as dead.
+    public void csKill(ChangeSet cs) {
         setDead(true);
+        cs.addPartial(See.all(), this, "dead");
         cs.addDead(this);
 
-        // Notify everyone.
-        cs.addMessage(See.all().except(this),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             ((isEuropean())
-                              ? "model.diplomacy.dead.european"
-                              : "model.diplomacy.dead.native"),
-                             this)
-                .addStringTemplate("%nation%", getNationName()));
-
-        // Clean up missions and remove tension/alarm.
-        if (isEuropean()) {
-            for (Player other : getGame().getPlayers()) {
-                if (other.isIndian()) {
-                    for (IndianSettlement s : other.getIndianSettlements()) {
-                        Unit unit = s.getMissionary();
-                        if (unit != null
-                            && ((ServerPlayer) unit.getOwner()) == this) {
-                            s.changeMissionary(null);
-                            cs.addDispose(this, s.getTile(), unit);
-                            cs.add(See.perhaps(), s.getTile());
-                        }
-                        s.removeAlarm(this);
+        // Clean up missions and remove tension/alarm/stance.
+        for (Player other : getGame().getPlayers()) {
+            if (other == this) continue;
+            if (isEuropean() && other.isIndian()) {
+                for (IndianSettlement s : other.getIndianSettlements()) {
+                    Unit unit = s.getMissionary();
+                    if (unit != null
+                        && ((ServerPlayer) unit.getOwner()) == this) {
+                        s.changeMissionary(null);
+                        cs.addDispose(this, s.getTile(), unit);
+                        cs.add(See.perhaps(), s.getTile());
                     }
+                    s.removeAlarm(this);
                 }
                 other.removeTension(this);
             }
+            other.setStance(this, null);
         }
 
         // Remove settlements.  Update formerly owned tiles.
@@ -537,8 +528,23 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
             cs.addDispose(this, unit.getLocation(), unit);
         }
+    }
 
-        return cs;
+    /**
+     * Withdraw a player from the new world.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csWithdraw(ChangeSet cs) {
+        // Notify everyone.
+        cs.addMessage(See.all().except(this),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             ((isEuropean())
+                              ? "model.diplomacy.dead.european"
+                              : "model.diplomacy.dead.native"),
+                             this)
+                .addStringTemplate("%nation%", getNationName()));
+        csKill(cs);
     }
 
 
@@ -780,7 +786,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Do not need to update the clients here, these changes happen
         // while it is not their turn.
-        for (Player other : getGame().getEuropeanPlayers()) {
+        for (Player other : getGame().getLiveEuropeanPlayers()) {
             Market market;
             if ((ServerPlayer) other != this
                 && (market = other.getMarket()) != null) {
@@ -1042,7 +1048,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 java.util.Map<Player, Tension.Level> oldLevel
                     = new HashMap<Player, Tension.Level>();
                 oldLevels.put(settlement, oldLevel);
-                for (Player enemy : game.getEuropeanPlayers()) {
+                for (Player enemy : game.getLiveEuropeanPlayers()) {
                     Tension alarm = settlement.getAlarm(enemy);
                     if (alarm != null) oldLevel.put(enemy, alarm.getLevel());
                 }
@@ -1052,7 +1058,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (IndianSettlement settlement : allSettlements) {
                 java.util.Map<Player, Integer> extra
                     = new HashMap<Player, Integer>();
-                for (Player enemy : game.getEuropeanPlayers()) {
+                for (Player enemy : game.getLiveEuropeanPlayers()) {
                     extra.put(enemy, new Integer(0));
                 }
 
@@ -1112,7 +1118,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
 
             // Calm down a bit at the whole-tribe level.
-            for (Player enemy : game.getEuropeanPlayers()) {
+            for (Player enemy : game.getLiveEuropeanPlayers()) {
                 if (getTension(enemy).getValue() > 0) {
                     int change = -getTension(enemy).getValue()/100 - 4;
                     modifyTension(enemy, change);
@@ -1279,7 +1285,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             String eventId = event.getId();
             if (eventId.equals("model.event.resetNativeAlarm")) {
                 for (Player p : game.getPlayers()) {
-                    if (!p.isEuropean() && p.hasContacted(this)) {
+                    if (!p.isDead() && p.isIndian() && p.hasContacted(this)) {
                         p.setTension(this, new Tension(Tension.TENSION_MIN));
                         for (IndianSettlement is : p.getIndianSettlements()) {
                             if (is.hasContactedSettlement(this)) {

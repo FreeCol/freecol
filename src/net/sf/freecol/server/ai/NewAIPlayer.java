@@ -141,7 +141,7 @@ public abstract class NewAIPlayer extends AIObject {
         logger.finest("Entering method determineStances");
         Player player = getPlayer();
         for (Player p : getGame().getPlayers()) {
-            if (p != player) {
+            if (p != player && !p.isDead()) {
                 Stance newStance;
                 boolean symmetric;
                 if (p.getREFPlayer() == player

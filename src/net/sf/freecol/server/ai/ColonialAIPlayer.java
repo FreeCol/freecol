@@ -679,7 +679,7 @@ public class ColonialAIPlayer extends AIPlayer {
         logger.finest("Entering method determineStances");
         Player player = getPlayer();
         for (Player p : getGame().getPlayers()) {
-            if (p != player) determineStance(p);
+            if (p != player && !p.isDead()) determineStance(p);
         }
     }
 

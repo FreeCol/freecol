@@ -2601,6 +2601,10 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == this) {
             throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
         }
+        if (newStance == null) {
+            stance.remove(player.getId());
+            return;
+        }
         Stance oldStance = stance.get(player.getId());
         if (newStance.equals(oldStance)) {
             return;
@@ -2643,8 +2647,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *         any Europeans.
      */
     public boolean hasContactedEuropeans() {
-        for (Player other : getGame().getPlayers()) {
-            if (other != this && other.isEuropean() && hasContacted(other)) {
+        for (Player other : getGame().getLiveEuropeanPlayers()) {
+            if (other != this && hasContacted(other)) {
                 return true;
             }
         }
@@ -2658,7 +2662,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean hasContactedIndians() {
         for (Player other : getGame().getPlayers()) {
-            if (other != this && other.isIndian() && hasContacted(other)) {
+            if (other != this && !other.isDead() && other.isIndian()
+                && hasContacted(other)) {
                 return true;
             }
         }
@@ -2803,8 +2808,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 return true;
             }
             if (hasAbility("model.ability.customHouseTradesWithForeignCountries")) {
-                for (Player otherPlayer : getGame().getPlayers()) {
-                    if (otherPlayer != this && otherPlayer.isEuropean()
+                for (Player otherPlayer : getGame().getLiveEuropeanPlayers()) {
+                    if (otherPlayer != this
                         && (getStance(otherPlayer) == Stance.PEACE
                             || getStance(otherPlayer) == Stance.ALLIANCE)) {
                         return true;
