@@ -178,11 +178,11 @@ public class BuildColonyMission extends Mission {
             return;
         }
 
-        if (target == null
-            || (doNotGiveUp && (target.getSettlement() != null
-                                || colonyValue != player.getColonyValue(target)))) {
-            target = findColonyLocation(getUnit());
-            if (target == null) {
+        // Check target is valid and value has not degraded.
+        int newValue = (target == null) ? -1 : player.getColonyValue(target);
+        if (newValue <= 0 || newValue < colonyValue) {
+            if (!doNotGiveUp
+                || (target = findColonyLocation(getUnit())) == null) {
                 doNotGiveUp = false;
                 return;
             }
@@ -330,19 +330,19 @@ public class BuildColonyMission extends Mission {
 
             // Work out the path length to the target tile, ignore if we
             // can not get there.
-            int len;
+            float len;
             if (tile == startTile) {
-                len = 1;
+                len = 1.0f;
             } else {
                 PathNode path = (carrier == null)
                     ? map.findPath(unit, startTile, tile)
                     : map.findPath(unit, startTile, tile, carrier);
-                len = (path == null) ? -1 : path.getTotalTurns() + 1;
+                len = (path == null) ? -1.0f : path.getTotalTurns() + 1.0f;
             }
 
             // Score is proportional to tile value and inversely proportional
             // to distance.
-            if (len > 0) {
+            if (len > 0.0f) {
                 float value = unit.getOwner().getColonyValue(tile) / len;
                 if (value > bestValue) {
                     bestValue = value;

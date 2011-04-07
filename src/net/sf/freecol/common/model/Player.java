@@ -2416,8 +2416,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         //----- END MAGIC NUMBERS
 
-        // Also return 0 if a neighbouring tile contains a settlement.
-        for (Tile tile : t.getSurroundingTiles(1)) {
+        // Return 0 if there is a settlement here or neighbouring.
+        for (Tile tile : t.getSurroundingTiles(0, 1)) {
             if (tile.getSettlement() != null) return 0;
         }
 
