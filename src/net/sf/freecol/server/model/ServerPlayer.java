@@ -1860,10 +1860,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         } else if (burnedNativeCapital) {
             csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
             defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
+            cs.add(See.only(this), defenderPlayer); // TODO: just the tension
             for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
                 is.makeContactSettlement(this);
                 is.getAlarm(this).setValue(Tension.SURRENDERED);
-                cs.add(See.perhaps(), is);
+                cs.add(See.only(this), is);
             }
         } else { // At least one player is non-European
             if (isEuropean()) {

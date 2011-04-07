@@ -2230,11 +2230,15 @@ public class Player extends FreeColGameObject implements Nameable {
                                             + origin.getId());
         }
 
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        Tension.Level oldLevel = getTension(player).getLevel();
         getTension(player).modify(addToTension);
+        if (oldLevel != getTension(player).getLevel()) {
+            objects.add(this);
+        }
 
         // Propagate tension change as settlement alarm to all
         // settlements except the one that originated it (if any).
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         for (Settlement settlement : settlements) {
             if (!settlement.equals(origin)) {
                 if (settlement.propagateAlarm(player, addToTension)) {
