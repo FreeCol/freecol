@@ -245,9 +245,11 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 // Deselect the object if it is the current active unit.
                 GUI gui = getFreeColClient().getCanvas().getGUI();
-                if (fcgo instanceof Unit
-                    && (Unit)fcgo == gui.getActiveUnit()) {
-                    gui.setActiveUnit(null);
+                if (fcgo instanceof Unit) {
+                    player.invalidateCanSeeTiles();
+                    if ((Unit)fcgo == gui.getActiveUnit()) {
+                        gui.setActiveUnit(null);
+                    }
                 }
 
                 // Do just the low level dispose that removes
