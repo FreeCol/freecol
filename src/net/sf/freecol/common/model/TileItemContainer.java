@@ -243,7 +243,7 @@ public class TileItemContainer extends FreeColGameObject {
     public List<TileImprovement> getImprovements() {
         return getImprovements(false);
     }
-        
+
     /**
      * Returns a <code>List</code> of the completed
      * <code>TileImprovement</code>s in this
@@ -417,7 +417,7 @@ public class TileItemContainer extends FreeColGameObject {
             }
         }
     }
-    
+
     public void copyFrom(TileItemContainer tic) {
         copyFrom(tic, true, false);
     }
@@ -481,14 +481,14 @@ public class TileItemContainer extends FreeColGameObject {
         }
         return null;
     }
-    
+
     /**
      * Will check whether this tile has a completed improvement of the given
      * type.
-     * 
+     *
      * Useful for checking whether the tile for instance has a road or is
      * plowed.
-     * 
+     *
      * @param type
      *            The type to check for.
      * @return Whether the tile has the improvement and the improvement is
@@ -549,18 +549,18 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
@@ -568,7 +568,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) 
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         PlayerExploredTile pet = (showAll) ? null
             : tile.getPlayerExploredTile(player);
@@ -637,11 +637,11 @@ public class TileItemContainer extends FreeColGameObject {
     public static String getXMLElementTagName() {
         return "tileitemcontainer";
     }
-    
-    
+
+
     /**
      * Creates a <code>String</code> representation of this
-     * <code>TileItemContainer</code>.    
+     * <code>TileItemContainer</code>.
      */
     public String toString() {
         StringBuffer sb = new StringBuffer(60);
