@@ -102,6 +102,35 @@ public class Messages {
         messageBundle = new HashMap<String, String>();
         List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX, FILE_SUFFIX, language, country, variant);
 
+        if (!NumberRules.isInitialized()) {
+            // attempt to read grammatical rules
+            File stringDirectory = new File(FreeCol.getDataDirectory(), "strings");
+            if (stringDirectory.exists()) {
+                File cldr = new File(stringDirectory, "plurals.xml");
+                if (cldr.exists()) {
+                    try {
+                        FileInputStream in = new FileInputStream(cldr);
+                        NumberRules.load(in);
+                        in.close();
+                    } catch(Exception e) {
+                        logger.warning("Failed to read CLDR rules: "
+                                       + e.toString());
+                    }
+                } else {
+                    logger.warning("Could not find CLDR rules: "
+                                   + cldr.getPath());
+                }
+            } else {
+                logger.warning("Could not find string directory: "
+                               + stringDirectory.getName());
+            }
+        }
+
+        Number number = NumberRules.getNumberForLanguage(language);
+        if (number != null) {
+            grammaticalNumber = number;
+        }
+
         for (String fileName : filenames) {
             File resourceFile = new File(getI18nDirectory(), fileName);
             loadResources(resourceFile);
@@ -202,7 +231,9 @@ public class Messages {
                 continue;
             }
             String selector = input.substring(colonIndex + 1, pipeIndex);
-            if (selector.startsWith("%") && selector.endsWith("%")) {
+            if ("".equals(selector)) {
+                selector = "default";
+            } else if (selector.startsWith("%") && selector.endsWith("%")) {
                 if (template == null) {
                     selector = "default";
                 } else {
@@ -212,9 +243,9 @@ public class Messages {
                         continue;
                     } else {
                         selector = message(replacement);
-                    }
-                    if ("plural".equalsIgnoreCase(tag)) {
-                        selector = grammaticalNumber.getKey(selector);
+                        if ("plural".equalsIgnoreCase(tag)) {
+                            selector = grammaticalNumber.getKey(selector);
+                        }
                     }
                 }
             } else if ("plural".equalsIgnoreCase(tag)) {
@@ -232,13 +263,19 @@ public class Messages {
                         continue;
                     } else if (replacement.getTemplateType() == TemplateType.KEY) {
                         otherKey = messageBundle.get(replacement.getId());
-                        keyIndex = otherKey.indexOf(selector);
+                        keyIndex = otherKey.indexOf("{{");
                         if (keyIndex < 0) {
-                            logger.warning("Failed to find key " + selector + " in replacement "
-                                           + replacement.getId());
-                            continue;
+                            // not a choice format
+                            result.append(otherKey);
                         } else {
-                            result.append(getChoice(otherKey, selector));
+                            keyIndex = otherKey.indexOf(selector, keyIndex);
+                            if (keyIndex < 0) {
+                                logger.warning("Failed to find key " + selector + " in replacement "
+                                               + replacement.getId());
+                                continue;
+                            } else {
+                                result.append(getChoice(otherKey, selector));
+                            }
                         }
                     } else {
                         logger.warning("Choice substitution attempted, but template type was "
@@ -325,10 +362,8 @@ public class Messages {
             String key = messageBundle.get(template.getId());
             if (key == null) {
                 return template.getId();
-            } else if (key.startsWith("{{") && key.endsWith("}}")) {
-                return key.substring(2, key.length() - 2);
             } else {
-                return key;
+                return replaceChoices(key, null);
             }
         case NAME:
         default:

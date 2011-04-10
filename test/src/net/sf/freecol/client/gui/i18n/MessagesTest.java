@@ -141,7 +141,6 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals(StringTemplate.TemplateType.NAME,
                      t1.getReplacements().get(1).getTemplateType());
         assertEquals("model.goods.goodsAmount", t1.getId());
-        assertEquals("%amount% %goods%", Messages.message(t1.getId()));
         assertEquals("100 Food", Messages.message(t1));
 
 	StringTemplate t2 = StringTemplate.label(" / ")
@@ -179,6 +178,7 @@ public class MessagesTest extends FreeColTestCase {
         };
         String choices = "|zero=zero|one=one|two=two|few=few|many=many|other=other}}|xyz";
         // default Number is Other
+        Messages.setGrammaticalNumber(NumberRules.OTHER_NUMBER_RULE);
         for (double d : numbers) {
             assertEquals("abcother|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
         }

@@ -75,6 +75,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Scope;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit.Role;
@@ -859,9 +860,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 doc.insertString(doc.getLength(), "\n", doc.getStyle("regular"));
             }
             if (buildingType.getPopulationRequired() > 0) {
+                StringTemplate template = StringTemplate.template("colonist")
+                    .addAmount("%number%", buildingType.getPopulationRequired());
                 doc.insertString(doc.getLength(),
-                                 String.valueOf(buildingType.getPopulationRequired()) + " " +
-                                 Messages.message("colonists") + "\n",
+                                 Messages.message(template) + "\n",
                                  doc.getStyle("regular"));
             }
             appendRequiredAbilities(doc, buildingType);

@@ -97,9 +97,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Goods g = new Goods(getGame(), null, cottonType, 75);
 
-        System.out.println(Messages.message(g.getLabel(true)));
         assertEquals("75 Cotton", Messages.message(g.getLabel(true)));
-
         assertEquals("75 Cotton (boycotted)", Messages.message(g.getLabel(false)));
 
         // Same as getName(int, boolean)

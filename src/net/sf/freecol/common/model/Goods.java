@@ -153,9 +153,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      * @return The name of this type of goods.
      */
     public StringTemplate getLabel(boolean sellable) {
-        return StringTemplate.template("model.goods.goodsAmount")
+        return StringTemplate.template(sellable ? "model.goods.goodsAmount" : "model.goods.goodsBoycotted")
             .addAmount("%amount%", getAmount())
-            .addStringTemplate("%goods%", getType().getLabel(sellable));
+            .add("%goods%", getType().getNameKey());
     }
 
     /**

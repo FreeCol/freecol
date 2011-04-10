@@ -44,19 +44,23 @@ public class NumberRules {
     public static Number PLURAL_NUMBER_RULE = new PluralNumberRule();
     public static Number ZERO_ONE_NUMBER_RULE = new ZeroOneNumberRule();
 
-    Map<String, Number> numberMap = new HashMap<String, Number>();
+    private static Map<String, Number> numberMap = new HashMap<String, Number>();
 
     public NumberRules(InputStream in) {
         load(in);
     }
 
 
-    public Number getNumberForLanguage(String lang) {
+    public static Number getNumberForLanguage(String lang) {
         return numberMap.get(lang);
     }
 
+    public static boolean isInitialized() {
+        return !numberMap.isEmpty();
+    }
 
-    private void load(InputStream in) {
+
+    public static void load(InputStream in) {
 
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
@@ -69,7 +73,7 @@ public class NumberRules {
         }
     }
 
-    private void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    private static void readFromXML(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = in.getLocalName();
             if ("version".equals(tag)) {
@@ -87,7 +91,7 @@ public class NumberRules {
         }
     }
 
-    private void readChild(XMLStreamReader in) throws XMLStreamException {
+    private static void readChild(XMLStreamReader in) throws XMLStreamException {
 
         String[] locales = in.getAttributeValue(null, "locales").split(" ");
         if (locales != null) {
