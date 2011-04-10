@@ -36,7 +36,7 @@ public class InstallerTranslations {
     private static final File MAIN_FILE =
         new File(SOURCE_DIRECTORY, "FreeColMessages.properties");
     private static final File DESTINATION_DIRECTORY =
-        new File("build/bin/langpacks/installer");
+        new File("build/installer");
     private static final File LANGUAGE_CODES =
         new File(DESTINATION_DIRECTORY, "iso-639-2.txt");
 

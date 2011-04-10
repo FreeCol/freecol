@@ -357,11 +357,15 @@ are the work of the devil!
   compile, run all tests and verify the specification(s). You can do
   that by calling \verb+ant prepare-commit+.
 
-\item Call \verb+ant dist+ in order to build all packages. It might be
+\item Call \verb+ant dist+ in order to build all packages. You will be
+  prompted for the version of this release. Alternatively, you can
+  specify the version on the command line, by saying something like
+  \verb+ant -Dfreecol.version=0.9.0-alpha2 dist+ instead (replace
+  0.9.0-alpha2 with the correct version, of course). It might be
   necessary to increase the memory available for ant, for example by
-  setting the environment variable \verb+ANT_OPTS="-Xms256m -Xmx256m"+.
-  Errors in language packs only apply to the installer and need not
-  delay the overall release.
+  setting the environment variable
+  \verb+ANT_OPTS="-Xms256m -Xmx256m"+.  Errors in language packs only
+  apply to the installer and need not delay the overall release.
 
 \item Install one of the generated packages and verify that you can play
   normally for at least five turns. Other good tests include loading a

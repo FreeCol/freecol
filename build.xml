@@ -214,8 +214,7 @@
         <mkdir dir="${freecol.release.dir}"/>
     </target>
 
-    <target name="setReleaseVersion" unless="freecol.version">
-        <input message="Please specify the release version (default: svn-${DSTAMP}): " addproperty="freecol.version" defaultvalue="svn-${DSTAMP}" />
+    <target name="setReleaseVersion" depends="askReleaseVersion">
         <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>
         <echo message="Creating Distribution of ${freecol.release.name}"/>
         <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
@@ -223,6 +222,11 @@
                        replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
                        />
         <echo message="Game version updated in FreeCol.java" />
+    </target>
+
+    <target name="askReleaseVersion" unless="freecol.version">
+        <input message="Please specify the release version (default: svn-${DSTAMP}): "
+               addproperty="freecol.version" defaultvalue="svn-${DSTAMP}" />
     </target>
 
     <target name="prepareManual" depends="initDist,print-manual">
