@@ -595,7 +595,9 @@ public class SimpleCombatModel extends CombatModel {
                 if (attackerWon) {
                     if (r < winner.getConvertProbability()) {
                         if (is.getUnitCount() + tile.getUnitCount() > 1
-                            && is.getMissionary(winnerPlayer) != null) {
+                            && is.getMissionary(winnerPlayer) != null
+                            && winner.getTile() != null
+                            && winner.getTile().isLand()) {
                             crs.add(CombatResult.CAPTURE_CONVERT);
                             lose++;
                         }
