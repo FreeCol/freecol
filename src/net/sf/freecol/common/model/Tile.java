@@ -1624,7 +1624,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      /**
       * Returns all the tiles surrounding this tile within the
       * given inclusive upper and lower bounds.
-      * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r).
+      * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r),
+      * thus this tile is included if rangeMin is zero.
       *
       * @param rangeMin The inclusive minimum distance from this tile.
       * @param rangeMax The inclusive maximum distance from this tile.
@@ -1632,31 +1633,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
       */
      public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
          List<Tile> result = new ArrayList<Tile>();
+         if (rangeMin > rangeMax || rangeMin < 0) return result;
 
-         if (rangeMin > rangeMax || rangeMin < 0) {
-             return result;
-}
+         if (rangeMin == 0) result.add(this);
 
-         if (rangeMax == 0) {
-             result.add(this);
-             return result;
+         if (rangeMax > 0) {
+             for (Tile t : getSurroundingTiles(rangeMax)) {
+                 // add all tiles up to rangeMax
+                 result.add(t);
+             }
          }
-         for (Tile tileToAdd: getSurroundingTiles(rangeMax)){
-             // add all tiles up to rangeMax
-             result.add(tileToAdd);
-         }
-         if (rangeMin == 0) { // remove nothing
-             return result;
-         }
-
-         if (rangeMin == 1) { // remove just the center tile
-             result.remove(this);
-             return result;
-         }
-
-         for (Tile tileToRemove: getSurroundingTiles(rangeMin - 1)) {
-             // remove the tiles closer than rangeMin
-             result.remove(tileToRemove);
+         if (rangeMin > 1) {
+             for (Tile t : getSurroundingTiles(rangeMin - 1)) {
+                 // remove the tiles closer than rangeMin
+                 result.remove(t);
+             }
          }
          return result;
      }
