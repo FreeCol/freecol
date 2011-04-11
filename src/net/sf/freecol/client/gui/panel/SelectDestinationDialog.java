@@ -135,16 +135,18 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
             PathNode path = unit.findPathToEurope();
-            if (path != null) {
+            int turns = (path != null)
+                ? unit.getSailTurns() + path.getTotalTurns()
+                : (unit.getTile() != null
+                   && (unit.getTile().canMoveToEurope()
+                       || unit.getTile().isAdjacentToMapEdge()))
+                ? unit.getSailTurns()
+                : -1;
+            if (turns >= 0) {
                 Europe europe = getMyPlayer().getEurope();
-                destinations.add(0, new Destination(europe, path.getTotalTurns(),
-                                                    getExtras(unit, europe, goodsTypes)));
-            } else if (unit.getTile() != null
-                       && (unit.getTile().canMoveToEurope()
-                           || unit.getTile().isAdjacentToMapEdge())) {
-                Europe europe = getMyPlayer().getEurope();
-                destinations.add(0, new Destination(europe, 0,
-                                                    getExtras(unit, europe, goodsTypes)));
+                destinations.add(0,
+                    new Destination(europe, turns,
+                        getExtras(unit, europe, goodsTypes)));
             }
         }
 
