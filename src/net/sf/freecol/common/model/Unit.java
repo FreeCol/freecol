@@ -1044,12 +1044,12 @@ public class Unit extends FreeColGameObject
     /**
      * Convenience wrapper to find a path to Europe for this unit.
      *
-     * @return A path to Europe, or null if already there.
+     * @return A path to Europe, or null if none found.
      */
     public PathNode findPathToEurope() {
         Location loc = getLocation();
         return (loc instanceof Tile)
-            ? getGame().getMap().findPathToEurope((Tile) loc)
+            ? getGame().getMap().findPathToEurope(this, (Tile) loc)
             : null;
     }
 
