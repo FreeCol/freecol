@@ -2403,7 +2403,8 @@ public class Unit extends FreeColGameObject
      */
     public boolean isInMission() {
         return getRole() == Role.MISSIONARY
-            && getTile() == null;
+            && getTile() == null
+            && !(getLocation() instanceof Unit);
     }
 
     /**
