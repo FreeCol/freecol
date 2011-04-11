@@ -193,6 +193,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     if (newUnit.hasAbility("model.ability.bornInColony")) {
                         newUnitBorn = true;
                     }
+                    tileDirty = true;
                 } else if (buildable instanceof BuildingType) {
                     colonyDirty = buildBuilding(queue, cs, updates);
                 } else {
