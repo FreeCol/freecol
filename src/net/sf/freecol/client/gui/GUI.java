@@ -1555,7 +1555,7 @@ public final class GUI {
                             BuildableType buildable = colony.getCurrentlyBuilding();
                             if (buildable != null) {
                                 specs = new TextSpecification[2];
-                                String turnsStr = colony.getTurnsText(buildable);
+                                String turnsStr = Messages.getTurnsText(colony.getTurnsToComplete(buildable));
                                 String nowBuilding = Messages.message(buildable.getNameKey()) + " " + turnsStr;
                                 specs[1] = new TextSpecification(nowBuilding, productionFont);
                             }

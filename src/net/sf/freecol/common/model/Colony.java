@@ -1063,7 +1063,9 @@ public class Colony extends Settlement implements Nameable {
         boolean goodsBeingProduced = false;
         boolean productionMissing = false;
 
-        TypeCountMap<GoodsType> netProduction = getNetProduction();
+        java.util.Map<Object, ProductionInfo> production = getProductionAndConsumption();
+        TypeCountMap<GoodsType> netProduction = getNetProduction(production);
+        ProductionInfo info = production.get(buildQueue);
         for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
@@ -1072,6 +1074,15 @@ public class Colony extends Settlement implements Nameable {
             }
             goodsMissing = true;
             int amountProduced = netProduction.getCount(requiredGoods.getType());
+            if (info != null) {
+                for (AbstractGoods consumed : info.getConsumption()) {
+                    if (consumed.getType() == requiredGoods.getType()) {
+                        // add the amount the build queue itself will consume
+                        amountProduced += consumed.getAmount();
+                        break;
+                    }
+                }
+            }
             if (amountProduced <= 0) {
                 productionMissing = true;
                 continue;
@@ -1089,20 +1100,6 @@ public class Colony extends Settlement implements Nameable {
             : (!goodsBeingProduced) ? UNDEFINED
             : (productionMissing) ? -result
             : result;
-    }
-
-    /**
-     * Gets a string describing the number of turns left for this colony
-     * to finish a Buildable.
-     *
-     * @param buildable The <code>BuildableType</code> to build.
-     * @return A descriptive string.
-     */
-    public String getTurnsText(BuildableType buildable) {
-        int turns = getTurnsToComplete(buildable);
-        return (turns == UNDEFINED) ? Messages.message("notApplicable.short")
-            : (turns >= 0) ? Integer.toString(turns)
-            : ">" + Integer.toString(-turns);
     }
 
     /**

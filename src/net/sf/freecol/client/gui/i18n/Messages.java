@@ -519,6 +519,20 @@ public class Messages {
         return message("model.stance." + stance.toString().toLowerCase());
     }
 
+    /**
+     * Gets a string describing the number of turns left for a colony
+     * to finish building something.
+     *
+     * @param turns the number of turns left
+     * @return A descriptive string.
+     */
+    public static String getTurnsText(int turns) {
+        return (turns == FreeColObject.UNDEFINED)
+            ? message("notApplicable.short")
+            : (turns >= 0) ? Integer.toString(turns)
+            : ">" + Integer.toString(-turns);
+    }
+
     public static String getNewLandName(Player player) {
         if (player.getNewLandName() == null) {
             return message(player.getNationID() + ".newLandName");

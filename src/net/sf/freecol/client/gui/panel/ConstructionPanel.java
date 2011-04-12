@@ -117,7 +117,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                 add(new JLabel(clickToBuild), "span, align center");
             }
         } else {
-            String turnsStr = colony.getTurnsText(buildable);
+            int turnsToComplete = colony.getTurnsToComplete(buildable);
+            String turnsStr = Messages.getTurnsText(turnsToComplete);
             add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))),
                 "spany");
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
@@ -130,6 +131,9 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                 int amountNeeded = requiredGoods.getAmount();
                 int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
                 int amountProduced = netProduction.getCount(requiredGoods.getType());
+                if (turnsToComplete < 2) {
+                    amountProduced += amountNeeded;
+                }
                 add(new FreeColProgressBar(parent, requiredGoods.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");
