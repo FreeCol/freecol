@@ -61,10 +61,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -108,7 +111,12 @@ public final class ColonyPanel extends FreeColPanel
      */
     public static final int SCROLL_SPEED = 40;
 
-    private static final int EXIT = 0, BUILDQUEUE = 1, UNLOAD = 2, WAREHOUSE = 4, FILL = 5;
+    private static final int EXIT = 0,
+        BUILDQUEUE = 1,
+        UNLOAD = 2,
+        WAREHOUSE = 4,
+        FILL = 5,
+        SETGOODS = 6;
 
     private final JPanel netProductionPanel = new JPanel();
     private final PopulationPanel populationPanel = new PopulationPanel();
@@ -152,6 +160,9 @@ public final class ColonyPanel extends FreeColPanel
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
 
     private JButton buildQueueButton = new JButton(Messages.message("colonyPanel.buildQueue"));
+
+    private JButton setGoodsButton = (FreeCol.isInDebugMode())
+        ? new JButton("Set Goods") : null;
 
     /**
      * The saved size of this panel.
@@ -274,6 +285,12 @@ public final class ColonyPanel extends FreeColPanel
         enterPressesWhenFocused(buildQueueButton);
         buildQueueButton.addActionListener(this);
 
+        if (setGoodsButton != null) {
+            setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
+            enterPressesWhenFocused(setGoodsButton);
+            setGoodsButton.addActionListener(this);
+        }
+
         selectedUnitLabel = null;
 
         // See the message of Ulf Onnen for more information about the presence
@@ -293,10 +310,13 @@ public final class ColonyPanel extends FreeColPanel
         add(cargoScroll, "grow, sg, height 60:121:");
         add(outsideColonyScroll, "grow, sg, height 60:121:");
         add(warehouseScroll, "span, height 40:60:, growx");
-        add(unloadButton, "span, split 5, align center");
+        add(unloadButton, "span, split "
+            + Integer.toString((setGoodsButton == null) ? 5 : 6)
+            + ", align center");
         add(fillButton);
         add(warehouseButton);
         add(buildQueueButton);
+        if (setGoodsButton != null) add(setGoodsButton);
         add(exitButton);
 
         initialize(colony);
@@ -376,6 +396,10 @@ public final class ColonyPanel extends FreeColPanel
         editable = colony.getOwner() == getMyPlayer();
     }
 
+    public void updateConstructionPanel() {
+        constructionPanel.update();
+    }
+
     public void updateInPortPanel() {
         inPortPanel.initialize();
     }
@@ -437,15 +461,18 @@ public final class ColonyPanel extends FreeColPanel
             case WAREHOUSE:
                 if (canvas.showFreeColDialog(new WarehouseDialog(canvas,
                                                                  colony))) {
-                    warehousePanel.update();
+                    updateWarehousePanel();
                 }
                 break;
             case BUILDQUEUE:
                 canvas.showSubPanel(new BuildQueuePanel(colony, canvas));
-                constructionPanel.update();
+                updateConstructionPanel();
                 break;
             case FILL:
                 fill();
+                break;
+            case SETGOODS:
+                debugSetGoods(canvas, colony);
                 break;
             default:
                 logger.warning("Invalid action");
@@ -454,6 +481,42 @@ public final class ColonyPanel extends FreeColPanel
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number: " + command);
         }
+    }
+
+    /**
+     * Interactive debug-mode change of goods amount in a colony.
+     *
+     * @param canvas The <code>Canvas</code> to use.
+     * @param colony The <code>Colony</code> to set goods amounts in.
+     */
+    private void debugSetGoods(Canvas canvas, Colony colony) {
+        List<ChoiceItem<GoodsType>> gtl
+            = new ArrayList<ChoiceItem<GoodsType>>();
+        for (GoodsType t : getSpecification().getGoodsTypeList()) {
+            gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
+                                              t));
+        }
+        GoodsType goodsType = canvas.showChoiceDialog(null, "Select Goods Type",
+                                                      "Cancel", gtl);
+        if (goodsType == null) return;
+        String amount = canvas.showInputDialog(null, "Select Goods Amount",
+                Integer.toString(colony.getGoodsCount(goodsType)),
+                "ok", "cancel", true);
+        if (amount == null) return;
+        int a;
+        try {
+            a = Integer.parseInt(amount);
+        } catch (NumberFormatException nfe) {
+            return;
+        }
+        GoodsContainer cgc = colony.getGoodsContainer();
+        cgc.setAmount(goodsType, a);
+        GoodsContainer sgc = (GoodsContainer) getClient().getFreeColServer()
+            .getGame().getFreeColGameObject(cgc.getId());
+        sgc.setAmount(goodsType, a);
+        updateConstructionPanel();
+        updateProductionPanel();
+        updateWarehousePanel();
     }
 
     /**
@@ -757,7 +820,7 @@ public final class ColonyPanel extends FreeColPanel
             updateProductionPanel();
             updateWarehousePanel();
             buildingsPanel.update();
-            constructionPanel.update();
+            updateConstructionPanel();
         } else if (Tile.UNIT_CHANGE.equals(property)) {
             updateOutsideColonyPanel();
             updateInPortPanel();
