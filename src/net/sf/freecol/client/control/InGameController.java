@@ -2554,6 +2554,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             }
         }
+        clearGotoOrders(unit);
     }
 
     /**
@@ -2625,6 +2626,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void moveLearnSkill(Unit unit, Direction direction) {
+        clearGotoOrders(unit);
         // Refresh knowledge of settlement skill.  It may have been
         // learned by another player.
         if (!askSkill(unit, direction)) {
@@ -2712,6 +2714,7 @@ public final class InGameController implements NetworkConstants {
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
+        clearGotoOrders(unit);
 
         // Offer the choices.
         NationSummary ns = getNationSummary(settlement.getOwner());
@@ -2798,6 +2801,7 @@ public final class InGameController implements NetworkConstants {
         boolean canEstablish = missionary == null;
         boolean canDenounce = missionary != null
             && missionary.getOwner() != unit.getOwner();
+        clearGotoOrders(unit);
 
         // Offer the choices.
         switch (canvas.showUseMissionaryDialog(unit, settlement,
@@ -2917,6 +2921,8 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
+        clearGotoOrders(unit);
+
         switch (canvas.showScoutForeignColonyDialog(colony, unit, canNeg)) {
         case CANCEL:
             break;
@@ -3100,6 +3106,8 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction to the settlement.
      */
     private void moveTrade(Unit unit, Direction direction) {
+        clearGotoOrders(unit);
+
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement instanceof Colony) {
             moveTradeColony(unit, direction);
