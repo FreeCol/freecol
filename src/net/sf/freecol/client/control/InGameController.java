@@ -1800,7 +1800,7 @@ public final class InGameController implements NetworkConstants {
                 if (unit.getDestination() instanceof Europe) {
                     moveToEurope(unit);
                 } else {
-                    moveMove(unit, direction);
+                    moveHighSeas(unit, direction);
                 }
             }
             return false;
