@@ -131,7 +131,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                 int amountNeeded = requiredGoods.getAmount();
                 int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
                 int amountProduced = netProduction.getCount(requiredGoods.getType());
-                if (turnsToComplete < 2) {
+                if (turnsToComplete == 0 || turnsToComplete == 1) {
                     amountProduced += amountNeeded;
                 }
                 add(new FreeColProgressBar(parent, requiredGoods.getType(), 0,
