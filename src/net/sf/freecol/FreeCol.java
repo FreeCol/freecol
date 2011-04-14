@@ -857,6 +857,13 @@ public final class FreeCol {
         return freeColSeed;
     }
 
+    /**
+     * Increments the seed for the PRNG.
+     */
+    public static void incrementFreeColSeed() {
+        freeColSeed++;
+    }
+
     private static void startServer() {
         logger.info("Starting stand-alone server.");
         try {

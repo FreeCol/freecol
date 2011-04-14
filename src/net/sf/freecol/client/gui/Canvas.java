@@ -1655,8 +1655,10 @@ public final class Canvas extends JDesktopPane {
             if (freeColClient.isMapEditor()) {
                 specification = freeColClient.getGame().getSpecification();
             } else if (showConfirmDialog("stopCurrentGame.text",
-                                         "stopCurrentGame.yes", "stopCurrentGame.no")) {
+                                         "stopCurrentGame.yes",
+                                         "stopCurrentGame.no")) {
                 freeColClient.getConnectController().quitGame(true);
+                FreeCol.incrementFreeColSeed();
             }
             removeInGameComponents();
         }
