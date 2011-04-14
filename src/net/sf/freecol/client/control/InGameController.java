@@ -4215,8 +4215,7 @@ public final class InGameController implements NetworkConstants {
         // Try to change the work location.
         ColonyWas colonyWas = new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(unit);
-        if (askWork(unit, workLocation)
-            && unit.getLocation() == workLocation) {
+        if (askWork(unit, workLocation) && unit.getLocation() == workLocation) {
             colonyWas.fireChanges();
             unitWas.fireChanges();
         }

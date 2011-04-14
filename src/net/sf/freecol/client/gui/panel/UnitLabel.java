@@ -56,7 +56,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class UnitLabel extends JLabel implements ActionListener {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
+        private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
     public static enum UnitAction { ASSIGN,
             CLEAR_SPECIALITY, ACTIVATE_UNIT, FORTIFY, SENTRY,
@@ -77,7 +77,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Initializes this JLabel with the given unit data.
-     * 
+     *
      * @param unit The Unit that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      */
@@ -95,7 +95,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Initializes this JLabel with the given unit data.
-     * 
+     *
      * @param unit The Unit that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      * @param isSmall The image will be smaller if set to <code>true</code>.
@@ -108,7 +108,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Initializes this JLabel with the given unit data.
-     * 
+     *
      * @param unit The Unit that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      * @param isSmall The image will be smaller if set to <code>true</code>.
@@ -123,7 +123,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Returns the parent Canvas object.
-     * 
+     *
      * @return This UnitLabel's Canvas.
      */
     public Canvas getCanvas() {
@@ -132,7 +132,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Returns this UnitLabel's unit data.
-     * 
+     *
      * @return This UnitLabel's unit data.
      */
     public Unit getUnit() {
@@ -141,7 +141,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Sets whether or not this unit should be selected.
-     * 
+     *
      * @param b Whether or not this unit should be selected.
      */
     public void setSelected(boolean b) {
@@ -151,7 +151,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     /**
      * Sets whether or not this unit label should include production and state
      * information.
-     * 
+     *
      * @param b Whether or not this unit label should include production and
      *            state information.
      */
@@ -161,7 +161,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Makes a smaller version.
-     * 
+     *
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
@@ -173,10 +173,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
             // ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth()
             // / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
-                    (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
+                                                                         (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
 
             setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance(
-                    (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
+                                                                                         (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
             setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
             this.isSmall = true;
         } else {
@@ -201,10 +201,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Gets the description label.
-     * 
+     *
      * The description label is a tooltip with the unit name and description of
      * the terrain its on if applicable *
-     * 
+     *
      * @return This UnitLabel's description label.
      */
     public String getDescriptionLabel() {
@@ -213,10 +213,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Sets the description label.
-     * 
+     *
      * The description label is a tooltip with the unit name and description of
      * the terrain its on if applicable
-     * 
+     *
      * @param label The string to set the label to.
      */
     public void setDescriptionLabel(String label) {
@@ -226,7 +226,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
      * Paints this UnitLabel.
-     * 
+     *
      * @param g The graphics context in which to do the painting.
      */
     public void paintComponent(Graphics g) {
@@ -275,8 +275,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                             leftIndent, // indent from left side of label (icon is placed at the left side)
                             ((getHeight() - textHeight) / 2),
                             null);
-                g.drawImage(repairImage2, 
-                            leftIndent, 
+                g.drawImage(repairImage2,
+                            leftIndent,
                             ((getHeight() - textHeight) / 2) + repairImage1.getHeight(null),
                             null);
             }
@@ -286,71 +286,71 @@ public final class UnitLabel extends JLabel implements ActionListener {
     /**
      * Analyzes an event and calls the right external methods to take care of
      * the user's request.
-     * 
+     *
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
         String commandString = event.getActionCommand();
-	String arg = null;
-	int index = commandString.indexOf(':');
-	if (index > 0) {
-	    arg = commandString.substring(index + 1);
-	    commandString = commandString.substring(0, index);
-	}
-	UnitAction command = Enum.valueOf(UnitAction.class, commandString.toUpperCase());
-	switch(command) {
-	case ASSIGN:
-	    Unit teacher = (Unit) unit.getGame().getFreeColGameObject(arg);
-	    inGameController.assignTeacher(unit, teacher);
-	    Component uc = getParent();
-	    while (uc != null) {
+        String arg = null;
+        int index = commandString.indexOf(':');
+        if (index > 0) {
+            arg = commandString.substring(index + 1);
+            commandString = commandString.substring(0, index);
+        }
+        UnitAction command = Enum.valueOf(UnitAction.class, commandString.toUpperCase());
+        switch(command) {
+        case ASSIGN:
+            Unit teacher = (Unit) unit.getGame().getFreeColGameObject(arg);
+            inGameController.assignTeacher(unit, teacher);
+            Component uc = getParent();
+            while (uc != null) {
                 /*
-		if (uc instanceof ColonyPanel) {
-		    ((ColonyPanel) uc).reinitialize();
-		    break;
-		}
+                  if (uc instanceof ColonyPanel) {
+                  ((ColonyPanel) uc).reinitialize();
+                  break;
+                  }
                 */
-		uc = uc.getParent();
-	    }
-	    break;
-	case WORK_TILE:
-	    GoodsType goodsType = parent.getSpecification().getGoodsType(arg);
-	    // Change workType first for the benefit of change listeners
-	    inGameController.changeWorkType(unit, goodsType);
-	    // Move unit to best producing ColonyTile
-	    ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, false, goodsType);
+                uc = uc.getParent();
+            }
+            break;
+        case WORK_TILE:
+            GoodsType goodsType = parent.getSpecification().getGoodsType(arg);
+            // Change workType first for the benefit of change listeners
+            inGameController.changeWorkType(unit, goodsType);
+            // Move unit to best producing ColonyTile
+            ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, false, goodsType);
             if (bestTile != unit.getLocation()) {
                 inGameController.work(unit, bestTile);
             }
-	    break;
-	case WORK_BUILDING:
-	    BuildingType buildingType = parent.getSpecification().getBuildingType(arg);
-	    Building building = unit.getColony().getBuilding(buildingType);
-	    inGameController.work(unit, building);
-	    break;
-	case ACTIVATE_UNIT:
+            break;
+        case WORK_BUILDING:
+            BuildingType buildingType = parent.getSpecification().getBuildingType(arg);
+            Building building = unit.getColony().getBuilding(buildingType);
+            inGameController.work(unit, building);
+            break;
+        case ACTIVATE_UNIT:
             inGameController.changeState(unit, UnitState.ACTIVE);
-	    parent.getGUI().setActiveUnit(unit);
-	    break;
-	case FORTIFY:
-	    inGameController.changeState(unit, UnitState.FORTIFYING);
-	    break;
+            parent.getGUI().setActiveUnit(unit);
+            break;
+        case FORTIFY:
+            inGameController.changeState(unit, UnitState.FORTIFYING);
+            break;
         case SENTRY:
-	    inGameController.changeState(unit, UnitState.SENTRY);
-	    break;
+            inGameController.changeState(unit, UnitState.SENTRY);
+            break;
         case COLOPEDIA:
-	    getCanvas().showPanel(new ColopediaPanel(getCanvas(), null, unit.getType()));
-	    break;
-	case LEAVE_TOWN:
-	    inGameController.putOutsideColony(unit);
-	    break;
-	case CLEAR_SPECIALITY:
-	    inGameController.clearSpeciality(unit);
-	    break;
-	case CLEAR_ORDERS:
+            getCanvas().showPanel(new ColopediaPanel(getCanvas(), null, unit.getType()));
+            break;
+        case LEAVE_TOWN:
+            inGameController.putOutsideColony(unit);
+            break;
+        case CLEAR_SPECIALITY:
+            inGameController.clearSpeciality(unit);
+            break;
+        case CLEAR_ORDERS:
             inGameController.clearOrders(unit);
-	}
-	updateIcon();
+        }
+        updateIcon();
     }
 
 
@@ -361,7 +361,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
         StringTemplate label = unit.getEquipmentLabel();
         if (label != null) {
-            setDescriptionLabel(getDescriptionLabel() + " (" 
+            setDescriptionLabel(getDescriptionLabel() + " ("
                                 + Messages.message(label) + ")");
         }
         setSmall(isSmall);
@@ -387,20 +387,20 @@ public final class UnitLabel extends JLabel implements ActionListener {
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();
     }
-    
+
     public boolean canUnitBeEquipedWith(JLabel data){
         if(!getUnit().hasAbility("model.ability.canBeEquipped")){
             return false;
         }
-        
+
         if(data instanceof GoodsLabel && ((GoodsLabel)data).isToEquip()){
             return true;
         }
-                
+
         if(data instanceof MarketLabel && ((MarketLabel)data).isToEquip()){
             return true;
         }
-        
+
         return false;
     }
 }

@@ -1559,6 +1559,7 @@ public final class ColonyPanel extends FreeColPanel
              * @return The component argument.
              */
             public Component add(Component comp, boolean editState) {
+                Canvas canvas = getCanvas();
                 Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -1583,8 +1584,7 @@ public final class ColonyPanel extends FreeColPanel
                             }
                             oldParent.remove(comp);
 
-                            GoodsType workType = colonyTile.getWorkType(unit);
-
+                            GoodsType workType = unit.getWorkType();
                             getController().work(unit, colonyTile);
                             // check whether worktype is suitable
                             if (workType != unit.getWorkType()) {
@@ -1602,12 +1602,11 @@ public final class ColonyPanel extends FreeColPanel
                                         .addStringTemplate("%unit%", Messages.getLabel(unit))
                                         .add("%goods%", workType.getNameKey())
                                         .addStringTemplate("%tile%", bestTile.getLabel());
-                                    getCanvas().showInformationMessage(template);
+                                    canvas.showInformationMessage(template);
                                 }
                             }
                         } else {
                             // could not add the unit on the tile
-                            Canvas canvas = getCanvas();
                             Tile workTile = colonyTile.getWorkTile();
                             Settlement s = workTile.getOwningSettlement();
 
@@ -1620,11 +1619,13 @@ public final class ColonyPanel extends FreeColPanel
                                     canvas.errorMessage("tileTakenEuro");
                                 } else if (s instanceof IndianSettlement) {
                                     // occupied by an indian settlement
-                                    canvas.errorMessage("tileTakenInd");
+                                    getController().claimLand(workTile,
+                                                              getColony(), 0);
+                                    //canvas.errorMessage("tileTakenInd");
                                 }
                             } else {
-                                if(colonyTile.getUnitCount() > 0) { // Tile is already occupied
-                                    ;
+                                if (colonyTile.getUnitCount() > 0) {
+                                    ; // Tile is already occupied
                                 } else if (!workTile.isLand()) { // no docks
                                     canvas.errorMessage("tileNeedsDocks");
                                 } else if (workTile.hasLostCityRumour()) {
@@ -1634,7 +1635,7 @@ public final class ColonyPanel extends FreeColPanel
                             return null;
                         }
                     } else {
-                        logger.warning("An invalid component got dropped on this CargoPanel.");
+                        logger.warning("An invalid component got dropped on this ASingleTilePanel.");
                         return null;
                     }
                 }
