@@ -1794,16 +1794,11 @@ public final class InGameController implements NetworkConstants {
             moveMove(unit, direction);
             return unit.getMovesLeft() > 0;
         case MOVE_HIGH_SEAS:
-            if (interactive) {
-                moveHighSeas(unit, direction);
-            } else {
-                if (unit.getDestination() instanceof Europe) {
-                    moveToEurope(unit);
-                } else {
-                    moveHighSeas(unit, direction);
-                }
+            if (!interactive && unit.getDestination() instanceof Europe) {
+                moveToEurope(unit);
+                return false;
             }
-            return false;
+            return moveHighSeas(unit, direction);
         case EXPLORE_LOST_CITY_RUMOUR:
             moveExplore(unit, direction);
             return false;
@@ -2132,7 +2127,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move.
      */
-    private void moveHighSeas(Unit unit, Direction direction) {
+    private boolean moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile
         // (TODO: can this still happen?), or if crossing the boundary
         // between coastal and high sea.  Otherwise just move.
@@ -2145,9 +2140,10 @@ public final class InGameController implements NetworkConstants {
                                         "highseas.yes", "highseas.no")) {
             moveToEurope(unit);
             nextActiveUnit();
-        } else {
-            moveMove(unit, direction);
+            return false;
         }
+        moveMove(unit, direction);
+        return true;
     }
 
     /**
