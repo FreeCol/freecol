@@ -245,4 +245,22 @@ public class MessagesTest extends FreeColTestCase {
 
     }
 
+    public void testNestedChoices() {
+        String mapping = "key1=%colony% tuottaa tuotetta "
+            + "{{tag:acc|%goods%}}.\n"
+            + "key2={{plural:%amount%|one=ruoka|other=ruokaa|"
+            + "default={{tag:|acc=viljaa|default=Vilja}}}}\n";
+
+        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
+        Messages.loadResources(stream);
+
+        StringTemplate t = StringTemplate.template("key1")
+            .addName("%colony%", "someColony")
+            .add("%goods%", "key2");
+
+        assertEquals("someColony tuottaa tuotetta viljaa.", Messages.message(t));
+
+    }
+
+
 }
