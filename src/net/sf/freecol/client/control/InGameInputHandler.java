@@ -876,14 +876,18 @@ public final class InGameInputHandler extends InputHandler {
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
 
-        if (player == first && first.getStance(second) == Stance.UNCONTACTED) {
-            freeColClient.playSound("sound.event.meet." + second.getNationID());
-        }
+        Stance old = first.getStance(second);
         try {
             first.setStance(second, stance);
         } catch (IllegalStateException e) {
             logger.log(Level.WARNING, "Illegal stance transition", e);
             return null;
+        }
+        logger.info("Stance transition: " + old.toString()
+                    + " -> " + stance.toString());
+        if (player == first && old == Stance.UNCONTACTED) {
+            freeColClient.playSound("sound.event.meet."
+                                    + second.getNationID());
         }
 
         return null;
