@@ -2763,6 +2763,14 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Reset the player iterators ready for a new turn.
+     */
+    public void resetIterators() {
+        nextActiveUnitIterator.reset();
+        nextGoingToUnitIterator.reset();
+    }
+
+    /**
      * Returns the arrears due for a type of goods.
      *
      * @param type a <code>GoodsType</code> value

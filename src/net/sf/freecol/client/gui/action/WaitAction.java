@@ -48,6 +48,6 @@ public class WaitAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().nextActiveUnit();
+        getFreeColClient().getInGameController().waitActiveUnit();
     }
 }

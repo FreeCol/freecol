@@ -49,7 +49,6 @@ public class SkipUnitAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), 
-                                                             UnitState.SKIPPED);
+        getFreeColClient().getInGameController().skipActiveUnit();
     }
 }

@@ -172,20 +172,13 @@ public final class InGameController implements NetworkConstants {
 
     private final short UNIT_LAST_MOVE_DELAY = 300;
 
-    /**
-     * Sets that the turn will be ended when all going-to units have been moved.
-     */
-    private boolean endingTurn = false;
+    // Selecting next unit depends on mode--- either from the active list,
+    // from the going-to list, or flush going-to and end the turn.
+    private final int MODE_NEXT_ACTIVE_UNIT = 0;
+    private final int MODE_EXECUTE_GOTO_ORDERS = 1;
+    private final int MODE_END_TURN = 2;
+    private int moveMode = MODE_NEXT_ACTIVE_UNIT;
 
-    /**
-     * If true, then at least one unit has been active and the turn may automatically be ended.
-     */
-    private boolean canAutoEndTurn = false;
-
-    /**
-     * Sets that all going-to orders should be executed.
-     */
-    private boolean executeGoto = false;
 
     /**
      * A hash map of messages to be ignored.
@@ -300,6 +293,23 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getConnectController().quitGame(true);
         canvas.removeInGameComponents();
         freeColClient.getConnectController().loadGame(file);
+    }
+
+    /**
+     * Send a trivial message (tag only) to the server.
+     *
+     * @param tag The tag for the message.
+     * @return True if the server replied.
+     */
+    private boolean askTrivial(String tag) {
+        Client client = freeColClient.getClient();
+        Element element = Message.createNewRootElement(tag);
+        element = askExpecting(client, element, null);
+        if (element == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, element);
+        return true;
     }
 
 
@@ -1136,15 +1146,6 @@ public final class InGameController implements NetworkConstants {
         if (unit != null) {
             clearGotoOrders(unit);
             move(unit, direction);
-
-            // Centers unit if option "always center" is active.  A
-            // few checks need to be remade, as the unit may no longer
-            // exist or no longer be on the map.
-            boolean alwaysCenter = freeColClient.getClientOptions()
-                .getBoolean(ClientOptions.ALWAYS_CENTER);
-            if (alwaysCenter && !unit.isDisposed() && unit.getTile() != null) {
-                centerOnUnit(unit);
-            }
         } // else: nothing: There is no active unit that can be moved.
     }
 
@@ -4934,39 +4935,94 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Centers the map on the selected tile.
+     * End the turn command.
      */
-    public void centerActiveUnit() {
-        Unit activeUnit = freeColClient.getGUI().getActiveUnit();
-        if (activeUnit == null){
-            return;
-        }
+    public void endTurn() {
+        if (!requireOurTurn()) return;
 
-        centerOnUnit(activeUnit);
+        // Make sure all goto orders are complete before ending turn.
+        moveMode = MODE_END_TURN;
+        if (!doExecuteGotoOrders()) return;
+        doEndTurn();
     }
 
     /**
-     * Centers the map on the given unit location.
+     * Actually do the end turn operation.
      */
-    public void centerOnUnit(Unit unit) {
-        // Sanitation
-        if(unit == null){
-            return;
-        }
-        Tile unitTile = unit.getTile();
-        if(unitTile == null){
-            return;
+    private void doEndTurn() {
+        // Ensure end-turn mode sticks.
+        if (moveMode < MODE_END_TURN) {
+            moveMode = MODE_END_TURN;
         }
 
-        freeColClient.getGUI().setFocus(unitTile);
+        // Clear active unit if any
+        GUI gui = freeColClient.getGUI();
+        gui.setActiveUnit(null);
+
+        // Inform the server of end of turn
+        askTrivial("endTurn");
+
+        // Restart the selection cycle
+        moveMode = MODE_NEXT_ACTIVE_UNIT;
     }
 
     /**
-     * Executes the units' goto orders.
+     * Execute goto orders command.
+     *
+     * @return True if all goto orders have been performed.
      */
     public void executeGotoOrders() {
-        executeGoto = true;
-        nextActiveUnit(null);
+        doExecuteGotoOrders();
+    }
+
+    /**
+     * Actually do the goto orders operation.
+     *
+     * @return True if all goto orders have been performed.
+     */
+    private boolean doExecuteGotoOrders() {
+        // Ensure the goto mode sticks.
+        if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
+            moveMode = MODE_EXECUTE_GOTO_ORDERS;
+        }
+
+        // Process all units.
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        GUI gui = freeColClient.getGUI();
+        while (player.hasNextGoingToUnit()) {
+            // Give the player a chance to deal with any problems
+            // shown in a popup before pressing on with more moves.
+            if (canvas.isShowingSubPanel()) {
+                canvas.getShowingSubPanel().requestFocus();
+                return false;
+            }
+
+            // Move the unit as much as possible
+            Unit unit = player.getNextGoingToUnit();
+            gui.setActiveUnit(unit);
+            moveToDestination(unit);
+            unit.setMovesLeft(0); // Fake change, client side only
+            nextModelMessage();
+        }
+        return true;
+    }
+
+    /**
+     * Tell a unit to wait.
+     */
+    public void waitActiveUnit() {
+        Canvas canvas = freeColClient.getCanvas();
+        GUI gui = canvas.getGUI();
+        gui.setActiveUnit(null);
+        nextActiveUnit();
+    }
+
+    /**
+     * Skip a unit.
+     */
+    public void skipActiveUnit() {
+        changeState(freeColClient.getGUI().getActiveUnit(), UnitState.SKIPPED);
     }
 
     /**
@@ -4977,73 +5033,63 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Makes a new unit active. Displays any new <code>ModelMessage</code>s
-     * (uses {@link #nextModelMessage}).
+     * Makes a new unit active if any, or focus on a tile (useful if the
+     * current unit just died).
+     * Displays any new <code>ModelMessage</code>s with
+     * {@link #nextModelMessage}.
      *
-     * @param tile The tile to select if no new unit can be made active.
+     * @param tile The <code>Tile</code> to select if no new unit can
+     *             be made active.
      */
     public void nextActiveUnit(Tile tile) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        if (!requireOurTurn()) return;
+
+        // Always flush outstanding messages first.
+        Canvas canvas = freeColClient.getCanvas();
+        nextModelMessage();
+        //if (canvas.isShowingSubPanel()) {
+        //    canvas.getShowingSubPanel().requestFocus();
+        //    return;
+        //}
+
+        // Flush any outstanding orders once the mode is raised.
+        if (moveMode >= MODE_EXECUTE_GOTO_ORDERS
+            && !doExecuteGotoOrders()) {
             return;
         }
 
-        nextModelMessage();
-
-        Canvas canvas = freeColClient.getCanvas();
-        Player myPlayer = freeColClient.getMyPlayer();
-        if (endingTurn || executeGoto) {
-            while (!freeColClient.getCanvas().isShowingSubPanel() && myPlayer.hasNextGoingToUnit()) {
-                Unit unit = myPlayer.getNextGoingToUnit();
-                moveToDestination(unit);
-                nextModelMessage();
-                if (unit.getMovesLeft() > 0) {
-                    if (endingTurn) {
-                        unit.setMovesLeft(0);
-                    } else {
-                        return;
-                    }
-                }
-            }
-
-            if (!myPlayer.hasNextGoingToUnit() && !freeColClient.getCanvas().isShowingSubPanel()) {
-                if (endingTurn) {
-                    canvas.getGUI().setActiveUnit(null);
-                    endingTurn = false;
-
-                    Element endTurnElement = Message.createNewRootElement("endTurn");
-                    freeColClient.getClient().send(endTurnElement);
-                    return;
-                } else {
-                    executeGoto = false;
-                }
-            }
+        // Look for active units.
+        Player player = freeColClient.getMyPlayer();
+        GUI gui = canvas.getGUI();
+        Unit unit = gui.getActiveUnit();
+        if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
+            && unit.getState() != UnitState.SKIPPED) {
+            return; // Current active unit has more moves to do.
+        }
+        if (player.hasNextActiveUnit()) {
+            gui.setActiveUnit(player.getNextActiveUnit());
+            return; // Successfully found a unit to display
         }
 
-        GUI gui = freeColClient.getGUI();
-        Unit nextActiveUnit = myPlayer.getNextActiveUnit();
+        // No active units left.  Do the goto orders.
+        if (!doExecuteGotoOrders()) return;
 
-        if (nextActiveUnit != null) {
-            canAutoEndTurn = true;
-            gui.setActiveUnit(nextActiveUnit);
+        // If not already ending the turn, use the fallback tile if
+        // supplied, then check for automatic end of turn, otherwise
+        // just select nothing and wait.
+        ClientOptions options = freeColClient.getClientOptions();
+        if (moveMode >= MODE_END_TURN) {
+            doEndTurn();
+        } else if (tile != null) {
+            gui.setActiveUnit(null);
+            gui.setSelectedTile(tile);
+        } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
+            doEndTurn();
         } else {
-            // no more active units, so we can move the others
-            nextActiveUnit = myPlayer.getNextGoingToUnit();
-            if (nextActiveUnit != null) {
-                moveToDestination(nextActiveUnit);
-            } else if (tile != null) {
-                gui.setSelectedTile(tile);
-                gui.setActiveUnit(null);
-            } else {
-                gui.setActiveUnit(null);
-            }
-
-            if (canAutoEndTurn && !endingTurn
-                && freeColClient.getClientOptions().getBoolean(ClientOptions.AUTO_END_TURN)) {
-                endTurn();
-            }
+            gui.setActiveUnit(null);
         }
     }
+
 
     /**
      * Ignore this ModelMessage from now on until it is not generated in a turn.
@@ -5189,20 +5235,5 @@ public final class InGameController implements NetworkConstants {
         } else {
             return option.getValue();
         }
-    }
-
-    /**
-     * End the turn.
-     */
-    public void endTurn() {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        endingTurn = true;
-        canAutoEndTurn = false;
-
-        nextActiveUnit(null);
     }
 }
