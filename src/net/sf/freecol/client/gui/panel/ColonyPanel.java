@@ -90,6 +90,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.Message;
 
 
 /**
@@ -510,10 +511,12 @@ public final class ColonyPanel extends FreeColPanel
             return;
         }
         GoodsContainer cgc = colony.getGoodsContainer();
-        cgc.setAmount(goodsType, a);
         GoodsContainer sgc = (GoodsContainer) getClient().getFreeColServer()
             .getGame().getFreeColGameObject(cgc.getId());
         sgc.setAmount(goodsType, a);
+        cgc = new GoodsContainer(getGame(), colony,
+                sgc.toXMLElement(Message.createNewDocument()));
+        colony.setGoodsContainer(cgc);
         updateConstructionPanel();
         updateProductionPanel();
         updateWarehousePanel();

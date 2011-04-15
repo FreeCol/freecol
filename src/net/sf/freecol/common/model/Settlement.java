@@ -361,8 +361,22 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         }
     }
 
+    /**
+     * Gets the goods container for this settlement.
+     *
+     * @return The settlements goods container.
+     */
     public GoodsContainer getGoodsContainer() {
         return goodsContainer;
+    }
+
+    /**
+     * Sets the goods container for this settlement.
+     *
+     * @param goodsContainer The new <code>GoodsContainer</code> to use.
+     */
+    public void setGoodsContainer(GoodsContainer goodsContainer) {
+        this.goodsContainer = goodsContainer;
     }
 
     /**
