@@ -1171,11 +1171,21 @@ public final class Specification {
         if (difficultyLevel != null) {
             applyDifficultyLevel(difficultyLevel);
         }
+
+        // TODO: 0.9.x compatibility hack post-0.10
+        for (BuildingType bt : getBuildingTypeList()) {
+            bt.fixup09x();
+        }
+        if (getModifiers("model.modifier.nativeTreasureModifier") != null) {
+            for (FoundingFather ff : getFoundingFathers()) {
+                ff.fixup09x();
+            }
+        }
+
         initialized = true;
     }
 
     public static String getXMLElementTagName() {
         return "freecol-specification";
     }
-
 }

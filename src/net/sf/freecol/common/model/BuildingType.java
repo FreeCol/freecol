@@ -119,6 +119,10 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         return getIndex() - other.getIndex();
     }
 
+    public boolean canAdd(UnitType unitType) {
+        return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
+    }
+
     /**
      * Is this building type automatically built in any colony?
      */
@@ -182,51 +186,11 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         }
     }
 
-    // TODO: remove 0.9.x compatibility code
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);
         }
-        try {
-            if (hasAbility("model.ability.autoProduction")
-                && !hasAbility("model.ability.avoidExcessProduction")) {
-                // old-style auto-production
-                Ability ability = new Ability("model.ability.avoidExcessProduction");
-                addAbility(ability);
-                getFeatureContainer().removeModifiers("model.goods.horses");
-                float value = ("model.building.country".equals(getId()))
-                    ? 50 : 25;
-                Modifier modifier = new Modifier("model.modifier.breedingDivisor", this,
-                                                 value, Modifier.Type.ADDITIVE);
-                addModifier(modifier);
-                getSpecification().addModifier(modifier);
-                modifier = new Modifier("model.modifier.breedingFactor", this, 2,
-                                        Modifier.Type.ADDITIVE);
-                addModifier(modifier);
-                getSpecification().addModifier(modifier);
-            }
-        } catch(Exception e) {
-            // no such ability, we don't care
-        }
-        try {
-            if (!getModifierSet("model.modifier.warehouseStorage").isEmpty()) {
-                if (getModifierSet("model.modifier.storeSurplus").isEmpty()) {
-                    Modifier modifier = new Modifier("model.modifier.storeSurplus", 0.5f,
-                                                     Modifier.Type.MULTIPLICATIVE);
-                    Scope scope = new Scope();
-                    scope.setType("model.goods.food");
-                    List<Scope> scopes = new ArrayList<Scope>();
-                    scopes.add(scope);
-                    modifier.setScopes(scopes);
-                    addModifier(modifier);
-                }
-            }
-        } catch(Exception e) {
-            // no such modifier, we don't care
-        }
-
     }
-    // end compatibility code
 
     /**
      * Makes an XML-representation of this object.
@@ -267,6 +231,52 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     }
 
     /**
+     * 0.9.x compatibility hack, called from the specification reader
+     * when it is finishing up.
+     */
+    public void fixup09x() {
+        try {
+            if (hasAbility("model.ability.autoProduction")
+                && !hasAbility("model.ability.avoidExcessProduction")) {
+                // old-style auto-production
+                Ability ability = new Ability("model.ability.avoidExcessProduction");
+                addAbility(ability);
+                getFeatureContainer().removeModifiers("model.goods.horses");
+                float value = ("model.building.country".equals(getId()))
+                    ? 50 : 25;
+                Modifier modifier = new Modifier("model.modifier.breedingDivisor",
+                                                 this, value,
+                                                 Modifier.Type.ADDITIVE);
+                addModifier(modifier);
+                getSpecification().addModifier(modifier);
+                modifier = new Modifier("model.modifier.breedingFactor",
+                                        this, 2, Modifier.Type.ADDITIVE);
+                addModifier(modifier);
+                getSpecification().addModifier(modifier);
+            }
+        } catch(Exception e) {
+            // no such ability, we don't care
+        }
+        try {
+            if (!getModifierSet("model.modifier.warehouseStorage").isEmpty()) {
+                if (getModifierSet("model.modifier.storeSurplus").isEmpty()) {
+                    Modifier modifier = new Modifier("model.modifier.storeSurplus",
+                                                     0.5f,
+                                                     Modifier.Type.MULTIPLICATIVE);
+                    Scope scope = new Scope();
+                    scope.setType("model.goods.food");
+                    List<Scope> scopes = new ArrayList<Scope>();
+                    scopes.add(scope);
+                    modifier.setScopes(scopes);
+                    addModifier(modifier);
+                }
+            }
+        } catch(Exception e) {
+            // no such modifier, we don't care
+        }
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      * This method should be overwritten by any sub-class, preferably
      * with the name of the class with the first letter in lower case.
@@ -276,9 +286,4 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     public static String getXMLElementTagName() {
         return "building-type";
     }
-
-    public boolean canAdd(UnitType unitType) {
-        return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
-    }
-
 }

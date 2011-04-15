@@ -236,11 +236,17 @@ public class FoundingFather extends FreeColGameObjectType {
 
     }
 
-    // TODO: remove 0.9.x compatibility code
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);
         }
+    }
+
+    /**
+     * 0.9.x compatibility hack, called from the specification when it is
+     * finishing up.
+     */
+    public void fixup09x() {
         try {
             // Cortes has changed
             if (!getModifierSet("model.modifier.nativeTreasureModifier").isEmpty()) {
@@ -250,7 +256,6 @@ public class FoundingFather extends FreeColGameObjectType {
             // we don't care
         }
     }
-    // end compatibility code
 
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
