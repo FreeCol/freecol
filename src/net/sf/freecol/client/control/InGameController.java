@@ -2293,6 +2293,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveAttack(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
+        clearGotoOrders();
 
         // Extra option with native settlement
         Tile tile = unit.getTile();
@@ -2522,6 +2523,8 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to embark.
      */
     private void moveEmbark(Unit unit, Direction direction) {
+        clearGotoOrders();
+
         // Choose which carrier to embark upon.
         Canvas canvas = freeColClient.getCanvas();
         Tile sourceTile = unit.getTile();
