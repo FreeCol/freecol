@@ -248,6 +248,26 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
+     * Add a new key and replacement to the StringTemplate. The
+     * replacement must be a proper name. This is only possible if the
+     * StringTemplate is of type TEMPLATE.
+     *
+     * @param key a <code>String</code> value
+     * @param value a <code>String</code> value
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate addName(String key, FreeColObject object) {
+        if (templateType == TemplateType.TEMPLATE) {
+            keys.add(key);
+            replacements.add(new StringTemplate(object.getId() + ".name", TemplateType.KEY));
+        } else {
+            throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
+                                               + templateType.toString());
+        }
+        return this;
+    }
+
+    /**
      * Add a replacement value without a key to the StringTemplate.
      * The replacement must be a proper name.  This is only possible
      * if the StringTemplate is of type LABEL.
@@ -270,11 +290,11 @@ public class StringTemplate extends FreeColObject {
      * StringTemplate.
      *
      * @param key a <code>String</code> value
-     * @param amount an <code>int</code> value
+     * @param amount a <code>Number</code> value
      * @return a <code>StringTemplate</code> value
      */
-    public StringTemplate addAmount(String key, int amount) {
-        addName(key, Integer.toString(amount));
+    public StringTemplate addAmount(String key, Number amount) {
+        addName(key, amount.toString());
         return this;
     }
 

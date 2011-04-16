@@ -79,6 +79,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
@@ -163,8 +164,9 @@ public final class GUI {
 
             Font nameFont = getFont();
             FontMetrics nameFontMetrics = getFontMetrics(nameFont);
-            String message = Messages.message("waitingFor", "%nation%",
-                                              Messages.message(player.getNationName()));
+            StringTemplate t = StringTemplate.template("waitingFor")
+                .addStringTemplate("%nation%", player.getNationName());
+            String message = Messages.message(t);
 
             Rectangle textBounds;
             int fontSize = DEFAULT_FONT_SIZE;

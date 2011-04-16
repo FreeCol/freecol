@@ -165,20 +165,14 @@ public class Messages {
     }
 
     /**
-     * Finds the message with a particular ID in the default locale and performs
-     * string replacements.
+     * Finds the message with a particular ID in the default locale.
      *
      * @param messageId The key of the message to find
-     * @param data consists of pairs of strings, each time the first of the pair
-     *       is replaced by the second in the messages.
      */
-    public static String message(String messageId, String... data) {
+    public static String message(String messageId) {
         // Check that all the values are correct.
         if (messageId == null) {
             throw new NullPointerException();
-        }
-        if (data!=null && data.length % 2 != 0) {
-            throw new IllegalArgumentException("Programming error, the data should consist of only pairs.");
         }
         if (messageBundle == null) {
             setMessageBundle(Locale.getDefault());
@@ -188,24 +182,11 @@ public class Messages {
         if (message == null) {
             return messageId;
         }
-
-        if (data != null && data.length > 0) {
-            for (int i = 0; i < data.length; i += 2) {
-                if (data[i] == null || data[i+1] == null) {
-                    throw new IllegalArgumentException("Programming error, no data should be <null>.");
-                }
-                message = message.replace(data[i], data[i+1]);
-            }
-        }
-        message = replaceChoices(message);
+        message = replaceChoices(message, null);
         return message.trim();
     }
 
-    public static String replaceChoices(String input) {
-        return replaceChoices(input, null);
-    }
-
-    public static String replaceChoices(String input, StringTemplate template) {
+    private static String replaceChoices(String input, StringTemplate template) {
         int openChoice = 0;
         int closeChoice = 0;
         int highWaterMark = 0;
@@ -483,8 +464,8 @@ public class Messages {
         if (containsKey(messageID)) {
             return message(messageID);
         } else {
-            return message("model.unit." + key + ".name", "%unit%",
-                           Messages.message(someType.getNameKey()));
+            return message(StringTemplate.template("model.unit." + key + ".name")
+                           .addName("%unit%", someType));
         }
     }
 
@@ -504,8 +485,8 @@ public class Messages {
         if (containsKey(messageID)) {
             return message(messageID);
         } else {
-            return message("model.unit." + key + ".name", "%unit%",
-                           Messages.message(unit.getId() + ".name"));
+            return message(StringTemplate.template("model.unit." + key + ".name")
+                           .addName("%unit%", unit));
         }
     }
 

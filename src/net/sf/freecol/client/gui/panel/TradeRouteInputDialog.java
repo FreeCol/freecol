@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 
@@ -225,7 +226,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         Player player = getMyPlayer();
 
         // combo box for selecting destination
-        destinationSelector.addItem(Messages.message("report.allColonies", "%number%", ""));
+        destinationSelector.addItem(Messages.message(StringTemplate.template("report.allColonies")
+                                                     .addName("%number%", "")));
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }

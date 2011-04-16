@@ -631,9 +631,11 @@ public final class Canvas extends JDesktopPane {
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(String text,
-                                     String okText, String cancelText) {
-        return showConfirmDialog(null, text, okText, cancelText);
+    public boolean showConfirmDialog(String text, String okText, String cancelText) {
+        return showFreeColDialog(FreeColDialog.createConfirmDialog(Messages.message(text),
+                                                                   Messages.message(okText),
+                                                                   Messages.message(cancelText)),
+                                 null);
     }
 
     /**
@@ -649,32 +651,13 @@ public final class Canvas extends JDesktopPane {
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(Tile tile, String text,
-                                     String okText, String cancelText,
-                                     String... replace) {
-        try {
-            text = Messages.message(text, replace);
-            okText = Messages.message(okText);
-            cancelText = Messages.message(cancelText);
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + text
-                           + ", " + okText + " or " + cancelText + ".");
-        }
-        return showFreeColDialog(FreeColDialog.createConfirmDialog(text,
-                                                                   okText,
-                                                                   cancelText),
+    public boolean showConfirmDialog(Tile tile, StringTemplate text,
+                                     String okText, String cancelText) {
+        return showFreeColDialog(FreeColDialog.createConfirmDialog(Messages.message(text),
+                                                                   Messages.message(okText),
+                                                                   Messages.message(cancelText)),
                                  tile);
     }
-
-    public boolean showConfirmDialog(Tile tile, StringTemplate template,
-                                     String okKey, String cancelKey) {
-        String text = Messages.message(template);
-        String okText = Messages.message(okKey);
-        String cancelText = Messages.message(cancelKey);
-        return showFreeColDialog(FreeColDialog.createConfirmDialog(text, okText, cancelText),
-                                 tile);
-    }
-
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -836,11 +819,9 @@ public final class Canvas extends JDesktopPane {
      *         to cancel the action.
      * @see FreeColDialog
      */
-    public String showInputDialog(Tile tile, String text, String defaultValue,
-                                  String okText, String cancelText,
-                                  String... data) {
-        return showInputDialog(tile, text, defaultValue, okText, cancelText,
-                               true, data);
+    public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
+                                  String okText, String cancelText) {
+        return showInputDialog(tile, text, defaultValue, okText, cancelText, true);
     }
 
     /**
@@ -857,23 +838,14 @@ public final class Canvas extends JDesktopPane {
      *         to cancel the action.
      * @see FreeColDialog
      */
-    public String showInputDialog(Tile tile, String text, String defaultValue,
+    public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
                                   String okText, String cancelText,
-                                  boolean rejectEmptyString, String... data) {
-        try {
-            text = Messages.message(text, data);
-            okText = Messages.message(okText);
-
-            if (cancelText != null) {
-                cancelText = Messages.message(cancelText);
-            }
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + text + ", " + okText + " or " + cancelText + ".");
-        }
-
+                                  boolean rejectEmptyString) {
         FreeColDialog<String> inputDialog
-            = FreeColDialog.createInputDialog(text, defaultValue,
-                                              okText, cancelText);
+            = FreeColDialog.createInputDialog(Messages.message(text),
+                                              Messages.message(defaultValue),
+                                              Messages.message(okText),
+                                              Messages.message(cancelText));
         String response = null;
         for (;;) {
             response = showFreeColDialog(inputDialog, tile);
@@ -1321,7 +1293,7 @@ public final class Canvas extends JDesktopPane {
      * @param messageId The messageId of the message to display.
      */
     public void showInformationMessage(String messageId) {
-        showInformationMessage(null, messageId, new String[0]);
+        showInformationMessage(null, StringTemplate.key(messageId));
     }
 
     /**
@@ -1331,60 +1303,9 @@ public final class Canvas extends JDesktopPane {
      * @param messageId The messageId of the message to display.
      */
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
-        showInformationMessage(displayObject, messageId, new String[0]);
+        showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
-     * <br>
-     * <br>
-     * <b>Example:</b> <br>
-     * <code>canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());</code>
-     *
-     * @param messageId The messageId of the message to display.
-     * @param replace All occurrences of <code>replace[2x]</code> in the
-     *            message gets replaced by <code>replace[2x+1]</code>.
-     */
-    public void showInformationMessage(String messageId, String... replace) {
-        showInformationMessage(null, messageId, replace);
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
-     * <b>Example:</b> <br>
-     * <code>canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());</code>
-     *
-     * @param messageId The messageId of the message to display.
-     * @param replace All occurrences of <code>replace[2x]</code> in the
-     *            message gets replaced by <code>replace[2x+1]</code>.
-     * @param displayObject Optional object for displaying an icon
-     */
-    public void showInformationMessage(FreeColObject displayObject, String messageId, String... replace) {
-        String text;
-        try {
-            text = Messages.message(messageId, replace);
-        } catch (MissingResourceException e) {
-            text = messageId;
-            logger.warning("Missing i18n resource: " + messageId);
-        }
-        ImageIcon icon = null;
-        if (displayObject != null) {
-            icon = getImageIcon(displayObject, false);
-        }
-        Tile tile = null;
-        if (displayObject instanceof Tile) {
-            tile = (Tile) displayObject;
-        } else {
-            try { // If the displayObject has a "getTile" method, invoke it.
-                tile = (Tile) displayObject.getClass().getMethod("getTile")
-                    .invoke(displayObject);
-            } catch (Exception e) { /* Ignore failure */ }
-        }
-        showFreeColDialog(new InformationDialog(this, text, icon), tile);
-    }
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -2127,8 +2048,8 @@ public final class Canvas extends JDesktopPane {
             = new StringBuilder(Messages.message(StringTemplate.template(messageId)
                                                  .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
         introText.append("\n\n");
-        introText.append(Messages.message("missionarySettlement.question",
-                                          "%settlement%", settlement.getName()));
+        introText.append(Messages.message(StringTemplate.template("missionarySettlement.question")
+                                          .addName("%settlement%", settlement.getName())));
         MissionaryAction result = showChoiceDialog(unit.getTile(),
                 introText.toString(),
                 Messages.message("cancel"),
@@ -2348,15 +2269,14 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<SellAction>(
                 Messages.message("sell.moreGold"),
                 SellAction.HAGGLE));
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message("sell.gift",
-                                 "%goods%", Messages.message(goods.getNameKey())),
-                SellAction.GIFT));
+        choices.add(new ChoiceItem<SellAction>(Messages.message(StringTemplate.template("sell.gift")
+                                                                .addName("%goods%", goods)),
+                                               SellAction.GIFT));
         SellAction result =
             showChoiceDialog(unit.getTile(),
                              Messages.message(StringTemplate.template("sell.text")
                                               .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                                              .add("%goods%", goods.getNameKey())
+                                              .addName("%goods%", goods)
                                               .addAmount("%gold%", gold)),
                              Messages.message("sellProposition.cancel"),
                              choices);
@@ -2377,9 +2297,8 @@ public final class Canvas extends JDesktopPane {
                                        Player owner, boolean canAccept) {
         List<ChoiceItem<ClaimAction>> choices
             = new ArrayList<ChoiceItem<ClaimAction>>();
-        choices.add(new ChoiceItem<ClaimAction>(
-                Messages.message("indianLand.pay",
-                                 "%amount%", Integer.toString(price)),
+        choices.add(new ChoiceItem<ClaimAction>(Messages.message(StringTemplate.template("indianLand.pay")
+                                                                 .addAmount("%amount%", price)),
                 ClaimAction.ACCEPT, canAccept));
         choices.add(new ChoiceItem<ClaimAction>(
                 Messages.message("indianLand.take"),

@@ -242,12 +242,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
         String nonExpertName = Messages.message(nonExpert.getType().getNameKey());
         String expertProductionName = Messages.message(expertGoods.getWorkingAsKey());
         String nonExpertProductionName = Messages.message(nonExpertGoods.getWorkingAsKey());
-        String newMessage = Messages.message("report.requirements.badAssignment",
-            "%colony%", colonyName,
-            "%expert%", expertName,
-            "%expertWork%", expertProductionName,
-            "%nonExpert%", nonExpertName,
-            "%nonExpertWork%", nonExpertProductionName);
+        String newMessage = Messages.message(StringTemplate.template("report.requirements.badAssignment")
+                                             .addName("%colony%", colonyName)
+                                             .addName("%expert%", expertName)
+                                             .addName("%expertWork%", expertProductionName)
+                                             .addName("%nonExpert%", nonExpertName)
+                                             .addName("%nonExpertWork%", nonExpertProductionName));
 
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
@@ -257,12 +257,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
     }
 
     private void addExpertWarning(StyledDocument doc, Colony c, GoodsType goodsType, UnitType workType) {
-        String expertName = Messages.message(workType.getNameKey());
-        String colonyName = c.getName();
-        String goods = Messages.message(goodsType.getNameKey());
-        String work = Messages.message(goodsType.getWorkingAsKey());
-        String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
-                "%unit%", expertName);
+        String newMessage = Messages.message(StringTemplate.template("report.requirements.noExpert")
+                                             .addName("%colony%", c.getName())
+                                             .addName("%goods%", goodsType)
+                                             .addName("%unit%", workType));
 
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
@@ -289,8 +287,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!misusedExperts.isEmpty()) {
                 doc.insertString(doc.getLength(), "\n"
-                                 + Messages.message("report.requirements.misusedExperts",
-                                                    "%unit%", expertName, "%work%", work) + " ",
+                                 + Messages.message(StringTemplate.template("report.requirements.misusedExperts")
+                                                    .addName("%unit%", workType)
+                                                    .add("%work%", goodsType.getWorkingAsKey())) + " ",
                                  doc.getStyle("regular"));
                 int lastExpertsIndex = misusedExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {
@@ -305,7 +304,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!severalExperts.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                        "\n" + Messages.message("report.requirements.severalExperts", "%unit%", expertName) + " ",
+                                 "\n" + Messages.message(StringTemplate.template("report.requirements.severalExperts")
+                                                         .addName("%unit%", workType)) + " ",
                         doc.getStyle("regular"));
                 int lastExpertsIndex = severalExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {
@@ -320,7 +320,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!canTrainExperts.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                        "\n" + Messages.message("report.requirements.canTrainExperts", "%unit%", expertName) + " ",
+                                 "\n" + Messages.message(StringTemplate.template("report.requirements.canTrainExperts")
+                                                         .addName("%unit%", workType)) + " ",
                         doc.getStyle("regular"));
                 int lastExpertsIndex = canTrainExperts.size() - 1;
                 for (int index = 0; index <= lastExpertsIndex; index++) {

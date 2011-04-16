@@ -46,6 +46,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.util.XMLStream;
@@ -657,16 +658,17 @@ public final class FreeCol {
                 mainUserDirectory = new File(arg);
                 String errMsg = null;
                 if(!mainUserDirectory.exists()){
-                    errMsg = Messages.message("cli.error.home.notExists", "%string%", arg);
+                    errMsg = "cli.error.home.notExists";
                 }
                 if(!mainUserDirectory.canRead()){
-                    errMsg = Messages.message("cli.error.home.noRead", "%string%", arg);
+                    errMsg = "cli.error.home.noRead";
                 }
                 if(!mainUserDirectory.canWrite()){
-                    errMsg = Messages.message("cli.error.home.noWrite", "%string%", arg);
+                    errMsg = "cli.error.home.noWrite";
                 }
                 if(errMsg != null){
-                    System.out.println(errMsg);
+                    System.out.println(Messages.message(StringTemplate.template(errMsg)
+                                                        .addName("%string%", arg)));
                     System.exit(1);
                 }
             }
@@ -741,7 +743,8 @@ public final class FreeCol {
                     try {
                         serverPort = Integer.parseInt(arg);
                     } catch (NumberFormatException nfe) {
-                        System.out.println(Messages.message("cli.error.port", "%string%", arg));
+                        System.out.println(Messages.message(StringTemplate.template("cli.error.port")
+                                                            .addName("%string%", arg)));
                         System.exit(1);
                     }
                 }

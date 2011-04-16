@@ -247,8 +247,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
 
             if (unitType.getPopulationRequired() > unitCount) {
-                lockReason.add(Messages.message("colonyPanel.populationTooSmall", "%number%",
-                                                Integer.toString(unitType.getPopulationRequired())));
+                lockReason.add(Messages.message(StringTemplate.template("colonyPanel.populationTooSmall")
+                                                .addAmount("%number%", unitType.getPopulationRequired())));
             }
 
             if (unitType.getLimits() != null) {
@@ -297,8 +297,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             if (lockReason.isEmpty()) {
                 lockReasons.put(unitType, null);
             } else {
-                lockReasons.put(unitType, Messages.message("colonyPanel.requires", "%string%",
-                                                           Utils.join("/", lockReason)));
+                lockReasons.put(unitType, Messages.message(StringTemplate.template("colonyPanel.requires")
+                                                           .addName("%string%", Utils.join("/", lockReason))));
             }
             if (lockReason.isEmpty() || showAll.isSelected()) {
                 units.addElement(unitType);
@@ -329,8 +329,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
 
             if (buildingType.getPopulationRequired() > unitCount) {
-                lockReason.add(Messages.message("colonyPanel.populationTooSmall", "%number%",
-                                                Integer.toString(buildingType.getPopulationRequired())));
+                lockReason.add(Messages.message(StringTemplate.template("colonyPanel.populationTooSmall")
+                                                .addAmount("%number%", buildingType.getPopulationRequired())));
             }
 
             Map<String, Boolean> requiredAbilities = buildingType.getAbilitiesRequired();
@@ -367,8 +367,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             if (lockReason.isEmpty()) {
                 lockReasons.put(buildingType, null);
             } else {
-                lockReasons.put(buildingType, Messages.message("colonyPanel.requires", "%string%",
-                                                               Utils.join("/", lockReason)));
+                lockReasons.put(buildingType, Messages.message(StringTemplate.template("colonyPanel.requires")
+                                                               .addName("%string%", Utils.join("/", lockReason))));
             }
             if (lockReason.isEmpty() || showAll.isSelected()) {
                 buildings.addElement(buildingType);

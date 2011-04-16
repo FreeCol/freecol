@@ -191,9 +191,9 @@ public final class ReportNavalPanel extends ReportPanel {
         	UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true);
         	if (unit.getDestination() != null) {
               String destination = Messages.message(unit.getDestination().getLocationNameFor(getMyPlayer()));
-              unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText()
-                                       + "<br>"
-                                       + Messages.message("goingTo", "%location%", destination)
+              unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>"
+                                       + Messages.message(StringTemplate.template("goingTo")
+                                                          .addName("%location%", destination))
                                        + "</html>");
         	}
         	// this is necessary because UnitLabel deselects carriers

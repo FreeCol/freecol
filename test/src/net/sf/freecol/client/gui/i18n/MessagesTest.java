@@ -53,40 +53,6 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals(noSuchKey, Messages.message(noSuchKey));
     }
 
-    public void testMessageStringVarargs() {
-
-        try {
-            Messages.message(null);
-            fail("We should never get here");
-        } catch (NullPointerException npe) {
-            // Expected
-        }
-
-        assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
-
-        // With parameters for "Gold: %gold% | Tax: %tax%% | Year: %year%"
-        assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%",
-                     Messages.message("menuBar.statusLine", "%score%", "1050", "%gold%", "silver", "%tax%", "13"));
-
-        // Long String
-        assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                     + "A new colonist is born whenever a colony has 200 units of food or more.",
-                     Messages.message("model.goods.food.description"));
-
-        try {
-            Messages.message("menuBar.statusLine", "%tax%");
-            fail("We should never have gotten here.");
-        } catch (RuntimeException re) {
-            // Expected
-        }
-
-
-        // Message not found
-        assertEquals(noSuchKey, Messages.message(noSuchKey));
-
-        assertEquals(noSuchKey, Messages.message(noSuchKey,
-                                                 "%gold%", "silver", "%tax%", "13"));
-    }
 
     public void testChangeLocaleSettings() {
         Messages.setMessageBundle(Locale.US);
@@ -109,7 +75,8 @@ public class MessagesTest extends FreeColTestCase {
         errMsg = "Wrong message";
         expected = "You establish the colony of $specialColName\\.";
         try{
-            message = Messages.message("model.history.FOUND_COLONY","%colony%",colNameWithSpecialChars);
+            message = Messages.message(StringTemplate.template("model.history.FOUND_COLONY")
+                                       .addName("%colony%", colNameWithSpecialChars));
         }
         catch(IllegalArgumentException e){
             if(e.getMessage().contains("Illegal group reference")){
@@ -168,7 +135,10 @@ public class MessagesTest extends FreeColTestCase {
     public void testReplaceGarbage() {
         // random garbage enclosed in double brackets should be
         // removed
-        assertEquals("abc   def", Messages.replaceChoices("{{}}abc   {{xyz}}def{{123|567}}"));
+        String mapping = "some.key={{}}abc   {{xyz}}def{{123|567}}\n";
+        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
+        Messages.loadResources(stream);
+        assertEquals("abc   def", Messages.message("some.key"));
     }
 
     public void testReplaceNumber() {
@@ -176,19 +146,26 @@ public class MessagesTest extends FreeColTestCase {
         double[] numbers = new double[] {
             -1.3, -1, -0.5, 0, 0.33, 1, 1.2, 2, 2.7, 3, 3.4, 11, 13, 27, 100
         };
-        String choices = "|zero=zero|one=one|two=two|few=few|many=many|other=other}}|xyz";
+        String mapping = "some.key=abc{{plural:%number%|zero=zero|one=one|two=two"
+            + "|few=few|many=many|other=other}}|xyz";
+        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
+        Messages.loadResources(stream);
+
         // default Number is Other
         Messages.setGrammaticalNumber(NumberRules.OTHER_NUMBER_RULE);
         for (double d : numbers) {
-            assertEquals("abcother|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
+            assertEquals("abcother|xyz", Messages.message(StringTemplate.template("some.key")
+                                                          .addAmount("%number%", d)));
         }
         // apply English rules
         Messages.setGrammaticalNumber(NumberRules.PLURAL_NUMBER_RULE);
         for (double d : numbers) {
             if (d == 1) {
-                assertEquals("abcone|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
+                assertEquals("abcone|xyz", Messages.message(StringTemplate.template("some.key")
+                                                            .addAmount("%number%", d)));
             } else {
-                assertEquals("abcother|xyz", Messages.replaceChoices("abc{{plural:" + d + choices));
+                assertEquals("abcother|xyz", Messages.message(StringTemplate.template("some.key")
+                                                              .addAmount("%number%", d)));
             }
         }
 
@@ -206,10 +183,18 @@ public class MessagesTest extends FreeColTestCase {
 
         assertEquals("artillery", Messages.message("unit.key"));
 
-        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "0"));
-        assertEquals("This is a test.", Messages.message("some.key", "%number%", "1"));
-        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "2"));
-        assertEquals("This is one of several tests.", Messages.message("some.key", "%number%", "24"));
+        assertEquals("This is one of several tests.",
+                     Messages.message(StringTemplate.template("some.key")
+                                      .addAmount("%number%", 0)));
+        assertEquals("This is a test.",
+                     Messages.message(StringTemplate.template("some.key")
+                                      .addAmount("%number%", 1)));
+        assertEquals("This is one of several tests.",
+                     Messages.message(StringTemplate.template("some.key")
+                                      .addAmount("%number%", 2)));
+        assertEquals("This is one of several tests.",
+                     Messages.message(StringTemplate.template("some.key")
+                                      .addAmount("%number%", 24)));
 
         StringTemplate template = StringTemplate.template("unit.template")
             .addAmount("%number%", 1)

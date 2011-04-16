@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -66,7 +67,7 @@ public class CargoPanel extends FreeColPanel
 
     /**
      * Creates this CargoPanel.
-     * 
+     *
      * @param parent The parent Canvas that holds this CargoPanel.
      */
     public CargoPanel(Canvas parent, boolean withTitle) {
@@ -212,14 +213,15 @@ public class CargoPanel extends FreeColPanel
         if (border == null) {
             return;
         }
-        
+
         if (carrier == null) {
             border.setTitle(Messages.message("cargoOnCarrier"));
         } else {
             int spaceLeft = carrier.getSpaceLeft();
-            border.setTitle(Messages.message("cargoOnCarrierLong", 
-                                             "%name%", Messages.message(Messages.getLabel(carrier)),
-                                             "%space%", String.valueOf(spaceLeft)));
+            StringTemplate t = StringTemplate.template("cargoOnCarrierLong")
+                .addStringTemplate("%name%", Messages.getLabel(carrier))
+                .addAmount("%space%", spaceLeft);
+            border.setTitle(Messages.message(t));
         }
     }
 
@@ -227,7 +229,7 @@ public class CargoPanel extends FreeColPanel
      * Adds a component to this CargoPanel and makes sure that the unit or
      * good that the component represents gets modified so that it is on
      * board the currently selected ship.
-     * 
+     *
      * @param comp The component to add to this CargoPanel.
      * @param editState Must be set to 'true' if the state of the component
      *            that is added (which should be a dropped component
@@ -240,7 +242,7 @@ public class CargoPanel extends FreeColPanel
         if (carrier == null) {
             return null;
         }
-        
+
         if (editState) {
             if (comp instanceof UnitLabel) {
                 Unit unit = ((UnitLabel) comp).getUnit();

@@ -265,8 +265,9 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 if (unit.getDestination() != null) {
                     String destination = Messages.message(unit.getDestination().getLocationNameFor(getMyPlayer()));
                     unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +
-                                             Messages.message("goingTo", "%location%", destination) +
-                                             "</html>");
+                                             Messages.message(StringTemplate.template("goingTo")
+                                                              .addName("%location%", destination))
+                                             + "</html>");
                 }
                 reportPanel.add(unitLabel, "sg");
             }

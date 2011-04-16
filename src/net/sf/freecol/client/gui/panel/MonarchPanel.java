@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.StringTemplate;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -41,10 +42,22 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent panel.
+     * @param action The MonarchAction
      */
-    public MonarchPanel(Canvas parent, MonarchAction action, String... replace) {
+    public MonarchPanel(Canvas parent, MonarchAction action) {
+        this(parent, action, null);
+    }
+
+    /**
+     * The constructor that will add the items to this panel.
+     *
+     * @param parent The parent panel.
+     * @param action The MonarchAction
+     * @param replace The StringTemplate to use
+     */
+    public MonarchPanel(Canvas parent, MonarchAction action, StringTemplate replace) {
 
         super(parent);
 
@@ -95,7 +108,11 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             messageID = "Unknown monarch action: " + action;
         }
 
-        add(getDefaultTextArea(Messages.message(messageID, replace)));
+        if (replace == null) {
+            add(getDefaultTextArea(Messages.message(messageID)));
+        } else {
+            add(getDefaultTextArea(Messages.message(new StringTemplate(messageID, replace))));
+        }
 
         okButton.setText(Messages.message(okText));
         if (cancelText == null) {
@@ -112,7 +129,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     @Override

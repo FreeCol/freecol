@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Turn;
@@ -82,7 +83,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param freeColClient The main controller.
      */
     public InGameInputHandler(FreeColClient freeColClient) {
@@ -91,7 +92,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Deals with incoming messages that have just been received.
-     * 
+     *
      * @param connection The <code>Connection</code> the message was received
      *            on.
      * @param element The root element of the message.
@@ -163,13 +164,15 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "reconnect"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
     private Element reconnect(Element element) {
         logger.finest("Entered reconnect...");
-        if (new ShowConfirmDialogSwingTask(null, "reconnect.text", "reconnect.yes", "reconnect.no").confirm()) {
+        if (new ShowConfirmDialogSwingTask(null,
+                                           StringTemplate.key("reconnect.text"),
+                                           "reconnect.yes", "reconnect.no").confirm()) {
             logger.finest("User wants to reconnect, do it!");
             new ReconnectSwingTask().invokeLater();
         } else {
@@ -183,7 +186,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "update"-message.
-     * 
+     *
      * @param updateElement The element (root element in a DOM-parsed XML tree)
      *            that holds all the information.
      * @return The reply.
@@ -198,7 +201,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Updates all FreeColGameObjects from the childNodes of the message
-     * 
+     *
      * @param nodeList The list of nodes from the message
      */
     private void updateGameObjects(NodeList nodeList) {
@@ -218,7 +221,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "remove"-message.
-     * 
+     *
      * @param removeElement The element (root element in a DOM-parsed XML tree)
      *            that holds all the information.
      */
@@ -302,7 +305,7 @@ public final class InGameInputHandler extends InputHandler {
      * Handles an "animateMove"-message. This only performs animation,
      * if required. It does not actually change unit positions, which
      * happens in an "update".
-     * 
+     *
      * @param element An element (root element in a DOM-parsed XML tree) that
      *            holds attributes for the old and new tiles and an element for
      *            the unit that is moving (which are used solely to operate the
@@ -359,7 +362,7 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handles an "animateAttack"-message. This only performs animation, if
      * required. It does not actually perform any attacks.
-     * 
+     *
      * @param element An element (root element in a DOM-parsed XML tree) that
      *            holds attributes for the old and new tiles and an element for
      *            the unit that is moving (which are used solely to operate the
@@ -413,7 +416,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "setCurrentPlayer"-message.
-     * 
+     *
      * @param setCurrentPlayerElement The element (root element in a DOM-parsed
      *            XML tree) that holds all the information.
      */
@@ -432,7 +435,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "newTurn"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree)
      *            that holds all the information.
      */
@@ -448,7 +451,7 @@ public final class InGameInputHandler extends InputHandler {
         Turn currTurn = game.getTurn();
         if (currTurn.getYear() == Turn.SEASON_YEAR
             && Turn.getYear(currTurn.getNumber() - 1) == Turn.SEASON_YEAR - 1) {
-            new ShowInformationMessageSwingTask("twoTurnsPerYear").invokeLater();
+            new ShowInformationMessageSwingTask(StringTemplate.key("twoTurnsPerYear")).invokeLater();
         }
         new UpdateMenuBarSwingTask().invokeLater();
         return null;
@@ -456,7 +459,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "setDead"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -466,14 +469,17 @@ public final class InGameInputHandler extends InputHandler {
         Player myPlayer = freeColClient.getMyPlayer();
         if (player == myPlayer) {
             if (freeColClient.isSingleplayer()) {
-                if (!new ShowConfirmDialogSwingTask(null, "defeatedSingleplayer.text", "defeatedSingleplayer.yes",
-                        "defeatedSingleplayer.no").confirm()) {
+                if (!new ShowConfirmDialogSwingTask(null,
+                                                    StringTemplate.key("defeatedSingleplayer.text"),
+                                                    "defeatedSingleplayer.yes",
+                                                    "defeatedSingleplayer.no").confirm()) {
                     freeColClient.quit();
                 } else {
                     freeColClient.getFreeColServer().enterRevengeMode(player.getName());
                 }
             } else {
-                if (!new ShowConfirmDialogSwingTask(null, "defeated.text", "defeated.yes", "defeated.no").confirm()) {
+                if (!new ShowConfirmDialogSwingTask(null, StringTemplate.key("defeated.text"),
+                                                    "defeated.yes", "defeated.no").confirm()) {
                     freeColClient.quit();
                 }
             }
@@ -486,7 +492,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "gameEnded"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -503,7 +509,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "chat"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -523,7 +529,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "error"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -540,7 +546,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "setAI"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -612,12 +618,12 @@ public final class InGameInputHandler extends InputHandler {
 
         switch (theirAgreement.getStatus()) {
         case ACCEPT_TRADE:
-            new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
-                                                "%nation%", nation).show();
+            new ShowInformationMessageSwingTask(StringTemplate.template("negotiationDialog.offerAccepted")
+                                                .addName("%nation%", nation)).show();
             break;
         case REJECT_TRADE:
-            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
-                                                "%nation%", nation).show();
+            new ShowInformationMessageSwingTask(StringTemplate.template("negotiationDialog.offerRejected")
+                                                .addName("%nation%", nation)).show();
             break;
         case PROPOSE_TRADE:
             ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement,
@@ -638,7 +644,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "indianDemand"-request.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -670,11 +676,12 @@ public final class InGameInputHandler extends InputHandler {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                        "indianDemand.gold.text",
-                        "indianDemand.gold.yes", "indianDemand.gold.no",
-                        "%nation%", nation,
-                        "%colony%", colony.getName(),
-                        "%amount%", goldStr).confirm();
+                                                          StringTemplate.template("indianDemand.gold.text")
+                                                          .addName("%nation%", nation)
+                                                          .addName("%colony%", colony.getName())
+                                                          .addAmount("%amount%", message.getGold()),
+                                                          "indianDemand.gold.yes",
+                                                          "indianDemand.gold.no").confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
@@ -701,20 +708,20 @@ public final class InGameInputHandler extends InputHandler {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (goods.getType().isFoodType()) {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                            "indianDemand.food.text",
-                            "indianDemand.food.yes", "indianDemand.food.no",
-                            "%nation%", nation,
-                            "%colony%", colony.getName(),
-                            "%amount%", String.valueOf(goods.getAmount()))
+                                                              StringTemplate.template("indianDemand.food.text")
+                                                              .addName("%nation%", nation)
+                                                              .addName("%colony%", colony.getName())
+                                                              .addAmount("%amount%", goods.getAmount()),
+                                                              "indianDemand.food.yes", "indianDemand.food.no")
                         .confirm();
                 } else {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                            "indianDemand.other.text",
-                            "indianDemand.other.yes", "indianDemand.other.no",
-                            "%nation%", nation,
-                            "%colony%", colony.getName(),
-                            "%amount%", String.valueOf(goods.getAmount()),
-                            "%goods%", Messages.message(goods.getNameKey()))
+                                                              StringTemplate.template("indianDemand.other.text")
+                                                              .addName("%nation%", nation)
+                                                              .addName("%colony%", colony.getName())
+                                                              .addAmount("%amount%", goods.getAmount())
+                                                              .addName("%goods%", goods),
+                                                              "indianDemand.other.yes", "indianDemand.other.no")
                         .confirm();
                 }
                 break;
@@ -765,7 +772,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "monarchAction"-request.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -789,46 +796,42 @@ public final class InGameInputHandler extends InputHandler {
             amount = Integer.toString(message.getAmount());
             GoodsType goodsType = message.getGoodsType(game);
             String goods = Messages.message(goodsType.getLabel(true));
-            accept = new ShowMonarchPanelSwingTask(action,
-                                                   "%replace%", amount,
-                                                   "%goods%", goods).confirm();
+            accept = new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
+                                                   .addAmount("%replace%", message.getAmount())
+                                                   .addStringTemplate("%goods%", goodsType.getLabel(true))).confirm();
             element.setAttribute("accepted", String.valueOf(accept));
             new UpdateMenuBarSwingTask().invokeLater();
             return element;
 
         case LOWER_TAX:
             int newTax = message.getAmount();
-            amount = Integer.toString(newTax);
-            String diff = Integer.toString(player.getTax() - newTax);
-            new ShowMonarchPanelSwingTask(action,
-                                          "%difference%", diff,
-                                          "%newTax%", amount).confirm();
+            new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
+                                          .addAmount("%difference%", player.getTax() - newTax)
+                                          .addAmount("%newTax%", newTax)).confirm();
             new UpdateMenuBarSwingTask().invokeLater();
             break;
 
         case WAIVE_TAX:
-            new ShowMonarchPanelSwingTask(action).confirm();
+            new ShowMonarchPanelSwingTask(action, null).confirm();
             break;
 
         case ADD_TO_REF: case SUPPORT_LAND: case SUPPORT_SEA:
             additions = unitListSummary(message.getAdditions());
-            new ShowMonarchPanelSwingTask(action,
-                                          "%addition%", additions).confirm();
+            new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
+                                          .addName("%addition%", additions)).confirm();
             break;
 
         case DECLARE_WAR:
             Player enemy = message.getEnemy(game);
-            String nationName = Messages.message(enemy.getNationName());
-            new ShowMonarchPanelSwingTask(action,
-                                          "%nation%", nationName).confirm();
+            new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
+                                          .addStringTemplate("%nation%", enemy.getNationName())).confirm();
             break;
 
         case OFFER_MERCENARIES:
-            amount = Integer.toString(message.getAmount());
             additions = unitListSummary(message.getAdditions());
-            accept = new ShowMonarchPanelSwingTask(action,
-                                                   "%gold%", amount,
-                                                   "%mercenaries%", additions)
+            accept = new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
+                                                   .addAmount("%gold%", message.getAmount())
+                                                   .addName("%mercenaries%", additions))
                 .confirm();
             element.setAttribute("accepted", String.valueOf(accept));
             if (accept) {
@@ -864,7 +867,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "setStance"-request.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -895,7 +898,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "addPlayer"-message.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -915,7 +918,7 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Disposes of the <code>Unit</code>s which are the children of this
      * Element.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -942,7 +945,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Add the objects which are the children of this Element.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -992,7 +995,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handle all the children of this element.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
@@ -1008,9 +1011,9 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
-     * 
+     *
      * Handler methods end here.
-     * 
+     *
      */
 
     /**
@@ -1023,7 +1026,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Run the task and wait for it to complete.
-         * 
+         *
          * @return return value from {@link #doWork()}.
          * @throws InvocationTargetException on unexpected exceptions.
          */
@@ -1064,7 +1067,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Mark started and set the synchronous flag.
-         * 
+         *
          * @param synchronous The synch/asynch flag.
          */
         private synchronized void markStarted(boolean synchronous) {
@@ -1090,7 +1093,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Check if the client is waiting.
-         * 
+         *
          * @return true if client is waiting for a result.
          */
         private synchronized boolean isSynchronous() {
@@ -1127,7 +1130,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Get the return vale from {@link #doWork()}.
-         * 
+         *
          * @return result.
          */
         public synchronized Object getResult() {
@@ -1136,7 +1139,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Save result.
-         * 
+         *
          * @param r The result.
          */
         private synchronized void setResult(Object r) {
@@ -1145,7 +1148,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Override this method to do the actual work.
-         * 
+         *
          * @return result.
          */
         protected abstract Object doWork();
@@ -1185,7 +1188,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Constructor.
-         * 
+         *
          * @param requestFocus True to request focus after refresh.
          */
         public RefreshCanvasSwingTask(boolean requestFocus) {
@@ -1290,7 +1293,7 @@ public final class InGameInputHandler extends InputHandler {
         /**
          * Constructor - Play the unit movement animation, always focusing on
          * the source tile.
-         * 
+         *
          * @param unit The unit that is moving.
          * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
@@ -1302,7 +1305,7 @@ public final class InGameInputHandler extends InputHandler {
         /**
          * Constructor - Play the unit movement animation, optionally focusing
          * on the source tile.
-         * 
+         *
          * @param unit The unit that is moving.
          * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
@@ -1342,7 +1345,7 @@ public final class InGameInputHandler extends InputHandler {
         /**
          * Constructor - Play the unit attack animation, always focusing on the
          * source tile.
-         * 
+         *
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
          * @param success Did the attack succeed?
@@ -1355,7 +1358,7 @@ public final class InGameInputHandler extends InputHandler {
         /**
          * Constructor - Play the unit attack animation, optionally focusing on
          * the source tile.
-         * 
+         *
          * @param unit The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
          * @param success Did the attack succeed?
@@ -1414,35 +1417,32 @@ public final class InGameInputHandler extends InputHandler {
 
         private Tile tile;
 
-        private String text;
+        private StringTemplate text;
 
         private String okText;
 
         private String cancelText;
 
-        private String[] replace;
 
 
         /**
          * Constructor.
-         * 
+         *
          * @param tile An optional tile to make visible.
          * @param text The key for the question.
          * @param okText The key for the OK button.
          * @param cancelText The key for the Cancel button.
-         * @param replace The replacement values.
          */
-        public ShowConfirmDialogSwingTask(Tile tile, String text, String okText, String cancelText, String... replace) {
+        public ShowConfirmDialogSwingTask(Tile tile, StringTemplate text, String okText, String cancelText) {
             this.tile = tile;
             this.text = text;
             this.okText = okText;
             this.cancelText = cancelText;
-            this.replace = replace;
         }
 
         /**
          * Show dialog and wait for selection.
-         * 
+         *
          * @return true if OK, false if Cancel.
          */
         public boolean confirm() {
@@ -1460,7 +1460,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected Object doWork() {
             Canvas canvas = getFreeColClient().getCanvas();
-            boolean choice = canvas.showConfirmDialog(tile, text, okText, cancelText, replace);
+            boolean choice = canvas.showConfirmDialog(tile, text, okText, cancelText);
             return Boolean.valueOf(choice);
         }
     }
@@ -1492,7 +1492,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Constructor.
-         * 
+         *
          * @param modelMessage The model message to show.
          */
         public ShowModelMessageSwingTask(ModelMessage modelMessage) {
@@ -1513,25 +1513,21 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowInformationMessageSwingTask extends ShowMessageSwingTask {
 
-        private String messageId;
-
-        private String[] replace;
+        private StringTemplate message;
 
 
         /**
          * Constructor.
-         * 
-         * @param messageId The key for the message.
-         * @param replace The values to replace text with.
+         *
+         * @param message the StringTemplate
          */
-        public ShowInformationMessageSwingTask(String messageId, String... replace) {
-            this.messageId = messageId;
-            this.replace = replace;
+        public ShowInformationMessageSwingTask(StringTemplate message) {
+            this.message = message;
         }
 
         protected Object doWork() {
             Canvas canvas = getFreeColClient().getCanvas();
-            canvas.showInformationMessage(null, messageId, replace);
+            canvas.showInformationMessage(null, message);
             return null;
         }
     }
@@ -1543,7 +1539,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Constructor.
-         * 
+         *
          * @param messageId The i18n-keyname of the error message to display.
          * @param message An alternative message to display if the resource
          *            specified by <code>messageID</code> is unavailable.
@@ -1570,7 +1566,7 @@ public final class InGameInputHandler extends InputHandler {
     abstract class ShowSelectSwingTask extends SwingTask {
         /**
          * Show dialog and wait for selection.
-         * 
+         *
          * @return selection.
          */
         public int select() {
@@ -1597,7 +1593,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Constructor.
-         * 
+         *
          * @param choices The possible founding fathers.
          */
         public ShowSelectFoundingFatherSwingTask(List<FoundingFather> choices) {
@@ -1611,7 +1607,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Show dialog and wait for selection.
-         * 
+         *
          * @return selection.
          */
         public FoundingFather select() {
@@ -1635,7 +1631,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Constructor.
-         * 
+         *
          * @param unit The unit which init the negotiation.
          * @param settlement The settlement where the unit has made the proposal
          * @param proposal The proposal made by unit's owner.
@@ -1648,7 +1644,7 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Show dialog and wait for selection.
-         * 
+         *
          * @return selection.
          */
         public DiplomaticTrade select() {
@@ -1683,18 +1679,18 @@ public final class InGameInputHandler extends InputHandler {
 
         /**
          * Constructor.
-         * 
+         *
          * @param action The action key.
          * @param replace The replacement values.
          */
-        public ShowMonarchPanelSwingTask(MonarchAction action, String... replace) {
+        public ShowMonarchPanelSwingTask(MonarchAction action, StringTemplate replace) {
             _action = action;
             _replace = replace;
         }
 
         /**
          * Show dialog and wait for selection.
-         * 
+         *
          * @return true if OK, false if Cancel.
          */
         public boolean confirm() {
@@ -1719,6 +1715,6 @@ public final class InGameInputHandler extends InputHandler {
 
         private MonarchAction _action;
 
-        private String[] _replace;
+        private StringTemplate _replace;
     }
 }

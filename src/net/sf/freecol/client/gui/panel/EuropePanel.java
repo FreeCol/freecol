@@ -495,9 +495,9 @@ public final class EuropePanel extends FreeColPanel {
             }
 
             String newLandName = Messages.getNewLandName(getMyPlayer());
-            ((TitledBorder) getBorder())
-                .setTitle(Messages.message("sailingTo",
-                                           "%location%", newLandName));
+            StringTemplate t = StringTemplate.template("sailingTo")
+                .addName("%location%", newLandName);
+            ((TitledBorder) getBorder()).setTitle(Messages.message(t));
             revalidate();
         }
 
@@ -526,9 +526,10 @@ public final class EuropePanel extends FreeColPanel {
                     && docksPanel.getComponentCount() > 0
                     && unit.getSpaceLeft() > 0) {
                     boolean leave = getCanvas()
-                        .showConfirmDialog(null, "europe.leaveColonists",
-                                           "yes", "no",
-                                           "%newWorld%", Messages.getNewLandName(unit.getOwner()));
+                        .showConfirmDialog(null,
+                                           StringTemplate.template("europe.leaveColonists")
+                                           .addName("%newWorld%", Messages.getNewLandName(unit.getOwner())),
+                                           "yes", "no");
                     if (!leave) { // Colonists remain in Europe.
                         return null;
                     }
@@ -886,8 +887,8 @@ public final class EuropePanel extends FreeColPanel {
                                            .add("%goods%", goodsType.getNameKey())
                                            .addAmount("%amount%", amount)
                                            .addAmount("%gold%", price))
-                + "\n" + Messages.message("transaction.price",
-                    "%gold%", String.valueOf(total));
+                + "\n" + Messages.message(StringTemplate.template("transaction.price")
+                                          .addAmount("%gold%", total));
             add(text);
         }
 
@@ -900,13 +901,13 @@ public final class EuropePanel extends FreeColPanel {
                                            .add("%goods%", goodsType.getNameKey())
                                            .addAmount("%amount%", amount)
                                            .addAmount("%gold%", price))
-                + "\n" + Messages.message("transaction.price",
-                    "%gold%", String.valueOf(totalBeforeTax))
-                + "\n" + Messages.message("transaction.tax",
-                    "%tax%", String.valueOf(tax),
-                    "%gold%", String.valueOf(totalTax))
-                + "\n" + Messages.message("transaction.net",
-                    "%gold%", String.valueOf(totalAfterTax));
+            + "\n" + Messages.message(StringTemplate.template("transaction.price")
+                                      .addAmount("%gold%", totalBeforeTax))
+            + "\n" + Messages.message(StringTemplate.template("transaction.tax")
+                                      .addAmount("%tax%", tax)
+                                      .addAmount("%gold%", totalTax))
+            + "\n" + Messages.message(StringTemplate.template("transaction.net")
+                                      .addAmount("%gold%", totalAfterTax));
             add(text);
         }
 

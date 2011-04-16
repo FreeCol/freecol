@@ -121,10 +121,11 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             String turnsStr = Messages.getTurnsText(turnsToComplete);
             add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))),
                 "spany");
-            add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
-                                            "%buildable%", Messages.message(buildable.getNameKey()))));
+            add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
+                                            .addName("%buildable%", buildable))));
 
-            add(new JLabel(Messages.message("turnsToComplete.long", "%number%", turnsStr)));
+            add(new JLabel(Messages.message(StringTemplate.template("turnsToComplete.long")
+                                            .addName("%number%", turnsStr))));
 
             TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
             for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {

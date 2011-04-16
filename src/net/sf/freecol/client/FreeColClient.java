@@ -67,6 +67,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -324,8 +325,8 @@ public final class FreeColClient {
                             } else {
                                 Locale l = ((Language) e.getNewValue()).getLocale();
                                 Messages.setMessageBundle(l);
-                                canvas.showInformationMessage("newLanguageSelected",
-                                        "%language%", l.getDisplayName());
+                                canvas.showInformationMessage(StringTemplate.template("newLanguageSelected")
+                                                              .addName("%language%", l.getDisplayName()));
                             }
                         }
                     });

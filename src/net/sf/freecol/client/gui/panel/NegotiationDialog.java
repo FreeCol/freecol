@@ -349,11 +349,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 if (item instanceof StanceTradeItem) {
                     description = Messages.getStanceAsString(((StanceTradeItem) item).getStance());
                 } else if (item instanceof GoldTradeItem) {
-                    String gold = String.valueOf(((GoldTradeItem) item).getGold());
-                    description = Messages.message("tradeItem.gold.long", "%amount%", gold);
+                    int gold = ((GoldTradeItem) item).getGold();
+                    description = Messages.message(StringTemplate.template("tradeItem.gold.long")
+                                                   .addAmount("%amount%", gold));
                 } else if (item instanceof ColonyTradeItem) {
-                    description = Messages.message("tradeItem.colony.long", 
-                                                   "%colony%", ((ColonyTradeItem) item).getColonyName());
+                    description = Messages.message(StringTemplate.template("tradeItem.colony.long")
+                                                   .addName("%colony%", ((ColonyTradeItem) item).getColonyName()));
                 } else if (item instanceof GoodsTradeItem) {
                     description = Messages.message(StringTemplate.template("model.goods.goodsAmount")
                                                    .addAmount("%amount%", ((GoodsTradeItem) item).getGoods().getAmount())

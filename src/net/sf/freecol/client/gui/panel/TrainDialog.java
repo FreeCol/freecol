@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
@@ -71,7 +72,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         final Europe europe = getMyPlayer().getEurope();
         unitPriceComparator = new Comparator<UnitType>() {
             public int compare(final UnitType type1, final UnitType type2) {
-                return (europe.getUnitPrice(type1) - 
+                return (europe.getUnitPrice(type1) -
                         europe.getUnitPrice(type2));
             }
         };
@@ -118,8 +119,8 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, Role.DEFAULT,
                                                                !player.checkGold(price), 0.66);
             JLabel unitName = localizedLabel(unitType.getNameKey());
-            JLabel unitPrice = new JLabel(Messages.message("goldAmount", "%amount%", 
-                                                           String.valueOf(price)));
+            JLabel unitPrice = localizedLabel(StringTemplate.template("goldAmount")
+                                              .addAmount("%amount%", price));
             if (!player.checkGold(price)) {
                 unitName.setEnabled(false);
                 unitPrice.setEnabled(false);
@@ -145,7 +146,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
     /**
      * Analyzes an event and calls the right external methods to take care of
      * the user's request.
-     * 
+     *
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {

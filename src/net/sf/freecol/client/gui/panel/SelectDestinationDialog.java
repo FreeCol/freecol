@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -72,7 +73,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Centers the map on a known settlement or colony.
  */
-public final class SelectDestinationDialog extends FreeColDialog<Location> 
+public final class SelectDestinationDialog extends FreeColDialog<Location>
     implements ActionListener, ChangeListener, ItemListener {
 
     @SuppressWarnings("unused")
@@ -371,10 +372,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 label.setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
                                             .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
             }
-            label.setText(Messages.message("selectDestination.destinationTurns",
-                                           "%location%", name,
-                                           "%turns%", String.valueOf(d.turns),
-                                           "%extras%", d.extras));
+            label.setText(Messages.message(StringTemplate.template("selectDestination.destinationTurns")
+                                           .addName("%location%", name)
+                                           .addAmount("%turns%", d.turns)
+                                           .addName("%extras%", d.extras)));
         }
     }
 

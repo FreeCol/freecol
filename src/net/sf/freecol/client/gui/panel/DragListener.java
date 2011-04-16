@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -261,9 +262,9 @@ public final class DragListener extends MouseAdapter {
             ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, false, goodsType);
             if (bestTile != null) {
                 int maxpotential = bestTile.getProductionOf(tempUnit, goodsType);
-                JMenuItem menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs",
-                                                                    "%amount%",
-                                                                    Integer.toString(maxpotential)),
+                String text = Messages.message(StringTemplate.template(goodsType.getId() + ".workAs")
+                                               .addAmount("%amount%", maxpotential));
+                JMenuItem menuItem = new JMenuItem(text,
                                                    imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                 menuItem.setActionCommand(UnitAction.WORK_TILE.toString() + ":" + goodsType.getId());
                 menuItem.addActionListener(unitLabel);
@@ -342,7 +343,8 @@ public final class DragListener extends MouseAdapter {
                         menuItem.addActionListener(unitLabel);
                     } else {
                         String teacherName = Messages.message(teacher.getType().getNameKey());
-                        menuItem = new JMenuItem(Messages.message("menu.unit.apprentice", "%unit%", teacherName),
+                        menuItem = new JMenuItem(Messages.message(StringTemplate.template("menu.unit.apprentice")
+                                                                  .addName("%unit%", teacherName)),
                                                  teacherIcon);
                         menuItem.setEnabled(false);
                     }
@@ -374,7 +376,8 @@ public final class DragListener extends MouseAdapter {
                     .getProbability(ChangeType.EXPERIENCE) * experience / (double) maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
                 ImageIcon expertIcon = imageLibrary.getUnitImageIcon(expertType, 0.5);
-                JMenuItem experienceItem = new JMenuItem(Messages.message("menu.unit.experience", "%job%", jobName)
+                JMenuItem experienceItem = new JMenuItem(Messages.message(StringTemplate.template("menu.unit.experience")
+                                                                          .addName("%job%", jobName))
                                                          + " " + experience + "/" + maxExperience + " ("
                                                          + FreeColPanel.getModifierFormat().format(probability) + "%)",
                                                          expertIcon);
@@ -500,8 +503,8 @@ public final class DragListener extends MouseAdapter {
                         count--;
                     }
                     newItem.setText(Messages.message(equipmentType.getId() + ".add") + " (" +
-                                    Messages.message("goldAmount", "%amount%",
-                                                     String.valueOf(count * price)) +
+                                    Messages.message(StringTemplate.template("goldAmount")
+                                                     .addAmount("%amount%", count * price)) +
                                     ")");
                 } else if (tempUnit.getColony() != null &&
                            tempUnit.getColony().canBuildEquipment(equipmentType)) {

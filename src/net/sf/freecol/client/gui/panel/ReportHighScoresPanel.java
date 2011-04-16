@@ -29,6 +29,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 
 
@@ -40,7 +41,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportHighScoresPanel(Canvas parent) {
@@ -65,21 +66,21 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 messageID = "report.highScores.governor";
             }
             String country = highScore.getNewLandName();
-            JLabel headline = new JLabel(Messages.message(messageID,
-                                                          "%name%", highScore.getPlayerName(),
-                                                          "%nation%", country));
+            JLabel headline = localizedLabel(Messages.message(StringTemplate.template(messageID)
+                                                              .addName("%name%", highScore.getPlayerName())
+                                                              .addName("%nation%", country)));
             headline.setFont(smallHeaderFont);
             reportPanel.add(headline, "span, wrap 10");
 
-            reportPanel.add(new JLabel(Messages.message("report.highScores.turn")), "skip");    
+            reportPanel.add(new JLabel(Messages.message("report.highScores.turn")), "skip");
             int retirementTurn = highScore.getRetirementTurn();
             String retirementTurnStr = (retirementTurn > 0) ? Turn.toString(retirementTurn) :
-                Messages.message("N/A");   
+                Messages.message("N/A");
             reportPanel.add(new JLabel(retirementTurnStr));
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.score")), "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getScore())));
-            
+
             reportPanel.add(new JLabel(Messages.message("report.highScores.difficulty")), "skip");
             reportPanel.add(new JLabel(Messages.message(highScore.getDifficulty())));
 
@@ -113,11 +114,11 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
         reportPanel.doLayout();
     }
-    
+
     /**
      * Just drop the panel.  Retired players quitting is handled in
      * Canvas.retire().
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {

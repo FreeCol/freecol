@@ -24,6 +24,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -447,9 +448,8 @@ public final class CompactLabourReport extends ReportPanel {
         if (!allColonists) {
             row = addRow(data,
                          data.getOtherStudentsName(),
-                         Messages.message("report.labour.learning",
-                                          "%unit%",
-                                          data.getUnitData().getUnitName()),
+                         Messages.message(StringTemplate.template("report.labour.learning")
+                                          .addName("%unit%", data.getUnitData().getUnitName())),
                          data.getOtherStudents(),
                          0, row);
         }
@@ -470,9 +470,8 @@ public final class CompactLabourReport extends ReportPanel {
                 }
 
                 String student = resultOfTraining.size() == 1 ?
-                    Messages.message("report.labour.learning",
-                                     "%unit%",
-                                     Messages.message(resultOfTraining.iterator().next().getNameKey())) :
+                    Messages.message(StringTemplate.template("report.labour.learning")
+                                     .addName("%unit%", resultOfTraining.iterator().next())) :
                     Messages.message("report.labour.learningOther");
                 addRow(data,
                        data.getUnitData().getUnitName(),
@@ -509,7 +508,8 @@ public final class CompactLabourReport extends ReportPanel {
                                 + " " + 1 + " " + rows);
             }
         } else {
-            colonistsLabel.setToolTipText(Messages.message("report.labour.unitTotal.tooltip", "%unit%", data.getUnitData().getUnitName()));
+            colonistsLabel.setToolTipText(Messages.message(StringTemplate.template("report.labour.unitTotal.tooltip")
+                                                           .addName("%unit%", data.getUnitData().getUnitName())));
         }
 
         reportPanel.add(colonistsLabel, "cell " + COLONIST_SUMMARY_COLUMN + " " + row

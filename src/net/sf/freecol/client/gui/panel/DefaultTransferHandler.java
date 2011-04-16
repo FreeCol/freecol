@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
@@ -146,8 +147,8 @@ public final class DefaultTransferHandler extends TransferHandler {
     public boolean importData(JComponent comp, Transferable t) {
         try {
             JLabel data;
-            
-            /* 
+
+            /*
                 This variable is used to temporarily keep the old selected unit,
                 while moving cargo from one carrier to another:
             */
@@ -239,7 +240,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 if (unit.isUnderRepair()) {
                     return false;
                 }
-                
+
                 if ((unit.getState() == UnitState.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
                     return false;
                 }
@@ -295,9 +296,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                             Set<Modifier> modifierSet = outside.getColony().getFeatureContainer()
                                 .getModifierSet("model.modifier.minimumColonySize");
                             for (Modifier modifier : modifierSet) {
-                                message += Messages.message("colonyPanel.minimumColonySize",
-                                                            "%object%",
-                                                            Messages.message(modifier.getSource().getNameKey()))
+                                message += Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
+                                                            .addName("%object%", modifier.getSource()))
                                     + "\n";
                             }
                             canvas.showInformationMessage(message);
@@ -312,10 +312,10 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
 
                     // Update unit selection
-                    
+
                     // new unit selection has already been taken cared of
                     //if this unit was moved to ToAmericaPanel
-                    
+
                     if (oldSelectedUnit != null) {
                     	if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
                             ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
@@ -325,7 +325,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
 
                     comp.revalidate();
-                    
+
                     return true;
                 }
             } else if (data instanceof GoodsLabel) {
@@ -347,9 +347,9 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
                 /*
-                if (!(comp instanceof ColonyPanel.WarehousePanel || 
+                if (!(comp instanceof ColonyPanel.WarehousePanel ||
                       comp instanceof CargoPanel ||
-                      comp instanceof EuropePanel.MarketPanel) || 
+                      comp instanceof EuropePanel.MarketPanel) ||
                     (comp instanceof CargoPanel && !((CargoPanel) comp).isActive())) {
 
                     return false;
@@ -475,7 +475,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         return false;
     }
 
-    
+
     /**
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
@@ -551,7 +551,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                         if (bestSize.width > bestSize.height) {
                             bestSize.height = (int) ((((double) bestSize.width) / ((double) imageIcon.getIconWidth())) * imageIcon.getIconHeight());
                         } else {
-                            bestSize.width = (int) ((((double) bestSize.height) / ((double) imageIcon.getIconHeight())) * imageIcon.getIconWidth());                            
+                            bestSize.width = (int) ((((double) bestSize.height) / ((double) imageIcon.getIconHeight())) * imageIcon.getIconWidth());
                         }
                         image = imageIcon.getImage().getScaledInstance(bestSize.width, bestSize.height, Image.SCALE_DEFAULT);
 
@@ -567,16 +567,16 @@ public final class DefaultTransferHandler extends TransferHandler {
                             dge.startDrag(null, t, this);
                             return;
                         }
-                        
+
                         Point point = new Point(bestSize.width / 2, bestSize.height / 2);
                         Cursor cursor;
                         try {
-                            cursor = tk.createCustomCursor(image, point, "freeColDragIcon");                            
+                            cursor = tk.createCustomCursor(image, point, "freeColDragIcon");
                         } catch (RuntimeException re) {
                             cursor = null;
                         }
                         //Point point = new Point(0, 0);
-                        dge.startDrag(cursor, t, this);                    
+                        dge.startDrag(cursor, t, this);
                     } else {
                         dge.startDrag(null, t, this);
                     }
@@ -619,7 +619,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
-            
+
             if (dsde.getDropSuccess()) {
                 ((DefaultTransferHandler) c.getTransferHandler()).exportDone(c, dsc.getTransferable(), dsde.getDropAction());
             } else {
@@ -634,8 +634,8 @@ public final class DefaultTransferHandler extends TransferHandler {
             JComponent comp = (JComponent)dsc.getComponent();
             updatePartialChosen(comp, dsde.getUserAction() == MOVE);
         }
-        
-        
+
+
         private void updatePartialChosen(JComponent comp, boolean partialChosen) {
             if (comp instanceof GoodsLabel) {
                 ((GoodsLabel) comp).setPartialChosen(partialChosen);

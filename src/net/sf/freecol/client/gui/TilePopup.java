@@ -95,9 +95,9 @@ public final class TilePopup extends JPopupMenu {
      * @param gui An object with methods used for making the popup.
      */
     public TilePopup(final Tile tile, final FreeColClient freeColClient, final Canvas canvas, final GUI gui) {
-        super(Messages.message("tile",
-                               "%x%", String.valueOf(tile.getX()),
-                               "%y%", String.valueOf(tile.getY())));
+        super(Messages.message(StringTemplate.template("tile")
+                               .addAmount("%x%", tile.getX())
+                               .addAmount("%y%", tile.getY())));
 
         this.canvas = canvas;
         this.freeColClient = freeColClient;
@@ -120,7 +120,8 @@ public final class TilePopup extends JPopupMenu {
                 } else {
                     victoryPercent = Integer.toString((int)(combatOdds.win * 100));
                 }
-                gotoMenuItem = new JMenuItem(Messages.message("attackTileOdds", "%chance%", victoryPercent));
+                gotoMenuItem = new JMenuItem(Messages.message(StringTemplate.template("attackTileOdds")
+                                                              .addName("%chance%", victoryPercent)));
             } else if (activeUnit.getSimpleMoveType(unitTile, tile, false).isLegal()) {
                 //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
                 //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));

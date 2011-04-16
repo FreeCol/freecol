@@ -500,9 +500,10 @@ public final class ColonyPanel extends FreeColPanel
         GoodsType goodsType = canvas.showChoiceDialog(null, "Select Goods Type",
                                                       "Cancel", gtl);
         if (goodsType == null) return;
-        String amount = canvas.showInputDialog(null, "Select Goods Amount",
-                Integer.toString(colony.getGoodsCount(goodsType)),
-                "ok", "cancel", true);
+        String amount = canvas.showInputDialog(null,
+                                               StringTemplate.name("Select Goods Amount"),
+                                               Integer.toString(colony.getGoodsCount(goodsType)),
+                                               "ok", "cancel", true);
         if (amount == null) return;
         int a;
         try {
@@ -809,9 +810,9 @@ public final class ColonyPanel extends FreeColPanel
             String oldType = (String) event.getOldValue();
             String newType = (String) event.getNewValue();
             getCanvas().showInformationMessage(object,
-                                               "model.colony.unitChange",
-                                               "%oldType%", oldType,
-                                               "%newType%", newType);
+                                               StringTemplate.template("model.colony.unitChange")
+                                               .addName("%oldType%", oldType)
+                                               .addName("%newType%", newType));
             updateTilePanel();
         } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
             // Note: ColonyTile.UNIT_CHANGE.equals(Building.UNIT_CHANGE)
@@ -1041,17 +1042,17 @@ public final class ColonyPanel extends FreeColPanel
             int population = getColony().getUnitCount();
             int members = getColony().getMembers();
             int rebels = getColony().getSoL();
-            String rebelNumber = Messages.message("colonyPanel.rebelLabel", "%number%",
-                                                  Integer.toString(members));
-            String royalistNumber = Messages.message("colonyPanel.royalistLabel", "%number%",
-                                                     Integer.toString(population - members));
+            String rebelNumber = Messages.message(StringTemplate.template("colonyPanel.rebelLabel")
+                                                  .addAmount("%number%", members));
+            String royalistNumber = Messages.message(StringTemplate.template("colonyPanel.royalistLabel")
+                                                     .addAmount("%number%", population - members));
 
-            popLabel.setText(Messages.message("colonyPanel.populationLabel", "%number%",
-                                              Integer.toString(population)));
+            popLabel.setText(Messages.message(StringTemplate.template("colonyPanel.populationLabel")
+                                              .addAmount("%number%", population)));
             rebelLabel.setText(rebelNumber);
             rebelMemberLabel.setText(Integer.toString(rebels) + "%");
-            bonusLabel.setText(Messages.message("colonyPanel.bonusLabel", "%number%",
-                                                Integer.toString(getColony().getProductionBonus())));
+            bonusLabel.setText(Messages.message(StringTemplate.template("colonyPanel.bonusLabel")
+                                                .addAmount("%number%", getColony().getProductionBonus())));
             royalistLabel.setText(royalistNumber);
             royalistMemberLabel.setText(Integer.toString(getColony().getTory()) + "%");
             rebelShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(getColony().getOwner().getNation(), 0.5)));

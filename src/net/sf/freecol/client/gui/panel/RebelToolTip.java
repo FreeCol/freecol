@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 
 import net.miginfocom.swing.MigLayout;
@@ -52,10 +53,12 @@ public class RebelToolTip extends JToolTip {
         int members = colony.getMembers();
         int rebels = colony.getSoL();
 
-        add(new JLabel(Messages.message("colonyPanel.rebelLabel", "%number%", "")));
+        add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.rebelLabel")
+                                        .addName("%number%", ""))));
         add(new JLabel(Integer.toString(members)));
         add(new JLabel(Integer.toString(rebels) + "%"));
-        add(new JLabel(Messages.message("colonyPanel.royalistLabel", "%number%", "")));
+        add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.royalistLabel")
+                                        .addName("%number%", ""))));
         add(new JLabel(Integer.toString(colony.getUnitCount() - members)));
         add(new JLabel(Integer.toString(colony.getTory()) + "%"));
 

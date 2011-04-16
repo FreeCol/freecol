@@ -259,8 +259,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
             g.drawImage(parent.getGUI().getOccupationIndicatorImage(g, unit), 0, 0, null);
 
             if (unit.isUnderRepair()) {
-                String underRepair = Messages.message("underRepair",
-                                                      "%turns%", Integer.toString(unit.getTurnsForRepair()));
+                String underRepair = Messages.message(StringTemplate.template("underRepair")
+                                                      .addAmount("%turns%", unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = ResourceManager.getFont("NormalFont", 14f);

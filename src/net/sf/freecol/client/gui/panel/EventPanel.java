@@ -29,6 +29,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -65,8 +66,8 @@ public final class EventPanel extends FreeColDialog<Boolean> {
         switch(type) {
         case FIRST_LANDING:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.firstLanding")));
-            header.setText(Messages.message("event.firstLanding", "%name%",
-                                            Messages.getNewLandName(getMyPlayer())));
+            header.setText(Messages.message(StringTemplate.template("event.firstLanding")
+                                            .addName("%name%", Messages.getNewLandName(getMyPlayer()))));
             break;
         case MEETING_EUROPEANS:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingEuropeans")));

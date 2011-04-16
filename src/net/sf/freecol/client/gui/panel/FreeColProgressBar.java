@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -76,7 +77,7 @@ public class FreeColProgressBar extends JPanel {
 
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
-     * 
+     *
      * @param parent a <code>Canvas</code> value
      * @param goodsType the type of goods produced
      */
@@ -86,7 +87,7 @@ public class FreeColProgressBar extends JPanel {
 
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
-     * 
+     *
      * @param parent a <code>Canvas</code> value
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
@@ -98,7 +99,7 @@ public class FreeColProgressBar extends JPanel {
 
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
-     * 
+     *
      * @param parent a <code>Canvas</code> value
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
@@ -126,7 +127,7 @@ public class FreeColProgressBar extends JPanel {
 
     /**
      * Upate the data of the progress bar.
-     * 
+     *
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
@@ -136,7 +137,7 @@ public class FreeColProgressBar extends JPanel {
 
     /**
      * Upate the data of the progress bar.
-     * 
+     *
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      * @param value the current value of the progress bar
@@ -190,7 +191,7 @@ public class FreeColProgressBar extends JPanel {
             }
         }
 
-        String stepSignal = (step < 0) ? "-" : "+"; 
+        String stepSignal = (step < 0) ? "-" : "+";
         String progressString = String.valueOf(value) + stepSignal + Math.abs(step) + "/" + max;
         String turnsString = Messages.message("notApplicable.short");
         if (max <= value) {
@@ -203,8 +204,9 @@ public class FreeColProgressBar extends JPanel {
             }
             turnsString = Integer.toString(turns);
         }
-        progressString += " " + Messages.message("turnsToComplete.short", "%number%", turnsString);
-        
+        progressString += " " + Messages.message(StringTemplate.template("turnsToComplete.short")
+                                                 .addName("%number%", turnsString));
+
         int stringWidth = g2d.getFontMetrics().stringWidth(progressString);
         int stringHeight = g2d.getFontMetrics().getAscent() + g2d.getFontMetrics().getDescent();
         int restWidth = getWidth() - stringWidth;

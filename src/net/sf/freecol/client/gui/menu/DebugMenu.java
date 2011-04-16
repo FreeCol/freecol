@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -75,7 +76,7 @@ public class DebugMenu extends JMenu {
     private final Canvas canvas;
 
     private final GUI gui;
-    
+
     private JMenuItem skipTurnsMenuItem;
 
 
@@ -259,8 +260,8 @@ public class DebugMenu extends JMenu {
                     }
 
                     String response = canvas.showInputDialog(null,
-                             "How many turns should be skipped:",
-                             Integer.toString(10), "ok", "cancel", true);
+                                                             StringTemplate.name("How many turns should be skipped:"),
+                                                             Integer.toString(10), "ok", "cancel", true);
                     if (response == null) return;
                     try {
                         int skip = Integer.parseInt(response);
@@ -333,14 +334,13 @@ public class DebugMenu extends JMenu {
             });
         runMonarch.setEnabled(server != null);
 
-        final String goldTitle = Messages.message("menuBar.debug.addGold");
-        final JMenuItem addGold = new JMenuItem(goldTitle);
+        final JMenuItem addGold = new JMenuItem(Messages.message("menuBar.debug.addGold"));
         addGold.setOpaque(false);
         this.add(addGold);
         addGold.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String response
-                        = canvas.showInputDialog(null, goldTitle,
+                        = canvas.showInputDialog(null, StringTemplate.key("menuBar.debug.addGold"),
                                                  Integer.toString(1000),
                                                  "ok", "cancel", true);
                     int gold = Integer.parseInt(response);
@@ -359,7 +359,8 @@ public class DebugMenu extends JMenu {
         addCrosses.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String response
-                        = canvas.showInputDialog(null, immigrationTitle,
+                        = canvas.showInputDialog(null,
+                                                 StringTemplate.key("menuBar.debug.addImmigration"),
                                                  Integer.toString(100),
                                                  "ok", "cancel", true);
                     int crosses = Integer.parseInt(response);
@@ -398,9 +399,9 @@ public class DebugMenu extends JMenu {
                     while (more) {
                         int val = igc.stepRandom();
                         more = canvas.showConfirmDialog(null,
-                                "menuBar.debug.stepRandomNumberGenerator",
-                                "more", "ok",
-                                "%value%", Integer.toString(val));
+                                                        StringTemplate.template("menuBar.debug.stepRandomNumberGenerator")
+                                                        .addAmount("%value%", val),
+                                                        "more", "ok");
                     }
                 }
             });
@@ -448,7 +449,7 @@ public class DebugMenu extends JMenu {
                         units.put("To Europe", toEurope);
                         units.put("In Europe", inEurope);
                         units.put("To America", toAmerica);
-                        
+
                         sb.append("\n==");
                         sb.append(Messages.message(p.getNationName()));
                         sb.append("==\n");
@@ -510,7 +511,7 @@ public class DebugMenu extends JMenu {
                 }
             });
         useAI.setEnabled(server != null);
-        
+
         this.addSeparator();
 
         final JMenuItem compareMaps = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
@@ -572,7 +573,7 @@ public class DebugMenu extends JMenu {
                 }
             });
         compareMaps.setEnabled(server != null);
-        
+
         // statistics
         final JMenuItem statistics = new JMenuItem("Statistics");
         statistics.setOpaque(false);

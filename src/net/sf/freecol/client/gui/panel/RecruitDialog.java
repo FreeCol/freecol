@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
@@ -113,9 +114,9 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
             }
             recruitPrice = player.getRecruitPrice();
 
-            question.setText(Messages.message("recruitDialog.clickOn",
-                                              "%money%", String.valueOf(recruitPrice),
-                                              "%number%", String.valueOf(turns)));
+            question.setText(Messages.message(StringTemplate.template("recruitDialog.clickOn")
+                                              .addAmount("%money%", recruitPrice)
+                                              .addAmount("%number%", turns)));
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 UnitType unitType = player.getEurope().getRecruitable(index);
