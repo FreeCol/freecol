@@ -1590,7 +1590,8 @@ public final class ColonyPanel extends FreeColPanel
                             GoodsType workType = unit.getWorkType();
                             getController().work(unit, colonyTile);
                             // check whether worktype is suitable
-                            if (workType != unit.getWorkType()) {
+                            if (workType != null
+                                && workType != unit.getWorkType()) {
                                 getController().changeWorkType(unit, workType);
                             }
 
