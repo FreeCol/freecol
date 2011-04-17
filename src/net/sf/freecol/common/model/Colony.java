@@ -2117,6 +2117,22 @@ public class Colony extends Settlement implements Nameable {
     }
 
 
+    public int getNetProductionOf(GoodsType goodsType) {
+        int result = getNetProduction().getCount(goodsType);
+        for (BuildQueue queue : new BuildQueue[] { buildQueue, populationQueue }) {
+            ProductionInfo info = getProductionAndConsumption().get(queue);
+            if (info != null) {
+                for (AbstractGoods goods : info.getConsumption()) {
+                    if (goods.getType() == goodsType) {
+                        result += goods.getAmount();
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     public void invalidateCache() {
         netProduction = null;
         productionAndConsumption = null;
@@ -2383,10 +2399,19 @@ public class Colony extends Settlement implements Nameable {
         // TODO: remove 0.9.x compatibility code
         if (populationQueue.isEmpty()) {
             for (UnitType unitType : getSpecification().getUnitTypesWithAbility("model.ability.bornInColony")) {
+                GoodsType food = getSpecification().getGoodsType("model.goods.food");
                 List<AbstractGoods> required = unitType.getGoodsRequired();
-                required.add(new AbstractGoods(getSpecification().getGoodsType("model.goods.food"),
-                                               FOOD_PER_COLONIST));
-                unitType.setGoodsRequired(required);
+                boolean found = false;
+                for (AbstractGoods goods : required) {
+                    if (goods.getType() == food) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    required.add(new AbstractGoods(food, FOOD_PER_COLONIST));
+                    unitType.setGoodsRequired(required);
+                }
                 populationQueue.add(unitType);
             }
         }

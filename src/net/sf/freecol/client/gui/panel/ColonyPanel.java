@@ -417,7 +417,7 @@ public final class ColonyPanel extends FreeColPanel
         netProductionPanel.removeAll();
 
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            int amount = colony.getNetProduction().getCount(goodsType);
+            int amount = colony.getNetProductionOf(goodsType);
             if (amount != 0) {
                 netProductionPanel.add(new ProductionLabel(goodsType, amount, getCanvas()));
             }

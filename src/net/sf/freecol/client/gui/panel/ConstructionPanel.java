@@ -37,9 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -127,14 +125,10 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             add(new JLabel(Messages.message(StringTemplate.template("turnsToComplete.long")
                                             .addName("%number%", turnsStr))));
 
-            TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
             for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
                 int amountNeeded = requiredGoods.getAmount();
                 int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
-                int amountProduced = netProduction.getCount(requiredGoods.getType());
-                if (turnsToComplete == 0 || turnsToComplete == 1) {
-                    amountProduced += amountNeeded;
-                }
+                int amountProduced = colony.getNetProductionOf(requiredGoods.getType());
                 add(new FreeColProgressBar(parent, requiredGoods.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");
