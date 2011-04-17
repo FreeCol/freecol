@@ -38,8 +38,12 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 /**
-* Represents a work location on a tile.
-*/
+ * Represents a work location on a tile. Each ColonyTile except the
+ * colony center tile provides a work place for a single unit and
+ * produces a single type of goods. The colony center tile generally
+ * produces two different of goods, one food type and one new world
+ * raw material.
+ */
 public class ColonyTile extends FreeColGameObject
     implements WorkLocation, Ownable {
 
