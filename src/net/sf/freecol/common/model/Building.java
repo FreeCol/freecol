@@ -226,6 +226,13 @@ public class Building extends FreeColGameObject
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean hasAbility(String id) {
+        return getType().hasAbility(id);
+    }
+
+    /**
      * Returns whether this building can be damaged
      *
      * @return <code>true</code> if can be damaged

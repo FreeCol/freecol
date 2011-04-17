@@ -2178,9 +2178,9 @@ public class Colony extends Settlement implements Nameable {
                 boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
                 List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
                 for (AbstractGoods g : consumer.getConsumedGoods()) {
-                    AbstractGoods surplus = production.get(g.getType());
+                    AbstractGoods surplus = new AbstractGoods(production.get(g.getType()));
                     if (!surplusOnly) {
-                        surplus = new AbstractGoods(g.getType(), surplus.getAmount() + getGoodsCount(g.getType()));
+                        surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
                     }
                     goods.add(surplus);
                 }
@@ -2189,7 +2189,7 @@ public class Colony extends Settlement implements Nameable {
                     Building building = (Building) consumer;
                     AbstractGoods output = null;
                     if (building.getGoodsOutputType() != null) {
-                        output = production.get(building.getGoodsOutputType());
+                        output = new AbstractGoods(production.get(building.getGoodsOutputType()));
                         output.setAmount(output.getAmount() + getGoodsCount(output.getType()));
                     }
                     info = building.getProductionInfo(output, goods);
