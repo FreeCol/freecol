@@ -155,7 +155,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
             for (Colony colony : colonies) {
                 Map<Object, ProductionInfo> productionMap = colony.getProductionAndConsumption();
-                TypeCountMap<GoodsType> netProduction = colony.getNetProduction(productionMap);
+                TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
 
                 // colonyButton
                 JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());

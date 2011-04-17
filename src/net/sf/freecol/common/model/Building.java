@@ -367,6 +367,7 @@ public class Building extends FreeColGameObject
         units.add(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setWorkType(getGoodsOutputType());
+        getColony().invalidateCache();
 
         if (buildingType.hasAbility("model.ability.teach")) {
             Unit student = unit.getStudent();
@@ -399,6 +400,7 @@ public class Building extends FreeColGameObject
         if (units.remove(unit)) {
             unit.setMovesLeft(0);
             unit.setState(Unit.UnitState.ACTIVE);
+            getColony().invalidateCache();
 
             if (buildingType.hasAbility("model.ability.teach")) {
                 Unit student = unit.getStudent();
@@ -423,7 +425,7 @@ public class Building extends FreeColGameObject
      * @param locatable The <code>Locatable</code> to test the presence of.
      * @return
      *            <ul>
-     *            <li><code>>true</code>if the specified
+     *            <li><code>true</code>if the specified
      *            <code>Locatable</code> is in this <code>Building</code>
      *            and</li>
      *            <li><code>false</code> otherwise.</li>

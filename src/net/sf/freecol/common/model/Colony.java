@@ -154,6 +154,11 @@ public class Colony extends Settlement implements Nameable {
     protected BuildQueue<UnitType> populationQueue =
         new BuildQueue<UnitType>(this, Consumer.POPULATION_PRIORITY);
 
+
+    private TypeCountMap<GoodsType> netProduction;
+    private java.util.Map<Object, ProductionInfo> productionAndConsumption;
+
+
     protected Colony() {
         // empty constructor
     }
@@ -662,6 +667,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public void removeGoods(GoodsType type) {
         Goods removed = goodsContainer.removeGoods(type);
+        invalidateCache();
         modifySpecialGoods(type, -removed.getAmount());
     }
 
@@ -673,6 +679,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public void addGoods(GoodsType type, int amount) {
         goodsContainer.addGoods(type, amount);
+        invalidateCache();
         modifySpecialGoods(type, amount);
     }
 
@@ -1063,9 +1070,7 @@ public class Colony extends Settlement implements Nameable {
         boolean goodsBeingProduced = false;
         boolean productionMissing = false;
 
-        java.util.Map<Object, ProductionInfo> production = getProductionAndConsumption();
-        TypeCountMap<GoodsType> netProduction = getNetProduction(production);
-        ProductionInfo info = production.get(buildQueue);
+        ProductionInfo info = getProductionAndConsumption().get(buildQueue);
         for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
@@ -1073,7 +1078,7 @@ public class Colony extends Settlement implements Nameable {
                 continue;
             }
             goodsMissing = true;
-            int amountProduced = netProduction.getCount(requiredGoods.getType());
+            int amountProduced = getNetProduction().getCount(requiredGoods.getType());
             if (info != null) {
                 for (AbstractGoods consumed : info.getConsumption()) {
                     if (consumed.getType() == requiredGoods.getType()) {
@@ -1917,7 +1922,9 @@ public class Colony extends Settlement implements Nameable {
             newBonus = Math.max(0, newBonus);
         }
 
-        int oldBonus = productionBonus;
+        if (productionBonus != newBonus) {
+            invalidateCache();
+        }
         productionBonus = newBonus;
     }
 
@@ -2110,23 +2117,26 @@ public class Colony extends Settlement implements Nameable {
     }
 
 
-    public TypeCountMap<GoodsType> getNetProduction() {
-        // TODO: cache productionMap
-        return getNetProduction(getProductionAndConsumption());
+    public void invalidateCache() {
+        netProduction = null;
+        productionAndConsumption = null;
     }
 
-    public TypeCountMap<GoodsType> getNetProduction(java.util.Map<Object, ProductionInfo> productionMap) {
-        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
-        for (Entry<Object, ProductionInfo> entry : productionMap.entrySet()) {
-            ProductionInfo productionInfo = entry.getValue();
-            for (AbstractGoods goods : productionInfo.getProduction()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getStorage()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getConsumption()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
+
+    public TypeCountMap<GoodsType> getNetProduction() {
+        if (netProduction == null) {
+            netProduction = new TypeCountMap<GoodsType>();
+            for (Entry<Object, ProductionInfo> entry : getProductionAndConsumption().entrySet()) {
+                ProductionInfo productionInfo = entry.getValue();
+                for (AbstractGoods goods : productionInfo.getProduction()) {
+                    netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+                }
+                for (AbstractGoods goods : productionInfo.getStorage()) {
+                    netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
+                }
+                for (AbstractGoods goods : productionInfo.getConsumption()) {
+                    netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
+                }
             }
         }
         return netProduction;
@@ -2144,54 +2154,56 @@ public class Colony extends Settlement implements Nameable {
      */
     @SuppressWarnings("unchecked")
     public java.util.Map<Object, ProductionInfo> getProductionAndConsumption() {
-        java.util.Map<Object, ProductionInfo> result = new HashMap<Object, ProductionInfo>();
-        ProductionMap production = new ProductionMap();
-        int count = 0;
-        for (ColonyTile colonyTile : getColonyTiles()) {
-            List<AbstractGoods> p = colonyTile.getProduction();
-            if (!p.isEmpty()) {
-                production.add(p);
-                ProductionInfo info = new ProductionInfo();
-                info.addProduction(p);
-                result.put(colonyTile, info);
+        if (productionAndConsumption == null) {
+            productionAndConsumption = new HashMap<Object, ProductionInfo>();
+            ProductionMap production = new ProductionMap();
+            int count = 0;
+            for (ColonyTile colonyTile : getColonyTiles()) {
+                List<AbstractGoods> p = colonyTile.getProduction();
+                if (!p.isEmpty()) {
+                    production.add(p);
+                    ProductionInfo info = new ProductionInfo();
+                    info.addProduction(p);
+                    productionAndConsumption.put(colonyTile, info);
+                }
+            }
+
+            GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
+            int unitsThatUseNoBells = getSpecification().getIntegerOption("model.option.unitsThatUseNoBells").getValue();
+            ProductionInfo bellsInfo = new ProductionInfo();
+            bellsInfo.addProduction(new AbstractGoods(bells, Math.min(unitsThatUseNoBells, getUnitCount())));
+            productionAndConsumption.put(this, bellsInfo);
+
+            for (Consumer consumer : getConsumers()) {
+                boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
+                List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
+                for (AbstractGoods g : consumer.getConsumedGoods()) {
+                    AbstractGoods surplus = production.get(g.getType());
+                    if (!surplusOnly) {
+                        surplus = new AbstractGoods(g.getType(), surplus.getAmount() + getGoodsCount(g.getType()));
+                    }
+                    goods.add(surplus);
+                }
+                ProductionInfo info = null;
+                if (consumer instanceof Building) {
+                    Building building = (Building) consumer;
+                    AbstractGoods output = null;
+                    if (building.getGoodsOutputType() != null) {
+                        output = production.get(building.getGoodsOutputType());
+                        output.setAmount(output.getAmount() + getGoodsCount(output.getType()));
+                    }
+                    info = building.getProductionInfo(output, goods);
+                } else if (consumer instanceof Unit) {
+                    info = ((Unit) consumer).getProductionInfo(goods);
+                } else if (consumer instanceof BuildQueue) {
+                    info = ((BuildQueue) consumer).getProductionInfo(goods);
+                }
+                production.add(info.getProduction());
+                production.remove(info.getConsumption());
+                productionAndConsumption.put(consumer, info);
             }
         }
-
-        GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
-        int unitsThatUseNoBells = getSpecification().getIntegerOption("model.option.unitsThatUseNoBells").getValue();
-        ProductionInfo bellsInfo = new ProductionInfo();
-        bellsInfo.addProduction(new AbstractGoods(bells, Math.min(unitsThatUseNoBells, getUnitCount())));
-        result.put(this, bellsInfo);
-
-        for (Consumer consumer : getConsumers()) {
-            boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
-            List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
-            for (AbstractGoods g : consumer.getConsumedGoods()) {
-                AbstractGoods surplus = production.get(g.getType());
-                if (!surplusOnly) {
-                    surplus = new AbstractGoods(g.getType(), surplus.getAmount() + getGoodsCount(g.getType()));
-                }
-                goods.add(surplus);
-            }
-            ProductionInfo info = null;
-            if (consumer instanceof Building) {
-                Building building = (Building) consumer;
-                AbstractGoods output = null;
-                if (building.getGoodsOutputType() != null) {
-                    output = production.get(building.getGoodsOutputType());
-                    output.setAmount(output.getAmount() + getGoodsCount(output.getType()));
-                }
-                info = building.getProductionInfo(output, goods);
-            } else if (consumer instanceof Unit) {
-                info = ((Unit) consumer).getProductionInfo(goods);
-            } else if (consumer instanceof BuildQueue) {
-                info = ((BuildQueue) consumer).getProductionInfo(goods);
-            }
-            production.add(info.getProduction());
-            production.remove(info.getConsumption());
-            result.put(consumer, info);
-        }
-        return result;
+        return productionAndConsumption;
     }
 
     public List<Consumer> getConsumers() {

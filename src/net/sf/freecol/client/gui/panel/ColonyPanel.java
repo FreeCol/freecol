@@ -146,10 +146,6 @@ public final class ColonyPanel extends FreeColPanel
 
     private Colony colony;
 
-    private java.util.Map<Object, ProductionInfo> productionMap;
-
-    private TypeCountMap<GoodsType> netProduction;
-
     private UnitLabel selectedUnitLabel;
 
     private JButton exitButton = new JButton(Messages.message("close"));
@@ -419,11 +415,9 @@ public final class ColonyPanel extends FreeColPanel
 
     public void updateProductionPanel() {
         netProductionPanel.removeAll();
-        productionMap = colony.getProductionAndConsumption();
-        netProduction = colony.getNetProduction(productionMap);
 
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            int amount = netProduction.getCount(goodsType);
+            int amount = colony.getNetProduction().getCount(goodsType);
             if (amount != 0) {
                 netProductionPanel.add(new ProductionLabel(goodsType, amount, getCanvas()));
             }
@@ -658,8 +652,6 @@ public final class ColonyPanel extends FreeColPanel
      */
     private void initialize(Colony colony) {
         setColony(colony);
-        productionMap = colony.getProductionAndConsumption();
-        netProduction = colony.getNetProduction(productionMap);
 
         // Set listeners and transfer handlers
         outsideColonyPanel.removeMouseListener(releaseListener);
@@ -939,7 +931,7 @@ public final class ColonyPanel extends FreeColPanel
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(building, productionMap.get(building), getCanvas());
+                super(building, colony.getProductionAndConsumption().get(building), getCanvas());
             }
 
             public void autoscroll(Point p) {
@@ -1035,7 +1027,7 @@ public final class ColonyPanel extends FreeColPanel
         }
 
         public JToolTip createToolTip() {
-            return new RebelToolTip(getColony(), netProduction, getCanvas());
+            return new RebelToolTip(getColony(), getCanvas());
         }
 
         public void update() {
@@ -1482,7 +1474,7 @@ public final class ColonyPanel extends FreeColPanel
 
                 setLayout(new MigLayout("wrap 1, center"));
 
-                for (AbstractGoods goods : productionMap.get(colonyTile).getProduction()) {
+                for (AbstractGoods goods : colony.getProductionAndConsumption().get(colonyTile).getProduction()) {
                     add(new ProductionLabel(goods, getCanvas()), "center");
                 }
             }

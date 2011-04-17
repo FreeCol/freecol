@@ -361,6 +361,8 @@ public class ColonyTile extends FreeColGameObject
         final Unit unit = (Unit) locatable;
         setUnit(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
+        getColony().invalidateCache();
+
         if (unit.getWorkType() == null || !unit.getWorkType().isRawMaterial()) {
             AbstractGoods goods = workTile.getType().getPrimaryGoods();
             if (goods == null) {
@@ -394,6 +396,7 @@ public class ColonyTile extends FreeColGameObject
         setUnit(null);
         unit.setMovesLeft(0);
         unit.setState(Unit.UnitState.ACTIVE);
+        getColony().invalidateCache();
 
         Unit teacher = unit.getTeacher();
         if (teacher != null) {

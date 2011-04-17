@@ -29,7 +29,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.TypeCountMap;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -42,11 +41,9 @@ public class RebelToolTip extends JToolTip {
      * Creates this RebelToolTip.
      *
      * @param colony the colony for which to display information
-     * @param netProduction a <code>TypeCountMap</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public RebelToolTip(Colony colony, TypeCountMap<GoodsType> netProduction, Canvas parent) {
-        // TODO: cache colony net production and get it directly from colony
+    public RebelToolTip(Colony colony, Canvas parent) {
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
@@ -65,7 +62,7 @@ public class RebelToolTip extends JToolTip {
         int libertyProduction = 0;
         for (GoodsType goodsType : colony.getSpecification().getLibertyGoodsTypeList()) {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
-            int production = netProduction.getCount(goodsType);
+            int production = colony.getNetProduction().getCount(goodsType);
             libertyProduction += production;
             add(new ProductionLabel(goodsType, production, parent), "span 2");
         }

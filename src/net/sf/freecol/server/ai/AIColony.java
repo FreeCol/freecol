@@ -302,7 +302,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int goodsWishValue = 50;
 
         Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
-        TypeCountMap<GoodsType> netProduction = colony.getNetProduction(info);
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
 
         // for every non-expert, request expert replacement
         for (Unit unit : colony.getUnitList()) {
@@ -820,7 +820,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         colonyPlan.create();
 
         Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
-        TypeCountMap<GoodsType> netProduction = colony.getNetProduction(info);
+        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
 
         if (!rearrangeWorkers) {
             logger.fine("No need to rearrange workers in " + colony.getName() + ".");
