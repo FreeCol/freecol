@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.GridLayout;
-
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,7 +46,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(0, 2));
+        reportPanel.setLayout(new MigLayout("wrap 2", "[]push[]"));
 
         for (Player enemy : getGame().getLiveEuropeanPlayers()) {
             NationSummary ns = getController().getNationSummary(enemy);
@@ -99,6 +97,9 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             }
             reportPanel.add(enemyPanel);
         }
+
+        reportPanel.add(getDefaultTextArea(Messages.message("report.foreignAffairs.notice"), 40),
+                        "newline 20, span 8");
 
         reportPanel.doLayout();
     }
