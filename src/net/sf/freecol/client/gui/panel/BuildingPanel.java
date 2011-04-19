@@ -84,6 +84,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         removeAll();
         unitLabels.clear();
 
+        if (info == null) {
+            info = building.getColony().getProductionAndConsumption()
+                .get(building);
+        }
         if (info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {
@@ -128,7 +132,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(bi, rop, 0, 0);
-		return bi;
+        return bi;
     }
 
     public Building getBuilding() {
