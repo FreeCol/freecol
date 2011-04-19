@@ -468,7 +468,7 @@ final class ReceivingThread extends Thread {
                     empty = true;
                     if (!fill()) {
                         wait = true;
-                        return -1;
+                        return r + 1;
                     }
                 }
                 if (bStart == BUFFER_SIZE) {
