@@ -64,7 +64,7 @@ public final class MapControls {
 
     private final InfoPanel        infoPanel;
     private final MiniMap          miniMap;
-    private final UnitButton[]     unitButton;   
+    private final UnitButton[]     unitButton;
     private final JLabel compassRose;
 
     private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
@@ -83,9 +83,9 @@ public final class MapControls {
         infoPanel = new InfoPanel(freeColClient);
         miniMap = new MiniMap(freeColClient);
         compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
-        
+
         final ActionManager am = freeColClient.getActionManager();
-        
+
         List<UnitButton> ubList = new ArrayList<UnitButton>();
         ubList.add(new UnitButton(am.getFreeColAction(WaitAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.id)));
@@ -131,7 +131,7 @@ public final class MapControls {
 
     /**
      * Updates this <code>InfoPanel</code>.
-     * 
+     *
      * @param mapTransform The current MapTransform.
      */
     public void update(MapTransform mapTransform) {
@@ -149,7 +149,7 @@ public final class MapControls {
             || freeColClient.getGame().getMap() == null) {
             return;
         }
-        
+
         //
         // Relocate GUI Objects
         //
@@ -157,11 +157,11 @@ public final class MapControls {
         infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
         miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
         compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
-        
+
         final int SPACE = unitButton[0].getWidth() + 5;
-        for(int i=0; i<unitButton.length; i++) {            
+        for(int i=0; i<unitButton.length; i++) {
             unitButton[i].setLocation(miniMap.getWidth() +
-                                      (infoPanel.getX() - miniMap.getWidth() - 
+                                      (infoPanel.getX() - miniMap.getWidth() -
                                        unitButton.length*SPACE)/2 +
                                       i*SPACE,
                                       component.getHeight() - 40);
@@ -238,7 +238,7 @@ public final class MapControls {
     public void zoomOut() {
         miniMap.zoomOut();
     }
-    
+
     public boolean canZoomIn() {
         return miniMap.canZoomIn();
     }
@@ -248,7 +248,7 @@ public final class MapControls {
     }
 
     /**
-     * 
+     *
      * @param newColor
      */
     public void changeBackgroundColor(Color newColor) {
