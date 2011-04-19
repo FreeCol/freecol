@@ -40,10 +40,10 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 * be placed on a JComponent in order to be useable.
 */
 public final class UnitButton extends JButton {
-    
+
     /**
     * The basic constructor.
-    * @param a The action to be used with this button. 
+    * @param a The action to be used with this button.
     */
     public UnitButton(FreeColAction a) {
         super(a);
@@ -51,7 +51,7 @@ public final class UnitButton extends JButton {
 
     protected void configurePropertiesFromAction(Action a) {
         super.configurePropertiesFromAction(a);
-        
+
         if (a != null) {
             setRolloverEnabled(true);
             Icon bi = (Icon) a.getValue(FreeColAction.BUTTON_IMAGE);
@@ -64,26 +64,26 @@ public final class UnitButton extends JButton {
             setFocusPainted(false);
             setContentAreaFilled(false);
             setBorderPainted(false);
-            
+
             if (bi == null) {
                 throw new IllegalArgumentException("The given action is missing \"BUTTON_IMAGE\".");
-            } 
+            }
             setSize(bi.getIconWidth(), bi.getIconHeight());
         }
     }
-   
+
     protected PropertyChangeListener createActionPropertyChangeListener(Action a) {
         return new UnitButtonActionPropertyChangeListener(this);
     }
-    
+
     private static class UnitButtonActionPropertyChangeListener implements PropertyChangeListener {
         private AbstractButton button;
-        
+
         UnitButtonActionPropertyChangeListener(AbstractButton button) {
             this.button = button;
         }
-        
-        public void propertyChange(PropertyChangeEvent e) {     
+
+        public void propertyChange(PropertyChangeEvent e) {
             String propertyName = e.getPropertyName();
             if (e.getPropertyName().equals(Action.NAME)
                     || e.getPropertyName().equals(Action.SHORT_DESCRIPTION)) {
@@ -108,11 +108,11 @@ public final class UnitButton extends JButton {
             } else if (e.getPropertyName().equals(FreeColAction.BUTTON_PRESSED_IMAGE)) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setPressedIcon(icon);
-                button.repaint();                
+                button.repaint();
             } else if (e.getPropertyName().equals(FreeColAction.BUTTON_DISABLED_IMAGE)) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setDisabledIcon(icon);
-                button.repaint();                  
+                button.repaint();
             } else if (e.getPropertyName().equals(Action.MNEMONIC_KEY)) {
                 Integer mn = (Integer) e.getNewValue();
                 button.setMnemonic(mn.intValue());
