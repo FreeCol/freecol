@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -938,43 +939,47 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         }
 
-        JPanel productionPanel = new JPanel(new GridLayout(0, 2, 10, 0));
-        productionPanel.setOpaque(false);
-
         Set<Modifier> bonusList = buildingType.getFeatureContainer().getModifiers();
-        if (!bonusList.isEmpty()) {
-
-            for (Modifier productionBonus : bonusList) {
-                try {
-                    GoodsType goodsType = getSpecification()
-                        .getGoodsType(productionBonus.getId());
-                    String bonus = getModifierAsString(productionBonus);
-                    productionPanel.add(getGoodsButton(goodsType, bonus));
-                } catch(Exception e) {
-                    // not a production bonus
-                    String bonus = getFeatureName(productionBonus)
-                        + ": " + getModifierAsString(productionBonus);
-                    JLabel label = new JLabel(bonus);
-                    label.setToolTipText(Messages.message(productionBonus.getId() + ".shortDescription"));
-                    productionPanel.add(label);
-                }
+        List<JComponent> labels = new ArrayList<JComponent>();
+        for (Modifier productionBonus : bonusList) {
+            try {
+                GoodsType goodsType = getSpecification()
+                    .getGoodsType(productionBonus.getId());
+                String bonus = getModifierAsString(productionBonus);
+                labels.add(0, getGoodsButton(goodsType, bonus));
+            } catch(Exception e) {
+                // not a production bonus
+                String bonus = getFeatureName(productionBonus)
+                    + ": " + getModifierAsString(productionBonus);
+                JLabel label = new JLabel(bonus);
+                label.setToolTipText(Messages.message(productionBonus.getId() + ".shortDescription"));
+                labels.add(label);
             }
         }
 
         Set<Ability> abilities = buildingType.getFeatureContainer().getAbilities();
-        if (!abilities.isEmpty()) {
-            for (Ability ability : abilities) {
-                if (ability.getValue()) {
-                    JLabel label = new JLabel(getAbilityAsString(ability));
-                    label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
-                    productionPanel.add(label);
-                }
+        for (Ability ability : abilities) {
+            if (ability.getValue()) {
+                JLabel label = new JLabel(getAbilityAsString(ability));
+                label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
+                labels.add(label);
             }
         }
 
-        if (productionPanel.getComponentCount() > 0) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.modifiers")), "top");
-            detailPanel.add(productionPanel);
+        if (!labels.isEmpty()) {
+            detailPanel.add(new JLabel(Messages.message(StringTemplate.template("colopedia.buildings.modifiers")
+                                                        .addAmount("%number%", labels.size()))), "top");
+            int count = 0;
+            for (JComponent component : labels) {
+                if (count == 0) {
+                    detailPanel.add(component, "split 2");
+                } else if (count % 2 == 0) {
+                    detailPanel.add(component, "skip, split 2");
+                } else {
+                    detailPanel.add(component, "gap 20");
+                }
+                count++;
+            }
         }
 
         // Notes
