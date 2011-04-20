@@ -844,7 +844,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildBuildingDetail(BuildingType buildingType) {
 
-        detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
+        detailPanel.setLayout(new MigLayout("wrap 7, fillx, gapx 20", "", ""));
 
         JLabel name = localizedLabel(buildingType.getNameKey());
         name.setFont(smallHeaderFont);
@@ -870,7 +870,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             appendRequiredAbilities(doc, buildingType);
 
             detailPanel.add(new JLabel(Messages.message("colopedia.buildings.requires")), "top");
-            detailPanel.add(textPane, "growx");
+            detailPanel.add(textPane, "span, growx");
         } catch(BadLocationException e) {
             logger.warning(e.toString());
         }
@@ -878,43 +878,45 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         // Costs to build - Hammers & Tools
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")));
         if (buildingType.getGoodsRequired().isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.autoBuilt")));
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.autoBuilt")), "span");
         } else {
             AbstractGoods goodsRequired = buildingType.getGoodsRequired().get(0);
             if (buildingType.getGoodsRequired().size() > 1) {
                 detailPanel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()),
-                                "split " + buildingType.getGoodsRequired().size());
+                                "span, split " + buildingType.getGoodsRequired().size());
 
                 for (int index = 1; index < buildingType.getGoodsRequired().size(); index++) {
                     goodsRequired = buildingType.getGoodsRequired().get(index);
                     detailPanel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()));
                 }
             } else {
-                detailPanel.add((getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount())));
+                detailPanel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()), "span");
             }
         }
 
         // Production - Needs & Produces
         if (buildingType.hasAbility("model.ability.teach")) {
-            JPanel production = new JPanel();
-            production.setOpaque(false);
-            production.setLayout(new MigLayout("wrap 3, gapx 20", "", ""));
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.teaches")), "newline, top");
+            int count = 0;
             for (UnitType unitType2 : getSpecification().getUnitTypeList()) {
                 if (buildingType.canAdd(unitType2)) {
-                    production.add(getButton(unitType2));
+                    if (count > 0 && count % 3 == 0) {
+                        detailPanel.add(getButton(unitType2), "skip, span 2");
+                    } else {
+                        detailPanel.add(getButton(unitType2), "span 2");
+                    }
+                    count++;
                 }
             }
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.teaches")), "top");
-            detailPanel.add(production);
         } else {
 
             GoodsType inputType = buildingType.getConsumedGoodsType();
             GoodsType outputType = buildingType.getProducedGoodsType();
 
             if (outputType != null) {
-                detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")));
+                detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")), "newline");
                 if (inputType != null) {
-                    detailPanel.add(getGoodsButton(inputType), "split 3");
+                    detailPanel.add(getGoodsButton(inputType), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
                     arrow.setFont(arrowFont);
                     detailPanel.add(arrow);
@@ -924,18 +926,18 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         int workplaces = buildingType.getWorkPlaces();
-        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.workplaces")));
-        detailPanel.add(new JLabel(Integer.toString(workplaces)));
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.workplaces")), "newline");
+        detailPanel.add(new JLabel(Integer.toString(workplaces)), "span");
 
         // Specialist
         if (workplaces > 0) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")));
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")), "newline");
             final UnitType unitType = getSpecification()
                 .getExpertForProducing(buildingType.getProducedGoodsType());
             if (unitType == null) {
-                detailPanel.add(new JLabel(none));
+                detailPanel.add(new JLabel(none), "span");
             } else {
-                detailPanel.add(getUnitButton(unitType));
+                detailPanel.add(getUnitButton(unitType), "span");
             }
         }
 
@@ -968,15 +970,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         if (!labels.isEmpty()) {
             detailPanel.add(new JLabel(Messages.message(StringTemplate.template("colopedia.buildings.modifiers")
-                                                        .addAmount("%number%", labels.size()))), "top");
+                                                        .addAmount("%number%", labels.size()))), "newline, top");
             int count = 0;
             for (JComponent component : labels) {
-                if (count == 0) {
-                    detailPanel.add(component, "split 2");
-                } else if (count % 2 == 0) {
-                    detailPanel.add(component, "skip, split 2");
+                if (count > 0 && count % 2 == 0) {
+                    detailPanel.add(component, "skip, span 3");
                 } else {
-                    detailPanel.add(component, "gap 20");
+                    detailPanel.add(component, "span 3");
                 }
                 count++;
             }
@@ -984,7 +984,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         // Notes
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.notes")), "newline 20, top");
-        detailPanel.add(getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20),
+                        "span, growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
