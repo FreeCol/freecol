@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * An action for skipping the active unit.
