@@ -394,6 +394,13 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Clears all <code>Equipment</code> held by this unit.
+     */
+    public void clearEquipment() {
+        setEquipment(new TypeCountMap<EquipmentType>());
+    }
+
+    /**
      * Get the <code>TradeRoute</code> value.
      *
      * @return a <code>TradeRoute</code> value
