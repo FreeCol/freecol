@@ -69,7 +69,6 @@ public class Messages {
     private static Number grammaticalNumber = NumberRules.OTHER_NUMBER_RULE;
 
 
-
     public static void setGrammaticalNumber(Number number) {
         grammaticalNumber = number;
     }
@@ -186,6 +185,23 @@ public class Messages {
         return message.trim();
     }
 
+
+    /**
+     * Replace all choice formats in the given string, using keys and
+     * replacement values from the given template, which may be null.
+     *
+     * A choice format is enclosed in double brackets and consists of
+     * a tag, followed by a colon, followed by an optional selector,
+     * followed by a pipe character, followed by one or several
+     * choices separated by pipe characters. If there is only one
+     * choice, it must be a message id or a variable. Otherwise, each
+     * choice consists of a key and a value separated by an assignment
+     * character. Example: "{{tag:selector|key1=val1|key2=val2}}".
+     *
+     * @param input a <code>String</code> value
+     * @param template a <code>StringTemplate</code> value
+     * @return a <code>String</code> value
+     */
     private static String replaceChoices(String input, StringTemplate template) {
         int openChoice = 0;
         int closeChoice = 0;
@@ -193,7 +209,7 @@ public class Messages {
         StringBuilder result = new StringBuilder();
         while ((openChoice = input.indexOf("{{", highWaterMark)) >= 0) {
             result.append(input.substring(highWaterMark, openChoice));
-            closeChoice = input.indexOf("}}", openChoice + 2);
+            closeChoice = findMatchingBracket(input, openChoice + 2);
             if (closeChoice < 0) {
                 // no closing brackets found
                 logger.warning("Mismatched brackets: " + input);
@@ -273,11 +289,17 @@ public class Messages {
             } else {
                 int start = keyIndex + selector.length() + 1;
                 int replacementIndex = input.indexOf("|", start);
-                if (replacementIndex < 0 || replacementIndex > closeChoice) {
-                    // must be last choice
-                    result.append(input.substring(start, closeChoice));
+                int nextOpenIndex = input.indexOf("{{", start);
+                if (nextOpenIndex >= 0 && nextOpenIndex < replacementIndex) {
+                    replacementIndex = input.indexOf("|", findMatchingBracket(input, nextOpenIndex + 2) + 2);
+                }
+                int end = (replacementIndex < 0 || replacementIndex > closeChoice)
+                    ? closeChoice : replacementIndex;
+                String replacement = input.substring(start, end);
+                if (replacement.indexOf("{{") < 0) {
+                    result.append(replacement);
                 } else {
-                    result.append(input.substring(start, replacementIndex));
+                    result.append(replaceChoices(replacement, template));
                 }
             }
         }
@@ -285,6 +307,14 @@ public class Messages {
         return result.toString();
     }
 
+    /**
+     * Return the choice tagged with the given key, or null, if the
+     * given input string does not contain the key.
+     *
+     * @param input a <code>String</code> value
+     * @param key a <code>String</code> value
+     * @return a <code>String</code> value
+     */
     private static String getChoice(String input, String key) {
         int keyIndex = input.indexOf(key);
         if (keyIndex < 0) {
@@ -302,6 +332,46 @@ public class Messages {
             }
             return input.substring(start, end);
         }
+    }
+
+
+    /**
+     * Return the index of the matching pair of brackets, or -1 if
+     * none is found.
+     *
+     * @param input a <code>String</code> value
+     * @param start an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    private static int findMatchingBracket(String input, int start) {
+        char last = 0;
+        int level = 0;
+        for (int index = start; index < input.length(); index++) {
+            switch(input.charAt(index)) {
+            case '{':
+                if (last == '{') {
+                    last = 0;
+                    level++;
+                } else {
+                    last = '{';
+                }
+                break;
+            case '}':
+                if (last == '}') {
+                    if (level == 0) {
+                        return index - 1;
+                    } else {
+                        last = 0;
+                        level--;
+                    }
+                } else {
+                    last = '}';
+                }
+                break;
+            }
+        }
+        // found no matching bracket
+        return -1;
     }
 
     /**

@@ -234,7 +234,8 @@ public class MessagesTest extends FreeColTestCase {
         String mapping = "key1=%colony% tuottaa tuotetta "
             + "{{tag:acc|%goods%}}.\n"
             + "key2={{plural:%amount%|one=ruoka|other=ruokaa|"
-            + "default={{tag:|acc=viljaa|default=Vilja}}}}\n";
+            + "default={{tag:|acc=viljaa|default=Vilja}}}}\n"
+            + "key3={{tag:|acc=viljaa|default={{plural:%amount%|one=ruoka|other=ruokaa|default=Ruoka}}}}\n";
 
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
         Messages.loadResources(stream);
@@ -244,6 +245,9 @@ public class MessagesTest extends FreeColTestCase {
             .add("%goods%", "key2");
 
         assertEquals("someColony tuottaa tuotetta viljaa.", Messages.message(t));
+
+        assertEquals("Ruoka", Messages.message(StringTemplate.key("key3")));
+        assertEquals("Ruoka", Messages.message("key3"));
 
     }
 
