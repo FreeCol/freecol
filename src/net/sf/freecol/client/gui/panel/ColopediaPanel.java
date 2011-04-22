@@ -534,7 +534,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildTerrainDetail(TileType tileType) {
 
-        detailPanel.setLayout(new MigLayout("wrap 4, gap 20", "[][]push[][]", ""));
+        detailPanel.setLayout(new MigLayout("wrap 4, gap 20"));
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
         String defenseBonus = none;
@@ -547,13 +547,14 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         nameLabel.setFont(smallHeaderFont);
         detailPanel.add(nameLabel, "span, align center");
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")));
+        detailPanel.add(localizedLabel("colopedia.terrain.terrainImage"),
+                        "spany 3");
         Image terrainImage = getLibrary().getCompoundTerrainImage(tileType, 1);
-        detailPanel.add(new JLabel(new ImageIcon(terrainImage)));
+        detailPanel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypeList();
         if (resourceList.size() > 0) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.terrain.resource")));
+            detailPanel.add(localizedLabel("colopedia.terrain.resource"));
             if (resourceList.size() > 1) {
                 detailPanel.add(getResourceButton(resourceList.get(0)), "split " + resourceList.size());
                 for (int index = 1; index < resourceList.size(); index++) {
@@ -566,13 +567,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             detailPanel.add(new JLabel(), "wrap");
         }
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.movementCost")));
+        detailPanel.add(localizedLabel("colopedia.terrain.movementCost"));
         detailPanel.add(new JLabel(movementCost));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.defenseBonus")));
+        detailPanel.add(localizedLabel("colopedia.terrain.defenseBonus"));
         detailPanel.add(new JLabel(defenseBonus));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.production")));
+        detailPanel.add(localizedLabel("colopedia.terrain.production"));
 
         List<AbstractGoods> production = tileType.getProduction();
         if (production.size() > 0) {
@@ -591,7 +592,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             detailPanel.add(new JLabel(), "wrap");
         }
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")));
+        detailPanel.add(localizedLabel("colopedia.terrain.description"));
         detailPanel.add(getDefaultTextArea(Messages.message(tileType.getDescriptionKey()), 20),
                         "span, growx");
 
@@ -614,7 +615,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         Set<Modifier> modifiers = type.getFeatureContainer().getModifiers();
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.resource.bonusProduction")));
+        detailPanel.add(localizedLabel("colopedia.resource.bonusProduction"));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
         for (Modifier modifier : modifiers) {
@@ -639,7 +640,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
         detailPanel.add(goodsPanel);
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.resource.description")), "newline 20");
+        detailPanel.add(localizedLabel("colopedia.resource.description"), "newline 20");
         detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
 
         detailPanel.revalidate();
@@ -653,28 +654,28 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildUnitDetail(UnitType type) {
 
-        detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
+        detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20"));
 
         JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.offensivePower")));
+        detailPanel.add(localizedLabel("colopedia.unit.offensivePower"));
         detailPanel.add(new JLabel(Integer.toString(type.getOffence())));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.defensivePower")));
+        detailPanel.add(localizedLabel("colopedia.unit.defensivePower"));
         detailPanel.add(new JLabel(Integer.toString(type.getDefence())));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.movement")));
+        detailPanel.add(localizedLabel("colopedia.unit.movement"));
         detailPanel.add(new JLabel(String.valueOf(type.getMovement()/3)));
 
         if (type.canCarryGoods() || type.canCarryUnits()) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.capacity")));
+            detailPanel.add(localizedLabel("colopedia.unit.capacity"));
             detailPanel.add(new JLabel(Integer.toString(type.getSpace())));
         }
 
         if (type.hasSkill()) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")));
+            detailPanel.add(localizedLabel("colopedia.unit.skill"));
             detailPanel.add(new JLabel(Integer.toString(type.getSkill())));
 
             List<BuildingType> schools = new ArrayList<BuildingType>();
@@ -686,7 +687,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
 
             if (!schools.isEmpty()) {
-                detailPanel.add(new JLabel(Messages.message("colopedia.unit.school")));
+                detailPanel.add(localizedLabel("colopedia.unit.school"));
                 if (schools.size() > 1) {
                     detailPanel.add(getButton(schools.get(0)),
                                     "span, split " + schools.size());
@@ -710,13 +711,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             price = Integer.toString(type.getPrice());
         }
         if (price != null) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")));
+            detailPanel.add(localizedLabel("colopedia.unit.price"));
             detailPanel.add(new JLabel(price));
         }
 
         // Requires - prerequisites to build
         if (!type.getAbilitiesRequired().isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.requirements")), "top");
+            detailPanel.add(localizedLabel("colopedia.unit.requirements"), "top");
             try {
                 JTextPane textPane = getDefaultTextPane();
                 StyledDocument doc = textPane.getStyledDocument();
@@ -733,8 +734,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.productionBonus")),
-                            "newline 20, top");
+            StringTemplate template = StringTemplate.template("colopedia.unit.productionBonus")
+                .addAmount("%number%", bonusNumber);
+            detailPanel.add(localizedLabel(template), "newline 20, top");
             JPanel productionPanel = new JPanel(new GridLayout(0, MODIFIERS_PER_ROW));
             productionPanel.setOpaque(false);
             for (Modifier productionBonus : bonusList) {
@@ -746,7 +748,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         if (!type.getGoodsRequired().isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.goodsRequired")),
+            detailPanel.add(localizedLabel("colopedia.unit.goodsRequired"),
                             "newline 20");
             AbstractGoods goods = type.getGoodsRequired().get(0);
             if (type.getGoodsRequired().size() > 1) {
@@ -761,7 +763,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         }
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
+        detailPanel.add(localizedLabel("colopedia.unit.description"),
                         "newline 20");
         detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
 
@@ -783,7 +785,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(name, "span, align center, wrap 40");
 
         /**
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.isFarmed")));
+        detailPanel.add(localizedLabel("colopedia.goods.isFarmed"));
         detailPanel.add(new JLabel(Messages.message(type.isFarmed() ? "yes" : "no")));
         **/
 
@@ -799,7 +801,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 }
             }
 
-            detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedBy")), "top");
+            detailPanel.add(localizedLabel("colopedia.goods.improvedBy"), "top");
             if (improvements.size() == 0) {
                 detailPanel.add(new JLabel(none));
             } else if (improvements.size() == 1) {
@@ -815,7 +817,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 }
             }
         } else {
-            detailPanel.add(new JLabel(Messages.message("colopedia.goods.madeFrom")));
+            detailPanel.add(localizedLabel("colopedia.goods.madeFrom"));
             if (type.isRefined()) {
                 detailPanel.add(getGoodsButton(type.getRawMaterial()));
             } else {
@@ -823,14 +825,14 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
         }
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.makes")));
+        detailPanel.add(localizedLabel("colopedia.goods.makes"));
         if (type.isRawMaterial()) {
             detailPanel.add(getGoodsButton(type.getProducedMaterial()), "wrap 40");
         } else {
             detailPanel.add(new JLabel(none), "wrap 40");
         }
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.description")));
+        detailPanel.add(localizedLabel("colopedia.goods.description"));
         detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
 
         detailPanel.revalidate();
@@ -869,16 +871,16 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
             appendRequiredAbilities(doc, buildingType);
 
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.requires")), "top");
+            detailPanel.add(localizedLabel("colopedia.buildings.requires"), "top");
             detailPanel.add(textPane, "span, growx");
         } catch(BadLocationException e) {
             logger.warning(e.toString());
         }
 
         // Costs to build - Hammers & Tools
-        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")));
+        detailPanel.add(localizedLabel("colopedia.buildings.cost"));
         if (buildingType.getGoodsRequired().isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.autoBuilt")), "span");
+            detailPanel.add(localizedLabel("colopedia.buildings.autoBuilt"), "span");
         } else {
             AbstractGoods goodsRequired = buildingType.getGoodsRequired().get(0);
             if (buildingType.getGoodsRequired().size() > 1) {
@@ -896,7 +898,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         // Production - Needs & Produces
         if (buildingType.hasAbility("model.ability.teach")) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.teaches")), "newline, top");
+            detailPanel.add(localizedLabel("colopedia.buildings.teaches"), "newline, top");
             int count = 0;
             for (UnitType unitType2 : getSpecification().getUnitTypeList()) {
                 if (buildingType.canAdd(unitType2)) {
@@ -914,7 +916,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             GoodsType outputType = buildingType.getProducedGoodsType();
 
             if (outputType != null) {
-                detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")), "newline");
+                detailPanel.add(localizedLabel("colopedia.buildings.production"), "newline");
                 if (inputType != null) {
                     detailPanel.add(getGoodsButton(inputType), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
@@ -926,12 +928,12 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         int workplaces = buildingType.getWorkPlaces();
-        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.workplaces")), "newline");
+        detailPanel.add(localizedLabel("colopedia.buildings.workplaces"), "newline");
         detailPanel.add(new JLabel(Integer.toString(workplaces)), "span");
 
         // Specialist
         if (workplaces > 0) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")), "newline");
+            detailPanel.add(localizedLabel("colopedia.buildings.specialist"), "newline");
             final UnitType unitType = getSpecification()
                 .getExpertForProducing(buildingType.getProducedGoodsType());
             if (unitType == null) {
@@ -944,33 +946,26 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         Set<Modifier> bonusList = buildingType.getFeatureContainer().getModifiers();
         List<JComponent> labels = new ArrayList<JComponent>();
         for (Modifier productionBonus : bonusList) {
-            try {
-                GoodsType goodsType = getSpecification()
-                    .getGoodsType(productionBonus.getId());
-                String bonus = getModifierAsString(productionBonus);
-                labels.add(0, getGoodsButton(goodsType, bonus));
-            } catch(Exception e) {
-                // not a production bonus
-                String bonus = getFeatureName(productionBonus)
-                    + ": " + getModifierAsString(productionBonus);
-                JLabel label = new JLabel(bonus);
-                label.setToolTipText(Messages.message(productionBonus.getId() + ".shortDescription"));
-                labels.add(label);
+            JComponent component = getModifierComponent(productionBonus);
+            if (component instanceof JButton) {
+                labels.add(0, component);
+            } else {
+                labels.add(component);
             }
         }
 
         Set<Ability> abilities = buildingType.getFeatureContainer().getAbilities();
         for (Ability ability : abilities) {
-            if (ability.getValue()) {
-                JLabel label = new JLabel(getAbilityAsString(ability));
-                label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
-                labels.add(label);
+            JComponent component = getAbilityComponent(ability);
+            if (component != null) {
+                labels.add(component);
             }
         }
 
         if (!labels.isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message(StringTemplate.template("colopedia.buildings.modifiers")
-                                                        .addAmount("%number%", labels.size()))), "newline, top");
+            detailPanel.add(localizedLabel(StringTemplate.template("colopedia.buildings.modifiers")
+                                           .addAmount("%number%", labels.size())),
+                            "newline, top");
             int count = 0;
             for (JComponent component : labels) {
                 if (count > 0 && count % 2 == 0) {
@@ -983,7 +978,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         // Notes
-        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.notes")), "newline 20, top");
+        detailPanel.add(localizedLabel("colopedia.buildings.notes"), "newline 20, top");
         detailPanel.add(getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20),
                         "span, growx");
 
@@ -1052,10 +1047,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(localizedLabel("colopedia.nation.ruler"));
         detailPanel.add(localizedLabel(nation.getRulerNameKey()));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nation.defaultAdvantage")));
+        detailPanel.add(localizedLabel("colopedia.nation.defaultAdvantage"));
         detailPanel.add(getButton(nation.getType()));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nation.currentAdvantage")));
+        detailPanel.add(localizedLabel("colopedia.nation.currentAdvantage"));
         detailPanel.add(getButton(currentNationType), "wrap push");
 
         detailPanel.revalidate();
@@ -1069,20 +1064,23 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType) {
 
+        Font boldFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 16f);
+
         Set<Ability> abilities = nationType.getFeatureContainer().getAbilities();
         Set<Modifier> modifiers = nationType.getFeatureContainer().getModifiers();
 
-        detailPanel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
+        detailPanel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
-        JLabel name = localizedLabel(nationType.getNameKey());
-        name.setFont(smallHeaderFont);
-        detailPanel.add(name, "span, align center, wrap 40");
+        JLabel label = localizedLabel(nationType.getNameKey());
+        label.setFont(smallHeaderFont);
+        detailPanel.add(label, "span, align center, wrap 40");
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.units")));
+        label = localizedLabel("colopedia.nationType.units");
+        label.setFont(boldFont);
+        detailPanel.add(label, "wrap");
+
         List<AbstractUnit> startingUnits = nationType.getStartingUnits();
-        if (startingUnits.isEmpty()) {
-            detailPanel.add(new JLabel());
-        } else {
+        if (!startingUnits.isEmpty()) {
             AbstractUnit startingUnit = startingUnits.get(0);
             if (startingUnits.size() > 1) {
                 detailPanel.add(getUnitButton(startingUnit),
@@ -1097,21 +1095,20 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         if (!abilities.isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message("abilities")), "newline 20, span");
-            String trueString = Messages.message("true");
-            String falseString = Messages.message("false");
+            label = localizedLabel("abilities");
+            label.setFont(boldFont);
+            detailPanel.add(label, "newline 20, span");
             for (Ability ability : abilities) {
-                detailPanel.add(new JLabel("* " + getFeatureName(ability)));
-                String value = ability.getValue() ? trueString : falseString;
-                detailPanel.add(new JLabel(value));
+                detailPanel.add(getAbilityComponent(ability));
             }
         }
 
         if (!modifiers.isEmpty()) {
-            detailPanel.add(new JLabel(Messages.message("modifiers")), "newline 20, span");
+            label = localizedLabel("modifiers");
+            label.setFont(boldFont);
+            detailPanel.add(label, "newline 20, span");
             for (Modifier modifier : modifiers) {
-                detailPanel.add(new JLabel("* " + getFeatureName(modifier)));
-                detailPanel.add(new JLabel(getModifierAsString(modifier)));
+                detailPanel.add(getModifierComponent(modifier));
             }
         }
 
@@ -1135,16 +1132,16 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.aggression")));
+        detailPanel.add(localizedLabel("colopedia.nationType.aggression"));
         detailPanel.add(new JLabel(Messages.message("colopedia.nationType.aggression." +
                                                     nationType.getAggression().toString().toLowerCase())));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.numberOfSettlements")));
+        detailPanel.add(localizedLabel("colopedia.nationType.numberOfSettlements"));
         detailPanel.add(new JLabel(Messages.message("colopedia.nationType.numberOfSettlements." +
                                                     nationType.getNumberOfSettlements().toString()
                                                     .toLowerCase())));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.typeOfSettlements")));
+        detailPanel.add(localizedLabel("colopedia.nationType.typeOfSettlements"));
         detailPanel.add(new JLabel(Messages.message(nationType.getCapitalType().getId() + ".name"),
                                    new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
                                    SwingConstants.CENTER));
@@ -1153,10 +1150,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         for (String regionName : nationType.getRegionNames()) {
             regionNames.add(Messages.message(regionName + ".name"));
         }
-        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.regions")));
+        detailPanel.add(localizedLabel("colopedia.nationType.regions"));
         detailPanel.add(new JLabel(Utils.join(", ", regionNames)));
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.skills")), "top, newline 20");
+        detailPanel.add(localizedLabel("colopedia.nationType.skills"), "top, newline 20");
         GridLayout gridLayout = new GridLayout(0, 2);
         gridLayout.setHgap(10);
         JPanel unitPanel = new JPanel(gridLayout);
@@ -1218,16 +1215,21 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         return Messages.message(feature.getNameKey());
     }
 
-    private String getAbilityAsString(Ability ability) {
-        String label = Messages.message(getFeatureName(ability)) + ":";
-        if (ability.hasScope()) {
-            for (Scope scope : ability.getScopes()) {
+    private String getFeatureAsString(Feature feature) {
+        String label = Messages.message(getFeatureName(feature)) + ":";
+        if (feature.hasScope()) {
+            for (Scope scope : feature.getScopes()) {
+                String key = null;
                 if (scope.getType() != null) {
-                    label += (scope.isMatchNegated() ? " !" : " ")
-                        + Messages.message(scope.getType() + ".name") + ",";
+                    key = scope.getType();
                 } else if (scope.getAbilityID() != null) {
+                    key = scope.getAbilityID();
+                } else if (scope.getMethodName() != null) {
+                    key = "model.scope." + scope.getMethodName();
+                }
+                if (key != null) {
                     label += (scope.isMatchNegated() ? " !" : " ")
-                        + Messages.message(scope.getAbilityID() + ".name") + ",";
+                        + Messages.message(key + ".name") + ",";
                 }
             }
         }
@@ -1254,6 +1256,31 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         default:
         }
         return bonus;
+    }
+
+    public JComponent getModifierComponent(Modifier modifier) {
+        try {
+            GoodsType goodsType = getSpecification()
+                .getGoodsType(modifier.getId());
+            String bonus = getModifierAsString(modifier);
+            return getGoodsButton(goodsType, bonus);
+        } catch(Exception e) {
+            // not a production bonus
+            JLabel label = new JLabel(getFeatureAsString(modifier) + ": "
+                                      + getModifierAsString(modifier));
+            label.setToolTipText(Messages.message(modifier.getId() + ".shortDescription"));
+            return label;
+        }
+    }
+
+    public JLabel getAbilityComponent(Ability ability) {
+        if (ability.getValue()) {
+            JLabel label = new JLabel(getFeatureAsString(ability));
+            label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
+            return label;
+        } else {
+            return null;
+        }
     }
 
     public void appendRequiredAbilities(StyledDocument doc, BuildableType buildableType)
