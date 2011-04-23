@@ -827,6 +827,10 @@ public class Building extends FreeColGameObject
         int factor = (int) getType().getFeatureContainer()
             .applyModifier(0, "model.modifier.breedingFactor");
         int result = ((available - 1) / divisor + 1) * factor;
+        if (getType().hasAbility("model.ability.avoidExcessProduction")) {
+            int capacity = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
+            result = Math.min(capacity, result);
+        }
         return result;
     }
 
