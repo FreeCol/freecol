@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.ImageIcon;
@@ -58,16 +56,22 @@ public class BuildingToolTip extends JToolTip {
      */
     public BuildingToolTip(Building building, ProductionInfo info, Canvas parent) {
 
-        setLayout(new MigLayout("fill"));
+        int workplaces = building.getMaxUnits();
 
-        String buildingName = Messages.message(building.getNameKey());
-        if (building.getMaxUnits() == 0) {
-            buildingName = "(" + buildingName + ")";
+        String columns = "[align center]";
+        for (int index = 0; index < workplaces; index++) {
+            columns += "20[]5[]";
         }
+
+        MigLayout layout = new MigLayout("fill, insets 20, wrap " + (2 * workplaces + 1),
+                                         columns, "[][][align bottom]");
+        setLayout(layout);
 
         boolean canTeach = building.getType().hasAbility("model.ability.teach");
 
-        add(new JLabel(buildingName), "span, align center");
+        JLabel buildingName = new JLabel(Messages.message(building.getNameKey()));
+        buildingName.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 16f));
+        add(buildingName, "span");
 
         if (info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
@@ -77,19 +81,19 @@ public class BuildingToolTip extends JToolTip {
                 ? production : info.getMaximumProduction().get(0);
             ProductionLabel productionOutput = new ProductionLabel(production, maximumProduction, parent);
             if (info.getConsumption().isEmpty()) {
-                add(productionOutput, "span, align center");
+                add(productionOutput, "span");
             } else {
                 AbstractGoods consumption = info.getConsumption().get(0);
                 if (consumption.getAmount() > 0) {
                     AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
                         ? consumption: info.getMaximumConsumption().get(0);
                     ProductionLabel productionInput = new ProductionLabel(consumption, maximumConsumption, parent);
-                    add(productionInput, "span, split 3, align center");
+                    add(productionInput, "span, split 3");
                     add(arrow);
                     add(productionOutput);
                 } else {
                     add(new JLabel(parent.getImageLibrary().getGoodsImageIcon(consumption.getType())),
-                        "span, split 3, align center");
+                        "span, split 3");
                     add(arrow);
                     add(new JLabel(parent.getImageLibrary().getGoodsImageIcon(production.getType())));
                 }
@@ -103,8 +107,6 @@ public class BuildingToolTip extends JToolTip {
             if (canTeach && unit.getStudent() != null) {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
                                              unit.getNeededTurnsOfTraining());
-                progress.setBackground(Color.WHITE);
-                progress.setOpaque(true);
                 UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                 studentLabel.setIgnoreLocation(true);
                 add(unitLabel);
@@ -115,11 +117,15 @@ public class BuildingToolTip extends JToolTip {
             }
         }
 
+        int diff = building.getMaxUnits() - building.getUnitList().size();
+        for (int index = 0; index < diff; index++) {
+            add(new JLabel(new ImageIcon(ResourceManager.getImage("placeholder.image"))), "span 2");
+        }
+
+        setPreferredSize(layout.preferredLayoutSize(this));
+
     }
 
-    public Dimension getPreferredSize() {
-        return new Dimension(400, 200);
-    }
 }
 
 
