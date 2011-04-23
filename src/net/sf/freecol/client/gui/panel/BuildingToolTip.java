@@ -42,17 +42,23 @@ import net.miginfocom.swing.MigLayout;
  */
 public class BuildingToolTip extends JToolTip {
 
-    private static final Font arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
+    private static final JLabel arrow = new JLabel("\u2192");
+
+    static {
+        arrow.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 24f));
+    }
+
 
     /**
      * Creates this BuildingToolTip.
      *
      * @param building The building to display information from.
+     * @param info a <code>ProductionInfo</code> value
      * @param parent a <code>Canvas</code> value
      */
     public BuildingToolTip(Building building, ProductionInfo info, Canvas parent) {
 
-        setLayout(new MigLayout("fill", "", ""));
+        setLayout(new MigLayout("fill"));
 
         String buildingName = Messages.message(building.getNameKey());
         if (building.getMaxUnits() == 0) {
@@ -74,14 +80,19 @@ public class BuildingToolTip extends JToolTip {
                 add(productionOutput, "span, align center");
             } else {
                 AbstractGoods consumption = info.getConsumption().get(0);
-                AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
-                    ? consumption: info.getMaximumConsumption().get(0);
-                ProductionLabel productionInput = new ProductionLabel(consumption, maximumConsumption, parent);
-                JLabel arrow = new JLabel("\u2192");
-                arrow.setFont(arrowFont);
-                add(productionInput, "span, split 3, align center");
-                add(arrow);
-                add(productionOutput);
+                if (consumption.getAmount() > 0) {
+                    AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
+                        ? consumption: info.getMaximumConsumption().get(0);
+                    ProductionLabel productionInput = new ProductionLabel(consumption, maximumConsumption, parent);
+                    add(productionInput, "span, split 3, align center");
+                    add(arrow);
+                    add(productionOutput);
+                } else {
+                    add(new JLabel(parent.getImageLibrary().getGoodsImageIcon(consumption.getType())),
+                        "span, split 3, align center");
+                    add(arrow);
+                    add(new JLabel(parent.getImageLibrary().getGoodsImageIcon(production.getType())));
+                }
             }
         }
 
