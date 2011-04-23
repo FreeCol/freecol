@@ -92,9 +92,11 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
             add(new JLabel(), "span");
         } else {
             AbstractGoods output = info.getProduction().get(0);
-            AbstractGoods maximum = info.getMaximumProduction().get(0);
-            productionOutput = new ProductionLabel(output, maximum, parent);
-            add(productionOutput, "span, align center");
+            if (output.getAmount() > 0) {
+                AbstractGoods maximum = info.getMaximumProduction().get(0);
+                productionOutput = new ProductionLabel(output, maximum, parent);
+                add(productionOutput, "span, align center");
+            }
         }
 
         for (Unit unit : building.getUnitList()) {
