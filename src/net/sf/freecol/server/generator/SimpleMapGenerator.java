@@ -426,7 +426,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = spec.getRangeOption("model.option.settlementNumber").getValue();
         List<Tile> settlementTiles = new ArrayList<Tile>();
         tiles: for (Tile tile : map.getAllTiles()) {
-            if (!map.isPolar(tile) && tile.isSettleable()) {
+            if (!map.isPolar(tile) && tile.getType().canSettle()) {
                 for (Tile t : settlementTiles) {
                     if (tile.getDistanceTo(t) < minSettlementDistance) {
                         continue tiles;

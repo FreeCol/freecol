@@ -103,8 +103,12 @@ public class SettlementTest extends FreeColTestCase {
 
         Colony colony = getStandardColony();
         for (Tile tile : colony.getTile().getSurroundingTiles(1)) {
-            assertEquals(tile.getOwner(), colony.getOwner());
-            assertEquals(tile.getOwningSettlement(), colony);
+            assertEquals("Tile " + tile.toString()
+                         + " should be owned by " + colony.getOwner().getId(),
+                         tile.getOwner(), colony.getOwner());
+            assertEquals("Tile " + tile.toString()
+                         + " should be owned by " + colony.getId(),
+                         tile.getOwningSettlement(), colony);
         }
 
     }

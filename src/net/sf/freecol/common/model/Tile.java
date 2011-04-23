@@ -1001,16 +1001,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Check to see if this tile can be used to construct a new settlement.
-     *
-     * @return True if tile is suitable for colonization, false otherwise
-     */
-    public boolean isSettleable() {
-        if (settlement != null || !getType().canSettle()) return false;
-        return true;
-    }
-
-    /**
      * Gets a <code>Unit</code> that can become active. This is preferably a
      * <code>Unit</code> not currently performing any work.
      *

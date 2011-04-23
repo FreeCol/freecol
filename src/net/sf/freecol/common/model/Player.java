@@ -1045,7 +1045,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Can a tile be owned by this player?
      * This is a test of basic practicality and does not consider
-     * tile ownership issues.
+     * the full complexity of tile ownership issues.
      *
      * @param tile The <code>Tile</code> to consider.
      * @return True if the tile can be owned by this player.
@@ -1057,21 +1057,22 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * The test for whether a tile can be claimed by a player
-     * settlement.  Note that this does not consider purchase or
-     * stealing.  The rule for the center tile is one step more
-     * exacting than this.
+     * The test for whether a tile can be freely claimed by a player
+     * settlement (freely => not purchase or stealing).  The rule for
+     * the center tile is different, see below.
      *
-     * The tile must be ownable by this player, not currently owned,
-     * or owned by this player and not by a settlement, unless it is a
-     * colony that is not using the tile, or owned by someone else
-     * who does not want anything for it.  Got that?
+     * The tile must be ownable by this player, settlement-free, and
+     * either not currently owned, owned by this player and not by
+     * another settlement unless it is a colony that is not using the
+     * tile, or owned by someone else who does not want anything for
+     * it.  Got that?
      *
      * @param tile The <code>Tile</code> to try to claim.
      * @return True if the tile can be claimed.
      */
     public boolean canClaimForSettlement(Tile tile) {
         return canOwnTile(tile)
+            && tile.getSettlement() == null
             && (tile.getOwner() == null
                 || (tile.getOwner() == this
                     && (tile.getOwningSettlement() == null
@@ -1083,32 +1084,46 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Is a tile acquirable by purchase or stealing?
+     * The tile must be ownable, without a settlement, and currently
+     * owned by someone else who is prepared to sell it.
+     *
+     * @param tile The <code>Tile</code> to acquire.
+     * @return True if the tile can be acquired by purchase or stealing.
+     */
+    private boolean canAcquireTile(Tile tile) {
+        return canOwnTile(tile)
+            && tile.getSettlement() == null
+            && tile.getOwner() != null
+            && tile.getOwner() != this
+            && getLandPrice(tile) > 0;
+    }
+
+    /**
+     * Can a tile be acquired for a settlement, either freely or by
+     * payment or stealing.
+     *
+     * @param tile The <code>Tile</code> to acquire.
+     * @return True if the tile can be acquired in some way.
+     */
+    public boolean canAcquireForSettlement(Tile tile) {
+        return canClaimForSettlement(tile)
+            || canAcquireTile(tile);
+    }
+
+    /**
      * Can a tile be claimed to found a settlement on?
+     * Almost the same as canClaimForSettlement but there is an extra
+     * requirement that the tile be of a settleable type, and some
+     * relaxations that allow free center tile acquisition
      *
      * @param tile The <code>Tile</code> to try to claim.
      * @return True if the tile can be claimed.
      */
     public boolean canClaimToFoundSettlement(Tile tile) {
-        return canOwnTile(tile)
-            && tile.isSettleable()
-            && (canClaimFreeCenterTile(tile) || canClaimForSettlement(tile));
-    }
-
-    /**
-     * Can a tile be acquired from its owners and used to found a settlement?
-     * Slightly weakens canClaimToFoundSettlement to allow for purchase
-     * and/or stealing.
-     *
-     * @param tile The <code>Tile</code> to try to claim.
-     * @return True if the tile can be acquired.
-     */
-    public boolean canAcquireToFoundSettlement(Tile tile) {
-        return canClaimToFoundSettlement(tile)
-            || (canOwnTile(tile)
-                && tile.isSettleable()
-                && tile.getOwner() != null
-                && tile.getOwner() != this
-                && getLandPrice(tile) >= 0);
+        return tile.getType().canSettle()
+            && (canClaimForSettlement(tile)
+                || canClaimFreeCenterTile(tile));
     }
 
     /**
@@ -1122,6 +1137,10 @@ public class Player extends FreeColGameObject implements Nameable {
         String build = getGame().getSpecification()
             .getStringOption("model.option.buildOnNativeLand").getValue();
         return isEuropean()
+            && canOwnTile(tile)
+            && tile.getSettlement() == null
+            && tile.getOwner() != null
+            && tile.getOwner() != this
             && ("model.option.buildOnNativeLand.always".equals(build)
                 || ("model.option.buildOnNativeLand.first".equals(build)
                     && hasZeroSettlements())
@@ -1151,6 +1170,19 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Can a tile be acquired from its owners and used to found a settlement?
+     * Slightly weakens canClaimToFoundSettlement to allow for purchase
+     * and/or stealing.
+     *
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be acquired.
+     */
+    public boolean canAcquireToFoundSettlement(Tile tile) {
+        return canClaimToFoundSettlement(tile)
+            || (tile.getType().canSettle() && canAcquireTile(tile));
+    }
+
+    /**
      * Can the ownership of this tile be claimed for the purposes of
      * making an improvement.  Quick test that does not handle the
      * curly case of tile transfer between colonies, or guarantee
@@ -1176,7 +1208,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean canAcquireForImprovement(Tile tile) {
         return canClaimForImprovement(tile)
-            || getLandPrice(tile) >= 0;
+            || canAcquireTile(tile);
     }
 
     /**

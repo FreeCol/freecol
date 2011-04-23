@@ -294,29 +294,6 @@ public class ColonyTile extends FreeColGameObject
                 && !colony.hasAbility("model.ability.produceInWater"))) {
             return false;
         }
-
-        // Special cases when tile owned by another settlement.
-        Settlement settlement = tile.getOwningSettlement();
-        if (settlement == null) {
-            ; // OK
-        } else if (settlement instanceof Colony) {
-            // Disallow if owned by other Europeans or in active use.
-            Colony otherColony = (Colony) settlement;
-            if (otherColony != colony) {
-                if (otherColony.getOwner() != player
-                    || otherColony.isTileInUse(tile)) {
-                    return false;
-                }
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            // Disallow if owned and valued by natives.
-            if (player.getLandPrice(tile) > 0) {
-                return false;
-            }
-        } else {
-            throw new IllegalStateException("Bogus settlement");
-        }
-
         return true;
     }
 

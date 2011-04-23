@@ -1559,23 +1559,26 @@ public final class ColonyPanel extends FreeColPanel
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
                         Tile tile = colonyTile.getWorkTile();
+                        Colony colony = getColony();
                         Player player = unit.getOwner();
 
-                        if (colonyTile.canAdd(unit)) {
-                            if (tile.getOwner() != player
-                                || tile.getOwningSettlement() != getColony()) {
-                                String name = getColony().getName();
-                                if (getController().claimLand(tile, getColony(), 0)) {
-                                    logger.info("Colony " + name
-                                        + " claims tile " + tile.toString()
-                                        + " with unit " + unit.getId());
-                                } else {
-                                    logger.warning("Colony " + name
-                                        + " could not claim " + tile.toString()
-                                        + " with unit " + unit.getId());
-                                    return null;
-                                }
+                        // May need to acquire the tile before working it.
+                        if (tile.getOwningSettlement() != colony
+                            && player.canAcquireForSettlement(tile)) {
+                            if (getController().claimLand(tile, colony, 0)
+                                && tile.getOwningSettlement() == colony) {
+                                logger.info("Colony " + colony.getName()
+                                    + " claims tile " + tile.toString()
+                                    + " with unit " + unit.getId());
+                            } else {
+                                logger.warning("Colony " + colony.getName()
+                                    + " did not claim " + tile.toString()
+                                    + " with unit " + unit.getId());
+                                return null;
                             }
+                        }
+
+                        if (colonyTile.canAdd(unit)) {
                             oldParent.remove(comp);
 
                             GoodsType workType = unit.getWorkType();
@@ -1585,7 +1588,6 @@ public final class ColonyPanel extends FreeColPanel
                                 && workType != unit.getWorkType()) {
                                 getController().changeWorkType(unit, workType);
                             }
-
                             ((UnitLabel) comp).setSmall(false);
 
                             if (getClient().getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
@@ -1614,9 +1616,7 @@ public final class ColonyPanel extends FreeColPanel
                                     canvas.errorMessage("tileTakenEuro");
                                 } else if (s instanceof IndianSettlement) {
                                     // occupied by an indian settlement
-                                    getController().claimLand(workTile,
-                                                              getColony(), 0);
-                                    //canvas.errorMessage("tileTakenInd");
+                                    canvas.errorMessage("tileTakenInd");
                                 }
                             } else {
                                 if (colonyTile.getUnitCount() > 0) {
