@@ -263,6 +263,8 @@ public class ColonyPlan {
 
         if (colony.isLandLocked()) {
             // landlocked colonies need transportation
+            /* Disable this until the AI actually does something with
+               its wagon trains
             int landLockedColonies = 0;
             for (Colony otherColony : colony.getOwner().getColonies()) {
                 if (otherColony.isLandLocked()) {
@@ -273,6 +275,7 @@ public class ColonyPlan {
                 buildables.add(new Buildable(bestWagon, WAGON_TRAIN_PRIORITY
                                              * (landLockedColonies - wagonTrains)));
             }
+            */
         } else if (!colony.hasAbility("model.ability.produceInWater")) {
             // coastal colonies need docks
             int potential = 0;
