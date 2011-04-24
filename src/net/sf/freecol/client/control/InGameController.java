@@ -987,39 +987,26 @@ public final class InGameController implements NetworkConstants {
     private ModelMessage getUnloadGoodsMessage(Unit unit, GoodsType type,
                                                int amount, int atStop,
                                                int present, int toUnload) {
-        Player player = unit.getOwner();
-        Location loc = unit.getLocation();
-        String route = unit.getTradeRoute().getName();
-        ModelMessage m;
+        String key = null;
+        int overflow = 0;
 
         if (present == toUnload) {
-            m = new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                 "traderoute.unload", unit)
-                .addName("%route%", route)
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%location%", loc.getLocationNameFor(player))
-                .addName("%amount%", Integer.toString(amount))
-                .add("%goods%", type.getNameKey());
+            key = "traderoute.unload";
         } else if (toUnload > atStop) {
-            m = new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                 "traderoute.overflow", unit)
-                .addName("%route%", route)
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%colony%", loc.getLocationNameFor(player))
-                .addName("%amount%", Integer.toString(amount))
-                .addName("%overflow%", Integer.toString(toUnload - atStop))
-                .add("%goods%", type.getNameKey());
+            key = "traderoute.overflow";
+            overflow = toUnload - atStop;
         } else {
-            m = new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                 "traderoute.nounload", unit)
-                .addName("%route%", route)
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%location%", loc.getLocationNameFor(player))
-                .addName("%amount%", Integer.toString(amount))
-                .addName("%overflow%", Integer.toString(present - atStop))
-                .add("%goods%", type.getNameKey());
+            key = "traderoute.nounload";
+            overflow = present - atStop;
         }
-        return m;
+
+        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key, unit)
+            .addName("%route%", unit.getTradeRoute().getName())
+            .addStringTemplate("%unit%", Messages.getLabel(unit))
+            .addStringTemplate("%location%", unit.getLocation().getLocationNameFor(unit.getOwner()))
+            .addAmount("%amount%", amount)
+            .addAmount("%overflow%", overflow)
+            .add("%goods%", type.getNameKey());
     }
 
     /**
