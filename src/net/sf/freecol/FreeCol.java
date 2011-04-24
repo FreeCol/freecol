@@ -513,7 +513,9 @@ public final class FreeCol {
         if (locationArg != null) {
             dataFolder = locationArg;
         }
-        if (localeArg != null) {
+        if (localeArg == null) {
+            Messages.setMessageBundle(Locale.getDefault());
+        } else {
             Locale locale = LanguageOption.getLocale(localeArg);
             Locale.setDefault(locale);
             Messages.setMessageBundle(locale);
