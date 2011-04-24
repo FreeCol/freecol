@@ -166,12 +166,12 @@ public class FreeColDataFile {
      * @param filename The filename of a resource within this collection of
      *      data. If this object represents a directory then the provided filename
      *      should be relative towards the path of the directory. In case
-     *      of a compressed archieve it should be the path within the
+     *      of a compressed archive it should be the path within the
      *      archive.
      * @return an <code>InputStream</code> value
      * @exception IOException if an error occurs
      */
-    public InputStream getInputStream(String filename) throws IOException {
+    public BufferedInputStream getInputStream(String filename) throws IOException {
         final URLConnection connection = getURI(filename).toURL().openConnection();
         connection.setDefaultUseCaches(false);
         return new BufferedInputStream(connection.getInputStream());
